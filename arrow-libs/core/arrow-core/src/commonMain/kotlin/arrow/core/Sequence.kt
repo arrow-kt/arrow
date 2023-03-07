@@ -1,5 +1,8 @@
 @file:OptIn(ExperimentalTypeInference::class)
 
+/**
+ * <!--- TEST_NAME SequenceKnitTest -->
+ */
 package arrow.core
 
 import arrow.core.Either.Left
@@ -12,6 +15,7 @@ import arrow.typeclasses.SemigroupDeprecation
 import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 
+/** Adds [kotlin.sequences.zip] support for 3 parameters */
 public fun <B, C, D, E> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -30,6 +34,7 @@ public fun <B, C, D, E> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 4 parameters */
 public fun <B, C, D, E, F> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -50,6 +55,7 @@ public fun <B, C, D, E, F> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 5 parameters */
 public fun <B, C, D, E, F, G> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -72,6 +78,7 @@ public fun <B, C, D, E, F, G> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 6 parameters */
 public fun <B, C, D, E, F, G, H> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -96,6 +103,7 @@ public fun <B, C, D, E, F, G, H> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 7 parameters */
 public fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -129,6 +137,7 @@ public fun <B, C, D, E, F, G, H, I> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 8 parameters */
 public fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -165,6 +174,7 @@ public fun <B, C, D, E, F, G, H, I, J> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 9 parameters */
 public fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -204,6 +214,7 @@ public fun <B, C, D, E, F, G, H, I, J, K> Sequence<B>.zip(
   }
 }
 
+/** Adds [kotlin.sequences.zip] support for 10 parameters */
 public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
   c: Sequence<C>,
   d: Sequence<D>,
@@ -247,60 +258,83 @@ public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
 }
 
 /**
- * Combines two structures by taking the union of their shapes and combining the elements with the given function.
+ * Combines two [Sequence] by returning [Ior.Both] when both [Sequence] have an item,
+ * [Ior.Left] when only the first [Sequence] has an item,
+ * and [Ior.Right] when only the second [Sequence] has an item.
  *
  * ```kotlin
  * import arrow.core.align
+ * import arrow.core.Ior.Both
+ * import arrow.core.Ior.Left
+ * import arrow.core.Ior.Right
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    sequenceOf("A", "B").align(sequenceOf(1, 2, 3)) {
- *      "$it"
- *    }
- *   //sampleEnd
- *   println(result.toList())
+ * fun test() {
+ *   fun Ior<String, Int>.visualise(): String =
+ *     fold({ "$it<" }, { ">$it" }, { a, b -> "$a<>$b" })
+ *
+ *   sequenceOf("A", "B").align(sequenceOf(1, 2, 3)) { ior ->
+ *     ior.visualise()
+ *   }.toList() shouldBe listOf("A<>1", "B<>2", ">3")
+ *
+ *   sequenceOf("A", "B", "C").align(sequenceOf(1, 2)) { ior ->
+ *     ior.visualise()
+ *   }.toList() shouldBe listOf("A<>1", "B<>2", "C<")
  * }
  * ```
  * <!--- KNIT example-sequence-01.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<C> =
-  this.align(b).map(fa)
+  alignRec(this, b, { fa(Ior.Left(it)) }, { fa(Ior.Right(it)) }) { a, bb -> fa(Ior.Both(a, bb)) }
 
 /**
- * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
+ * Combines two [Sequence] by returning [Ior.Both] when both [Sequence] have an item,
+ * [Ior.Left] when only the first [Sequence] has an item,
+ * and [Ior.Right] when only the second [Sequence] has an item.
  *
  * ```kotlin
  * import arrow.core.align
+ * import arrow.core.Ior.Both
+ * import arrow.core.Ior.Left
+ * import arrow.core.Ior.Right
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *     sequenceOf("A", "B").align(sequenceOf(1, 2, 3))
- *   //sampleEnd
- *   println(result.toList())
+ * fun test() {
+ *   sequenceOf("A", "B")
+ *     .align(sequenceOf(1, 2, 3)).toList() shouldBe listOf(Both("A", 1), Both("B", 2), Right(3))
+ *
+ *   sequenceOf("A", "B", "C")
+ *     .align(sequenceOf(1, 2)).toList() shouldBe listOf(Both("A", 1), Both("B", 2), Left("C"))
  * }
  * ```
  * <!--- KNIT example-sequence-02.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Sequence<A>.align(b: Sequence<B>): Sequence<Ior<A, B>> =
-  alignRec(this, b)
+  alignRec(this, b, { Ior.Left(it) }, { Ior.Right(it) }) { a, b -> Ior.Both(a, b) }
 
-private fun <X, Y> alignRec(ls: Sequence<X>, rs: Sequence<Y>): Sequence<Ior<X, Y>> {
+private fun <X, Y, Z> alignRec(
+  ls: Sequence<X>,
+  rs: Sequence<Y>,
+  left: (X) -> Z,
+  right: (Y) -> Z,
+  both: (X, Y) -> Z
+): Sequence<Z> {
   val lsIterator = ls.iterator()
   val rsIterator = rs.iterator()
 
   return sequence {
     while (lsIterator.hasNext() && rsIterator.hasNext()) {
       yield(
-        Ior.Both(
+        both(
           lsIterator.next(),
           rsIterator.next()
         )
       )
     }
-    while (lsIterator.hasNext()) yield(lsIterator.next().leftIor())
-    while (rsIterator.hasNext()) yield(rsIterator.next().rightIor())
+    while (lsIterator.hasNext()) yield(left(lsIterator.next()))
+    while (rsIterator.hasNext()) yield(right(rsIterator.next()))
   }
 }
 
@@ -374,27 +408,30 @@ public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
  * ```
  * <!--- KNIT example-sequence-03.kt -->
  */
+@Deprecated(
+  "Use flatMap and ifEmpty instead.\n$NicheAPI",
+  ReplaceWith("flatMap(ffa).ifEmpty { fb }")
+)
 public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): Sequence<B> =
-  split()?.let { (fa, a) ->
-    ffa(a) + fa.flatMap(ffa)
-  } ?: fb
+  flatMap(ffa).ifEmpty { fb }
 
 /**
- * interleave both computations in a fair way.
+ * Interleaves the elements of `this` [Sequence] with those of [other] [Sequence].
+ * Elements of `this` and [other] are taken in turn, and the resulting list is the concatenation of the interleaved elements.
+ * If one [Sequence] is longer than the other, the remaining elements are appended to the end.
  *
  * ```kotlin
- * import arrow.core.interleave
+ * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val tags = generateSequence { "#" }.take(10)
- *   val result =
- *    tags.interleave(sequenceOf("A", "B", "C"))
- *   //sampleEnd
- *   println(result.toList())
+ * fun test() {
+ *   val tags = generateSequence { "#" }.take(5)
+ *   val numbers = generateSequence(0) { it + 1 }.take(3)
+ *   tags.interleave(numbers).toList() shouldBe listOf("#", 0, "#", 1, "#", 2, "#", "#")
  * }
  * ```
  * <!--- KNIT example-sequence-04.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
   sequence {
@@ -410,7 +447,7 @@ public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
   }
 
 /**
- * Returns a [Sequence<C>] containing the result of applying some transformation `(A?, B) -> C`
+ * Returns a [Sequence] containing the result of applying some transformation `(A?, B) -> C`
  * on a zip, excluding all cases where the right value is null.
  *
  * Example:
@@ -488,19 +525,17 @@ public fun <A> Sequence<A>.once(): Sequence<A> =
  * <!--- KNIT example-sequence-07.kt -->
  */
 public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>> =
-  align(other) { ior ->
-    ior.fold(
-      { it to null },
-      { null to it },
-      { a, b -> a to b }
-    )
-  }
+  alignRec(
+    this,
+    other,
+    { a -> Pair(a, null) },
+    { b -> Pair(null, b) },
+    { a, b -> Pair(a, b) }
+  )
 
 /**
- * Returns a [Sequence<C>] containing the result of applying some transformation `(A?, B?) -> C`
- * on a zip.
+ * Returns a [Sequence] containing the result of applying some transformation `(A?, B?) -> C` on a zip.
  *
- * Example:
  * ```kotlin
  * import arrow.core.padZip
  *
@@ -519,7 +554,13 @@ public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>>
  * <!--- KNIT example-sequence-08.kt -->
  */
 public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
-  padZip(other).map { fa(it.first, it.second) }
+  alignRec(
+    this,
+    other,
+    { a -> fa(a, null) },
+    { b -> fa(null, b) },
+    { a, b -> fa(a, b) }
+  )
 
 @Deprecated(
   "$SemigroupDeprecation\n$NicheAPI",
@@ -678,21 +719,25 @@ public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
  *
  * ```kotlin
  * import arrow.core.split
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = sequenceOf("A", "B", "C").split()
- *   //sampleEnd
- *   result?.let { println("(${it.first.toList()}, ${it.second.toList()})") }
+ * fun test() {
+ *   sequenceOf("A", "B", "C").split()?.let { (tail, head) ->
+ *     head shouldBe "A"
+ *     tail.toList() shouldBe listOf("B", "C")
+ *   }
+ *   emptySequence<String>().split() shouldBe null
  * }
  * ```
  * <!--- KNIT example-sequence-11.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
   firstOrNull()?.let { first ->
     Pair(tail(), first)
   }
 
+/** Alias for drop(1) */
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
@@ -907,28 +952,51 @@ public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
 public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
   map(fc).unzip()
 
+@Deprecated(
+  "void is being deprecated in favor of simple Iterable.map.\n$NicheAPI",
+  ReplaceWith("map { }")
+)
 public fun <A> Sequence<A>.void(): Sequence<Unit> =
   map { Unit }
 
 /**
- *  Given [A] is a sub type of [B], re-type this value from Sequence<A> to Sequence<B>
+ * Given [A] is a subtype of [B], re-type this value from Sequence<A> to Sequence<B>
  *
- *  Kind<F, A> -> Kind<F, B>
+ * ```kotlin
+ * import arrow.core.widen
  *
- *  ```kotlin
- *  import arrow.core.widen
- *
- *  fun main(args: Array<String>) {
- *   //sampleStart
- *   val result: Sequence<CharSequence> =
- *     sequenceOf("Hello World").widen()
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
+ * fun main(args: Array<String>) {
+ *   val original: Sequence<String> = sequenceOf("Hello World")
+ *   val result: Sequence<CharSequence> = original.widen()
+ * }
+ * ```
+ * <!--- KNIT example-sequence-17.kt -->
  */
 public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
 
+/**
+ * Filters out all elements that are [None],
+ * and unwraps the remaining elements [Some] values.
+ *
+ * ```kotlin
+ * import arrow.core.widen
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun main(args: Array<String>) {
+ * generateSequence(0) { it + 1 }
+ *   .map { if (it % 2 == 0) Some(it) else None }
+ *   .filterOption()
+ *   .take(5)
+ *   .toList() shouldBe listOf(0, 2, 4, 6, 8)
+ * }
+ * ```
+ * <!--- KNIT example-sequence-18.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
 public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> =
-  mapNotNull { it.orNull() }
+  sequence {
+    forEach { option ->
+      option.fold({ }, { a -> yield(a) })
+    }
+  }
