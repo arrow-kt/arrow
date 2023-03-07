@@ -85,11 +85,7 @@ fun <A> Arb<A>.eval(): Arb<Eval<A>> =
   map { Eval.now(it) }
 
 private fun <A, B, R> Arb<A>.alignWith(arbB: Arb<B>, transform: (Ior<A, B>) -> R): Arb<R> =
-  Arb.choice(
-    this.map { Ior.Left(it) },
-    Arb.bind(this, arbB) { a, b -> Ior.Both(a, b) },
-    arbB.map { Ior.Right(it) }
-  ).map(transform)
+  Arb.bind(this, arbB) { a, b -> transform(Ior.Both(a, b)) }
 
 fun Arb.Companion.suspendFunThatReturnsEitherAnyOrAnyOrThrows(): Arb<suspend () -> Either<Any, Any>> =
   choice(
