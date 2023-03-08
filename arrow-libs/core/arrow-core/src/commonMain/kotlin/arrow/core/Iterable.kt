@@ -9,7 +9,9 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
 import arrow.core.raise.fold
+import arrow.core.raise.mapOrAccumulate
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.Result.Companion.success
@@ -481,16 +483,8 @@ public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
-): Either<Error, List<B>> {
-  var left: Any? = EmptyValue
-  val right = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this)
-    fold(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
-      { b -> right.add(b) }
-    )
-  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
+): Either<Error, List<B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, combine, transform)
 }
 
 /**
@@ -523,12 +517,8 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
-): Either<NonEmptyList<Error>, List<B>> {
-  val left = mutableListOf<Error>()
-  val right = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this)
-    fold({ transform(RaiseAccumulate(this), item) }, { error -> left.addAll(error) }, { b -> right.add(b) })
-  return left.toNonEmptyListOrNull()?.left() ?: right.right()
+): Either<NonEmptyList<Error>, List<B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, transform)
 }
 
 /**
