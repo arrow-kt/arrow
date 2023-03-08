@@ -111,6 +111,6 @@ public class IorRaise<E> @PublishedApi internal constructor(
 
   private fun combine(other: E): E =
     state.updateAndGet { prev ->
-      prev.map { combineError(it, other) }.orElse { Some(other) }
+      Some(prev.map { combineError(it, other) }.getOrElse { other })
     }.getOrElse { other }
 }

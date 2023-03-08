@@ -840,21 +840,17 @@ public fun <A> Iterable<A>.salign(
   other: Iterable<A>
 ): Iterable<A> =
   align(other) {
-    it.fold(::identity, ::identity) { a, b ->
-      combine(a, b)
-    }
+    it.fold(::identity, ::identity, combine)
   }
 
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("salign({ a, b -> SG.run { a.combine(b) } }, other)"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("salign(SG::combine, other)"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
-): Iterable<A> = SG.run {
-  salign({ a, b -> a.combine(b) }, other)
-}
+): Iterable<A> = salign(SG::combine, other)
 
 /**
  * unzips the structure holding the resulting elements in an `Pair`
