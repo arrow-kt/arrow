@@ -846,7 +846,7 @@ public fun <A> Iterable<A>.salign(
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("salign(SG::combine, other)"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("salign(SG::combine, other)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
