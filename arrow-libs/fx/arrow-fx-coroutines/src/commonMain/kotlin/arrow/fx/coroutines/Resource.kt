@@ -882,7 +882,7 @@ public sealed class Resource<out A> {
 }
 
 public fun <A> resource(
-  acquire: suspend AcquireStep.() -> A,
+  acquire: suspend () -> A,
   release: suspend (A, ExitCase) -> Unit,
 ): Resource<A> = resource {
   install({ acquire() }, release)
