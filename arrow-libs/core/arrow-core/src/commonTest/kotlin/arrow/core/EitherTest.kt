@@ -604,7 +604,7 @@ class EitherTest : StringSpec({
       Arb.either(Arb.string(), Arb.boolean())
     ) { a, b, c, d, e, f, g, h, i ->
       val res = Either.zipOrAccumulate(
-        { e1, e2 -> "$e1$e2" },
+        String::plus,
         { a.bind() },
         { b.bind() },
         { c.bind() },
@@ -613,8 +613,9 @@ class EitherTest : StringSpec({
         { f.bind() },
         { g.bind() },
         { h.bind() },
-        { i.bind() }
-      ) { aa, bb, cc, dd, ee, ff, gg, hh, ii -> Tuple9(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+        { i.bind() },
+        ::Tuple9
+      )
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
@@ -656,7 +657,9 @@ class EitherTest : StringSpec({
       val all = listOf(a.toEitherNel(), b, c.toEitherNel(), d, e.toEitherNel(), f, g.toEitherNel(), h, i.toEitherNel())
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>().flatMap { it.value }.toNonEmptyListOrNull()!!.left()
+        all.filterIsInstance<Left<NonEmptyList<String>>>()
+          .flatMap { it.value }
+          .toNonEmptyListOrNull()!!.left()
       } else {
         all.filterIsInstance<Right<Any?>>().map { it.value }.let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
