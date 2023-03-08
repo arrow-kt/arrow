@@ -40,16 +40,16 @@ class EitherKnitTest : StringSpec({
     arrow.core.examples.exampleEither44.test()
   }
 
-  "ExampleEither48" {
-    arrow.core.examples.exampleEither48.test()
+  "ExampleEither45" {
+    arrow.core.examples.exampleEither45.test()
   }
 
-  "ExampleEither53" {
-    arrow.core.examples.exampleEither53.test()
+  "ExampleEither49" {
+    arrow.core.examples.exampleEither49.test()
   }
 
-  "ExampleEither57" {
-    arrow.core.examples.exampleEither57.test()
+  "ExampleEither54" {
+    arrow.core.examples.exampleEither54.test()
   }
 
   "ExampleEither58" {
@@ -58,6 +58,10 @@ class EitherKnitTest : StringSpec({
 
   "ExampleEither59" {
     arrow.core.examples.exampleEither59.test()
+  }
+
+  "ExampleEither60" {
+    arrow.core.examples.exampleEither60.test()
   }
 
 }) {

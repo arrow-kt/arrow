@@ -1,5 +1,5 @@
 // This file was automatically generated from Raise.kt by Knit tool. Do not edit.
-package arrow.core.examples.exampleRaiseDsl09
+package arrow.core.examples.exampleRaiseDsl10
 
 import arrow.core.Either
 import arrow.core.raise.either
@@ -14,7 +14,7 @@ fun test() {
   fun fetchId(): Int = throw RuntimeException("BOOM")
 
   either {
-    catch({ fetchId() }) { t ->
+    catch({ fetchId() }) { t: RuntimeException ->
       raise("something went wrong: ${t.message}")
     }
   } shouldBe Either.Left("something went wrong: BOOM")
