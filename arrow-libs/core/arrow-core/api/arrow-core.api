@@ -3706,5 +3706,6 @@ public final class arrow/typeclasses/Semiring$DefaultImpls {
 public final class arrow/typeclasses/SemiringKt {
 	public static final field DoubleInstanceDeprecation Ljava/lang/String;
 	public static final field FloatInstanceDeprecation Ljava/lang/String;
+	public static final field SemiringDeprecation Ljava/lang/String;
 }
 
