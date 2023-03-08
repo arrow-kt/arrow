@@ -449,8 +449,8 @@ public final class arrow/fx/coroutines/ResourceKt {
 	public static final fun releaseCase (Larrow/fx/coroutines/Resource;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final fun releaseCase-zgiIeyo (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final synthetic fun resource (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-	public static final fun resource (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final fun resource (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Resource;
+	public static final fun resource (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Resource;
 	public static final fun resourceScope (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/fx/coroutines/Resource;
 	public static final fun traverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Resource;
