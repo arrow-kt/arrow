@@ -604,7 +604,7 @@ class EitherTest : StringSpec({
       Arb.either(Arb.string(), Arb.boolean())
     ) { a, b, c, d, e, f, g, h, i ->
       val res = Either.zipOrAccumulate(
-        String::plus,
+        { e1, e2 -> "$e1$e2" },
         { a.bind() },
         { b.bind() },
         { c.bind() },
