@@ -5,8 +5,6 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.longSmall
 import arrow.core.test.nonEmptyList
 import arrow.core.test.testLaws
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
@@ -20,8 +18,8 @@ import io.kotest.property.checkAll
 
 class MapKTest : StringSpec({
     testLaws(
-      MonoidLaws.laws(
-        Monoid.map(Semigroup.int()),
+      MonoidLaws(
+        emptyMap(), Map<Long, Int>::plus,
         Arb.map(Arb.longSmall(), Arb.intSmall(), maxSize = 10)
       )
     )
@@ -87,7 +85,7 @@ class MapKTest : StringSpec({
 
     "traverseValidated is stacksafe" {
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse(Semigroup.string()) { v ->
+      val res = (0..20_000).associateWith { it }.traverse(String::plus) { v ->
         acc.add(v)
         Validated.Valid(v)
       }
@@ -98,7 +96,7 @@ class MapKTest : StringSpec({
     "traverseValidated acummulates" {
       checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
         val res: ValidatedNel<Int, Map<Int, Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          ints.traverse(NonEmptyList<Int>::plus) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, Map<Int, Int>> =
           Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())

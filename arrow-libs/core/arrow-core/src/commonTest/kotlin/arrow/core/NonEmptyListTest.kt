@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.nonEmptyList
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -18,7 +17,7 @@ import kotlin.math.min
 
 class NonEmptyListTest : StringSpec({
 
-    testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
+    testLaws(SemigroupLaws(NonEmptyList<Int>::plus, Arb.nonEmptyList(Arb.int())))
 
     "iterable.toNonEmptyListOrNull should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
@@ -109,7 +108,7 @@ class NonEmptyListTest : StringSpec({
     "traverse for Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
+      val res = (0..20_000).traverse(String::plus) {
         acc.add(it)
         Validated.Valid(it)
       }
@@ -120,19 +119,12 @@ class NonEmptyListTest : StringSpec({
     "traverse for Validated acummulates" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val res: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
+          ints.traverse(NonEmptyList<Int>::plus) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
 
         val expected: ValidatedNel<Int, NonEmptyList<Int>> =
           ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
 
         res shouldBe expected
-      }
-    }
-
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
-          ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
       }
     }
 

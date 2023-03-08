@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.ior
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
@@ -20,12 +19,11 @@ class IorTest : StringSpec({
     val ARB = Arb.ior(Arb.string(), Arb.int())
 
     testLaws(
-      SemigroupLaws.laws(Semigroup.ior(Semigroup.string(), Semigroup.int()), ARB)
+      SemigroupLaws( { x, y -> x.combine(String::plus, Int::plus, y) }, ARB)
     )
 
-    val nullableLongSemigroup = object : Semigroup<Long?> {
-      override fun Long?.combine(b: Long?): Long? =
-        Nullable.zip(this, b) { a, bb -> a + bb }
+    val nullableLongSemigroup: (Long?, Long?) -> Long? = { x, y ->
+      Nullable.zip(x, y, Long::plus)
     }
 
     "zip identity" {
@@ -78,7 +76,7 @@ class IorTest : StringSpec({
 
     "zip should combine left values in correct order" {
       Ior.Both("fail1", -1).zip(
-        Semigroup.string(),
+        String::plus,
         Ior.Left("fail2"),
         Ior.Right(-1)
       ) { _, _, _ -> "success!" } shouldBe Ior.Left("fail1fail2")
@@ -180,12 +178,11 @@ class IorTest : StringSpec({
 
     "Ior.monad.flatMap should combine left values" {
       val ior1 = Ior.Both(3, "Hello, world!")
-      val iorResult = ior1.flatMap(Semigroup.int()) { Ior.Left(7) }
+      val iorResult = ior1.flatMap(Int::plus) { Ior.Left(7) }
       iorResult shouldBe Ior.Left(10)
     }
 
     "combine cases for Semigroup" {
-      Semigroup.ior(Semigroup.string(), Semigroup.int()).run {
         forAll(
           row("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
           row(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
@@ -197,9 +194,8 @@ class IorTest : StringSpec({
           row(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
           row(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2))
         ) { a, b, expectedResult ->
-          a + b shouldBe expectedResult
+          a.combine(String::plus, Int::plus, b) shouldBe expectedResult
         }
-      }
     }
 
     "traverse should wrap ior in a list" {
