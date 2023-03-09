@@ -2262,7 +2262,7 @@ public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>)
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
   ReplaceWith(
-    "recover { a -> f(a) }",
+    "this.recover<A, Nothing, B> { f(it) }",
     "arrow.core.recover"
   )
 )
