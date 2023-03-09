@@ -2547,7 +2547,7 @@ public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ emptyList() }, { iterable -> iterable.map { it.right() } })",
+    "this.fold<Option<Either<A, B>>>({ None }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
     "arrow.core.right",
   )
 )
