@@ -683,11 +683,11 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  * ```
  * <!--- KNIT example-iterable-11.kt -->
  */
-public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
+public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A?>, List<B?>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
     x.fold(
-      { l + it to r },
-      { l to r + it },
+      { l + it to r + null},
+      { l + null to r + it },
       { a, b -> l + a to r + b }
     )
   }
@@ -710,7 +710,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
  * ```
  * <!--- KNIT example-iterable-12.kt -->
  */
-public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
+public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A?>, List<B?>> =
   map(fa).unalign()
 
 @Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
