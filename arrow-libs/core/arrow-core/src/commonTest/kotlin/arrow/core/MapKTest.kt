@@ -19,6 +19,7 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldNotContainKey
+import io.kotest.matchers.maps.shouldNotHaveValues
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
@@ -685,6 +686,43 @@ class MapKTest : StringSpec({
         result shouldBe expected
       }
     }
+
+  "mapOrAccumulate can map" {
+    checkAll(
+      Arb.map(Arb.int(), Arb.int())
+    ) { xs ->
+
+      val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapOrAccumulate {
+        it.value.toString()
+      }
+
+      result.shouldBeInstanceOf<Either.Right<Map<Int, String>>>()
+      xs.forAll {
+        result.value.shouldContain(it.key to it.value.toString())
+      }
+    }
+  }
+
+  "mapOrAccumulate accumulates errors" {
+    checkAll(
+      Arb.map(Arb.int(), Arb.boolean())
+    ) { xs ->
+
+      val result: Either<NonEmptyList<Int>, Map<Int, String>> = xs.mapOrAccumulate {
+        if (it.value) {
+          raise(it.key)
+        } else {
+          ""
+        }
+      }
+
+      result.fold({ nel ->
+        nel.all shouldBe xs.filter { it.value }.keys.toSet()
+      }, {
+        xs.shouldNotHaveValues(true)
+      })
+    }
+  }
 
 })
 
