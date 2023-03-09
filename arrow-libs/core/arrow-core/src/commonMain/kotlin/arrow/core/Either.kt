@@ -2537,7 +2537,7 @@ public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ emptyList() }, { iterable -> iterable.map { it.right() } })",
+    "fold({ listOf<Either<A, B>>() }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
     "arrow.core.right",
   )
 )
