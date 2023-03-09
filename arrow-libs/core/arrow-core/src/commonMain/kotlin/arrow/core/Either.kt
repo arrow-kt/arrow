@@ -2121,7 +2121,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { if (predicate(it)) Right(it) else Left(default()) }")
+  ReplaceWith("this.flatMap { if (predicate(it)) Either.Right(it) else Either.Left(default()) }")
 )
 public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default(it)) }
