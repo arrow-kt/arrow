@@ -2332,7 +2332,7 @@ public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { f(bind(), fb.bind()) }",
+    "either { f(this.bind(), fb.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2344,7 +2344,7 @@ public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Eith
 @Deprecated(
   "Prefer using the inline arrow.core.raise.either DSL",
   ReplaceWith(
-    "either { Pair(bind(), fb.bind()) }",
+    "either { Pair(this.bind(), fb.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2355,7 +2355,7 @@ public fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2371,7 +2371,7 @@ public inline fun <A, B, C, D, E> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2388,7 +2388,7 @@ public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2406,7 +2406,7 @@ public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2425,7 +2425,7 @@ public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2445,7 +2445,7 @@ public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2466,7 +2466,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2488,7 +2488,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }",
     "arrow.core.raise.either"
   )
 )
