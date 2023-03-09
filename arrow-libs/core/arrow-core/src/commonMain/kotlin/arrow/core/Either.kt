@@ -900,7 +900,7 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ initial }) { rightOperation(initial, it) }")
+    ReplaceWith("this.fold<C>({ initial }) { rightOperation(initial, it) }")
   )
   public inline fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     fold({ initial }) { rightOperation(initial, it) }
