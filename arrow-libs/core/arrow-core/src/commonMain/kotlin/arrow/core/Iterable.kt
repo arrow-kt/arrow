@@ -913,14 +913,11 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  * ```
  * <!--- KNIT example-iterable-13.kt -->
  */
-public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
-    x.fold(
-      { l + it to r },
-      { l to r + it },
-      { a, b -> l + a to r + b }
-    )
-  }
+@Deprecated(
+  "The current unalign function is renamed to separateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  ReplaceWith("separateIor()", "arrow.core.separateIor")
+)
+public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = separateIor()
 
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
@@ -940,8 +937,27 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
  * ```
  * <!--- KNIT example-iterable-14.kt -->
  */
+@Deprecated(
+  "The current unalign function is renamed to separateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  ReplaceWith("map(fa).separateIor()", "arrow.core.separateIor")
+)
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
+
+/**
+ * Separate the inner [Ior] values into a pair of Lists.
+ *
+ * @receiver Iterable of Ior
+ * @return a tuple containing a List with the left side value from the[Ior.Left] and [Ior.Both] values and another List with the right side value from the [Ior.Right] and [Ior.Both] values.
+ */
+public fun <A, B> Iterable<Ior<A, B>>.separateIor(): Pair<List<A>, List<B>> =
+  fold(emptyList<A>() to emptyList()) { (l, r), x ->
+    x.fold(
+      { l + it to r },
+      { l to r + it },
+      { a, b -> l + a to r + b }
+    )
+  }
 
 @Deprecated("Use fold instead", ReplaceWith("fold(MA.empty(), MA::combine)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
