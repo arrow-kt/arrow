@@ -303,7 +303,8 @@ class IterableTest : StringSpec({
     }
 
   "unalign is the inverse of align" {
-    fun <A,B> Pair<List<A?>,List<B?>>.fix(): Pair<List<A>, List<B>> = first.mapNotNull { it } to second.mapNotNull { it }
+    fun <A, B> Pair<List<A?>, List<B?>>.fix(): Pair<List<A>, List<B>> =
+      first.mapNotNull { it } to second.mapNotNull { it }
 
     checkAll(Arb.list(Arb.int()), Arb.list(Arb.string())) { a, b ->
       a.align(b).unalign().fix() shouldBe (a to b)
@@ -311,13 +312,14 @@ class IterableTest : StringSpec({
   }
 
   "align is the inverse of unalign" {
-    fun <A, B> Ior<A?, B?>.fix(): Ior<A, B> = fold({ Ior.Left(it!!) }, { Ior.Right(it!!) }, { a, b ->
-      when {
-        a == null -> Ior.Right(b!!)
-        b == null -> Ior.Left(a)
-        else -> Ior.Both(a, b)
-      }
-    })
+    fun <A, B> Ior<A?, B?>.fix(): Ior<A, B> =
+      fold({ Ior.Left(it!!) }, { Ior.Right(it!!) }, { a, b ->
+        when {
+          a == null -> Ior.Right(b!!)
+          b == null -> Ior.Left(a)
+          else -> Ior.Both(a, b)
+        }
+      })
 
     checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
       val (a, b) = xs.unalign()
