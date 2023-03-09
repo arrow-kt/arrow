@@ -2510,7 +2510,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",
-  ReplaceWith("if (n <= 0) Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }")
+  ReplaceWith("if (n <= 0) Either.Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }")
 )
 public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }
