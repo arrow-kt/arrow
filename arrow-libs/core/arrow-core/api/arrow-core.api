@@ -459,6 +459,9 @@ public final class arrow/core/EvalKt {
 
 public abstract class arrow/core/Ior {
 	public static final field Companion Larrow/core/Ior$Companion;
+	public final fun _isBoth ()Z
+	public final fun _isLeft ()Z
+	public final fun _isRight ()Z
 	public final fun all (Lkotlin/jvm/functions/Function1;)Z
 	public final fun bicrosswalk (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public final fun bicrosswalkMap (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
@@ -481,11 +484,15 @@ public abstract class arrow/core/Ior {
 	public final fun foldLeft (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public final fun foldMap (Larrow/typeclasses/Monoid;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fromNullables (Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Ior;
+	public final fun getOrNull ()Ljava/lang/Object;
 	public abstract fun isBoth ()Z
+	public final fun isBoth (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Z
 	public final fun isEmpty ()Z
 	public abstract fun isLeft ()Z
+	public final fun isLeft (Lkotlin/jvm/functions/Function1;)Z
 	public final fun isNotEmpty ()Z
 	public abstract fun isRight ()Z
+	public final fun isRight (Lkotlin/jvm/functions/Function1;)Z
 	public static final fun leftNel (Ljava/lang/Object;)Larrow/core/Ior;
 	public final fun leftOrNull ()Ljava/lang/Object;
 	public static final fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
@@ -496,6 +503,7 @@ public abstract class arrow/core/Ior {
 	public final fun padNull ()Lkotlin/Pair;
 	public final fun swap ()Larrow/core/Ior;
 	public final fun toEither ()Larrow/core/Either;
+	public final fun toPair ()Lkotlin/Pair;
 	public fun toString ()Ljava/lang/String;
 	public final fun toValidated ()Larrow/core/Validated;
 	public final fun traverse (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
@@ -582,7 +590,8 @@ public final class arrow/core/IorKt {
 	public static final fun compareTo (Larrow/core/Ior;Larrow/core/Ior;)I
 	public static final fun flatMap (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static final fun flatten (Larrow/core/Ior;Larrow/typeclasses/Semigroup;)Larrow/core/Ior;
-	public static final fun getOrElse (Larrow/core/Ior;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final synthetic fun getOrElse (Larrow/core/Ior;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun getOrElse (Larrow/core/Ior;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun leftIor (Ljava/lang/Object;)Larrow/core/Ior;
 	public static final fun leftWiden (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun replicate (Larrow/core/Ior;Larrow/typeclasses/Semigroup;I)Larrow/core/Ior;

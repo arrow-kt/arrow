@@ -4,6 +4,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
+import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
@@ -51,7 +52,7 @@ class SequenceKTest : StringSpec({
     "traverse for Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverse(String::plus) {
+      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
         acc.add(it)
         Validated.Valid(it)
       }.map { it.toList() }
@@ -62,7 +63,7 @@ class SequenceKTest : StringSpec({
     "traverse for Validated acummulates" {
       checkAll(Arb.sequence(Arb.int())) { ints ->
         val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequence(NonEmptyList<Int>::plus)
+          .sequence(Semigroup.nonEmptyList())
 
         val expected: ValidatedNel<Int, Sequence<Int>> =
           ints.filterNot { it % 2 == 0 }.toList()
