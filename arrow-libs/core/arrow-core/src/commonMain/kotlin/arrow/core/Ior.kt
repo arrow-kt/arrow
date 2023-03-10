@@ -1065,7 +1065,7 @@ public fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> a.map { Ior.Left(it) } }, {b -> b.map{ Ior.Right(it) } }, { a, b -> a.zip(b) { aa, c -> Ior.Both(aa, c) } })",
+    "this.fold<List<Ior<A, B>>>({ a: List<A> -> a.map<A, Ior.Left<A>> { Ior.Left(it) } }, {b: List<B> -> b.map<B, Ior.Right<B>>{ Ior.Right(it) } }, { a, b -> a.zip<A, B, Ior.Both<A, B>>(b) { aa, c -> Ior.Both(aa, c) } })",
     "arrow.core.Ior"
   )
 )
