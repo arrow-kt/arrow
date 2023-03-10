@@ -1,8 +1,13 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.raise.RaiseAccumulate
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
@@ -215,10 +220,12 @@ public class NonEmptyList<out A>(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
 
+  public fun salign(other: NonEmptyList<@UnsafeVariance A>, combine: (A, A) -> @UnsafeVariance A): NonEmptyList<A> =
+    NonEmptyList(combine(head, other.head), tail.salign(combine, other.tail).toList())
+
+  @Deprecated(SemigroupDeprecation, ReplaceWith("salign(b, SA::combine)", "arrow.typeclasses.combine"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    SA.run {
-      NonEmptyList(head.combine(b.head), tail.salign(SA, b.tail).toList())
-    }
+    salign(b, SA::combine)
 
   public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
     NonEmptyList(head to other.head, tail.padZip(other.tail))
@@ -438,8 +445,12 @@ public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<
   traverse(::identity)
 
 @Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
+  )
 )
 public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
@@ -447,31 +458,54 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 ): Validated<E, NonEmptyList<B>> =
   traverse(semigroup, f)
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
+  )
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> NonEmptyList<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  fold<A, Validated<E, MutableList<B>>>(mutableListOf<B>().valid()) { acc, a ->
-    when (val res = f(a)) {
-      is Valid -> when (acc) {
-        is Valid -> acc.also { it.value.add(res.value) }
-        is Invalid -> acc
-      }
-      is Invalid -> when (acc) {
-        is Valid -> res
-        is Invalid -> semigroup.run { Invalid(acc.value.combine(res.value)) }
-      }
-    }
-  }.map { requireNotNull(it.toNonEmptyListOrNull()) }
+  mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()
 
-@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
+  )
+)
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  sequence(semigroup)
+  mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()
 
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
+  )
+)
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  traverse(semigroup, ::identity)
+  mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()
+
+public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
+  combine: (E, E) -> E,
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
+): Either<E, NonEmptyList<B>> =
+  all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
+
+public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
+): Either<NonEmptyList<E>, NonEmptyList<B>> =
+  all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 @Deprecated(
   "traverseOption is being renamed to traverse to simplify the Arrow API",

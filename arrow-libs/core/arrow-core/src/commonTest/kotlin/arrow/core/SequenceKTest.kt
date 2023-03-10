@@ -1,11 +1,10 @@
 package arrow.core
 
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
+import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
@@ -20,7 +19,7 @@ import kotlin.math.min
 
 class SequenceKTest : StringSpec({
 
-    testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
+    testLaws(MonoidLaws(emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
     "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)

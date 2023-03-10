@@ -6,7 +6,7 @@ import arrow.core.*
 fun main(args: Array<String>) {
   //sampleStart
   val result =
-   listOf(1,2,3).unweave { i -> listOf("$i, ${i + 1}") }
+   listOf("A", "B", "C").split()
   //sampleEnd
   println(result)
 }

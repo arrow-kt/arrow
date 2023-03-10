@@ -2,10 +2,15 @@
 package arrow.core
 
 import arrow.core.Either.Right
+import arrow.core.raise.EagerEffect
+import arrow.core.raise.Effect
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -390,10 +395,21 @@ public sealed class Option<out A> {
     }
 
     @JvmStatic
+    @Deprecated(
+      RedundantAPI + "Prefer explicitly creating lambdas",
+      ReplaceWith("{ it.map(f) }")
+    )
     public fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> =
       { it.map(f) }
   }
 
+  @Deprecated(
+    "Prefer using the inline option DSL",
+    ReplaceWith(
+      "option { Pair(bind(), b.bind()) }",
+      "arrow.core.raise.option"
+    )
+  )
   public fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
     zip(other, ::Pair)
 
@@ -1041,11 +1057,10 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("MB.run { this.fold({ empty() }) { a -> empty().combine(f(a)) } }")
+    ReplaceWith("fold({ MB.empty() }, f)")
   )
-  public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-    foldLeft(empty()) { b, a -> b.combine(f(a)) }
-  }
+  public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
+    fold({ MB.empty() }, f)
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
@@ -1254,22 +1269,27 @@ public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
  *
  * @param alternative the default option if this is empty.
  */
-public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> {
-  contract { callsInPlace(alternative, InvocationKind.AT_MOST_ONCE) }
-  return if (isEmpty()) alternative() else this
-}
+@Deprecated(
+  NicheAPI + "Prefer using the recover method",
+  ReplaceWith("recover { alternative().bind() }", "arrow.core.recover")
+)
+public inline fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> =
+  recover { alternative().bind() }
 
 @Deprecated(
-  NicheAPI + "Prefer using the orElse method",
-  ReplaceWith("orElse(value)")
+  NicheAPI + "Prefer using the recover method",
+  ReplaceWith("recover { value.bind() }", "arrow.core.recover")
 )
-public infix fun <T> Option<T>.or(value: Option<T>): Option<T> = if (isEmpty()) {
-  value
-} else {
-  this
-}
+public infix fun <T> Option<T>.or(value: Option<T>): Option<T> =
+  recover { value.bind() }
 
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
+
+/** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
+public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
+
+/** Run the [EagerEffect] by returning [Option] of [A], or [None] if raised with [None]. */
+public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
 
 @Deprecated(
   NicheAPI + "Prefer using if-else statement",
@@ -1292,9 +1312,9 @@ public fun <A> A.some(): Option<A> = Some(this)
 
 public fun <A> none(): Option<A> = None
 
-@Deprecated("use fold instead", ReplaceWith("fold(Monoid.option(MA))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("fold(none<A>()) { x, y -> x.combine(y, MA::combine) }", "arrow.typeclasses.combine"))
 public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
-  fold(Monoid.option(MA))
+  fold(none<A>()) { x, y -> x.combine(y, MA::combine) }
 
 @Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty() }"))
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
@@ -1395,12 +1415,10 @@ public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -
 
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or map",
-  ReplaceWith("MA.run { this.map { List(n) { it }.fold(empty()) { acc, v -> acc + v } } }")
+  ReplaceWith("map { a -> List(n) { a }.fold(MA.empty(), MA::combine) }", "arrow.typeclasses.combine")
 )
-public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
-  if (n <= 0) Some(empty())
-  else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
-}
+public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> =
+  map { a -> List(n) { a }.fold(MA.empty(), MA::combine) }
 
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or explicit flatmap",
@@ -1561,14 +1579,25 @@ public fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
     validated.fold({ None }, { b -> Some(b) })
   }
 
-public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
-  unzip(::identity)
-
-public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
-  fold(
-    { None to None },
-    { f(it).let { pair -> Some(pair.first) to Some(pair.second) } }
+@Deprecated(
+  NicheAPI + "Prefer using fold, when or Option DSL",
+  ReplaceWith(
+    "fold({ None to None }, { (a, b) -> Some(a) to Some(b) })",
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
   )
+)
+public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
+  fold({ None to None }, { (a, b) -> Some(a) to Some(b) })
+
+@Deprecated(
+  NicheAPI + "Prefer using fold, when or Option DSL",
+  ReplaceWith(
+    "fold({ None to None }, { f(it).let { (a, b) -> Some(a) to Some(b) } })",
+    "arrow.core.Option", "arrow.core.Some", "arrow.core.None"
+  )
+)
+public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
+  fold({ None to None }, { f(it).let { (a, b) -> Some(a) to Some(b) } })
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Option<A> to Option<B>
@@ -1595,15 +1624,18 @@ public fun <B, A : B> Option<A>.widen(): Option<B> =
 
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
-public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
+public fun <A> Option<A>.combine(other: Option<A>, combine: (A, A) -> A): Option<A> =
   when (this) {
-    is Some -> when (b) {
-      is Some -> Some(SGA.run { value.combine(b.value) })
+    is Some -> when (other) {
+      is Some -> Some(combine(value, other.value))
       None -> this
     }
-
-    None -> b
+    None -> other
   }
+
+@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b, SGA::combine)", "arrow.typeclasses.combine"))
+public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
+  combine(b, SGA::combine)
 
 public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },

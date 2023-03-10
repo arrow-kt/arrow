@@ -21,7 +21,7 @@ import kotlinx.coroutines.awaitAll
 )
 class IorSpec : StringSpec({
   "Accumulates" {
-    ior(Semigroup.string()) {
+    ior(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two = Ior.Both(", World!", 2).bind()
       one + two
@@ -29,7 +29,7 @@ class IorSpec : StringSpec({
   }
 
   "Accumulates and short-circuits with Left" {
-    ior(Semigroup.string()) {
+    ior(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two: Int = Ior.Left(", World!").bind()
       one + two
@@ -37,16 +37,16 @@ class IorSpec : StringSpec({
   }
 
   "Accumulates with Either" {
-    ior(Semigroup.string()) {
+    ior(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
-      val two: Int = Either.Left(", World!").bind()
+      val two: Int = Either.Left(", World!").bind<Int>()
       one + two
     } shouldBe Ior.Left("Hello, World!")
   }
 
   "Concurrent - arrow.ior bind" {
     checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
-      ior(Semigroup.list()) {
+      ior(List<String>::plus) {
         strs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
       }
         .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
@@ -54,7 +54,7 @@ class IorSpec : StringSpec({
   }
 
   "Accumulates eagerly" {
-    ior(Semigroup.string()) {
+    ior(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two = Ior.Both(", World!", 2).bind()
       one + two
@@ -62,9 +62,9 @@ class IorSpec : StringSpec({
   }
 
   "Accumulates with Either eagerly" {
-    ior(Semigroup.string()) {
+    ior(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
-      val two: Int = Either.Left(", World!").bind()
+      val two: Int = Either.Left(", World!").bind<Int>()
       one + two
     } shouldBe Ior.Left("Hello, World!")
   }
@@ -72,7 +72,7 @@ class IorSpec : StringSpec({
   "Ior rethrows exception" {
     val boom = RuntimeException("Boom!")
     shouldThrow<RuntimeException> {
-      ior(Semigroup.string()) {
+      ior(String::plus) {
        throw boom
       }
     }.message shouldBe "Boom!"
