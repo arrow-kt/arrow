@@ -900,7 +900,7 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ initial }) { rightOperation(initial, it) }")
+    ReplaceWith("this.fold<C>({ initial }) { rightOperation(initial, it) }")
   )
   public inline fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     fold({ initial }) { rightOperation(initial, it) }
@@ -2084,7 +2084,7 @@ public inline fun <A, B> Either<A, B>.getOrHandle(default: (A) -> B): B =
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { if (predicate(it)) Right(it) else Left(default(it)) }")
+  ReplaceWith("this.flatMap { if (predicate(it)) Either.Right(it) else Either.Left(default(it)) }")
 )
 public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
@@ -2121,7 +2121,7 @@ public inline fun <A, B> Either<A, B>.filterOrElse(predicate: (B) -> Boolean, de
  */
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { if (predicate(it)) Right(it) else Left(default()) }")
+  ReplaceWith("this.flatMap { if (predicate(it)) Either.Right(it) else Either.Left(default()) }")
 )
 public inline fun <A, B> Either<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default(it)) }
@@ -2262,7 +2262,7 @@ public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>)
 @Deprecated(
   RedundantAPI + "Prefer the new recover API",
   ReplaceWith(
-    "recover { a -> f(a) }",
+    "this.recover<A, Nothing, B> { f(it) }",
     "arrow.core.recover"
   )
 )
@@ -2311,11 +2311,8 @@ public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) 
   }
 
 @Deprecated(
-  SemigroupDeprecation,
-  ReplaceWith(
-    "combine(b, SGA::combine, SGB::combine)",
-    "arrow.typeclasses.combine"
-  )
+  RedundantAPI + "Prefer zipOrAccumulate",
+  ReplaceWith("Either.zipOrAccumulate<A, B, B, B>({ a:A, bb:A -> a + bb }, this, b) { a:B, bb:B -> a + bb }")
 )
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
   combine(b, SGA::combine, SGB::combine)
@@ -2356,7 +2353,7 @@ public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { f(bind(), fb.bind()) }",
+    "either { f(this.bind(), fb.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2368,7 +2365,7 @@ public fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Eith
 @Deprecated(
   "Prefer using the inline arrow.core.raise.either DSL",
   ReplaceWith(
-    "either { Pair(bind(), fb.bind()) }",
+    "either { Pair(this.bind(), fb.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2379,7 +2376,7 @@ public fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2395,7 +2392,7 @@ public inline fun <A, B, C, D, E> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2412,7 +2409,7 @@ public inline fun <A, B, C, D, E, F> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2430,7 +2427,7 @@ public inline fun <A, B, C, D, E, F, G> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2449,7 +2446,7 @@ public inline fun <A, B, C, D, E, F, G, H> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2469,7 +2466,7 @@ public inline fun <A, B, C, D, E, F, G, H, I> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2490,7 +2487,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2512,7 +2509,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Either<A, B>.zip(
 @Deprecated(
   "Prefer using the inline either DSL",
   ReplaceWith(
-    "either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }",
+    "either { map(this.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }",
     "arrow.core.raise.either"
   )
 )
@@ -2534,17 +2531,14 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",
-  ReplaceWith(
-    "map { b -> List(n) { b }.fold(MB.empty(), MB::combine) }",
-    "arrow.typeclasses.combine"
-  )
+  ReplaceWith("if (n <= 0) Either.Right(MB.empty()) else map { b -> List(n) { b }.fold(MB) }")
 )
 public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   map { b -> List(n) { b }.fold(MB.empty(), MB::combine) }
 
 @Deprecated(
   RedundantAPI + "Prefer if-else statement inside either DSL, or replace with explicit flatMap",
-  ReplaceWith("flatMap { b -> b.takeIf(predicate)?.right() ?: default().left() }")
+  ReplaceWith("flatMap { b -> b.takeIf(predicate)?.right() ?: error().left() }")
 ) // TODO open-question: should we expose `ensureNotNull` or `ensure` DSL API on Either or Companion?
 public inline fun <A, B> Either<A, B>.ensure(error: () -> A, predicate: (B) -> Boolean): Either<A, B> =
   flatMap { b -> b.takeIf(predicate)?.right() ?: error().left() }
@@ -2564,7 +2558,7 @@ public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ emptyList() }, { iterable -> iterable.map { it.right() } })",
+    "fold({ listOf<Either<A, B>>() }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
     "arrow.core.right",
   )
 )
@@ -2574,7 +2568,7 @@ public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ emptyList() }, { iterable -> iterable.map { it.right() } })",
+    "this.fold<Option<Either<A, B>>>({ None }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
     "arrow.core.right",
   )
 )
@@ -2584,7 +2578,7 @@ public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "orNull()?.orNull()?.right().toOption()",
+    "orNull()?.orNull()?.right<B>().toOption<Either<A, B>>()",
     "arrow.core.toOption",
     "arrow.core.right",
     "arrow.core.left"
@@ -2596,7 +2590,7 @@ public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ it.left() }, { it.orNull()?.right() }).toOption()",
+    "this.fold<Either<A, B>?>({ it.left() }, { it?.right() })",
     "arrow.core.toOption",
     "arrow.core.right",
     "arrow.core.left"
