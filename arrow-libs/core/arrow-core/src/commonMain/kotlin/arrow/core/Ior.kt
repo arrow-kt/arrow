@@ -1090,7 +1090,7 @@ public fun <A, B, C> Ior<Either<A, B>, Either<A, C>>.bisequenceEither(): Either<
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> a.map { Ior.Left(it) } }, {b -> b.map{ Ior.Right(it) } }, { a, b -> option { Both(a.bind(), b.bind()) } })",
+    "this.fold<Option<Ior<B, C>>>({ a -> a.map<Ior.Left<B>> { Ior.Left(it) } }, {b -> b.map<Ior.Right<C>>{ Ior.Right(it) } }, { a, b -> option<Ior.Both<B, C>> { Ior.Both(a.bind(), b.bind()) } })",
     "arrow.core.Ior",
     "arrow.core.raise.option"
   )
