@@ -1103,7 +1103,7 @@ public fun <B, C> Ior<Option<B>, Option<C>>.bisequenceOption(): Option<Ior<B, C>
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> a?.let{ Ior.Left(it) } }, {b -> b?.let{ Ior.Right(it) } }, { a, b -> nullable { Ior.Both(a.bind(), b.bind()) } })",
+    "fold({ a -> a?.let<B, Ior.Left<B>>{ Ior.Left<B>(it) } }, {b -> b?.let<C, Ior.Right<C>>{ Ior.Right<C>(it) } }, { a, b -> nullable<Ior.Both<B, C>> { Ior.Both(a.bind<B>(), b.bind<C>()) } })",
     "arrow.core.Ior",
     "arrow.core.raise.nullable"
   )
