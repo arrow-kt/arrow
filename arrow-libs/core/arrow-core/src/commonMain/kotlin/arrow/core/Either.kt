@@ -2313,7 +2313,7 @@ public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) 
 @Deprecated(
   SemigroupDeprecation,
   ReplaceWith(
-    "Either.zipOrAccumulate(SGA::combine, this, b, SGB::combine)",
+    "combine(b, SGA::combine, SGB::combine)",
     "arrow.typeclasses.combine"
   )
 )
