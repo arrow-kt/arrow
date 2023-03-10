@@ -6,8 +6,12 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+@RequiresOptIn("This API is experimental, and may change in the future.")
+public annotation class ExperimentalTraceApi
+
 /** Tracing result of `R`. Allows to inspect `R`, and the traces from where it was raised. */
-public data class Traced<R>(private val exception: CancellationException, private val raised: R) {
+@ExperimentalTraceApi
+public class Traced<R>(private val exception: CancellationException, public val raised: R) {
   /**
    * Returns the stacktrace as a [String]
    *

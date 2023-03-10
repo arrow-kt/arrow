@@ -9,7 +9,6 @@ import arrow.core.nonFatalOrThrow
 import arrow.core.Either
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
@@ -77,7 +76,6 @@ public inline fun <R, A, B> fold(
   transform: (value: A) -> B,
 ): B {
   contract {
-    callsInPlace(program, EXACTLY_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
@@ -92,7 +90,6 @@ public inline fun <R, A, B> fold(
   transform: (value: A) -> B,
 ): B {
   contract {
-    callsInPlace(program, EXACTLY_ONCE)
     callsInPlace(error, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
@@ -110,12 +107,6 @@ public inline fun <R, A, B> fold(
     error(e.nonFatalOrThrow())
   }
 }
-
-public fun <R, A> Effect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>) -> Unit): Effect<R, A> =
-  effect { traced({ bind() }, recover) }
-
-public fun <R, A> EagerEffect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>) -> Unit): EagerEffect<R, A> =
-  eagerEffect { traced({ bind() }, recover) }
 
 /**
  * Inspect a [Traced] value of [R].
@@ -156,17 +147,19 @@ public fun <R, A> EagerEffect<R, A>.traced(recover: Raise<R>.(traces: Traced<R>)
  * but **this only occurs** when composing `traced`.
  * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
  */
+@ExperimentalTraceApi
 public inline fun <R, A> Raise<R>.traced(
   @BuilderInference program: Raise<R>.() -> A,
-  recover: Raise<R>.(traces: Traced<R>) -> Unit,
+  trace: (traced: Traced<R>) -> Unit
 ): A {
-  val nested = DefaultRaise(true)
+  val itOuterTraced = this is DefaultRaise && isTraced
+  val nested = if (this is DefaultRaise && isTraced) this else DefaultRaise(true)
   return try {
     program.invoke(nested)
-  } catch (e: RaiseCancellationExceptionNoTrace) {
+  } catch (e: RaiseCancellationException) {
     val r: R = e.raisedOrRethrow(nested)
-    recover(Traced(e, r))
-    raise(r)
+    trace(Traced(e, r))
+    if (itOuterTraced) throw e else raise(r)
   }
 }
 
@@ -182,14 +175,14 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
-internal class DefaultRaise(private val isTraced: Boolean) : Raise<Any?> {
+internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Raise<Any?> {
   private val isActive = AtomicBoolean(true)
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
   override fun raise(r: Any?): Nothing = when {
     isActive.value && !isTraced -> throw RaiseCancellationExceptionNoTrace(r, this)
-    isActive.value && !isTraced -> throw RaiseCancellationException(r, this)
+    isActive.value && isTraced -> throw RaiseCancellationException(r, this)
     else -> throw RaiseLeakedException()
   }
 }
@@ -198,7 +191,7 @@ internal class DefaultRaise(private val isTraced: Boolean) : Raise<Any?> {
 private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
   CancellationExceptionNoTrace()
 
-private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationExceptionNoTrace()
+private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
 
 public expect open class CancellationExceptionNoTrace() : CancellationException
 
