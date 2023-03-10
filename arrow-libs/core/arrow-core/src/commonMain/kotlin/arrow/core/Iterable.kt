@@ -628,50 +628,39 @@ public inline fun <A, B> List<A>.reduceRightNull(
 }
 
 /**
- * Returns a [List<Pair<A?, B?>>] containing the zipped values of the two lists with null for padding.
+ * Returns a [List] containing the zipped values of the two lists with null for padding.
  *
- * Example:
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * //sampleStart
- * val padRight = listOf(1, 2).padZip(listOf("a"))        // Result: [Pair(1, "a"), Pair(2, null)]
- * val padLeft = listOf(1).padZip(listOf("a", "b"))       // Result: [Pair(1, "a"), Pair(null, "b")]
- * val noPadding = listOf(1, 2).padZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
- * //sampleEnd
- *
- * fun main() {
- *   println("padRight = $padRight")
- *   println("padLeft = $padLeft")
- *   println("noPadding = $noPadding")
+ * fun test() {
+ *   listOf(1, 2).padZip(listOf("a")) shouldBe listOf(1 to "a", 2 to null)
+ *   listOf(1).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
+ *   listOf(1).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-03.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
   padZip(other) { a, b -> a to b }
 
 /**
- * Returns a [List<C>] containing the result of applying some transformation `(A?, B?) -> C`
- * on a zip.
+ * Returns a [List] containing the result of applying some transformation `(A?, B?) -> C` on a zip.
  *
- * Example:
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * //sampleStart
- * val padZipRight = listOf(1, 2).padZip(listOf("a")) { l, r -> l to r }     // Result: [Pair(1, "a"), Pair(2, null)]
- * val padZipLeft = listOf(1).padZip(listOf("a", "b")) { l, r -> l to r }    // Result: [Pair(1, "a"), Pair(null, "b")]
- * val noPadding = listOf(1, 2).padZip(listOf("a", "b")) { l, r -> l to r }  // Result: [Pair(1, "a"), Pair(2, "b")]
- * //sampleEnd
- *
- * fun main() {
- *   println("padZipRight = $padZipRight")
- *   println("padZipLeft = $padZipLeft")
- *   println("noPadding = $noPadding")
+ * fun test() {
+ *   listOf(1, 2).padZip(listOf("a")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to null)
+ *   listOf(1).padZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", null to "b")
+ *   listOf(1).padZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", null to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-04.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
   padZip(other, { fa(it, null) }, { fa(null, it) }) { a, b -> fa(a, b) }
@@ -690,26 +679,21 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, left: (A) -> 
   }
 
 /**
- * Returns a [List<C>] containing the result of applying some transformation `(A?, B) -> C`
- * on a zip, excluding all cases where the right value is null.
+ * Returns a [List<C>] containing the result of applying some transformation `(A?, B) -> C` on a zip,
+ * excluding all cases where the right value is null.
  *
- * Example:
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * //sampleStart
- * val left = listOf(1, 2).leftPadZip(listOf("a")) { l, r -> l to r }      // Result: [Pair(1, "a")]
- * val right = listOf(1).leftPadZip(listOf("a", "b")) { l, r -> l to r }   // Result: [Pair(1, "a"), Pair(null, "b")]
- * val both = listOf(1, 2).leftPadZip(listOf("a", "b")) { l, r -> l to r } // Result: [Pair(1, "a"), Pair(2, "b")]
- * //sampleEnd
- *
- * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ * fun test() {
+ *   listOf(1, 2).leftPadZip(listOf("a")) { l, r -> l to r } shouldBe listOf(1 to "a")
+ *   listOf(1).leftPadZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", null to "b")
+ *   listOf(1, 2).leftPadZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-05.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
   buildList(maxOf(this.collectionSizeOrDefault(10), other.collectionSizeOrDefault(10))) {
@@ -724,77 +708,59 @@ public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?,
   }
 
 /**
- * Returns a [List<Pair<A?, B>>] containing the zipped values of the two lists
- * with null for padding on the left.
- *
- * Example:
+ * Returns a [List] containing the zipped values of the two lists with null for padding on the left.
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * //sampleStart
- * val padRight = listOf(1, 2).leftPadZip(listOf("a"))        // Result: [Pair(1, "a")]
- * val padLeft = listOf(1).leftPadZip(listOf("a", "b"))       // Result: [Pair(1, "a"), Pair(null, "b")]
- * val noPadding = listOf(1, 2).leftPadZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
- * //sampleEnd
- *
- * fun main() {
- *   println("padRight = $padRight")
- *   println("padLeft = $padLeft")
- *   println("noPadding = $noPadding")
+ * fun test() {
+ *   listOf(1, 2).leftPadZip(listOf("a")) shouldBe listOf(1 to "a")
+ *   listOf(1).leftPadZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
+ *   listOf(1, 2).leftPadZip(listOf("a", "b")) shouldBe listOf(1 to "a", 2 to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-06.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
 
 /**
- * Returns a [List<C>] containing the result of applying some transformation `(A, B?) -> C`
- * on a zip, excluding all cases where the left value is null.
+ * Returns a [List] containing the result of applying some transformation `(A, B?) -> C` on a zip,
+ * excluding all cases where the left value is null.
  *
- * Example:
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * //sampleStart
- * val left = listOf(1, 2).rightPadZip(listOf("a")) { l, r -> l to r }      // Result: [Pair(1, "a"), Pair(null, "b")]
- * val right = listOf(1).rightPadZip(listOf("a", "b")) { l, r -> l to r }   // Result: [Pair(1, "a")]
- * val both = listOf(1, 2).rightPadZip(listOf("a", "b")) { l, r -> l to r } // Result: [Pair(1, "a"), Pair(2, "b")]
- * //sampleEnd
- *
- * fun main() {
- *   println("left = $left")
- *   println("right = $right")
- *   println("both = $both")
+ * fun test() {
+ *   listOf(1, 2).rightPadZip(listOf("a")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to null)
+ *   listOf(1).rightPadZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a")
+ *   listOf(1, 2).rightPadZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-07.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> C): List<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
 
 /**
- * Returns a [List<Pair<A, B?>>] containing the zipped values of the two lists
- * with null for padding on the right.
+ * Returns a [List<Pair<A, B?>>] containing the zipped values of the two lists with null for padding on the right.
  *
- * Example:
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * //sampleStart
- * val padRight = listOf(1, 2).rightPadZip(listOf("a"))        // Result: [Pair(1, "a"), Pair(2, null)]
- * val padLeft = listOf(1).rightPadZip(listOf("a", "b"))       // Result: [Pair(1, "a")]
- * val noPadding = listOf(1, 2).rightPadZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
- * //sampleEnd
- *
- * fun main() {
- *   println("padRight = $padRight")
- *   println("padLeft = $padLeft")
- *   println("noPadding = $noPadding")
+ * fun test() {
+ *   listOf(1, 2).rightPadZip(listOf("a")) shouldBe listOf(1 to "a", 2 to null)
+ *   listOf(1).rightPadZip(listOf("a", "b")) shouldBe listOf(1 to "a")
+ *   listOf(1, 2).rightPadZip(listOf("a", "b")) shouldBe listOf(1 to "a", 2 to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-08.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
@@ -804,18 +770,16 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    listOf("A", "B").align(listOf(1, 2, 3)) {
+ * fun test() {
+ *   listOf("A", "B").align(listOf(1, 2, 3)) {
  *      "$it"
- *    }
- *   //sampleEnd
- *   println(result)
+ *   } shouldBe listOf("Ior.Both(A, 1)", "Ior.Both(B, 2)", "Ior.Right(3)")
  * }
  * ```
  * <!--- KNIT example-iterable-09.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
   padZip(b, { fa(Ior.Left(it)) }, { fa(Ior.Right(it)) }) { a, bb -> fa(Ior.Both(a, bb)) }
@@ -825,50 +789,42 @@ public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) ->
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *     listOf("A", "B").align(listOf(1, 2, 3))
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   listOf("A", "B")
+ *     .align(listOf(1, 2, 3)) shouldBe listOf(Ior.Both("A", 1), Ior.Both("B", 2), Ior.Right(3))
  * }
  * ```
  * <!--- KNIT example-iterable-10.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   this.align(b, ::identity)
 
 /**
- * aligns two structures and combine them with [combine]
- */
-public fun <A> Iterable<A>.align(other: Iterable<A>, combine: (A, A) -> A): Iterable<A> =
-  padZip(other, ::identity, ::identity, combine)
-
-/**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("align(other, SG::combine)", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("padZip(other, { it }, { it }, SG::combine)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
-): Iterable<A> = align(other, SG::combine)
+): Iterable<A> = padZip(other, { it }, { it }, SG::combine)
 
 /**
  * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *      listOf("A" to 1, "B" to 2).unzip()
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   listOf("A" to 1, "B" to 2)
+ *     .unzip() shouldBe Pair(listOf("A", "B"), listOf(1, 2))
  * }
  * ```
  * <!--- KNIT example-iterable-11.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -880,20 +836,18 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    listOf("A:1", "B:2", "C:3").unzip { e ->
- *      e.split(":").let {
- *        it.first() to it.last()
- *      }
- *    }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   listOf("A:1", "B:2", "C:3").unzip { e ->
+ *     e.split(":").let {
+ *       it.first() to it.last()
+ *     }
+ *   } shouldBe Pair(listOf("A", "B", "C"), listOf("1", "2", "3"))
  * }
  * ```
  * <!--- KNIT example-iterable-12.kt -->
+ * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzip()
@@ -1236,14 +1190,14 @@ public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
 /**
  *  Given [A] is a subtype of [B], re-type this value from Iterable<A> to Iterable<B>
  *
- *  ```kotlin
- *  import arrow.core.*
+ * ```kotlin
+ * import arrow.core.*
  *
- *  fun main() {
- *  val original: List<String> = listOf("Hello", ",", "World")
+ * fun test() {
+ *   val original: List<String> = listOf("Hello", ",", "World")
  *   val result: Iterable<CharSequence> = original.widen()
- *  }
- *  ```
+ * }
+ * ```
  */
 public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
   this
@@ -1251,14 +1205,14 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 /**
  *  Given [A] is a subtype of [B], re-type this value from List<A> to List<B>
  *
- *  ```kotlin
- *  import arrow.core.*
+ * ```kotlin
+ * import arrow.core.*
  *
- *  fun main() {
- *  val original: List<String> = listOf("Hello", ",", "World")
+ * fun main() {
+ *   val original: List<String> = listOf("Hello", ",", "World")
  *   val result: Iterable<CharSequence> = original.widen()
- *  }
- *  ```
+ * }
+ * ```
  */
 public fun <B, A : B> List<A>.widen(): List<B> =
   this

@@ -220,15 +220,15 @@ public class NonEmptyList<out A>(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
 
-  public fun align(other: NonEmptyList<@UnsafeVariance A>, combine: (A, A) -> @UnsafeVariance A): NonEmptyList<A> =
-    NonEmptyList(combine(head, other.head), tail.align(other.tail, combine).toList())
-
-  @Deprecated(SemigroupDeprecation, ReplaceWith("align(b, SA::combine)", "arrow.typeclasses.combine"))
+  @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, SA::combine)", "arrow.typeclasses.combine"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    align(b, SA::combine)
+    padZip(b, ::identity, ::identity, SA::combine)
 
   public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
-    NonEmptyList(head to other.head, tail.padZip(other.tail))
+    padZip(other, { it to null }, { null to it }, { a, b -> a to b })
+
+  public inline fun <B, C> padZip(other: NonEmptyList<B>, left: (A) -> C, right: (B) -> C, both: (A, B) -> C): NonEmptyList<C> =
+    NonEmptyList(both(head, other.head), tail.padZip(other.tail, left, right, both))
 
   public companion object {
 
