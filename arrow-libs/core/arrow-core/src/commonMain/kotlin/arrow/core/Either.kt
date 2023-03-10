@@ -2296,7 +2296,7 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
   ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
 )
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) } }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
+Either.zipOrAccumulate(SGA::combine, this, b, SGB::combine)
 
 @Deprecated(
   RedundantAPI + "Prefer explicit fold instead",
