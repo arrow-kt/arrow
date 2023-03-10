@@ -10,7 +10,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.foldLeft
+import arrow.core.fold
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
@@ -89,7 +89,7 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
         override fun <R> foldMap(M: Monoid<R>, source: Map<K, V>, map: (focus: V) -> R): R =
           M.run {
-            source.foldLeft(empty()) { acc, (_, v) ->
+            source.fold(empty()) { acc, (_, v) ->
               acc.combine(map(v))
             }
           }

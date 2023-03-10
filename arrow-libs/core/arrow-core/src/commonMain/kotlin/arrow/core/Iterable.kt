@@ -8,14 +8,17 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.Raise
-import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.either
+import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.nullable
 import arrow.core.raise.option
 import arrow.core.raise.result
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 
@@ -326,10 +329,7 @@ public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> =
   result { map { f(it).bind() } }
 
-@Deprecated(
-  "traverseResult is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseResult is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
@@ -800,18 +800,24 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   this.align(b, ::identity)
 
 /**
+ * aligns two structures and combine them with [combine]
+ */
+public fun <A> Iterable<A>.salign(
+  other: Iterable<A>,
+  combine: (A, A) -> A
+): Iterable<A> =
+  align(other) {
+    it.fold(::identity, ::identity, combine)
+  }
+
+/**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
+@Deprecated(SemigroupDeprecation, ReplaceWith("salign(other, SG::combine)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
-): Iterable<A> = SG.run {
-  align(other) {
-    it.fold(::identity, ::identity) { a, b ->
-      a.combine(b)
-    }
-  }
-}
+): Iterable<A> = salign(other, SG::combine)
 
 /**
  * unzips the structure holding the resulting elements in an `Pair`
@@ -915,9 +921,9 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = sepera
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
 
-@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }"))
+@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty(), MA::combine)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
-  fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }
+  fold(MA.empty(), MA::combine)
 
 /**
  * Returns the first element as [Some], or [None] if the iterable is empty.
@@ -1222,11 +1228,11 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
-@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }"))
+@Deprecated(MonoidDeprecation, ReplaceWith("fold(MA.empty(), MA::combine)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
-  fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }
+  fold(MA.empty(), MA::combine)
 
-@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MB.empty()) { acc, a -> MB.run { acc.combine(a) } }"))
+@Deprecated(MonoidDeprecation, ReplaceWith("fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }"))
 public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
   fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
 
