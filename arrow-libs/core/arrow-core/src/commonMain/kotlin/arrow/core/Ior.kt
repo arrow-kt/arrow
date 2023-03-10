@@ -1077,7 +1077,7 @@ public fun <A, B> Ior<Iterable<A>, Iterable<B>>.bisequence(): List<Ior<A, B>> =
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> a.map { Ior.Left(it) } }, {b -> b.map{ Ior.Right(it) } }, { a, b -> either { Ior.Both(a.bind(), b.bind()) } })",
+    "this.fold<Either<A, Ior<B, C>>>({ a -> a.map<Ior.Left<B>> { Ior.Left(it) } }, {b -> b.map<Ior.Right<C>>{ Ior.Right(it) } }, { a: Either<A, B>, b: Either<A, C> -> either<A, Ior.Both<B,C>> { Ior.Both(a.bind(), b.bind()) } })",
     "arrow.core.Ior",
     "arrow.core.raise.either"
   )
