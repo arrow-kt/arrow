@@ -34,7 +34,7 @@
     <div class="library-name">
 <a href="../../../index.html">
 <span>Arrow</span>            </a>    </div>
-    <div>1.1.6-alpha.46.1+55d441c
+    <div>1.1.6-alpha.47.1+1fd8cca
     </div>
     <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section">
@@ -69,7 +69,7 @@ import arrow.typeclasses.Semigroup
 import io.kotest.matchers.shouldBe
 
 fun Raise<String>.failure(): Int = raise("failed")
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun test() {<br>  val either: Either&lt;String, Int&gt; =<br>    either { failure() }<br><br>  val effect: Effect&lt;String, Int&gt; =<br>    effect { failure() }<br><br>  val ior: Ior&lt;String, Int&gt; =<br>    ior(Semigroup.string()) { failure() }<br><br>  either shouldBe Either.Left("failed")<br>  effect.toEither() shouldBe Either.Left("failed")<br>  ior shouldBe Ior.Left("failed")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-dsl-02.kt --><!-- TEST lines.isEmpty() --><p class="paragraph">And we can apply the same technique to recover from the failures using the <a href="index.html">Raise</a> DSL based error handlers available in Arrow.</p><!-- INCLUDE
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun test() {<br>  val either: Either&lt;String, Int&gt; =<br>    either { failure() }<br><br>  val effect: Effect&lt;String, Int&gt; =<br>    effect { failure() }<br><br>  val ior: Ior&lt;String, Int&gt; =<br>    ior(String::plus) { failure() }<br><br>  either shouldBe Either.Left("failed")<br>  effect.toEither() shouldBe Either.Left("failed")<br>  ior shouldBe Ior.Left("failed")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-dsl-02.kt --><!-- TEST lines.isEmpty() --><p class="paragraph">And we can apply the same technique to recover from the failures using the <a href="index.html">Raise</a> DSL based error handlers available in Arrow.</p><!-- INCLUDE
 import arrow.core.Either
 import arrow.core.raise.Raise
 import arrow.core.raise.either
