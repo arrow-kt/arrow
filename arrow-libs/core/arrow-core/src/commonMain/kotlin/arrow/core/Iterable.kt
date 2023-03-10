@@ -649,13 +649,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  * <!--- KNIT example-iterable-03.kt -->
  */
 public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
-  align(other) { ior ->
-    ior.fold(
-      { it to null },
-      { null to it },
-      { a, b -> a to b }
-    )
-  }
+  padZip(other) { a, b -> a to b }
 
 /**
  * Returns a [List<C>] containing the result of applying some transformation `(A?, B?) -> C`
@@ -680,7 +674,20 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  * <!--- KNIT example-iterable-04.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
-  padZip(other).map { fa(it.first, it.second) }
+  padZip(other, { fa(it, null) }, { fa(null, it) }) { a, b -> fa(a, b) }
+
+public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, left: (A) -> C, right: (B) -> C, both: (A, B) -> C): List<C> =
+  buildList(maxOf(this.collectionSizeOrDefault(10), other.collectionSizeOrDefault(10))) {
+    val first = this@padZip.iterator()
+    val second = other.iterator()
+    while (first.hasNext() || second.hasNext()) {
+      when {
+        first.hasNext() && second.hasNext() -> add(both(first.next(), second.next()))
+        first.hasNext() -> add(left(first.next()))
+        second.hasNext() -> add(right(second.next()))
+      }
+    }
+  }
 
 /**
  * Returns a [List<C>] containing the result of applying some transformation `(A?, B) -> C`
@@ -705,7 +712,16 @@ public inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) 
  * <!--- KNIT example-iterable-05.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> C): List<C> =
-  padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
+  buildList(maxOf(this.collectionSizeOrDefault(10), other.collectionSizeOrDefault(10))) {
+    val first = this@leftPadZip.iterator()
+    other.forEach { b ->
+      val c: C = when {
+        first.hasNext() -> fab(first.next(), b)
+        else -> fab(null, b)
+      }
+      add(c)
+    }
+  }
 
 /**
  * Returns a [List<Pair<A?, B>>] containing the zipped values of the two lists
@@ -802,19 +818,7 @@ public fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>>
  * <!--- KNIT example-iterable-09.kt -->
  */
 public inline fun <A, B, C> Iterable<A>.align(b: Iterable<B>, fa: (Ior<A, B>) -> C): List<C> =
-  buildList(maxOf(this.collectionSizeOrDefault(10), b.collectionSizeOrDefault(10))) {
-    val first = this@align.iterator()
-    val second = b.iterator()
-    while (first.hasNext() || second.hasNext()) {
-      val element: Ior<A, B> = when {
-        first.hasNext() && second.hasNext() -> Ior.Both(first.next(), second.next())
-        first.hasNext() -> first.next().leftIor()
-        second.hasNext() -> second.next().rightIor()
-        else -> throw IllegalStateException("this should never happen")
-      }
-      add(fa(element))
-    }
-  }
+  padZip(b, { fa(Ior.Left(it)) }, { fa(Ior.Right(it)) }) { a, bb -> fa(Ior.Both(a, bb)) }
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
@@ -839,9 +843,7 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
  * aligns two structures and combine them with [combine]
  */
 public fun <A> Iterable<A>.salign(other: Iterable<A>, combine: (A, A) -> A): Iterable<A> =
-  align(other) {
-    it.fold(::identity, ::identity, combine)
-  }
+  padZip(other, ::identity, ::identity, combine)
 
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]

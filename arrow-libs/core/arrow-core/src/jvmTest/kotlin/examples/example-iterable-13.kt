@@ -9,5 +9,5 @@ fun test() {
      Pair("A", 1).bothIor(),
      Pair("B", 2).bothIor(),
      "C".leftIor()
-   ).seperateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
+   ).separateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
 }
