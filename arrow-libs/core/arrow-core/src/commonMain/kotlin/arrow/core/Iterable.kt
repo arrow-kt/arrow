@@ -10,7 +10,7 @@ import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.either
-import arrow.core.raise.fold
+import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.nullable
 import arrow.core.raise.option
 import arrow.core.raise.result
@@ -293,10 +293,7 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseEither is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
   traverse(f)
 
@@ -309,10 +306,7 @@ public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): 
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> =
   either { map { f(it).bind() } }
 
-@Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   traverse(::identity)
 
@@ -339,10 +333,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
   traverse(f)
 
-@Deprecated(
-  "sequenceResult is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceResult is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   sequence()
 
@@ -353,10 +344,7 @@ public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
-)
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
@@ -378,10 +366,7 @@ public inline fun <E, A, B> Iterable<A>.traverse(
 ): Validated<E, List<B>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
-@Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseValidated is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   traverse(f)
 
@@ -397,10 +382,7 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
   mapOrAccumulate { f(it).bindNel() }.toValidated()
 
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
-)
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence(semigroup)", "arrow.core.sequence"))
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
   sequence(semigroup)
 
@@ -414,10 +396,7 @@ public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigro
 public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
-@Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceValidated is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
 
@@ -431,10 +410,7 @@ public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
   mapOrAccumulate { it.bindNel() }.toValidated()
 
-@Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
   traverse(f)
 
@@ -447,10 +423,7 @@ public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> =
   option { map { f(it).bind() } }
 
-@Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   sequence()
 
@@ -461,10 +434,7 @@ public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "traverseNullable is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
-)
+@Deprecated("traverseNullable is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(f)", "arrow.core.traverse"))
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
@@ -477,10 +447,7 @@ public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? =
   nullable { map { f(it).bind() } }
 
-@Deprecated(
-  "sequenceNullable is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
-)
+@Deprecated("sequenceNullable is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   sequence()
 
@@ -515,16 +482,8 @@ public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
-): Either<Error, List<B>> {
-  var left: Any? = EmptyValue
-  val right = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this)
-    fold(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
-      { b -> right.add(b) }
-    )
-  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
+): Either<Error, List<B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, combine, transform)
 }
 
 /**
@@ -557,12 +516,8 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
-): Either<NonEmptyList<Error>, List<B>> {
-  val left = mutableListOf<Error>()
-  val right = ArrayList<B>(collectionSizeOrDefault(10))
-  for (item in this)
-    fold({ transform(RaiseAccumulate(this), item) }, { error -> left.addAll(error) }, { b -> right.add(b) })
-  return left.toNonEmptyListOrNull()?.left() ?: right.right()
+): Either<NonEmptyList<Error>, List<B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, transform)
 }
 
 /**
@@ -921,21 +876,14 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  * <!--- KNIT example-iterable-13.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> {
-  val lefts = mutableListOf<A>()
-  val rights = mutableListOf<B>()
-  forEach { ior ->
-    ior.fold(
-      { lefts.add(it) },
-      { rights.add(it) },
-      { a, b ->
-        lefts.add(a)
-        rights.add(b)
-      }
+public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> =
+  fold(emptyList<A>() to emptyList<B>()) { (l, r), x ->
+    x.fold(
+      { l + it to r },
+      { l to r + it },
+      { a, b -> l + a to r + b }
     )
   }
-  return Pair(lefts, rights)
-}
 
 @Deprecated(
   "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
@@ -961,17 +909,11 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = sepera
  * <!--- TEST lines.isEmpty() -->
  */
 @Deprecated(
-  "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
-  ReplaceWith("map(fa).seperateIor()", "arrow.core.seperateIor")
+  "The current unalign function is renamed to separateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  ReplaceWith("map(fa).separateIor()", "arrow.core.separateIor")
 )
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
-  fold(mutableListOf<A>() to mutableListOf<B>()) { (l, r), c ->
-    fa(c).fold(
-      { l.apply { add(it) } to r },
-      { l to r.apply { add(it) } },
-      { a, b -> l.apply { add(a) } to r.apply { add(b) } }
-    )
-  }
+  map(fa).unalign()
 
 @Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
@@ -1280,17 +1222,13 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
-public fun <A> Iterable<A>.fold(MA: Monoid<A>): A = MA.run {
-  this@fold.fold(empty()) { acc, a ->
-    acc.combine(a)
-  }
-}
+@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }"))
+public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
+  fold(MA.empty()) { acc, a -> MA.run { acc.combine(a) } }
 
-public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-  this@foldMap.fold(empty()) { acc, a ->
-    acc.combine(f(a))
-  }
-}
+@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MB.empty()) { acc, a -> MB.run { acc.combine(a) } }"))
+public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
+  fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
 
 public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
