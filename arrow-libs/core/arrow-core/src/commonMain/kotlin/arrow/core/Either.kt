@@ -6,11 +6,8 @@ import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.Either.Right.Companion.unit
-import arrow.core.computations.ResultEffect.bind
-import arrow.core.continuations.Eager
 import arrow.core.continuations.EagerEffect
 import arrow.core.continuations.Effect
-import arrow.core.continuations.Token
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.typeclasses.Monoid
@@ -772,7 +769,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
  */
 public sealed class Either<out A, out B> {
-  
+
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
    * Used only for performance instead of fold.
@@ -1338,9 +1335,11 @@ public sealed class Either<out A, out B> {
     { "Either.Right($it)" }
   )
 
+  @Deprecated(ValidatedDeprMsg + "ValidatedNel is being replaced by EitherNel")
   public fun toValidatedNel(): ValidatedNel<A, B> =
     fold({ Validated.invalidNel(it) }, ::Valid)
 
+  @Deprecated(ValidatedDeprMsg + "You can find more details about how to migrate on the Github release page, or the 1.2.0 release post.")
   public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
 
@@ -1489,7 +1488,19 @@ public sealed class Either<out A, out B> {
       transform: (A, B) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(
+        combine,
+        a,
+        b,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit
+      ) { aa, bb, _, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
     }
@@ -1502,7 +1513,19 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(
+        combine,
+        a,
+        b,
+        c,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit
+      ) { aa, bb, cc, _, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
     }
@@ -1516,7 +1539,19 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+      return zipOrAccumulate(
+        combine,
+        a,
+        b,
+        c,
+        d,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit
+      ) { aa, bb, cc, dd, _, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
     }
@@ -1531,7 +1566,19 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+      return zipOrAccumulate(
+        combine,
+        a,
+        b,
+        c,
+        d,
+        e,
+        unit,
+        unit,
+        unit,
+        unit,
+        unit
+      ) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
     }
@@ -2297,7 +2344,7 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
   ReplaceWith("Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }")
 )
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
-  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) }  }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
+  Either.zipOrAccumulate({ a, bb -> SGA.run { a.combine(bb) } }, this, b) { a, bb -> SGB.run { a.combine(bb) } }
 
 @Deprecated(
   RedundantAPI + "Prefer explicit fold instead",
@@ -2505,7 +2552,20 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J, K) -> L,
 ): Either<A, L> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }
+  return either {
+    map(
+      bind(),
+      c.bind(),
+      d.bind(),
+      e.bind(),
+      f.bind(),
+      g.bind(),
+      h.bind(),
+      i.bind(),
+      j.bind(),
+      k.bind()
+    )
+  }
 }
 
 @Deprecated(
@@ -2664,7 +2724,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
   contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
-  return when(this) {
+  return when (this) {
     is Left -> either { recover(this, value) }
     is Right -> this@recover
   }
