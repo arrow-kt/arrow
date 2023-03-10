@@ -17,17 +17,16 @@ import arrow.typeclasses.combine
  * and using `Pair` to hold the elements.
  *
  * ```kotlin
- * import arrow.core.*
+ * import arrow.core.zip
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3"))
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf(1 to "A", 2 to "B")
+ *     .zip(mapOf(1 to "1", 2 to "2", 3 to "3")) shouldBe mapOf(1 to Pair("A", "1"), 2 to Pair("B", "2"))
  * }
  * ```
  * <!--- KNIT example-map-01.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
   zip(other) { _, a, b -> Pair(a, b) }
@@ -37,19 +36,17 @@ public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  * and combining the elements with the given function.
  *
  * ```kotlin
- * import arrow.core.*
+ * import arrow.core.zip
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3")) {
- *      key, a, b -> "$key -> $a # $b"
- *    }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf(1 to "A", 2 to "B").zip(mapOf(1 to "1", 2 to "2", 3 to "3")) {
+ *     key, a, b -> "$a ~ $b"
+ *   } shouldBe mapOf(1 to "A ~ 1", 2 to "B ~ 2")
  * }
  * ```
  * <!--- KNIT example-map-02.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> =
   buildMap(size) {
@@ -402,16 +399,15 @@ public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf("1" to 1, "2" to 2).align(mapOf("1" to 1, "2" to 2, "3" to 3))
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   val res = mapOf(1 to 1, 2 to 2).align(mapOf(1 to "1", 2 to "2", 3 to "3"))
+ *   res shouldBe mapOf(1 to Ior.Both(1, "1"), 2 to Ior.Both(2, "2"), 3 to Ior.Right("3"))
  * }
  * ```
  * <!--- KNIT example-map-03.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
   padZip(b, { _, a -> Ior.Left(a) }, { _, bb -> Ior.Right(bb) }) { _, a, bb -> Ior.Both(a, bb) }
@@ -421,18 +417,17 @@ public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf("1" to 1, "2" to 2).align(mapOf("1" to 1, "2" to 2, "3" to 3)) { (_, a) ->
- *      "$a"
- *    }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf("1" to 1, "2" to 2)
+ *     .align(mapOf("1" to 1, "2" to 2, "3" to 3)) { (_, a) ->
+ *       "$a"
+ *     } shouldBe mapOf("1" to "Ior.Both(1, 1)", "2" to Ior.Both(2, 2), "3" to Ior.Right(3))
  * }
  * ```
  * <!--- KNIT example-map-04.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B, C> Map<K, A>.align(b: Map<K, B>, fa: (Map.Entry<K, Ior<A, B>>) -> C): Map<K, C> =
   padZip(
@@ -448,15 +443,15 @@ private class Entry<K, V>(override val key: K, override val value: V) : Map.Entr
     other is Map.Entry<*, *> && other.key == key && other.value == value
 }
 
-public fun <K, A> Map<K, A>.align(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
+public fun <K, A> Map<K, A>.salign(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
   padZip(other, { _, a -> a }, { _, b -> b }) { _, a, b -> combine(a, b) }
 
 @Deprecated(
   "${SemigroupDeprecation}\n use align instead",
-  ReplaceWith("align(other, SG::combine)", "arrow.typeclasses.combine")
+  ReplaceWith("salign(other, SG::combine)", "arrow.typeclasses.combine")
 )
 public fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> =
-  align(other, SG::combine)
+  salign(other, SG::combine)
 
 /**
  * Align two structures as in zip, but filling in blanks with null.
@@ -467,42 +462,40 @@ public fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
 public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K, C> =
   padZip(other, { k, a -> fa(k, a, null) }, { k, b -> fa(k, null, b) }) { k, a, b -> fa(k, a, b) }
 
-public fun <K, A, B, C> Map<K, A>.padZip(
+public inline fun <K, A, B, C> Map<K, A>.padZip(
   other: Map<K, B>,
   left: (K, A) -> C,
   right: (K, B) -> C,
   both: (K, A, B) -> C
-): Map<K, C> =
-  buildMap {
-    (keys + other.keys).forEach { key ->
-      @Suppress("UNCHECKED_CAST")
-      when {
-        key in this@padZip && key in other -> put(key, both(key, this@padZip[key] as A, other[key] as B))
-        key in this@padZip -> put(key, left(key, this@padZip[key] as A))
-        key in other -> put(key, right(key, other[key] as B))
-      }
+): Map<K, C> = buildMap {
+  (this@padZip.keys + other.keys).forEach { key ->
+    when {
+      this@padZip.containsKey(key) && other.containsKey(key) ->
+        put(key, both(key, this@padZip[key] as A, other[key] as B))
+
+      this@padZip.containsKey(key) -> put(key, left(key, this@padZip[key] as A))
+      other.containsKey(key) -> put(key, right(key, other[key] as B))
     }
   }
+}
 
 /**
  * Splits a union into its component parts.
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf(
- *      "first" to ("A" to 1).bothIor(),
- *      "second" to ("B" to 2).bothIor(),
- *      "third" to "C".leftIor()
- *    ).unalign()
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf(
+ *     "first" to Ior.Both("A", 1),
+ *     "second" to Ior.Both("B", 2),
+ *     "third" to Ior.Left("C")
+ *   ).unalign() shouldBe Pair(mapOf("first" to "A", "second" to "B", "third" to "C"), mapOf("first" to 1, "second" to 2))
  * }
  * ```
  * <!--- KNIT example-map-05.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
   unalign { (_, ior) -> ior }
@@ -512,17 +505,21 @@ public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *      mapOf("1" to 1, "2" to 2, "3" to 3)
- *        .unalign { it.leftIor() }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf("1" to 1, "2" to 2, "3" to 3)
+ *     .unalign { (key, value) ->
+ *       when(key) {
+ *         "1" -> Ior.Left(value)
+ *         "2" -> Ior.Right(key)
+ *         else -> Ior.Both(value, key)
+ *       }
+ *     } shouldBe Pair(mapOf("1" to 1, "3" to 3), mapOf("2" to 2, "3" to 3))
  * }
  * ```
  * <!--- KNIT example-map-06.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public inline fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> {
   val lefts = mutableMapOf<K, A>()
@@ -545,16 +542,17 @@ public inline fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A,
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *      mapOf("first" to ("A" to 1), "second" to ("B" to 2)).unzip()
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf(
+ *     "first" to ("A" to 1),
+ *     "second" to ("B" to 2)
+ *   ).unzip() shouldBe Pair(mapOf("first" to "A", "second" to "B"), mapOf("first" to 1, "second" to 2))
  * }
  * ```
  * <!--- KNIT example-map-07.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
   unzip { (_, pair) -> pair }
@@ -564,20 +562,21 @@ public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
  *
  * ```kotlin
  * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    mapOf("first" to "A:1", "second" to "B:2", "third" to "C:3").unzip { (_, e) ->
- *      e.split(":").let {
- *        it.first() to it.last()
- *      }
- *    }
- *   //sampleEnd
- *   println(result)
+ * fun test() {
+ *   mapOf("first" to "A:1", "second" to "B:2", "third" to "C:3").unzip { (_, e) ->
+ *     e.split(":").let {
+ *       it.first() to it.last()
+ *     }
+ *   } shouldBe Pair(
+ *     mapOf("first" to "A", "second" to "B", "third" to "C"),
+ *     mapOf("first" to "1", "second" to "2", "third" to "3")
+ *   )
  * }
  * ```
  * <!--- KNIT example-map-08.kt -->
+ * <!--- lines.isEmpty() -->
  */
 public inline fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> {
   val lefts = mutableMapOf<K, A>()

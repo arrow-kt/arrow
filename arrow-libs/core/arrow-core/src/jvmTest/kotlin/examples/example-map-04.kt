@@ -2,13 +2,11 @@
 package arrow.core.examples.exampleMap04
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-   mapOf("1" to 1, "2" to 2).align(mapOf("1" to 1, "2" to 2, "3" to 3)) { (_, a) ->
-     "$a"
-   }
-  //sampleEnd
-  println(result)
+fun test() {
+  mapOf("1" to 1, "2" to 2)
+    .align(mapOf("1" to 1, "2" to 2, "3" to 3)) { (_, a) ->
+      "$a"
+    } shouldBe mapOf("1" to "Ior.Both(1, 1)", "2" to Ior.Both(2, 2), "3" to Ior.Right(3))
 }

@@ -110,30 +110,32 @@ class MapKTest : StringSpec({
       }
     }
 
-    "can align maps" {
-      // aligned keySet is union of a's and b's keys
+    "aligned keySet is union of a's and b's keys" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         aligned.size shouldBe (a.keys + b.keys).size
       }
+    }
 
-      // aligned map contains Both for all entries existing in a and b
+    "aligned map contains Both for all entries existing in a and b" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         a.keys.intersect(b.keys).forEach {
           aligned[it]?.isBoth shouldBe true
         }
       }
+    }
 
-      // aligned map contains Left for all entries existing only in a
+    "aligned map contains Left for all entries existing only in a" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         (a.keys - b.keys).forEach { key ->
-          aligned[key]?.isLeft shouldBe true
+          aligned[key]?.isLeft() shouldBe true
         }
       }
+    }
 
-      // aligned map contains Right for all entries existing only in b
+    "aligned map contains Right for all entries existing only in b" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         (b.keys - a.keys).forEach { key ->
