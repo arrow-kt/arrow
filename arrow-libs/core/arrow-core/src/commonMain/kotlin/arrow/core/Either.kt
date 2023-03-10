@@ -1488,19 +1488,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(
-        combine,
-        a,
-        b,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit
-      ) { aa, bb, _, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
     }
@@ -1513,19 +1501,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(
-        combine,
-        a,
-        b,
-        c,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit
-      ) { aa, bb, cc, _, _, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
     }
@@ -1539,19 +1515,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(
-        combine,
-        a,
-        b,
-        c,
-        d,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit
-      ) { aa, bb, cc, dd, _, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
     }
@@ -1566,19 +1530,7 @@ public sealed class Either<out A, out B> {
       transform: (A, B, C, D, EE) -> Z,
     ): Either<E, Z> {
       contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return zipOrAccumulate(
-        combine,
-        a,
-        b,
-        c,
-        d,
-        e,
-        unit,
-        unit,
-        unit,
-        unit,
-        unit
-      ) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
+      return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
     }
@@ -2552,20 +2504,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J, K) -> L,
 ): Either<A, L> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return either {
-    map(
-      bind(),
-      c.bind(),
-      d.bind(),
-      e.bind(),
-      f.bind(),
-      g.bind(),
-      h.bind(),
-      i.bind(),
-      j.bind(),
-      k.bind()
-    )
-  }
+  return either { map(bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind()) }
 }
 
 @Deprecated(
