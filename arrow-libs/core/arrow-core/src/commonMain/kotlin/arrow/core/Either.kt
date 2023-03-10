@@ -772,7 +772,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
  */
 public sealed class Either<out A, out B> {
-  
+
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
    * Used only for performance instead of fold.
@@ -1338,9 +1338,11 @@ public sealed class Either<out A, out B> {
     { "Either.Right($it)" }
   )
 
+  @Deprecated(ValidatedDeprMsg + "ValidatedNel is being replaced by EitherNel")
   public fun toValidatedNel(): ValidatedNel<A, B> =
     fold({ Validated.invalidNel(it) }, ::Valid)
 
+  @Deprecated(ValidatedDeprMsg + "You can find more details about how to migrate on the Github release page, or the 1.2.0 release post.")
   public fun toValidated(): Validated<A, B> =
     fold({ it.invalid() }, { it.valid() })
 
@@ -2317,6 +2319,7 @@ public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) 
 public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
   combine(b, SGA::combine, SGB::combine)
 
+
 @Deprecated(
   MonoidDeprecation,
   ReplaceWith(
@@ -2685,7 +2688,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
   contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
-  return when(this) {
+  return when (this) {
     is Left -> either { recover(this, value) }
     is Right -> this@recover
   }
