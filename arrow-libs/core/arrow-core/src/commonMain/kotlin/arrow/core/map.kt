@@ -2,15 +2,15 @@
 
 package arrow.core
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.collections.flatMap as _flatMap
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
 import arrow.core.raise.fold
 import arrow.core.raise.nullable
+import arrow.core.raise.option
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.combine
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -226,23 +226,25 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   }
 }
 
+/**
+ * Transform every [Map.Entry] of the original [Map] using [f],
+ * only keeping the [Map.Entry] of the transformed map that match the input [Map.Entry].
+ */
 public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
-  _flatMap { entry ->
-    f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
-  }.toMap()
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Either<E, Map<K, B>> {
-  val acc = mutableMapOf<K, B>()
-  forEach { (k, v) ->
-    when (val res = f(v)) {
-      is Right -> acc[k] = res.value
-      is Left -> return@traverse res
+  buildMap {
+    this@flatMap.forEach { entry ->
+      f(entry)[entry.key]?.let { put(entry.key, it) }
     }
   }
-  return acc.right()
-}
+
+@Deprecated(
+  "",
+  ReplaceWith("either<E, Map<K, B>> { this.mapValues { (_, a) -> f(a).bind() } }", "arrow.core.raise.either")
+)
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
+  either { mapValues { (_, a) -> f(a).bind() } }
 
 @Deprecated(
   "traverseEither is being renamed to traverse to simplify the Arrow API",
@@ -251,8 +253,12 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Eithe
 public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
   traverse(f)
 
+@Deprecated(
+  "",
+  ReplaceWith("either<E, Map<K, B>> { this.mapValues { (_, a) -> a.bind() } }", "arrow.core.raise.either")
+)
 public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
-  traverse(::identity)
+  either { mapValues { (_, a) -> a.bind() } }
 
 @Deprecated(
   "sequenceEither is being renamed to sequence to simplify the Arrow API",
@@ -264,8 +270,9 @@ public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>>
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
@@ -277,15 +284,16 @@ public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it.value).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { f(it.value).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 public inline fun <K, E, A, B> Map<K, A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, Map<K, B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it.value).bind() }.toValidated()
+  mapOrAccumulate(semigroup::combine) { f(it.value).bind() }.toValidated()
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
@@ -322,18 +330,14 @@ public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigr
 public fun <K, E, A> Map<K, Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
   traverse(semigroup, ::identity)
 
+@Deprecated(
+  "",
+  ReplaceWith("option<Map<K, B>> { this.mapValues { (_, a) -> f(a).bind() } }", "arrow.core.raise.option")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<K, B>> {
-  val acc = mutableMapOf<K, B>()
-  forEach { (k, v) ->
-    when (val res = f(v)) {
-      is Some -> acc[k] = res.value
-      is None -> return@traverse res
-    }
-  }
-  return acc.some()
-}
+public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<K, B>> =
+  option { mapValues { (_, a) -> f(a).bind() } }
 
 @Deprecated(
   "traverseOption is being renamed to traverse to simplify the Arrow API",
@@ -349,11 +353,19 @@ public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Optio
 public fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
   sequence()
 
+@Deprecated(
+  "",
+  ReplaceWith("option<Map<K, B>> { this.mapValues { (_, a) -> a.bind() } }", "arrow.core.raise.option")
+)
 public fun <K, V> Map<K, Option<V>>.sequence(): Option<Map<K, V>> =
-  traverse(::identity)
+  option { mapValues { (_, a) -> a.bind() } }
 
+@Deprecated(
+  "",
+  ReplaceWith("this.mapValues { }")
+)
 public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
-  mapValues { Unit }
+  mapValues { }
 
 public fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
@@ -402,7 +414,7 @@ public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  * <!--- KNIT example-map-03.kt -->
  */
 public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
-  align(b) { (_, ior) -> ior }
+  padZip(b, { _, a -> Ior.Left(a) }, { _, bb -> Ior.Right(bb) }) { _, a, bb -> Ior.Both(a, bb) }
 
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
@@ -423,44 +435,53 @@ public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
  * <!--- KNIT example-map-04.kt -->
  */
 public fun <K, A, B, C> Map<K, A>.align(b: Map<K, B>, fa: (Map.Entry<K, Ior<A, B>>) -> C): Map<K, C> =
-  buildMap {
-    (keys + b.keys).forEach { key ->
-      Ior.fromNullables(this@align[key], b[key])?.let { put(key, fa(Entry(key, it))) }
-    }
-  }
+  padZip(
+    b,
+    { k, a -> fa(Entry(k, Ior.Left(a))) },
+    { k, bb -> fa(Entry(k, Ior.Right(bb))) }
+  ) { k, a, bb -> fa(Entry(k, Ior.Both(a, bb))) }
 
-private data class Entry<K, A>(override val key: K, override val value: A) : Map.Entry<K, A>
-
-/**
- * aligns two structures and combine them with the given Semigroups '+'
- */
-public fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> = SG.run {
-  align(other) { (_, ior) ->
-    ior.fold(::identity, ::identity) { a, b ->
-      a.combine(b)
-    }
-  }
+private class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V> {
+  override fun hashCode(): Int = key.hashCode() xor value.hashCode()
+  override fun toString(): String = "$key=$value"
+  override fun equals(other: Any?): Boolean =
+    other is Map.Entry<*, *> && other.key == key && other.value == value
 }
+
+public fun <K, A> Map<K, A>.align(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
+  padZip(other, { _, a -> a }, { _, b -> b }) { _, a, b -> combine(a, b) }
+
+@Deprecated(
+  "${SemigroupDeprecation}\n use align instead",
+  ReplaceWith("align(other, SG::combine)", "arrow.typeclasses.combine")
+)
+public fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> =
+  align(other, SG::combine)
 
 /**
  * Align two structures as in zip, but filling in blanks with null.
  */
 public fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
-  align(other) { (_, ior) ->
-    ior.fold(
-      { it to null },
-      { null to it },
-      { a, b -> a to b }
-    )
-  }
+  padZip(other) { _, a, b -> a to b }
 
 public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K, C> =
-  align(other) { (k, ior) ->
-    ior.fold(
-      { fa(k, it, null) },
-      { fa(k, null, it) },
-      { a, b -> fa(k, a, b) }
-    )
+  padZip(other, { k, a -> fa(k, a, null) }, { k, b -> fa(k, null, b) }) { k, a, b -> fa(k, a, b) }
+
+public fun <K, A, B, C> Map<K, A>.padZip(
+  other: Map<K, B>,
+  left: (K, A) -> C,
+  right: (K, B) -> C,
+  both: (K, A, B) -> C
+): Map<K, C> =
+  buildMap {
+    (keys + other.keys).forEach { key ->
+      @Suppress("UNCHECKED_CAST")
+      when {
+        key in this@padZip && key in other -> put(key, both(key, this@padZip[key] as A, other[key] as B))
+        key in this@padZip -> put(key, left(key, this@padZip[key] as A))
+        key in other -> put(key, right(key, other[key] as B))
+      }
+    }
   }
 
 /**
@@ -569,16 +590,29 @@ public inline fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, 
   return lefts to rights
 }
 
-public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
+@Suppress("UNCHECKED_CAST")
+public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> =
+  if (containsKey(key)) Some(get(key) as V) else None
 
-public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
-  if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }
-  else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
-}
+/** Combines two maps using [combine] to combine values for the same key. */
+public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
+  if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
+  else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(a, it) } ?: a) }
 
-@Deprecated("use fold instead", ReplaceWith("fold(Monoid.map(SG))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b, SG::combine)", "arrow.typeclasses.combine"))
+public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
+  combine(b, SG::combine)
+
+@Deprecated(
+  "Use fold & Map.combine instead.\n$NicheAPI",
+  ReplaceWith(
+    "fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }",
+    "arrow.core.combine",
+    "arrow.typeclasses.combine"
+  )
+)
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(Monoid.map(SG))
+  fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }
 
 public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
   var accumulator = initial
@@ -586,13 +620,11 @@ public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.E
   return accumulator
 }
 
-@Deprecated("Use fold instead align with Kotlin Std naming", ReplaceWith("fold<K, A, B>(b, f)"))
-public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
-  var result = b
-  this.forEach { result = f(result, it) }
-  return result
-}
+@Deprecated("Use fold instead foldLeft", ReplaceWith("fold<K, A, B>(b, f)"))
+public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B =
+  fold(b, f)
 
+@Deprecated("Internal method will be removed from binary in 2.0.0")
 internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
   when (this) {
     null -> emptyList()

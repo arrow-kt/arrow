@@ -6,6 +6,8 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
 
@@ -218,10 +220,12 @@ public class NonEmptyList<out A>(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
 
+  public fun salign(other: NonEmptyList<@UnsafeVariance A>, combine: (A, A) -> @UnsafeVariance A): NonEmptyList<A> =
+    NonEmptyList(combine(head, other.head), tail.salign(combine, other.tail).toList())
+
+  @Deprecated(SemigroupDeprecation, ReplaceWith("salign(b, SA::combine)", "arrow.typeclasses.combine"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    SA.run {
-      NonEmptyList(head.combine(b.head), tail.salign(SA, b.tail).toList())
-    }
+    salign(b, SA::combine)
 
   public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
     NonEmptyList(head to other.head, tail.padZip(other.tail))
@@ -443,8 +447,9 @@ public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
@@ -456,8 +461,9 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 @OptIn(ExperimentalTypeInference::class)
@@ -466,27 +472,29 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+  mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
+  mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
+  mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()
 
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   combine: (E, E) -> E,
