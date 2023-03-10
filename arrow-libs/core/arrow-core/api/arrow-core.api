@@ -57,6 +57,7 @@ public final class arrow/core/Const$Companion {
 }
 
 public final class arrow/core/ConstKt {
+	public static final field ConstDeprecation Ljava/lang/String;
 	public static final fun combine (Larrow/core/Const;Larrow/typeclasses/Semigroup;Larrow/core/Const;)Larrow/core/Const;
 	public static final fun compareTo (Larrow/core/Const;Larrow/core/Const;)I
 	public static final fun const (Ljava/lang/Object;)Larrow/core/Const;
@@ -586,10 +587,13 @@ public final class arrow/core/IorKt {
 	public static final fun bisequenceOption (Larrow/core/Ior;)Larrow/core/Option;
 	public static final fun bisequenceValidated (Larrow/core/Ior;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
 	public static final fun bothIor (Lkotlin/Pair;)Larrow/core/Ior;
+	public static final fun combine (Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
 	public static final fun combine (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun compareTo (Larrow/core/Ior;Larrow/core/Ior;)I
 	public static final fun flatMap (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static final fun flatMap (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static final fun flatten (Larrow/core/Ior;Larrow/typeclasses/Semigroup;)Larrow/core/Ior;
+	public static final fun flatten (Larrow/core/Ior;Lkotlin/jvm/functions/Function2;)Larrow/core/Ior;
 	public static final synthetic fun getOrElse (Larrow/core/Ior;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun getOrElse (Larrow/core/Ior;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun leftIor (Ljava/lang/Object;)Larrow/core/Ior;
@@ -2883,6 +2887,7 @@ public final class arrow/core/continuations/FoldContinuation : arrow/core/contin
 
 public final class arrow/core/continuations/IorEagerEffectScope : arrow/core/continuations/EagerEffectScope, arrow/typeclasses/Semigroup {
 	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/EagerEffectScope;)V
+	public fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2903,6 +2908,7 @@ public final class arrow/core/continuations/IorEagerEffectScope : arrow/core/con
 
 public final class arrow/core/continuations/IorEffectScope : arrow/core/continuations/EffectScope, arrow/typeclasses/Semigroup {
 	public fun <init> (Larrow/typeclasses/Semigroup;Larrow/core/continuations/EffectScope;)V
+	public fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3607,6 +3613,7 @@ public final class arrow/typeclasses/Monoid$Companion {
 }
 
 public final class arrow/typeclasses/Monoid$DefaultImpls {
+	public static fun append (Larrow/typeclasses/Monoid;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun combineAll (Larrow/typeclasses/Monoid;Ljava/util/Collection;)Ljava/lang/Object;
 	public static fun combineAll (Larrow/typeclasses/Monoid;Ljava/util/List;)Ljava/lang/Object;
 	public static fun fold (Larrow/typeclasses/Monoid;Ljava/util/Collection;)Ljava/lang/Object;
@@ -3626,6 +3633,7 @@ public abstract interface class arrow/typeclasses/Semigroup {
 	public static fun Integer ()Larrow/typeclasses/Semigroup;
 	public static fun Long ()Larrow/typeclasses/Semigroup;
 	public static fun Short ()Larrow/typeclasses/Semigroup;
+	public abstract fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun constant (Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
 	public static fun either (Larrow/typeclasses/Semigroup;Larrow/typeclasses/Semigroup;)Larrow/typeclasses/Semigroup;
@@ -3665,6 +3673,8 @@ public final class arrow/typeclasses/Semigroup$Companion {
 
 public final class arrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup : arrow/typeclasses/Semigroup {
 	public static final field INSTANCE Larrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup;
+	public fun append (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public synthetic fun append (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun combine (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public synthetic fun combine (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun maybeCombine (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
@@ -3674,6 +3684,7 @@ public final class arrow/typeclasses/Semigroup$Companion$NonEmptyListSemigroup :
 }
 
 public final class arrow/typeclasses/Semigroup$DefaultImpls {
+	public static fun append (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun maybeCombine (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun plus (Larrow/typeclasses/Semigroup;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
