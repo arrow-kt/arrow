@@ -842,17 +842,17 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
 /**
  * aligns two structures and combine them with [combine]
  */
-public fun <A> Iterable<A>.salign(other: Iterable<A>, combine: (A, A) -> A): Iterable<A> =
+public fun <A> Iterable<A>.align(other: Iterable<A>, combine: (A, A) -> A): Iterable<A> =
   padZip(other, ::identity, ::identity, combine)
 
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("salign(other, SG::combine)", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("align(other, SG::combine)", "arrow.typeclasses.combine"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
-): Iterable<A> = salign(other, SG::combine)
+): Iterable<A> = align(other, SG::combine)
 
 /**
  * unzips the structure holding the resulting elements in an `Pair`
