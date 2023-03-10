@@ -909,13 +909,13 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  *      Pair("A", 1).bothIor(),
  *      Pair("B", 2).bothIor(),
  *      "C".leftIor()
- *    ).seperateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
+ *    ).separateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
  * }
  * ```
  * <!--- KNIT example-iterable-13.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> =
+public fun <A, B> Iterable<Ior<A, B>>.separateIor(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList<B>()) { (l, r), x ->
     x.fold(
       { l + it to r },
@@ -925,10 +925,10 @@ public fun <A, B> Iterable<Ior<A, B>>.seperateIor(): Pair<List<A>, List<B>> =
   }
 
 @Deprecated(
-  "The current unalign function is renamed to seperateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
-  ReplaceWith("seperateIor()", "arrow.core.seperateIor")
+  "The current unalign function is renamed to separateIor, and a new unalign function is going to be added to Arrow 2.0.0.",
+  ReplaceWith("separateIor()", "arrow.core.separateIor")
 )
-public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = seperateIor()
+public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = separateIor()
 
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
