@@ -665,8 +665,8 @@ public final class arrow/core/IterableKt {
 	public static final fun salign (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Ljava/lang/Iterable;)Ljava/lang/Iterable;
 	public static final fun salign (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/lang/Iterable;
 	public static final fun separateEither (Ljava/lang/Iterable;)Lkotlin/Pair;
+	public static final fun separateIor (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun separateValidated (Ljava/lang/Iterable;)Lkotlin/Pair;
-	public static final fun seperateIor (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Either;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun sequence (Ljava/lang/Iterable;)Larrow/core/Validated;
