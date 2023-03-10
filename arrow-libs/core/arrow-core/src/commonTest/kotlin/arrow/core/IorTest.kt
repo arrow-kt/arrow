@@ -16,19 +16,15 @@ import io.kotest.property.checkAll
 
 class IorTest : StringSpec({
 
-    val ARB = Arb.ior(Arb.string(), Arb.int())
+    fun nullableLongSemigroup(x: Long?, y: Long?): Long? = Nullable.zip(x, y, Long::plus)
 
     testLaws(
-      SemigroupLaws( { x, y -> x.combine(String::plus, Int::plus, y) }, ARB)
+      SemigroupLaws( { x, y -> x.combine(String::plus, Int::plus, y) }, Arb.ior(Arb.string(), Arb.int()))
     )
-
-    val nullableLongSemigroup: (Long?, Long?) -> Long? = { x, y ->
-      Nullable.zip(x, y, Long::plus)
-    }
 
     "zip identity" {
       checkAll(Arb.ior(Arb.long().orNull(), Arb.int().orNull())) { ior ->
-        val res = ior.zip(nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
+        val res = ior.zip(::nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
         res shouldBe ior
       }
     }
@@ -47,7 +43,7 @@ class IorTest : StringSpec({
         Arb.ior(Arb.long().orNull(), Arb.int().orNull())
       ) { a, b, c, d, e, f, g, h, i, j ->
         val res = a.zip(
-          nullableLongSemigroup,
+          ::nullableLongSemigroup,
           b, c, d, e, f, g, h, i, j
         ) { a, b, c, d, e, f, g, h, i, j ->
           Nullable.zip(
@@ -66,7 +62,7 @@ class IorTest : StringSpec({
 
         val expected = listOf(a, b, c, d, e, f, g, h, i, j)
           .fold<Ior<Long?, Int?>, Ior<Long?, Int?>>(Ior.Right(0)) { acc, ior ->
-            val mid = acc.flatMap(nullableLongSemigroup) { a -> ior.map { b -> Nullable.zip(a, b) { a, b -> a + b } } }
+            val mid = acc.flatMap(::nullableLongSemigroup) { a -> ior.map { b -> Nullable.zip(a, b) { a, b -> a + b } } }
             mid
           }
 
