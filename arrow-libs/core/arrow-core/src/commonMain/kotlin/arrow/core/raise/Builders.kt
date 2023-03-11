@@ -13,11 +13,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.orElse
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
@@ -85,7 +81,7 @@ public class IorRaise<E> @PublishedApi internal constructor(
   private val combineError: (E, E) -> E,
   private val state: Atomic<Option<E>>,
   private val raise: Raise<E>,
-) : Raise<E> by raise {
+) : Raise<E> {
 
   override fun raise(r: E): Nothing = raise.raise(combine(r))
 

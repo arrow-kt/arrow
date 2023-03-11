@@ -51,7 +51,7 @@ class TraceSpec : StringSpec({
 
   "nested tracing - identity" {
     val inner = CompletableDeferred<String>()
-    ior(Semigroup.string()) {
+    ior(String::plus) {
       traced({
         traced({ raise("") }) { traced ->
           inner.complete(traced.stackTraceToString())
