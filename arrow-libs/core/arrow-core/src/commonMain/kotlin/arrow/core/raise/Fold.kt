@@ -203,3 +203,8 @@ private class RaiseLeakedException : IllegalStateException(
   See: Effect documentation for additional information.
   """.trimIndent()
 )
+
+internal const val RaiseCancellationExceptionCaptured: String =
+  "kotlin.coroutines.cancellation.CancellationException should never get cancelled. Always re-throw it if captured." +
+    "This swallows the exception of Arrow's Raise, and leads to unexpected behavior." +
+    "When working with Arrow prefer Either.catch or arrow.core.raise.catch to automatically rethrow CancellationException."
