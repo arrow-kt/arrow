@@ -91,7 +91,6 @@ public inline fun <R, A, B> fold(
   transform: (value: A) -> B,
 ): B {
   contract {
-    callsInPlace(program, EXACTLY_ONCE)
     callsInPlace(error, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)

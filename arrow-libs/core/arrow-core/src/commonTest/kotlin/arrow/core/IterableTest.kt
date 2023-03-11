@@ -2,14 +2,19 @@ package arrow.core
 
 import arrow.core.test.either
 import arrow.core.test.ior
+import arrow.core.test.functionAToB
 import arrow.core.test.option
+import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.math.max
@@ -50,7 +55,7 @@ class IterableTest : StringSpec({
 
     "mapAccumulating accumulates" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val res: Either<NonEmptyList<Int>, List<Int>> =
+        val res=
           ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
 
         val expected: Either<NonEmptyList<Int>, List<Int>> = ints.filterNot { it % 2 == 0 }
@@ -302,6 +307,23 @@ class IterableTest : StringSpec({
       }
     }
 
+  "unzip is the inverse of zip" {
+    checkAll(Arb.list(Arb.int())) { xs ->
+
+      val zipped = xs.zip(xs)
+      val ls = zipped.unzip()
+      val rs = xs to xs
+
+      ls shouldBe rs
+    }
+  }
+
+  "unzip(fn)" {
+    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string()))) { xs ->
+      xs.unzip { it } shouldBe xs.unzip()
+    }
+  }
+
   "unalign is the inverse of align" {
     fun <A, B> Pair<List<A?>, List<B?>>.fix(): Pair<List<A>, List<B>> =
       first.mapNotNull { it } to second.mapNotNull { it }
@@ -332,6 +354,46 @@ class IterableTest : StringSpec({
   "unalign(fn)" {
     checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
       xs.unalign { it } shouldBe xs.unalign()
+    }
+  }
+
+  "salign" {
+    checkAll(Arb.list(Arb.int())) { xs ->
+      xs.salign(Semigroup.int(), xs) shouldBe xs.map { it + it }
+    }
+  }
+
+  "reduceOrNull is compatible with reduce from stdlib" {
+    checkAll(Arb.list(Arb.string())) { xs ->
+
+      val rs = xs.reduceOrNull({ it }) { a, b ->
+        a + b
+      }
+
+      if (xs.isEmpty()) {
+        rs.shouldBeNull()
+      } else {
+        rs shouldBe xs.reduce {
+            a,b -> a +b
+        }
+      }
+    }
+  }
+
+  "reduceRightNull is compatible with reduce from stdlib" {
+    checkAll(Arb.list(Arb.string())) { xs ->
+
+      val rs = xs.reduceRightNull({ it }) { a, b ->
+        a + b
+      }
+
+      if (xs.isEmpty()) {
+        rs.shouldBeNull()
+      } else {
+        rs shouldBe xs.reduceRight {
+            a,b -> a +b
+        }
+      }
     }
   }
 })

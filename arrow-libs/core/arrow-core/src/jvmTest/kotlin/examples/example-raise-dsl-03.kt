@@ -10,10 +10,10 @@ import io.kotest.matchers.shouldBe
 
 fun Raise<String>.failure(): Int = raise("failed")
 
-fun Raise<Nothing>.recovered(): Int = recover({ failure() }) { _: String -> 1 }
+fun recovered(): Int = recover({ failure() }) { _: String -> 1 }
 
 fun test() {
-  val either = either { failure() }
+  val either: Either<Nothing, Int> = either { failure() }
     .recover { _: String -> recovered() }
 
   either shouldBe Either.Right(1)

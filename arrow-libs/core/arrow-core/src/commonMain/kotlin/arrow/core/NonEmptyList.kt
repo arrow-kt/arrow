@@ -1,6 +1,12 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.core
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.core.raise.RaiseAccumulate
 import arrow.typeclasses.Semigroup
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -344,7 +350,72 @@ public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmp
   this.unzip(::identity)
 
 public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> =
-  all.unzip(f).let { (a, b) -> NonEmptyList(a) to NonEmptyList(b) }
+  this.map(f).let { nel ->
+    nel.tail.unzip().let {
+      NonEmptyList(nel.head.first, it.first) to
+        NonEmptyList(nel.head.second, it.second)
+    }
+  }
+
+@Deprecated(
+  "traverseEither is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
+public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
+  f(head).map { newHead ->
+    val acc = mutableListOf<B>()
+    tail.forEach { a ->
+      when (val res = f(a)) {
+        is Right -> acc.add(res.value)
+        is Left -> return@traverse res
+      }
+    }
+    NonEmptyList(newHead, acc)
+  }
+
+@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
+  sequence()
+
+public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<A>> =
+  traverse(::identity)
+
+public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
+  combine: (E, E) -> E,
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
+): Either<E, NonEmptyList<B>> =
+  all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
+
+public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
+): Either<NonEmptyList<E>, NonEmptyList<B>> =
+  all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
+
+@Deprecated(
+  "traverseOption is being renamed to traverse to simplify the Arrow API",
+  ReplaceWith("traverse(f)", "arrow.core.traverse")
+)
+public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  traverse(f)
+
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
+  f(head).map { newHead ->
+    val acc = mutableListOf<B>()
+    tail.forEach { a ->
+      when (val res = f(a)) {
+        is Some -> acc.add(res.value)
+        is None -> return@traverse res
+      }
+    }
+    NonEmptyList(newHead, acc)
+  }
 
 @JvmName("toNonEmptyListOrNull")
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =

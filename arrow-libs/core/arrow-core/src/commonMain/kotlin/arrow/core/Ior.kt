@@ -1,13 +1,21 @@
 @file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
-import arrow.core.Ior.*
-import arrow.core.Ior.Right.Companion.unit
+import arrow.core.Ior.Both
+import arrow.core.Ior.Left
+import arrow.core.Ior.Right
+import arrow.core.raise.either
+import arrow.core.raise.ior
+import arrow.core.raise.nullable
+import arrow.core.raise.option
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.experimental.ExperimentalTypeInference
+import kotlin.js.JsName
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public typealias IorNel<A, B> = Ior<Nel<A>, B>
@@ -32,7 +40,7 @@ public typealias IorNel<A, B> = Ior<Nel<A>, B>
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
 public sealed class Ior<out A, out B> {
-  
+
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
    *
@@ -49,8 +57,12 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-01.kt -->
    */
+  @Deprecated(
+    RedundantAPI + "Use isRight()",
+    ReplaceWith("isRight()")
+  )
   public abstract val isRight: Boolean
-  
+
   /**
    * Returns `true` if this is a [Left], `false` otherwise.
    *
@@ -67,8 +79,12 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-02.kt -->
    */
+  @Deprecated(
+    RedundantAPI + "Use isLeft()",
+    ReplaceWith("isLeft()")
+  )
   public abstract val isLeft: Boolean
-  
+
   /**
    * Returns `true` if this is a [Both], `false` otherwise.
    *
@@ -84,8 +100,45 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-03.kt -->
    */
+
+  @Deprecated(
+    RedundantAPI + "Use isBoth()",
+    ReplaceWith("isBoth()")
+  )
   public abstract val isBoth: Boolean
-  
+  @JsName("_isLeft")
+  @JvmName("_isLeft")
+  public fun isLeft(): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Ior.Left<A>)
+      returns(false) implies (this@Ior is Ior.Right<B>)
+      returns(false) implies (this@Ior is Ior.Both<A,B>)
+    }
+    return this@Ior is Ior.Left<A>
+  }
+
+  @JsName("_isRight")
+  @JvmName("_isRight")
+  public fun isRight(): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Ior.Right<B>)
+      returns(false) implies (this@Ior is Ior.Left<A>)
+      returns(false) implies (this@Ior is Ior.Both<A,B>)
+    }
+    return this@Ior is Ior.Right<B>
+  }
+
+  @JsName("_isBoth")
+  @JvmName("_isBoth")
+  public fun isBoth(): Boolean {
+    contract {
+      returns(false) implies (this@Ior is Ior.Right<B>)
+      returns(false) implies (this@Ior is Ior.Left<A>)
+      returns(true) implies (this@Ior is Ior.Both<A,B>)
+    }
+    return this@Ior is Ior.Both<A, B>
+  }
+
   public companion object {
     /**
      * Create an [Ior] from two nullables if at least one of them is defined.
@@ -103,19 +156,19 @@ public sealed class Ior<out A, out B> {
           true -> Both(a, b)
           false -> Left(a)
         }
-        
+
         false -> when (b != null) {
           true -> Right(b)
           false -> null
         }
       }
-    
+
     @JvmStatic
     public fun <A, B> leftNel(a: A): IorNel<A, B> = Left(nonEmptyListOf(a))
-    
+
     @JvmStatic
     public fun <A, B> bothNel(a: A, b: B): IorNel<A, B> = Both(nonEmptyListOf(a), b)
-    
+
     /**
      *  Lifts a function `(B) -> C` to the [Ior] structure returning a polymorphic function
      *  that can be applied over all [Ior] values in the shape of Ior<A, B>
@@ -134,14 +187,20 @@ public sealed class Ior<out A, out B> {
      *  ```
      */
     @JvmStatic
+    @Deprecated(RedundantAPI + "Prefer explicitly creating lambdas",
+      ReplaceWith("{ it.map(f) }")
+    )
     public fun <A, B, C> lift(f: (B) -> C): (Ior<A, B>) -> Ior<A, C> =
       { it.map(f) }
-    
+
     @JvmStatic
+    @Deprecated(RedundantAPI + "Prefer explicitly creating lambdas",
+      ReplaceWith("{ it.map(fb).mapLeft(fa) }")
+    )
     public fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Ior<A, B>) -> Ior<C, D> =
-      { it.bimap(fa, fb) }
+      { it.map(fb).mapLeft(fa) }
   }
-  
+
   /**
    * Applies `fa` if this is a [Left], `fb` if this is a [Right] or `fab` if this is a [Both]
    *
@@ -164,18 +223,30 @@ public sealed class Ior<out A, out B> {
     }
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("fold({ c }, { f(c, it) }, { _, b -> f(c, b) })")
+  )
   public inline fun <C> foldLeft(c: C, f: (C, B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
     return fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("this.fold<C>({ MN.empty() }, { f }, { _, b -> f(b) })")
+  )
   public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
     return MN.run {
-      foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
+      fold({ MN.empty() }, { f(it) }, { _, b -> f(b) })
     }
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("this.fold<C>({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })")
+  )
   public inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C {
     contract {
       callsInPlace(f, InvocationKind.AT_MOST_ONCE)
@@ -184,16 +255,20 @@ public sealed class Ior<out A, out B> {
     return fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer when or fold instead",
+    ReplaceWith("  MN.run { fold({ f(it) },{ g(it) },{ a,b -> f(a).combine(g(b)) })}")
+  )
   public inline fun <C> bifoldMap(MN: Monoid<C>, f: (A) -> C, g: (B) -> C): C {
     contract {
       callsInPlace(f, InvocationKind.AT_MOST_ONCE)
       callsInPlace(g, InvocationKind.AT_MOST_ONCE)
     }
     return MN.run {
-      bifoldLeft(MN.empty(), { c, a -> c.combine(f(a)) }, { c, b -> c.combine(g(b)) })
+      fold({ f(it) },{ g(it) },{ a,b -> f(a).combine(g(b)) })
     }
   }
-  
+
   /**
    * The given function is applied if this is a [Right] or [Both] to `B`.
    *
@@ -234,16 +309,16 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-05.kt -->
    */
+  @Deprecated(
+    NicheAPI + "Prefer using the Either DSL, or map + mapLeft",
+    ReplaceWith("map(fb).mapLeft(fa)")
+  )
   public inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> {
     contract {
       callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
       callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
     }
-    return fold(
-      { Left(fa(it)) },
-      { Right(fb(it)) },
-      { a, b -> Both(fa(a), fb(b)) }
-    )
+    return map(fb).mapLeft(fa)
   }
 
   /**
@@ -254,9 +329,9 @@ public sealed class Ior<out A, out B> {
    * import arrow.core.Ior
    *
    * fun main() {
-   *   Ior.Right(12).map { "flower" } // Result: Right(12)
-   *   Ior.Left(12).map { "flower" }  // Result: Left("power")
-   *   Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
+   *   Ior.Right(12).mapLeft { "flower" } // Result: Right(12)
+   *   Ior.Left(12).mapLeft { "flower" }  // Result: Left("power")
+   *   Ior.Both(12, "power").mapLeft { "flower $it" }  // Result: Both("flower 12", "power")
    * }
    * ```
    * <!--- KNIT example-ior-06.kt -->
@@ -291,7 +366,7 @@ public sealed class Ior<out A, out B> {
     { Left(it) },
     { a, b -> Both(b, a) }
   )
-  
+
   /**
    * Return the isomorphic [Either] of this [Ior]
    */
@@ -300,7 +375,7 @@ public sealed class Ior<out A, out B> {
     { Either.Left(Either.Right(it)) },
     { a, b -> Either.Right(Pair(a, b)) }
   )
-  
+
   /**
    * Return this [Ior] as [Pair] of nullables]
    *
@@ -320,12 +395,21 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-08.kt -->
    */
+  @Deprecated(
+    "padNull is being renamed to toPair to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("toPair()")
+  )
   public fun padNull(): Pair<A?, B?> = fold(
     { Pair(it, null) },
     { Pair(null, it) },
     { a, b -> Pair(a, b) }
   )
-  
+  public fun toPair(): Pair<A?, B?> = fold(
+    { Pair(it, null) },
+    { Pair(null, it) },
+    { a, b -> Pair(a, b) }
+  )
+
   /**
    * Returns a [Either.Right] containing the [Right] value or `B` if this is [Right] or [Both]
    * and [Either.Left] if this is a [Left].
@@ -344,7 +428,7 @@ public sealed class Ior<out A, out B> {
    */
   public fun toEither(): Either<A, B> =
     fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
-  
+
   /**
    * Returns the [Right] value or `B` if this is [Right] or [Both]
    * and [null] if this is a [Left].
@@ -365,7 +449,19 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-10.kt -->
    */
+  @Deprecated(
+    "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
+    ReplaceWith("getOrNull()")
+  )
   public fun orNull(): B? {
+    contract {
+      returns(null) implies (this@Ior is Left<A>)
+      returnsNotNull() implies ((this@Ior is Right<B>) || (this@Ior is Both<A, B>))
+    }
+    return fold({ null }, { it }, { _, b -> b })
+  }
+
+  public fun getOrNull(): B? {
     contract {
       returns(null) implies (this@Ior is Left<A>)
       returnsNotNull() implies ((this@Ior is Right<B>) || (this@Ior is Both<A, B>))
@@ -404,40 +500,46 @@ public sealed class Ior<out A, out B> {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = true
     override val isBoth: Boolean get() = false
-    
+
     override fun toString(): String = "Ior.Left($value)"
-    
+
     public companion object
   }
-  
+
   public data class Right<out B>(val value: B) : Ior<Nothing, B>() {
     override val isRight: Boolean get() = true
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = false
-    
+
     override fun toString(): String = "Ior.Right($value)"
-    
+
     public companion object {
       @PublishedApi
       internal val unit: Ior<Nothing, Unit> =
         Right(Unit)
     }
   }
-  
+
   public data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = true
-    
+
     override fun toString(): String = "Ior.Both($leftValue, $rightValue)"
   }
-  
+
   override fun toString(): String = fold(
     { "Ior.Left($it" },
     { "Ior.Right($it)" },
     { a, b -> "Ior.Both($a, $b)" }
   )
-  
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("fold({ a -> fa(a).map { it.leftIor() } }, { b -> fb(b).map { it.rightIor() } },{ a, b -> fa(a).align(fb(b)) })",
+      "arrow.core.leftIor",
+      "arrow.core.rightIor",
+      "arrow.core.align")
+  )
   public inline fun <C, D> bicrosswalk(
     fa: (A) -> Iterable<C>,
     fb: (B) -> Iterable<D>,
@@ -447,7 +549,13 @@ public sealed class Ior<out A, out B> {
       { b -> fb(b).map { it.rightIor() } },
       { a, b -> fa(a).align(fb(b)) }
     )
-  
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("this.fold<K, Ior<C, D>>( { a -> fa(a).mapValues { it.value.leftIor() } },{ b -> fb(b).mapValues { it.value.rightIor() } },{ a, b -> fa(a).align(fb(b)) })",
+      "arrow.core.leftIor",
+      "arrow.core.rightIor",
+      "arrow.core.align")
+  )
   public inline fun <C, D, K> bicrosswalkMap(
     fa: (A) -> Map<K, C>,
     fb: (B) -> Map<K, D>,
@@ -457,7 +565,10 @@ public sealed class Ior<out A, out B> {
       { b -> fb(b).mapValues { it.value.rightIor() } },
       { a, b -> fa(a).align(fb(b)) }
     )
-  
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("fold({ a -> fa(a)?.let { Ior.Left(it) } },{ b -> fb(b)?.let { Ior.Right(it) } },{ a, b -> fromNullables(fa(a), fb(b)) })")
+  )
   public inline fun <C, D> bicrosswalkNull(
     fa: (A) -> C?,
     fb: (B) -> D?,
@@ -467,21 +578,34 @@ public sealed class Ior<out A, out B> {
       { b -> fb(b)?.let { Right(it) } },
       { a, b -> fromNullables(fa(a), fb(b)) }
     )
-  
+
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("fold({ emptyList() },{ b -> fa(b).map { Ior.Right(it) } },{ a, b -> fa(b).map { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
+  )
   public inline fun <C> crosswalk(fa: (B) -> Iterable<C>): List<Ior<A, C>> =
     fold(
       { emptyList() },
       { b -> fa(b).map { Right(it) } },
       { a, b -> fa(b).map { Both(a, it) } }
     )
-  
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("fold({ emptyMap() },{ b -> fa(b).mapValues { Ior.Right(it.value)} },{ a, b -> fa(b).mapValues { Ior.Both(a, it.value) })",
+      "arrow.core.Ior")
+  )
   public inline fun <K, V> crosswalkMap(fa: (B) -> Map<K, V>): Map<K, Ior<A, V>> =
     fold(
       { emptyMap() },
       { b -> fa(b).mapValues { Right(it.value) } },
       { a, b -> fa(b).mapValues { Both(a, it.value) } }
     )
-  
+  @Deprecated(
+    NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+    ReplaceWith("fold({ a -> Ior.Left(a) },{ b -> fa(b)?.let { Ior.Right(it) } },{ a, b -> fa(b)?.let { Ior.Both(a, it) } })",
+      "arrow.core.Ior")
+  )
   public inline fun <A, B, C> crosswalkNull(ior: Ior<A, B>, fa: (B) -> C?): Ior<A, C>? =
     ior.fold(
       { a -> Left(a) },
@@ -489,11 +613,15 @@ public sealed class Ior<out A, out B> {
       { a, b -> fa(b)?.let { Both(a, it) } }
     )
 
+  @Deprecated(
+    NicheAPI + "Prefer using fold, or map + getOrElse",
+    ReplaceWith("fold({ true }, predicate, { _, b -> predicate(b) })")
+  )
   public inline fun all(predicate: (B) -> Boolean): Boolean {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
     return fold({ true }, predicate, { _, b -> predicate(b) })
   }
-  
+
   /**
    * Returns `false` if [Left] or returns the result of the application of
    * the given predicate to the [Right] value.
@@ -512,20 +640,107 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-12.kt -->
    */
+  @Deprecated(
+    NicheAPI + "Prefer using fold, or map + getOrElse",
+    ReplaceWith("fold({ false }, predicate, { _, b -> predicate(b) })")
+  )
   public inline fun exists(predicate: (B) -> Boolean): Boolean {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
     return fold({ false }, predicate, { _, b -> predicate(b) })
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer Kotlin nullable syntax instead",
+    ReplaceWith("getOrNull()?.takeIf(predicate)")
+  )
   public inline fun findOrNull(predicate: (B) -> Boolean): B? {
     contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is Left -> null
-      is Right -> if (predicate(this.value)) this.value else null
-      is Both -> if (predicate(this.rightValue)) this.rightValue else null
-    }
+    return getOrNull()?.takeIf(predicate)
   }
 
+
+  /**
+   * Returns `false` if [Right] or [Both], or returns the result of the application of
+   * the given predicate to the [Left] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   val right: Ior<Int, Int> = Ior.Right(12)
+   *   right.isLeft { it > 10 }   // Result: false
+   *   Ior.Both(12, 7).isLeft { it > 10 }    // Result: false
+   *   Ior.Left(12).isLeft { it > 10 }      // Result: true
+   * }
+   * ```
+   * <!--- KNIT example-ior-13.kt -->
+   */
+  public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Left<A>)
+      returns(false) implies (this@Ior is Right<B> || this@Ior is Both<A, B>)
+    }
+    return this@Ior is Left<A> && predicate(value)
+  }
+
+  /**
+   * Returns `false` if [Left] or [Both], or returns the result of the application of
+   * the given predicate to the [Right] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *   Ior.Right(12).isRight { it > 10 }   // Result: false
+   *   Ior.Both(12, 7).isRight { it > 10 }    // Result: false
+   *   val left: Ior<Int, Int> = Ior.Left(12)
+   *   left.isRight { it > 10 }      // Result: true
+   * }
+   * ```
+   * <!--- KNIT example-ior-14.kt -->
+   */
+  public inline fun isRight(predicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Right<B>)
+      returns(false) implies (this@Ior is Left<A> || this@Ior is Both<A, B>)
+    }
+    return this@Ior is Right<B> && predicate(value)
+  }
+
+  /**
+   * Returns `false` if [Right] or [Left], or returns the result of the application of
+   * the given predicate to the [Both] value.
+   *
+   * Example:
+   * ```kotlin
+   * import arrow.core.Ior
+   *
+   * fun main() {
+   *     val right: Ior<Int, Int> = Ior.Right(12)
+   *     right.isBoth( {it > 10}, {it > 6 })   // Result: false
+   *     Ior.Both(12, 7).isBoth( {it > 10}, {it > 6 })// Result: true
+   *     val left: Ior<Int, Int> = Ior.Left(12)
+   *     left.isBoth ( {it > 10}, {it > 6 })      // Result: false
+   * }
+   * ```
+   * <!--- KNIT example-ior-15.kt -->
+   */
+  public inline fun isBoth(leftPredicate: (A) -> Boolean, rightPredicate: (B) -> Boolean): Boolean {
+    contract {
+      returns(true) implies (this@Ior is Both<A, B>)
+      returns(false) implies (this@Ior is Left<A> || this@Ior is Right<B>)
+    }
+    return this@Ior is Both<A, B> && leftPredicate(leftValue) && rightPredicate(rightValue)
+  }
+
+
+
+  @Deprecated(
+    NicheAPI + "Prefer using isLeft",
+    ReplaceWith("isLeft()")
+  )
   public fun isEmpty(): Boolean {
     contract {
       returns(true) implies (this@Ior is Left<A>)
@@ -534,6 +749,10 @@ public sealed class Ior<out A, out B> {
     return isLeft
   }
 
+  @Deprecated(
+    NicheAPI + "Prefer using isRight and isBoth",
+    ReplaceWith("(this.isRight() || this.isBoth())")
+  )
   public fun isNotEmpty(): Boolean {
     contract {
       returns(false) implies (this@Ior is Left<A>)
@@ -541,7 +760,7 @@ public sealed class Ior<out A, out B> {
     }
     return !isLeft
   }
-  
+
   public fun void(): Ior<A, Unit> =
     map { Unit }
 }
@@ -564,10 +783,20 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A,
     }
   }
 
+@Deprecated(
+  RedundantAPI + "This API is overloaded with an API with a single argument",
+  level = DeprecationLevel.HIDDEN
+)
 public inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B {
   contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
   return fold({ default() }, ::identity, { _, b -> b })
 }
+
+public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
+  contract {callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  return fold(default, ::identity) { _, b -> b }
+}
+
 
 public fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
@@ -584,13 +813,13 @@ public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: I
           is Ior.Right -> Ior.Both(a.value, other.value)
           is Ior.Both -> Ior.Both(a.value + other.leftValue, other.rightValue)
         }
-        
+
         is Ior.Right -> when (other) {
           is Ior.Left -> Ior.Both(other.value, a.value)
           is Ior.Right -> Ior.Right(a.value + other.value)
           is Ior.Both -> Ior.Both(other.leftValue, a.value + other.rightValue)
         }
-        
+
         is Ior.Both -> when (other) {
           is Ior.Left -> Ior.Both(a.leftValue + other.value, a.rightValue)
           is Ior.Right -> Ior.Both(a.leftValue, a.rightValue + other.value)
@@ -604,26 +833,46 @@ public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: I
 public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)
 
+@Deprecated(
+  NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+  ReplaceWith("if (n <= 0) Ior.Right<List<B>>(emptyList<B>())\n" +
+    "  else when (this) {\n" +
+    "    is Ior.Right -> Ior.Right<List<B>>(List(n) { value })\n" +
+    "    is Ior.Left -> this\n" +
+    "    is Ior.Both -> map { List(n) { rightValue } }.mapLeft<A>{ List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run<Semigroup<A>> { acc + a } } }\n" +
+    "  }","arrow.core.Ior")
+)
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>> =
   if (n <= 0) Ior.Right(emptyList())
   else when (this) {
     is Ior.Right -> Ior.Right(List(n) { value })
     is Ior.Left -> this
-    is Ior.Both -> bimap(
-      { List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run { acc + a } } },
-      { List(n) { rightValue } }
-    )
+    is Ior.Both -> map { List(n) { rightValue } }.mapLeft{ List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run { acc + a } } }
   }
 
+@Deprecated(
+  NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
+  ReplaceWith("if (n <= 0) Ior.Right(MB.empty())\n" +
+    "  else when (this) {\n" +
+    "    is Ior.Right -> Ior.Right(MB.run { List(n) { value }.fold() })\n" +
+    "    is Ior.Left -> this\n" +
+    "    is Ior.Both -> map { MB.run { List(n) { rightValue }.fold() } }.mapLeft {\n" +
+    "      List(n - 1) { leftValue }.fold(\n" +
+    "        leftValue\n" +
+    "      ) { acc, a -> SA.run { acc + a } }\n" +
+    "    }\n" +
+    "  }", "arrow.core.Ior")
+)
 public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, B> =
   if (n <= 0) Ior.Right(MB.empty())
   else when (this) {
     is Ior.Right -> Ior.Right(MB.run { List(n) { value }.fold() })
     is Ior.Left -> this
-    is Ior.Both -> bimap(
-      { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
-      { MB.run { List(n) { rightValue }.fold() } }
-    )
+    is Ior.Both -> map { MB.run { List(n) { rightValue }.fold() } }.mapLeft {
+      List(n - 1) { leftValue }.fold(
+        leftValue
+      ) { acc, a -> SA.run { acc + a } }
+    }
   }
 
 /**
@@ -641,26 +890,46 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): 
  *   println(chars)
  * }
  * ```
- * <!--- KNIT example-ior-13.kt -->
+ * <!--- KNIT example-ior-16.kt -->
  */
 public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
   this
 
+@Deprecated(
+  NicheAPI + "Prefer using widen",
+  ReplaceWith("widen", "arrow.core.widen")
+)
 public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
   this
 
-public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
-  zip(SA, fb, ::Pair)
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { Pair(this@zip.bind(), fb.bind()) }", "arrow.core.raise.ior")
+)
+public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> {
 
+  return ior(SA) { Pair(this@zip.bind(), fb.bind()) }
+}
+
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind()) }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
   map: (B, C) -> D
 ): Ior<A, D> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()) }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -668,9 +937,15 @@ public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   map: (B, C, D) -> E
 ): Ior<A, E> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -679,9 +954,15 @@ public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   map: (B, C, D, E) -> F
 ): Ior<A, F> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind(), e.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -691,9 +972,15 @@ public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   map: (B, C, D, E, F) -> G
 ): Ior<A, G> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -704,9 +991,15 @@ public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
   map: (B, C, D, E, F, G) -> H
 ): Ior<A, H> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -718,9 +1011,15 @@ public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H) -> I
 ): Ior<A, I> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -733,9 +1032,15 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H, I) -> J
 ): Ior<A, J> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -749,9 +1054,15 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
   map: (B, C, D, E, F, G, H, I, J) -> K
 ): Ior<A, K> {
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-  return zip(SA, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+  return ior(SA) {
+    map(this@zip.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind())
+  }
 }
 
+@Deprecated(
+  NicheAPI + "Prefer using the inline ior DSL",
+  ReplaceWith("ior(SA) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind() }", "arrow.core.raise.ior")
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   SA: Semigroup<A>,
   c: Ior<A, C>,
@@ -768,16 +1079,16 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
   contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
   // If any of the values is Right or Both then we can calculate L otherwise it results in MY_NULL
   val rightValue: Any? = if (
-    (this@zip.isRight || this@zip.isBoth) &&
-    (c.isRight || c.isBoth) &&
-    (d.isRight || d.isBoth) &&
-    (e.isRight || e.isBoth) &&
-    (f.isRight || f.isBoth) &&
-    (g.isRight || g.isBoth) &&
-    (h.isRight || h.isBoth) &&
-    (i.isRight || i.isBoth) &&
-    (j.isRight || j.isBoth) &&
-    (k.isRight || k.isBoth)
+    (this@zip.isRight() || this@zip.isBoth()) &&
+    (c.isRight() || c.isBoth()) &&
+    (d.isRight() || d.isBoth()) &&
+    (e.isRight() || e.isBoth()) &&
+    (f.isRight() || f.isBoth()) &&
+    (g.isRight() || g.isBoth()) &&
+    (h.isRight() || h.isBoth()) &&
+    (i.isRight() || i.isBoth()) &&
+    (j.isRight() || j.isBoth()) &&
+    (k.isRight() || k.isBoth())
   ) {
     map(
       this@zip.orNull() as B,
@@ -792,44 +1103,44 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
       k.orNull() as K
     )
   } else EmptyValue
-  
+
   val leftValue: Any? = SA.run {
     var accumulatedLeft: Any? = EmptyValue
-    
+
     if (this@zip is Left) return@zip Left(this@zip.value)
     accumulatedLeft =
       if (this@zip is Both) this@zip.leftValue else accumulatedLeft
-    
+
     if (c is Left) return@zip Left(emptyCombine(accumulatedLeft, c.value))
     accumulatedLeft = if (c is Both) emptyCombine(accumulatedLeft, c.leftValue) else accumulatedLeft
-    
+
     if (d is Left) return@zip Left(emptyCombine(accumulatedLeft, d.value))
     accumulatedLeft = if (d is Both) emptyCombine(accumulatedLeft, d.leftValue) else accumulatedLeft
-    
+
     if (e is Left) return@zip Left(emptyCombine(accumulatedLeft, e.value))
     accumulatedLeft = if (e is Both) emptyCombine(accumulatedLeft, e.leftValue) else accumulatedLeft
-    
+
     if (f is Left) return@zip Left(emptyCombine(accumulatedLeft, f.value))
     accumulatedLeft = if (f is Both) emptyCombine(accumulatedLeft, f.leftValue) else accumulatedLeft
-    
+
     if (g is Left) return@zip Left(emptyCombine(accumulatedLeft, g.value))
     accumulatedLeft = if (g is Both) emptyCombine(accumulatedLeft, g.leftValue) else accumulatedLeft
-    
+
     if (h is Left) return@zip Left(emptyCombine(accumulatedLeft, h.value))
     accumulatedLeft = if (h is Both) emptyCombine(accumulatedLeft, h.leftValue) else accumulatedLeft
-    
+
     if (i is Left) return@zip Left(emptyCombine(accumulatedLeft, i.value))
     accumulatedLeft = if (i is Both) emptyCombine(accumulatedLeft, i.leftValue) else accumulatedLeft
-    
+
     if (j is Left) return@zip Left(emptyCombine(accumulatedLeft, j.value))
     accumulatedLeft = if (j is Both) emptyCombine(accumulatedLeft, j.leftValue) else accumulatedLeft
-    
+
     if (k is Left) return@zip Left(emptyCombine(accumulatedLeft, k.value))
     accumulatedLeft = if (k is Both) emptyCombine(accumulatedLeft, k.leftValue) else accumulatedLeft
-    
+
     accumulatedLeft
   }
-  
+
   return when {
     rightValue != EmptyValue && leftValue == EmptyValue -> Right(rightValue as L)
     rightValue != EmptyValue && leftValue != EmptyValue -> Both(leftValue as A, rightValue as L)
