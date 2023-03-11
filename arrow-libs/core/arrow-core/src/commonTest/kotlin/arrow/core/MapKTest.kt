@@ -4,7 +4,6 @@ import arrow.core.test.intSmall
 import arrow.core.test.ior
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.longSmall
-import arrow.core.test.nonEmptyList
 import arrow.core.test.option
 import arrow.core.test.testLaws
 import arrow.typeclasses.Monoid
@@ -12,10 +11,10 @@ import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAllValues
-import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldNotContainKey
@@ -28,7 +27,6 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
@@ -686,6 +684,15 @@ class MapKTest : StringSpec({
         result shouldBe expected
       }
     }
+
+  "mapOrAccumulate of empty should be empty" {
+      val result: Either<NonEmptyList<String>, Map<Int, String>> = emptyMap<Int, Int>().mapOrAccumulate {
+        it.value.toString()
+      }
+
+    result.shouldBeInstanceOf<Either.Right<Map<Int, String>>>()
+      .value.shouldBeEmpty()
+  }
 
   "mapOrAccumulate can map" {
     checkAll(
