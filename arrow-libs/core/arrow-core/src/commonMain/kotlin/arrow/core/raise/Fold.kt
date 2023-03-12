@@ -109,13 +109,13 @@ public inline fun <R, A, B> fold(
 }
 
 /**
- * Inspect a [Traced] value of [R].
+ * Inspect a [Trace] value of [R].
  *
  * Tracing [R] can be useful to know where certain errors, or failures are coming from.
  * Let's say you have a `DomainError`, but it might be raised from many places in the project.
  *
  * You would have to manually _trace_ where this error is coming from,
- * instead [Traced] offers you ways to inspect the actual stacktrace of where the raised value occurred.
+ * instead [Trace] offers you ways to inspect the actual stacktrace of where the raised value occurred.
  *
  * Beware that tracing can only track the [Raise.bind] or [Raise.raise] call that resulted in the [R] value,
  * and not any location of where the [R], or [Either.Left] value was created.
@@ -150,7 +150,7 @@ public inline fun <R, A, B> fold(
 @ExperimentalTraceApi
 public inline fun <R, A> Raise<R>.traced(
   @BuilderInference program: Raise<R>.() -> A,
-  trace: (traced: Traced<R>) -> Unit
+  trace: (traced: Trace, R) -> Unit
 ): A {
   val itOuterTraced = this is DefaultRaise && isTraced
   val nested = if (this is DefaultRaise && isTraced) this else DefaultRaise(true)
@@ -158,7 +158,7 @@ public inline fun <R, A> Raise<R>.traced(
     program.invoke(nested)
   } catch (e: RaiseCancellationException) {
     val r: R = e.raisedOrRethrow(nested)
-    trace(Traced(e, r))
+    trace(Trace(e), r)
     if (itOuterTraced) throw e else raise(r)
   }
 }
@@ -168,7 +168,6 @@ public inline fun <R, A> Raise<R>.traced(
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
-    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
     this is RaiseCancellationException && this.raise === raise -> raised as R
     else -> throw this
   }
@@ -180,20 +179,20 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
-  override fun raise(r: Any?): Nothing = when {
-    isActive.value && !isTraced -> throw RaiseCancellationExceptionNoTrace(r, this)
-    isActive.value && isTraced -> throw RaiseCancellationException(r, this)
-    else -> throw RaiseLeakedException()
-  }
+  override fun raise(r: Any?): Nothing =
+    if (isActive.value) throw RaiseCancellationException(r, this, isTraced) else throw RaiseLeakedException()
 }
 
 /** CancellationException is required to cancel coroutines when raising from within them. */
-private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
-  CancellationExceptionNoTrace()
-
-private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
-
-public expect open class CancellationExceptionNoTrace() : CancellationException
+internal expect open class RaiseCancellationException constructor(
+  raised: Any?,
+  raise: Raise<Any?>,
+  isTraced: Boolean
+) : CancellationException {
+  internal val raised: Any?
+  internal val raise: Raise<Any?>
+  internal val isTraced: Boolean
+}
 
 private class RaiseLeakedException : IllegalStateException(
   """
@@ -205,6 +204,6 @@ private class RaiseLeakedException : IllegalStateException(
 )
 
 internal const val RaiseCancellationExceptionCaptured: String =
-  "kotlin.coroutines.cancellation.CancellationException should never get cancelled. Always re-throw it if captured." +
+  "kotlin.coroutines.cancellation.CancellationException should never get captured, always re-throw it if captured." +
     "This swallows the exception of Arrow's Raise, and leads to unexpected behavior." +
     "When working with Arrow prefer Either.catch or arrow.core.raise.catch to automatically rethrow CancellationException."
