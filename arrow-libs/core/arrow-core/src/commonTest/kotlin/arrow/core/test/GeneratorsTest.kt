@@ -14,13 +14,13 @@ class GeneratorsTest : StringSpec({
   "Arb.ior should generate Left, Right & Both" {
     assertSoftly(Arb.list(Arb.ior(Arb.string(), Arb.int())).next()) {
         forAtLeastOne {
-          it.isRight.shouldBeTrue()
+          it.isRight().shouldBeTrue()
         }
         forAtLeastOne {
-          it.isBoth.shouldBeTrue()
+          it.isBoth().shouldBeTrue()
         }
         forAtLeastOne {
-          it.isLeft.shouldBeTrue()
+          it.isLeft().shouldBeTrue()
         }
     }
   }
