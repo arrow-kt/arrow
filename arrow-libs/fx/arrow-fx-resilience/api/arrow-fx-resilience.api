@@ -1,6 +1,6 @@
 public final class arrow/fx/resilience/CircuitBreaker {
 	public static final field Companion Larrow/fx/resilience/CircuitBreaker$Companion;
-	public synthetic fun <init> (Ljava/util/concurrent/atomic/AtomicReference;Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;DDDLkotlin/time/TimeSource;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/util/concurrent/atomic/AtomicReference;DDDLkotlin/time/TimeSource;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun awaitClose (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun doOnClosed (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/CircuitBreaker;
 	public final fun doOnHalfOpen (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/CircuitBreaker;
@@ -12,12 +12,12 @@ public final class arrow/fx/resilience/CircuitBreaker {
 }
 
 public final class arrow/fx/resilience/CircuitBreaker$Companion {
-	public final fun invoke-3c68mSE (IJDJLkotlin/time/TimeSource;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/CircuitBreaker;
-	public static synthetic fun invoke-3c68mSE$default (Larrow/fx/resilience/CircuitBreaker$Companion;IJDJLkotlin/time/TimeSource;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/resilience/CircuitBreaker;
-	public final fun of (IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun of$default (Larrow/fx/resilience/CircuitBreaker$Companion;IDDDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun of-3c68mSE (IJDJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun of-3c68mSE$default (Larrow/fx/resilience/CircuitBreaker$Companion;IJDJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun invoke-MWqDXGA (JLarrow/fx/resilience/CircuitBreaker$OpeningStrategy;DJLkotlin/time/TimeSource;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/CircuitBreaker;
+	public static synthetic fun invoke-MWqDXGA$default (Larrow/fx/resilience/CircuitBreaker$Companion;JLarrow/fx/resilience/CircuitBreaker$OpeningStrategy;DJLkotlin/time/TimeSource;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/resilience/CircuitBreaker;
+	public final fun of (DLarrow/fx/resilience/CircuitBreaker$OpeningStrategy;DDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun of$default (Larrow/fx/resilience/CircuitBreaker$Companion;DLarrow/fx/resilience/CircuitBreaker$OpeningStrategy;DDLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun of-MWqDXGA (JLarrow/fx/resilience/CircuitBreaker$OpeningStrategy;DJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun of-MWqDXGA$default (Larrow/fx/resilience/CircuitBreaker$Companion;JLarrow/fx/resilience/CircuitBreaker$OpeningStrategy;DJLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/resilience/CircuitBreaker$ExecutionRejected : java/lang/Throwable {
@@ -26,42 +26,66 @@ public final class arrow/fx/resilience/CircuitBreaker$ExecutionRejected : java/l
 	public final fun getState ()Larrow/fx/resilience/CircuitBreaker$State;
 }
 
-public abstract interface class arrow/fx/resilience/CircuitBreaker$OpeningStrategy {
+public abstract class arrow/fx/resilience/CircuitBreaker$OpeningStrategy {
 }
 
 public final class arrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count : arrow/fx/resilience/CircuitBreaker$OpeningStrategy {
-	public fun <init> (I)V
+	public static final field Companion Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count$Companion;
+	public fun <init> (IILkotlin/time/TimeMark;)V
+	public synthetic fun <init> (IILkotlin/time/TimeMark;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()I
-	public final fun copy (I)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;
-	public static synthetic fun copy$default (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;IILjava/lang/Object;)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;
+	public final fun component2 ()I
+	public final fun component3 ()Lkotlin/time/TimeMark;
+	public final fun copy (IILkotlin/time/TimeMark;)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;
+	public static synthetic fun copy$default (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;IILkotlin/time/TimeMark;ILjava/lang/Object;)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFailuresCount ()I
+	public final fun getLastFailureAt ()Lkotlin/time/TimeMark;
 	public final fun getMaxFailures ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract class arrow/fx/resilience/CircuitBreaker$State {
+public final class arrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count$Companion {
+	public final fun invoke (I)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$Count;
 }
 
-public final class arrow/fx/resilience/CircuitBreaker$State$Closed : arrow/fx/resilience/CircuitBreaker$State {
-	public fun <init> (I)V
-	public fun <init> (ILkotlin/time/TimeMark;)V
-	public synthetic fun <init> (ILkotlin/time/TimeMark;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()I
-	public final fun component2 ()Lkotlin/time/TimeMark;
-	public final fun copy (ILkotlin/time/TimeMark;)Larrow/fx/resilience/CircuitBreaker$State$Closed;
-	public static synthetic fun copy$default (Larrow/fx/resilience/CircuitBreaker$State$Closed;ILkotlin/time/TimeMark;ILjava/lang/Object;)Larrow/fx/resilience/CircuitBreaker$State$Closed;
+public final class arrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy : arrow/fx/resilience/CircuitBreaker$OpeningStrategy {
+	public static final field Companion Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy$Companion;
+	public synthetic fun <init> (Lkotlin/time/TimeSource;Ljava/util/List;JILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lkotlin/time/TimeSource;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3-UwyO8pc ()J
+	public final fun component4 ()I
+	public final fun copy-exY8QGI (Lkotlin/time/TimeSource;Ljava/util/List;JI)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy;
+	public static synthetic fun copy-exY8QGI$default (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy;Lkotlin/time/TimeSource;Ljava/util/List;JIILjava/lang/Object;)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getFailures ()I
-	public final fun getLastFailure ()Lkotlin/time/TimeMark;
+	public final fun getFailures ()Ljava/util/List;
+	public final fun getMaxFailures ()I
+	public final fun getTimeSource ()Lkotlin/time/TimeSource;
+	public final fun getWindowDuration-UwyO8pc ()J
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class arrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy$Companion {
+	public final fun invoke-8Mi8wO0 (Lkotlin/time/TimeSource;JI)Larrow/fx/resilience/CircuitBreaker$OpeningStrategy$SlidingWindowLogStrategy;
+}
+
+public abstract class arrow/fx/resilience/CircuitBreaker$State {
+	public abstract fun getOpeningStrategy ()Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;
+}
+
+public final class arrow/fx/resilience/CircuitBreaker$State$Closed : arrow/fx/resilience/CircuitBreaker$State {
+	public fun <init> (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;)V
+	public fun getOpeningStrategy ()Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;
+}
+
 public final class arrow/fx/resilience/CircuitBreaker$State$HalfOpen : arrow/fx/resilience/CircuitBreaker$State {
-	public fun <init> (D)V
-	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;D)V
+	public synthetic fun <init> (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;JLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
+	public fun getOpeningStrategy ()Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public fun hashCode ()I
@@ -69,10 +93,11 @@ public final class arrow/fx/resilience/CircuitBreaker$State$HalfOpen : arrow/fx/
 }
 
 public final class arrow/fx/resilience/CircuitBreaker$State$Open : arrow/fx/resilience/CircuitBreaker$State {
-	public fun <init> (JD)V
-	public synthetic fun <init> (JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;JD)V
+	public synthetic fun <init> (Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;JJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getExpiresAt ()Lkotlin/time/TimeMark;
+	public fun getOpeningStrategy ()Larrow/fx/resilience/CircuitBreaker$OpeningStrategy;
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getResetTimeoutNanos ()D
 	public final fun getStartedAt ()Lkotlin/time/TimeMark;

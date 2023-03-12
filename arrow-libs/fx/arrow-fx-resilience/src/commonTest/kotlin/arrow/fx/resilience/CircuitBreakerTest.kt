@@ -1,6 +1,8 @@
 package arrow.fx.resilience
 
 import arrow.core.Either
+import arrow.fx.resilience.CircuitBreaker.OpeningStrategy
+import arrow.fx.resilience.CircuitBreaker.OpeningStrategy.SlidingWindowLogStrategy
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,6 +13,7 @@ import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlin.time.Duration
@@ -30,7 +33,7 @@ class CircuitBreakerTest {
 
   @Test
   fun shouldWorkForSuccessfulAsyncTasks(): TestResult = runTest {
-    val cb = CircuitBreaker(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
     var effect = 0
     val iterations = stackSafeIteration()
     Schedule.recurs<Unit>(iterations).repeat {
@@ -41,7 +44,7 @@ class CircuitBreakerTest {
 
   @Test
   fun shouldWorkForSuccessfulImmediateTasks(): TestResult = runTest {
-    val cb = CircuitBreaker(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
     var effect = 0
     val iterations = stackSafeIteration()
     Schedule.recurs<Unit>(iterations).repeat {
@@ -52,33 +55,33 @@ class CircuitBreakerTest {
 
   @Test
   fun staysClosedAfterLessThanMaxFailures(): TestResult = runTest {
-    val cb = CircuitBreaker(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
     assertTrue(result.all { it == Either.Left(dummy) })
-    assertEquals(CircuitBreaker.State.Closed(5), cb.state())
+    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
   }
 
   @Test
   fun closedCircuitBreakerResetsFailureCountAfterSuccess(): TestResult = runTest {
-    val cb = CircuitBreaker(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
     assertTrue(result.all { it == Either.Left(dummy) })
-    assertEquals(CircuitBreaker.State.Closed(5), cb.state())
+    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
     assertEquals(1, cb.protectOrThrow { 1 })
-    assertEquals(CircuitBreaker.State.Closed(0), cb.state())
+    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
   }
 
   @Test
   fun circuitBreakerOpensAfterMaxFailures(): TestResult = runTest {
-    val cb = CircuitBreaker(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
@@ -86,7 +89,7 @@ class CircuitBreakerTest {
 
     assertTrue(result.all { it == Either.Left(dummy) })
 
-    assertEquals(CircuitBreaker.State.Closed(5), cb.state())
+    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
 
     assertEquals(Either.Left(dummy), Either.catch { cb.protectOrThrow { throw dummy } })
 
@@ -109,8 +112,8 @@ class CircuitBreakerTest {
     val timeSource = TestTimeSource()
 
     val cb = CircuitBreaker(
-      maxFailures = maxFailures,
       resetTimeout = resetTimeout,
+      openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),
       exponentialBackoffFactor = exponentialBackoffFactor,
       maxResetTimeout = maxTimeout,
       timeSource = timeSource
@@ -178,7 +181,7 @@ class CircuitBreakerTest {
     stateAssertionLatch.await()
 
     // Circuit breaker should be reset after successful task.
-    assertEquals(CircuitBreaker.State.Closed(0), cb.state())
+    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
 
     assertEquals(3, rejectedCount) // 3 tasks were rejected in total
     assertEquals(1, openedCount) // Circuit breaker opened once
@@ -196,8 +199,8 @@ class CircuitBreakerTest {
     val timeSource = TestTimeSource()
 
     val cb = CircuitBreaker(
-      maxFailures = maxFailures,
       resetTimeout = resetTimeout,
+      openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),
       exponentialBackoffFactor = 2.0,
       maxResetTimeout = maxTimeout,
       timeSource = timeSource
@@ -287,7 +290,7 @@ class CircuitBreakerTest {
   @Test
   fun shouldBeStackSafeForSuccessfulAsyncTasks(): TestResult = runTest {
     val result = stackSafeSuspend(
-      CircuitBreaker(maxFailures = 5, resetTimeout = 1.minutes),
+      CircuitBreaker(resetTimeout = 1.minutes, CircuitBreaker.OpeningStrategy.Count(maxFailures = 5)),
       stackSafeIteration(), 0
     )
 
@@ -297,7 +300,7 @@ class CircuitBreakerTest {
   @Test
   fun shouldBeStackSafeForSuccessfulImmediateTasks(): TestResult = runTest {
     val result = stackSafeImmediate(
-      CircuitBreaker(maxFailures = 5, resetTimeout = 1.minutes),
+      CircuitBreaker(resetTimeout = 1.minutes, CircuitBreaker.OpeningStrategy.Count(maxFailures = 5)),
       stackSafeIteration(), 0
     )
 
@@ -316,13 +319,13 @@ class CircuitBreakerTest {
       ConstructorValues(maxResetTimeout = (-1).seconds),
     ).forEach { (maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout) ->
       assertFailsWith<IllegalArgumentException> {
-        CircuitBreaker(maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout)
+        CircuitBreaker(resetTimeout, CircuitBreaker.OpeningStrategy.Count(maxFailures), exponentialBackoffFactor, maxResetTimeout)
       }
 
       assertFailsWith<IllegalArgumentException> {
         CircuitBreaker(
-          maxFailures,
           resetTimeout,
+          CircuitBreaker.OpeningStrategy.Count(maxFailures),
           exponentialBackoffFactor,
           maxResetTimeout
         )
@@ -330,13 +333,69 @@ class CircuitBreakerTest {
 
       assertFailsWith<IllegalArgumentException> {
         CircuitBreaker(
-          maxFailures,
           resetTimeout,
+          CircuitBreaker.OpeningStrategy.Count(maxFailures),
           exponentialBackoffFactor,
           maxResetTimeout
         )
       }
     }
+  }
+
+  @Test
+  fun slidingWindowStrategyShouldKeepClosed(): TestResult = runTest {
+    val timeSource = TestTimeSource()
+    val windowDuration = 200.milliseconds
+    val stepDuration = 40.milliseconds
+    val maxFailures = 5
+    var openingStrategy: OpeningStrategy = SlidingWindowLogStrategy(timeSource, windowDuration, maxFailures)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
+
+    schedule.repeat {
+      timeSource += stepDuration
+      openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+      val shouldOpen = openingStrategy.shouldOpen()
+      assertFalse(shouldOpen, "The circuit breaker should keep closed")
+    }
+
+  }
+
+  @Test
+  fun slidingWindowStrategyShouldOpen(): TestResult = runTest {
+    val timeSource = TestTimeSource()
+    val windowDuration = 200.milliseconds
+    val stepDuration = 39.milliseconds
+    val maxFailures = 5
+    var openingStrategy: OpeningStrategy = SlidingWindowLogStrategy(timeSource, windowDuration, maxFailures)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
+
+    schedule.repeat {
+      timeSource += stepDuration
+      openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+    }
+
+    assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should open after reaching max failures")
+  }
+
+  @Test
+  fun slidingWindowStrategyShouldCloseAfterResetTimeout(): TestResult = runTest {
+    val timeSource = TestTimeSource()
+    val windowDuration = 200.milliseconds
+    val stepDuration = 39.milliseconds
+    val maxFailures = 5
+    var openingStrategy: OpeningStrategy = SlidingWindowLogStrategy(timeSource, windowDuration, maxFailures)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
+
+    schedule.repeat {
+      timeSource += stepDuration
+      openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+    }
+
+    assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should open after reaching max failures")
+
+    timeSource += windowDuration
+
+    assertFalse(openingStrategy.shouldOpen(), "The circuit breaker should close after reset timeout")
   }
 }
 
