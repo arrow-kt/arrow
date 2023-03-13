@@ -1273,7 +1273,7 @@ public fun <A, B> Ior<A, B?>.sequenceNullable(): Ior<A, B>? =
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> Ior.Left(a) }, {b -> b?.let { Ior.Right(it) } }, { a, b -> b?.let{ Ior.Both(a, it) } })",
+    "fold({ a -> Ior.Left(a) }, {b -> b?.let<B, Ior.Right<B>> { Ior.Right(it) } }, { a, b -> b?.let<B, Ior.Both<A, B>>{ Ior.Both(a, it) } })",
     "arrow.core.Ior"
   )
 )
