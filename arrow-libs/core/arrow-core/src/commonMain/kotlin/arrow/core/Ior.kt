@@ -1170,7 +1170,7 @@ public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> 
       "  else when (this) {\n" +
       "    is Ior.Right -> Ior.Right<List<B>>(List(n) { value })\n" +
       "    is Ior.Left -> this\n" +
-      "    is Ior.Both -> map { List(n) { rightValue } }.mapLeft<A>{ List(n - 1) { leftValue }.fold(leftValue) { acc, a -> SA.run<Semigroup<A>> { acc + a } } }\n" +
+      "    is Ior.Both -> map { List(n) { rightValue } }.mapLeft<A>{ List(n - 1) { leftValue }.fold(leftValue) { acc, a ->  acc + a } }\n" +
       "  }", "arrow.core.Ior"
   )
 )
