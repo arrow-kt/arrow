@@ -93,13 +93,7 @@ class CircuitBreakerTest {
 
     assertEquals(Either.Left(dummy), Either.catch { cb.protectOrThrow { throw dummy } })
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.Open -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
   }
 
   @Test
@@ -125,13 +119,7 @@ class CircuitBreakerTest {
     // CircuitBreaker opens after 5 failures
     recurAndCollect<Unit>(5).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.Open -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
     // If CircuitBreaker is Open our tasks our rejected
     assertFailsWith<CircuitBreaker.ExecutionRejected> {
@@ -141,13 +129,7 @@ class CircuitBreakerTest {
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
     timeSource += resetTimeout + 10.milliseconds
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.Open -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
     val checkHalfOpen = CompletableDeferred<Unit>()
     val delayProtectLatch = CompletableDeferred<Unit>()
@@ -164,13 +146,7 @@ class CircuitBreakerTest {
 
     checkHalfOpen.await()
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.HalfOpen -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.HalfOpen -> assertEquals(resetTimeout, s.resetTimeout) }
 
     // Rejects all other tasks in HalfOpen
     assertFailsWith<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
@@ -212,13 +188,7 @@ class CircuitBreakerTest {
     // CircuitBreaker opens after 5 failures
     recurAndCollect<Unit>(5).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.Open -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
     assertTrue(cb.state() is CircuitBreaker.State.Open)
     // If CircuitBreaker is Open our tasks our rejected
@@ -229,13 +199,7 @@ class CircuitBreakerTest {
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
     timeSource += resetTimeout + 10.milliseconds
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.Open -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
     val checkHalfOpen = CompletableDeferred<Unit>()
     val delayProtectLatch = CompletableDeferred<Unit>()
@@ -255,13 +219,7 @@ class CircuitBreakerTest {
 
     checkHalfOpen.await()
 
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.HalfOpen -> {
-        assertEquals(resetTimeout, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.HalfOpen -> assertEquals(resetTimeout, s.resetTimeout) }
 
     // Rejects all other tasks in HalfOpen
     assertFailsWith<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
@@ -273,13 +231,7 @@ class CircuitBreakerTest {
 
     // Circuit breaker should've stayed open on failure after timeOutReset
     // resetTimeout should've applied
-    when (val s = cb.state()) {
-      is CircuitBreaker.State.Open -> {
-        assertEquals(resetTimeout * exponentialBackoffFactor, s.resetTimeout)
-      }
-
-      else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-    }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout * exponentialBackoffFactor, s.resetTimeout) }
 
     assertEquals(3, rejectedCount) // 3 tasks were rejected in total
     assertEquals(2, openedCount) // Circuit breaker opened twice
@@ -405,6 +357,11 @@ private data class ConstructorValues(
   val exponentialBackoffFactor: Double = 1.0,
   val maxResetTimeout: Duration = Duration.INFINITE,
 )
+
+inline fun <reified A, reified B : A> assert(expected: A, block: (b: B) -> Unit): Unit =
+  if (expected is B) block(expected)
+  else fail("Expected ${B::class.simpleName} but found ${expected!!::class.simpleName}")
+
 
 /**
  * Recurs the effect [n] times, and collects the output along the way for easy asserting.
