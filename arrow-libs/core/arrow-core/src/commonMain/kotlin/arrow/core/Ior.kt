@@ -1333,14 +1333,18 @@ public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA::combine) { Pair(this@zip.bind(), fb.bind()) }", "arrow.core.raise.ior", "arrow.typeclasses.combine")
+  ReplaceWith(
+    "ior(SA::combine) { Pair(this.bind(), fb.bind()) }",
+    "arrow.core.raise.ior",
+    "arrow.typeclasses.combine"
+  )
 )
 public fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>> =
   ior(SA::combine) { Pair(this@zip.bind(), fb.bind()) }
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA::combine) { map(this@zip.bind(), c.bind()) }", "arrow.core.raise.ior", "arrow.typeclasses.combine")
+  ReplaceWith("ior({a, b -> a + b}) { map(this.bind(), c.bind()) }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1355,7 +1359,7 @@ public inline fun <A, B, C, D> Ior<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()) }", "arrow.core.raise.ior", "arrow.typeclasses.combine")
+  ReplaceWith("ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()) }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1371,7 +1375,7 @@ public inline fun <A, B, C, D, E> Ior<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind() }", "arrow.core.raise.ior", "arrow.typeclasses.combine")
+  ReplaceWith("ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind() }", "arrow.core.raise.ior")
 )
 public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1388,7 +1392,10 @@ public inline fun <A, B, C, D, E, F> Ior<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
-  ReplaceWith("ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind() }", "arrow.core.raise.ior", "arrow.typeclasses.combine")
+  ReplaceWith(
+    "ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind(), f.bind() }",
+    "arrow.core.raise.ior"
+  )
 )
 public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
   SA: Semigroup<A>,
@@ -1407,8 +1414,8 @@ public inline fun <A, B, C, D, E, F, G> Ior<A, B>.zip(
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
   ReplaceWith(
-    "ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind() }",
-    "arrow.core.raise.ior", "arrow.typeclasses.combine"
+    "ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind() }",
+    "arrow.core.raise.ior"
   )
 )
 public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
@@ -1429,8 +1436,8 @@ public inline fun <A, B, C, D, E, F, G, H> Ior<A, B>.zip(
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
   ReplaceWith(
-    "ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind() }",
-    "arrow.core.raise.ior", "arrow.typeclasses.combine"
+    "ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind() }",
+    "arrow.core.raise.ior"
   )
 )
 public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
@@ -1452,8 +1459,8 @@ public inline fun <A, B, C, D, E, F, G, H, I> Ior<A, B>.zip(
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
   ReplaceWith(
-    "ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind() }",
-    "arrow.core.raise.ior", "arrow.typeclasses.combine"
+    "ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind() }",
+    "arrow.core.raise.ior"
   )
 )
 public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
@@ -1476,8 +1483,8 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Ior<A, B>.zip(
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
   ReplaceWith(
-    "ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind() }",
-    "arrow.core.raise.ior", "arrow.typeclasses.combine"
+    "ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind() }",
+    "arrow.core.raise.ior"
   )
 )
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
@@ -1501,8 +1508,8 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K> Ior<A, B>.zip(
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
   ReplaceWith(
-    "ior(SA::combine) { map(this@zip.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind() }",
-    "arrow.core.raise.ior", "arrow.typeclasses.combine"
+    "ior({a, b -> a + b}) { map(this.bind(), c.bind(), d.bind()), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind(), k.bind() }",
+    "arrow.core.raise.ior"
   )
 )
 public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Ior<A, B>.zip(
