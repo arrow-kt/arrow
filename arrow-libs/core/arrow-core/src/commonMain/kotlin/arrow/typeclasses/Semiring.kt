@@ -9,6 +9,9 @@ public const val FloatInstanceDeprecation: String =
 public const val DoubleInstanceDeprecation: String =
   "Double instances for Semigroup/Monoid & Semiring are deprecated. Due to how equality of floating-point numbers work, they're not lawful under equality."
 
+public const val SemiringDeprecation: String =
+  "Semiring is being deprecated."
+
 /**
  * The [Semiring] type class for a given type `A` combines both a commutative additive [Monoid] and a multiplicative [Monoid].
  *  It requires the multiplicative [Monoid] to distribute over the additive one. The operations of the multiplicative [Monoid] have been renamed to
@@ -83,6 +86,7 @@ public const val DoubleInstanceDeprecation: String =
  * ```
  * <!--- KNIT example-semiring-04.kt -->
  */
+@Deprecated(SemiringDeprecation)
 public interface Semiring<A> {
 
   /**
