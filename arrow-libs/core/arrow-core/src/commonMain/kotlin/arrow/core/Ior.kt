@@ -1252,7 +1252,7 @@ public fun <A, B> Ior<A, Option<B>>.sequenceOption(): Option<Ior<A, B>> =
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> Some(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
+    "fold({ a -> Some<Ior.Left<A>>(Ior.Left(a)) }, {b -> b.map<Ior.Right<B>> { Ior.Right(it) } }, { a, b -> b.map<Ior.Both<A, B>>{ Ior.Both(a, it) } })",
     "arrow.core.Ior",
     "arrow.core.Some"
   )
