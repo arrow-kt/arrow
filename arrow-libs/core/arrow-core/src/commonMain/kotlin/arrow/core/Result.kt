@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalContracts::class)
+
 package arrow.core
 
 import kotlin.Result.Companion.failure
@@ -53,6 +54,13 @@ public inline fun <A, B> Result<A>.redeemWith(
 /**
  * Combines n-arity independent [Result] values with a [transform] function.
  */
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result<A> {transform(this.bind(), b.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C> Result<A>.zip(b: Result<B>, transform: (A, B) -> C): Result<C> {
   contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
   return zip(
@@ -68,6 +76,13 @@ public inline fun <A, B, C> Result<A>.zip(b: Result<B>, transform: (A, B) -> C):
   ) { a, b, _, _, _, _, _, _, _, _ -> transform(a, b) }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D> Result<A>.zip(b: Result<B>, c: Result<C>, transform: (A, B, C) -> D): Result<D> {
   contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
   return zip(
@@ -83,6 +98,13 @@ public inline fun <A, B, C, D> Result<A>.zip(b: Result<B>, c: Result<C>, transfo
   ) { a, b, c, _, _, _, _, _, _, _ -> transform(a, b, c) }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -103,6 +125,13 @@ public inline fun <A, B, C, D, E> Result<A>.zip(
   ) { a, b, c, d, _, _, _, _, _, _ -> transform(a, b, c, d) }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E, F> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -122,6 +151,13 @@ public inline fun <A, B, C, D, E, F> Result<A>.zip(
   }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E, F, G> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -143,6 +179,13 @@ public inline fun <A, B, C, D, E, F, G> Result<A>.zip(
   }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -153,9 +196,26 @@ public inline fun <A, B, C, D, E, F, G, H> Result<A>.zip(
   transform: (A, B, C, D, E, F, G) -> H
 ): Result<H> {
   contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-  return zip(b, c, d, e, f, g, UnitResult, UnitResult, UnitResult) { a, b, c, d, e, f, g, _, _, _ -> transform(a, b, c, d, e, f, g) }
+  return zip(b, c, d, e, f, g, UnitResult, UnitResult, UnitResult) { a, b, c, d, e, f, g, _, _, _ ->
+    transform(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g
+    )
+  }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -167,9 +227,27 @@ public inline fun <A, B, C, D, E, F, G, H, I> Result<A>.zip(
   transform: (A, B, C, D, E, F, G, H) -> I
 ): Result<I> {
   contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-  return zip(b, c, d, e, f, g, h, UnitResult, UnitResult) { a, b, c, d, e, f, g, h, _, _ -> transform(a, b, c, d, e, f, g, h) }
+  return zip(b, c, d, e, f, g, h, UnitResult, UnitResult) { a, b, c, d, e, f, g, h, _, _ ->
+    transform(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h
+    )
+  }
 }
 
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
@@ -182,10 +260,29 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Result<A>.zip(
   transform: (A, B, C, D, E, F, G, H, I) -> J
 ): Result<J> {
   contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-  return zip(b, c, d, e, f, g, h, i, UnitResult) { a, b, c, d, e, f, g, h, i, _ -> transform(a, b, c, d, e, f, g, h, i) }
+  return zip(b, c, d, e, f, g, h, i, UnitResult) { a, b, c, d, e, f, g, h, i, _ ->
+    transform(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h,
+      i
+    )
+  }
 }
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(
+  "Prefer using the inline result DSL",
+  ReplaceWith(
+    "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), k.bind()) }",
+    "arrow.core.raise.result"
+  )
+)
 public inline fun <A, B, C, D, E, F, G, H, I, J, K> Result<A>.zip(
   b: Result<B>,
   c: Result<C>,
