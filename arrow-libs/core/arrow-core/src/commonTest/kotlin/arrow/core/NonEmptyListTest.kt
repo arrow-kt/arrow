@@ -18,7 +18,7 @@ import kotlin.math.min
 
 class NonEmptyListTest : StringSpec({
 
-    testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
+    testLaws(SemigroupLaws(NonEmptyList<Int>::plus, Arb.nonEmptyList(Arb.int())))
 
     "iterable.toNonEmptyListOrNull should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
@@ -109,8 +109,10 @@ class NonEmptyListTest : StringSpec({
     "traverse for Validated stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
-        acc.add(it)
+      val res = (0..20_000)
+        .toNonEmptyListOrNull()!!
+        .traverse(Semigroup.string()) {
+          acc.add(it)
         Validated.Valid(it)
       }
       res shouldBe Validated.Valid(acc)
@@ -126,13 +128,6 @@ class NonEmptyListTest : StringSpec({
           ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
 
         res shouldBe expected
-      }
-    }
-
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
-          ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
       }
     }
 

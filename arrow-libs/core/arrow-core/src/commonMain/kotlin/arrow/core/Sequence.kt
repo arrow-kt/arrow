@@ -8,6 +8,8 @@ import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
+import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 
 public fun <B, C, D, E> Sequence<B>.zip(
@@ -519,10 +521,14 @@ public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>>
 public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
   padZip(other).map { fa(it.first, it.second) }
 
+@Deprecated(
+  "$SemigroupDeprecation\n$NicheAPI",
+  ReplaceWith("Sequence { List(n) { this@replicate }.iterator() }")
+)
 public fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
-  if (n <= 0) emptySequence()
-  else this.let { l -> Sequence { List(n) { l }.iterator() } }
+  Sequence { List(n) { this@replicate }.iterator() }
 
+@Deprecated(NicheAPI)
 public fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
   if (n <= 0) sequenceOf(MA.empty())
   else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
@@ -578,18 +584,23 @@ public fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, 
   this.rightPadZip(other) { a, b -> a to b }
 
 /**
+ * aligns two structures and combine them with the given [combine]
+ */
+public fun <A> Sequence<A>.salign(
+  other: Sequence<A>,
+  combine: (A, A) -> A
+): Sequence<A> =
+  align(other) { it.fold(::identity, ::identity, combine) }
+
+/**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
+@Deprecated(SemigroupDeprecation, ReplaceWith("salign(other, SG::combine)", "arrow.typeclasses.combine"))
 public fun <A> Sequence<A>.salign(
   SG: Semigroup<A>,
   other: Sequence<A>
-): Sequence<A> = SG.run {
-  align(other) {
-    it.fold(::identity, ::identity) { a, b ->
-      a.combine(b)
-    }
-  }
-}
+): Sequence<A> =
+  salign(other, SG::combine)
 
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
@@ -642,12 +653,13 @@ public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
+  mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()
 
 @Deprecated(
   "sequenceValidated is being renamed to sequence to simplify the Arrow API",
@@ -733,8 +745,9 @@ public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequen
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
+    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate",
+    "arrow.typeclasses.combine"
   )
 )
 @OptIn(ExperimentalTypeInference::class)
@@ -743,7 +756,7 @@ public fun <E, A, B> Sequence<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+  mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()
 
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,

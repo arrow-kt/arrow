@@ -107,7 +107,7 @@ public annotation class RaiseDSL
  *     effect { failure() }
  *
  *   val ior: Ior<String, Int> =
- *     ior(Semigroup.string()) { failure() }
+ *     ior(String::plus) { failure() }
  *
  *   either shouldBe Either.Left("failed")
  *   effect.toEither() shouldBe Either.Left("failed")
