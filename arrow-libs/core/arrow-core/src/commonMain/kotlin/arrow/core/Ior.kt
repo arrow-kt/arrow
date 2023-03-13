@@ -1212,7 +1212,7 @@ public fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): 
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> listOf(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
+    "fold({ a -> listOf<Ior.Left<A>>(Ior.Left(a)) }, {b -> b.map<B, Ior.Right<B>>{ Ior.Right(it) } }, { a, b -> b.map<B, Ior.Both<A, B>>{ Ior.Both(a, it) } })",
     "arrow.core.Ior"
   )
 )
