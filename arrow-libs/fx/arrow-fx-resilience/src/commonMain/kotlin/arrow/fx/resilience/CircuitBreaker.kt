@@ -691,8 +691,7 @@ private constructor(
 
     public data class Count(
       val maxFailures: Int,
-      val failuresCount: Int = 0,
-      val lastFailureAt: TimeMark? = null
+      val failuresCount: Int = 0
     ) : OpeningStrategy() {
 
       init {
@@ -704,18 +703,15 @@ private constructor(
       override fun shouldOpen(): Boolean = failuresCount > maxFailures
 
       override fun trackFailure(failureAt: TimeMark): OpeningStrategy =
-        copy(
-          failuresCount = failuresCount + 1,
-          lastFailureAt = failureAt
-        )
+        copy(failuresCount = failuresCount + 1)
 
       public companion object {
         public operator fun invoke(maxFailures: Int): Count =
-          Count(maxFailures = maxFailures, failuresCount = 0, lastFailureAt = null)
+          Count(maxFailures = maxFailures, failuresCount = 0)
       }
     }
 
-    public data class SlidingWindowLogStrategy(
+    public data class SlidingWindow(
       val timeSource: TimeSource, val failures: List<TimeMark>, val windowDuration: Duration, val maxFailures: Int
     ) : OpeningStrategy() {
 
@@ -727,8 +723,8 @@ private constructor(
         else copy(failures = failures.drop(1) + failureAt)
 
       public companion object {
-        public operator fun invoke(timeSource: TimeSource, windowDuration: Duration, maxFailures: Int): SlidingWindowLogStrategy =
-          SlidingWindowLogStrategy(timeSource = timeSource, failures = emptyList(), windowDuration = windowDuration, maxFailures = maxFailures)
+        public operator fun invoke(timeSource: TimeSource, windowDuration: Duration, maxFailures: Int): SlidingWindow =
+          SlidingWindow(timeSource = timeSource, failures = emptyList(), windowDuration = windowDuration, maxFailures = maxFailures)
       }
     }
   }

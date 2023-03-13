@@ -2,7 +2,7 @@ package arrow.fx.resilience
 
 import arrow.core.Either
 import arrow.fx.resilience.CircuitBreaker.OpeningStrategy
-import arrow.fx.resilience.CircuitBreaker.OpeningStrategy.SlidingWindowLogStrategy
+import arrow.fx.resilience.CircuitBreaker.OpeningStrategy.SlidingWindow
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -348,7 +348,7 @@ class CircuitBreakerTest {
     val windowDuration = 200.milliseconds
     val stepDuration = 40.milliseconds
     val maxFailures = 5
-    var openingStrategy: OpeningStrategy = SlidingWindowLogStrategy(timeSource, windowDuration, maxFailures)
+    var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
     val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
 
     schedule.repeat {
@@ -366,7 +366,7 @@ class CircuitBreakerTest {
     val windowDuration = 200.milliseconds
     val stepDuration = 39.milliseconds
     val maxFailures = 5
-    var openingStrategy: OpeningStrategy = SlidingWindowLogStrategy(timeSource, windowDuration, maxFailures)
+    var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
     val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
 
     schedule.repeat {
@@ -383,7 +383,7 @@ class CircuitBreakerTest {
     val windowDuration = 200.milliseconds
     val stepDuration = 39.milliseconds
     val maxFailures = 5
-    var openingStrategy: OpeningStrategy = SlidingWindowLogStrategy(timeSource, windowDuration, maxFailures)
+    var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
     val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
 
     schedule.repeat {
