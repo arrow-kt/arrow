@@ -1293,7 +1293,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequenceValidated(): Validated<B, I
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> Valid(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map { Ior.Both(a, it) } })",
+    "fold({ a -> Valid<Ior.Left<A>>(Ior.Left(a)) }, {b -> b.map<Ior.Right<C>> { Ior.Right(it) } }, { a, b -> b.map<Ior.Both<A, C>> { Ior.Both(a, it) } })",
     "arrow.core.Ior",
     "arrow.core.Valid"
   )
