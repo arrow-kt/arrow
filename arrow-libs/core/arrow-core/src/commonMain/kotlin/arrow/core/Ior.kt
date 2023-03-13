@@ -1232,7 +1232,7 @@ public fun <A, B, C> Ior<A, Either<B, C>>.sequenceEither(): Either<B, Ior<A, C>>
 @Deprecated(
   NicheAPI + "Prefer using Ior DSL, or explicit fold, or when",
   ReplaceWith(
-    "fold({ a -> Either.Right(Ior.Left(a)) }, {b -> b.map { Ior.Right(it) } }, { a, b -> b.map{ Ior.Both(a, it) } })",
+    "fold({ a -> Either.Right<Ior.Left<A>>(Ior.Left(a)) }, {b -> b.map<Ior.Right<C>> { Ior.Right(it) } }, { a, b -> b.map<Ior.Both<A, C>>{ Ior.Both(a, it) } })",
     "arrow.core.Ior"
   )
 )
