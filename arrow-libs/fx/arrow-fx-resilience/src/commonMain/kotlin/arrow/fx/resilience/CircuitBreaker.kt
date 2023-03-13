@@ -212,7 +212,13 @@ private constructor(
       is Closed -> {
         when (result) {
           is Either.Right -> {
-            result.value
+            val openingStrategy = state.get().openingStrategy
+            if (openingStrategy is OpeningStrategy.Count && openingStrategy.failuresCount == 0)
+              result.value
+            else {
+              state.compareAndSet(curr, Closed(openingStrategy.resetFailuresCount()))
+              result.value
+            }
           }
 
           is Either.Left -> {
@@ -720,7 +726,15 @@ private constructor(
 
       override fun trackFailure(failureAt: TimeMark): OpeningStrategy =
         if (failures.size < maxFailures + 1) copy(failures = failures + failureAt)
-        else copy(failures = failures.drop(1) + failureAt)
+        else copy(failures = failures.slide(failureAt))
+
+      private fun List<TimeMark>.slide(timeMark: TimeMark): List<TimeMark> =
+        buildList(size) {
+          forEachIndexed { index, mark ->
+            if (index == 1) Unit else add(mark)
+          }
+          add(timeMark)
+        }
 
       public companion object {
         public operator fun invoke(timeSource: TimeSource, windowDuration: Duration, maxFailures: Int): SlidingWindow =
