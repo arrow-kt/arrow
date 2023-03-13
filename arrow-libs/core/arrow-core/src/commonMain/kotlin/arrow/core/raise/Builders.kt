@@ -27,23 +27,16 @@ import kotlin.jvm.JvmName
 public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
-public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(NullableRaise(this)) }, { null }, ::identity)
-}
+public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
+  fold({ block(NullableRaise(this)) }, { null }, ::identity)
 
-public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
-}
+public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
+  fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
 
-public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(OptionRaise(this)) }, ::identity, ::Some)
-}
+public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
+  fold({ block(OptionRaise(this)) }, ::identity, ::Some)
 
 public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
   val state: Atomic<Option<E>> = Atomic(None)
   return fold<E, A, Ior<E, A>>(
     { block(IorRaise(combineError, state, this)) },
@@ -55,36 +48,64 @@ public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInferen
 
 public typealias Null = Nothing?
 
-@JvmInline
-public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
+public class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
-  override fun raise(r: Nothing?): Nothing = cont.raise(r)
+
+  @RaiseDSL
+  override fun raise(r: Null): Nothing = cont.raise(r)
+
+  @RaiseDSL
   public fun <B> Option<B>.bind(): B = getOrElse { raise(null) }
 
+  @RaiseDSL
   public fun <B> B?.bind(): B {
     contract { returns() implies (this@bind != null) }
     return this ?: raise(null)
   }
 
+  @RaiseDSL
+  @JvmName("bindAllNullable")
+  public fun <A> Iterable<A?>.bind(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
 }
 
-@JvmInline
-public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
+public class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
+  @RaiseDSL
   override fun raise(r: Throwable): Nothing = cont.raise(r)
+
+  @RaiseDSL
   public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
+
+  @RaiseDSL
+  @JvmName("bindAllResult")
+  public fun <A> Iterable<Result<A>>.bind(): List<A> =
+    map { it.bind() }
 }
 
-@JvmInline
-public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
+public class OptionRaise(private val cont: Raise<None>) : Raise<None> {
+
+  @RaiseDSL
   override fun raise(r: None): Nothing = cont.raise(r)
+
+  @RaiseDSL
   public fun <B> Option<B>.bind(): B = getOrElse { raise(None) }
+
+  @RaiseDSL
+  @JvmName("bindAllOption")
+  public fun <A> Iterable<Option<A>>.bind(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
+  @RaiseDSL
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
@@ -97,8 +118,10 @@ public class IorRaise<E> @PublishedApi internal constructor(
   private val raise: Raise<E>,
 ) : Raise<E> {
 
+  @RaiseDSL
   override fun raise(r: E): Nothing = raise.raise(combine(r))
 
+  @RaiseDSL
   public fun <B> Ior<E, B>.bind(): B =
     when (this) {
       is Ior.Left -> raise(value)
