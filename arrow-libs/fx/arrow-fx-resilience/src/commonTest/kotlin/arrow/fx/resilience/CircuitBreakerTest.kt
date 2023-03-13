@@ -33,7 +33,7 @@ class CircuitBreakerTest {
 
   @Test
   fun shouldWorkForSuccessfulAsyncTasks(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
     var effect = 0
     val iterations = stackSafeIteration()
     Schedule.recurs<Unit>(iterations).repeat {
@@ -44,7 +44,7 @@ class CircuitBreakerTest {
 
   @Test
   fun shouldWorkForSuccessfulImmediateTasks(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
     var effect = 0
     val iterations = stackSafeIteration()
     Schedule.recurs<Unit>(iterations).repeat {
@@ -55,33 +55,33 @@ class CircuitBreakerTest {
 
   @Test
   fun staysClosedAfterLessThanMaxFailures(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
     assertTrue(result.all { it == Either.Left(dummy) })
-    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
   }
 
   @Test
   fun closedCircuitBreakerResetsFailureCountAfterSuccess(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
     assertTrue(result.all { it == Either.Left(dummy) })
-    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
     assertEquals(1, cb.protectOrThrow { 1 })
-    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
   }
 
   @Test
   fun circuitBreakerOpensAfterMaxFailures(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
@@ -89,7 +89,7 @@ class CircuitBreakerTest {
 
     assertTrue(result.all { it == Either.Left(dummy) })
 
-    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
 
     assertEquals(Either.Left(dummy), Either.catch { cb.protectOrThrow { throw dummy } })
 
@@ -107,7 +107,7 @@ class CircuitBreakerTest {
 
     val cb = CircuitBreaker(
       resetTimeout = resetTimeout,
-      openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),
+      openingStrategy = OpeningStrategy.Count(maxFailures),
       exponentialBackoffFactor = exponentialBackoffFactor,
       maxResetTimeout = maxTimeout,
       timeSource = timeSource
@@ -157,7 +157,7 @@ class CircuitBreakerTest {
     stateAssertionLatch.await()
 
     // Circuit breaker should be reset after successful task.
-    assertEquals(CircuitBreaker.State.Closed::class, cb.state()::class)
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
 
     assertEquals(3, rejectedCount) // 3 tasks were rejected in total
     assertEquals(1, openedCount) // Circuit breaker opened once
@@ -176,7 +176,7 @@ class CircuitBreakerTest {
 
     val cb = CircuitBreaker(
       resetTimeout = resetTimeout,
-      openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures),
+      openingStrategy = OpeningStrategy.Count(maxFailures),
       exponentialBackoffFactor = 2.0,
       maxResetTimeout = maxTimeout,
       timeSource = timeSource
@@ -242,7 +242,7 @@ class CircuitBreakerTest {
   @Test
   fun shouldBeStackSafeForSuccessfulAsyncTasks(): TestResult = runTest {
     val result = stackSafeSuspend(
-      CircuitBreaker(resetTimeout = 1.minutes, CircuitBreaker.OpeningStrategy.Count(maxFailures = 5)),
+      CircuitBreaker(resetTimeout = 1.minutes, OpeningStrategy.Count(maxFailures = 5)),
       stackSafeIteration(), 0
     )
 
@@ -252,7 +252,7 @@ class CircuitBreakerTest {
   @Test
   fun shouldBeStackSafeForSuccessfulImmediateTasks(): TestResult = runTest {
     val result = stackSafeImmediate(
-      CircuitBreaker(resetTimeout = 1.minutes, CircuitBreaker.OpeningStrategy.Count(maxFailures = 5)),
+      CircuitBreaker(resetTimeout = 1.minutes, OpeningStrategy.Count(maxFailures = 5)),
       stackSafeIteration(), 0
     )
 
@@ -271,13 +271,13 @@ class CircuitBreakerTest {
       ConstructorValues(maxResetTimeout = (-1).seconds),
     ).forEach { (maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout) ->
       assertFailsWith<IllegalArgumentException> {
-        CircuitBreaker(resetTimeout, CircuitBreaker.OpeningStrategy.Count(maxFailures), exponentialBackoffFactor, maxResetTimeout)
+        CircuitBreaker(resetTimeout, OpeningStrategy.Count(maxFailures), exponentialBackoffFactor, maxResetTimeout)
       }
 
       assertFailsWith<IllegalArgumentException> {
         CircuitBreaker(
           resetTimeout,
-          CircuitBreaker.OpeningStrategy.Count(maxFailures),
+          OpeningStrategy.Count(maxFailures),
           exponentialBackoffFactor,
           maxResetTimeout
         )
@@ -286,7 +286,7 @@ class CircuitBreakerTest {
       assertFailsWith<IllegalArgumentException> {
         CircuitBreaker(
           resetTimeout,
-          CircuitBreaker.OpeningStrategy.Count(maxFailures),
+          OpeningStrategy.Count(maxFailures),
           exponentialBackoffFactor,
           maxResetTimeout
         )
