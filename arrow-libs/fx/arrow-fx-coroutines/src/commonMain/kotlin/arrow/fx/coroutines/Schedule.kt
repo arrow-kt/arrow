@@ -775,7 +775,9 @@ public sealed class Schedule<Input, Output> {
         Decision.cont(0.0, s, Eval.now(a))
       }
 
-    /** Creates a Schedule that continues without delay and always returns Unit.*/
+    /**
+     * Creates a Schedule that continues without delay and always returns Unit.
+     */
     public fun <A> unit(): Schedule<A, Unit> =
       identity<A>().void()
 
