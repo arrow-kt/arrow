@@ -1,19 +1,23 @@
+@file:OptIn(ExperimentalTime::class)
+
 package arrow.fx.resilience
 
 import arrow.core.Either
 import arrow.core.continuations.AtomicRef
 import arrow.core.identity
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.bracketCase
-import arrow.fx.coroutines.timeInMillis
 import arrow.fx.resilience.CircuitBreaker.State.Closed
 import arrow.fx.resilience.CircuitBreaker.State.HalfOpen
 import arrow.fx.resilience.CircuitBreaker.State.Open
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * A [CircuitBreaker] is used to `protect` resources or services from being overloaded
@@ -53,8 +57,8 @@ import kotlin.time.DurationUnit
  * suspend fun main(): Unit {
  * //sampleStart
  *   val circuitBreaker = CircuitBreaker.of(
- *     maxFailures = 2,
  *     resetTimeout = 2.seconds,
+ *     openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures = 2),
  *     exponentialBackoffFactor = 1.2,
  *     maxResetTimeout = 60.seconds,
  *   )
@@ -100,8 +104,8 @@ import kotlin.time.DurationUnit
  *
  *   //sampleStart
  *   val circuitBreaker = CircuitBreaker.of(
- *     maxFailures = 2,
  *     resetTimeout = 2.seconds,
+ *     openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures = 2),
  *     exponentialBackoffFactor = 2.0, // enable exponentialBackoffFactor
  *     maxResetTimeout = 60.seconds, // limit exponential back-off time
  *   )
@@ -128,44 +132,41 @@ import kotlin.time.DurationUnit
  * ```
  * <!--- KNIT example-circuitbreaker-02.kt -->
  */
+
 public class CircuitBreaker
 private constructor(
   private val state: AtomicRef<State>,
-  private val maxFailures: Int,
   private val resetTimeoutNanos: Double,
   private val exponentialBackoffFactor: Double,
   private val maxResetTimeoutNanos: Double,
+  private val timeSource: TimeSource,
   private val onRejected: suspend () -> Unit,
   private val onClosed: suspend () -> Unit,
   private val onHalfOpen: suspend () -> Unit,
   private val onOpen: suspend () -> Unit
 ) {
-  
+
   private val resetTimeout: Duration = resetTimeoutNanos.nanoseconds
   private val maxResetTimeout: Duration = maxResetTimeoutNanos.nanoseconds
-  
-  /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
-   */
+
+  /** Returns the current [State], meant for debugging purposes.*/
   public suspend fun state(): State = state.get()
 
   /**
-   * Awaits for this `CircuitBreaker` to be [CircuitBreaker.State.Closed].
+   * Awaits for this `CircuitBreaker` to be [Closed].
    *
-   * If this `CircuitBreaker` is already in a closed state, then
-   * it returns immediately, otherwise it will wait (asynchronously) until
-   * the `CircuitBreaker` switches to the [CircuitBreaker.Closed]
-   * state again.
+   * If this `CircuitBreaker` is already in a closed state, then it returns immediately,
+   * otherwise it will wait (asynchronously) until the `CircuitBreaker` switches to the [Closed] state again.
    */
   public suspend fun awaitClose(): Unit =
     when (val curr = state.get()) {
       is Closed -> Unit
       is Open -> curr.awaitClose.await()
-      is State.HalfOpen -> curr.awaitClose.await()
+      is HalfOpen -> curr.awaitClose.await()
     }
 
   /**
-   * Returns a new task that upon execution will execute the given
-   * task, but with the protection of this circuit breaker.
+   * Returns a new task that upon execution will execute the given task, but with the protection of this circuit breaker.
    * If an exception in [fa] occurs, other than an [ExecutionRejected] exception, it will be rethrown.
    */
   public suspend fun <A> protectEither(fa: suspend () -> A): Either<ExecutionRejected, A> =
@@ -176,34 +177,20 @@ private constructor(
     }
 
   /**
-   * Returns a new task that upon execution will execute the given
-   * task, but with the protection of this circuit breaker.
+   * Returns a new task that upon execution will execute the given task, but with the protection of this circuit breaker.
    * If an exception in [fa] occurs it will be rethrown
    */
   public tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
     when (val curr = state.get()) {
-      is Closed -> {
-        val attempt = try {
-          Either.Right(fa.invoke())
-        } catch (e: Throwable) {
-          Either.Left(e)
-        }
-        markOrResetFailures(attempt)
-      }
+      is Closed -> markOrResetFailures(Either.catch { fa() })
       is Open -> {
-        val now = timeInMillis()
-        if (now >= curr.expiresAt) {
-          // The Open state has expired, so we are letting just one
-          // task to execute, while transitioning into HalfOpen
-          if (!state.compareAndSet(
-              curr,
-              HalfOpen(curr.resetTimeout, curr.awaitClose)
-            )
-          ) protectOrThrow(fa) // retry!
+        if (curr.expiresAt.hasPassedNow()) {
+          // The Open state has expired, so we are transition to HalfOpen and attempt to close the CircuitBreaker
+          if (!state.compareAndSet(curr, HalfOpen(curr.openingStrategy, curr.resetTimeout, curr.awaitClose))) protectOrThrow(fa)
           else attemptReset(fa, curr.resetTimeout, curr.awaitClose, curr.startedAt)
         } else {
-          // Open isn't expired, so we need to fail
-          val expiresInMillis = curr.expiresAt - now
+          // Open isn't expired, so we reject execution
+          val expiresInMillis = curr.expiresAt.elapsedNow().absoluteValue.inWholeMilliseconds
           onRejected.invoke()
           throw ExecutionRejected(
             "Rejected because the CircuitBreaker is in the Open state, attempting to close in $expiresInMillis millis",
@@ -211,114 +198,98 @@ private constructor(
           )
         }
       }
-      is State.HalfOpen -> {
-        // CircuitBreaker is in HalfOpen state, which means we still reject all
-        // tasks, while waiting to see if our reset attempt succeeds or fails
+
+      is HalfOpen -> {
+        // CircuitBreaker is in HalfOpen state, which means we still reject all tasks, while waiting to see if our attempt to close the CircuitBreaker succeeds or fails
         onRejected.invoke()
         throw ExecutionRejected("Rejected because the CircuitBreaker is in the HalfOpen state", curr)
       }
     }
 
-  /** Function for counting failures in the `Closed` state,
-   * triggering the `Open` state if necessary.
-   */
+  /** Function for counting failures in the `Closed` state, triggering the `Open` state if necessary.*/
   private tailrec suspend fun <A> markOrResetFailures(result: Either<Throwable, A>): A =
     when (val curr = state.get()) {
       is Closed -> {
         when (result) {
           is Either.Right -> {
-            if (curr.failures == 0) result.value
-            else { // In case of success, must reset the failures counter!
-              val update = Closed(0)
-              if (!state.compareAndSet(curr, update)) markOrResetFailures(result) // retry?
+            val openingStrategy = state.get().openingStrategy
+            if (openingStrategy is OpeningStrategy.Count && openingStrategy.failuresCount == 0)
+              result.value
+            else {
+              if (!state.compareAndSet(curr, Closed(openingStrategy.resetFailuresCount()))) markOrResetFailures(result)
               else result.value
             }
           }
+
           is Either.Left -> {
-            // In case of failure, we either increment the failures counter,
-            // or we transition in the `Open` state.
-            if (curr.failures + 1 < maxFailures) {
-              // It's fine, just increment the failures count
-              val update = Closed(curr.failures + 1)
-              if (!state.compareAndSet(curr, update)) markOrResetFailures<A>(result) // retry?
-              else throw result.value
-            } else {
-              // N.B. this could be canceled, however we don't care
-              val now = timeInMillis()
-              // We've gone over the permitted failures threshold,
-              // so we need to open the circuit breaker
-              val update = Open(now, resetTimeout, CompletableDeferred())
-              if (!state.compareAndSet(curr, update)) markOrResetFailures<A>(result) // retry
+            val currentOpeningStrategy = curr.openingStrategy.trackFailure(timeSource.markNow())
+            // In case of failure, we either increment the failures counter, or we transition in the `Open` state.
+            if (currentOpeningStrategy.shouldOpen()) {
+              // We've gone over the permitted failures threshold, so we need to open the circuit breaker
+              val update = Open(currentOpeningStrategy, timeSource.markNow(), resetTimeout, CompletableDeferred())
+              if (!state.compareAndSet(curr, update)) markOrResetFailures<A>(result)
               else {
                 onOpen.invoke()
                 throw result.value
               }
+            } else {
+              // It's fine, just increment the failures count
+              if (!state.compareAndSet(curr, Closed(currentOpeningStrategy))) markOrResetFailures<A>(result)
+              else throw result.value
             }
           }
         }
       }
+
       else -> result.fold({ throw it }, ::identity)
     }
 
-  /** Internal function that is the handler for the reset attempt when
-   * the circuit breaker is in `HalfOpen`. In this state we can
-   * either transition to `Closed` in case the attempt was
-   * successful, or to `Open` again, in case the attempt failed.
+  /** Internal function that is the handler for the reset attempt when the circuit breaker is in `HalfOpen`.
+   * In this state we can either transition to `Closed` in case the attempt was successful, or to `Open` again, in case the attempt failed.
    *
-   * @param task is the task to execute, along with the attempt
-   *        handler attached
-   * @param resetTimeout is the last timeout applied to the previous
-   *        `Open` state, to be multiplied by the backoff factor in
-   *        case the attempt fails and it needs to transition to
-   *        `Open` again
+   * @param task is the task to execute, along with the attempt handler attached
+   * @param resetTimeout is the last timeout applied to the previous [Open] state,
+   * to be multiplied by the backoff factor in case the attempt fails, and it needs to transition to [Open] again
    */
   private suspend fun <A> attemptReset(
     task: suspend () -> A,
     resetTimeout: Duration,
     awaitClose: CompletableDeferred<Unit>,
-    lastStartedAt: Long
-  ): A =
-    bracketCase(
-      acquire = onHalfOpen,
-      use = { task.invoke() },
-      release = { _, exit ->
-        when (exit) {
-          is ExitCase.Cancelled -> {
-            // We need to return to Open state
-            // otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
-            state.set(Open(lastStartedAt, resetTimeout, awaitClose))
-            onOpen.invoke()
-          }
-          ExitCase.Completed -> {
-            // While in HalfOpen only a reset attempt is allowed to update
-            // the state, so setting this directly is safe
-            state.set(Closed(0))
-            awaitClose.complete(Unit)
-            onClosed.invoke()
-          }
-          is ExitCase.Failure -> {
-            // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
-            val value: Duration = (resetTimeout * exponentialBackoffFactor)
-            val nextTimeout: Duration =
-              if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout
-              else value
-            val ts = timeInMillis()
-            state.set(Open(ts, nextTimeout, awaitClose))
-            onOpen.invoke()
-          }
-        }
-      }
-    )
+    lastStartedAt: TimeMark
+  ): A = try {
+    onHalfOpen.invoke()
+    task.invoke()
+  } catch (e: CancellationException) {
+    // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
+    state.set(Open(state.get().openingStrategy ,lastStartedAt, resetTimeout, awaitClose))
+    onOpenAndThrow(e)
+  } catch (e: Throwable) {
+    // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
+    val value: Duration = (resetTimeout * exponentialBackoffFactor)
+    val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
+    state.set(Open(state.get().openingStrategy, timeSource.markNow(), nextTimeout, awaitClose))
+    onOpenAndThrow(e)
+  }.also {
+    // While in HalfOpen only a reset attempt is allowed to update the state, so setting this directly is safe
+    state.set(Closed(state.get().openingStrategy.resetFailuresCount()))
+    awaitClose.complete(Unit)
+    onClosed.invoke()
+  }
+
+  private suspend fun onOpenAndThrow(original: Throwable): Nothing {
+    runCatching {
+      withContext(NonCancellable) { onOpen.invoke() }
+    }.exceptionOrNull()?.let { original.addSuppressed(it) }
+    throw original
+  }
 
   /** Returns a new circuit breaker that wraps the state of the source
-   * and that upon a task being rejected will execute the given
-   * `callback`.
+   * and that upon a task being rejected will execute the given [callback].
    *
    * This is useful for gathering stats.
    *
-   * NOTE: calling this method multiple times will create a circuit
-   * breaker that will call multiple callbacks, thus the callback
-   * given is cumulative with other specified callbacks.
+   * NOTE: calling this method multiple times will create a circuit breaker that will call multiple callbacks,
+   * thus the callback given is cumulative with other specified callbacks.
    *
    * @param callback will be executed when tasks get rejected.
    * @return a new circuit breaker wrapping the state of the source.
@@ -326,11 +297,11 @@ private constructor(
   public fun doOnRejectedTask(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      maxFailures = maxFailures,
       resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
       maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
       onRejected = suspend { onRejected.invoke(); callback.invoke() },
+      timeSource = timeSource,
       onClosed = onClosed,
       onHalfOpen = onHalfOpen,
       onOpen = onOpen
@@ -352,11 +323,11 @@ private constructor(
   public fun doOnClosed(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      maxFailures = maxFailures,
       resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
       maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
       onRejected = onRejected,
+      timeSource = timeSource,
       onClosed = suspend { onClosed.invoke(); callback.invoke(); },
       onHalfOpen = onHalfOpen,
       onOpen = onOpen
@@ -378,13 +349,13 @@ private constructor(
   public fun doOnHalfOpen(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      maxFailures = maxFailures,
       resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
       maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      timeSource = timeSource,
       onRejected = onRejected,
       onClosed = onClosed,
-      onHalfOpen = suspend { onHalfOpen.invoke(); callback.invoke() },
+      onHalfOpen = { onHalfOpen.invoke(); callback.invoke() },
       onOpen = onOpen
     )
 
@@ -404,14 +375,14 @@ private constructor(
   public fun doOnOpen(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      maxFailures = maxFailures,
       resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
       exponentialBackoffFactor = exponentialBackoffFactor,
       maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      timeSource = timeSource,
       onRejected = onRejected,
       onClosed = onClosed,
       onHalfOpen = onHalfOpen,
-      onOpen = suspend { onOpen.invoke(); callback.invoke() }
+      onOpen = { onOpen.invoke(); callback.invoke() }
     )
 
   /**
@@ -420,50 +391,38 @@ private constructor(
    * The available states are:
    *  - [Closed] in case tasks are allowed to go through
    *  - [Open] in case the circuit breaker is active and rejects incoming tasks
-   *  - [HalfOpen] in case a reset attempt was triggered and it is waiting for
-   *    the result in order to evolve in [Closed], or back to [Open]
+   *  - [HalfOpen] in case a reset attempt was triggered, and it is waiting for the result in order to evolve in [Closed], or back to [Open]
    */
   public sealed class State {
+    public abstract val openingStrategy: OpeningStrategy
 
     /**
      * [Closed] is the normal state of the [CircuitBreaker], where requests are being made. The state in which [CircuitBreaker] starts.
-     *    - When an exceptions occurs it increments the failure counter
+     *    - When an exception occurs it increments the failure counter
      *    - A successful request will reset the failure counter to zero
      *    - When the failure counter reaches the [maxFailures] threshold, the breaker is tripped into the [Open] state
      *
      * @param failures is the current failures count
      */
-    public class Closed(public val failures: Int) : State() {
-      override fun hashCode(): Int =
-        failures.hashCode()
-
-      override fun equals(other: Any?): Boolean =
-        if (other is Closed) failures == other.failures
-        else false
-
-      override fun toString(): String =
-        "Closed(failures=$failures)"
-    }
+    public class Closed(public override val openingStrategy: OpeningStrategy) : State()
 
     /**
      *  When the [CircuitBreaker] is in the [Open] state it will short-circuit/fail-fast all requests
-     *    - All requests short-circuit/fail-fast with `ExecutionRejected`
+     *    - All requests short-circuit/fail-fast with [ExecutionRejected]
      *    - If a request is made after the configured [resetTimeout] passes, the [CircuitBreaker] is tripped into the a [HalfOpen] state, allowing one request to go through as a test.
      *
-     * @param startedAt is the timestamp in milliseconds since the
-     *        epoch when the transition to [Open] happened.
+     * @param startedAt is the [TimeMark] when the transition to [Open] happened.
      *
-     * @param resetTimeout is the current `resetTimeout` that is
-     *        applied to this `Open` state, to be multiplied by the
-     *        exponential backoff factor for the next transition from
-     *        `HalfOpen` to `Open`.
+     * @param resetTimeout is the current `resetTimeout` that is applied to this [Open] state, to be multiplied by the
+     *        exponential backoff factor for the next transition from [HalfOpen] to [Open].
      */
     public class Open internal constructor(
-      public val startedAt: Long,
+      public override val openingStrategy: OpeningStrategy,
+      public val startedAt: TimeMark,
       public val resetTimeout: Duration,
       internal val awaitClose: CompletableDeferred<Unit>,
     ) : State() {
-      
+
       @Deprecated(
         "Prefer to use resetTimeout with kotlin.time.Duration",
         ReplaceWith(
@@ -473,45 +432,49 @@ private constructor(
       )
       public val resetTimeoutNanos: Double
         get() = resetTimeout.toDouble(DurationUnit.NANOSECONDS)
-      
-      public constructor(startedAt: Long, resetTimeout: Duration) : this(
-        startedAt,
+
+      @Deprecated(
+        "This constructor will be removed in Arrow 2.0",
+        level = DeprecationLevel.WARNING
+      )
+      public constructor(openingStrategy: OpeningStrategy, startedAt: Long, resetTimeout: Duration) : this(
+        openingStrategy,
+        TimeSource.Monotonic.markNow(),
         resetTimeout,
         CompletableDeferred()
       )
-      
+
       @Deprecated(
         "This constructor will be removed in Arrow 2.0",
         level = DeprecationLevel.WARNING
       )
       internal constructor(
+        openingStrategy: OpeningStrategy,
         startedAt: Long,
         resetTimeoutNanos: Double,
         awaitClose: CompletableDeferred<Unit>,
-      ) : this(startedAt, resetTimeoutNanos.nanoseconds, awaitClose)
-      
+      ) : this(openingStrategy, TimeSource.Monotonic.markNow(), resetTimeoutNanos.nanoseconds, awaitClose)
+
       @Deprecated(
         "This constructor will be removed in Arrow 2.0",
         level = DeprecationLevel.WARNING
       )
-      public constructor(startedAt: Long, resetTimeoutNanos: Double) : this(
-        startedAt,
+      public constructor(openingStrategy: OpeningStrategy, startedAt: Long, resetTimeoutNanos: Double) : this(
+        openingStrategy,
+        TimeSource.Monotonic.markNow(),
         resetTimeoutNanos.nanoseconds,
         CompletableDeferred()
       )
 
-      /** The timestamp in milliseconds since the epoch, specifying
-       * when the `Open` state is to transition to [HalfOpen].
+      /** The timestamp in milliseconds since the epoch, specifying when the [Open] state is to transition to [HalfOpen].
        *
        * It is calculated as:
        * `startedAt + resetTimeout`
        */
-      public val expiresAt: Long = resetTimeout.plus(startedAt.milliseconds).toLong(DurationUnit.MILLISECONDS)
+      public val expiresAt: TimeMark = startedAt + resetTimeout
 
       override fun equals(other: Any?): Boolean =
-        if (other is Open) this.startedAt == startedAt &&
-          this.resetTimeout == resetTimeout &&
-          this.expiresAt == expiresAt
+        if (other is Open) this.startedAt == startedAt && this.resetTimeout == resetTimeout
         else false
 
       override fun toString(): String =
@@ -533,13 +496,14 @@ private constructor(
      *
      * @param resetTimeout is the current `reset timeout` that the [CircuitBreaker] has to stay in [Open] state.
      * When the `reset timeout` lapsed, than the [CircuitBreaker] will allow a test request to go through in [HalfOpen].
-     * If the test request failed, the [CircuitBreaker] will go back into [Open] and it'll multiply the [resetTimeout] with the the exponential backoff factor.
+     * If the test request failed, the [CircuitBreaker] will go back into [Open] and it'll multiply the [resetTimeout] with the exponential backoff factor.
      */
     public class HalfOpen internal constructor(
+      public override  val openingStrategy: OpeningStrategy,
       public val resetTimeout: Duration,
       internal val awaitClose: CompletableDeferred<Unit>
     ) : State() {
-      
+
       @Deprecated(
         "Prefer to use resetTimeout with kotlin.time.Duration",
         ReplaceWith(
@@ -549,19 +513,20 @@ private constructor(
       )
       public val resetTimeoutNanos: Double
         get() = resetTimeout.toDouble(DurationUnit.NANOSECONDS)
-      
-      public constructor(resetTimeout: Duration) : this(resetTimeout, CompletableDeferred())
-      
+
+      public constructor(openingStrategy: OpeningStrategy, resetTimeout: Duration) : this(openingStrategy, resetTimeout, CompletableDeferred())
+
       @Deprecated(
         "This constructor will be removed in Arrow 2.0",
         level = DeprecationLevel.WARNING
       )
       internal constructor(
+        openingStrategy: OpeningStrategy,
         resetTimeoutNanos: Double,
         awaitClose: CompletableDeferred<Unit>,
-      ) : this(resetTimeoutNanos.nanoseconds, awaitClose)
+      ) : this(openingStrategy, resetTimeoutNanos.nanoseconds, awaitClose)
 
-      public constructor(resetTimeoutNanos: Double) : this(resetTimeoutNanos.nanoseconds, CompletableDeferred())
+      public constructor(openingStrategy: OpeningStrategy, resetTimeoutNanos: Double) : this(openingStrategy, resetTimeoutNanos.nanoseconds, CompletableDeferred())
 
       override fun hashCode(): Int =
         resetTimeout.hashCode()
@@ -581,54 +546,44 @@ private constructor(
     /**
      * Attempts to create a [CircuitBreaker].
      *
-     * @param maxFailures is the maximum count for failures before
-     *        opening the circuit breaker.
+     * @param maxFailures is the maximum count for failures before opening the circuit breaker.
      *
-     * @param resetTimeoutNanos is the timeout to wait in the `Open` state
-     *        before attempting a close of the circuit breaker (but without
-     *        the backoff factor applied) in nanoseconds.
+     * @param resetTimeoutNanos is the timeout to wait in the `Open` state before attempting a close of the circuit breaker
+     * (but without the backoff factor applied) in nanoseconds.
      *
-     * @param exponentialBackoffFactor is a factor to use for resetting
-     *        the `resetTimeout` when in the `HalfOpen` state, in case
-     *        the attempt to `Close` fails.
+     * @param exponentialBackoffFactor is a factor to use for resetting the `resetTimeout` when in the `HalfOpen` state,
+     * in case the attempt to `Close` fails.
      *
-     * @param maxResetTimeoutNanos is the maximum timeout the circuit breaker
-     *        is allowed to use when applying the `exponentialBackoffFactor`.
+     * @param maxResetTimeoutNanos is the maximum timeout the circuit breaker is allowed to use when applying the `exponentialBackoffFactor`.
      *
-     * @param onRejected is a callback for signaling rejected tasks, so
-     *         every time a task execution is attempted and rejected in
-     *         [CircuitBreaker.Open] or [CircuitBreaker.HalfOpen]
-     *         states.
+     * @param onRejected is a callback for signaling rejected tasks,
+     * so every time a task execution is attempted and rejected in [Open] or [HalfOpen] states.
      *
      * @param onClosed is a callback for signaling transitions to the [CircuitBreaker.State.Closed] state.
      *
      * @param onHalfOpen is a callback for signaling transitions to [CircuitBreaker.State.HalfOpen].
      *
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
-     *
      */
     @Deprecated(
       "Prefer the kotlin.time.Duration constructor instead",
       ReplaceWith(
-        "of(maxFailures, resetTimeoutNanos.nanoseconds, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)",
+        "CircuitBreaker(maxFailures, resetTimeoutNanos.nanoseconds, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)",
         "import kotlin.time.Duration.Companion.nanoseconds"
       )
     )
     public suspend fun of(
-      maxFailures: Int,
       resetTimeoutNanos: Double,
+      openingStrategy: OpeningStrategy,
       exponentialBackoffFactor: Double = 1.0,
       maxResetTimeoutNanos: Double = Double.POSITIVE_INFINITY,
       onRejected: suspend () -> Unit = { },
       onClosed: suspend () -> Unit = { },
       onHalfOpen: suspend () -> Unit = { },
-      onOpen: suspend () -> Unit = { },
+      onOpen: suspend () -> Unit = { }
     ): CircuitBreaker =
       CircuitBreaker(
-        state = AtomicRef(Closed(0)),
-        maxFailures = maxFailures
-          .takeIf { it >= 0 }
-          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
+        state = AtomicRef(Closed(openingStrategy)),
         resetTimeoutNanos = resetTimeoutNanos
           .takeIf { it > 0 }
           .let { requireNotNull(it) { "resetTimeout expected to be greater than 0, but was $resetTimeoutNanos" } },
@@ -638,6 +593,7 @@ private constructor(
         maxResetTimeoutNanos = maxResetTimeoutNanos
           .takeIf { it > 0 }
           .let { requireNotNull(it) { "maxResetTimeout expected to be greater than 0, but was $maxResetTimeoutNanos" } },
+        timeSource = TimeSource.Monotonic,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
@@ -673,21 +629,45 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
+    @Deprecated(
+      "Use the non-suspend constructor instead.",
+      ReplaceWith("CircuitBreaker(maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)")
+    )
     public suspend fun of(
-      maxFailures: Int,
       resetTimeout: Duration,
+      openingStrategy: OpeningStrategy,
       exponentialBackoffFactor: Double = 1.0,
       maxResetTimeout: Duration = Duration.INFINITE,
       onRejected: suspend () -> Unit = suspend { },
       onClosed: suspend () -> Unit = suspend { },
       onHalfOpen: suspend () -> Unit = suspend { },
-      onOpen: suspend () -> Unit = suspend { },
+      onOpen: suspend () -> Unit = suspend { }
+    ): CircuitBreaker =
+      invoke(
+        resetTimeout,
+        openingStrategy,
+        exponentialBackoffFactor,
+        maxResetTimeout,
+        TimeSource.Monotonic,
+        onRejected,
+        onClosed,
+        onHalfOpen,
+        onOpen
+      )
+
+    public operator fun invoke(
+      resetTimeout: Duration,
+      openingStrategy: OpeningStrategy,
+      exponentialBackoffFactor: Double = 1.0,
+      maxResetTimeout: Duration = Duration.INFINITE,
+      timeSource: TimeSource = TimeSource.Monotonic,
+      onRejected: suspend () -> Unit = suspend { },
+      onClosed: suspend () -> Unit = suspend { },
+      onHalfOpen: suspend () -> Unit = suspend { },
+      onOpen: suspend () -> Unit = suspend { }
     ): CircuitBreaker =
       CircuitBreaker(
-        state = AtomicRef(Closed(0)),
-        maxFailures = maxFailures
-          .takeIf { it >= 0 }
-          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
+        state = AtomicRef(Closed(openingStrategy)),
         resetTimeoutNanos = resetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
           .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } }
@@ -699,10 +679,67 @@ private constructor(
           .takeIf { it.isPositive() && it != Duration.ZERO }
           .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } }
           .toDouble(DurationUnit.NANOSECONDS),
+        timeSource = timeSource,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
         onOpen = onOpen
       )
+  }
+
+  public sealed class OpeningStrategy {
+    internal fun resetFailuresCount(): OpeningStrategy = when (this) {
+    is Count -> copy(failuresCount = 0)
+    else -> this
+  }
+    internal abstract fun shouldOpen(): Boolean
+    internal abstract fun trackFailure(failureAt: TimeMark): OpeningStrategy
+
+    public data class Count(
+      val maxFailures: Int,
+      val failuresCount: Int = 0
+    ) : OpeningStrategy() {
+
+      init {
+        maxFailures
+          .takeIf { it >= 0 }
+          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } }
+      }
+
+      override fun shouldOpen(): Boolean = failuresCount > maxFailures
+
+      override fun trackFailure(failureAt: TimeMark): OpeningStrategy =
+        copy(failuresCount = failuresCount + 1)
+
+      public companion object {
+        public operator fun invoke(maxFailures: Int): Count =
+          Count(maxFailures = maxFailures, failuresCount = 0)
+      }
+    }
+
+    public data class SlidingWindow(
+      val timeSource: TimeSource, val failures: List<TimeMark>, val windowDuration: Duration, val maxFailures: Int
+    ) : OpeningStrategy() {
+
+      override fun shouldOpen(): Boolean =
+        maxFailures < failures.size && failures.firstOrNull()?.plus(windowDuration)?.hasNotPassedNow() == true
+
+      override fun trackFailure(failureAt: TimeMark): OpeningStrategy =
+        if (failures.size < maxFailures + 1) copy(failures = failures + failureAt)
+        else copy(failures = failures.slide(failureAt))
+
+      private fun List<TimeMark>.slide(timeMark: TimeMark): List<TimeMark> =
+        buildList(size) {
+          this@slide.forEachIndexed { index, mark ->
+            if (index == 0) Unit else add(mark)
+          }
+          add(timeMark)
+        }
+
+      public companion object {
+        public operator fun invoke(timeSource: TimeSource, windowDuration: Duration, maxFailures: Int): SlidingWindow =
+          SlidingWindow(timeSource = timeSource, failures = emptyList(), windowDuration = windowDuration, maxFailures = maxFailures)
+      }
+    }
   }
 }
