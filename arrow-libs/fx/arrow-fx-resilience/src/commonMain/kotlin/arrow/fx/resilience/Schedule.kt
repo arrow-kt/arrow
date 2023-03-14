@@ -26,9 +26,7 @@ public typealias Next<Input, Output> =
   suspend (Input) -> Schedule.Decision<Input, Output>
 
 @JvmInline
-public value class Schedule<Input, Output>(
-  public val step: Next<Input, Output>
-) {
+public value class Schedule<Input, Output>(public val step: Next<Input, Output>) {
 
   /** Repeat the schedule, and uses [block] as [Input] for the [step] function. */
   public suspend fun repeat(block: suspend () -> Input): Output =
@@ -41,8 +39,7 @@ public value class Schedule<Input, Output>(
   public suspend fun repeatOrElse(
     block: suspend () -> Input,
     orElse: suspend (error: Throwable, output: Output?) -> Output
-  ): Output =
-    repeatOrElseEither(block, orElse).fold(::identity, ::identity)
+  ): Output = repeatOrElseEither(block, orElse).merge()
 
   /**
    * Repeat the schedule, and uses [block] as [Input] for the [step] function.
@@ -412,10 +409,6 @@ public value class Schedule<Input, Output>(
     /** Creates a [Schedule] which [collect]s all its [Input] in a [List]. */
     public fun <Input> collect(): Schedule<Input, List<Input>> =
       identity<Input>().collect()
-
-    /** Creates a Schedule that recurs [n] times. */
-    public fun <Input> recurs(n: Int): Schedule<Input, Long> =
-      recurs(n.toLong())
 
     /** Creates a Schedule that recurs [n] times. */
     public fun <Input> recurs(n: Long): Schedule<Input, Long> {
