@@ -237,7 +237,7 @@ public value class Schedule<Input, Output>(
           is Done -> return Either.Right(decision.output)
         }
       } catch (e: Throwable) {
-        return Either.Left(orElse(e.nonFatalOrThrow(), state.orNull()))
+        return Either.Left(orElse(e.nonFatalOrThrow(), state.getOrNull()))
       }
     }
   }
@@ -387,7 +387,7 @@ public value class Schedule<Input, Output>(
   public infix fun <B> zipRight(other: Schedule<Input, B>): Schedule<Input, B> =
     and(other) { _, b -> b }
 
-  public fun <B> and(other: Schedule<Input, B>): Schedule<Input, Pair<Output, B>> =
+  public infix fun <B> and(other: Schedule<Input, B>): Schedule<Input, Pair<Output, B>> =
     and(other, ::Pair)
 
   public fun <B, C> and(

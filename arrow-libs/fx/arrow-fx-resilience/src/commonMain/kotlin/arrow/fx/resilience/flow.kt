@@ -1,8 +1,8 @@
 package arrow.fx.resilience
 
+import kotlin.time.Duration.Companion.ZERO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
 
 /**
@@ -33,24 +33,17 @@ import kotlinx.coroutines.flow.retryWhen
  *
  * @param schedule - the [Schedule] used for retrying the collection of the flow
  */
-@Suppress("UNCHECKED_CAST")
-public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
-  (schedule as Schedule.ScheduleImpl<Any?, Throwable, B>)
-  var dec: Schedule.Decision<Any?, B>
-  var state: Any? = schedule.initialState()
+public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> {
+  var step = schedule.step
+  return retryWhen { cause, _ ->
+    when (val dec = step(cause)) {
+      is Schedule.Decision.Continue -> {
+        if (dec.delay != ZERO) delay(dec.delay)
+        step = dec.next
+        true
+      }
 
-  val retryWhen = retryWhen { cause, _ ->
-    dec = schedule.update(cause, state)
-    state = dec.state
-
-    if (dec.cont) {
-      delay(dec.duration)
-      true
-    } else {
-      false
+      is Schedule.Decision.Done -> false
     }
-  }
-  retryWhen.collect {
-    emit(it)
   }
 }
