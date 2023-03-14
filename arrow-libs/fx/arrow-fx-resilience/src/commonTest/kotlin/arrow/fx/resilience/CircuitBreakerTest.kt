@@ -301,7 +301,7 @@ class CircuitBreakerTest {
     val stepDuration = 40.milliseconds
     val maxFailures = 5
     var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
-    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(10)
 
     schedule.repeat {
       timeSource += stepDuration
@@ -327,6 +327,11 @@ class CircuitBreakerTest {
     }
 
     assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should open after reaching max failures")
+
+    timeSource += stepDuration
+    openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+
+    assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should still open")
   }
 
   @Test

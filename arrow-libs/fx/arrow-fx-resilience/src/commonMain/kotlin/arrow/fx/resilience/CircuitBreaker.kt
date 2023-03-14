@@ -730,8 +730,8 @@ private constructor(
 
       private fun List<TimeMark>.slide(timeMark: TimeMark): List<TimeMark> =
         buildList(size) {
-          forEachIndexed { index, mark ->
-            if (index == 1) Unit else add(mark)
+          this@slide.forEachIndexed { index, mark ->
+            if (index == 0) Unit else add(mark)
           }
           add(timeMark)
         }
