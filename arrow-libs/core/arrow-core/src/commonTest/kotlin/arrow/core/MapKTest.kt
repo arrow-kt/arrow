@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.core.test.functionABCToD
+import arrow.core.test.functionAToB
 import arrow.core.test.intSmall
 import arrow.core.test.ior
 import arrow.core.test.laws.MonoidLaws
@@ -20,9 +22,9 @@ import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldNotContainKey
 import io.kotest.matchers.maps.shouldNotHaveValues
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
@@ -171,6 +173,14 @@ class MapKTest : StringSpec({
     }
   }
 
+  "align is idempotent" {
+    checkAll(
+      Arb.map(KEY_ARB, Arb.intSmall())) {
+        a ->
+      a.align(a) shouldBe a.mapValues { Ior.Both(it.value, it.value) }
+    }
+  }
+
   "zip is commutative" {
     checkAll(
       Arb.map(KEY_ARB, Arb.intSmall()),
@@ -179,7 +189,19 @@ class MapKTest : StringSpec({
         a,
         b ->
 
-      a.zip(b).mapValues { it.value.second to it.value.first } shouldBe b.zip(a)
+      a.zip(b) shouldBe b.zip(a).mapValues { it.value.second to it.value.first }
+    }
+  }
+
+  "align is commutative" {
+    checkAll(
+      Arb.map(KEY_ARB, Arb.intSmall()),
+      Arb.map(KEY_ARB, Arb.intSmall())
+    ) {
+        a,
+        b ->
+
+      a.align(b) shouldBe b.align(a).mapValues { it.value.swap() }
     }
   }
 
@@ -198,24 +220,62 @@ class MapKTest : StringSpec({
     }
   }
 
+  "align is associative" {
+    checkAll(
+      Arb.map(KEY_ARB, Arb.intSmall()),
+      Arb.map(KEY_ARB, Arb.intSmall()),
+      Arb.map(KEY_ARB, Arb.intSmall())
+    ) {
+        a,b,c ->
+
+      fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
+        when (this) {
+          is Ior.Left -> when (val inner = this.value) {
+            is Ior.Left -> Ior.Left(inner.value)
+            is Ior.Right -> Ior.Right(Ior.Left(inner.value))
+            is Ior.Both -> Ior.Both(inner.leftValue, Ior.Left(inner.rightValue))
+          }
+          is Ior.Right -> Ior.Right(Ior.Right(this.value))
+          is Ior.Both -> when (val inner = this.leftValue) {
+            is Ior.Left -> Ior.Both(inner.value, Ior.Right(this.rightValue))
+            is Ior.Right -> Ior.Right(Ior.Both(inner.value, this.rightValue))
+            is Ior.Both -> Ior.Both(inner.leftValue, Ior.Both(inner.rightValue, this.rightValue))
+          }
+        }
+
+      a.align(b.align(c)) shouldBe (a.align(b)).align(c).mapValues { it.value.assoc() }
+    }
+  }
+
   "zip with" {
     checkAll(
       Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) { a, b ->
-      val fn = { k: Int, l: String, r: String -> "$k $l $r" }
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.functionABCToD<Int, String, String, String>(Arb.string())
+    ) { a, b, fn ->
       a.zip(b, fn) shouldBe a.zip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
+    }
+  }
+
+  "align with" {
+    checkAll(
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.functionAToB<Map.Entry<Int, Ior<String, String>>, String>(Arb.string())
+    ) { a, b, fn ->
+      a.align(b, fn) shouldBe a.align(b).mapValues { fn(it) }
     }
   }
 
     "zip functoriality" {
       checkAll(
         Arb.map(KEY_ARB, Arb.string()),
-        Arb.map(KEY_ARB, Arb.string())) {
-        a,b ->
+        Arb.map(KEY_ARB, Arb.string()),
+        Arb.functionAToB<String, String>(Arb.string()),
+        Arb.functionAToB<String, String>(Arb.string())
+      ) {
+        a,b,f,g ->
 
-        val f = { e: String -> "f${e}" }
-        val g = { e: String -> "g${e}" }
         fun <A,B,C,D> Pair<A,C>.bimap(f: (A) -> B, g: (C) -> D) = Pair(f(first), g(second))
 
         val l = a.mapValues{ f(it.value)}.zip(b.mapValues{g(it.value)})
@@ -224,6 +284,50 @@ class MapKTest : StringSpec({
         l shouldBe r
       }
     }
+
+  "align functoriality" {
+    checkAll(
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.functionAToB<String, String>(Arb.string()),
+      Arb.functionAToB<String, String>(Arb.string())
+    ) {
+        a,b,f,g ->
+
+      val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
+      val r = a.align(b).mapValues { it.value.bimap(f,g)}
+
+      l shouldBe r
+    }
+  }
+
+  "alignedness" {
+    checkAll(
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.map(KEY_ARB, Arb.string())
+    ) {
+        a ,b->
+
+      fun <K,V> toList(es: Map<K,V>): List<V> =
+        es.fold(emptyList()) {
+          acc, e -> acc + e.value
+      }
+
+      val left = toList(a)
+
+      fun <A,B> Ior<A,B>.toLeftOption() =
+        fold({it}, {null}, {a,_ -> a})
+
+      // toListOf (folded . here) (align x y)
+      val middle = toList(a.align(b).mapValues { it.value.toLeftOption() }).filterNotNull()
+
+      // mapMaybe justHere (toList (align x y))
+      val right = toList(a.align(b)).mapNotNull { it.toLeftOption() }
+
+      left shouldBe right
+      left shouldBe middle
+    }
+  }
 
   "zippyness1" {
     checkAll(
@@ -420,9 +524,10 @@ class MapKTest : StringSpec({
   "padZip with" {
     checkAll(
       Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) { a, b ->
-      a.padZip(b) { a,b,c -> "$a $b $c"} shouldBe a.padZip(b).mapValues { "${it.key} ${it.value.first} ${it.value.second}"}
+      Arb.map(KEY_ARB, Arb.string()),
+      Arb.functionABCToD<Int, String?, String?, String>(Arb.string())
+    ) { a, b, fn ->
+      a.padZip(b, fn) shouldBe a.padZip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
     }
   }
 
@@ -493,7 +598,8 @@ class MapKTest : StringSpec({
     "ensure that Arb used for map keys produces a small enough set of distinct values" {
 
       /*
-        when zipping/aligning maps we will execute different code paths depending on if a given key is present in both maps or not.
+        when zipping/aligning maps we will execute different code paths depending if a given key is present in both maps or not.
+        when using types with lots of values like String/Int etc. this is most likely not the case. In effect the tests will not cover all code branches.
         therefor we need to make sure to use an Arb here that produces a small enough set of distint values.
         this test is to ensure that the arb in use should cause at least 50 iterations with at least 10 keys in both maps
        */

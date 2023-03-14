@@ -9,10 +9,12 @@ import arrow.core.NonEmptySet
 import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.left
+import arrow.core.memoize
 import arrow.core.right
 import arrow.core.toNonEmptySetOrNull
 import arrow.core.toOption
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
@@ -22,6 +24,7 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.set
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
@@ -46,8 +49,13 @@ fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
 
-fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
-  arb.map { b: B -> { _: A -> b } }
+fun <A, B>Arb.Companion.functionAToB(arbB: Arb<B>): Arb<(A) -> B> = arbitrary {random ->
+  { _: A -> arbB.next(random) }.memoize()
+}
+
+fun <A, B, C, D>Arb.Companion.functionABCToD(arb: Arb<D>): Arb<(A, B, C) -> D> = arbitrary {random ->
+  ({ _: A, _:B, _:C -> arb.next(random)}.memoize())
+}
 
 fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.of(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
