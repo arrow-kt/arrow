@@ -96,22 +96,22 @@ class ScheduleTest {
 
   @Test
   fun scheduleDoWhileRepeatsWhileConditionHolds(): TestResult = runTest {
-    checkRepeat(Schedule.identity<Long>().whileInput { it < 10 }, expected = 10)
-    checkRepeat(Schedule.identity<Long>().whileInput  { it > 10 }, expected = 1)
-    checkRepeat(Schedule.identity<Long>().whileInput  { it == 1L }, expected = 2)
+    checkRepeat(Schedule.doWhile { input, _ -> input < 10 }, expected = 10)
+    checkRepeat(Schedule.doWhile { input, _ -> input > 10 }, expected = 1)
+    checkRepeat(Schedule.doWhile { input, _ -> input == 1L }, expected = 2)
   }
 
   @Test
   fun scheduleDoUntilRepeatsUntilConditionIsSatisfied(): TestResult = runTest {
-    checkRepeat(Schedule.doUntil { it < 10 }, expected = 1)
-    checkRepeat(Schedule.doUntil { it > 10 }, expected = 11)
-    checkRepeat(Schedule.doUntil { it == 1L }, expected = 1)
+    checkRepeat(Schedule.doUntil { input, _ -> input < 10 }, expected = 1)
+    checkRepeat(Schedule.doUntil { input, _ -> input > 10 }, expected = 11)
+    checkRepeat(Schedule.doUntil { input, _ -> input == 1L }, expected = 1)
   }
 
   @Test
   fun scheduleDoWhileCollectCollectsAllInputsIntoAList(): TestResult = runTest {
     checkRepeat(
-      Schedule.doWhile<Long> { it < 10L }.collect(),
+      Schedule.doWhile<Long> { input, _ -> input < 10L }.collect(),
       expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
     )
   }
@@ -119,7 +119,7 @@ class ScheduleTest {
   @Test
   fun scheduleDoUntilCollectCollectsAllInputsIntoAList(): TestResult = runTest {
     checkRepeat(
-      Schedule.doUntil<Long> { it > 10L }.collect(),
+      Schedule.doUntil<Long> { input, _ -> input > 10L }.collect(),
       expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     )
   }
@@ -300,8 +300,8 @@ class ScheduleTest {
     val ex = Throwable("Hello")
 
     val schedule = Schedule.exponential<Throwable>(1.0.milliseconds)
-      .untilOutput { it > 50.0.milliseconds }
-      .untilInput<Throwable> { it is IllegalStateException }
+      .doUntil { _, output -> output > 50.0.milliseconds }
+      .doUntil { input, _ -> input is IllegalStateException }
 
     val result: Either<Throwable, Unit> = withTimeout(10.seconds) {
       schedule.retryOrElseEither({
@@ -343,12 +343,13 @@ private fun linear(base: Duration): Sequence<Duration> =
 private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Long): List<Schedule.Decision<I, A>> =
   buildList {
     var step = this@calculateSchedule.step
-    for(i in 0 until n) {
-      when(val decision = step(input)) {
+    for (i in 0 until n) {
+      when (val decision = step(input)) {
         is Continue -> {
           add(decision)
           step = decision.next
         }
+
         is Done -> {
           add(decision)
           break
@@ -359,7 +360,7 @@ private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Long): 
 
 private suspend fun <I, A> Schedule<I, A>.calculateCont(input: I, n: Long): List<Pair<A, Duration>> =
   calculateSchedule(input, n).mapNotNull {
-    when(it) {
+    when (it) {
       is Continue -> it.output to it.delay
       else -> null
     }

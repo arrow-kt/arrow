@@ -146,14 +146,15 @@ public final class arrow/fx/resilience/Schedule {
 	public static final fun and-TAF2p8g (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun and-nZJhjPk (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun and-trTh5YI (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun andThen-TAF2p8g (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun andThen-nZJhjPk (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun andThen-trTh5YI (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final synthetic fun box-impl (Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Schedule;
-	public static final fun check-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun collect-n7EYv7Q (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static fun constructor-impl (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun delay-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun delayed-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun doUntil-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun doWhile-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (Lkotlin/jvm/functions/Function2;Ljava/lang/Object;)Z
 	public static final fun equals-impl0 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Z
@@ -174,18 +175,14 @@ public final class arrow/fx/resilience/Schedule {
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Lkotlin/jvm/functions/Function2;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Lkotlin/jvm/functions/Function2;
-	public static final fun untilInput-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun untilOutput-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun whileInput-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun whileOutput-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun zipLeft-nZJhjPk (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun zipRight-nZJhjPk (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 }
 
 public final class arrow/fx/resilience/Schedule$Companion {
 	public final fun collect-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
-	public final fun doUntil-nxrvn7M (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public final fun doWhile-nxrvn7M (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public final fun doUntil-nxrvn7M (Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public final fun doWhile-nxrvn7M (Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public final fun exponential-WtiCasI (JD)Lkotlin/jvm/functions/Function2;
 	public static synthetic fun exponential-WtiCasI$default (Larrow/fx/resilience/Schedule$Companion;JDILjava/lang/Object;)Lkotlin/jvm/functions/Function2;
 	public final fun fibonacci-xw-eLiE (J)Lkotlin/jvm/functions/Function2;

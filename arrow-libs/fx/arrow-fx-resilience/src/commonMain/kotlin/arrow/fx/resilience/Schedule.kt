@@ -74,57 +74,63 @@ public value class Schedule<Input, Output>(
     return Schedule { input -> loop(input, step) }
   }
 
+  /**
+   * Runs `this` schedule until [Done], and then runs [other] until [Done].
+   * Wrapping the output of `this` in [Either.Left], and the output of [other] in [Either.Right].
+   */
   public infix fun <B> andThen(other: Schedule<Input, B>): Schedule<Input, Either<Output, B>> =
-    andThen(other) { it }
+    andThen(other, { it.left() }) { it.right() }
 
+  /**
+   * Runs `this` schedule, and transforms the output of this schedule using [ifLeft],
+   * When `this` schedule is [Done], it runs [other] schedule, and transforms the output using [ifRight].
+   */
   public fun <B, C> andThen(
     other: Schedule<Input, B>,
-    transform: suspend (Either<Output, B>) -> C
+    ifLeft: suspend (Output) -> C,
+    ifRight: suspend (B) -> C
   ): Schedule<Input, C> {
     suspend fun loop(input: Input, self: Next<Input, B>): Decision<Input, C> =
       when (val decision = self(input)) {
-        is Continue -> Continue(transform(decision.output.right()), decision.delay) {
+        is Done -> Done(ifRight(decision.output))
+        is Continue -> Continue(ifRight(decision.output), decision.delay) {
           loop(input, decision.next)
         }
-
-        is Done -> Done(transform(decision.output.right()))
       }
 
     suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, C> =
       when (val decision = self(input)) {
-        is Continue -> Continue(transform(decision.output.left()), decision.delay) { loop(it, decision.next) }
-        is Done -> Continue(transform(decision.output.left()), ZERO) {
-          loop(input, other.step)
-        }
+        is Continue -> Continue(ifLeft(decision.output), decision.delay) { loop(it, decision.next) }
+        is Done -> Continue(ifLeft(decision.output), ZERO) { loop(input, other.step) }
       }
 
     return Schedule { input -> loop(input, step) }
   }
 
+  /**
+   * Pipes the output of this schedule to the input of the [other].
+   * Similar to |> in F# but for [Schedule].
+   */
   public infix fun <B> pipe(other: Schedule<Output, B>): Schedule<Input, B> {
     suspend fun loop(input: Input, self: Next<Input, Output>, other: Next<Output, B>): Decision<Input, B> =
       when (val decision = self(input)) {
+        is Done -> Done(other(decision.output).output)
         is Continue -> when (val decision2 = other(decision.output)) {
+          is Done -> Done(decision2.output)
           is Continue -> Continue(decision2.output, decision.delay + decision2.delay) {
             loop(it, decision.next, decision2.next)
           }
-
-          is Done -> Done(decision2.output)
         }
-
-        is Done -> Done(other(decision.output).output)
       }
 
     return Schedule { input -> loop(input, step, other.step) }
   }
 
   /**
-   * Returns a new schedule that passes each input and output of this schedule to the specified
-   * function, and then determines whether to continue based on the return value of the
-   * function.
+   * Runs the [Schedule] until the predicate of [Input] and [Output] returns false.
    */
-  public fun <A : Input> check(test: suspend (A, Output) -> Boolean): Schedule<A, Output> {
-    suspend fun loop(input: A, self: Next<A, Output>): Decision<A, Output> =
+  public fun doWhile(test: suspend (Input, Output) -> Boolean): Schedule<Input, Output> {
+    suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, Output> =
       when (val decision = self(input)) {
         is Continue ->
           if (test(input, decision.output)) Continue(decision.output, decision.delay) { loop(it, decision.next) }
@@ -137,26 +143,18 @@ public value class Schedule<Input, Output>(
   }
 
   /**
-   * `untilOutput(f) = whileOutput { !f(it) }`
+   * Runs the [Schedule] until the predicate of [Input] and [Output] returns true.
+   * Inverse version of [doWhile].
    */
-  public fun untilOutput(f: suspend (Output) -> Boolean): Schedule<Input, Output> =
-    whileOutput { !f(it) }
+  public fun doUntil(test: suspend (input: Input, output: Output) -> Boolean): Schedule<Input, Output> =
+    doWhile { input, output -> !test(input, output) }
 
   /**
-   * `untilInput(f) = whileInput { !f(it) }`
+   * Adds a logging action to the [Schedule].
    */
-  public fun <A : Input> untilInput(f: suspend (A) -> Boolean): Schedule<A, Output> =
-    whileInput { !f(it) }
-
-  public fun <A : Input> whileInput(f: suspend (A) -> Boolean): Schedule<A, Output> =
-    check { input, _ -> f(input) }
-
-  public fun whileOutput(f: suspend (Output) -> Boolean): Schedule<Input, Output> =
-    check { _, output -> f(output) }
-
-  public fun log(f: suspend (Input, Output) -> Unit): Schedule<Input, Output> =
-    check { input, output ->
-      f(input, output)
+  public fun log(action: suspend (input: Input, output: Output) -> Unit): Schedule<Input, Output> =
+    doWhile { input, output ->
+      action(input, output)
       true
     }
 
@@ -312,14 +310,14 @@ public value class Schedule<Input, Output>(
     /**
      * Creates a Schedule that continues as long as [f] returns true.
      */
-    public fun <A> doWhile(f: suspend (A) -> Boolean): Schedule<A, A> =
-      identity<A>().whileInput(f)
+    public fun <A> doWhile(f: suspend (input: A, output: A) -> Boolean): Schedule<A, A> =
+      identity<A>().doWhile(f)
 
     /**
      * Creates a Schedule that continues until [f] returns true.
      */
-    public fun <A> doUntil(f: suspend (A) -> Boolean): Schedule<A, A> =
-      identity<A>().untilInput(f)
+    public fun <A> doUntil(f: suspend (input: A, output: A) -> Boolean): Schedule<A, A> =
+      identity<A>().doUntil(f)
 
     public fun <A> identity(): Schedule<A, A> {
       fun loop(input: A): Decision<A, A> =
