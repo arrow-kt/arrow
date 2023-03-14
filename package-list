@@ -19,6 +19,7 @@ arrow.fx.coroutines
 arrow.fx.coroutines.continuations
 module:arrow-fx-resilience
 arrow.fx.resilience
+arrow.fx.resilience.common
 module:arrow-fx-stm
 arrow.fx.stm
 module:arrow-optics

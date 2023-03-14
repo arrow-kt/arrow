@@ -34,9 +34,12 @@
     <div class="library-name">
 <a href="../../../../index.html">
 <span>Arrow</span>            </a>    </div>
-    <div>1.1.6-alpha.49.1+1d8b314
+    <div>1.1.6-alpha.50.1+210ee5a
     </div>
     <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">common</button>
+        </div>
         <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
         <div id="searchBar"></div>
     </div>
@@ -50,10 +53,10 @@
   <div class="breadcrumbs"><a href="../../../index.html">arrow-fx-resilience</a><span class="delimiter">/</span><a href="../../index.html">arrow.fx.resilience</a><span class="delimiter">/</span><a href="../index.html">CircuitBreaker</a><span class="delimiter">/</span><span class="current">State</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>State</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">State</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-resilience/src/commonMain/kotlin/arrow/fx/resilience/CircuitBreaker.kt#L417">source</a>)</span></span></div><p class="paragraph">The initial state when initializing a <a href="../index.html">CircuitBreaker</a> is <a href="-closed/index.html">Closed</a>.</p><p class="paragraph">The available states are:</p><ul><li><p class="paragraph"><a href="-closed/index.html">Closed</a> in case tasks are allowed to go through</p></li><li><p class="paragraph"><a href="-open/index.html">Open</a> in case the circuit breaker is active and rejects incoming tasks</p></li><li><p class="paragraph"><a href="-half-open/index.html">HalfOpen</a> in case a reset attempt was triggered and it is waiting for     the result in order to evolve in <a href="-closed/index.html">Closed</a>, or back to <a href="-open/index.html">Open</a></p></li></ul></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">State</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-resilience/src/commonMain/kotlin/arrow/fx/resilience/CircuitBreaker.kt#L388">source</a>)</span></span></div><p class="paragraph">The initial state when initializing a <a href="../index.html">CircuitBreaker</a> is <a href="-closed/index.html">Closed</a>.</p><p class="paragraph">The available states are:</p><ul><li><p class="paragraph"><a href="-closed/index.html">Closed</a> in case tasks are allowed to go through</p></li><li><p class="paragraph"><a href="-open/index.html">Open</a> in case the circuit breaker is active and rejects incoming tasks</p></li><li><p class="paragraph"><a href="-half-open/index.html">HalfOpen</a> in case a reset attempt was triggered, and it is waiting for the result in order to evolve in <a href="-closed/index.html">Closed</a>, or back to <a href="-open/index.html">Open</a></p></li></ul></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
     <div class="tabs-section-body">
       <h2 class="">Types</h2>
       <div class="table" data-togglable="Types"><a data-name="-894215100%2FClasslikes%2F-880363011" anchor-label="Closed" id="-894215100%2FClasslikes%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
@@ -66,7 +69,7 @@
                 </span></span></div>
             <div>
               <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-closed/index.html">Closed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>failures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph"><a href="-closed/index.html">Closed</a> is the normal state of the <a href="../index.html">CircuitBreaker</a>, where requests are being made. The state in which <a href="../index.html">CircuitBreaker</a> starts.     - When an exceptions occurs it increments the failure counter     - A successful request will reset the failure counter to zero     - When the failure counter reaches the <a href="../../../../arrow-fx-resilience/arrow.fx.resilience/-circuit-breaker/max-failures.html">maxFailures</a> threshold, the breaker is tripped into the <a href="-open/index.html">Open</a> state</p></div></div></div>
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-closed/index.html">Closed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>openingStrategy<span class="token operator">: </span><a href="../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></span></span><span class="token punctuation">)</span> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph"><a href="-closed/index.html">Closed</a> is the normal state of the <a href="../index.html">CircuitBreaker</a>, where requests are being made. The state in which <a href="../index.html">CircuitBreaker</a> starts.     - When an exception occurs it increments the failure counter     - A successful request will reset the failure counter to zero     - When the failure counter reaches the maxFailures threshold, the breaker is tripped into the <a href="-open/index.html">Open</a> state</p></div></div></div>
               </div>
             </div>
           </div>
@@ -96,7 +99,24 @@
                 </span></span></div>
             <div>
               <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-open/index.html">Open</a> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph">When the <a href="../index.html">CircuitBreaker</a> is in the <a href="-open/index.html">Open</a> state it will short-circuit/fail-fast all requests     - All requests short-circuit/fail-fast with <code class="lang-kotlin">ExecutionRejected</code>     - If a request is made after the configured <a href="-open/reset-timeout.html">resetTimeout</a> passes, the <a href="../index.html">CircuitBreaker</a> is tripped into the a <a href="-half-open/index.html">HalfOpen</a> state, allowing one request to go through as a test.</p></div></div></div>
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-open/index.html">Open</a> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph">When the <a href="../index.html">CircuitBreaker</a> is in the <a href="-open/index.html">Open</a> state it will short-circuit/fail-fast all requests     - All requests short-circuit/fail-fast with <a href="../-execution-rejected/index.html">ExecutionRejected</a>     - If a request is made after the configured <a href="-open/reset-timeout.html">resetTimeout</a> passes, the <a href="../index.html">CircuitBreaker</a> is tripped into the a <a href="-half-open/index.html">HalfOpen</a> state, allowing one request to go through as a test.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="447991028%2FProperties%2F-880363011" anchor-label="openingStrategy" id="447991028%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-fx-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="opening-strategy.html"><span>opening</span><wbr><span><span>Strategy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="447991028%2FProperties%2F-880363011"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"><a data-name="447991028%2FProperties%2F-880363011" anchor-label="openingStrategy" id="447991028%2FProperties%2F-880363011" data-filterable-set=":arrow-fx-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="opening-strategy.html">openingStrategy</a><span class="token operator">: </span><a href="../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></div></div></div>
               </div>
             </div>
           </div>
