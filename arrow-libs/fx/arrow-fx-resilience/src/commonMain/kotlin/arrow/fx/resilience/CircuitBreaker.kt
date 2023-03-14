@@ -216,8 +216,8 @@ private constructor(
             if (openingStrategy is OpeningStrategy.Count && openingStrategy.failuresCount == 0)
               result.value
             else {
-              state.compareAndSet(curr, Closed(openingStrategy.resetFailuresCount()))
-              result.value
+              if (!state.compareAndSet(curr, Closed(openingStrategy.resetFailuresCount()))) markOrResetFailures(result)
+              else result.value
             }
           }
 
