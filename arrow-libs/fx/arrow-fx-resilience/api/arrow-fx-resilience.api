@@ -151,7 +151,6 @@ public final class arrow/fx/resilience/Schedule {
 	public static final synthetic fun box-impl (Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Schedule;
 	public static final fun collect-n7EYv7Q (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static fun constructor-impl (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun delay-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun delayed-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun doUntil-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun doWhile-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
@@ -189,8 +188,6 @@ public final class arrow/fx/resilience/Schedule$Companion {
 	public final fun forever-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
 	public final fun identity-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
 	public final fun linear-xw-eLiE (J)Lkotlin/jvm/functions/Function2;
-	public final fun never-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
-	public final fun once-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
 	public final fun recurs-nxrvn7M (I)Lkotlin/jvm/functions/Function2;
 	public final fun recurs-nxrvn7M (J)Lkotlin/jvm/functions/Function2;
 	public final fun spaced-xw-eLiE (J)Lkotlin/jvm/functions/Function2;

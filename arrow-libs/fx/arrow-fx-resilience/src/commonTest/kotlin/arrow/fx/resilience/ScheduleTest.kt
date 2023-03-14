@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.fx.resilience.Schedule.Decision.Continue
 import arrow.fx.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -16,12 +15,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
-import kotlin.time.Duration.Companion.days
 
 internal data class SideEffect(var counter: Int = 0) {
   fun increment() {
@@ -38,42 +35,30 @@ class ScheduleTest {
   private val exception = MyException()
 
   @Test
-  fun scheduleIdentity(): TestResult = runTest {
+  fun identity(): TestResult = runTest {
     val identity = Schedule.identity<String>().calculateCont("test", 100)
-
     assertEquals(identity.map { it.first }, (0 until 100L).map { "test" })
     assertEquals(identity.map { it.second }, (0 until 100).map { ZERO })
   }
 
   @Test
-  fun scheduleUnfold(): TestResult = runTest {
+  fun unfold(): TestResult = runTest {
     val unfold = Schedule.unfold<String, Long>(0) { it + 1 }.calculateCont("test", 100)
-
     assertEquals(unfold.map { it.first }, (0 until 100L).toList())
     assertEquals(unfold.map { it.second }, (0 until 100).map { ZERO })
   }
 
-  // schedule.forever() == Schedule.unfold(0) { it + 1 }
   @Test
-  fun scheduleForever(): TestResult = runTest {
+  fun forever(): TestResult = runTest {
     val forever = Schedule.forever<String>().calculateCont("test", 100)
-
     assertEquals(forever.map { it.first }, (0 until 100L).toList())
     assertEquals(forever.map { it.second }, (0 until 100).map { ZERO })
   }
 
   @Test
-  fun scheduleRecursWithNegativeNumber(): TestResult = runTest {
+  fun recurs(): TestResult = runTest {
     checkRepeat(Schedule.recurs(-500), expected = 0)
-  }
-
-  @Test
-  fun scheduleRecursWithZero(): TestResult = runTest {
     checkRepeat(Schedule.recurs(0), expected = 0)
-  }
-
-  @Test
-  fun scheduleRecursWithOne(): TestResult = runTest {
     checkRepeat(Schedule.recurs(1), expected = 1)
   }
 
@@ -88,28 +73,21 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleOnceRepeatsOneAdditionalTime(): TestResult = runTest {
-    var count = 0
-    Schedule.once<Int>().repeat { count++ }
-    assertEquals(2, count)
-  }
-
-  @Test
-  fun scheduleDoWhileRepeatsWhileConditionHolds(): TestResult = runTest {
+  fun doWhileRepeatsWhileConditionHolds(): TestResult = runTest {
     checkRepeat(Schedule.doWhile { input, _ -> input < 10 }, expected = 10)
     checkRepeat(Schedule.doWhile { input, _ -> input > 10 }, expected = 1)
     checkRepeat(Schedule.doWhile { input, _ -> input == 1L }, expected = 2)
   }
 
   @Test
-  fun scheduleDoUntilRepeatsUntilConditionIsSatisfied(): TestResult = runTest {
+  fun doUntilRepeatsUntilConditionIsSatisfied(): TestResult = runTest {
     checkRepeat(Schedule.doUntil { input, _ -> input < 10 }, expected = 1)
     checkRepeat(Schedule.doUntil { input, _ -> input > 10 }, expected = 11)
     checkRepeat(Schedule.doUntil { input, _ -> input == 1L }, expected = 1)
   }
 
   @Test
-  fun scheduleDoWhileCollectCollectsAllInputsIntoAList(): TestResult = runTest {
+  fun doWhileCollectCollectsAllInputsIntoAList(): TestResult = runTest {
     checkRepeat(
       Schedule.doWhile<Long> { input, _ -> input < 10L }.collect(),
       expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -117,7 +95,7 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleDoUntilCollectCollectsAllInputsIntoAList(): TestResult = runTest {
+  fun doUntilCollectCollectsAllInputsIntoAList(): TestResult = runTest {
     checkRepeat(
       Schedule.doUntil<Long> { input, _ -> input > 10L }.collect(),
       expected = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -138,17 +116,7 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleNeverTimesOut(): TestResult = runTest {
-    val result = withTimeoutOrNull(1.days) {
-      val a: Nothing = Schedule.never<Int>().repeat {
-        1
-      }
-    }
-    assertNull(result)
-  }
-
-  @Test
-  fun scheduleSpaced(): TestResult = runTest {
+  fun spaced(): TestResult = runTest {
     val duration = 5.seconds
     val res = Schedule.spaced<String>(duration).calculateSchedule("test", 500)
 
@@ -157,7 +125,7 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleFibonacci(): TestResult = runTest {
+  fun fibonacci(): TestResult = runTest {
     val n = 10L
     val res = Schedule.fibonacci<String>(10.seconds).calculateDelay("test", n)
 
@@ -166,7 +134,7 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleLinear(): TestResult = runTest {
+  fun linear(): TestResult = runTest {
     val n = 10L
     val res = Schedule.linear<String>(10.seconds).calculateDelay("test", n)
 
@@ -175,7 +143,7 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleExponential(): TestResult = runTest {
+  fun exponential(): TestResult = runTest {
     val n = 10L
     val res = Schedule.exponential<String>(10.seconds).calculateDelay("test", n)
 
@@ -296,7 +264,7 @@ class ScheduleTest {
   }
 
   @Test
-  fun scheduleStopsRetryingIfFirstOfMorePredicatesIsMet(): TestResult = runTest {
+  fun stopsRetryingIfFirstOfMorePredicatesIsMet(): TestResult = runTest {
     val ex = Throwable("Hello")
 
     val schedule = Schedule.exponential<Throwable>(1.0.milliseconds)
