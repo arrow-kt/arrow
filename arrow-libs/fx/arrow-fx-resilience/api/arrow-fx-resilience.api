@@ -194,6 +194,7 @@ public final class arrow/fx/resilience/Schedule$Companion {
 	public final fun linear-xw-eLiE (J)Lkotlin/jvm/functions/Function2;
 	public final fun never-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
 	public final fun once-n7EYv7Q ()Lkotlin/jvm/functions/Function2;
+	public final fun recurs-nxrvn7M (I)Lkotlin/jvm/functions/Function2;
 	public final fun recurs-nxrvn7M (J)Lkotlin/jvm/functions/Function2;
 	public final fun spaced-xw-eLiE (J)Lkotlin/jvm/functions/Function2;
 	public final fun unfold-QrgEJug (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
