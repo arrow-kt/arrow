@@ -17,14 +17,20 @@ public typealias Schedule2<Delay, Input, Output> = Next2<Delay, Input, Output>
 public value class Next2<Delay, in Input, out Output>(
   public val step: suspend (Input) -> Decision2<Delay, Input, Output>
 ) {
+  // any structure over the inner suspended function can be lifted
+
+  public fun <A, B, C> lift(
+    f: (suspend (Input) -> Decision2<Delay, Input, Output>) -> (suspend (B) -> Decision2<A, B, C>)
+  ): Next2<A, B, C> = Next2(f(step))
+
   public fun <T> mapDelay(f: (Delay) -> T): Next2<T, Input, Output> =
-    Next2 { i: Input -> step(i).mapDelay(f) }
+    lift { step -> { i: Input -> step(i).mapDelay(f) } }
 
   public fun <A> contramap(f: (A) -> Input): Next2<Delay, A, Output> =
-    Next2 { a: A -> step(f(a)).contramap(f) }
+    lift { step -> { a: A -> step(f(a)).contramap(f) } }
 
   public fun <A> map(f: (Output) -> A): Next2<Delay, Input, A> =
-    Next2 { i: Input -> step(i).map(f) }
+    lift { step -> { i: Input -> step(i).map(f) } }
 
   // this is the sequential structure
 
