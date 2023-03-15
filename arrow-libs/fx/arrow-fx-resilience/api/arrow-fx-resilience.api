@@ -184,6 +184,7 @@ public final class arrow/fx/resilience/Next2 {
 	public final fun getStep ()Lkotlin/jvm/functions/Function2;
 	public fun hashCode ()I
 	public static fun hashCode-impl (Lkotlin/jvm/functions/Function2;)I
+	public static final fun lift-TbaLxl8 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static final fun map-TbaLxl8 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static final fun mapDelay-TbaLxl8 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static final fun or-eHcZZYs (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
