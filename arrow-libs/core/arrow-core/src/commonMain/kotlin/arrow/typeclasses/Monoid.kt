@@ -8,13 +8,17 @@ import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.combine
 import arrow.core.compose
-import arrow.core.flatten
 import arrow.core.fold
 import arrow.core.identity
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.collections.plus as _plus
+import kotlin.sequences.plus as _plus
 
+public const val MonoidDeprecation: String =
+  "Monoid is being deprecated, use combine (A, A) -> A lambdas or method references with initial values instead."
+
+@Deprecated(MonoidDeprecation)
 public interface Monoid<A> : Semigroup<A> {
   /**
    * A zero value for this A
@@ -191,7 +195,7 @@ public interface Monoid<A> : Semigroup<A> {
 
     private object SequenceMonoid : Monoid<Sequence<Any?>> {
       override fun empty(): Sequence<Any?> = emptySequence()
-      override fun Sequence<Any?>.combine(b: Sequence<Any?>): Sequence<Any?> = sequenceOf(this, b).flatten()
+      override fun Sequence<Any?>.combine(b: Sequence<Any?>): Sequence<Any?> = this._plus(b)
     }
 
     private class EitherMonoid<L, R>(

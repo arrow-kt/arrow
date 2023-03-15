@@ -8,7 +8,6 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.longSmall
 import arrow.core.test.option
 import arrow.core.test.testLaws
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
@@ -36,8 +35,9 @@ import io.kotest.property.checkAll
 
 class MapKTest : StringSpec({
     testLaws(
-      MonoidLaws.laws(
-        Monoid.map(Semigroup.int()),
+      MonoidLaws(
+        emptyMap(),
+        { a, b -> a.combine(b, Int::plus) },
         Arb.map(Arb.longSmall(), Arb.intSmall(), maxSize = 10)
       )
     )

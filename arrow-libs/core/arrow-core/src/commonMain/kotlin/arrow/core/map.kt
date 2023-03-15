@@ -4,12 +4,13 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.collections.flatMap as _flatMap
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
+import arrow.typeclasses.combine
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -234,10 +235,16 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   return destination
 }
 
+/**
+ * Transform every [Map.Entry] of the original [Map] using [f],
+ * only keeping the [Map.Entry] of the transformed map that match the input [Map.Entry].
+ */
 public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
-  _flatMap { entry ->
-    f(entry)[entry.key]?.let { Pair(entry.key, it) }.asIterable()
-  }.toMap()
+  buildMap {
+    this@flatMap.forEach { entry ->
+      f(entry)[entry.key]?.let { put(entry.key, it) }
+    }
+  }
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -536,14 +543,25 @@ public fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pa
 
 public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> = this[key].toOption()
 
-public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {
-  if (size < b.size) foldLeft(b) { my, (k, b) -> my + Pair(k, b.maybeCombine(my[k])) }
-  else b.foldLeft(this@combine) { my, (k, a) -> my + Pair(k, a.maybeCombine(my[k])) }
-}
+/** Combines two maps using [combine] to combine values for the same key. */
+public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
+  if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
+  else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(a, it) } ?: a) }
 
-@Deprecated("use fold instead", ReplaceWith("fold(Monoid.map(SG))", "arrow.core.fold", "arrow.typeclasses.Monoid"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b, SG::combine)", "arrow.typeclasses.combine"))
+public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
+  combine(b, SG::combine)
+
+@Deprecated(
+  "Use fold & Map.combine instead.\n$NicheAPI",
+  ReplaceWith(
+    "fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }",
+    "arrow.core.combine",
+    "arrow.typeclasses.combine"
+  )
+)
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(Monoid.map(SG))
+  fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }
 
 public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
   var accumulator = initial
@@ -551,13 +569,11 @@ public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.E
   return accumulator
 }
 
-@Deprecated("Use fold instead align with Kotlin Std naming", ReplaceWith("fold<K, A, B>(b, f)"))
-public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
-  var result = b
-  this.forEach { result = f(result, it) }
-  return result
-}
+@Deprecated("Use fold instead foldLeft", ReplaceWith("fold<K, A, B>(b, f)"))
+public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B =
+  fold(b, f)
 
+@Deprecated("Internal method will be removed from binary in 2.0.0")
 internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
   when (this) {
     null -> emptyList()

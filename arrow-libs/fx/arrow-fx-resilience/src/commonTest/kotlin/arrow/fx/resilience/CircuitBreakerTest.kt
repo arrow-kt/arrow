@@ -1,274 +1,266 @@
 package arrow.fx.resilience
 
 import arrow.core.Either
-import io.kotest.assertions.asClue
-import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldBe
+import arrow.fx.resilience.CircuitBreaker.OpeningStrategy
+import arrow.fx.resilience.CircuitBreaker.OpeningStrategy.SlidingWindow
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.TestTimeSource
 
-@ExperimentalTime
-class CircuitBreakerTest : StringSpec({
-    val dummy = RuntimeException("dummy")
-    val maxFailures = 5
-    val exponentialBackoffFactor = 2.0
-    val resetTimeout = 200.milliseconds
-    val maxTimeout = 600.milliseconds
+@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
+class CircuitBreakerTest {
+  val dummy = RuntimeException("dummy")
+  val maxFailures = 5
+  val exponentialBackoffFactor = 2.0
+  val resetTimeout = 500.milliseconds
+  val maxTimeout = 1000.milliseconds
 
-    "should work for successful async tasks" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
-      var effect = 0
-      Schedule.recurs<Unit>(10_000).repeat {
-        cb.protectOrThrow { withContext(Dispatchers.Default) { effect += 1 } }
-      }
-      effect shouldBe 10_001
+  @Test
+  fun shouldWorkForSuccessfulAsyncTasks(): TestResult = runTest {
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    var effect = 0
+    val iterations = stackSafeIteration()
+    Schedule.recurs<Unit>(iterations).repeat {
+      cb.protectOrThrow { withContext(Dispatchers.Default) { effect += 1 } }
+    }
+    assertEquals(iterations + 1, effect)
+  }
+
+  @Test
+  fun shouldWorkForSuccessfulImmediateTasks(): TestResult = runTest {
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    var effect = 0
+    val iterations = stackSafeIteration()
+    Schedule.recurs<Unit>(iterations).repeat {
+      cb.protectOrThrow { effect += 1 }
+    }
+    assertEquals(iterations + 1, effect)
+  }
+
+  @Test
+  fun staysClosedAfterLessThanMaxFailures(): TestResult = runTest {
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+
+    val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
+      Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
-    "should work for successful immediate tasks" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
-      var effect = 0
-      Schedule.recurs<Unit>(10_000).repeat {
-        cb.protectOrThrow { effect += 1 }
-      }
-      effect shouldBe 10_001
+    assertTrue(result.all { it == Either.Left(dummy) })
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
+  }
+
+  @Test
+  fun closedCircuitBreakerResetsFailureCountAfterSuccess(): TestResult = runTest {
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+
+    val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
+      Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
-    "Circuit breaker stays closed after less than maxFailures" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    assertTrue(result.all { it == Either.Left(dummy) })
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
+    assertEquals(1, cb.protectOrThrow { 1 })
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
+  }
 
-      recurAndCollect<Either<Throwable, Unit>>(3).repeat {
-        Either.catch { cb.protectOrThrow { throw dummy } }
-      } shouldBe (0..3).map { Either.Left(dummy) }
+  @Test
+  fun circuitBreakerOpensAfterMaxFailures(): TestResult = runTest {
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
 
-      cb.state() shouldBe CircuitBreaker.State.Closed(4)
+    val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
+      Either.catch { cb.protectOrThrow { throw dummy } }
     }
 
-    "Closed circuit breaker resets failure count after success" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    assertTrue(result.all { it == Either.Left(dummy) })
 
-      recurAndCollect<Either<Throwable, Unit>>(3).repeat {
-        Either.catch { cb.protectOrThrow { throw dummy } }
-      } shouldBe (0..3).map { Either.Left(dummy) }
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
 
-      cb.state() shouldBe CircuitBreaker.State.Closed(4)
+    assertEquals(Either.Left(dummy), Either.catch { cb.protectOrThrow { throw dummy } })
 
-      cb.protectOrThrow { 1 } shouldBe 1
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
+  }
 
-      cb.state() shouldBe CircuitBreaker.State.Closed(0)
+  @Test
+  fun circuitBreakerCanBeClosedAgainAfterWaitingResetTimeOut(): TestResult = runTest {
+    var openedCount = 0
+    var closedCount = 0
+    var halfOpenCount = 0
+    var rejectedCount = 0
+
+    val timeSource = TestTimeSource()
+
+    val cb = CircuitBreaker(
+      resetTimeout = resetTimeout,
+      openingStrategy = OpeningStrategy.Count(maxFailures),
+      exponentialBackoffFactor = exponentialBackoffFactor,
+      maxResetTimeout = maxTimeout,
+      timeSource = timeSource
+    ).doOnOpen { openedCount += 1 }
+      .doOnClosed { closedCount += 1 }
+      .doOnHalfOpen { halfOpenCount += 1 }
+      .doOnRejectedTask { rejectedCount += 1 }
+
+    // CircuitBreaker opens after 5 failures
+    recurAndCollect<Unit>(5).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
+
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
+
+    // If CircuitBreaker is Open our tasks our rejected
+    assertFailsWith<CircuitBreaker.ExecutionRejected> {
+      cb.protectOrThrow { throw dummy }
     }
 
-    "Circuit breaker opens after max failures" {
-      val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)
+    // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
+    timeSource += resetTimeout + 10.milliseconds
 
-      recurAndCollect<Either<Throwable, Unit>>(3).repeat {
-        Either.catch { cb.protectOrThrow { throw dummy } }
-      } shouldBe (0..3).map { Either.Left(dummy) }
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
-      cb.state() shouldBe CircuitBreaker.State.Closed(4)
+    val checkHalfOpen = CompletableDeferred<Unit>()
+    val delayProtectLatch = CompletableDeferred<Unit>()
+    val stateAssertionLatch = CompletableDeferred<Unit>()
 
-      Either.catch { cb.protectOrThrow { throw dummy } } shouldBe Either.Left(dummy)
-
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.Open -> {
-          s.resetTimeout shouldBe resetTimeout
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-      }
+    @Suppress("DeferredResultUnused")
+    async { // Successful tasks puts circuit breaker back in HalfOpen
+      cb.protectOrThrow {
+        checkHalfOpen.complete(Unit)
+        delayProtectLatch.await()
+      } // Delay protect, to inspect HalfOpen state.
+      stateAssertionLatch.complete(Unit)
     }
 
-    "Circuit breaker can be closed again after waiting resetTimeOut" {
-      var openedCount = 0
-      var closedCount = 0
-      var halfOpenCount = 0
-      var rejectedCount = 0
+    checkHalfOpen.await()
 
-      val cb = CircuitBreaker.of(
-        maxFailures = maxFailures,
-        resetTimeout = resetTimeout,
-        exponentialBackoffFactor = exponentialBackoffFactor,
-        maxResetTimeout = maxTimeout
-      ).doOnOpen { openedCount += 1 }
-        .doOnClosed { closedCount += 1 }
-        .doOnHalfOpen { halfOpenCount += 1 }
-        .doOnRejectedTask { rejectedCount += 1 }
+    assert(cb.state()) { s: CircuitBreaker.State.HalfOpen -> assertEquals(resetTimeout, s.resetTimeout) }
 
-      // CircuitBreaker opens after 4 failures
-      recurAndCollect<Unit>(4).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
+    // Rejects all other tasks in HalfOpen
+    assertFailsWith<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
+    assertFailsWith<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
 
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.Open -> {
-          s.resetTimeout shouldBe resetTimeout
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-      }
+    // Once we complete `protect`, the circuit breaker will go back to closer state
+    delayProtectLatch.complete(Unit)
+    stateAssertionLatch.await()
 
-      // If CircuitBreaker is Open our tasks our rejected
-      shouldThrow<CircuitBreaker.ExecutionRejected> {
-        cb.protectOrThrow { throw dummy }
-      }
+    // Circuit breaker should be reset after successful task.
+    assertTrue(cb.state() is CircuitBreaker.State.Closed)
 
-      // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
-      delay(resetTimeout + 10.milliseconds)
+    assertEquals(3, rejectedCount) // 3 tasks were rejected in total
+    assertEquals(1, openedCount) // Circuit breaker opened once
+    assertEquals(1, halfOpenCount) // Circuit breaker went into halfOpen once
+    assertEquals(1, closedCount) // Circuit breaker closed once after it opened
+  }
 
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.Open -> {
-          s.resetTimeout shouldBe resetTimeout
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-      }
+  @Test
+  fun circuitBreakerStaysOpenWithFailureAfterResetTimeOut(): TestResult = runTest {
+    var openedCount = 0
+    var closedCount = 0
+    var halfOpenCount = 0
+    var rejectedCount = 0
 
-      val checkHalfOpen = CompletableDeferred<Unit>()
-      val delayProtectLatch = CompletableDeferred<Unit>()
-      val stateAssertionLatch = CompletableDeferred<Unit>()
+    val timeSource = TestTimeSource()
 
-      @Suppress("DeferredResultUnused")
-      async { // Successful tasks puts circuit breaker back in HalfOpen
+    val cb = CircuitBreaker(
+      resetTimeout = resetTimeout,
+      openingStrategy = OpeningStrategy.Count(maxFailures),
+      exponentialBackoffFactor = 2.0,
+      maxResetTimeout = maxTimeout,
+      timeSource = timeSource
+    ).doOnOpen { openedCount += 1 }
+      .doOnClosed { closedCount += 1 }
+      .doOnHalfOpen { halfOpenCount += 1 }
+      .doOnRejectedTask { rejectedCount += 1 }
+
+    // CircuitBreaker opens after 5 failures
+    recurAndCollect<Unit>(5).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
+
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
+
+    assertTrue(cb.state() is CircuitBreaker.State.Open)
+    // If CircuitBreaker is Open our tasks our rejected
+    assertFailsWith<CircuitBreaker.ExecutionRejected> {
+      cb.protectOrThrow { throw dummy }
+    }
+
+    // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
+    timeSource += resetTimeout + 10.milliseconds
+
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
+
+    val checkHalfOpen = CompletableDeferred<Unit>()
+    val delayProtectLatch = CompletableDeferred<Unit>()
+    val stateAssertionLatch = CompletableDeferred<Unit>()
+
+    @Suppress("DeferredResultUnused")
+    async { // Successful tasks puts circuit breaker back in HalfOpen
+      // Delay protect, to inspect HalfOpen state.
+      Either.catch {
         cb.protectOrThrow {
           checkHalfOpen.complete(Unit)
-          delayProtectLatch.await()
-        } // Delay protect, to inspect HalfOpen state.
-        stateAssertionLatch.complete(Unit)
-      }
-
-      checkHalfOpen.await()
-
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeout shouldBe resetTimeout
+          delayProtectLatch.await(); throw dummy
         }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
       }
-
-      // Rejects all other tasks in HalfOpen
-      shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
-      shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
-
-      // Once we complete `protect`, the circuit breaker will go back to closer state
-      delayProtectLatch.complete(Unit)
-      stateAssertionLatch.await()
-
-      // Circuit breaker should be reset after successful task.
-      cb.state() shouldBe CircuitBreaker.State.Closed(0)
-
-      rejectedCount shouldBe 3 // 3 tasks were rejected in total
-      openedCount shouldBe 1 // Circuit breaker opened once
-      halfOpenCount shouldBe 1 // Circuit breaker went into halfOpen once
-      closedCount shouldBe 1 // Circuit breaker closed once after it opened
+      stateAssertionLatch.complete(Unit)
     }
 
-    "Circuit breaker stays open with failure after resetTimeOut" {
-      var openedCount = 0
-      var closedCount = 0
-      var halfOpenCount = 0
-      var rejectedCount = 0
+    checkHalfOpen.await()
 
-      val cb = CircuitBreaker.of(
-        maxFailures = maxFailures,
-        resetTimeout = resetTimeout,
-        exponentialBackoffFactor = 2.0,
-        maxResetTimeout = maxTimeout
-      ).doOnOpen { openedCount += 1 }
-        .doOnClosed { closedCount += 1 }
-        .doOnHalfOpen { halfOpenCount += 1 }
-        .doOnRejectedTask { rejectedCount += 1 }
+    assert(cb.state()) { s: CircuitBreaker.State.HalfOpen -> assertEquals(resetTimeout, s.resetTimeout) }
 
-      // CircuitBreaker opens after 4 failures
-      recurAndCollect<Unit>(4).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
+    // Rejects all other tasks in HalfOpen
+    assertFailsWith<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
+    assertFailsWith<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
 
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.Open -> {
-          s.resetTimeout shouldBe resetTimeout
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-      }
+    // Once we complete `protect`, the circuit breaker will go back to closer state
+    delayProtectLatch.complete(Unit)
+    stateAssertionLatch.await()
 
-      // If CircuitBreaker is Open our tasks our rejected
-      shouldThrow<CircuitBreaker.ExecutionRejected> {
-        cb.protectOrThrow { throw dummy }
-      }
+    // Circuit breaker should've stayed open on failure after timeOutReset
+    // resetTimeout should've applied
+    assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout * exponentialBackoffFactor, s.resetTimeout) }
 
-      // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
-      delay(resetTimeout + 10.milliseconds)
+    assertEquals(3, rejectedCount) // 3 tasks were rejected in total
+    assertEquals(2, openedCount) // Circuit breaker opened twice
+    assertEquals(1, halfOpenCount) // Circuit breaker went into halfOpen once
+    assertEquals(0, closedCount) // Circuit breaker closed once after it opened
+  }
 
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.Open -> {
-          s.resetTimeout shouldBe resetTimeout
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-      }
+  @Test
+  fun shouldBeStackSafeForSuccessfulAsyncTasks(): TestResult = runTest {
+    val result = stackSafeSuspend(
+      CircuitBreaker(resetTimeout = 1.minutes, OpeningStrategy.Count(maxFailures = 5)),
+      stackSafeIteration(), 0
+    )
 
-      val checkHalfOpen = CompletableDeferred<Unit>()
-      val delayProtectLatch = CompletableDeferred<Unit>()
-      val stateAssertionLatch = CompletableDeferred<Unit>()
+    assertEquals(stackSafeIteration(), result)
+  }
 
-      @Suppress("DeferredResultUnused")
-      async { // Successful tasks puts circuit breaker back in HalfOpen
-        // Delay protect, to inspect HalfOpen state.
-        Either.catch {
-          cb.protectOrThrow {
-            checkHalfOpen.complete(Unit)
-            delayProtectLatch.await(); throw dummy
-          }
-        }
-        stateAssertionLatch.complete(Unit)
-      }
+  @Test
+  fun shouldBeStackSafeForSuccessfulImmediateTasks(): TestResult = runTest {
+    val result = stackSafeImmediate(
+      CircuitBreaker(resetTimeout = 1.minutes, OpeningStrategy.Count(maxFailures = 5)),
+      stackSafeIteration(), 0
+    )
 
-      checkHalfOpen.await()
+    assertEquals(stackSafeIteration(), result)
+  }
 
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.HalfOpen -> {
-          s.resetTimeout shouldBe resetTimeout
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.HalfOpen but found $s")
-      }
-
-      // Rejects all other tasks in HalfOpen
-      shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
-      shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
-
-      // Once we complete `protect`, the circuit breaker will go back to closer state
-      delayProtectLatch.complete(Unit)
-      stateAssertionLatch.await()
-
-      // Circuit breaker should've stayed open on failure after timeOutReset
-      // resetTimeout should've applied
-      when (val s = cb.state()) {
-        is CircuitBreaker.State.Open -> {
-          s.resetTimeout shouldBe resetTimeout * exponentialBackoffFactor
-        }
-        else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
-      }
-
-      rejectedCount shouldBe 3 // 3 tasks were rejected in total
-      openedCount shouldBe 2 // Circuit breaker opened once
-      halfOpenCount shouldBe 1 // Circuit breaker went into halfOpen once
-      closedCount shouldBe 0 // Circuit breaker closed once after it opened
-    }
-
-    "should be stack safe for successful async tasks" {
-      stackSafeSuspend(
-        CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes),
-        stackSafeIteration(), 0
-      ) shouldBe stackSafeIteration()
-    }
-
-    "should be stack safe for successful immediate tasks" {
-      stackSafeImmediate(
-        CircuitBreaker.of(maxFailures = 5, resetTimeout = 1.minutes),
-        stackSafeIteration(), 0
-      ) shouldBe stackSafeIteration()
-    }
-
+  @Test
+  fun shouldRequireValidConstructorValues(): TestResult = runTest {
     listOf(
       ConstructorValues(maxFailures = -1),
       ConstructorValues(resetTimeout = Duration.ZERO),
@@ -277,35 +269,92 @@ class CircuitBreakerTest : StringSpec({
       ConstructorValues(exponentialBackoffFactor = -1.0),
       ConstructorValues(maxResetTimeout = Duration.ZERO),
       ConstructorValues(maxResetTimeout = (-1).seconds),
-    ).forEach { value ->
-      "should require valid constructor values" {
-        value.asClue { (maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout) ->
-          shouldThrow<IllegalArgumentException> {
-            CircuitBreaker.of(maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout)
-          }
+    ).forEach { (maxFailures, resetTimeout, exponentialBackoffFactor, maxResetTimeout) ->
+      assertFailsWith<IllegalArgumentException> {
+        CircuitBreaker(resetTimeout, OpeningStrategy.Count(maxFailures), exponentialBackoffFactor, maxResetTimeout)
+      }
 
-          shouldThrow<IllegalArgumentException> {
-            CircuitBreaker.of(
-              maxFailures,
-              resetTimeout,
-              exponentialBackoffFactor,
-              maxResetTimeout
-            )
-          }
+      assertFailsWith<IllegalArgumentException> {
+        CircuitBreaker(
+          resetTimeout,
+          OpeningStrategy.Count(maxFailures),
+          exponentialBackoffFactor,
+          maxResetTimeout
+        )
+      }
 
-          shouldThrow<IllegalArgumentException> {
-            CircuitBreaker.of(
-              maxFailures,
-              resetTimeout,
-              exponentialBackoffFactor,
-              maxResetTimeout
-            )
-          }
-        }
+      assertFailsWith<IllegalArgumentException> {
+        CircuitBreaker(
+          resetTimeout,
+          OpeningStrategy.Count(maxFailures),
+          exponentialBackoffFactor,
+          maxResetTimeout
+        )
       }
     }
   }
-)
+
+  @Test
+  fun slidingWindowStrategyShouldKeepClosed(): TestResult = runTest {
+    val timeSource = TestTimeSource()
+    val windowDuration = 200.milliseconds
+    val stepDuration = 40.milliseconds
+    val maxFailures = 5
+    var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(10)
+
+    schedule.repeat {
+      timeSource += stepDuration
+      openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+      val shouldOpen = openingStrategy.shouldOpen()
+      assertFalse(shouldOpen, "The circuit breaker should keep closed")
+    }
+
+  }
+
+  @Test
+  fun slidingWindowStrategyShouldOpen(): TestResult = runTest {
+    val timeSource = TestTimeSource()
+    val windowDuration = 200.milliseconds
+    val stepDuration = 39.milliseconds
+    val maxFailures = 5
+    var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
+
+    schedule.repeat {
+      timeSource += stepDuration
+      openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+    }
+
+    assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should open after reaching max failures")
+
+    timeSource += stepDuration
+    openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+
+    assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should still open")
+  }
+
+  @Test
+  fun slidingWindowStrategyShouldCloseAfterResetTimeout(): TestResult = runTest {
+    val timeSource = TestTimeSource()
+    val windowDuration = 200.milliseconds
+    val stepDuration = 39.milliseconds
+    val maxFailures = 5
+    var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
+    val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
+
+    schedule.repeat {
+      timeSource += stepDuration
+      openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
+    }
+
+    assertTrue(openingStrategy.shouldOpen(), "The circuit breaker should open after reaching max failures")
+
+    timeSource += windowDuration
+
+    assertFalse(openingStrategy.shouldOpen(), "The circuit breaker should close after reset timeout")
+  }
+}
 
 private data class ConstructorValues(
   val maxFailures: Int = 1,
@@ -313,6 +362,11 @@ private data class ConstructorValues(
   val exponentialBackoffFactor: Double = 1.0,
   val maxResetTimeout: Duration = Duration.INFINITE,
 )
+
+inline fun <reified A, reified B : A> assert(expected: A, block: (b: B) -> Unit): Unit =
+  if (expected is B) block(expected)
+  else fail("Expected ${B::class.simpleName} but found ${expected!!::class.simpleName}")
+
 
 /**
  * Recurs the effect [n] times, and collects the output along the way for easy asserting.

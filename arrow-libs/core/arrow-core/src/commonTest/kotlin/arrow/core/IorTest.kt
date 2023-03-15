@@ -9,6 +9,7 @@ import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
@@ -17,324 +18,482 @@ import io.kotest.property.checkAll
 
 class IorTest : StringSpec({
 
-    val ARB = Arb.ior(Arb.string(), Arb.int())
+  val ARB = Arb.ior(Arb.string(), Arb.int())
 
-    testLaws(
-      SemigroupLaws.laws(Semigroup.ior(Semigroup.string(), Semigroup.int()), ARB)
-    )
+  testLaws(
+    SemigroupLaws({ a, b ->
+      a.combine(b, String::plus, Int::plus)
+    }, ARB)
+  )
 
-    val nullableLongSemigroup = object : Semigroup<Long?> {
-      override fun Long?.combine(b: Long?): Long? =
-        Nullable.zip(this, b) { a, bb -> a + bb }
+  val nullableLongSemigroup = object : Semigroup<Long?> {
+    override fun Long?.combine(b: Long?): Long? =
+      Nullable.zip(this, b) { a, bb -> a + bb }
+  }
+
+  "zip identity" {
+    checkAll(Arb.ior(Arb.long().orNull(), Arb.int().orNull())) { ior ->
+      val res = ior.zip(nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
+      res shouldBe ior
     }
+  }
 
-    "zip identity" {
-      checkAll(Arb.ior(Arb.long().orNull(), Arb.int().orNull())) { ior ->
-        val res = ior.zip(nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
-        res shouldBe ior
-      }
-    }
-
-    "zip is derived from flatMap" {
-      checkAll(
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-        Arb.ior(Arb.long().orNull(), Arb.int().orNull())
+  "zip is derived from flatMap" {
+    checkAll(
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
+      Arb.ior(Arb.long().orNull(), Arb.int().orNull())
+    ) { a, b, c, d, e, f, g, h, i, j ->
+      val res = a.zip(
+        nullableLongSemigroup,
+        b, c, d, e, f, g, h, i, j
       ) { a, b, c, d, e, f, g, h, i, j ->
-        val res = a.zip(
-          nullableLongSemigroup,
-          b, c, d, e, f, g, h, i, j
-        ) { a, b, c, d, e, f, g, h, i, j ->
-          Nullable.zip(
-            a,
-            b,
-            c,
-            d,
-            e,
-            f,
-            g,
-            h,
-            i,
-            j
-          ) { a, b, c, d, e, f, g, h, i, j -> a + b + c + d + e + f + g + h + i + j }
+        Nullable.zip(
+          a,
+          b,
+          c,
+          d,
+          e,
+          f,
+          g,
+          h,
+          i,
+          j
+        ) { a, b, c, d, e, f, g, h, i, j -> a + b + c + d + e + f + g + h + i + j }
+      }
+
+      val expected = listOf(a, b, c, d, e, f, g, h, i, j)
+        .fold<Ior<Long?, Int?>, Ior<Long?, Int?>>(Ior.Right(0)) { acc, ior ->
+          val mid = acc.flatMap(nullableLongSemigroup) { a -> ior.map { b -> Nullable.zip(a, b) { a, b -> a + b } } }
+          mid
         }
 
-        val expected = listOf(a, b, c, d, e, f, g, h, i, j)
-          .fold<Ior<Long?, Int?>, Ior<Long?, Int?>>(Ior.Right(0)) { acc, ior ->
-            val mid = acc.flatMap(nullableLongSemigroup) { a -> ior.map { b -> Nullable.zip(a, b) { a, b -> a + b } } }
-            mid
-          }
-
-        res shouldBe expected
-      }
+      res shouldBe expected
     }
+  }
 
-    "zip should combine left values in correct order" {
-      Ior.Both("fail1", -1).zip(
-        Semigroup.string(),
-        Ior.Left("fail2"),
-        Ior.Right(-1)
-      ) { _, _, _ -> "success!" } shouldBe Ior.Left("fail1fail2")
+  "zip should combine left values in correct order" {
+    Ior.Both("fail1", -1).zip(
+      Semigroup.string(),
+      Ior.Left("fail2"),
+      Ior.Right(-1)
+    ) { _, _, _ -> "success!" } shouldBe Ior.Left("fail1fail2")
+  }
+
+  "bimap() should allow modify both value" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Right(b).bimap({ "5" }, { a * 2 }) shouldBe Ior.Right(a * 2)
+      Ior.Left(a).bimap({ a * 3 }, { "5" }) shouldBe Ior.Left(a * 3)
+      Ior.Both(a, b).bimap({ 2 }, { "power of $it" }) shouldBe Ior.Both(2, "power of $b")
     }
+  }
 
-    "bimap() should allow modify both value" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Right(b).bimap({ "5" }, { a * 2 }) shouldBe Ior.Right(a * 2)
-        Ior.Left(a).bimap({ a * 3 }, { "5" }) shouldBe Ior.Left(a * 3)
-        Ior.Both(a, b).bimap({ 2 }, { "power of $it" }) shouldBe Ior.Both(2, "power of $b")
-      }
+  "map() should just right side of an Ior" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).map { l: String -> l.length } shouldBe Ior.Left(a)
+      Ior.Right(b).map { it.length } shouldBe Ior.Right(b.length)
+      Ior.Both(a, b).map { it.length } shouldBe Ior.Both(a, b.length)
     }
+  }
 
-    "mapLeft() should modify only left value" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Right(b).mapLeft { a * 2 } shouldBe Ior.Right(b)
-        Ior.Left(a).mapLeft { b } shouldBe Ior.Left(b)
-        Ior.Both(a, b).mapLeft { "power of $it" } shouldBe Ior.Both("power of $a", b)
-      }
+  "mapLeft() should modify only left value" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Right(b).mapLeft { a * 2 } shouldBe Ior.Right(b)
+      Ior.Left(a).mapLeft { b } shouldBe Ior.Left(b)
+      Ior.Both(a, b).mapLeft { "power of $it" } shouldBe Ior.Both("power of $a", b)
     }
+  }
 
-    "swap() should interchange value" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Both(a, b).swap() shouldBe Ior.Both(b, a)
-      }
+  "swap() should interchange value" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Both(a, b).swap() shouldBe Ior.Both(b, a)
     }
+  }
 
-    "swap() should interchange entity" {
-      checkAll(Arb.int()) { a: Int ->
-        Ior.Left(a).swap() shouldBe Ior.Right(a)
-        Ior.Right(a).swap() shouldBe Ior.Left(a)
-      }
+  "swap() should interchange entity" {
+    checkAll(Arb.int()) { a: Int ->
+      Ior.Left(a).swap() shouldBe Ior.Right(a)
+      Ior.Right(a).swap() shouldBe Ior.Left(a)
     }
+  }
 
-    "unwrap() should return the isomorphic either" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).unwrap() shouldBe Either.Left(Either.Left(a))
-        Ior.Right(b).unwrap() shouldBe Either.Left(Either.Right(b))
-        Ior.Both(a, b).unwrap() shouldBe Either.Right(Pair(a, b))
-      }
+  "unwrap() should return the isomorphic either" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).unwrap() shouldBe Either.Left(Either.Left(a))
+      Ior.Right(b).unwrap() shouldBe Either.Left(Either.Right(b))
+      Ior.Both(a, b).unwrap() shouldBe Either.Right(Pair(a, b))
     }
+  }
 
-    "padNull() should return the correct Pair of nullables" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).padNull() shouldBe Pair(a, null)
-        Ior.Right(b).padNull() shouldBe Pair(null, b)
-        Ior.Both(a, b).padNull() shouldBe Pair(a, b)
-      }
+  "padNull() should return the correct Pair of nullables" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).padNull() shouldBe Pair(a, null)
+      Ior.Right(b).padNull() shouldBe Pair(null, b)
+      Ior.Both(a, b).padNull() shouldBe Pair(a, b)
     }
+  }
 
-    "toEither() should convert values into a valid Either" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).toEither() shouldBe Either.Left(a)
-        Ior.Right(b).toEither() shouldBe Either.Right(b)
-        Ior.Both(a, b).toEither() shouldBe Either.Right(b)
-      }
+  "toEither() should convert values into a valid Either" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).toEither() shouldBe Either.Left(a)
+      Ior.Right(b).toEither() shouldBe Either.Right(b)
+      Ior.Both(a, b).toEither() shouldBe Either.Right(b)
     }
+  }
 
-    "orNull() should convert right values into a nullable" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).orNull() shouldBe null
-        Ior.Right(b).orNull() shouldBe b
-        Ior.Both(a, b).orNull() shouldBe b
-      }
+  "orNull() should convert right values into a nullable" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).orNull() shouldBe null
+      Ior.Right(b).orNull() shouldBe b
+      Ior.Both(a, b).orNull() shouldBe b
     }
+  }
 
-    "leftOrNull() should convert left values into a nullable" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).leftOrNull() shouldBe a
-        Ior.Right(b).leftOrNull() shouldBe null
-        Ior.Both(a, b).leftOrNull() shouldBe a
-      }
+  "getOrNull() should convert right values into a nullable, or return null if left" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).getOrNull() shouldBe null
+      Ior.Right(b).getOrNull() shouldBe b
+      Ior.Both(a, b).getOrNull() shouldBe b
     }
+  }
 
-    "toValidated() should convert values into a valid Validated" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.Left(a).toValidated() shouldBe Invalid(a)
-        Ior.Right(b).toValidated() shouldBe Valid(b)
-        Ior.Both(a, b).toValidated() shouldBe Valid(b)
-      }
+
+  "leftOrNull() should convert left values into a nullable" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).leftOrNull() shouldBe a
+      Ior.Right(b).leftOrNull() shouldBe null
+      Ior.Both(a, b).leftOrNull() shouldBe a
     }
+  }
 
-    "fromNullables() should build a correct Ior" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        Ior.fromNullables(a, null) shouldBe Ior.Left(a)
-        Ior.fromNullables(a, b) shouldBe Ior.Both(a, b)
-        Ior.fromNullables(null, b) shouldBe Ior.Right(b)
-        Ior.fromNullables(null, null) shouldBe null
-      }
+  "toValidated() should convert values into a valid Validated" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.Left(a).toValidated() shouldBe Invalid(a)
+      Ior.Right(b).toValidated() shouldBe Valid(b)
+      Ior.Both(a, b).toValidated() shouldBe Valid(b)
     }
+  }
 
-    "getOrElse() should return value" {
-      checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
-        Ior.Right(a).getOrElse { b } shouldBe a
-        Ior.Left(a).getOrElse { b } shouldBe b
-        Ior.Both(a, b).getOrElse { a * 2 } shouldBe b
-      }
+  "fromNullables() should build a correct Ior" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.fromNullables(a, null) shouldBe Ior.Left(a)
+      Ior.fromNullables(a, b) shouldBe Ior.Both(a, b)
+      Ior.fromNullables(null, b) shouldBe Ior.Right(b)
+      Ior.fromNullables(null, null) shouldBe null
     }
+  }
 
-    "Ior.monad.flatMap should combine left values" {
-      val ior1 = Ior.Both(3, "Hello, world!")
-      val iorResult = ior1.flatMap(Semigroup.int()) { Ior.Left(7) }
-      iorResult shouldBe Ior.Left(10)
+  "leftNel() should build a correct Ior" {
+    checkAll(Arb.int()) { a: Int ->
+      Ior.leftNel<Int, Nothing>(a) shouldBe Ior.Left(nonEmptyListOf(a))
     }
+  }
 
-    "combine cases for Semigroup" {
-      Semigroup.ior(Semigroup.string(), Semigroup.int()).run {
-        forAll(
-          row("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
-          row(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
-          row(Ior.Left("Hello, "), Ior.Both("number", 1), Ior.Both("Hello, number", 1)),
-          row(Ior.Right(9000), Ior.Left("Over"), Ior.Both("Over", 9000)),
-          row(Ior.Right(9000), Ior.Right(1), Ior.Right(9001)),
-          row(Ior.Right(8000), Ior.Both("Over", 1000), Ior.Both("Over", 9000)),
-          row(Ior.Both("Hello ", 1), Ior.Left("number"), Ior.Both("Hello number", 1)),
-          row(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
-          row(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2))
-        ) { a, b, expectedResult ->
-          a + b shouldBe expectedResult
-        }
-      }
+  "bothNel() should build a correct Ior" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      Ior.bothNel(a, b) shouldBe Ior.Both(nonEmptyListOf(a), b)
     }
+  }
 
-    "traverse should wrap ior in a list" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
-
-        iorL.traverse { listOf(it) } shouldBe listOf(Ior.Left(a))
-        iorR.traverse { listOf(it) } shouldBe listOf(Ior.Right(b))
-        iorBoth.traverse { listOf(it) } shouldBe listOf(Ior.Both(a, b))
-      }
+  "lift(f) should apply the input function to an Ior correctly" {
+    checkAll(Arb.string()) { a: String ->
+      val f = Ior.lift<Nothing, String, String> { s: String -> "Hello $s" }
+      f(Ior.Right(a)) shouldBe Ior.Right("Hello $a")
     }
+  }
 
-    "sequence should be consistent with traverse" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map { listOf(it) }.sequence() shouldBe ior.traverse { listOf(it) }
-      }
+  "lift(fa, fb) should apply the input functions to an Ior correctly" {
+    checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
+      val fa = { s1: String -> "Hello $s1" }
+      val fb = { s2: String -> s2.length }
+      val f = Ior.lift(fa, fb)
+      f(Ior.Right(b)) shouldBe Ior.Right(b.length)
+      f(Ior.Left(a)) shouldBe Ior.Left("Hello $a")
+      f(Ior.Both(a, b)) shouldBe Ior.Both("Hello $a", b.length)
     }
+  }
 
-    "traverseNullable should wrap ior in a nullable" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
-
-        iorL.traverseNullable { it } shouldBe Ior.Left(a)
-        iorR.traverseNullable { it } shouldBe Ior.Right(b)
-        iorBoth.traverseNullable { it } shouldBe Ior.Both(a, b)
-
-        iorL.traverseNullable { null } shouldBe Ior.Left(a)
-        iorR.traverseNullable { null } shouldBe null
-        iorBoth.traverseNullable { null } shouldBe null
-      }
+  "foldLeft should fold an Ior correctly" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val left = Ior.Left(a)
+      val right = Ior.Right(b)
+      val both = Ior.Both(a, b)
+      val f = { c: Int, b: String -> c + b.length }
+      left.foldLeft(0, f) shouldBe 0
+      right.foldLeft(0, f) shouldBe b.length
+      both.foldLeft(0, f) shouldBe b.length
     }
+  }
 
-    "sequence for Nullable should be consistent with traverseNullable" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map<String?> { it }.sequence() shouldBe ior.traverseNullable { it }
-        ior.map<String?> { null }.sequence() shouldBe ior.traverseNullable { null }
-      }
+  "getOrElse() should return value" {
+    checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
+      Ior.Right(a).getOrElse { b } shouldBe a
+      Ior.Left(a).getOrElse { b } shouldBe b
+      Ior.Both(a, b).getOrElse { a * 2 } shouldBe b
     }
+  }
 
-    "traverseOption should wrap ior in an Option" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
+  "Ior.monad.flatMap should combine left values" {
+    val ior1 = Ior.Both(3, "Hello, world!")
+    val iorResult = ior1.flatMap(Int::plus) { Ior.Left(7) }
+    iorResult shouldBe Ior.Left(10)
+  }
 
-        iorL.traverse { Some(it) } shouldBe Some(Ior.Left(a))
-        iorR.traverse { Some(it) } shouldBe Some(Ior.Right(b))
-        iorBoth.traverse { Some(it) } shouldBe Some(Ior.Both(a, b))
-      }
+  "Ior.monad.flatMap should combine Both values" {
+    val ior1 = Ior.Both(3, "Hello, world!")
+    val iorResult1 = ior1.flatMap(Int::plus) { Ior.Both(7, "Again!") }
+    iorResult1 shouldBe Ior.Both(10, "Again!")
+
+    val iorResult2 = ior1.flatMap(Int::plus) { Ior.Right("Again!") }
+    iorResult2 shouldBe Ior.Both(3, "Again!")
+  }
+
+  "combine cases for Semigroup" {
+    forAll(
+      row("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
+      row(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
+      row(Ior.Left("Hello, "), Ior.Both("number", 1), Ior.Both("Hello, number", 1)),
+      row(Ior.Right(9000), Ior.Left("Over"), Ior.Both("Over", 9000)),
+      row(Ior.Right(9000), Ior.Right(1), Ior.Right(9001)),
+      row(Ior.Right(8000), Ior.Both("Over", 1000), Ior.Both("Over", 9000)),
+      row(Ior.Both("Hello ", 1), Ior.Left("number"), Ior.Both("Hello number", 1)),
+      row(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
+      row(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2))
+    ) { a, b, expectedResult ->
+      a.combine(b, String::plus, Int::plus) shouldBe expectedResult
     }
+  }
 
-    "sequenceOption should be consistent with traverseOption" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map { Some(it) }.sequence() shouldBe ior.traverse { Some(it) }
-      }
+  "traverse should wrap ior in a list" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.traverse { listOf(it) } shouldBe listOf(Ior.Left(a))
+      iorR.traverse { listOf(it) } shouldBe listOf(Ior.Right(b))
+      iorBoth.traverse { listOf(it) } shouldBe listOf(Ior.Both(a, b))
     }
+  }
 
-    "traverseEither should wrap ior in an Option" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
-
-        iorL.traverse { it.right() } shouldBe Either.Right(Ior.Left(a))
-        iorR.traverse { it.right() } shouldBe Either.Right(Ior.Right(b))
-        iorBoth.traverse { it.right() } shouldBe Either.Right(Ior.Both(a, b))
-      }
+  "sequence should be consistent with traverse" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.map { listOf(it) }.sequence() shouldBe ior.traverse { listOf(it) }
     }
+  }
 
-    "sequenceEither should be consistent with traverseEither" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.map { it.right() }.sequence() shouldBe ior.traverse { it.right() }
-      }
+  "traverseNullable should wrap ior in a nullable" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.traverseNullable { it } shouldBe Ior.Left(a)
+      iorR.traverseNullable { it } shouldBe Ior.Right(b)
+      iorBoth.traverseNullable { it } shouldBe Ior.Both(a, b)
+
+      iorL.traverseNullable { null } shouldBe Ior.Left(a)
+      iorR.traverseNullable { null } shouldBe null
+      iorBoth.traverseNullable { null } shouldBe null
     }
+  }
 
-    "bitraverse should wrap ior in a list" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
-
-        iorL.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) shouldBe listOf(Ior.Left(a), Ior.Left(2), Ior.Left(3))
-        iorR.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) shouldBe listOf(Ior.Right(b))
-        iorBoth.bitraverse({ listOf(it, 2, 3) }, { listOf(it, 4, 5) }) shouldBe
-          listOf(Ior.Both(a, b), Ior.Both(2, 4), Ior.Both(3, 5))
-      }
+  "sequence for Nullable should be consistent with traverseNullable" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.map<String?> { it }.sequence() shouldBe ior.traverseNullable { it }
+      ior.map<String?> { null }.sequence() shouldBe ior.traverseNullable { null }
     }
+  }
 
-    "bisequence should be consistent with bitraverse" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe
-          ior.bitraverse({ listOf(it) }, { listOf(it) })
-      }
+  "traverseOption should wrap ior in an Option" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.traverse { Some(it) } shouldBe Some(Ior.Left(a))
+      iorR.traverse { Some(it) } shouldBe Some(Ior.Right(b))
+      iorBoth.traverse { Some(it) } shouldBe Some(Ior.Both(a, b))
     }
+  }
 
-    "bitraverseOption should wrap ior in an Option" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
-
-        iorL.bitraverseOption({ None }, { Some(it) }) shouldBe None
-        iorR.bitraverseOption({ None }, { Some(it) }) shouldBe Some(Ior.Right(b))
-        iorBoth.bitraverseOption({ None }, { Some(it) }) shouldBe None
-      }
+  "sequenceOption should be consistent with traverseOption" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.map { Some(it) }.sequence() shouldBe ior.traverse { Some(it) }
     }
+  }
 
-    "bisequenceOption should be consistent with bitraverseOption" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.bimap({ None }, { Some(it) }).bisequenceOption() shouldBe
-          ior.bitraverseOption({ None }, { Some(it) })
-      }
+  "traverseEither should wrap ior in an Option" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.traverse { it.right() } shouldBe Either.Right(Ior.Left(a))
+      iorR.traverse { it.right() } shouldBe Either.Right(Ior.Right(b))
+      iorBoth.traverse { it.right() } shouldBe Either.Right(Ior.Both(a, b))
     }
+  }
 
-    "bitraverseEither should wrap ior in an Either" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val iorL: Ior<Int, String> = a.leftIor()
-        val iorR: Ior<Int, String> = b.rightIor()
-        val iorBoth: Ior<Int, String> = (a to b).bothIor()
-
-        iorL.bitraverseEither({ it.left() }, { it.right() }) shouldBe Either.Left(a)
-        iorR.bitraverseEither({ it.left() }, { it.right() }) shouldBe Either.Right(Ior.Right(b))
-        iorBoth.bitraverseEither({ it.left() }, { it.right() }) shouldBe Either.Left(a)
-      }
+  "sequenceEither should be consistent with traverseEither" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.map { it.right() }.sequence() shouldBe ior.traverse { it.right() }
     }
+  }
 
-    "bisequenceEither should be consistent with bitraverseEither" {
-      checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
-        ior.bimap({ it.left() }, { it.right() }).bisequenceEither() shouldBe
-          ior.bitraverseEither({ it.left() }, { it.right() })
-      }
+  "bitraverse should wrap ior in a list" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) shouldBe listOf(Ior.Left(a), Ior.Left(2), Ior.Left(3))
+      iorR.bitraverse({ listOf(it, 2, 3) }, { listOf(it) }) shouldBe listOf(Ior.Right(b))
+      iorBoth.bitraverse({ listOf(it, 2, 3) }, { listOf(it, 4, 5) }) shouldBe
+        listOf(Ior.Both(a, b), Ior.Both(2, 4), Ior.Both(3, 5))
     }
+  }
 
+  "bisequence should be consistent with bitraverse" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.bimap({ listOf(it) }, { listOf(it) }).bisequence() shouldBe
+        ior.bitraverse({ listOf(it) }, { listOf(it) })
+    }
+  }
+
+  "bitraverseOption should wrap ior in an Option" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.bitraverseOption({ None }, { Some(it) }) shouldBe None
+      iorR.bitraverseOption({ None }, { Some(it) }) shouldBe Some(Ior.Right(b))
+      iorBoth.bitraverseOption({ None }, { Some(it) }) shouldBe None
+    }
+  }
+
+  "bisequenceOption should be consistent with bitraverseOption" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.bimap({ None }, { Some(it) }).bisequenceOption() shouldBe
+        ior.bitraverseOption({ None }, { Some(it) })
+    }
+  }
+
+  "bitraverseEither should wrap ior in an Either" {
+    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
+      val iorL: Ior<Int, String> = a.leftIor()
+      val iorR: Ior<Int, String> = b.rightIor()
+      val iorBoth: Ior<Int, String> = (a to b).bothIor()
+
+      iorL.bitraverseEither({ it.left() }, { it.right() }) shouldBe Either.Left(a)
+      iorR.bitraverseEither({ it.left() }, { it.right() }) shouldBe Either.Right(Ior.Right(b))
+      iorBoth.bitraverseEither({ it.left() }, { it.right() }) shouldBe Either.Left(a)
+    }
+  }
+
+  "bisequenceEither should be consistent with bitraverseEither" {
+    checkAll(Arb.ior(Arb.int(), Arb.string())) { ior ->
+      ior.bimap({ it.left() }, { it.right() }).bisequenceEither() shouldBe
+        ior.bitraverseEither({ it.left() }, { it.right() })
+    }
+  }
+
+  "isLeft() should return true with Left and false otherwise" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      Ior.Left(a).isLeft() shouldBe true
+      Ior.Right(b).isLeft() shouldBe false
+      Ior.Both(a, b).isLeft() shouldBe false
+    }
+  }
+
+  "isRight() should return true with Right and false otherwise" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      Ior.Left(a).isRight() shouldBe false
+      Ior.Right(b).isRight() shouldBe true
+      Ior.Both(a, b).isRight() shouldBe false
+    }
+  }
+
+  "isBoth() should return true with Both and false otherwise" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      Ior.Left(a).isBoth() shouldBe false
+      Ior.Right(b).isBoth() shouldBe false
+      Ior.Both(a, b).isBoth() shouldBe true
+    }
+  }
+
+  "isLeft(predicate) should return true with Left, if satisfies the predicate, and false otherwise" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      val predicate = { i: Int -> i % 2 == 0 }
+
+      if (predicate(a)) Ior.Left(a).isLeft(predicate) shouldBe true
+      else Ior.Left(a).isLeft(predicate) shouldBe false
+
+      Ior.Right(b).isLeft(predicate) shouldBe false
+      Ior.Both(a, b).isLeft(predicate) shouldBe false
+    }
+  }
+
+  "isRight(predicate) should return true with Right, if satisfies the predicate, and false otherwise" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      val predicate = { s: String -> s.length % 2 == 0 }
+
+      if (predicate(b)) Ior.Right(b).isRight(predicate) shouldBe true
+      else Ior.Right(b).isRight(predicate) shouldBe false
+
+      Ior.Left(a).isRight(predicate) shouldBe false
+      Ior.Both(a, b).isRight(predicate) shouldBe false
+    }
+  }
+
+  "isBoth(predicate) should return true with Both, if satisfies the predicate, and false otherwise" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      val leftPredicate = { i: Int -> i % 2 == 0 }
+      val rightPredicate = { s: String -> s.length % 2 == 0 }
+      if (leftPredicate(a) && rightPredicate(b)) Ior.Both(a, b).isBoth(leftPredicate, rightPredicate) shouldBe true
+      else Ior.Both(a, b).isBoth(leftPredicate, rightPredicate) shouldBe false
+
+      Ior.Left(a).isBoth(leftPredicate, rightPredicate) shouldBe false
+      Ior.Right(b).isBoth(leftPredicate, rightPredicate) shouldBe false
+    }
+  }
+
+  "widen should retype Right" {
+    checkAll(Arb.int(), Arb.string()) { a, b ->
+      val ior = Ior.Both(a, b)
+      ior.widen<Int, CharSequence, String>().shouldBeInstanceOf<Ior.Both<Int, CharSequence>>()
+    }
+  }
+
+  "compareTo should compare 2 Ior" {
+    val left1 = Ior.Left(1)
+    val left2 = Ior.Left(2)
+    val right1 = Ior.Right(1)
+    val right2 = Ior.Right(2)
+    val both11 = Ior.Both(1, 1)
+    val both22 = Ior.Both(2, 2)
+    left1.compareTo(left2) shouldBe -1
+    left1.compareTo(left1) shouldBe 0
+    left2.compareTo(left1) shouldBe 1
+    left1.compareTo(right1) shouldBe -1
+    left1.compareTo(both11) shouldBe -1
+    right1.compareTo(right2) shouldBe -1
+    right1.compareTo(right1) shouldBe 0
+    right2.compareTo(right1) shouldBe 1
+    right1.compareTo(left1) shouldBe 1
+    right1.compareTo(both11) shouldBe -1
+    both11.compareTo(both22) shouldBe -1
+    both11.compareTo(both11) shouldBe 0
+    both22.compareTo(both11) shouldBe 1
+    both11.compareTo(left1) shouldBe 1
+    both11.compareTo(right1) shouldBe 1
+  }
 })
