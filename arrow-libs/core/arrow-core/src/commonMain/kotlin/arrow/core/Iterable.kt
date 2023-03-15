@@ -796,9 +796,9 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A?>, List<B?>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
     x.fold(
-      { l + it to r + null},
-      { l + null to r + it },
-      { a, b -> l + a to r + b }
+      { Pair(l + it, r + null) },
+      { Pair(l + null, r + it) },
+      { a, b -> Pair(l + a, r + b) }
     )
   }
 
