@@ -14,7 +14,6 @@ import io.kotest.property.checkAll
 class GeneratorsTest : FreeSpec( {
 
   "functionAToB" - {
-
     "should return same result when invoked multiple times" {
       checkAll(Arb.string(), Arb.functionAToB<String, Int>(Arb.int())) { a, fn ->
         fn(a) shouldBe fn(a)
@@ -34,7 +33,6 @@ class GeneratorsTest : FreeSpec( {
   }
 
   "functionABCToD" - {
-
     "should return same result when invoked multiple times" {
       checkAll(Arb.string(), Arb.string(), Arb.string(), Arb.functionABCToD<String, String, String, Int>(Arb.int())) { a, b, c, fn ->
         fn(a,b,c) shouldBe fn(a,b,c)
@@ -51,7 +49,6 @@ class GeneratorsTest : FreeSpec( {
           }
         }
     }
-
   }
 
 })
