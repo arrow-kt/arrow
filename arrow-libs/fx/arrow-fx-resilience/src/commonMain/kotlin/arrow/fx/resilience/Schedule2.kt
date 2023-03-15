@@ -46,18 +46,29 @@ public value class Next2<Delay, in Input, out Output>(
     f: (Decision2<Delay, Input, Output>, Decision2<Delay, Input, A>) -> Decision2<Delay, @UnsafeVariance Input, B>
   ): Next2<Delay, Input, B> = Next2 { i: Input -> f(step(i), other.step(i)) }
 
+  // we could have versions with more arguments
   public fun <A, B> and(
     other: Next2<Delay, @UnsafeVariance Input, A>,
     f: (Output, A) -> B,
     combineDuration: (left: Delay, right: Delay) -> Delay
   ): Next2<Delay, Input, B> = this.zip(other) { x, y -> x.and(y, f, combineDuration) }
 
+  // we could have versions with more arguments
   public fun <A, B> or(
     other: Next2<Delay, @UnsafeVariance Input, A>,
     f: (Output?, A?) -> B,
     combineDuration: (left: Delay, right: Delay) -> Delay
   ): Next2<Delay, Input, B> = this.zip(other) { x, y -> x.or(y, f, combineDuration) }
 }
+
+public fun <Delay, Input, Output> sequence(
+  inBetweenDelay: Delay,
+  schedules: List<Next2<Delay, Input, Output>>
+): Next2<Delay, Input, Output> = schedules.reduce { acc, x -> acc.then(inBetweenDelay, x) }
+
+public fun <Input, Output> sequence(
+  schedules: List<Next2<Duration, Input, Output>>
+): Next2<Duration, Input, Output> = sequence(Duration.ZERO, schedules)
 
 public sealed interface Decision2<Delay, in Input, out Output> {
   public val output: Output
@@ -112,7 +123,8 @@ public sealed interface Decision2<Delay, in Input, out Output> {
     is Continue -> Continue(output, this.delay) { x -> this.next.step(x).then(inBetweenDelay, continuation) }
   }
 
-  // Decision2 is Applicative in two different ways
+  // Decision2 is Applicative in two different ways,
+  // (in Haskell they would be Applicative and Alternative)
 
   // 2. in parallel, one stops = both stop (think of 'race')
 
@@ -172,6 +184,28 @@ public suspend fun <A, Input, Output> Schedule2<Duration, Input, Output>.repeatO
       }
     } catch (e: Throwable) {
       return Either.Left(orElse(e.nonFatalOrThrow(), state.getOrNull()))
+    }
+  }
+}
+
+public suspend fun <Input, Output, A> Schedule2<Duration, Throwable, Output>.retryOrElseEither(
+  action: suspend () -> Input,
+  orElse: suspend (Throwable, Output) -> A
+): Either<A, Input> {
+  var current = this
+
+  while (true) {
+    currentCoroutineContext().ensureActive()
+    try {
+      return Either.Right(action.invoke())
+    } catch (e: Throwable) {
+      when (val decision = current.step(e)) {
+        is Decision2.Continue -> {
+          if (decision.delay != Duration.ZERO) delay(decision.delay)
+          current = decision.next
+        }
+        is Decision2.Done -> return Either.Left(orElse(e.nonFatalOrThrow(), decision.output))
+      }
     }
   }
 }
