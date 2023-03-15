@@ -5,6 +5,7 @@ import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.core.test.either
 import arrow.core.toNonEmptyListOrNull
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -612,6 +613,31 @@ class EffectSpec : StringSpec({
       either<NonEmptyList<Int>, List<String>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
+    }
+  }
+
+  "bindAll fails on first error" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+      val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
+      either {
+        eithers.bindAll()
+      } shouldBe expected
+    }
+  }
+
+  fun <E, A> Either<E, A>.leftOrNull(): E? = fold(::identity) { null }
+
+  "accumulate - bindAll" {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+      val expected =
+        eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
+
+      either<NonEmptyList<String>, List<Int>> {
+        zipOrAccumulate(
+          { eithers.bindAll() },
+          { emptyList<Int>() }
+        ) { a, b -> a + b }
+      } shouldBe expected
     }
   }
 

@@ -10,8 +10,6 @@ import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.either
-import arrow.core.raise.fold
 import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.nullable
 import arrow.core.raise.option
@@ -324,14 +322,14 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
   ReplaceWith("let { l -> either<E, List<A>> { l.bind() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  let { l -> either { l.bind() } }
+  let { l -> either { l.bindAll() } }
 
 @Deprecated(
   "Sequence is being deprecated in favor of the either DSL.",
   ReplaceWith("let { l -> either<E, List<A>> { l.bind() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
-  let { l -> either { l.bind() } }
+  let { l -> either { l.bindAll() } }
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -357,14 +355,14 @@ public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result
   ReplaceWith("let { l -> either<E, List<A>> { l.bind() } }", "arrow.core.raise.either")
 )
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  let { l -> result { l.bind() } }
+  let { l -> result { l.bindAll() } }
 
 @Deprecated(
   "Sequence is being deprecated in favor of the result DSL.",
   ReplaceWith("let { l -> result<List<A>> { l.bind() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
-  let { l -> result { l.bind() } }
+  let { l -> result { l.bindAll() } }
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -481,14 +479,14 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
   ReplaceWith("let { l -> result<List<A>> { l.bind() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  let { l -> option { l.bind() } }
+  let { l -> option { l.bindAll() } }
 
 @Deprecated(
   "Sequence is being deprecated in favor of the option DSL.",
   ReplaceWith("let { l -> option<List<A>> { l.bind() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
-  let { l -> option { l.bind() } }
+  let { l -> option { l.bindAll() } }
 
 @Deprecated(
   "traverseNullable is being renamed to traverse to simplify the Arrow API",
@@ -517,14 +515,14 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
   ReplaceWith("let { l -> nullable<List<A>> { l.bind() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  let { l -> nullable { l.bind() } }
+  let { l -> nullable { l.bindAll() } }
 
 @Deprecated(
   "Sequence is being deprecated in favor of the nullable DSL.",
   ReplaceWith("let { l -> nullable<List<A>> { l.bind() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequence(): List<A>? =
-  let { l -> nullable { l.bind() } }
+  let { l -> nullable { l.bindAll() } }
 
 /**
  * Returns [Either] a [List] containing the results of applying the given [transform] function to each element in the original collection,

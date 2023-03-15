@@ -15,7 +15,6 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -172,7 +171,7 @@ public interface Raise<in R> {
   /**
    * Extract the [Either.Right] value of an [Either].
    * Any encountered [Either.Left] will be raised as a _logical failure_ in `this` [Raise] context.
-   * You can wrap the [bind] call in [recover] if you want to attempt to recover from any _logical failure_.
+   * You can wrap the [bindAll] call in [recover] if you want to attempt to recover from any _logical failure_.
    *
    * <!--- INCLUDE
    * import arrow.core.Either
@@ -211,7 +210,7 @@ public interface Raise<in R> {
   }
 
   @RaiseDSL
-  public fun <A> Iterable<Either<R, A>>.bind(): List<A> =
+  public fun <A> Iterable<Either<R, A>>.bindAll(): List<A> =
     map { it.bind() }
 
   @RaiseDSL

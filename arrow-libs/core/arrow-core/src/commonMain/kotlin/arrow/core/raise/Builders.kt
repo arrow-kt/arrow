@@ -13,14 +13,9 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.orElse
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -66,7 +61,7 @@ public class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
 
   @RaiseDSL
   @JvmName("bindAllNullable")
-  public fun <A> Iterable<A?>.bind(): List<A> =
+  public fun <A> Iterable<A?>.bindAll(): List<A> =
     map { it.bind() }
 
   @RaiseDSL
@@ -85,7 +80,7 @@ public class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> 
 
   @RaiseDSL
   @JvmName("bindAllResult")
-  public fun <A> Iterable<Result<A>>.bind(): List<A> =
+  public fun <A> Iterable<Result<A>>.bindAll(): List<A> =
     map { it.bind() }
 }
 
@@ -99,7 +94,7 @@ public class OptionRaise(private val cont: Raise<None>) : Raise<None> {
 
   @RaiseDSL
   @JvmName("bindAllOption")
-  public fun <A> Iterable<Option<A>>.bind(): List<A> =
+  public fun <A> Iterable<Option<A>>.bindAll(): List<A> =
     map { it.bind() }
 
   @RaiseDSL
@@ -120,6 +115,11 @@ public class IorRaise<E> @PublishedApi internal constructor(
 
   @RaiseDSL
   override fun raise(r: E): Nothing = raise.raise(combine(r))
+
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  public fun <A> Iterable<Ior<E, A>>.bindAll(): List<A> =
+    map { it.bind() }
 
   @RaiseDSL
   public fun <B> Ior<E, B>.bind(): B =
