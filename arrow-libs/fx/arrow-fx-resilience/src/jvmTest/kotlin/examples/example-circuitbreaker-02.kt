@@ -18,8 +18,8 @@ suspend fun main(): Unit {
 
   //sampleStart
   val circuitBreaker = CircuitBreaker.of(
-    maxFailures = 2,
     resetTimeout = 2.seconds,
+    openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures = 2),
     exponentialBackoffFactor = 2.0, // enable exponentialBackoffFactor
     maxResetTimeout = 60.seconds, // limit exponential back-off time
   )
