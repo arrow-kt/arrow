@@ -3243,9 +3243,9 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3267,9 +3267,10 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllIor (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3290,10 +3291,10 @@ public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindAllNullable (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
@@ -3319,9 +3320,9 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindAllOption (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
@@ -3345,9 +3346,9 @@ public abstract interface class arrow/core/raise/Raise {
 	public abstract fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public abstract fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public abstract fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public abstract fun catch (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3366,9 +3367,9 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind (Larrow/core/raise/Raise;Ljava/lang/Iterable;)Ljava/util/List;
 	public static fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bindAll (Larrow/core/raise/Raise;Ljava/lang/Iterable;)Ljava/util/List;
 	public static fun catch (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun catch (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static fun catch (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3387,9 +3388,9 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindNel (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bindNel (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3398,6 +3399,7 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun getRaise ()Larrow/core/raise/Raise;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3483,10 +3485,10 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bind (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindAllResult (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
