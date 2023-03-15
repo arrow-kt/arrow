@@ -388,7 +388,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
     public fun <Input> fibonacci(one: Duration): Schedule<Input, Duration> {
       fun loop(prev: Duration, curr: Duration): Decision<Input, Duration> =
         (prev + curr).let { next ->
-          Continue(next, next) { loop(curr, next) }
+          Continue(curr, curr) { loop(curr, next) }
         }
 
       return Schedule { loop(0.nanoseconds, one) }

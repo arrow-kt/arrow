@@ -290,7 +290,7 @@ fun <A, B> Schedule.Decision<A, B>.delay(): Duration? = when (this) {
 private fun fibs(one: Duration): Sequence<Duration> =
   generateSequence(Pair(one, one)) { (a, b) ->
     Pair(b, (a + b))
-  }.map { it.first }.drop(1)
+  }.map { it.first }
 
 @ExperimentalTime
 private fun exp(base: Duration): Sequence<Duration> =
