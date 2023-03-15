@@ -103,8 +103,95 @@ public final class arrow/fx/resilience/CircuitBreaker$State$Open : arrow/fx/resi
 	public fun toString ()Ljava/lang/String;
 }
 
+public abstract interface class arrow/fx/resilience/Decision2 {
+	public abstract fun and (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public abstract fun contramap (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public abstract fun getOutput ()Ljava/lang/Object;
+	public abstract fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public abstract fun mapDelay (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public abstract fun or (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public abstract fun then (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2$Continue;
+	public abstract fun then (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/resilience/Decision2$Continue : arrow/fx/resilience/Decision2 {
+	public static final field Companion Larrow/fx/resilience/Decision2$Continue$Companion;
+	public synthetic fun <init> (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun and (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun component3-fmX1jfI ()Lkotlin/jvm/functions/Function2;
+	public fun contramap (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public final fun copy-uXYcAyI (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2$Continue;
+	public static synthetic fun copy-uXYcAyI$default (Larrow/fx/resilience/Decision2$Continue;Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Larrow/fx/resilience/Decision2$Continue;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDelay ()Ljava/lang/Object;
+	public final fun getNext-fmX1jfI ()Lkotlin/jvm/functions/Function2;
+	public fun getOutput ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public fun mapDelay (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public fun or (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public fun then (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2$Continue;
+	public fun then (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/resilience/Decision2$Continue$Companion {
+	public final fun invoke (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2$Continue;
+}
+
+public final class arrow/fx/resilience/Decision2$DefaultImpls {
+	public static fun and (Larrow/fx/resilience/Decision2;Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public static fun contramap (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public static fun map (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public static fun mapDelay (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public static fun or (Larrow/fx/resilience/Decision2;Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public static fun then (Larrow/fx/resilience/Decision2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2$Continue;
+	public static fun then (Larrow/fx/resilience/Decision2;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/resilience/Decision2$Done : arrow/fx/resilience/Decision2 {
+	public fun <init> (Ljava/lang/Object;)V
+	public fun and (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public final fun component1 ()Ljava/lang/Object;
+	public fun contramap (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public final fun copy (Ljava/lang/Object;)Larrow/fx/resilience/Decision2$Done;
+	public static synthetic fun copy$default (Larrow/fx/resilience/Decision2$Done;Ljava/lang/Object;ILjava/lang/Object;)Larrow/fx/resilience/Decision2$Done;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getOutput ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public fun mapDelay (Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2;
+	public fun or (Larrow/fx/resilience/Decision2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Decision2;
+	public fun then (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/resilience/Decision2$Continue;
+	public fun then (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class arrow/fx/resilience/FlowKt {
 	public static final fun retry-dkRSkxk (Lkotlinx/coroutines/flow/Flow;Lkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class arrow/fx/resilience/Next2 {
+	public static final fun and-eHcZZYs (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final synthetic fun box-impl (Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Next2;
+	public static fun constructor-impl (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun contramap-TbaLxl8 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lkotlin/jvm/functions/Function2;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Z
+	public final fun getStep ()Lkotlin/jvm/functions/Function2;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lkotlin/jvm/functions/Function2;)I
+	public static final fun map-TbaLxl8 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
+	public static final fun mapDelay-TbaLxl8 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
+	public static final fun or-eHcZZYs (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun then-VGBj2nY (Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lkotlin/jvm/functions/Function2;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lkotlin/jvm/functions/Function2;
+	public static final fun zip-ZKbEytY (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 }
 
 public final class arrow/fx/resilience/SagaActionStep {
@@ -221,6 +308,10 @@ public final class arrow/fx/resilience/Schedule$Decision$Done : arrow/fx/resilie
 	public fun getOutput ()Ljava/lang/Object;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/resilience/Schedule2Kt {
+	public static final fun repeatOrElseEither-2Qgj6Ao (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/resilience/ScheduleKt {
