@@ -297,20 +297,20 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
 @Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  "Traverse for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("let<Iterable<A>, Either<E, List<B>>> { l -> either<E, List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.either")
 )
 public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  traverse(f)
+  let { l -> either { l.map { f(it).bind() } } }
 
 @Deprecated(
   "Traverse for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("either<E, List<B>> { this.map { f(it).bind() } }", "arrow.core.raise.either")
+  ReplaceWith("let<Iterable<A>, Either<E, List<B>>> { l -> either<E, List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.either")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  either { map { f(it).bind() } }
+  let { l -> either { l.map { f(it).bind() } } }
 
 @Deprecated(
   "sequenceEither is being renamed to sequence to simplify the Arrow API",
@@ -328,19 +328,19 @@ public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
 
 @Deprecated(
   "Traverse for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("result<List<B>> { this.map { f(it).bind<B>() } }", "arrow.core.raise.result")
+  ReplaceWith("let<Iterable<A>, Result<List<B>>> { l -> result<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.result")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> =
-  result { map { f(it).bind() } }
+  let { l -> result { l.map { f(it).bind() } } }
 
 @Deprecated(
-  "traverseResult is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  "Traverse for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("let<Iterable<A>, Result<List<B>>> { l -> result<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.result")
 )
 public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
-  traverse(f)
+  let { l -> result { l.map { f(it).bind() } } }
 
 @Deprecated(
   "sequenceResult is being renamed to sequence to simplify the Arrow API",
@@ -357,14 +357,17 @@ public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   traverse(::identity)
 
 @Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  traverse(semigroup, f)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -382,11 +385,14 @@ public inline fun <E, A, B> Iterable<A>.traverse(
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate<E, A, B> { f(it).bindNel() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(f)
+  mapOrAccumulate { f(it).bindNel() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -401,11 +407,14 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): 
   mapOrAccumulate { f(it).bindNel() }.toValidated()
 
 @Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  sequence(semigroup)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -418,8 +427,11 @@ public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): V
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
 @Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bindNel() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
   sequence()
@@ -435,20 +447,20 @@ public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<
   mapOrAccumulate { it.bindNel() }.toValidated()
 
 @Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  "Traverse for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith("let<Iterable<A>, Option<List<B>>> { l -> option<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.option")
 )
 public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
-  traverse(f)
+  let { l -> option { l.map { f(it).bind() } } }
 
 @Deprecated(
   "Traverse for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("option<List<B>> { this.map { f(it).bind() } }", "arrow.core.raise.option")
+  ReplaceWith("let<Iterable<A>, Option<List<B>>> { l -> option<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.option")
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> =
-  option { map { f(it).bind() } }
+  let { l -> option { l.map { f(it).bind() } } }
 
 @Deprecated(
   "sequenceOption is being renamed to sequence to simplify the Arrow API",
@@ -465,20 +477,26 @@ public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
 
 @Deprecated(
-  "traverseNullable is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  "Traverse for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
+  ReplaceWith(
+    "let<Iterable<A>, List<B & Any>?> { l -> nullable<List<B & Any>> { l.map<A, B & Any> { f(it).bind<B & Any>() } } }",
+    "arrow.core.raise.nullable"
+  )
 )
 public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
   traverse(f)
 
 @Deprecated(
   "Traverse for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("nullable<List<B>> { this.map { f(it).bind() } }", "arrow.core.raise.nullable")
+  ReplaceWith(
+    "let<Iterable<A>, List<B & Any>?> { l -> nullable<List<B & Any>> { l.map<A, B & Any> { f(it).bind<B & Any>() } } }",
+    "arrow.core.raise.nullable"
+  )
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? =
-  nullable { map { f(it).bind() } }
+  let { l -> nullable { l.map { f(it).bind() } } }
 
 @Deprecated(
   "sequenceNullable is being renamed to sequence to simplify the Arrow API",
