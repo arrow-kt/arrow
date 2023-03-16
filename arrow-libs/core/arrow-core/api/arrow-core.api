@@ -3570,10 +3570,19 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 }
 
 public final class arrow/core/raise/Trace {
-	public fun <init> (Ljava/util/concurrent/CancellationException;)V
-	public final fun printStackTrace ()V
-	public final fun stackTraceToString ()Ljava/lang/String;
-	public final fun suppressedExceptions ()Ljava/util/List;
+	public static final synthetic fun box-impl (Ljava/util/concurrent/CancellationException;)Larrow/core/raise/Trace;
+	public static fun constructor-impl (Ljava/util/concurrent/CancellationException;)Ljava/util/concurrent/CancellationException;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/CancellationException;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/CancellationException;Ljava/util/concurrent/CancellationException;)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/CancellationException;)I
+	public static final fun printStackTrace-impl (Ljava/util/concurrent/CancellationException;)V
+	public static final fun stackTraceToString-impl (Ljava/util/concurrent/CancellationException;)Ljava/lang/String;
+	public static final fun suppressedExceptions-impl (Ljava/util/concurrent/CancellationException;)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/CancellationException;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/CancellationException;
 }
 
 public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Semigroup {
