@@ -9,7 +9,7 @@ import kotlin.jvm.JvmName
 @RequiresOptIn("This API is experimental, and may change in the future.")
 public annotation class ExperimentalTraceApi
 
-/** Tracing result of `R`. Allows to inspect `R`, and the traces from where it was raised. */
+/** Tracing result. Allows to inspect the traces from where raise was called. */
 @ExperimentalTraceApi
 @JvmInline
 public value class Trace(private val exception: CancellationException) {
