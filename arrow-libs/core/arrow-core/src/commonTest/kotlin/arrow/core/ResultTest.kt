@@ -17,15 +17,4 @@ class ResultTest : StringSpec({
     } shouldBe Result.success(-1)
   }
 
-  "result DSL + bind usage should return the same as deprecated zip" {
-    checkAll(Arb.int(), Arb.int(), Arb.int()) { x, y, z ->
-      val resX = Result.success(x)
-      val resY = Result.success(y)
-      val resZ = Result.success(z)
-      val zip = resX.zip(resY, resZ) { a, b, c -> a + b + c }
-      val dsl = result { resX.bind() + resY.bind() + resZ.bind() }
-      dsl shouldBe zip
-    }
-  }
-
 })
