@@ -30,7 +30,8 @@ public typealias ScheduleStep<Input, Output> =
  * A [Schedule] describes how a `suspend fun` should [retry] or [repeat].
  *
  * It's defined by a [step] function that takes an [Input] and returns a [Decision],
- * the [Decision] determines if the `suspend fun` should be [Continue] to be retried or repeated,
+* the [Decision] determines if the `suspend fun` should be [Continue] to be retried or repeated
+* (and if so, the `delay` until the next attempt),
  * or if the [Schedule] is [Done] retrying or repeating.
  */
 @JvmInline
