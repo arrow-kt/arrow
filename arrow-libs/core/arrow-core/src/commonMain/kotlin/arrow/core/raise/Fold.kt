@@ -109,13 +109,13 @@ public inline fun <R, A, B> fold(
 }
 
 /**
- * Inspect a [Traced] value of [R].
+ * Inspect a [Trace] value of [R].
  *
  * Tracing [R] can be useful to know where certain errors, or failures are coming from.
  * Let's say you have a `DomainError`, but it might be raised from many places in the project.
  *
  * You would have to manually _trace_ where this error is coming from,
- * instead [Traced] offers you ways to inspect the actual stacktrace of where the raised value occurred.
+ * instead [Trace] offers you ways to inspect the actual stacktrace of where the raised value occurred.
  *
  * Beware that tracing can only track the [Raise.bind] or [Raise.raise] call that resulted in the [R] value,
  * and not any location of where the [R], or [Either.Left] value was created.
@@ -150,7 +150,7 @@ public inline fun <R, A, B> fold(
 @ExperimentalTraceApi
 public inline fun <R, A> Raise<R>.traced(
   @BuilderInference program: Raise<R>.() -> A,
-  trace: (traced: Traced<R>) -> Unit
+  trace: (traced: Trace, R) -> Unit
 ): A {
   val itOuterTraced = this is DefaultRaise && isTraced
   val nested = if (this is DefaultRaise && isTraced) this else DefaultRaise(true)
@@ -158,7 +158,7 @@ public inline fun <R, A> Raise<R>.traced(
     program.invoke(nested)
   } catch (e: RaiseCancellationException) {
     val r: R = e.raisedOrRethrow(nested)
-    trace(Traced(e, r))
+    trace(Trace(e), r)
     if (itOuterTraced) throw e else raise(r)
   }
 }
@@ -193,7 +193,7 @@ private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Rai
 
 private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
 
-public expect open class CancellationExceptionNoTrace() : CancellationException
+internal expect open class CancellationExceptionNoTrace() : CancellationException
 
 private class RaiseLeakedException : IllegalStateException(
   """

@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 class TraceJvmSpec : StringSpec({
   "Can trace a typed error" {
     either<RuntimeException, Nothing> {
-      traced({ raise(RuntimeException("")) }) { traced ->
+      traced({ raise(RuntimeException("")) }) { traced, raised ->
         // Remove first 2 lines:
         // arrow.core.raise.RaiseCancellationException
         //	at arrow.core.raise.DefaultRaise.raise(Fold.kt:187)
@@ -15,7 +15,7 @@ class TraceJvmSpec : StringSpec({
 
         // Remove first line:
         // java.lang.RuntimeException:
-        val exceptionTrace = traced.raised.stackTraceToString().lines().drop(1)
+        val exceptionTrace = raised.stackTraceToString().lines().drop(1)
 
         trace shouldBe exceptionTrace
       }
