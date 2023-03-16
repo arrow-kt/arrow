@@ -34,7 +34,7 @@ public typealias Next<Input, Output> =
  * or if the [Schedule] is [Done] retrying or repeating.
  */
 @JvmInline
-public value class Schedule<Input, Output>(public val step: Next<Input, Output>) {
+public value class Schedule<in Input, out Output>(public val step: Next<Input, Output>) {
 
   /** Repeat the schedule, and uses [block] as [Input] for the [step] function. */
   public suspend fun repeat(block: suspend () -> Input): Output =
@@ -46,7 +46,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    */
   public suspend fun repeatOrElse(
     block: suspend () -> Input,
-    orElse: suspend (error: Throwable, output: Output?) -> Output
+    orElse: suspend (error: Throwable, output: Output?) -> @UnsafeVariance Output
   ): Output = repeatOrElseEither(block, orElse).merge()
 
   /**
@@ -80,22 +80,30 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
     }
   }
 
-  /** Transforms every [Output]'ed value of `this` schedule using [transform]. */
-  public fun <A> map(transform: suspend (output: Output) -> A): Schedule<Input, A> {
-    suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, A> =
-      when (val decision = self(input)) {
-        is Continue -> Continue(transform(decision.output), decision.delay) { loop(it, decision.next) }
-        is Done -> Done(transform(decision.output))
-      }
+  /**
+   * Modify [Continue.delay] by the given function [transform].
+   */
+  public fun delayed(transform: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
+    Schedule { step(it).delayed(transform) }
 
-    return Schedule { input -> loop(input, step) }
-  }
+  /**
+   * Transform the [Schedule] by mapping the [Input]'s.
+   */
+  public fun <A> contramap(transform: suspend (A) -> Input): Schedule<A, Output> =
+    Schedule { step(transform(it)).contramap(transform) }
+
+  /** Transforms every [Output]'ed value of `this` schedule using [transform]. */
+  public fun <A> map(transform: suspend (output: Output) -> A): Schedule<Input, A> =
+    Schedule { step(it).map(transform) }
+
+  public fun mapDecision(f: suspend (Decision<Input, Output>) -> Decision<@UnsafeVariance Input, @UnsafeVariance Output>): Schedule<Input, Output> =
+    Schedule { step(it).recursiveMap(f) }
 
   /**
    * Runs `this` schedule until [Done], and then runs [other] until [Done].
    * Wrapping the output of `this` in [Either.Left], and the output of [other] in [Either.Right].
    */
-  public infix fun <A> andThen(other: Schedule<Input, A>): Schedule<Input, Either<Output, A>> =
+  public infix fun <A> andThen(other: Schedule<@UnsafeVariance Input, A>): Schedule<Input, Either<Output, A>> =
     andThen(other, { it.left() }) { it.right() }
 
   /**
@@ -103,26 +111,11 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * When `this` schedule is [Done], it runs [other] schedule, and transforms the output using [ifRight].
    */
   public fun <A, B> andThen(
-    other: Schedule<Input, A>,
+    other: Schedule<@UnsafeVariance Input, A>,
     ifLeft: suspend (Output) -> B,
     ifRight: suspend (A) -> B
-  ): Schedule<Input, B> {
-    suspend fun loop(input: Input, self: Next<Input, A>): Decision<Input, B> =
-      when (val decision = self(input)) {
-        is Done -> Done(ifRight(decision.output))
-        is Continue -> Continue(ifRight(decision.output), decision.delay) {
-          loop(input, decision.next)
-        }
-      }
-
-    suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, B> =
-      when (val decision = self(input)) {
-        is Continue -> Continue(ifLeft(decision.output), decision.delay) { loop(it, decision.next) }
-        is Done -> Continue(ifLeft(decision.output), ZERO) { loop(input, other.step) }
-      }
-
-    return Schedule { input -> loop(input, step) }
-  }
+  ): Schedule<Input, B> =
+    Schedule { step(it).andThen(other.step, ifLeft, ifRight) }
 
   /**
    * Pipes the output of `this` [Schedule] to the input of the [other] [Schedule].
@@ -144,7 +137,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
   }
 
   /** Runs `this` [Schedule] _while_ the [predicate] of [Input] and [Output] returns `false`. */
-  public fun doWhile(predicate: suspend (Input, Output) -> Boolean): Schedule<Input, Output> {
+  public fun doWhile(predicate: suspend (@UnsafeVariance Input, Output) -> Boolean): Schedule<Input, Output> {
     suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, Output> =
       when (val decision = self(input)) {
         is Continue ->
@@ -161,30 +154,17 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * Runs the [Schedule] _until_ the [predicate] of [Input] and [Output] returns true.
    * Inverse version of [doWhile].
    */
-  public fun doUntil(predicate: suspend (input: Input, output: Output) -> Boolean): Schedule<Input, Output> =
+  public fun doUntil(predicate: suspend (input: @UnsafeVariance Input, output: Output) -> Boolean): Schedule<Input, Output> =
     doWhile { input, output -> !predicate(input, output) }
 
   /**
    * Adds a logging action to the [Schedule].
    */
-  public fun log(action: suspend (input: Input, output: Output) -> Unit): Schedule<Input, Output> =
+  public fun log(action: suspend (input: @UnsafeVariance Input, output: Output) -> Unit): Schedule<Input, Output> =
     doWhile { input, output ->
       action(input, output)
       true
     }
-
-  /**
-   * Modify [Continue.delay] by the given function [transform].
-   */
-  public fun delayed(transform: suspend (Output, Duration) -> Duration): Schedule<Input, Output> {
-    suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, Output> =
-      when (val decision = self(input)) {
-        is Continue -> Continue(decision.output, transform(decision.output, decision.delay)) { loop(it, decision.next) }
-        is Done -> decision
-      }
-
-    return Schedule { input -> loop(input, step) }
-  }
 
   /** Adds a [Random] jitter to the delay of the [Schedule]. */
   public fun jittered(
@@ -193,13 +173,6 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
     random: Random = Random.Default
   ): Schedule<Input, Output> =
     delayed { _, duration -> duration * random.nextDouble(min, max) }
-
-  public fun mapDecision(f: suspend (Decision<Input, Output>) -> Decision<Input, Output>): Schedule<Input, Output> {
-    suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, Output> =
-      f(self(input))
-
-    return Schedule { input -> loop(input, step) }
-  }
 
   /**
    * Collects all the [Output] of the [Schedule] into a [List].
@@ -231,7 +204,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * It chooses the longest delay between the two [Schedule]s.
    * If one of the [Schedule]s is done, the other [Schedule] is not executed anymore.
    */
-  public infix fun <B> zipLeft(other: Schedule<Input, B>): Schedule<Input, Output> =
+  public infix fun <B> zipLeft(other: Schedule<@UnsafeVariance Input, B>): Schedule<Input, Output> =
     and(other) { input, _ -> input }
 
   /**
@@ -239,7 +212,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * It chooses the longest delay between the two [Schedule]s.
    * If one of the [Schedule]s is done, the other [Schedule] is not executed anymore.
    */
-  public infix fun <B> zipRight(other: Schedule<Input, B>): Schedule<Input, B> =
+  public infix fun <B> zipRight(other: Schedule<@UnsafeVariance Input, B>): Schedule<Input, B> =
     and(other) { _, b -> b }
 
   /**
@@ -247,7 +220,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * It chooses the longest delay between the two [Schedule]s.
    * If one of the [Schedule]s is done, the other [Schedule] is not executed anymore.
    */
-  public infix fun <B> and(other: Schedule<Input, B>): Schedule<Input, Pair<Output, B>> =
+  public infix fun <B> and(other: Schedule<@UnsafeVariance Input, B>): Schedule<Input, Pair<Output, B>> =
     and(other, ::Pair)
 
   /**
@@ -256,7 +229,7 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * If one of the [Schedule]s is done, the other [Schedule] is not executed anymore.
    */
   public fun <B, C> and(
-    other: Schedule<Input, B>,
+    other: Schedule<@UnsafeVariance Input, B>,
     transform: suspend (output: Output, b: B) -> C
   ): Schedule<Input, C> = and(other, transform) { a, b -> maxOf(a, b) }
 
@@ -266,29 +239,11 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * If one of the [Schedule]s is done, the other [Schedule] is not executed anymore.
    */
   public fun <B, C> and(
-    other: Schedule<Input, B>,
+    other: Schedule<@UnsafeVariance Input, B>,
     transform: suspend (output: Output, b: B) -> C,
     combineDuration: suspend (left: Duration, right: Duration) -> Duration
-  ): Schedule<Input, C> {
-    suspend fun loop(
-      input: Input,
-      self: Next<Input, Output>,
-      that: Next<Input, B>
-    ): Decision<Input, C> {
-      val left = self(input)
-      val right = that(input)
-      return if (left is Continue && right is Continue) Continue(
-        transform(left.output, right.output),
-        combineDuration(left.delay, right.delay)
-      ) {
-        loop(it, left.next, right.next)
-      } else Done(transform(left.output, right.output))
-    }
-
-    return Schedule { input ->
-      loop(input, step, other.step)
-    }
-  }
+  ): Schedule<Input, C> =
+    Schedule { this.step(it).and(other.step(it), transform, combineDuration) }
 
   /**
    * Combines two [Schedule]s into one by transforming the output of both [Schedule]s using [transform].
@@ -297,68 +252,11 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
    * padding the output and duration with `null` if one of the [Schedule]s is done.
    */
   public fun <B, C> or(
-    other: Schedule<Input, B>,
+    other: Schedule<@UnsafeVariance Input, B>,
     transform: suspend (output: Output?, b: B?) -> C,
     combineDuration: suspend (left: Duration?, right: Duration?) -> Duration
-  ): Schedule<Input, C> {
-    suspend fun loop(
-      input: Input,
-      self: Next<Input, Output>?,
-      that: Next<Input, B>?
-    ): Decision<Input, C> =
-      when (val left = self?.invoke(input)) {
-        is Continue -> when (val right = that?.invoke(input)) {
-          is Continue -> Continue(
-            transform(left.output, right.output),
-            combineDuration(left.delay, right.delay)
-          ) {
-            loop(it, left.next, right.next)
-          }
-
-          is Done -> Continue(
-            transform(left.output, right.output),
-            combineDuration(left.delay, null)
-          ) {
-            loop(it, left.next, null)
-          }
-
-          null -> Continue(
-            transform(left.output, null),
-            combineDuration(left.delay, null)
-          ) {
-            loop(it, left.next, null)
-          }
-        }
-
-        is Done -> when (val right = that?.invoke(input)) {
-          is Continue -> Continue(
-            transform(left.output, right.output),
-            combineDuration(null, right.delay)
-          ) {
-            loop(it, null, right.next)
-          }
-
-          is Done -> Done(transform(left.output, right.output))
-          null -> Done(transform(left.output, null))
-        }
-
-        null -> when (val right = that?.invoke(input)) {
-          is Continue -> Continue(
-            transform(null, right.output),
-            combineDuration(null, right.delay)
-          ) {
-            loop(it, null, right.next)
-          }
-
-          is Done -> Done(transform(null, right.output))
-          null -> Done(transform(null, null))
-        }
-      }
-
-    return Schedule { input ->
-      loop(input, step, other.step)
-    }
-  }
+  ): Schedule<Input, C> =
+    Schedule { this.step(it).or(other.step(it), transform, combineDuration) }
 
   public companion object {
 
@@ -444,12 +342,77 @@ public value class Schedule<Input, Output>(public val step: Next<Input, Output>)
   public sealed interface Decision<in Input, out Output> {
     public val output: Output
 
-    public data class Done<Output>(override val output: Output) : Decision<Any?, Output>
+    public data class Done<out Output>(override val output: Output) : Decision<Any?, Output>
     public data class Continue<in Input, out Output>(
       override val output: Output,
       val delay: Duration,
       val next: Next<Input, Output>
     ) : Decision<Input, Output>
+
+    public suspend fun recursiveMap(
+      transform: suspend (Decision<Input, Output>) -> Decision<@UnsafeVariance Input, @UnsafeVariance Output>
+    ): Decision<Input, Output> = when (val next = transform(this)) {
+      is Done -> next
+      is Continue -> Continue(next.output, next.delay) { next.next(it).recursiveMap(transform) }
+    }
+
+    public suspend fun delayed(transform: suspend (Output, Duration) -> Duration): Decision<Input, Output> = when (this) {
+      is Done -> Done(output)
+      is Continue -> Continue(output, transform(output, delay), next)
+    }
+
+    public suspend fun <A> contramap(f: suspend (A) -> Input): Decision<A, Output> = when (this) {
+      is Done -> Done(output)
+      is Continue -> Continue(output, delay) { next(f(it)).contramap(f) }
+    }
+
+    public suspend fun <A> map(f: suspend (output: Output) -> A): Decision<Input, A> = when (this) {
+      is Done -> Done(f(output))
+      is Continue -> Continue(f(output), delay) { next(it).map(f) }
+    }
+
+    public suspend fun andThen(
+      other: suspend (@UnsafeVariance Input) -> Decision<@UnsafeVariance Input, @UnsafeVariance Output>
+    ): Decision<Input, Output> = when (this) {
+      is Done -> Continue(output, ZERO, other)
+      is Continue -> Continue(output, delay) { next(it).andThen(other) }
+    }
+
+    public suspend fun <A, B> andThen(
+      other: suspend (@UnsafeVariance Input) -> Decision<@UnsafeVariance Input, A>,
+      ifLeft: suspend (Output) -> B,
+      ifRight: suspend (A) -> B
+    ): Decision<Input, B> =
+      this.map(ifLeft).andThen { other(it).map(ifRight) }
+
+    public suspend fun <B, C> and(
+      other: Decision<@UnsafeVariance Input, B>,
+      transform: suspend (output: Output, b: B) -> C,
+      combineDuration: suspend (left: Duration, right: Duration) -> Duration
+    ): Decision<Input, C> = when {
+      this is Continue && other is Continue ->
+        Continue(
+          transform(this.output, other.output),
+          combineDuration(this.delay, other.delay)
+        ) { this.next(it).and(other.next(it), transform, combineDuration) }
+      else -> Done(transform(this.output, other.output))
+    }
+
+    public suspend fun <B, C> or(
+      other: Decision<@UnsafeVariance Input, B>,
+      transform: suspend (output: Output?, b: B?) -> C,
+      combineDuration: suspend (left: Duration?, right: Duration?) -> Duration
+    ): Decision<Input, C> = when {
+      this is Done && other is Done -> Done(transform(this.output, other.output))
+      this is Done && other is Continue -> other.map { x -> transform(null, x) }
+      this is Continue && other is Done -> this.map { x -> transform(x, null) }
+      this is Continue && other is Continue ->
+        Continue(
+          transform(this.output, other.output),
+          combineDuration(this.delay, other.delay)
+        ) { this.next(it).or(other.next(it), transform, combineDuration) }
+      else -> throw IllegalStateException()
+    }
   }
 }
 
