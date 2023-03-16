@@ -3,6 +3,7 @@
 package arrow.core.raise
 
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
