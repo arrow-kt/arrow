@@ -43,7 +43,7 @@ class EffectSpec : StringSpec({
         } catch (e: Throwable) {
           i()
         }
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -56,8 +56,7 @@ class EffectSpec : StringSpec({
         } finally {
           require(promise.complete(i()))
         }
-      }
-        .fold(::identity) { unreachable() } shouldBe s()
+      }.fold(::identity) { unreachable() } shouldBe s()
       promise.await() shouldBe i()
     }
   }
@@ -81,11 +80,11 @@ class EffectSpec : StringSpec({
       effect<String, Int> {
         effect<Long, Int> {
           raise(l())
-        } recover { ll ->
+        } getOrElse { ll ->
           ll shouldBe l()
           i()
         }
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -97,7 +96,7 @@ class EffectSpec : StringSpec({
       effect {
         effect<Long, Int> {
           raise(l())
-        } recover { ll ->
+        } getOrElse { ll ->
           ll shouldBe l()
           raise(s())
         }
@@ -108,8 +107,8 @@ class EffectSpec : StringSpec({
   "recover - success" {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
-        effect<Long, Int> { i() } recover { unreachable() }
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+        effect<Long, Int> { i() } getOrElse { unreachable() }
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -118,11 +117,11 @@ class EffectSpec : StringSpec({
       effect<String, Int> {
         effect<Long, Int> {
           raise(l())
-        }.recover({ ll ->
+        } getOrElse { ll ->
           ll shouldBe l()
           i()
-        }, { unreachable() })
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+        }
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -131,10 +130,10 @@ class EffectSpec : StringSpec({
       effect {
         effect<Long, Int> {
           raise(l())
-        }.recover({ ll ->
+        } getOrElse { ll ->
           ll shouldBe l()
           raise(s())
-        }, { unreachable() })
+        }
       }.fold(::identity) { unreachable() } shouldBe s()
     }
   }
@@ -146,13 +145,11 @@ class EffectSpec : StringSpec({
       effect<String, Int> {
         effect<Long, Int> {
           throw boom
-        }.recover(
-          { unreachable() },
-          { e ->
-            e shouldBe boom
-            i()
-          })
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+        }.catch { e ->
+          e shouldBe boom
+          i()
+        }.getOrElse { unreachable() }
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -161,11 +158,10 @@ class EffectSpec : StringSpec({
       effect {
         effect<Long, Int> {
           throw boom
-        }.recover({ unreachable() },
-          { e ->
-            e shouldBe boom
-            raise(s())
-          })
+        }.catch { e ->
+          e shouldBe boom
+          raise(s())
+        }.getOrElse { unreachable() }
       }.fold(::identity) { unreachable() } shouldBe s()
     }
   }
@@ -175,10 +171,11 @@ class EffectSpec : StringSpec({
       effect<String, Int> {
         effect<Long, Int> {
           raise(l())
-        }.recover({ ll ->
+        }.recover { ll ->
           ll shouldBe l()
           throw boom
-        }, { unreachable() })
+          raise("failure")
+        }.getOrElse { unreachable() }
       }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom
     }
   }
@@ -188,11 +185,10 @@ class EffectSpec : StringSpec({
     effect<String, Int> {
       effect<Long, Int> {
         throw boom
-      }.recover({ unreachable() },
-        { e ->
-          e shouldBe boom
-          throw boom2
-        })
+      }.catch { e ->
+        e shouldBe boom
+        throw boom2
+      }.getOrElse { unreachable() }
     }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom2
   }
 
@@ -200,8 +196,8 @@ class EffectSpec : StringSpec({
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> { i() }
-          .recover({ unreachable() }, { unreachable() })
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+          .catch { unreachable() }.getOrElse { unreachable() }
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -210,10 +206,10 @@ class EffectSpec : StringSpec({
     effect {
       effect<String, Int> {
         throw boom
-      } catch { e ->
+      }.catch { e ->
         e shouldBe boom
         throw boom2
-      }
+      }.bind()
     }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom2
   }
 
@@ -222,10 +218,10 @@ class EffectSpec : StringSpec({
       effect {
         effect<String, Int> {
           throw boom
-        } catch { e ->
+        }.catch { e ->
           e shouldBe boom
           raise(s())
-        }
+        }.bind()
       }.fold(::identity) { unreachable() } shouldBe s()
     }
   }
@@ -235,11 +231,11 @@ class EffectSpec : StringSpec({
       effect {
         effect<String, Int> {
           throw boom
-        } catch { e ->
+        }.catch { e ->
           e shouldBe boom
           i()
-        }
-      }.fold({ unreachable() }, ::identity) shouldBe i()
+        }.bind()
+      }.getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -298,7 +294,7 @@ class EffectSpec : StringSpec({
   "success" {
     checkAll(Arb.int().suspend()) { i ->
       effect<Nothing, Int> { i() }
-        .fold({ unreachable() }, ::identity) shouldBe i()
+        .getOrElse { unreachable() } shouldBe i()
     }
   }
 
@@ -323,7 +319,7 @@ class EffectSpec : StringSpec({
   "Can short-circuit from nested blocks" {
     checkAll(Arb.string().suspend()) { msg ->
       effect<String, Int> {
-        effect<Nothing, Long> { raise(msg()) }.fold({ unreachable() }, ::identity)
+        effect<Nothing, Long> { raise(msg()) }.getOrElse { unreachable() }
         fail("Should never reach this point")
       }
         .fold(::identity, ::identity) shouldBe msg()
@@ -336,7 +332,7 @@ class EffectSpec : StringSpec({
         effect<Nothing, Long> {
           1L.suspend()
           raise(msg())
-        }.fold({ unreachable() }, ::identity)
+        }.getOrElse { unreachable() }
         fail("Should never reach this point")
       }.fold(::identity, ::identity) shouldBe msg()
     }
@@ -468,7 +464,7 @@ class EffectSpec : StringSpec({
       effect<Int, String> {
         str()
       }.recover<Int, Nothing, String> { fail("It should never catch a success value") }
-        .fold({ unreachable() }, ::identity) shouldBe str()
+        .getOrElse { unreachable() } shouldBe str()
     }
   }
 
@@ -478,7 +474,7 @@ class EffectSpec : StringSpec({
         raise(int())
         unreachable()
       }.recover<Int, Nothing, String> { fallback() }
-        .fold({ unreachable() }, ::identity) shouldBe fallback()
+        .getOrElse { unreachable() } shouldBe fallback()
     }
   }
 
@@ -499,7 +495,7 @@ class EffectSpec : StringSpec({
           raise(int())
           unreachable()
         }.recover<Int, Nothing, String> { throw RuntimeException(msg()) }
-          .fold({ unreachable() }, ::identity)
+          .getOrElse { unreachable() }
       }.message.shouldNotBeNull() shouldBe msg()
     }
   }
@@ -509,7 +505,7 @@ class EffectSpec : StringSpec({
       effect<Int, String> {
         str()
       }.catch { unreachable() }
-        .fold({ unreachable() }, ::identity) shouldBe str()
+        .getOrElse { unreachable() } shouldBe str()
     }
   }
 
@@ -584,7 +580,7 @@ class EffectSpec : StringSpec({
       effect<Int, String> {
         msg()
       }.catch()
-        .fold({ unreachable() }, ::identity) shouldBe Result.success(msg())
+        .getOrElse { unreachable() } shouldBe Result.success(msg())
     }
   }
 

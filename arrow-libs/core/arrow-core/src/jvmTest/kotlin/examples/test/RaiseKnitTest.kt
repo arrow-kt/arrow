@@ -36,6 +36,10 @@ class RaiseKnitTest : StringSpec({
     arrow.core.examples.exampleRaiseDsl09.test()
   }
 
+  "ExampleRaiseDsl10" {
+    arrow.core.examples.exampleRaiseDsl10.test()
+  }
+
 }) {
   override fun timeout(): Long = 1000
 }
