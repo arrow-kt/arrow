@@ -12,9 +12,8 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
-    ReplaceWith(
-      "nullable<A> { fn(a.bind<A>()) }", "arrow.core.raise.nullable"
+    "Prefer using the let",
+    ReplaceWith("a?.let(fn)"
     )
   )
   public inline fun <A, R> zip(a: A?, fn: (A) -> R): R? {
@@ -24,7 +23,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith("nullable<A, B> { fn(a.bind<A>(), b.bind<B>()) }", "arrow.core.raise.nullable")
   )
   public inline fun <A, B, R> zip(a: A?, b: B?, fn: (A, B) -> R): R? {
@@ -34,7 +33,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
       "nullable<A, B, C> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>()) }", "arrow.core.raise.nullable"
     )
@@ -46,7 +45,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
       "nullable<A, B, C, D> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>()) }", "arrow.core.raise.nullable"
     )
@@ -58,7 +57,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
       "nullable<A, B, C, D, E> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>()) }",
       "arrow.core.raise.nullable"
@@ -71,7 +70,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
       "nullable<A, B, C, D, E, F> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>()) }",
       "arrow.core.raise.nullable"
@@ -86,7 +85,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
       "nullable<A, B, C, D, E, F, G> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>(), g.bind<G>()) }",
       "arrow.core.raise.nullable"
@@ -101,7 +100,7 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
       "nullable<A, B, C, D, E, F, G, H> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>(), g.bind<G>(), h.bind<H>()) }",
       "arrow.core.raise.nullable"
@@ -116,9 +115,9 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
-      "nullable<A, B, C, D, E, F, H, I> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>(), g.bind<G>(), h.bind<H>(), i.bind<I>()) }",
+      "nullable<A, B, C, D, E, F, G, H, I> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>(), g.bind<G>(), h.bind<H>(), i.bind<I>()) }",
       "arrow.core.raise.nullable"
     )
   )
@@ -131,9 +130,9 @@ public object Nullable {
 
   @JvmStatic
   @Deprecated(
-    "Prefer using the inline result DSL",
+    "Prefer using the inline nullable DSL",
     ReplaceWith(
-      "nullable<A, B, C, D, E, F, I, J> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>(), g.bind<G>(), h.bind<H>(), i.bind<I>(), j.bind<J>()) }",
+      "nullable<A, B, C, D, E, F, G, H, I, J> { fn(a.bind<A>(), b.bind<B>(), c.bind<C>(), d.bind<D>(), e.bind<E>(), f.bind<F>(), g.bind<G>(), h.bind<H>(), i.bind<I>(), j.bind<J>()) }",
       "arrow.core.raise.nullable"
     )
   )
