@@ -55,8 +55,7 @@ public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInferen
 
 public typealias Null = Nothing?
 
-@JvmInline
-public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
+public class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
   override fun raise(r: Nothing?): Nothing = cont.raise(r)
@@ -67,23 +66,33 @@ public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
     return this ?: raise(null)
   }
 
+  @JvmName("bindAllNullable")
+  public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
+
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
 }
 
-@JvmInline
-public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
+public class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
   override fun raise(r: Throwable): Nothing = cont.raise(r)
   public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
+
+  @JvmName("bindAllResult")
+  public fun <K, V> Map<K, Result<V>>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
 }
 
-@JvmInline
-public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
+public class OptionRaise(private val cont: Raise<None>) : Raise<None> {
   override fun raise(r: None): Nothing = cont.raise(r)
   public fun <B> Option<B>.bind(): B = getOrElse { raise(None) }
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
+
+  @JvmName("bindAllOption")
+  public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
 
   public fun <B> ensureNotNull(value: B?): B {
     contract { returns() implies (value != null) }
@@ -108,6 +117,10 @@ public class IorRaise<E> @PublishedApi internal constructor(
         rightValue
       }
     }
+
+  @JvmName("bindAllIor")
+  public fun <K, V> Map<K, Ior<E, V>>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
 
   private fun combine(other: E): E =
     state.updateAndGet { prev ->

@@ -491,6 +491,9 @@ public open class RaiseAccumulate<Error>(
   public override fun raise(r: Error): Nothing =
     raise.raise(nonEmptyListOf(r))
 
+  public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
+    mapOrAccumulate { (_, a) -> a.bind() }.bindNel()
+
   @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {
     is Either.Left -> raise.raise(value)

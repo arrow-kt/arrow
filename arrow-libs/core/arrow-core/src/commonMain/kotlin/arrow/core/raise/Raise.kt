@@ -201,6 +201,8 @@ public interface Raise<in R> {
     is Either.Right -> value
   }
 
+  public fun <K, A> Map<K, Either<R, A>>.bindAll(): Map<K, A> =
+    mapValues { (_, a) -> a.bind() }
 
   @Deprecated(
     "Validated is deprecated in favor of Either.",
