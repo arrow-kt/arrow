@@ -8,6 +8,10 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+internal const val deprecateZip: String =
+  "Prefer using the inline result DSL + bind(). Please, be aware that all the errors are no longer accumulated, just the first error found is considered." +
+    "In case you think this behaviour should stay, please provide feedback and your use-case on https://github.com/arrow-kt/arrow/issues"
+
 @PublishedApi
 internal inline val UnitResult: Result<Unit>
   inline get() = success(Unit)
@@ -55,7 +59,7 @@ public inline fun <A, B> Result<A>.redeemWith(
  * Combines n-arity independent [Result] values with a [transform] function.
  */
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result<A> {transform(this.bind(), b.bind()) }",
     "arrow.core.raise.result"
@@ -77,7 +81,7 @@ public inline fun <A, B, C> Result<A>.zip(b: Result<B>, transform: (A, B) -> C):
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind()) }",
     "arrow.core.raise.result"
@@ -99,7 +103,7 @@ public inline fun <A, B, C, D> Result<A>.zip(b: Result<B>, c: Result<C>, transfo
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind()) }",
     "arrow.core.raise.result"
@@ -126,7 +130,7 @@ public inline fun <A, B, C, D, E> Result<A>.zip(
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind()) }",
     "arrow.core.raise.result"
@@ -152,7 +156,7 @@ public inline fun <A, B, C, D, E, F> Result<A>.zip(
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }",
     "arrow.core.raise.result"
@@ -180,7 +184,7 @@ public inline fun <A, B, C, D, E, F, G> Result<A>.zip(
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }",
     "arrow.core.raise.result"
@@ -210,7 +214,7 @@ public inline fun <A, B, C, D, E, F, G, H> Result<A>.zip(
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }",
     "arrow.core.raise.result"
@@ -242,7 +246,7 @@ public inline fun <A, B, C, D, E, F, G, H, I> Result<A>.zip(
 }
 
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }",
     "arrow.core.raise.result"
@@ -277,7 +281,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J> Result<A>.zip(
 
 @Suppress("UNCHECKED_CAST")
 @Deprecated(
-  "Prefer using the inline result DSL",
+  deprecateZip,
   ReplaceWith(
     "result {transform(this.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), k.bind()) }",
     "arrow.core.raise.result"
