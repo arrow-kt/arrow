@@ -171,7 +171,7 @@ public interface Raise<in R> {
   /**
    * Extract the [Either.Right] value of an [Either].
    * Any encountered [Either.Left] will be raised as a _logical failure_ in `this` [Raise] context.
-   * You can wrap the [bindAll] call in [recover] if you want to attempt to recover from any _logical failure_.
+   * You can wrap the [bind] call in [recover] if you want to attempt to recover from any _logical failure_.
    *
    * <!--- INCLUDE
    * import arrow.core.Either

@@ -352,7 +352,7 @@ public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result
 
 @Deprecated(
   "The sequence extension function is being deprecated in favor of the result DSL.",
-  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   let { l -> result { l.bindAll() } }
@@ -367,7 +367,7 @@ public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
@@ -417,7 +417,7 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
@@ -476,7 +476,7 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
 
 @Deprecated(
   "The sequence extension function is being deprecated in favor of the option DSL.",
-  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
+  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   let { l -> option { l.bindAll() } }
