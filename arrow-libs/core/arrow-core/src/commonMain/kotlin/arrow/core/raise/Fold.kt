@@ -159,7 +159,7 @@ public inline fun <R, A> Raise<R>.traced(
   } catch (e: RaiseCancellationException) {
     val r: R = e.raisedOrRethrow(nested)
     trace(Trace(e), r)
-    if (itOuterTraced) throw e else raise(r)
+    if (isOuterTraced) throw e else raise(r)
   }
 }
 
@@ -168,7 +168,8 @@ public inline fun <R, A> Raise<R>.traced(
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
-    this.raise === raise && (this is RaiseCancellationExceptionNoTrace || this is RaiseCancellationException) -> raised as R
+    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
+    this is RaiseCancellationException && this.raise === raise -> raised as R
     else -> throw this
   }
 
