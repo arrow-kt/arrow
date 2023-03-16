@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -344,4 +345,13 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Long, B>, expected: B) {
   }
 
   assertEquals(expected, result)
+}
+
+private suspend fun <B> checkRepeat(schedule: Schedule<Long, List<B>>, expected: List<B>) {
+  val count = AtomicLong(0)
+  val result = schedule.repeat {
+    count.updateAndGet { it + 1 }
+  }
+
+  assertContentEquals(expected, result)
 }
