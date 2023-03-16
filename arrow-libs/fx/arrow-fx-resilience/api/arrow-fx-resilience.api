@@ -151,6 +151,7 @@ public final class arrow/fx/resilience/Schedule {
 	public static final synthetic fun box-impl (Lkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Schedule;
 	public static final fun collect-n7EYv7Q (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static fun constructor-impl (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun contramap-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun delayed-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun doUntil-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun doWhile-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
@@ -194,32 +195,67 @@ public final class arrow/fx/resilience/Schedule$Companion {
 }
 
 public abstract interface class arrow/fx/resilience/Schedule$Decision {
+	public abstract fun and (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun contramap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun delayed (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getOutput ()Ljava/lang/Object;
+	public abstract fun map (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun or (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun recursiveMap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/resilience/Schedule$Decision$Continue : arrow/fx/resilience/Schedule$Decision {
 	public synthetic fun <init> (Ljava/lang/Object;JLkotlin/jvm/functions/Function2;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun and (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2-UwyO8pc ()J
 	public final fun component3 ()Lkotlin/jvm/functions/Function2;
+	public fun contramap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun copy-8Mi8wO0 (Ljava/lang/Object;JLkotlin/jvm/functions/Function2;)Larrow/fx/resilience/Schedule$Decision$Continue;
 	public static synthetic fun copy-8Mi8wO0$default (Larrow/fx/resilience/Schedule$Decision$Continue;Ljava/lang/Object;JLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Larrow/fx/resilience/Schedule$Decision$Continue;
+	public fun delayed (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDelay-UwyO8pc ()J
 	public final fun getNext ()Lkotlin/jvm/functions/Function2;
 	public fun getOutput ()Ljava/lang/Object;
 	public fun hashCode ()I
+	public fun map (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun or (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recursiveMap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/resilience/Schedule$Decision$DefaultImpls {
+	public static fun and (Larrow/fx/resilience/Schedule$Decision;Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun andThen (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun andThen (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun contramap (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun delayed (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun map (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun or (Larrow/fx/resilience/Schedule$Decision;Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun recursiveMap (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/resilience/Schedule$Decision$Done : arrow/fx/resilience/Schedule$Decision {
 	public fun <init> (Ljava/lang/Object;)V
+	public fun and (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun component1 ()Ljava/lang/Object;
+	public fun contramap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun copy (Ljava/lang/Object;)Larrow/fx/resilience/Schedule$Decision$Done;
 	public static synthetic fun copy$default (Larrow/fx/resilience/Schedule$Decision$Done;Ljava/lang/Object;ILjava/lang/Object;)Larrow/fx/resilience/Schedule$Decision$Done;
+	public fun delayed (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getOutput ()Ljava/lang/Object;
 	public fun hashCode ()I
+	public fun map (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun or (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun recursiveMap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 }
 
