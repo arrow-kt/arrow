@@ -1,84 +1,85 @@
 package arrow.fx.resilience
 
-import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.longs.shouldBeGreaterThanOrEqual
-import io.kotest.matchers.longs.shouldBeLessThan
-import io.kotest.matchers.shouldBe
-import io.kotest.property.Arb
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.positiveInt
-import io.kotest.property.checkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.reduce
+import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
+import kotlin.random.Random
+import kotlin.random.nextInt
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalTime
-class FlowTest : StringSpec({
+class FlowTest {
 
-  "Retry - flow fails" {
+  @Test
+  fun retryFlowFails(): TestResult = runTest {
     val bang = RuntimeException("Bang!")
+    val value = Random.nextInt()
+    val iterations = Random.nextInt(1..10)
 
-    checkAll(Arb.int(), Arb.positiveInt(10)) { a, n ->
-      var counter = 0
-      val e = assertThrowable {
-        flow {
-          emit(a)
-          if (++counter <= 11) throw bang
-        }.retry(Schedule.recurs(n))
-          .collect()
-      }
-      e shouldBe bang
+
+    var counter = 0
+    val e = assertThrowable {
+      flow {
+        emit(value)
+        if (++counter <= 11) throw bang
+      }.retry(Schedule.recurs(iterations))
+        .collect()
     }
+    assertEquals(bang, e)
   }
 
-  "Retry - flow succeeds" {
-    checkAll(Arb.int(), Arb.int(5, 10)) { a, n ->
-      var counter = 0
-      val sum = flow {
-        emit(a)
-        if (++counter <= 5) throw RuntimeException("Bang!")
-      }.retry(Schedule.recurs(n))
-        .reduce { acc, int -> acc + int }
+  @Test
+  fun retryFlowSucceeds(): TestResult = runTest {
+    val value = Random.nextInt()
+    val iterations = Random.nextInt(5..10)
 
-      sum shouldBe a * 6
-    }
+    var counter = 0
+    val sum = flow {
+      emit(value)
+      if (++counter <= 5) throw RuntimeException("Bang!")
+    }.retry(Schedule.recurs(iterations))
+      .reduce { acc, int -> acc + int }
+
+    assertEquals(value * 6, sum)
   }
 
-  "Retry - schedule with delay" {
-    runTest {
-      checkAll(Arb.int(), Arb.int(100, 1000)) { a, delayMs ->
-        val start = currentTime
-        val timestamps = mutableListOf<Long>()
-        shouldThrow<RuntimeException> {
-          flow {
-            emit(a)
-            timestamps.add(currentTime)
-            throw RuntimeException("Bang!")
-          }
-            .retry(Schedule.recurs<Throwable>(2) and Schedule.spaced(delayMs.milliseconds))
-            .collect()
-        }
-        timestamps.size shouldBe 3
+  @Test
+  fun retryScheduleWithDelay(): TestResult = runTest {
+    val value = Random.nextInt()
+    val delayMs = Random.nextInt(100..1000)
 
-        // total run should be between start time + delay * 3 AND start + tolerance %
-        val min = start + (delayMs * 2)
-        val max = min + delayMs / 10
-
-        timestamps.last() shouldBeGreaterThanOrEqual min
-        timestamps.last() shouldBeLessThan max
+    val start = currentTime
+    val timestamps = mutableListOf<Long>()
+    assertFailsWith<RuntimeException> {
+      flow {
+        emit(value)
+        timestamps.add(currentTime)
+        throw RuntimeException("Bang!")
       }
+        .retry(Schedule.recurs<Throwable>(2) and Schedule.spaced(delayMs.milliseconds))
+        .collect()
     }
+    assertEquals(3, timestamps.size)
+
+    // total run should be between start time + delay * 3 AND start + tolerance %
+    val min = start + (delayMs * 2)
+    val max = min + delayMs / 10
+
+    assertTrue { timestamps.last() >= min }
+    assertTrue { timestamps.last() < max }
   }
 }
-)
 
 inline fun <A> assertThrowable(executable: () -> A): Throwable {
   val a = try {

@@ -10,9 +10,13 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.spec.style.stringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
@@ -20,8 +24,6 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.SocketException
-import java.net.SocketTimeoutException
 
 @ExperimentalSerializationApi
 class NetworkEitherCallAdapterTestSuite : StringSpec({
@@ -39,8 +41,12 @@ private fun networkEitherCallAdapterTests(
   beforeAny {
     server = MockWebServer()
     server!!.start()
+    val client = OkHttpClient.Builder()
+      .readTimeout(200, TimeUnit.MILLISECONDS)
+      .build()
     service = Retrofit.Builder()
       .baseUrl(server!!.url("/"))
+      .client(client)
       .addConverterFactory(jsonConverterFactory)
       .addCallAdapterFactory(EitherCallAdapterFactory.create())
       .build()
