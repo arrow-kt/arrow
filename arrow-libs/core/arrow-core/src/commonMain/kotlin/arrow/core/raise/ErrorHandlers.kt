@@ -30,10 +30,10 @@ import kotlin.jvm.JvmName
  * <!--- KNIT example-effect-error-01.kt -->
  */
 public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: suspend Raise<E2>.(raised: E) -> A): Effect<E2, A> =
-  effect { recover(resolve) }
+  effect { recover({ invoke() }) { resolve(it) } }
 
 /**
- * Catch any unexpected exceptions, and [resolve] them.
+ * Catch any unexpected exceptions, and [recover] them.
  * You can either return a value a new value of [A],
  * or short-circuit the effect by raising with a value of [E],
  * or raise an exception into [suspend].
@@ -53,8 +53,8 @@ public infix fun <E, E2, A> Effect<E, A>.recover(@BuilderInference resolve: susp
  * ```
  * <!--- KNIT example-effect-error-02.kt -->
  */
-public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Raise<E>.(throwable: Throwable) -> A): Effect<E, A> =
-  effect { catch(resolve) }
+public infix fun <E, A> Effect<E, A>.catch(@BuilderInference recover: suspend Raise<E>.(throwable: Throwable) -> A): Effect<E, A> =
+  effect { catch({ invoke() }) { recover(it) } }
 
 /**
  * A version of [catch] that refines the [Throwable] to [T].
@@ -85,32 +85,28 @@ public infix fun <E, A> Effect<E, A>.catch(@BuilderInference resolve: suspend Ra
 public inline infix fun <reified T : Throwable, E, A> Effect<E, A>.catch(
   @BuilderInference crossinline recover: suspend Raise<E>.(T) -> A,
 ): Effect<E, A> =
-  effect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
+  effect { catch({ invoke() }) { t: T -> recover(t) } }
 
 /** Runs the [Effect] and captures any [nonFatalOrThrow] exception into [Result]. */
 public fun <E, A> Effect<E, A>.catch(): Effect<E, Result<A>> =
   effect {
-    try {
-      Result.success(invoke())
-    } catch (e: Throwable) {
-      Result.failure(e.nonFatalOrThrow())
-    }
+    catch({ Result.success(invoke()) }, Result.Companion::failure)
   }
 
+public suspend inline infix fun <E, A> Effect<E, A>.getOrElse(onRaise: suspend (E) -> A): A =
+  recover({ invoke() }) { onRaise(it) }
+
 public infix fun <E, E2, A> EagerEffect<E, A>.recover(@BuilderInference resolve: Raise<E2>.(raised: E) -> A): EagerEffect<E2, A> =
-  eagerEffect { recover(resolve) }
+  eagerEffect { recover({ invoke() }) { resolve(it) } }
 
 public infix fun <E, A> EagerEffect<E, A>.catch(@BuilderInference recover: Raise<E>.(throwable: Throwable) -> A): EagerEffect<E, A> =
-  eagerEffect { catch(recover) }
+  eagerEffect { catch({ invoke() }) { recover(it) } }
 
 @JvmName("catchReified")
 public inline infix fun <reified T : Throwable, E, A> EagerEffect<E, A>.catch(
   @BuilderInference crossinline recover: Raise<E>.(T) -> A,
 ): EagerEffect<E, A> =
-  eagerEffect { catch { t: Throwable -> if (t is T) recover(t) else throw t } }
-
-public suspend inline infix fun <E, A> Effect<E, A>.getOrElse(onRaise: (E) -> A): A =
-  recover({ invoke() }, onRaise)
+  eagerEffect { catch({ invoke() }) { t: T -> recover(t) } }
 
 public inline infix fun <E, A> EagerEffect<E, A>.getOrElse(onRaise: (E) -> A): A =
   recover({ invoke() }, onRaise)
