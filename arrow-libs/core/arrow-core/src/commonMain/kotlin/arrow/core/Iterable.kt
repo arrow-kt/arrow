@@ -318,15 +318,15 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
 }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the either DSL.",
-  ReplaceWith("let { l -> either<E, List<A>> { l.bind() } }", "arrow.core.raise.either")
+  "The sequence extension function is being deprecated in favor of the either DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
   let { l -> either { l.bindAll() } }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the either DSL.",
-  ReplaceWith("let { l -> either<E, List<A>> { l.bind() } }", "arrow.core.raise.either")
+  "The sequence extension function is being deprecated in favor of the either DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
   let { l -> either { l.bindAll() } }
@@ -351,15 +351,15 @@ public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result
   traverse(f)
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the result DSL.",
-  ReplaceWith("let { l -> either<E, List<A>> { l.bind() } }", "arrow.core.raise.either")
+  "The sequence extension function is being deprecated in favor of the result DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
 )
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
   let { l -> result { l.bindAll() } }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the result DSL.",
-  ReplaceWith("let { l -> result<List<A>> { l.bind() } }", "arrow.core.raise.result")
+  "The sequence extension function is being deprecated in favor of the result DSL.",
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
   let { l -> result { l.bindAll() } }
@@ -475,15 +475,15 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
 }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the option DSL.",
-  ReplaceWith("let { l -> result<List<A>> { l.bind() } }", "arrow.core.raise.result")
+  "The sequence extension function is being deprecated in favor of the option DSL.",
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
   let { l -> option { l.bindAll() } }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the option DSL.",
-  ReplaceWith("let { l -> option<List<A>> { l.bind() } }", "arrow.core.raise.option")
+  "The sequence extension function is being deprecated in favor of the option DSL.",
+  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
   let { l -> option { l.bindAll() } }
@@ -511,15 +511,15 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
 }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the nullable DSL.",
-  ReplaceWith("let { l -> nullable<List<A>> { l.bind() } }", "arrow.core.raise.nullable")
+  "The sequence extension function is being deprecated in favor of the nullable DSL.",
+  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
   let { l -> nullable { l.bindAll() } }
 
 @Deprecated(
-  "Sequence is being deprecated in favor of the nullable DSL.",
-  ReplaceWith("let { l -> nullable<List<A>> { l.bind() } }", "arrow.core.raise.nullable")
+  "The sequence extension function is being deprecated in favor of the nullable DSL.",
+  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequence(): List<A>? =
   let { l -> nullable { l.bindAll() } }
