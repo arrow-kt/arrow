@@ -12,6 +12,7 @@ import arrow.core.some
 import arrow.fx.resilience.Schedule.Companion.identity
 import arrow.fx.resilience.Schedule.Decision.Continue
 import arrow.fx.resilience.Schedule.Decision.Done
+import kotlin.coroutines.RestrictsSuspension
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlin.jvm.JvmInline

@@ -168,7 +168,6 @@ public final class arrow/fx/resilience/Schedule {
 	public static final fun map-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun mapDecision-nxrvn7M (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun or-TAF2p8g (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
-	public static final fun pipe-nZJhjPk (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun repeat-impl (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun repeatOrElse-impl (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun repeatOrElseEither-impl (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -220,8 +219,8 @@ public final class arrow/fx/resilience/Schedule$Decision$Continue : arrow/fx/res
 	public fun delayed (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDelay-UwyO8pc ()J
-	public final fun getNext ()Lkotlin/jvm/functions/Function2;
 	public fun getOutput ()Ljava/lang/Object;
+	public final fun getStep ()Lkotlin/jvm/functions/Function2;
 	public fun hashCode ()I
 	public fun map (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun or (Larrow/fx/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

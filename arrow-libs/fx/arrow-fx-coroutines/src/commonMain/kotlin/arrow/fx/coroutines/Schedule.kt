@@ -2,8 +2,10 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.NicheAPI
 import arrow.core.identity
 import arrow.core.left
+import arrow.core.merge
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
 import arrow.fx.coroutines.Schedule.ScheduleImpl
@@ -223,27 +225,49 @@ public sealed class Schedule<Input, Output> {
   public suspend fun repeatOrElse(fa: suspend () -> Input, orElse: suspend (Throwable, Output?) -> Output): Output =
     repeatOrElseEither(fa, orElse).fold(::identity, ::identity)
 
-  public abstract suspend fun <C> repeatOrElseEitherAsFlow(
+  @Deprecated(
+    NicheAPI,
+    ReplaceWith(
+      "flow<Either<C, Output>> { this.log { _, output -> emit(output.right()) }.repeatOrElseEither(fa) { e, output -> emit(orElse(e, output).left()) } }",
+      "kotlinx.coroutines.flow.flow", "arrow.core.left", "arrow.core.right"
+    )
+  )
+  public suspend fun <C> repeatOrElseEitherAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> C
-  ): Flow<Either<C, Output>>
+  ): Flow<Either<C, Output>> =
+    flow { this@Schedule.log { _, output -> emit(output.right()) }.repeatOrElseEither(fa) { e, output -> emit(orElse(e, output).left()) } }
 
   /**
    * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
    * This will raise an error if a repeat failed.
    */
+  @Deprecated(
+    NicheAPI,
+    ReplaceWith(
+      "flow<Output> { this.log { _, output -> emit(output) }.repeat(fa) }",
+      "kotlinx.coroutines.flow.flow"
+    )
+  )
   public suspend fun repeatAsFlow(fa: suspend () -> Input): Flow<Output> =
-    repeatOrElseAsFlow(fa) { e, _ -> throw e }
+    flow { this@Schedule.log { _, output -> emit(output) }.repeat(fa) }
 
   /**
    * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
    * Also offers a function to handle errors if they are encountered during repetition.
    */
+  @Deprecated(
+    NicheAPI,
+    ReplaceWith(
+      "flow<Output> { this.log { _, output -> emit(output) }.repeatOrElseEither(fa) { e, output -> emit(orElse(e, output)) } }",
+      "kotlinx.coroutines.flow.flow"
+    )
+  )
   public suspend fun repeatOrElseAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> Output
   ): Flow<Output> =
-    repeatOrElseEitherAsFlow(fa, orElse).map { it.fold(::identity, ::identity) }
+    flow { this@Schedule.log { _, output -> emit(output) }.repeatOrElseEither(fa) { e, output -> emit(orElse(e, output)) } }
 
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
@@ -258,17 +282,29 @@ public sealed class Schedule<Input, Output> {
   /**
    * Conditionally checks on both the input and the output whether or not to continue.
    */
+  @Deprecated(
+    "Check is being renamed to doWhile in Arrow Resilience",
+    ReplaceWith("doWhile(pred)")
+  )
   public abstract fun <A : Input> check(pred: suspend (input: A, output: Output) -> Boolean): Schedule<A, Output>
+
+  public fun doWhile(predicate: suspend (@UnsafeVariance Input, Output) -> Boolean): Schedule<Input, Output> =
+    check(predicate)
+
+  public fun doUntil(predicate: suspend (input: @UnsafeVariance Input, output: Output) -> Boolean): Schedule<Input, Output> =
+    doWhile { input, output -> !predicate(input, output) }
 
   /**
    * Inverts the decision of a schedule.
    */
+  @Deprecated(NicheAPI)
   public abstract operator fun not(): Schedule<Input, Output>
 
   /**
    * Combines with another schedule by combining the result and the delay of the [Decision] with the [zipContinue], [zipDuration] and a [zip] functions
    */
   @ExperimentalTime
+  @Deprecated("combine are being deprecated in favor of and & or APIs in Arrow Resilience. $NicheAPI")
   public fun <A : Input, B, C> combine(
     other: Schedule<A, B>,
     zipContinue: (cont: Boolean, otherCont: Boolean) -> Boolean,
@@ -280,6 +316,7 @@ public sealed class Schedule<Input, Output> {
   /**
    * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [zipContinue], [zipDuration] and a [zip] function
    */
+  @Deprecated("Nano based APIs are being deprecated, and removed in Arrow Resilience. $NicheAPI")
   public abstract fun <A : Input, B, C> combineNanos(
     other: Schedule<A, B>,
     zipContinue: (cont: Boolean, otherCont: Boolean) -> Boolean,
@@ -290,6 +327,7 @@ public sealed class Schedule<Input, Output> {
   /**
    * Always retries a schedule regardless of the decision made prior to invoking this method.
    */
+  @Deprecated(NicheAPI)
   public abstract fun forever(): Schedule<Input, Output>
 
   /**
@@ -302,24 +340,49 @@ public sealed class Schedule<Input, Output> {
    *
    */
   @ExperimentalTime
+  @Deprecated(
+    "modify is being renamed to delayed in Arrow Resilience",
+    ReplaceWith("delayed(f)")
+  )
   public fun modify(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
     modifyNanos { output, d -> f(output, d.nanoseconds).toDouble(NANOSECONDS) }
 
+  @ExperimentalTime
+  public fun delayed(transform: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
+    modify(transform)
+
+  @Deprecated(
+    "Nano based APIs are being deprecated, and removed in Arrow Resilience. Use delayed instead $NicheAPI",
+    ReplaceWith("delayed { output, nanos -> f(output, nanos.nanoseconds) }", "kotlin.time.Companion.Duration.nanoseconds")
+  )
   public abstract fun modifyNanos(f: suspend (Output, Double) -> Double): Schedule<Input, Output>
+
+  public abstract fun log(action: suspend (input: @UnsafeVariance Input, output: Output) -> Unit): Schedule<Input, Output>
 
   /**
    * Runs an effectful handler on every input. Does not alter the decision.
    */
-  public abstract fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output>
+  @Deprecated(
+    "logInput is being replaced to log in Arrow Resilience",
+    ReplaceWith("log { input, _ -> f(input) }")
+  )
+  public fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output> =
+    log { input, _ -> f(input) }
 
   /**
    * Runs an effectful handler on every output. Does not alter the decision.
    */
-  public abstract fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output>
+  @Deprecated(
+    "logOutput is being replaced to log in Arrow Resilience",
+    ReplaceWith(" log { _, output -> f(output) }")
+  )
+  public fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
+    log { _, output -> f(output) }
 
   /**
    * Accumulates the results of a schedule by folding over them effectfully.
    */
+  @Deprecated(NicheAPI)
   public abstract fun <C> foldLazy(
     initial: suspend () -> C,
     f: suspend (acc: C, output: Output) -> C
@@ -329,58 +392,87 @@ public sealed class Schedule<Input, Output> {
    * Composes this schedule with the other schedule by piping the output of this schedule
    *  into the input of the other.
    */
+  @Deprecated(NicheAPI)
   public abstract infix fun <B> pipe(other: Schedule<Output, B>): Schedule<Input, B>
 
   /**
    * Combines two with different input and output using and. Continues when both continue and uses the maximum delay.
    */
+  @Deprecated(NicheAPI)
   public infix fun <A, B> zip(other: Schedule<A, B>): Schedule<Pair<Input, A>, Pair<Output, B>> =
     zip(other, ::Pair)
 
   /**
    * Combines two with different input and output using and. Continues when both continue and uses the maximum delay.
    */
+  @Deprecated(NicheAPI)
   public abstract fun <A, B, C> zip(other: Schedule<A, B>, f: (Output, B) -> C): Schedule<Pair<Input, A>, C>
 
   /**
    * Combines two schedules with different input and output and conditionally choose between the two.
    * Continues when the chosen schedule continues and uses the chosen schedules delay.
    */
+  @Deprecated(NicheAPI)
   public abstract infix fun <A, B> choose(other: Schedule<A, B>): Schedule<Either<Input, A>, Either<Output, B>>
 
+  @Deprecated(
+    "Use map instead of void. Being removed in Arrow Resilience. $NicheAPI",
+    ReplaceWith("map { }")
+  )
   public fun void(): Schedule<Input, Unit> =
     map { Unit }
 
   /**
    * Changes the result of a [Schedule] to always be [b].
    */
+  @Deprecated(
+    "Use const instead of void. Being removed in Arrow Resilience. $NicheAPI",
+    ReplaceWith("map { b }")
+  )
   public fun <B> const(b: B): Schedule<Input, B> =
     map { b }
 
   /**
    * Continues or stops the schedule based on the output.
    */
+  @Deprecated(
+    "whileOutput is being replaced with doWhile in Arrow Resilience.",
+    ReplaceWith("doWhile { _, output -> f(output) }")
+  )
   public fun whileOutput(f: suspend (Output) -> Boolean): Schedule<Input, Output> =
-    check { _, output -> f(output) }
+    doWhile { _, output -> f(output) }
 
   /**
    * Continues or stops the schedule based on the input.
    */
+  @Deprecated(
+    "whileInput is being replaced with doWhile in Arrow Resilience.",
+    ReplaceWith("doWhile { input, _ -> f(input) }")
+  )
   public fun <A : Input> whileInput(f: suspend (A) -> Boolean): Schedule<A, Output> =
     check { input, _ -> f(input) }
 
   /**
    * `untilOutput(f) = whileOutput(f).not()`
    */
+  @Deprecated(
+    "untilOutput is being replaced with doUntil in Arrow Resilience.",
+    ReplaceWith("doUntil { _, output -> f(output) }")
+  )
   public fun untilOutput(f: suspend (Output) -> Boolean): Schedule<Input, Output> =
-    !whileOutput(f)
+    doUntil { _, output -> f(output) }
 
   /**
    * `untilInput(f) = whileInput(f).not()`
    */
+  @Deprecated(
+    "untilOutput is being replaced with doUntil in Arrow Resilience.",
+    ReplaceWith("doUntil { input, _ -> f(input) }")
+  )
   public fun <A : Input> untilInput(f: suspend (A) -> Boolean): Schedule<A, Output> =
     !whileInput(f)
 
+  @Deprecated(NicheAPI)
   public fun <B, C> dimap(f: suspend (B) -> Input, g: (Output) -> C): Schedule<B, C> =
     contramap(f).map(g)
 
@@ -409,12 +501,23 @@ public sealed class Schedule<Input, Output> {
     (this and other).map(Pair<Output, B>::first)
 
   @ExperimentalTime
+  @Deprecated(
+    "delay is being replaced with delayed in Arrow Resilience.",
+    ReplaceWith("delayed { _, duration -> f(duration) }")
+  )
   public fun delay(f: suspend (duration: Duration) -> Duration): Schedule<Input, Output> =
-    modify { _, duration -> f(duration) }
+    delayed { _, duration -> f(duration) }
 
+  @Deprecated(
+    "Nano based APIs are being deprecated, and removed in Arrow Resilience. Use delayed instead $NicheAPI",
+    ReplaceWith("delayed { _, nanos -> f(nanos.nanoseconds) }", "kotlin.time.Companion.Duration.nanoseconds")
+  )
   public fun delayedNanos(f: suspend (duration: Double) -> Double): Schedule<Input, Output> =
     modifyNanos { _, duration -> f(duration) }
 
+  @Deprecated(
+    "Nano based APIs are being deprecated, and removed in Arrow Resilience. $NicheAPI"
+  )
   public fun jittered(genRand: suspend () -> Double): Schedule<Input, Output> =
     modifyNanos { _, duration ->
       val n = genRand.invoke()
@@ -423,6 +526,7 @@ public sealed class Schedule<Input, Output> {
 
   @JvmName("jitteredDuration")
   @ExperimentalTime
+  @Deprecated("Use jittered with Kotlin's Random instead. This API will be removed in Arrow Resilience $NicheAPI")
   public fun jittered(genRand: suspend () -> Duration): Schedule<Input, Output> =
     modify { _, duration ->
       val n = genRand.invoke()
@@ -453,6 +557,7 @@ public sealed class Schedule<Input, Output> {
   /**
    * Infix variant of pipe with reversed order.
    */
+  @Deprecated(NicheAPI)
   public infix fun <B> compose(other: Schedule<B, Input>): Schedule<B, Output> =
     (other pipe this)
 
@@ -488,38 +593,6 @@ public sealed class Schedule<Input, Output> {
         }
       }
     }
-
-    override suspend fun <C> repeatOrElseEitherAsFlow(
-      fa: suspend () -> Input,
-      orElse: suspend (Throwable, Output?) -> C
-    ): Flow<Either<C, Output>> =
-      flow {
-        var loop = true
-        var last: (() -> Output)? = null // We haven't seen any input yet
-        var state: State = initialState.invoke()
-
-        while (loop) {
-          coroutineContext.ensureActive()
-          try {
-            val a = fa.invoke()
-            val step = update(a, state)
-            if (!step.cont) {
-              emit(Either.Right(step.finish.value()))
-              loop = false
-            } else {
-              delay((step.delayInNanos / 1_000_000).toLong())
-              val output = step.finish.value()
-              // Set state before looping again and emit Output
-              emit(Either.Right(output))
-              last = { output }
-              state = step.state
-            }
-          } catch (e: Throwable) {
-            emit(Either.Left(orElse(e.nonFatalOrThrow(), last?.invoke())))
-            loop = false
-          }
-        }
-      }
 
     override fun <B> map(f: (output: Output) -> B): Schedule<Input, B> =
       ScheduleImpl(initialState) { i, s -> update(i, s).map(f) }
@@ -593,17 +666,10 @@ public sealed class Schedule<Input, Output> {
         }
       }
 
-    override fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output> =
+    override fun log(action: suspend (Input, output: Output) -> Unit): Schedule<Input, Output> =
       updated { update ->
         { a: Input, s: State ->
-          update(a, s).also { f(a) }
-        }
-      }
-
-    override fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
-      updated { update ->
-        { a: Input, s: State ->
-          update(a, s).also { f(it.finish.value()) }
+          update(a, s).also { action(a, it.finish.value()) }
         }
       }
 
@@ -762,6 +828,7 @@ public sealed class Schedule<Input, Output> {
      * Invoke constructor to manually define a schedule. If you need this, please consider adding it to Arrow or suggest
      *  a change to avoid using this manual method.
      */
+    @Deprecated("The Schedule encoding in Arrow Resilience is simpler, and doesn't require this method anymore.")
     public operator fun <S, A, B> invoke(
       initial: suspend () -> S,
       update: suspend (input: A, state: S) -> Decision<S, B>
@@ -778,14 +845,19 @@ public sealed class Schedule<Input, Output> {
     /**
      * Creates a Schedule that continues without delay and always returns Unit.
      */
+    @Deprecated(
+      "Use identity and map instead. $NicheAPI",
+      ReplaceWith("identity<A>().map { }")
+    )
     public fun <A> unit(): Schedule<A, Unit> =
-      identity<A>().void()
+      identity<A>().map { }
 
     /**
      * Creates a schedule that unfolds effectfully using a seed value [c] and a unfold function [f].
      * This keeps the current state (the current seed) as [State] and runs the unfold function on every
      *  call to update. This schedule always continues without delay and returns the current state.
      */
+    @Deprecated("Use unfold instead. $NicheAPI")
     public fun <I, A> unfoldLazy(c: suspend () -> A, f: suspend (A) -> A): Schedule<I, A> =
       Schedule(c) { _: I, acc ->
         val a = f(acc)
@@ -816,6 +888,10 @@ public sealed class Schedule<Input, Output> {
     /**
      * Creates a Schedule that only retries once.
      */
+    @Deprecated(
+      "Use recurs(1) instead. This API will be removed in Arrow Resilience $NicheAPI",
+      ReplaceWith("recurs<A>(1)")
+    )
     public fun <A> once(): Schedule<A, Unit> =
       recurs<A>(1).void()
 
@@ -824,6 +900,7 @@ public sealed class Schedule<Input, Output> {
      *
      * Note that this will hang a program if used as a repeat/retry schedule unless cancelled.
      */
+    @Deprecated("This API will be removed in Arrow Resilience $NicheAPI")
     public fun <A> never(): Schedule<A, Nothing> =
       Schedule(suspend { arrow.fx.coroutines.never<Unit>() }) { _, _ ->
         Decision(false, 0.0, Unit, Eval.later { throw IllegalArgumentException("Impossible") })
@@ -841,6 +918,7 @@ public sealed class Schedule<Input, Output> {
      */
     @Suppress("UNCHECKED_CAST")
     @JvmName("delayedNanos")
+    @Deprecated("This API will be removed in Arrow Resilience $NicheAPI")
     public fun <A> delayed(delaySchedule: Schedule<A, Double>): Schedule<A, Double> =
       (delaySchedule.modifyNanos { a, b -> a + b } as ScheduleImpl<Any?, A, Double>)
         .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos)) }
@@ -855,6 +933,7 @@ public sealed class Schedule<Input, Output> {
      */
     @ExperimentalTime
     @JvmName("delayedDuration")
+    @Deprecated("This API will be removed in Arrow Resilience $NicheAPI")
     public fun <A> delayed(delaySchedule: Schedule<A, Duration>): Schedule<A, Duration> =
       (delaySchedule.modify { a, b -> a + b } as ScheduleImpl<Any?, A, Duration>)
         .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos.nanoseconds)) }
