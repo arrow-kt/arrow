@@ -27,7 +27,7 @@ dependencies {
   implementation(libs.ksp)
 
   if (!enableCompatibilityMetadataVariant) {
-    testImplementation(libs.kotlin.stdlibJDK8)
+    testImplementation(libs.kotlin.stdlib)
     testImplementation(libs.junitJupiter)
     testImplementation(libs.junitJupiterEngine)
     testImplementation(libs.assertj)
@@ -38,8 +38,8 @@ dependencies {
         module = libs.classgraph.get().module.name
       )
       exclude(
-        group = libs.kotlin.stdlibJDK8.get().module.group,
-        module = libs.kotlin.stdlibJDK8.get().module.name
+        group = libs.kotlin.stdlib.get().module.group,
+        module = libs.kotlin.stdlib.get().module.name
       )
     }
     testImplementation(libs.kotlinCompileTestingKsp)
