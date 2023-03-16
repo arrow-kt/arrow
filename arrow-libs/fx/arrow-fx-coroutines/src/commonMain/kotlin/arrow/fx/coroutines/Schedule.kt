@@ -263,11 +263,10 @@ public sealed class Schedule<Input, Output> {
       "kotlinx.coroutines.flow.flow"
     )
   )
-  public suspend fun repeatOrElseAsFlow(
+  public abstract suspend fun repeatOrElseAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> Output
-  ): Flow<Output> =
-    flow { this@Schedule.log { _, output -> emit(output) }.repeatOrElseEither(fa) { e, output -> emit(orElse(e, output)) } }
+  ): Flow<Output>
 
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
@@ -366,8 +365,7 @@ public sealed class Schedule<Input, Output> {
     "logInput is being replaced to log in Arrow Resilience",
     ReplaceWith("log { input, _ -> f(input) }")
   )
-  public fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output> =
-    log { input, _ -> f(input) }
+  public abstract fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output>
 
   /**
    * Runs an effectful handler on every output. Does not alter the decision.
@@ -376,8 +374,7 @@ public sealed class Schedule<Input, Output> {
     "logOutput is being replaced to log in Arrow Resilience",
     ReplaceWith(" log { _, output -> f(output) }")
   )
-  public fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
-    log { _, output -> f(output) }
+  public abstract fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output>
 
   /**
    * Accumulates the results of a schedule by folding over them effectfully.
@@ -594,6 +591,15 @@ public sealed class Schedule<Input, Output> {
       }
     }
 
+    override suspend fun repeatOrElseAsFlow(
+      fa: suspend () -> Input,
+      orElse: suspend (Throwable, Output?) -> Output
+    ): Flow<Output> = flow {
+      this@ScheduleImpl
+        .log { _, output -> emit(output) }
+        .repeatOrElseEither(fa) { e, output -> emit(orElse(e, output)) }
+    }
+
     override fun <B> map(f: (output: Output) -> B): Schedule<Input, B> =
       ScheduleImpl(initialState) { i, s -> update(i, s).map(f) }
 
@@ -672,6 +678,12 @@ public sealed class Schedule<Input, Output> {
           update(a, s).also { action(a, it.finish.value()) }
         }
       }
+
+    override fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output> =
+      log { input, _ -> f(input)  }
+
+    override fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
+      log { _, output -> f(output) }
 
     override fun <C> foldLazy(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C> =
       ScheduleImpl(suspend { Pair(initialState.invoke(), initial.invoke()) }) { i, s ->
