@@ -3231,6 +3231,11 @@ public final class arrow/core/continuations/result {
 	public final fun invoke-gIAlu-s (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public class arrow/core/raise/CancellationExceptionNoTrace : java/util/concurrent/CancellationException {
+	public fun <init> ()V
+	public fun fillInStackTrace ()Ljava/lang/Throwable;
+}
+
 public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun <init> (Z)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3500,7 +3505,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toValidated (Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun toValidated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun traced (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun traced (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function9;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function8;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function7;)Ljava/lang/Object;
@@ -3569,20 +3574,12 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
 }
 
-public final class arrow/core/raise/Trace {
-	public static final synthetic fun box-impl (Ljava/util/concurrent/CancellationException;)Larrow/core/raise/Trace;
-	public static fun constructor-impl (Ljava/util/concurrent/CancellationException;)Ljava/util/concurrent/CancellationException;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Ljava/util/concurrent/CancellationException;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Ljava/util/concurrent/CancellationException;Ljava/util/concurrent/CancellationException;)Z
-	public fun hashCode ()I
-	public static fun hashCode-impl (Ljava/util/concurrent/CancellationException;)I
-	public static final fun printStackTrace-impl (Ljava/util/concurrent/CancellationException;)V
-	public static final fun stackTraceToString-impl (Ljava/util/concurrent/CancellationException;)Ljava/lang/String;
-	public static final fun suppressedExceptions-impl (Ljava/util/concurrent/CancellationException;)Ljava/util/List;
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Ljava/util/concurrent/CancellationException;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Ljava/util/concurrent/CancellationException;
+public final class arrow/core/raise/Traced {
+	public fun <init> (Ljava/util/concurrent/CancellationException;Ljava/lang/Object;)V
+	public final fun getRaised ()Ljava/lang/Object;
+	public final fun printStackTrace ()V
+	public final fun stackTraceToString ()Ljava/lang/String;
+	public final fun suppressedExceptions ()Ljava/util/List;
 }
 
 public abstract interface class arrow/typeclasses/Monoid : arrow/typeclasses/Semigroup {

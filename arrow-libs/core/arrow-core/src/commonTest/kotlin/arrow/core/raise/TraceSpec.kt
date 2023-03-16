@@ -15,7 +15,7 @@ class TraceSpec : StringSpec({
   "trace is empty when no errors" {
     checkAll(Arb.int()) { i ->
       either<Nothing, Int> {
-        traced({ i }) { _,_ -> unreachable() }
+        traced({ i }) { unreachable() }
       } shouldBe i.right()
     }
   }
@@ -25,7 +25,7 @@ class TraceSpec : StringSpec({
       val error = RuntimeException(msg)
       shouldThrow<RuntimeException> {
         either<Nothing, Int> {
-          traced({ throw error }) { _, _ -> unreachable() }
+          traced({ throw error }) { unreachable() }
         }
       }.message shouldBe msg
     }
@@ -35,11 +35,11 @@ class TraceSpec : StringSpec({
     val inner = CompletableDeferred<String>()
     ior(String::plus) {
       traced({
-        traced({ raise("") }) { trace,_ ->
-          inner.complete(trace.stackTraceToString())
+        traced({ raise("") }) { traced ->
+          inner.complete(traced.stackTraceToString())
         }
-      }) { trace,_ ->
-        inner.await() shouldBe trace.stackTraceToString()
+      }) { traced ->
+        inner.await() shouldBe traced.stackTraceToString()
       }
     }
   }
