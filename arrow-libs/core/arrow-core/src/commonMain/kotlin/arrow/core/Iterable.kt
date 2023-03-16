@@ -1284,7 +1284,7 @@ internal val listUnit: List<Unit> =
   ReplaceWith("toList().let { l -> List(n) { l } }")
 )
 public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
-  if (n <= 0) emptyList() else toList().let { l -> List(n) { l } }
+  toList().let { l -> List(n) { l } }
 
 @Deprecated(NicheAPI)
 public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
