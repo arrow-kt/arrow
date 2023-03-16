@@ -152,7 +152,7 @@ public inline fun <R, A> Raise<R>.traced(
   @BuilderInference program: Raise<R>.() -> A,
   trace: (traced: Trace, R) -> Unit
 ): A {
-  val itOuterTraced = this is DefaultRaise && isTraced
+  val isOuterTraced = this is DefaultRaise && isTraced
   val nested = if (this is DefaultRaise && isTraced) this else DefaultRaise(true)
   return try {
     program.invoke(nested)
@@ -168,8 +168,7 @@ public inline fun <R, A> Raise<R>.traced(
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
-    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
-    this is RaiseCancellationException && this.raise === raise -> raised as R
+    this.raise === raise && (this is RaiseCancellationExceptionNoTrace || this is RaiseCancellationException) -> raised as R
     else -> throw this
   }
 
@@ -181,8 +180,7 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
   override fun raise(r: Any?): Nothing = when {
-    isActive.value && !isTraced -> throw RaiseCancellationExceptionNoTrace(r, this)
-    isActive.value && isTraced -> throw RaiseCancellationException(r, this)
+    isActive.value -> throw if (isTraced) RaiseCancellationException(r, this) else RaiseCancellationExceptionNoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
 }
