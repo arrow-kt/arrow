@@ -316,7 +316,7 @@ private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Long): 
       when (val decision = step(input)) {
         is Continue -> {
           add(decision)
-          step = decision.next
+          step = decision.step
         }
 
         is Done -> {

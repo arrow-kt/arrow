@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.nanoseconds
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.retry
 
-public typealias Next<Input, Output> =
+public typealias ScheduleStep<Input, Output> =
   suspend (Input) -> Schedule.Decision<Input, Output>
 
 /**
@@ -34,7 +34,7 @@ public typealias Next<Input, Output> =
  * or if the [Schedule] is [Done] retrying or repeating.
  */
 @JvmInline
-public value class Schedule<in Input, out Output>(public val step: Next<Input, Output>) {
+public value class Schedule<in Input, out Output>(public val step: ScheduleStep<Input, Output>) {
 
   /** Repeat the schedule, and uses [block] as [Input] for the [step] function. */
   public suspend fun repeat(block: suspend () -> Input): Output =
@@ -58,7 +58,7 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
     block: suspend () -> Input,
     orElse: suspend (error: Throwable, output: Output?) -> A
   ): Either<A, Output> {
-    var step: Next<Input, Output> = step
+    var step: ScheduleStep<Input, Output> = step
     var state: Option<Output> = None
 
     while (true) {
@@ -69,7 +69,7 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
           is Continue -> {
             if (decision.delay != ZERO) delay(decision.delay)
             state = decision.output.some()
-            step = decision.next
+            step = decision.step
           }
 
           is Done -> return Either.Right(decision.output)
@@ -117,31 +117,12 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
   ): Schedule<Input, B> =
     Schedule { step(it).andThen(other.step, ifLeft, ifRight) }
 
-  /**
-   * Pipes the output of `this` [Schedule] to the input of the [other] [Schedule].
-   * Similar to `|>` in F# but for [Schedule].
-   */
-  public infix fun <A> pipe(other: Schedule<Output, A>): Schedule<Input, A> {
-    suspend fun loop(input: Input, self: Next<Input, Output>, other: Next<Output, A>): Decision<Input, A> =
-      when (val decision = self(input)) {
-        is Done -> Done(other(decision.output).output)
-        is Continue -> when (val decision2 = other(decision.output)) {
-          is Done -> Done(decision2.output)
-          is Continue -> Continue(decision2.output, decision.delay + decision2.delay) {
-            loop(it, decision.next, decision2.next)
-          }
-        }
-      }
-
-    return Schedule { input -> loop(input, step, other.step) }
-  }
-
   /** Runs `this` [Schedule] _while_ the [predicate] of [Input] and [Output] returns `false`. */
   public fun doWhile(predicate: suspend (@UnsafeVariance Input, Output) -> Boolean): Schedule<Input, Output> {
-    suspend fun loop(input: Input, self: Next<Input, Output>): Decision<Input, Output> =
+    suspend fun loop(input: Input, self: ScheduleStep<Input, Output>): Decision<Input, Output> =
       when (val decision = self(input)) {
         is Continue ->
-          if (predicate(input, decision.output)) Continue(decision.output, decision.delay) { loop(it, decision.next) }
+          if (predicate(input, decision.output)) Continue(decision.output, decision.delay) { loop(it, decision.step) }
           else Done(decision.output)
 
         is Done -> decision
@@ -187,10 +168,10 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
    * If one of the [Schedule]s is done, the other [Schedule] is not executed anymore.
    */
   public fun <B> fold(b: B, f: suspend (B, Output) -> B): Schedule<Input, B> {
-    suspend fun loop(input: Input, b: B, self: Next<Input, Output>): Decision<Input, B> =
+    suspend fun loop(input: Input, b: B, self: ScheduleStep<Input, Output>): Decision<Input, B> =
       when (val decision = self(input)) {
         is Continue -> f(b, decision.output).let { b2 ->
-          Continue(b2, decision.delay) { loop(it, b2, decision.next) }
+          Continue(b2, decision.delay) { loop(it, b2, decision.step) }
         }
 
         is Done -> Done(b)
@@ -346,36 +327,36 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
     public data class Continue<in Input, out Output>(
       override val output: Output,
       val delay: Duration,
-      val next: Next<Input, Output>
+      val step: ScheduleStep<Input, Output>
     ) : Decision<Input, Output>
 
     public suspend fun recursiveMap(
       transform: suspend (Decision<Input, Output>) -> Decision<@UnsafeVariance Input, @UnsafeVariance Output>
     ): Decision<Input, Output> = when (val next = transform(this)) {
       is Done -> next
-      is Continue -> Continue(next.output, next.delay) { next.next(it).recursiveMap(transform) }
+      is Continue -> Continue(next.output, next.delay) { next.step(it).recursiveMap(transform) }
     }
 
     public suspend fun delayed(transform: suspend (Output, Duration) -> Duration): Decision<Input, Output> = when (this) {
       is Done -> Done(output)
-      is Continue -> Continue(output, transform(output, delay), next)
+      is Continue -> Continue(output, transform(output, delay), step)
     }
 
     public suspend fun <A> contramap(f: suspend (A) -> Input): Decision<A, Output> = when (this) {
       is Done -> Done(output)
-      is Continue -> Continue(output, delay) { next(f(it)).contramap(f) }
+      is Continue -> Continue(output, delay) { step(f(it)).contramap(f) }
     }
 
     public suspend fun <A> map(f: suspend (output: Output) -> A): Decision<Input, A> = when (this) {
       is Done -> Done(f(output))
-      is Continue -> Continue(f(output), delay) { next(it).map(f) }
+      is Continue -> Continue(f(output), delay) { step(it).map(f) }
     }
 
     public suspend fun andThen(
       other: suspend (@UnsafeVariance Input) -> Decision<@UnsafeVariance Input, @UnsafeVariance Output>
     ): Decision<Input, Output> = when (this) {
       is Done -> Continue(output, ZERO, other)
-      is Continue -> Continue(output, delay) { next(it).andThen(other) }
+      is Continue -> Continue(output, delay) { step(it).andThen(other) }
     }
 
     public suspend fun <A, B> andThen(
@@ -394,7 +375,7 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
         Continue(
           transform(this.output, other.output),
           combineDuration(this.delay, other.delay)
-        ) { this.next(it).and(other.next(it), transform, combineDuration) }
+        ) { this.step(it).and(other.step(it), transform, combineDuration) }
       else -> Done(transform(this.output, other.output))
     }
 
@@ -410,7 +391,7 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
         Continue(
           transform(this.output, other.output),
           combineDuration(this.delay, other.delay)
-        ) { this.next(it).or(other.next(it), transform, combineDuration) }
+        ) { this.step(it).or(other.step(it), transform, combineDuration) }
       else -> throw IllegalStateException()
     }
   }
@@ -420,7 +401,7 @@ public value class Schedule<in Input, out Output>(public val step: Next<Input, O
  * Retries [action] using any [Throwable] that occurred as the input to the [Schedule].
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
-public suspend fun <Input> Schedule<Throwable, *>.retry(action: suspend () -> Input): Input =
+public suspend fun <A> Schedule<Throwable, *>.retry(action: suspend () -> A): A =
   retryOrElse(action) { e, _ -> throw e }
 
 /**
@@ -443,7 +424,7 @@ public suspend fun <Input, Output, A> Schedule<Throwable, Output>.retryOrElseEit
   action: suspend () -> Input,
   orElse: suspend (Throwable, Output) -> A
 ): Either<A, Input> {
-  var step: Next<Throwable, Output> = step
+  var step: ScheduleStep<Throwable, Output> = step
 
   while (true) {
     currentCoroutineContext().ensureActive()
@@ -453,7 +434,7 @@ public suspend fun <Input, Output, A> Schedule<Throwable, Output>.retryOrElseEit
       when (val decision = step(e)) {
         is Continue -> {
           if (decision.delay != ZERO) delay(decision.delay)
-          step = decision.next
+          step = decision.step
         }
 
         is Done -> return Either.Left(orElse(e.nonFatalOrThrow(), decision.output))

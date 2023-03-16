@@ -39,7 +39,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> {
     when (val dec = step(cause)) {
       is Schedule.Decision.Continue -> {
         if (dec.delay != ZERO) delay(dec.delay)
-        step = dec.next
+        step = dec.step
         true
       }
 
