@@ -23,10 +23,10 @@ dependencies {
   api(projects.arrowCore)
   api(projects.arrowOptics)
   api(libs.kotlin.reflect)
-  implementation(libs.kotlin.stdlibJDK8)
+  implementation(libs.kotlin.stdlib)
 
   if(!enableCompatibilityMetadataVariant) {
-    testImplementation(libs.kotlin.stdlibJDK8)
+    testImplementation(libs.kotlin.stdlib)
     testImplementation(libs.junitJupiterEngine)
     testImplementation(libs.kotlin.reflect)
 
