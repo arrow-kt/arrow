@@ -11,7 +11,8 @@ public annotation class ExperimentalTraceApi
 
 /** Tracing result of `R`. Allows to inspect `R`, and the traces from where it was raised. */
 @ExperimentalTraceApi
-@JvmInline value class Trace(private val exception: CancellationException) {
+@JvmInline
+public value class Trace(private val exception: CancellationException) {
   /**
    * Returns the stacktrace as a [String]
    *
