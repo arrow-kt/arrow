@@ -9,7 +9,7 @@ import kotlinx.coroutines.delay
 
 @ExperimentalTime
 suspend fun main(): Unit {
-  val circuitBreaker = CircuitBreaker.of(
+  val circuitBreaker = CircuitBreaker(
     resetTimeout = 2.seconds,
     openingStrategy = CircuitBreaker.OpeningStrategy.Count(maxFailures = 2),
     exponentialBackoffFactor = 1.2,
