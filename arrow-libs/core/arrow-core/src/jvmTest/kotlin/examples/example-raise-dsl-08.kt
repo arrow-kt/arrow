@@ -1,21 +1,20 @@
 // This file was automatically generated from Raise.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleRaiseDsl08
 
-import arrow.core.Either
-import arrow.core.raise.either
-import arrow.core.raise.catch
+import arrow.core.raise.recover
+import arrow.core.raise.Raise
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  catch({ throw RuntimeException("BOOM") }) { t ->
-    "fallback"
-  } shouldBe "fallback"
+  recover(
+    { raise("failed") },
+    { str -> str.length }
+  ) { t -> t.message ?: -1 } shouldBe 6
 
-  fun fetchId(): Int = throw RuntimeException("BOOM")
+  fun Raise<String>.boom(): Int = throw RuntimeException("BOOM")
 
-  either {
-    catch({ fetchId() }) { t ->
-      raise("something went wrong: ${t.message}")
-    }
-  } shouldBe Either.Left("something went wrong: BOOM")
+  recover(
+    { boom() },
+    { str -> str.length }
+  ) { t: RuntimeException -> t.message?.length ?: -1 } shouldBe 4
 }
