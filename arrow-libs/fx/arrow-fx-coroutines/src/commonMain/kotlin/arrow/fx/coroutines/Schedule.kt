@@ -232,11 +232,10 @@ public sealed class Schedule<Input, Output> {
       "kotlinx.coroutines.flow.flow", "arrow.core.left", "arrow.core.right"
     )
   )
-  public suspend fun <C> repeatOrElseEitherAsFlow(
+  public abstract suspend fun <C> repeatOrElseEitherAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> C
-  ): Flow<Either<C, Output>> =
-    flow { this@Schedule.log { _, output -> emit(output.right()) }.repeatOrElseEither(fa) { e, output -> emit(orElse(e, output).left()) } }
+  ): Flow<Either<C, Output>>
 
   /**
    * Runs this effect and emits the output, if it succeeded, decide using the provided policy if the effect should be repeated and emitted, if so, with how much delay.
@@ -263,10 +262,13 @@ public sealed class Schedule<Input, Output> {
       "kotlinx.coroutines.flow.flow"
     )
   )
-  public abstract suspend fun repeatOrElseAsFlow(
+  public suspend fun repeatOrElseAsFlow(
     fa: suspend () -> Input,
     orElse: suspend (Throwable, Output?) -> Output
-  ): Flow<Output>
+  ): Flow<Output> = flow {
+    log { _, output -> emit(output) }
+      .repeatOrElseEither(fa) { e, output -> emit(orElse(e, output)) }
+  }
 
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
@@ -352,7 +354,10 @@ public sealed class Schedule<Input, Output> {
 
   @Deprecated(
     "Nano based APIs are being deprecated, and removed in Arrow Resilience. Use delayed instead $NicheAPI",
-    ReplaceWith("delayed { output, nanos -> f(output, nanos.nanoseconds) }", "kotlin.time.Companion.Duration.nanoseconds")
+    ReplaceWith(
+      "delayed { output, nanos -> f(output, nanos.nanoseconds) }",
+      "kotlin.time.Companion.Duration.nanoseconds"
+    )
   )
   public abstract fun modifyNanos(f: suspend (Output, Double) -> Double): Schedule<Input, Output>
 
@@ -591,13 +596,12 @@ public sealed class Schedule<Input, Output> {
       }
     }
 
-    override suspend fun repeatOrElseAsFlow(
+    override suspend fun <C> repeatOrElseEitherAsFlow(
       fa: suspend () -> Input,
-      orElse: suspend (Throwable, Output?) -> Output
-    ): Flow<Output> = flow {
-      this@ScheduleImpl
-        .log { _, output -> emit(output) }
-        .repeatOrElseEither(fa) { e, output -> emit(orElse(e, output)) }
+      orElse: suspend (Throwable, Output?) -> C
+    ): Flow<Either<C, Output>> = flow {
+      log { _, output -> emit(output.right()) }
+        .repeatOrElseEither(fa) { e, output -> emit(orElse(e, output).left()) }
     }
 
     override fun <B> map(f: (output: Output) -> B): Schedule<Input, B> =
@@ -680,7 +684,7 @@ public sealed class Schedule<Input, Output> {
       }
 
     override fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output> =
-      log { input, _ -> f(input)  }
+      log { input, _ -> f(input) }
 
     override fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
       log { _, output -> f(output) }
