@@ -359,7 +359,7 @@ public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
@@ -367,7 +367,7 @@ public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -409,12 +409,12 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -655,7 +655,7 @@ public inline fun <A, B> List<A>.reduceRightNull(
  * fun test() {
  *   listOf(1, 2).padZip(listOf("a")) shouldBe listOf(1 to "a", 2 to null)
  *   listOf(1).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
- *   listOf(1).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
+ *   listOf(1, 2).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", 2 to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-03.kt -->
@@ -674,7 +674,7 @@ public fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
  * fun test() {
  *   listOf(1, 2).padZip(listOf("a")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to null)
  *   listOf(1).padZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", null to "b")
- *   listOf(1).padZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", null to "b")
+ *   listOf(1, 2).padZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to "b")
  * }
  * ```
  * <!--- KNIT example-iterable-04.kt -->
