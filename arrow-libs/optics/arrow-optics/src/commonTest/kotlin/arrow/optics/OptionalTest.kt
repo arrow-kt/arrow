@@ -85,13 +85,6 @@ class OptionalTest : StringSpec({
         }
       }
 
-      "asFold should behave as valid Fold: combineAll" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          fold(0, { x, y -> x + y }, ints) shouldBe
-            ints.firstOrNull().toOption().fold({ 0 }, ::identity)
-        }
-      }
-
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
           fold(0, { x, y -> x + y }, ints) shouldBe

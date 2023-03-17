@@ -36,12 +36,6 @@ class GetterTest : StringSpec({
       }
     }
 
-    "asFold should behave as valid Fold: combineAll" {
-      checkAll(Arb.token()) { token ->
-        Getter.token().fold("", { x, y -> x + y }, token) shouldBe token.value
-      }
-    }
-
     "asFold should behave as valid Fold: fold" {
       checkAll(Arb.token()) { token ->
         Getter.token().fold("", { x, y -> x + y }, token) shouldBe token.value

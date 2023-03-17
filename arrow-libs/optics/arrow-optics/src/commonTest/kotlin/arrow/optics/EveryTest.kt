@@ -36,12 +36,6 @@ class EveryTest : StringSpec({
         }
       }
 
-      "asFold should behave as valid Fold: combineAll" {
-        checkAll(Arb.list(Arb.int())) { ints ->
-          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
-        }
-      }
-
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.list(Arb.int())) { ints ->
           fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()

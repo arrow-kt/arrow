@@ -51,6 +51,12 @@ public interface Monoid<A> : Semigroup<A> {
 
   public companion object {
     @JvmStatic
+    public fun <A> of(empty: A, combine: (A, A) -> A): Monoid<A> = object : Monoid<A> {
+      override fun empty(): A = empty
+      override fun A.combine(b: A): A = combine(this, b)
+    }
+
+    @JvmStatic
     @JvmName("Boolean")
     public fun boolean(): Monoid<Boolean> = AndMonoid
 

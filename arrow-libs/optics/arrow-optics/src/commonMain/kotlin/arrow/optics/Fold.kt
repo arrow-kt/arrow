@@ -10,6 +10,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.foldMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
@@ -29,14 +30,14 @@ public interface Fold<S, A> {
   /**
    * Map each target to a type [R] and combine the results as a fold.
    */
-  public fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R
+  public fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    foldMap(Monoid.of(empty, combine), source, map)
 
   /**
    * Map each target to a type R and use a Monoid to fold the results
    */
   @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(M.empty(), M::combine, source, map)", "arrow.typeclasses.combine"))
-  public fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    foldMap(M.empty(), M::combine, source, map)
+  public fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
 
   /**
    * Calculate the number of targets
@@ -129,8 +130,8 @@ public interface Fold<S, A> {
    */
   public infix fun <C> choice(other: Fold<C, A>): Fold<Either<S, C>, A> =
     object : Fold<Either<S, C>, A> {
-      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Either<S, C>, map: (focus: A) -> R): R =
-        source.fold({ ac -> this@Fold.foldMap(empty, combine, ac, map) }, { c -> other.foldMap(empty, combine, c, map) })
+      override fun <R> foldMap(M: Monoid<R>, source: Either<S, C>, map: (focus: A) -> R): R =
+        source.fold({ ac -> this@Fold.foldMap(M, ac, map) }, { c -> other.foldMap(M, c, map) })
     }
 
   /**
@@ -138,9 +139,9 @@ public interface Fold<S, A> {
    */
   public fun <C> left(): Fold<Either<S, C>, Either<A, C>> =
     object : Fold<Either<S, C>, Either<A, C>> {
-      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Either<S, C>, map: (Either<A, C>) -> R): R =
+      override fun <R> foldMap(M: Monoid<R>, source: Either<S, C>, map: (Either<A, C>) -> R): R =
         source.fold(
-          { a1: S -> this@Fold.foldMap(empty, combine, a1) { b -> map(Either.Left(b)) } },
+          { a1: S -> this@Fold.foldMap(M, a1) { b -> map(Either.Left(b)) } },
           { c -> map(Either.Right(c)) })
     }
 
@@ -149,8 +150,8 @@ public interface Fold<S, A> {
    */
   public fun <C> right(): Fold<Either<C, S>, Either<C, A>> =
     object : Fold<Either<C, S>, Either<C, A>> {
-      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Either<C, S>, map: (Either<C, A>) -> R): R =
-        source.fold({ c -> map(Either.Left(c)) }, { a1 -> this@Fold.foldMap(empty, combine, a1) { b -> map(Either.Right(b)) } })
+      override fun <R> foldMap(M: Monoid<R>, source: Either<C, S>, map: (Either<C, A>) -> R): R =
+        source.fold({ c -> map(Either.Left(c)) }, { a1 -> this@Fold.foldMap(M, a1) { b -> map(Either.Right(b)) } })
     }
 
   /**
@@ -158,8 +159,8 @@ public interface Fold<S, A> {
    */
   public infix fun <C> compose(other: Fold<in A, out C>): Fold<S, C> =
     object : Fold<S, C> {
-      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: C) -> R): R =
-        this@Fold.foldMap(empty, combine, source) { c -> other.foldMap(empty, combine, c, map) }
+      override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: C) -> R): R =
+        this@Fold.foldMap(M, source) { c -> other.foldMap(M, c, map) }
     }
 
   public operator fun <C> plus(other: Fold<in A, out C>): Fold<S, C> =
@@ -174,7 +175,7 @@ public interface Fold<S, A> {
      * [Fold] that takes either [S] or [S] and strips the choice of [S].
      */
     public fun <S> codiagonal(): Fold<Either<S, S>, S> = object : Fold<Either<S, S>, S> {
-      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Either<S, S>, map: (S) -> R): R =
+      override fun <R> foldMap(M: Monoid<R>, source: Either<S, S>, map: (S) -> R): R =
         source.fold(map, map)
     }
 
@@ -182,8 +183,8 @@ public interface Fold<S, A> {
      * Creates a [Fold] based on a predicate of the source [S]
      */
     public fun <S> select(p: (S) -> Boolean): Fold<S, S> = object : Fold<S, S> {
-      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (S) -> R): R =
-        if (p(source)) map(source) else empty
+      override fun <R> foldMap(M: Monoid<R>, source: S, map: (S) -> R): R =
+        if (p(source)) map(source) else M.empty()
     }
 
     /**
@@ -195,8 +196,8 @@ public interface Fold<S, A> {
     @JvmStatic
     public fun <A> iterable(): Fold<Iterable<A>, A> =
       object : Fold<Iterable<A>, A> {
-        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Iterable<A>, map: (focus: A) -> R): R =
-          source.map(map).fold(empty, combine)
+        override fun <R> foldMap(M: Monoid<R>, source: Iterable<A>, map: (focus: A) -> R): R =
+          source.foldMap(M, map)
       }
 
     /**

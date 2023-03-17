@@ -124,13 +124,6 @@ class PrismTest : StringSpec({
         }
       }
 
-      "asFold should behave as valid Fold: combineAll" {
-        checkAll(Arb.sumType()) { sum: SumType ->
-          fold("", { x, y -> x + y }, sum) shouldBe
-            (Prism.sumType().getOrNull(sum) ?: "")
-        }
-      }
-
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.sumType()) { sum: SumType ->
           fold("", { x, y -> x + y }, sum) shouldBe
