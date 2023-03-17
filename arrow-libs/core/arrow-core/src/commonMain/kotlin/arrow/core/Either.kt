@@ -2274,7 +2274,7 @@ public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>)
 }
 
 @Deprecated(
-  RedundantAPI + "Prefer the new recover API",
+  RedundantAPI + "Prefer resolving the error with getOrElse.",
   ReplaceWith("getOrElse(f).right()", "arrow.core.right", "arrow.core.getOrElse")
 )
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> {
