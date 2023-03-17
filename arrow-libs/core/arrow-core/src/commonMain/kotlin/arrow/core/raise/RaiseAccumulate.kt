@@ -21,7 +21,6 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-
 /**
  * Accumulate the errors from running both [action1] and [action2] using the given [combine] function.
  */

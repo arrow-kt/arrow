@@ -43,12 +43,10 @@ public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInferen
 
 public typealias Null = Nothing?
 
-public class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
+public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
 
-  @RaiseDSL
-  override fun raise(r: Null): Nothing = cont.raise(r)
 
   @RaiseDSL
   public fun <B> Option<B>.bind(): B = getOrElse { raise(null) }
@@ -71,10 +69,7 @@ public class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
   }
 }
 
-public class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
-  @RaiseDSL
-  override fun raise(r: Throwable): Nothing = cont.raise(r)
-
+public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
   @RaiseDSL
   public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
 
@@ -84,11 +79,7 @@ public class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> 
     map { it.bind() }
 }
 
-public class OptionRaise(private val cont: Raise<None>) : Raise<None> {
-
-  @RaiseDSL
-  override fun raise(r: None): Nothing = cont.raise(r)
-
+public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
   @RaiseDSL
   public fun <B> Option<B>.bind(): B = getOrElse { raise(None) }
 
