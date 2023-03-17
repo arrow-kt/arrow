@@ -23,6 +23,11 @@ public typealias Every<S, A> = PEvery<S, S, A, A>
  */
 public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSetter<S, T, A, B> {
 
+  /**
+   * Map each target to a type R and use a Monoid to fold the results
+   */
+  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
+
   override fun modify(source: S, map: (focus: A) -> B): T
 
   /**
