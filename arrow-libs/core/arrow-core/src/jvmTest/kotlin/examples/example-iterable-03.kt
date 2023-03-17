@@ -7,5 +7,5 @@ import io.kotest.matchers.shouldBe
 fun test() {
   listOf(1, 2).padZip(listOf("a")) shouldBe listOf(1 to "a", 2 to null)
   listOf(1).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
-  listOf(1).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
+  listOf(1, 2).padZip(listOf("a", "b")) shouldBe listOf(1 to "a", 2 to "b")
 }
