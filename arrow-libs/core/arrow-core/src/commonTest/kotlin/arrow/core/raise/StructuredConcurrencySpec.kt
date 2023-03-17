@@ -54,7 +54,7 @@ class StructuredConcurrencySpec : StringSpec({
     }.fold(::identity) { fail("Should never be here") } shouldBe "hello"
 
     withTimeout(2.seconds) {
-      cancelled.await().shouldNotBeNull().message shouldBe "Raised Continuation"
+      cancelled.await().shouldNotBeNull().message shouldBe RaiseCancellationExceptionCaptured
     }
   }
 

@@ -2,19 +2,29 @@
 package arrow.core.examples.exampleRaiseDsl03
 
 import arrow.core.Either
+import arrow.core.Ior
+import arrow.core.raise.Effect
 import arrow.core.raise.Raise
 import arrow.core.raise.either
-import arrow.core.raise.recover
-import arrow.core.recover
+import arrow.core.raise.effect
+import arrow.core.raise.ior
+import arrow.core.raise.toEither
+import arrow.typeclasses.Semigroup
 import io.kotest.matchers.shouldBe
 
 fun Raise<String>.failure(): Int = raise("failed")
 
-fun recovered(): Int = recover({ failure() }) { _: String -> 1 }
+suspend fun test() {
+  val either: Either<String, Int> =
+    either { failure() }
 
-fun test() {
-  val either: Either<Nothing, Int> = either { failure() }
-    .recover { _: String -> recovered() }
+  val effect: Effect<String, Int> =
+    effect { failure() }
 
-  either shouldBe Either.Right(1)
+  val ior: Ior<String, Int> =
+    ior(String::plus) { failure() }
+
+  either shouldBe Either.Left("failed")
+  effect.toEither() shouldBe Either.Left("failed")
+  ior shouldBe Ior.Left("failed")
 }

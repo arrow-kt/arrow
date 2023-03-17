@@ -2,14 +2,18 @@
 package arrow.core.examples.exampleRaiseDsl05
 
 import arrow.core.Either
+import arrow.core.right
 import arrow.core.raise.either
 import arrow.core.raise.recover
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  recover({ raise("failed") }) { str -> str.length } shouldBe 6
+  val one: Either<Nothing, Int> = 1.right()
+  val left: Either<String, Int> = Either.Left("failed")
 
-  either<Int, String> {
-    recover({ raise("failed") }) { str -> raise(-1) }
-  } shouldBe Either.Left(-1)
+  either {
+    val x = one.bind()
+    val y = recover({ left.bind() }) { failure : String -> 1 }
+    x + y
+  } shouldBe Either.Right(2)
 }
