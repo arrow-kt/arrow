@@ -14,7 +14,6 @@ import arrow.core.foldMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
-import arrow.typeclasses.combine
 import kotlin.jvm.JvmStatic
 
 /**
@@ -317,4 +316,7 @@ public fun <S, A> Fold<S, A>.fold(empty: A, combine: (A, A) -> A, source: S): A 
  * Map each target to a type [R] and combine the results as a fold.
  */
 public fun <S, A, R> Fold<S, A>.foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-  foldMap(Monoid.of(empty, combine), source, map)
+  foldMap(object : Monoid<R> {
+    override fun empty(): R = empty
+    override fun R.combine(b: R): R = combine(this, b)
+  }, source, map)
