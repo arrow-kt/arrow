@@ -68,9 +68,6 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    map(get(source))
-
   /**
    * Reverse a [PIso]: the source becomes the target and the target becomes the source
    */

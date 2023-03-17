@@ -41,9 +41,6 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    map(get(source))
-
   /**
    * Join two [PLens] with the same focus in [A]
    */

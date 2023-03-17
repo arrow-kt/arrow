@@ -72,9 +72,6 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
    */
   override fun getOrModify(source: S): Either<T, A>
 
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).getOrElse { empty }
-
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrModify(source).map(map).getOrElse { M.empty() }
 

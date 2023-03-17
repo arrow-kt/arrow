@@ -28,12 +28,6 @@ import kotlin.jvm.JvmStatic
 public interface Fold<S, A> {
 
   /**
-   * Map each target to a type [R] and combine the results as a fold.
-   */
-  public fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    foldMap(Monoid.of(empty, combine), source, map)
-
-  /**
    * Map each target to a type R and use a Monoid to fold the results
    */
   @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(M.empty(), M::combine, source, map)", "arrow.typeclasses.combine"))
@@ -105,14 +99,14 @@ public interface Fold<S, A> {
    * Get all targets of the [Fold]
    */
   public fun getAll(source: S): List<A> =
-    foldMap(emptyList(), { x, y -> x + y }, source, ::listOf)
+    foldMap(emptyList(), { x, y -> x + y }, source) { listOf(it) }
 
   /**
    * Find the first element matching the predicate, if one exists.
    */
   public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? =
     EMPTY_VALUE.unbox(
-      foldMap(EMPTY_VALUE, { x, y -> if (x == EMPTY_VALUE) y else x }, source) { focus ->
+      foldMap<S, A, Any?>(EMPTY_VALUE, { x, y -> if (x == EMPTY_VALUE) y else x }, source) { focus ->
         if (predicate(focus)) focus else EMPTY_VALUE
       }
     )
@@ -318,3 +312,9 @@ public interface Fold<S, A> {
       Every.tuple10()
   }
 }
+
+/**
+ * Map each target to a type [R] and combine the results as a fold.
+ */
+public fun <S, A, R> Fold<S, A>.foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+  foldMap(Monoid.of(empty, combine), source, map)

@@ -41,9 +41,6 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
 
   public fun reverseGet(focus: B): T
 
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    getOrNull(source)?.let(map) ?: empty
-
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrNull(source)?.let(map) ?: M.empty()
 

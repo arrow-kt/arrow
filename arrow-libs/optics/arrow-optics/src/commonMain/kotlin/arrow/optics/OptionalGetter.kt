@@ -37,9 +37,6 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
   public fun getOrNull(source: S): A? =
     getOrModify(source).getOrNull()
 
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).getOrElse { empty }
-
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrModify(source).map(map).getOrElse { M.empty() }
 
