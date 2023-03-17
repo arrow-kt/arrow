@@ -9,7 +9,6 @@ import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -27,42 +26,42 @@ class IsoTest : StringSpec({
 
     testLaws(
       "Iso token - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Iso.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string())
       ),
 
-      PrismLaws.laws(
+      PrismLaws(
         prism = aIso,
         aGen = Arb.sumTypeA(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string())
       ),
 
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Iso.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string())
       ),
 
-      OptionalLaws.laws(
+      OptionalLaws(
         optional = Iso.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string())
       ),
 
-      SetterLaws.laws(
+      SetterLaws(
         setter = Iso.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string())
       ),
 
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
@@ -98,13 +97,13 @@ class IsoTest : StringSpec({
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.token()) { token ->
-          fold(Monoid.string(), token) shouldBe token.value
+          fold("", { x, y -> x + y }, token) shouldBe token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.token()) { token ->
-          fold(Monoid.string(), token) shouldBe token.value
+          fold("", { x, y -> x + y }, token) shouldBe token.value
         }
       }
 

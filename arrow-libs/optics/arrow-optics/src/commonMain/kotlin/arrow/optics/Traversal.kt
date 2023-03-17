@@ -36,7 +36,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
   public fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
     PTraversal { s, f ->
       s.fold(
-        { a -> Either.Left(this@PTraversal.modify(a, f)) },
+        { a -> Either.Left(this.modify(a, f)) },
         { u -> Either.Right(other.modify(u, f)) }
       )
     }
@@ -45,7 +45,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * Compose a [PTraversal] with a [PTraversal]
    */
   public infix fun <C, D> compose(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
-    PTraversal { s, f -> this@PTraversal.modify(s) { b -> other.modify(b, f) } }
+    PTraversal { s, f -> this.modify(s) { b -> other.modify(b, f) } }
 
   public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     this compose other
@@ -55,7 +55,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
       PIso.id()
 
     public fun <S> codiagonal(): Traversal<Either<S, S>, S> =
-      Traversal { s, f -> s.bimap(f, f) }
+      Traversal { s, f -> s.mapLeft(f).map(f) }
 
     /**
      * [PTraversal] that points to nothing
@@ -210,7 +210,6 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
     /**
      * [Traversal] for [Either] that has focus in each [Either.Right].
      *
-     * @receiver [Traversal.Companion] to make it statically available.
      * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
      */
     @JvmStatic
@@ -461,8 +460,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this@every.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Iso] for a structure [S] to see all its foci [A]
@@ -471,8 +469,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this@every.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Prism] for a structure [S] to see all its foci [A]
@@ -481,8 +478,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Optional] for a structure [S] to see all its foci [A]
@@ -491,8 +487,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Setter] for a structure [S] to see all its foci [A]
@@ -501,8 +496,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [Setter] with a focus in [A]
    */
   public val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Traversal] for a structure [S] to see all its foci [A]
@@ -511,8 +505,7 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [PEvery] for a structure [S] to see all its foci [A]
@@ -521,6 +514,5 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @return [PEvery] with a focus in [A]
    */
   public val <U, V> PEvery<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 }

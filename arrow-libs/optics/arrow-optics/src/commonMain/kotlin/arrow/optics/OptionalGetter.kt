@@ -5,8 +5,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.flatMap
-import arrow.core.identity
-import arrow.typeclasses.Monoid
+import arrow.core.getOrElse
 import kotlin.jvm.JvmStatic
 
 /**
@@ -15,9 +14,8 @@ import kotlin.jvm.JvmStatic
  */
 public typealias OptionalGetter<S, A> = POptionalGetter<S, S, A>
 
-@Suppress("FunctionName")
 public fun <S, A> OptionalGetter(getOption: (source: S) -> Option<A>): OptionalGetter<S, A> =
-  POptionalGetter({ s -> getOption(s).toEither { s } })
+  POptionalGetter { s -> getOption(s).toEither { s } }
 
 /**
  * An [OptionalGetter] is an optic that allows into a structure and querying an optional focus.
@@ -36,55 +34,47 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
    * Get the focus of an [OptionalGetter] or `null` if the is not there
    */
   public fun getOrNull(source: S): A? =
-    getOrModify(source).orNull()
+    getOrModify(source).getOrNull()
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).fold({ M.empty() }, ::identity)
+  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    getOrModify(source).map(map).getOrElse { empty }
 
   /**
    * Join two [POptionalGetter] with the same focus
    */
   public infix fun <S1, T1> choice(other: POptionalGetter<S1, T1, A>): POptionalGetter<Either<S, S1>, Either<T, T1>, A> =
-    POptionalGetter(
-      { sources ->
-        sources.fold(
-          { leftSource ->
-            getOrModify(leftSource).bimap({ Either.Left(it) }, ::identity)
-          },
-          { rightSource ->
-            other.getOrModify(rightSource).bimap({ Either.Right(it) }, ::identity)
-          }
-        )
-      }
-    )
+    POptionalGetter { sources ->
+      sources.fold(
+        { leftSource ->
+          getOrModify(leftSource).mapLeft { Either.Left(it) }
+        },
+        { rightSource ->
+          other.getOrModify(rightSource).mapLeft { Either.Right(it) }
+        }
+      )
+    }
 
   /**
    * Create a product of the [POptionalGetter] and a type [C]
    */
   public fun <C> first(): POptionalGetter<Pair<S, C>, Pair<T, C>, Pair<A, C>> =
-    POptionalGetter(
-      { (source, c) -> getOrModify(source).bimap({ Pair(it, c) }, { Pair(it, c) }) }
-    )
+    POptionalGetter { (source, c) -> getOrModify(source).mapLeft { Pair(it, c) }.map { Pair(it, c) } }
 
   /**
    * Create a product of a type [C] and the [POptionalGetter]
    */
   public fun <C> second(): POptionalGetter<Pair<C, S>, Pair<C, T>, Pair<C, A>> =
-    POptionalGetter(
-      { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) }
-    )
+    POptionalGetter { (c, s) -> getOrModify(s).mapLeft { c to it }.map { c to it } }
 
   /**
    * Compose a [POptionalGetter] with a [POptionalGetter]
    */
   public infix fun <C> compose(other: POptionalGetter<in A, T, out C>): POptionalGetter<S, T, C> =
-    POptionalGetter(
-      { source ->
-        getOrModify(source).flatMap { a ->
-          other.getOrModify(a)
-        }
+    POptionalGetter { source ->
+      getOrModify(source).flatMap { a ->
+        other.getOrModify(a)
       }
-    )
+    }
 
   public operator fun <C, D> plus(other: POptionalGetter<in A, T, out C>): POptionalGetter<S, T, C> =
     this compose other
@@ -99,7 +89,7 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
       override fun getOrModify(source: S): Either<T, A> = getOrModify(source)
     }
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id()
 
     /**
      * [OptionalGetter] to itself if it satisfies the predicate.

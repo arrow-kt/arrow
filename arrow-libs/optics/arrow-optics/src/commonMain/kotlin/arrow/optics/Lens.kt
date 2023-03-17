@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.identity
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -38,7 +37,7 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
   override fun getOrModify(source: S): Either<T, A> =
     Either.Right(get(source))
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**
@@ -46,7 +45,7 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
    */
   public infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
     { ss -> ss.fold(this::get, other::get) },
-    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
+    { ss, b -> ss.mapLeft { s -> set(s, b) }.map { s -> other.set(s, b) } }
   )
 
   /**
@@ -87,14 +86,14 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
      */
     public fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
       get = { it.fold(::identity, ::identity) },
-      set = { s, b -> s.bimap({ b }, { b }) }
+      set = { s, b -> s.mapLeft { b }.map { b } }
     )
 
     /**

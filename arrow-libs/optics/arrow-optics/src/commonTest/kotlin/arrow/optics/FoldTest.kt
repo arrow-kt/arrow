@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -25,20 +24,20 @@ class FoldTest : StringSpec({
 
       "Folding a list of ints" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) shouldBe ints.sum()
+          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
         }
       }
 
       "Folding a list should yield same result as combineAll" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) shouldBe ints.sum()
+          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
         }
       }
 
       "Folding and mapping a list of strings" {
         checkAll(Arb.list(Arb.int())) { ints ->
           Fold.list<String>()
-            .foldMap(Monoid.int(), ints.map(Int::toString), String::toInt) shouldBe ints.sum()
+            .foldMap(0, { x, y -> x + y }, ints.map(Int::toString), String::toInt) shouldBe ints.sum()
         }
       }
 

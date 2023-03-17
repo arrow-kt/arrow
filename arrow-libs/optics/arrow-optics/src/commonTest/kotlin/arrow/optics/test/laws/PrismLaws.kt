@@ -7,16 +7,16 @@ import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.checkAll
 
-object PrismLaws {
+data class PrismLaws<A, B>(
+  val prism: Prism<A, B>,
+  val aGen: Arb<A>,
+  val bGen: Arb<B>,
+  val funcGen: Arb<(B) -> B>,
+  val eqa: (A, A) -> Boolean = { a, b -> a == b },
+  val eqb: (B?, B?) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <A, B> laws(
-    prism: Prism<A, B>,
-    aGen: Arb<A>,
-    bGen: Arb<B>,
-    funcGen: Arb<(B) -> B>,
-    eqa: (A, A) -> Boolean = { a, b -> a == b },
-    eqb: (B?, B?) -> Boolean = { a, b -> a == b }
-  ): List<Law> = listOf(
+  override val laws: List<Law> = listOf(
     Law("Prism law: partial round trip one way") { prism.partialRoundTripOneWay(aGen, eqa) },
     Law("Prism law: round trip other way") { prism.roundTripOtherWay(bGen, eqb) },
     Law("Prism law: modify identity") { prism.modifyIdentity(aGen, eqa) },

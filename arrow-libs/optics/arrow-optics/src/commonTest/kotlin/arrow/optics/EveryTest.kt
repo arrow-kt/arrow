@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -39,13 +38,13 @@ class EveryTest : StringSpec({
 
       "asFold should behave as valid Fold: combineAll" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) shouldBe ints.sum()
+          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) shouldBe ints.sum()
+          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
         }
       }
 
@@ -72,13 +71,13 @@ class EveryTest : StringSpec({
 
       "Folding all the values of a traversal" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) shouldBe ints.sum()
+          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
         }
       }
 
       "Combining all the values of a traversal" {
         checkAll(Arb.list(Arb.int())) { ints ->
-          fold(Monoid.int(), ints) shouldBe ints.sum()
+          fold(0, { x, y -> x + y }, ints) shouldBe ints.sum()
         }
       }
 

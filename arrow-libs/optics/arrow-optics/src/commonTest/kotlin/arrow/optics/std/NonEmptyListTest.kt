@@ -14,7 +14,7 @@ class NonEmptyListTest : StringSpec({
 
     testLaws(
       "Lens Nel head - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.nonEmptyListHead(),
         aGen = Arb.nonEmptyList(Arb.string()),
         bGen = Arb.string(),
@@ -24,7 +24,7 @@ class NonEmptyListTest : StringSpec({
 
     testLaws(
       "Lens Nel tail - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.nonEmptyListTail(),
         aGen = Arb.nonEmptyList(Arb.string()),
         bGen = Arb.list(Arb.string()),

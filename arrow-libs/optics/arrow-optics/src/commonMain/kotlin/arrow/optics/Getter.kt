@@ -3,8 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.compose
 import arrow.core.identity
-import arrow.core.right
-import arrow.typeclasses.Monoid
 
 /**
  * A [Getter] is an optic that allows to see into a structure and getting a focus.
@@ -22,7 +20,7 @@ public fun interface Getter<S, A> : Fold<S, A> {
    */
   public fun get(source: S): A
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (A) -> R): R =
+  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**
@@ -41,7 +39,7 @@ public fun interface Getter<S, A> : Fold<S, A> {
    * Create a sum of the [Getter] and type [C]
    */
   override fun <C> left(): Getter<Either<S, C>, Either<A, C>> =
-    Getter { sc -> sc.bimap(this::get, ::identity) }
+    Getter { sc -> sc.mapLeft(this::get) }
 
   /**
    * Create a sum of type [C] and the [Getter]
