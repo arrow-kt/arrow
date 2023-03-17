@@ -30,7 +30,7 @@ public interface Fold<S, A> {
   /**
    * Map each target to a type R and use a Monoid to fold the results
    */
-  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(M.empty(), M::combine, source, map)", "arrow.typeclasses.combine"))
+  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(M.empty(), M::combine, source, map)", "arrow.optics.foldMap", "arrow.typeclasses.combine"))
   public fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
 
   /**
@@ -76,17 +76,11 @@ public interface Fold<S, A> {
     EMPTY_VALUE.unbox(foldMap(EMPTY_VALUE, { x, y -> if (y != EMPTY_VALUE) y else x }, source, ::identity))
 
   /**
-   * Fold using the given [empty] element and [combine].
-   */
-  public fun fold(empty: A, combine: (A, A) -> A, source: S): A =
-    foldMap(empty, combine, source, ::identity)
-
-  /**
    * Fold using the given [Monoid] instance.
    */
-  @Deprecated(MonoidDeprecation, ReplaceWith("fold(M.empty(), M::combine, source)", "arrow.typeclasses.combine"))
+  @Deprecated(MonoidDeprecation, ReplaceWith("fold(M.empty(), M::combine, source)", "arrow.optics.fold", "arrow.typeclasses.combine"))
   public fun fold(M: Monoid<A>, source: S): A =
-    fold(M.empty(), M::combine, source)
+    foldMap(M, source, ::identity)
 
   /**
    * Alias for fold.
@@ -312,6 +306,12 @@ public interface Fold<S, A> {
       Every.tuple10()
   }
 }
+
+/**
+ * Fold using the given [empty] element and [combine].
+ */
+public fun <S, A> Fold<S, A>.fold(empty: A, combine: (A, A) -> A, source: S): A =
+  foldMap(empty, combine, source, ::identity)
 
 /**
  * Map each target to a type [R] and combine the results as a fold.
