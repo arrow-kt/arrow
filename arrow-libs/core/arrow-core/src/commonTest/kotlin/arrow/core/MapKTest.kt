@@ -16,6 +16,7 @@ import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAllValues
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeIn
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
@@ -757,30 +758,20 @@ class MapKTest : StringSpec({
       }
 
       result.shouldBeInstanceOf<Either.Right<Map<Int, String>>>()
-      xs.forAll {
-        result.value.shouldContain(it.key to it.value.toString())
-      }
+
+      result.value shouldBe xs.mapValues { it.value.toString() }
     }
   }
 
   "mapOrAccumulate accumulates errors" {
     checkAll(
-      Arb.map(Arb.int(), Arb.boolean())
+      Arb.map(Arb.int(), Arb.int())
     ) { xs ->
 
-      val result: Either<NonEmptyList<Int>, Map<Int, String>> = xs.mapOrAccumulate {
-        if (it.value) {
-          raise(it.key)
-        } else {
-          ""
-        }
-      }
-
-      result.fold({ nel ->
-        nel.all shouldBe xs.filter { it.value }.keys.toSet()
-      }, {
-        xs.shouldNotHaveValues(true)
-      })
+       xs.mapOrAccumulate {
+          raise(it.value)
+      }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
+         .value.all.shouldContainAll(xs.values)
     }
   }
 })
