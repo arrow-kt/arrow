@@ -27,7 +27,9 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.triple
 import kotlinx.coroutines.Dispatchers
 import kotlin.math.max
 import kotlin.Result.Companion.failure
@@ -141,3 +143,64 @@ suspend fun <A> A.suspend(): A =
 
     COROUTINE_SUSPENDED
   }
+
+private fun <A, B> value2(first: Arb<A>, second: Arb<B>): Arb<Pair<A?, B?>> =
+  Arb.pair(first.orNull(.2), second.orNull(.2))
+
+private fun <A, B, C> value3(first: Arb<A>, second: Arb<B>, third: Arb<C>): Arb<Triple<A?, B?, C?>> =
+  Arb.triple(first.orNull(.2), second.orNull(.2), third.orNull(.2))
+
+private fun <K, A, B, C> Map<K, Triple<A?, B?, C?>>.destructured(): Triple<Map<K, A>, Map<K, B>, Map<K, C>> {
+  val firstMap = mutableMapOf<K, A>()
+  val secondMap = mutableMapOf<K, B>()
+  val thirdMap = mutableMapOf<K, C>()
+
+  this.forEach { (key, triple) ->
+    val (a, b, c) = triple
+
+    if (a != null) {
+      firstMap[key] = a
+    }
+
+    if (b != null) {
+      secondMap[key] = b
+    }
+
+    if (c != null) {
+      thirdMap[key] = c
+    }
+  }
+
+  return Triple(firstMap, secondMap, thirdMap)
+}
+
+private fun <K, A, B> Map<K, Pair<A?, B?>>.destructured(): Pair<Map<K, A>, Map<K, B>> {
+  val firstMap = mutableMapOf<K, A>()
+  val secondMap = mutableMapOf<K, B>()
+
+  this.forEach { (key, pair) ->
+    val (a, b) = pair
+    if (a != null) {
+      firstMap[key] = a
+    }
+
+    if (b != null) {
+      secondMap[key] = b
+    }
+  }
+
+  return firstMap to secondMap
+}
+
+fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>): Arb<Pair<Map<K, A>, Map<K, B>>> =
+  Arb.map(arbK, value2(arbA, arbB))
+    .map { it.destructured() }
+
+fun <K, A, B, C> Arb.Companion.map3(
+  arbK: Arb<K>,
+  arbA: Arb<A>,
+  arbB: Arb<B>,
+  arbC: Arb<C>
+): Arb<Triple<Map<K, A>, Map<K, B>, Map<K, C>>> =
+  Arb.map(arbK, value3(arbA, arbB, arbC))
+    .map { it.destructured() }

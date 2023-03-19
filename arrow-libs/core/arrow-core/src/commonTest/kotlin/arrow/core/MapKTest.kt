@@ -6,6 +6,8 @@ import arrow.core.test.intSmall
 import arrow.core.test.ior
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.longSmall
+import arrow.core.test.map2
+import arrow.core.test.map3
 import arrow.core.test.option
 import arrow.core.test.testLaws
 import arrow.typeclasses.Semigroup
@@ -14,7 +16,6 @@ import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAllValues
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeIn
-import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
@@ -135,13 +136,17 @@ class MapKTest : StringSpec({
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
-      checkAll(Arb.map(KEY_ARB, Arb.boolean()), Arb.map(KEY_ARB, Arb.boolean())) { a, b ->
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val aligned = a.align(b)
         aligned.size shouldBe (a.keys + b.keys).size
       }
 
       // aligned map contains Both for all entries existing in a and b
-      checkAll(Arb.map(KEY_ARB, Arb.boolean()), Arb.map(KEY_ARB, Arb.boolean())) { a, b ->
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val aligned = a.align(b)
         a.keys.intersect(b.keys).forEach {
           aligned[it]?.isBoth shouldBe true
@@ -149,7 +154,9 @@ class MapKTest : StringSpec({
       }
 
       // aligned map contains Left for all entries existing only in a
-      checkAll(Arb.map(KEY_ARB, Arb.boolean()), Arb.map(KEY_ARB, Arb.boolean())) { a, b ->
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val aligned = a.align(b)
         (a.keys - b.keys).forEach { key ->
           aligned[key]?.isLeft shouldBe true
@@ -157,7 +164,9 @@ class MapKTest : StringSpec({
       }
 
       // aligned map contains Right for all entries existing only in b
-      checkAll(Arb.map(KEY_ARB, Arb.boolean()), Arb.map(KEY_ARB, Arb.boolean())) { a, b ->
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val aligned = a.align(b)
         (b.keys - a.keys).forEach { key ->
           aligned[key]?.isRight shouldBe true
@@ -167,7 +176,7 @@ class MapKTest : StringSpec({
 
   "zip is idempotent" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.intSmall())) {
+      Arb.map(Arb.string(), Arb.intSmall())) {
         a ->
         a.zip(a) shouldBe a.mapValues { it.value to it.value }
     }
@@ -175,7 +184,7 @@ class MapKTest : StringSpec({
 
   "align is idempotent" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.intSmall())) {
+      Arb.map(Arb.string(), Arb.intSmall())) {
         a ->
       a.align(a) shouldBe a.mapValues { Ior.Both(it.value, it.value) }
     }
@@ -183,11 +192,8 @@ class MapKTest : StringSpec({
 
   "zip is commutative" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.intSmall()),
-      Arb.map(KEY_ARB, Arb.intSmall())
-    ) {
-        a,
-        b ->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int())
+    ) { (a, b) ->
 
       a.zip(b) shouldBe b.zip(a).mapValues { it.value.second to it.value.first }
     }
@@ -195,11 +201,8 @@ class MapKTest : StringSpec({
 
   "align is commutative" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.intSmall()),
-      Arb.map(KEY_ARB, Arb.intSmall())
-    ) {
-        a,
-        b ->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int())
+    ) { (a, b) ->
 
       a.align(b) shouldBe b.align(a).mapValues { it.value.swap() }
     }
@@ -207,11 +210,8 @@ class MapKTest : StringSpec({
 
   "zip is associative" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.intSmall()),
-      Arb.map(KEY_ARB, Arb.intSmall()),
-      Arb.map(KEY_ARB, Arb.intSmall())
-    ) {
-      a,b,c ->
+      Arb.map3(Arb.string(), Arb.int(), Arb.int(), Arb.int())
+    ) { (a, b, c)  ->
 
       fun <A, B, C> Pair<Pair<A, B>, C>.assoc(): Pair<A, Pair<B, C>> =
         this.first.first to (this.first.second to this.second)
@@ -222,11 +222,8 @@ class MapKTest : StringSpec({
 
   "align is associative" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.intSmall()),
-      Arb.map(KEY_ARB, Arb.intSmall()),
-      Arb.map(KEY_ARB, Arb.intSmall())
-    ) {
-        a,b,c ->
+      Arb.map3(Arb.string(), Arb.int(), Arb.int(), Arb.int())
+    ) { (a, b, c)  ->
 
       fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
         when (this) {
@@ -249,32 +246,29 @@ class MapKTest : StringSpec({
 
   "zip with" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.functionABCToD<Int, String, String, String>(Arb.string())
-    ) { a, b, fn ->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+      Arb.functionABCToD<String, Int, Int, String>(Arb.string())
+    ) { (a, b), fn ->
       a.zip(b, fn) shouldBe a.zip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
     }
   }
 
   "align with" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.functionAToB<Map.Entry<Int, Ior<String, String>>, String>(Arb.string())
-    ) { a, b, fn ->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+      Arb.functionAToB<Map.Entry<String, Ior<Int, Int>>, String>(Arb.string())
+    ) { (a, b), fn ->
       a.align(b, fn) shouldBe a.align(b).mapValues { fn(it) }
     }
   }
 
     "zip functoriality" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.string()),
-        Arb.map(KEY_ARB, Arb.string()),
-        Arb.functionAToB<String, String>(Arb.string()),
-        Arb.functionAToB<String, String>(Arb.string())
+        Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+        Arb.functionAToB<Int, String>(Arb.string()),
+        Arb.functionAToB<Int, String>(Arb.string())
       ) {
-        a,b,f,g ->
+          (a,b),f,g ->
 
         fun <A,B,C,D> Pair<A,C>.bimap(f: (A) -> B, g: (C) -> D) = Pair(f(first), g(second))
 
@@ -287,12 +281,11 @@ class MapKTest : StringSpec({
 
   "align functoriality" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.functionAToB<String, String>(Arb.string()),
-      Arb.functionAToB<String, String>(Arb.string())
+      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+      Arb.functionAToB<Int, String>(Arb.string()),
+      Arb.functionAToB<Int, String>(Arb.string())
     ) {
-        a,b,f,g ->
+        (a,b),f,g ->
 
       val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
       val r = a.align(b).mapValues { it.value.bimap(f,g)}
@@ -303,20 +296,18 @@ class MapKTest : StringSpec({
 
   "alignedness" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) {
-        a ,b->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int())
+    ) { (a, b) ->
 
-      fun <K,V> toList(es: Map<K,V>): List<V> =
-        es.fold(emptyList()) {
-          acc, e -> acc + e.value
-      }
+      fun <K, V> toList(es: Map<K, V>): List<V> =
+        es.fold(emptyList()) { acc, e ->
+          acc + e.value
+        }
 
       val left = toList(a)
 
-      fun <A,B> Ior<A,B>.toLeftOption() =
-        fold({it}, {null}, {a,_ -> a})
+      fun <A, B> Ior<A, B>.toLeftOption() =
+        fold({ it }, { null }, { a, _ -> a })
 
       // toListOf (folded . here) (align x y)
       val middle = toList(a.align(b).mapValues { it.value.toLeftOption() }).filterNotNull()
@@ -355,10 +346,8 @@ class MapKTest : StringSpec({
 
   "distributivity1" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) {x,y,z ->
+      Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+    ) {(x,y,z) ->
 
       fun <A, B, C> Pair<Ior<A, C>, Ior<B, C>>.undistrThesePair(): Ior<Pair<A, B>, C> =
         when (val l = this.first) {
@@ -386,10 +375,8 @@ class MapKTest : StringSpec({
 
   "distributivity2" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) {x,y,z ->
+      Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+    ) {(x,y,z) ->
 
       fun <A, B, C> Pair<Ior<A, B>, C>.distrPairThese(): Ior<Pair<A, C>, Pair<B, C>> =
         when (val l = this.first) {
@@ -407,10 +394,8 @@ class MapKTest : StringSpec({
 
   "distributivity3" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) {x,y,z ->
+      Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+    ) {(x,y,z) ->
 
       fun <A, B, C> Ior<Pair<A, C>, Pair<B, C>>.undistrPairThese(): Pair<Ior<A, B>, C> =
         when (val e = this) {
@@ -483,9 +468,8 @@ class MapKTest : StringSpec({
 
   "unalign is the inverse of align" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) { a,b ->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int())
+    ) { (a, b) ->
       a.align(b).unalign() shouldBe (a to b)
     }
   }
@@ -502,9 +486,8 @@ class MapKTest : StringSpec({
 
   "padZip" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) { a, b ->
+      Arb.map2(Arb.string(), Arb.string(), Arb.string())
+    ) { (a, b) ->
       val x = a.padZip(b)
 
       a.forAll {
@@ -523,20 +506,17 @@ class MapKTest : StringSpec({
 
   "padZip with" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.functionABCToD<Int, String?, String?, String>(Arb.string())
-    ) { a, b, fn ->
+      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+      Arb.functionABCToD<String, Int?, Int?, String>(Arb.string())
+    ) { (a, b), fn ->
       a.padZip(b, fn) shouldBe a.padZip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
     }
   }
 
   "salign" {
     checkAll(
-      Arb.map(KEY_ARB, Arb.string()),
-      Arb.map(KEY_ARB, Arb.string())
-    ) {
-      a,b ->
+      Arb.map2(Arb.string(), Arb.string(), Arb.string())
+    ) { (a, b) ->
       a.salign(Semigroup.string(), b) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
     }
   }
@@ -595,48 +575,23 @@ class MapKTest : StringSpec({
   }
 
 
-    "ensure that Arb used for map keys produces a small enough set of distinct values" {
+  "zip2" {
+    checkAll(
+      Arb.map2(Arb.string(), Arb.int(), Arb.int())
+    ) { (a, b) ->
+      val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
+      val expected = a.filter { (k, _) -> b.containsKey(k) }
+        .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
+        .toMap()
 
-      /*
-        when zipping/aligning maps we will execute different code paths depending if a given key is present in both maps or not.
-        when using types with lots of values like String/Int etc. this is most likely not the case. In effect the tests will not cover all code branches.
-        therefor we need to make sure to use an Arb here that produces a small enough set of distint values.
-        this test is to ensure that the arb in use should cause at least 50 iterations with at least 10 keys in both maps
-       */
-
-      val result = mutableListOf<Int>()
-
-      val arb = KEY_ARB
-      checkAll(
-        Arb.map(arb, Arb.intSmall()),
-        Arb.map(arb, Arb.intSmall())
-      ) { a, b ->
-         result.add((a.keys.intersect(b.keys)).size)
-      }
-
-      result.count { it > 10 } shouldBeGreaterThan 50
+      result shouldBe expected
     }
-
-
-    "zip2" {
-      checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall())
-      ) { a, b ->
-        val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
-        val expected = a.filter { (k, _) -> b.containsKey(k) }
-          .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
+  }
 
     "zip3" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall())
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b) { _, aa, bb, cc -> Triple(aa, bb, cc) }
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
@@ -649,9 +604,8 @@ class MapKTest : StringSpec({
 
     "zip4" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall()),
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b, b) { _, aa, bb, cc, dd -> Tuple4(aa, bb, cc, dd) }
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
@@ -664,9 +618,8 @@ class MapKTest : StringSpec({
 
     "zip5" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall()),
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b, b, b) { _, aa, bb, cc, dd, ee -> Tuple5(aa, bb, cc, dd, ee) }
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
@@ -679,9 +632,8 @@ class MapKTest : StringSpec({
 
     "zip6" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall()),
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff -> Tuple6(aa, bb, cc, dd, ee, ff) }
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
@@ -694,9 +646,8 @@ class MapKTest : StringSpec({
 
     "zip7" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall())
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg -> Tuple7(aa, bb, cc, dd, ee, ff, gg) }
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
@@ -709,9 +660,8 @@ class MapKTest : StringSpec({
 
     "zip8" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall())
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result =
           a.zip(b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh -> Tuple8(aa, bb, cc, dd, ee, ff, gg, hh) }
 
@@ -725,9 +675,8 @@ class MapKTest : StringSpec({
 
     "zip9" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall())
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
           Tuple9(
             aa,
@@ -752,9 +701,8 @@ class MapKTest : StringSpec({
 
     "zip10" {
       checkAll(
-        Arb.map(KEY_ARB, Arb.intSmall()),
-        Arb.map(KEY_ARB, Arb.intSmall())
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
         val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
           Tuple10(
             aa,
@@ -780,9 +728,8 @@ class MapKTest : StringSpec({
 
     "flatMap" {
       checkAll(
-        Arb.map(Arb.string(), Arb.intSmall()),
-        Arb.map(Arb.string(), Arb.string())
-      ) { a, b ->
+        Arb.map2(Arb.string(), Arb.int(), Arb.string())
+      ) { (a, b) ->
         val result: Map<String, String> = a.flatMap { b }
         val expected: Map<String, String> = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, _) -> Pair(k, b[k]!!) }
@@ -836,7 +783,4 @@ class MapKTest : StringSpec({
       })
     }
   }
-
 })
-
-private val KEY_ARB = Arb.int(0 .. 250)
