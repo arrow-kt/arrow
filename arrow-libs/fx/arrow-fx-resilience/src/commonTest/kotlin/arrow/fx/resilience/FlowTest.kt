@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import kotlin.random.Random
-import kotlin.random.nextInt
+import kotlin.random.nextLong
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -25,7 +25,7 @@ class FlowTest {
   fun retryFlowFails(): TestResult = runTest {
     val bang = RuntimeException("Bang!")
     val value = Random.nextInt()
-    val iterations = Random.nextInt(1..10)
+    val iterations = Random.nextLong(1..10L)
 
 
     var counter = 0
@@ -42,7 +42,7 @@ class FlowTest {
   @Test
   fun retryFlowSucceeds(): TestResult = runTest {
     val value = Random.nextInt()
-    val iterations = Random.nextInt(5..10)
+    val iterations = Random.nextLong(5..10L)
 
     var counter = 0
     val sum = flow {
@@ -57,7 +57,7 @@ class FlowTest {
   @Test
   fun retryScheduleWithDelay(): TestResult = runTest {
     val value = Random.nextInt()
-    val delayMs = Random.nextInt(100..1000)
+    val delayMs = Random.nextLong(100..1000L)
 
     val start = currentTime
     val timestamps = mutableListOf<Long>()
