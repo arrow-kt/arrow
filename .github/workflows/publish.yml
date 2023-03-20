@@ -27,6 +27,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   JEKYLL_ENV: production
   S3_BUCKET: ${{ secrets.S3_BUCKET }}
+  VERSIONING: true
 
 jobs:
   publish:
