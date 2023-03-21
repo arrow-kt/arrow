@@ -470,8 +470,11 @@ public abstract class arrow/fx/coroutines/Schedule {
 	public final fun const (Ljava/lang/Object;)Larrow/fx/coroutines/Schedule;
 	public abstract fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public final fun delay (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
+	public final fun delayed (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
 	public final fun delayedNanos (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public final fun dimap (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
+	public final fun doUntil (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
+	public final fun doWhile (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
 	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
 	public abstract fun foldLazy (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
 	public abstract fun forever ()Larrow/fx/coroutines/Schedule;
@@ -479,6 +482,7 @@ public abstract class arrow/fx/coroutines/Schedule {
 	public final fun jittered (Lkotlin/random/Random;)Larrow/fx/coroutines/Schedule;
 	public static synthetic fun jittered$default (Larrow/fx/coroutines/Schedule;Lkotlin/random/Random;ILjava/lang/Object;)Larrow/fx/coroutines/Schedule;
 	public final fun jitteredDuration (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;
+	public abstract fun log (Lkotlin/jvm/functions/Function3;)Larrow/fx/coroutines/Schedule;
 	public abstract fun logInput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public abstract fun logOutput (Lkotlin/jvm/functions/Function2;)Larrow/fx/coroutines/Schedule;
 	public abstract fun map (Lkotlin/jvm/functions/Function1;)Larrow/fx/coroutines/Schedule;

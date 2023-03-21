@@ -25,12 +25,7 @@ kotlin {
         api(projects.arrowCore)
         compileOnly(libs.kotlin.stdlibCommon)
         implementation(libs.coroutines.core)
-        implementation("org.jetbrains.kotlin:kotlin-stdlib") {
-          version {
-            strictly("[1.7, 1.8[")
-            prefer("1.8.10")
-          }
-        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib")
       }
     }
     if (!enableCompatibilityMetadataVariant) {

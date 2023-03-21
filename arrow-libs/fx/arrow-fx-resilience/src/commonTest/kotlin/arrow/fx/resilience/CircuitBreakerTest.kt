@@ -36,7 +36,7 @@ class CircuitBreakerTest {
     val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
     var effect = 0
     val iterations = stackSafeIteration()
-    Schedule.recurs<Unit>(iterations).repeat {
+    Schedule.recurs<Unit>(iterations.toLong()).repeat {
       cb.protectOrThrow { withContext(Dispatchers.Default) { effect += 1 } }
     }
     assertEquals(iterations + 1, effect)
@@ -47,7 +47,7 @@ class CircuitBreakerTest {
     val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
     var effect = 0
     val iterations = stackSafeIteration()
-    Schedule.recurs<Unit>(iterations).repeat {
+    Schedule.recurs<Unit>(iterations.toLong()).repeat {
       cb.protectOrThrow { effect += 1 }
     }
     assertEquals(iterations + 1, effect)
@@ -371,7 +371,7 @@ inline fun <reified A, reified B : A> assert(expected: A, block: (b: B) -> Unit)
 /**
  * Recurs the effect [n] times, and collects the output along the way for easy asserting.
  */
-fun <A> recurAndCollect(n: Int): Schedule<A, List<A>> =
+fun <A> recurAndCollect(n: Long): Schedule<A, List<A>> =
   Schedule.recurs<A>(n).zipRight(Schedule.identity<A>().collect())
 
 tailrec suspend fun stackSafeSuspend(cb: CircuitBreaker, n: Int, acc: Int): Int =
