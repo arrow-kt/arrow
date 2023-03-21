@@ -71,7 +71,7 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Erro
 
 @JvmName("_foldOrThrow")
 public inline fun <Error, A, B> fold(
-  @BuilderInference action: Raise<Error>.() -> A,
+  @BuilderInference block: Raise<Error>.() -> A,
   recover: (error: Error) -> B,
   transform: (value: A) -> B,
 ): B {
@@ -79,7 +79,7 @@ public inline fun <Error, A, B> fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold(action, { throw it }, recover, transform)
+  return fold(block, { throw it }, recover, transform)
 }
 
 @JvmName("_fold")
