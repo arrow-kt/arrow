@@ -18,27 +18,27 @@ import kotlin.jvm.JvmName
 /**
  * `invoke` the [Effect] and [fold] the result:
  *  - _success_ [transform] result of [A] to a value of [B].
- *  - _raised_ [recover] from `raised` value of [R] to a value of [B].
- *  - _exception_ [error] from [Throwable] by transforming value into [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *  - _exception_ [catch] from [Throwable] by transforming value into [B].
  *
  * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
  * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
  */
-public suspend fun <R, A, B> Effect<R, A>.fold(
-  error: suspend (error: Throwable) -> B,
-  recover: suspend (raised: R) -> B,
+public suspend fun <Error, A, B> Effect<Error, A>.fold(
+  catch: suspend (throwable: Throwable) -> B,
+  recover: suspend (error: Error) -> B,
   transform: suspend (value: A) -> B,
 ): B {
   contract {
-    callsInPlace(error, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold({ invoke() }, { error(it) }, { recover(it) }, { transform(it) })
+  return fold({ invoke() }, { catch(it) }, { recover(it) }, { transform(it) })
 }
 
-public suspend fun <R, A, B> Effect<R, A>.fold(
-  recover: suspend (raised: R) -> B,
+public suspend fun <Error, A, B> Effect<Error, A>.fold(
+  recover: suspend (error: Error) -> B,
   transform: suspend (value: A) -> B,
 ): B {
   contract {
@@ -48,20 +48,20 @@ public suspend fun <R, A, B> Effect<R, A>.fold(
   return fold({ throw it }, recover, transform)
 }
 
-public inline fun <R, A, B> EagerEffect<R, A>.fold(
-  error: (error: Throwable) -> B,
-  recover: (raised: R) -> B,
+public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
+  catch: (throwable: Throwable) -> B,
+  recover: (error: Error) -> B,
   transform: (value: A) -> B,
 ): B {
   contract {
-    callsInPlace(error, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold({ invoke(this) }, error, recover, transform)
+  return fold({ invoke(this) }, catch, recover, transform)
 }
 
-public inline fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform: (A) -> B): B {
+public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Error) -> B, transform: (value: A) -> B): B {
   contract {
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
@@ -70,33 +70,33 @@ public inline fun <R, A, B> EagerEffect<R, A>.fold(recover: (R) -> B, transform:
 }
 
 @JvmName("_foldOrThrow")
-public inline fun <R, A, B> fold(
-  @BuilderInference program: Raise<R>.() -> A,
-  recover: (raised: R) -> B,
+public inline fun <Error, A, B> fold(
+  @BuilderInference block: Raise<Error>.() -> A,
+  recover: (error: Error) -> B,
   transform: (value: A) -> B,
 ): B {
   contract {
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold(program, { throw it }, recover, transform)
+  return fold(block, { throw it }, recover, transform)
 }
 
 @JvmName("_fold")
-public inline fun <R, A, B> fold(
-  @BuilderInference program: Raise<R>.() -> A,
-  error: (error: Throwable) -> B,
-  recover: (raised: R) -> B,
+public inline fun <Error, A, B> fold(
+  @BuilderInference block: Raise<Error>.() -> A,
+  catch: (throwable: Throwable) -> B,
+  recover: (error: Error) -> B,
   transform: (value: A) -> B,
 ): B {
   contract {
-    callsInPlace(error, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
   val raise = DefaultRaise(false)
   return try {
-    val res = program(raise)
+    val res = block(raise)
     raise.complete()
     transform(res)
   } catch (e: CancellationException) {
@@ -104,21 +104,21 @@ public inline fun <R, A, B> fold(
     recover(e.raisedOrRethrow(raise))
   } catch (e: Throwable) {
     raise.complete()
-    error(e.nonFatalOrThrow())
+    catch(e.nonFatalOrThrow())
   }
 }
 
 /**
- * Inspect a [Trace] value of [R].
+ * Inspect a [Trace] value of [Error].
  *
- * Tracing [R] can be useful to know where certain errors, or failures are coming from.
+ * Tracing [Error] can be useful to know where certain errors, or failures are coming from.
  * Let's say you have a `DomainError`, but it might be raised from many places in the project.
  *
  * You would have to manually _trace_ where this error is coming from,
  * instead [Trace] offers you ways to inspect the actual stacktrace of where the raised value occurred.
  *
- * Beware that tracing can only track the [Raise.bind] or [Raise.raise] call that resulted in the [R] value,
- * and not any location of where the [R], or [Either.Left] value was created.
+ * Beware that tracing can only track the [Raise.bind] or [Raise.raise] call that resulted in the [Error] value,
+ * and not any location of where the [Error], or [Either.Left] value was created.
  *
  * ```kotlin
  * public fun main() {
@@ -148,16 +148,16 @@ public inline fun <R, A, B> fold(
  * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
  */
 @ExperimentalTraceApi
-public inline fun <R, A> Raise<R>.traced(
-  @BuilderInference program: Raise<R>.() -> A,
-  trace: (traced: Trace, R) -> Unit
+public inline fun <Error, A> Raise<Error>.traced(
+  @BuilderInference block: Raise<Error>.() -> A,
+  trace: (trace: Trace, error: Error) -> Unit
 ): A {
   val isOuterTraced = this is DefaultRaise && isTraced
   val nested = if (this is DefaultRaise && isTraced) this else DefaultRaise(true)
   return try {
-    program.invoke(nested)
+    block.invoke(nested)
   } catch (e: RaiseCancellationException) {
-    val r: R = e.raisedOrRethrow(nested)
+    val r: Error = e.raisedOrRethrow(nested)
     trace(Trace(e), r)
     if (isOuterTraced) throw e else raise(r)
   }
