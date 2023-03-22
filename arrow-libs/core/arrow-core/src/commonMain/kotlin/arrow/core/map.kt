@@ -48,27 +48,33 @@ public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
  * <!--- KNIT example-map-02.kt -->
  * <!--- lines.isEmpty() -->
  */
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> =
   buildMap(size) {
     this@zip.forEach { (key, bb) ->
-      nullable {
-        put(key, map(key, bb, other[key].bind()))
+      if (other.containsKey(key)) {
+        put(key, map(key, bb, other[key] as B))
       }
     }
   }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
   map: (Key, B, C, D) -> E
 ): Map<Key, E> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(key, map(key, bb, c[key].bind(), d[key].bind()))
+    if (c.containsKey(key) && d.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+
+      put(key, map(key, bb, cc, dd))
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -76,12 +82,17 @@ public inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   map: (Key, B, C, D, E) -> F
 ): Map<Key, F> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind()))
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+
+      put(key, map(key, bb, cc, dd, ee))
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -90,12 +101,18 @@ public inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   map: (Key, B, C, D, E, F) -> G
 ): Map<Key, G> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind(), f[key].bind()))
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+      val ff = f[key] as F
+
+      put(key, map(key, bb, cc, dd, ee, ff))
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -105,12 +122,19 @@ public inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   map: (Key, B, C, D, E, F, G) -> H
 ): Map<Key, H> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind(), f[key].bind(), g[key].bind()))
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+      val ff = f[key] as F
+      val gg = g[key] as G
+
+      put(key, map(key, bb, cc, dd, ee, ff, gg))
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -121,12 +145,20 @@ public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   map: (Key, B, C, D, E, F, G, H) -> I
 ): Map<Key, I> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(key, map(key, bb, c[key].bind(), d[key].bind(), e[key].bind(), f[key].bind(), g[key].bind(), h[key].bind()))
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+      val ff = f[key] as F
+      val gg = g[key] as G
+      val hh = h[key] as H
+
+      put(key, map(key, bb, cc, dd, ee, ff, gg, hh))
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -138,25 +170,23 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   map: (Key, B, C, D, E, F, G, H, I) -> J
 ): Map<Key, J> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key) && i.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+      val ff = f[key] as F
+      val gg = g[key] as G
+      val hh = h[key] as H
+      val ii = i[key] as I
+
       put(
-        key,
-        map(
-          key,
-          bb,
-          c[key].bind(),
-          d[key].bind(),
-          e[key].bind(),
-          f[key].bind(),
-          g[key].bind(),
-          h[key].bind(),
-          i[key].bind()
-        )
+        key, map(key, bb, cc, dd, ee, ff, gg, hh, ii)
       )
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -169,26 +199,22 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   map: (Key, B, C, D, E, F, G, H, I, J) -> K
 ): Map<Key, K> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(
-        key,
-        map(
-          key,
-          bb,
-          c[key].bind(),
-          d[key].bind(),
-          e[key].bind(),
-          f[key].bind(),
-          g[key].bind(),
-          h[key].bind(),
-          i[key].bind(),
-          j[key].bind()
-        )
-      )
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key) && i.containsKey(key) && j.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+      val ff = f[key] as F
+      val gg = g[key] as G
+      val hh = h[key] as H
+      val ii = i[key] as I
+      val jj = j[key] as J
+
+      put(key, map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj))
     }
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   c: Map<Key, C>,
   d: Map<Key, D>,
@@ -202,23 +228,18 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   map: (Key, B, C, D, E, F, G, H, I, J, K) -> L
 ): Map<Key, L> = buildMap(size) {
   this@zip.forEach { (key, bb) ->
-    nullable {
-      put(
-        key,
-        map(
-          key,
-          bb,
-          c[key].bind(),
-          d[key].bind(),
-          e[key].bind(),
-          f[key].bind(),
-          g[key].bind(),
-          h[key].bind(),
-          i[key].bind(),
-          j[key].bind(),
-          k[key].bind()
-        )
-      )
+    if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key) && i.containsKey(key) && j.containsKey(key) && k.containsKey(key)) {
+      val cc = c[key] as C
+      val dd = d[key] as D
+      val ee = e[key] as E
+      val ff = f[key] as F
+      val gg = g[key] as G
+      val hh = h[key] as H
+      val ii = i[key] as I
+      val jj = j[key] as J
+      val kk = k[key] as K
+
+      put(key, map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk))
     }
   }
 }
@@ -227,10 +248,14 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
  * Transform every [Map.Entry] of the original [Map] using [f],
  * only keeping the [Map.Entry] of the transformed map that match the input [Map.Entry].
  */
+@Suppress("UNCHECKED_CAST")
 public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   buildMap {
     this@flatMap.forEach { entry ->
-      f(entry)[entry.key]?.let { put(entry.key, it) }
+      val nestedMap = f(entry)
+      if (nestedMap.containsKey(entry.key)) {
+        put(entry.key, nestedMap[entry.key] as B)
+      }
     }
   }
 
