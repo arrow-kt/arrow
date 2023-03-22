@@ -2,6 +2,7 @@
 package arrow.core.examples.exampleSequence01
 
 import arrow.core.align
+import arrow.core.Ior
 import arrow.core.Ior.Both
 import arrow.core.Ior.Left
 import arrow.core.Ior.Right

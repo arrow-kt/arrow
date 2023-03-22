@@ -264,6 +264,7 @@ public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
  *
  * ```kotlin
  * import arrow.core.align
+ * import arrow.core.Ior
  * import arrow.core.Ior.Both
  * import arrow.core.Ior.Left
  * import arrow.core.Ior.Right
@@ -285,8 +286,8 @@ public fun <B, C, D, E, F, G, H, I, J, K, L> Sequence<B>.zip(
  * <!--- KNIT example-sequence-01.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<C> =
-  alignRec(this, b, { fa(Ior.Left(it)) }, { fa(Ior.Right(it)) }) { a, bb -> fa(Ior.Both(a, bb)) }
+public fun <A, B, C> Sequence<A>.align(seqB: Sequence<B>, fa: (Ior<A, B>) -> C): Sequence<C> =
+  alignRec(this, seqB, { fa(Ior.Left(it)) }, { fa(Ior.Right(it)) }) { a, b -> fa(Ior.Both(a, b)) }
 
 /**
  * Combines two [Sequence] by returning [Ior.Both] when both [Sequence] have an item,
@@ -311,8 +312,8 @@ public fun <A, B, C> Sequence<A>.align(b: Sequence<B>, fa: (Ior<A, B>) -> C): Se
  * <!--- KNIT example-sequence-02.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B> Sequence<A>.align(b: Sequence<B>): Sequence<Ior<A, B>> =
-  alignRec(this, b, { Ior.Left(it) }, { Ior.Right(it) }) { a, b -> Ior.Both(a, b) }
+public fun <A, B> Sequence<A>.align(seqB: Sequence<B>): Sequence<Ior<A, B>> =
+  alignRec(this, seqB, { Ior.Left(it) }, { Ior.Right(it) }) { a, b -> Ior.Both(a, b) }
 
 private fun <X, Y, Z> alignRec(
   ls: Sequence<X>,
