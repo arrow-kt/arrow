@@ -10,6 +10,7 @@ import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupDeprecation
 import arrow.typeclasses.combine
@@ -423,6 +424,10 @@ public fun <A> Sequence<A>.fold(MA: Monoid<A>): A = MA.run {
   }
 }
 
+@Deprecated(
+  "$MonoidDeprecation\n$NicheAPI",
+  ReplaceWith("fold(initial){ acc, a -> acc, f(a) } }", "arrow.core.sequence")
+)
 public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   this@foldMap.fold(empty()) { acc, a ->
     acc.combine(f(a))
@@ -605,7 +610,7 @@ public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): 
 
 @Deprecated(
   "$SemigroupDeprecation\n$NicheAPI",
-  ReplaceWith("Sequence { List(n) { this@replicate }.iterator() }")
+  ReplaceWith("Sequence<Sequence<A>> { List<Sequence<A>>(n) { this }.iterator() }")
 )
 public fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
   Sequence { List(n) { this@replicate }.iterator() }
@@ -677,7 +682,7 @@ public fun <A> Sequence<A>.salign(
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("salign(other, SG::combine)", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("salign(other, {a, b -> a + b})", "arrow.typeclasses.combine"))
 public fun <A> Sequence<A>.salign(
   SG: Semigroup<A>,
   other: Sequence<A>
@@ -717,6 +722,11 @@ public fun <A, B> Sequence<Either<A, B>>.separateEitherToPair(): Pair<List<A>, L
  * @receiver Iterable of Validated
  * @return a tuple containing Sequence with [Validated.Invalid] and another Sequence with its [Validated.Valid] values.
  */
+@Deprecated(
+  "${ValidatedDeprMsg}SemigroupDeprecation\n$NicheAPI",
+  ReplaceWith("separateEither()")
+)
+
 public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> =
   fold(sequenceOf<A>() to sequenceOf<B>()) { (invalids, valids), validated ->
     when (validated) {
@@ -844,9 +854,8 @@ public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequen
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<E, A, B>({e1, e2 -> e1 + e2}) { f(it).bind<E, B>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 @OptIn(ExperimentalTypeInference::class)
@@ -880,7 +889,10 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
 
 @Deprecated(
   "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f).map { it.asSequence() }", "arrow.core.traverse")
+  ReplaceWith(
+    "mapOrAccumulate{e1, e2 -> e1 + e2} { f(it).bind() }.toValidated().map { it.asSequence() }",
+    "`arrow.core.mapOrAccumulate`"
+  )
 )
 public fun <E, A, B> Sequence<A>.traverseValidated(
   semigroup: Semigroup<E>,
@@ -954,11 +966,24 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
 public fun <A, B, C> Sequence<C>.unalignToPair(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalignToPair()
 
+@Deprecated(
+  NicheAPI + "Prefer using flatMap + fold",
+  ReplaceWith(
+    "flatMap { either -> either.fold<Sequence<B>>({ emptySequence() }, { b -> sequenceOf(b) }) }"
+  )
+)
 public fun <A, B> Sequence<Either<A, B>>.uniteEither(): Sequence<B> =
   flatMap { either ->
     either.fold({ emptySequence() }, { b -> sequenceOf(b) })
   }
 
+@Deprecated(
+  ValidatedDeprMsg,
+  ReplaceWith(
+    "flatMap { validated -> validated.toEither().fold<Sequence<B>>({ emptySequence() }, { b -> sequenceOf(b) })}",
+    "arrow.core.traverse"
+  )
+)
 public fun <A, B> Sequence<Validated<A, B>>.uniteValidated(): Sequence<B> =
   flatMap { validated ->
     validated.fold({ emptySequence() }, { b -> sequenceOf(b) })
