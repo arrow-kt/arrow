@@ -12,6 +12,7 @@ import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
 import kotlin.math.max
@@ -40,24 +41,26 @@ class SequenceKTest : StringSpec({
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = generateSequence(0) { it + 1 }.traverse { a ->
-        (a <= 20_000).maybe {
+        if ((a <= 20_000)) {
           acc.add(a)
-          a
+          Some(a)
+        } else {
+          None
         }
       }
       acc shouldBe (0..20_000).toList()
       res shouldBe None
     }
 
-    "traverse for Validated stack-safe" {
+    "mapOrAccumlate for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
+      val res = (0..20_000).asSequence().mapOrAccumulate(String::plus) {
         acc.add(it)
-        Validated.Valid(it)
+        Either.Right(it).bind()
       }.map { it.toList() }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
+      res shouldBe Either.Right(acc)
+      res shouldBe Either.Right((0..20_000).toList())
     }
 
     "traverse for Validated acummulates" {
@@ -262,7 +265,7 @@ class SequenceKTest : StringSpec({
     "can align sequences - 2" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
-          it.isBoth shouldBe true
+          it.isBoth() shouldBe true
         }
       }
     }
@@ -272,11 +275,8 @@ class SequenceKTest : StringSpec({
         val ls = a.toList()
         val rs = b.toList()
         a.align(b).drop(min(ls.size, rs.size)).forEach {
-          if (ls.size < rs.size) {
-            it.isRight shouldBe true
-          } else {
-            it.isLeft shouldBe true
-          }
+          if (ls.size < rs.size) it.isRight() shouldBe true
+          else it.isLeft() shouldBe true
         }
       }
     }
@@ -350,20 +350,20 @@ class SequenceKTest : StringSpec({
           else it.right()
         }
 
-        val (lefts, rights) = sequence.separateEither()
+        val (lefts, rights) = sequence.separateEitherToPair()
 
-        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
+        lefts to rights shouldBe ints.partition { it % 2 == 0 }
       }
     }
 
     "separateValidated" {
       checkAll(Arb.sequence(Arb.int())) { ints ->
         val sequence = ints.map {
-          if (it % 2 == 0) it.invalid()
-          else it.valid()
+          if (it % 2 == 0) it.left()
+          else it.right()
         }
 
-        val (invalids, valids) = sequence.separateValidated()
+        val (invalids, valids) = sequence.separateEitherToPair()
 
         invalids.toList() to valids.toList() shouldBe ints.partition { it % 2 == 0 }
       }
