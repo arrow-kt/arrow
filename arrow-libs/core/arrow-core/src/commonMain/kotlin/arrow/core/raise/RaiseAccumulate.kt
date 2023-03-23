@@ -492,7 +492,7 @@ public open class RaiseAccumulate<Error>(
   @RaiseDSL
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
-  ): List<B> = raise.mapOrAccumulate(this) { transform(it) }
+  ): List<B> = raise.mapOrAccumulate(this, transform)
 
   @RaiseDSL
   override fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
