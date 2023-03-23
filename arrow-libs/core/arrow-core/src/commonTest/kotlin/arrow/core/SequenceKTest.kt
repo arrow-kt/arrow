@@ -241,7 +241,8 @@ class SequenceKTest : StringSpec({
     "crosswalk the sequence to a List function" {
       checkAll(Arb.list(Arb.string())){ strList ->
         val obtained = strList.asSequence().crosswalk { listOf(it.length) }
-        val expected = listOf(strList.map { it.length })
+        val expected = if (strList.isEmpty()) emptyList()
+                      else listOf(strList.map { it.length })
         obtained.map{ it.sorted() } shouldBe expected.map { it.sorted() }
       }
     }
