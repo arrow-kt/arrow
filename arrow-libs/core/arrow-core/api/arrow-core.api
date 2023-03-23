@@ -1569,6 +1569,8 @@ public final class arrow/core/SequenceKt {
 	public static final fun crosswalk (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/sequences/Sequence;
 	public static final fun crosswalkMap (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun crosswalkNull (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/sequences/Sequence;
+	public static final fun crosswalkNullList (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun crosswalkT (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun filterOption (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun flatten (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun fold (Lkotlin/sequences/Sequence;Larrow/typeclasses/Monoid;)Ljava/lang/Object;
@@ -1590,6 +1592,7 @@ public final class arrow/core/SequenceKt {
 	public static final fun salign (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun salign (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;
 	public static final fun separateEither (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
+	public static final fun separateEitherToPair (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun separateValidated (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Either;
 	public static final fun sequence (Lkotlin/sequences/Sequence;)Larrow/core/Option;
@@ -1608,11 +1611,15 @@ public final class arrow/core/SequenceKt {
 	public static final fun traverseValidated (Lkotlin/sequences/Sequence;Larrow/typeclasses/Semigroup;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun unalign (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun unalign (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
+	public static final fun unalignToPair (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
+	public static final fun unalignToPair (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun uniteEither (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun uniteValidated (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun unweave (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/sequences/Sequence;
 	public static final fun unzip (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun unzip (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
+	public static final fun unzipToPair (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
+	public static final fun unzipToPair (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun void (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun widen (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun zip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function3;)Lkotlin/sequences/Sequence;

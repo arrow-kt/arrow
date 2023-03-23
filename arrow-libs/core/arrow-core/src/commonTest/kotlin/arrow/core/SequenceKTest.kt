@@ -235,6 +235,24 @@ class SequenceKTest : StringSpec({
       }
     }
 
+    "crosswalk the sequence to a List function" {
+      checkAll(Arb.list(Arb.string())){ strList ->
+        val obtained = strList.asSequence().crosswalk { listOf(it.length) }
+        val expected = listOf(strList.map { it.length })
+        obtained.map{ it.sorted() } shouldBe expected.map { it.sorted() }
+      }
+    }
+
+    "crosswalk the sequence to a nullable function" {
+      checkAll(Arb.list(Arb.string())){ strList ->
+        fun nullEvens(i: Int): Int? = if(i % 2 == 0) i else null
+
+        val obtained = strList.asSequence().crosswalkNullList { nullEvens(it.length) }
+        val expected = strList.map { nullEvens(it.length) }
+        obtained?.size shouldBe expected.filterNotNull().size
+      }
+    }
+
     "can align sequences - 1" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
@@ -302,7 +320,24 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "filterOption should filter None" {
+    "unzipToPair should unzip values in a Pair in a Sequence of Pairs" {
+      checkAll(Arb.list(Arb.pair(Arb.string(), Arb.int()))){pairList ->
+        val obtained = pairList.asSequence().unzipToPair()
+        val expected = pairList.unzip()
+        obtained shouldBe expected
+      }
+    }
+
+    "unzipToPair should unzip values in a Pair in a Sequence" {
+      checkAll(Arb.list(Arb.string())){strList ->
+        val obtained = strList.asSequence().unzipToPair{str -> Pair(str, str.length)}
+        val expected = strList.unzip { str -> Pair(str, str.length) }
+        obtained shouldBe expected
+      }
+    }
+
+
+  "filterOption should filter None" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
