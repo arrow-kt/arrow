@@ -1098,10 +1098,12 @@ public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
  * and unwraps the remaining elements [Some] values.
  *
  * ```kotlin
- * import arrow.core.widen
+ * import arrow.core.None
+ * import arrow.core.Some
+ * import arrow.core.filterOption
  * import io.kotest.matchers.shouldBe
  *
- * fun main(args: Array<String>) {
+ * fun test() {
  * generateSequence(0) { it + 1 }
  *   .map { if (it % 2 == 0) Some(it) else None }
  *   .filterOption()
