@@ -491,7 +491,7 @@ public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Sem
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "this.mapOrAccumulate<E, A>({ a, b -> semigroup.run<Semigroup<E>, E> { a.combine(b) } }) { it.bind<A>() }.toValidated()",
+    "this.mapOrAccumulate<E, A>({ a, b -> a + b }) { it.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
