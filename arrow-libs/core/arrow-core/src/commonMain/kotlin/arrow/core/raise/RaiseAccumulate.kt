@@ -3,7 +3,6 @@
 @file:JvmName("RaiseKt")
 package arrow.core.raise
 
-import arrow.core.mapOrAccumulate
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.EmptyValue
@@ -489,6 +488,15 @@ public open class RaiseAccumulate<Error>(
   @RaiseDSL
   public override fun raise(r: Error): Nothing =
     raise.raise(nonEmptyListOf(r))
+
+  @RaiseDSL
+  public inline fun <A, B> Iterable<A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(A) -> B
+  ): List<B> = raise.mapOrAccumulate(this, transform)
+
+  @RaiseDSL
+  override fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
+    mapOrAccumulate { it.bind() }
 
   @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {

@@ -16,7 +16,6 @@ import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -44,33 +43,54 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
 
 public typealias Null = Nothing?
 
-@JvmInline
-public value class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
+public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
+
+  @RaiseDSL
   public fun <A> Option<A>.bind(): A = getOrElse { raise(null) }
 
+  @RaiseDSL
   public fun <A> A?.bind(): A {
     contract { returns() implies (this@bind != null) }
     return this ?: raise(null)
   }
 
+  @RaiseDSL
+  @JvmName("bindAllNullable")
+  public fun <A> Iterable<A?>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
   public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
 }
 
-@JvmInline
-public value class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
+public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
+  @RaiseDSL
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
+
+  @RaiseDSL
+  @JvmName("bindAllResult")
+  public fun <A> Iterable<Result<A>>.bindAll(): List<A> =
+    map { it.bind() }
 }
 
-@JvmInline
-public value class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
+public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
+  @RaiseDSL
   public fun <A> Option<A>.bind(): A = getOrElse { raise(None) }
+
+  @RaiseDSL
+  @JvmName("bindAllOption")
+  public fun <A> Iterable<Option<A>>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
+  @RaiseDSL
   public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
@@ -83,8 +103,15 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   private val raise: Raise<Error>,
 ) : Raise<Error> {
 
+  @RaiseDSL
   override fun raise(r: Error): Nothing = raise.raise(combine(r))
 
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  public fun <A> Iterable<Ior<Error, A>>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
   public fun <A> Ior<Error, A>.bind(): A =
     when (this) {
       is Ior.Left -> raise(value)
