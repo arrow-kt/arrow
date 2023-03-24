@@ -466,7 +466,7 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "this.mapOrAccumulate<E, A, B>({ a, b -> semigroup.run<Semigroup<E>, E> { a.combine(b) } }) { f(it).bind<B>() }.toValidated()",
+    "this.mapOrAccumulate<E, A, B>({ a, b -> a + b}) { f(it).bind<B>() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
