@@ -453,7 +453,7 @@ public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "this.mapOrAccumulate<E, A, B>({ a, b -> semigroup.run<Semigroup<E>, E> { a.combine(b) } }) { f(it).bind<B>() }.toValidated()",
+    "this.mapOrAccumulate<E, A, B>({ a, b -> a + b}) { f(it).bind<B>() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
