@@ -546,7 +546,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "filterInstance1" {
+    "filterInstance" {
       checkAll(
         Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.string()))
       ) { xs ->
@@ -557,10 +557,15 @@ class MapKTest : StringSpec({
       }
     }
 
-    "filterInstance2" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) {
-        xs ->
-          xs.filterIsInstance<Int, Int>() shouldBe xs
+    "filterInstance: identity" {
+      checkAll(Arb.map(Arb.int(), Arb.int())) { xs ->
+        xs.filterIsInstance<Int, Int>() shouldBe xs
+      }
+    }
+
+    "filterInstance: identity with null" {
+      checkAll(Arb.map(Arb.int(), Arb.int().orNull())) { xs ->
+        xs.filterIsInstance<Int, Int?>() shouldBe xs
       }
     }
 
