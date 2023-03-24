@@ -1,8 +1,8 @@
 package arrow.core
 
 import arrow.core.test.either
-import arrow.core.test.functionAToB
 import arrow.core.test.ior
+import arrow.core.test.functionAToB
 import arrow.core.test.option
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
@@ -325,15 +325,29 @@ class IterableTest : StringSpec({
   }
 
   "unalign is the inverse of align" {
+    fun <A, B> Pair<List<A?>, List<B?>>.fix(): Pair<List<A>, List<B>> =
+      first.mapNotNull { it } to second.mapNotNull { it }
+
     checkAll(Arb.list(Arb.int()), Arb.list(Arb.string())) { a, b ->
-      a.align(b).unalign() shouldBe (a to b)
+      a.align(b).unalign().fix() shouldBe (a to b)
     }
   }
 
   "align is the inverse of unalign" {
+    fun <A, B> Ior<A?, B?>.fix(): Ior<A, B> =
+      fold({ Ior.Left(it!!) }, { Ior.Right(it!!) }, { a, b ->
+        when {
+          a == null -> Ior.Right(b!!)
+          b == null -> Ior.Left(a)
+          else -> Ior.Both(a, b)
+        }
+      })
+
     checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
       val (a, b) = xs.unalign()
-      a.align(b) shouldBe xs
+      a.align(b) {
+        it.fix()
+      } shouldBe xs
     }
   }
 

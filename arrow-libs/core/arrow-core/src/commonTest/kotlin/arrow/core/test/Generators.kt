@@ -77,7 +77,12 @@ fun <A, B> Arb.Companion.ior(arbA: Arb<A>, arbB: Arb<B>): Arb<Ior<A, B>> =
   arbA.alignWith(arbB) { it }
 
 private fun <A, B, R> Arb<A>.alignWith(arbB: Arb<B>, transform: (Ior<A, B>) -> R): Arb<R> =
-  Arb.bind(this, arbB) { a, b -> transform(Ior.Both(a, b)) }
+  Arb.choice(
+    this.map { Ior.Left(it) },
+    Arb.bind(this, arbB) { a, b -> Ior.Both(a, b) },
+    arbB.map { Ior.Right(it) }
+  ).map(transform)
+
 
 fun Arb.Companion.suspendFunThatReturnsEitherAnyOrAnyOrThrows(): Arb<suspend () -> Either<Any, Any>> =
   choice(
