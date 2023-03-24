@@ -450,7 +450,7 @@ public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> =
  * Returns a Map containing all elements that are instances of specified type parameter R.
  */
 public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
-  mapNotNull { it as? R }
+  mapNotNull { it.value as? R }
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
