@@ -391,9 +391,7 @@ public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
  * <!--- KNIT example-map-03.kt -->
  */
 public fun <K, A, B> Map<K, A>.align(b: Map<K, B>): Map<K, Ior<A, B>> =
-  (keys + b.keys).mapNotNull { key ->
-    Ior.fromNullables(this[key], b[key])!!.let { key to it }
-  }.toMap()
+  (keys + b.keys).associateWith { key -> Ior.fromNullables(this[key], b[key])!! }
 
 /**
  * Combines two structures by taking the union of their shapes and combining the elements with the given function.
