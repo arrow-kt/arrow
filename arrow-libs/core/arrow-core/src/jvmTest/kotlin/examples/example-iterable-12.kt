@@ -2,15 +2,12 @@
 package arrow.core.examples.exampleIterable12
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-   listOf("A:1", "B:2", "C:3").unzip { e ->
-     e.split(":").let {
-       it.first() to it.last()
-     }
-   }
-  //sampleEnd
-  println(result)
+fun test() {
+  listOf("A:1", "B:2", "C:3").unzip { e ->
+    e.split(":").let {
+      it.first() to it.last()
+    }
+  } shouldBe Pair(listOf("A", "B", "C"), listOf("1", "2", "3"))
 }

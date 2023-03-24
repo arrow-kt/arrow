@@ -7,16 +7,16 @@ import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.checkAll
 
-object IsoLaws {
+data class IsoLaws<A, B>(
+  val iso: Iso<A, B>,
+  val aGen: Arb<A>,
+  val bGen: Arb<B>,
+  val funcGen: Arb<(B) -> B>,
+  val eqa: (A, A) -> Boolean = { a, b -> a == b },
+  val eqb: (B, B) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <A, B> laws(
-    iso: Iso<A, B>,
-    aGen: Arb<A>,
-    bGen: Arb<B>,
-    funcGen: Arb<(B) -> B>,
-    eqa: (A, A) -> Boolean = { a, b -> a == b },
-    eqb: (B, B) -> Boolean = { a, b -> a == b }
-  ): List<Law> =
+  override val laws: List<Law> =
     listOf(
       Law("Iso Law: round trip one way") { iso.roundTripOneWay(aGen, eqa) },
       Law("Iso Law: round trip other way") { iso.roundTripOtherWay(bGen, eqb) },

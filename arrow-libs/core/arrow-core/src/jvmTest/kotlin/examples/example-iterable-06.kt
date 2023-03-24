@@ -2,13 +2,10 @@
 package arrow.core.examples.exampleIterable06
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-val padRight = listOf(1, 2).leftPadZip(listOf("a"))        // Result: [Pair(1, "a")]
-val padLeft = listOf(1).leftPadZip(listOf("a", "b"))       // Result: [Pair(1, "a"), Pair(null, "b")]
-val noPadding = listOf(1, 2).leftPadZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
-
-fun main() {
-  println("padRight = $padRight")
-  println("padLeft = $padLeft")
-  println("noPadding = $noPadding")
+fun test() {
+  listOf(1, 2).leftPadZip(listOf("a")) shouldBe listOf(1 to "a")
+  listOf(1).leftPadZip(listOf("a", "b")) shouldBe listOf(1 to "a", null to "b")
+  listOf(1, 2).leftPadZip(listOf("a", "b")) shouldBe listOf(1 to "a", 2 to "b")
 }

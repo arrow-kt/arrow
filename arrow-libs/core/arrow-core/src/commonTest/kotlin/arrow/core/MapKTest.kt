@@ -21,7 +21,6 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldNotContainKey
-import io.kotest.matchers.maps.shouldNotHaveValues
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -32,6 +31,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
@@ -136,132 +136,114 @@ class MapKTest : StringSpec({
     }
 
     "can align maps" {
-      // aligned keySet is union of a's and b's keys
       checkAll(
         Arb.map2(Arb.string(), Arb.int(), Arb.int())
       ) { (a, b) ->
         val aligned = a.align(b)
+        // aligned keySet is union of a's and b's keys
         aligned.size shouldBe (a.keys + b.keys).size
-      }
-
-      // aligned map contains Both for all entries existing in a and b
-      checkAll(
-        Arb.map2(Arb.string(), Arb.int(), Arb.int())
-      ) { (a, b) ->
-        val aligned = a.align(b)
+        // aligned map contains Both for all entries existing in a and b
         a.keys.intersect(b.keys).forEach {
-          aligned[it]?.isBoth shouldBe true
+          aligned[it]?.isBoth() shouldBe true
         }
-      }
-
-      // aligned map contains Left for all entries existing only in a
-      checkAll(
-        Arb.map2(Arb.string(), Arb.int(), Arb.int())
-      ) { (a, b) ->
-        val aligned = a.align(b)
+        // aligned map contains Left for all entries existing only in a
         (a.keys - b.keys).forEach { key ->
-          aligned[key]?.isLeft shouldBe true
+          aligned[key]?.isLeft() shouldBe true
+        }
+        // aligned map contains Right for all entries existing only in b
+        (b.keys - a.keys).forEach { key ->
+          aligned[key]?.isRight() shouldBe true
         }
       }
+    }
 
-      // aligned map contains Right for all entries existing only in b
+    "zip is idempotent" {
+      checkAll(
+        Arb.map(Arb.string(), Arb.intSmall())) {
+          a ->
+          a.zip(a) shouldBe a.mapValues { it.value to it.value }
+      }
+    }
+
+    "align is idempotent" {
+      checkAll(
+        Arb.map(Arb.string(), Arb.intSmall())) {
+          a ->
+        a.align(a) shouldBe a.mapValues { Ior.Both(it.value, it.value) }
+      }
+    }
+
+    "zip is commutative" {
       checkAll(
         Arb.map2(Arb.string(), Arb.int(), Arb.int())
       ) { (a, b) ->
-        val aligned = a.align(b)
-        (b.keys - a.keys).forEach { key ->
-          aligned[key]?.isRight shouldBe true
-        }
+
+        a.zip(b) shouldBe b.zip(a).mapValues { it.value.second to it.value.first }
       }
     }
 
-  "zip is idempotent" {
-    checkAll(
-      Arb.map(Arb.string(), Arb.intSmall())) {
-        a ->
-        a.zip(a) shouldBe a.mapValues { it.value to it.value }
+    "align is commutative" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
+
+        a.align(b) shouldBe b.align(a).mapValues { it.value.swap() }
+      }
     }
-  }
 
-  "align is idempotent" {
-    checkAll(
-      Arb.map(Arb.string(), Arb.intSmall())) {
-        a ->
-      a.align(a) shouldBe a.mapValues { Ior.Both(it.value, it.value) }
+    "zip is associative" {
+      checkAll(
+        Arb.map3(Arb.string(), Arb.int(), Arb.int(), Arb.int())
+      ) { (a, b, c)  ->
+
+        fun <A, B, C> Pair<Pair<A, B>, C>.assoc(): Pair<A, Pair<B, C>> =
+          this.first.first to (this.first.second to this.second)
+
+        a.zip(b.zip(c)) shouldBe (a.zip(b)).zip(c).mapValues { it.value.assoc() }
+      }
     }
-  }
 
-  "zip is commutative" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int())
-    ) { (a, b) ->
+    "align is associative" {
+      checkAll(
+        Arb.map3(Arb.string(), Arb.int(), Arb.int(), Arb.int())
+      ) { (a, b, c)  ->
 
-      a.zip(b) shouldBe b.zip(a).mapValues { it.value.second to it.value.first }
-    }
-  }
-
-  "align is commutative" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int())
-    ) { (a, b) ->
-
-      a.align(b) shouldBe b.align(a).mapValues { it.value.swap() }
-    }
-  }
-
-  "zip is associative" {
-    checkAll(
-      Arb.map3(Arb.string(), Arb.int(), Arb.int(), Arb.int())
-    ) { (a, b, c)  ->
-
-      fun <A, B, C> Pair<Pair<A, B>, C>.assoc(): Pair<A, Pair<B, C>> =
-        this.first.first to (this.first.second to this.second)
-
-      a.zip(b.zip(c)) shouldBe (a.zip(b)).zip(c).mapValues { it.value.assoc() }
-    }
-  }
-
-  "align is associative" {
-    checkAll(
-      Arb.map3(Arb.string(), Arb.int(), Arb.int(), Arb.int())
-    ) { (a, b, c)  ->
-
-      fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
-        when (this) {
-          is Ior.Left -> when (val inner = this.value) {
-            is Ior.Left -> Ior.Left(inner.value)
-            is Ior.Right -> Ior.Right(Ior.Left(inner.value))
-            is Ior.Both -> Ior.Both(inner.leftValue, Ior.Left(inner.rightValue))
+        fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
+          when (this) {
+            is Ior.Left -> when (val inner = this.value) {
+              is Ior.Left -> Ior.Left(inner.value)
+              is Ior.Right -> Ior.Right(Ior.Left(inner.value))
+              is Ior.Both -> Ior.Both(inner.leftValue, Ior.Left(inner.rightValue))
+            }
+            is Ior.Right -> Ior.Right(Ior.Right(this.value))
+            is Ior.Both -> when (val inner = this.leftValue) {
+              is Ior.Left -> Ior.Both(inner.value, Ior.Right(this.rightValue))
+              is Ior.Right -> Ior.Right(Ior.Both(inner.value, this.rightValue))
+              is Ior.Both -> Ior.Both(inner.leftValue, Ior.Both(inner.rightValue, this.rightValue))
+            }
           }
-          is Ior.Right -> Ior.Right(Ior.Right(this.value))
-          is Ior.Both -> when (val inner = this.leftValue) {
-            is Ior.Left -> Ior.Both(inner.value, Ior.Right(this.rightValue))
-            is Ior.Right -> Ior.Right(Ior.Both(inner.value, this.rightValue))
-            is Ior.Both -> Ior.Both(inner.leftValue, Ior.Both(inner.rightValue, this.rightValue))
-          }
-        }
 
-      a.align(b.align(c)) shouldBe (a.align(b)).align(c).mapValues { it.value.assoc() }
+        a.align(b.align(c)) shouldBe (a.align(b)).align(c).mapValues { it.value.assoc() }
+      }
     }
-  }
 
-  "zip with" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
-      Arb.functionABCToD<String, Int, Int, String>(Arb.string())
-    ) { (a, b), fn ->
-      a.zip(b, fn) shouldBe a.zip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
+    "zip with" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+        Arb.functionABCToD<String, Int, Int, String>(Arb.string())
+      ) { (a, b), fn ->
+        a.zip(b, fn) shouldBe a.zip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
+      }
     }
-  }
 
-  "align with" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
-      Arb.functionAToB<Map.Entry<String, Ior<Int, Int>>, String>(Arb.string())
-    ) { (a, b), fn ->
-      a.align(b, fn) shouldBe a.align(b).mapValues { fn(it) }
+    "align with" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+        Arb.functionAToB<Map.Entry<String, Ior<Int, Int>>, String>(Arb.string())
+      ) { (a, b), fn ->
+        a.align(b, fn) shouldBe a.align(b).mapValues { fn(it) }
+      }
     }
-  }
 
     "zip functoriality" {
       checkAll(
@@ -280,314 +262,330 @@ class MapKTest : StringSpec({
       }
     }
 
-  "align functoriality" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
-      Arb.functionAToB<Int, String>(Arb.string()),
-      Arb.functionAToB<Int, String>(Arb.string())
-    ) {
-        (a,b),f,g ->
+    "align functoriality" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+        Arb.functionAToB<Int, String>(Arb.string()),
+        Arb.functionAToB<Int, String>(Arb.string())
+      ) {
+          (a,b),f,g ->
 
-      val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
-      val r = a.align(b).mapValues { it.value.bimap(f,g)}
+        val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
+        val r = a.align(b).mapValues { it.value.bimap(f,g)}
 
-      l shouldBe r
+        l shouldBe r
+      }
     }
-  }
 
-  "alignedness" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int())
-    ) { (a, b) ->
+    "alignedness" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
 
-      fun <K, V> toList(es: Map<K, V>): List<V> =
-        es.fold(emptyList()) { acc, e ->
-          acc + e.value
-        }
+        fun <K, V> toList(es: Map<K, V>): List<V> =
+          es.fold(emptyList()) { acc, e ->
+            acc + e.value
+          }
 
-      val left = toList(a)
+        val left = toList(a)
 
-      fun <A, B> Ior<A, B>.toLeftOption() =
-        fold({ it }, { null }, { a, _ -> a })
+        fun <A, B> Ior<A, B>.toLeftOption() =
+          fold({ it }, { null }, { a, _ -> a })
 
-      // toListOf (folded . here) (align x y)
-      val middle = toList(a.align(b).mapValues { it.value.toLeftOption() }).filterNotNull()
+        // toListOf (folded . here) (align x y)
+        val middle = toList(a.align(b).mapValues { it.value.toLeftOption() }).filterNotNull()
 
-      // mapMaybe justHere (toList (align x y))
-      val right = toList(a.align(b)).mapNotNull { it.toLeftOption() }
+        // mapMaybe justHere (toList (align x y))
+        val right = toList(a.align(b)).mapNotNull { it.toLeftOption() }
 
-      left shouldBe right
-      left shouldBe middle
+        left shouldBe right
+        left shouldBe middle
+      }
     }
-  }
 
-  "zippyness1" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.string())) {
-      xs ->
-        xs.zip(xs).mapValues { it.value.first } shouldBe xs
-    }
-  }
-
-  "zippyness2" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.string())) {
+    "zippyness1" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.string())) {
         xs ->
-      xs.zip(xs).mapValues { it.value.second } shouldBe xs
+          xs.zip(xs).mapValues { it.value.first } shouldBe xs
+      }
     }
-  }
 
-  "zippyness3" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.pair(Arb.string(), Arb.int()))) {
-        xs ->
-      xs.mapValues { it.value.first }.zip(xs.mapValues { it.value.second }) shouldBe xs
+    "zippyness2" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.string())) {
+          xs ->
+        xs.zip(xs).mapValues { it.value.second } shouldBe xs
+      }
     }
-  }
 
-  "distributivity1" {
-    checkAll(
-      Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
-    ) {(x,y,z) ->
+    "zippyness3" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.pair(Arb.string(), Arb.int()))) {
+          xs ->
+        xs.mapValues { it.value.first }.zip(xs.mapValues { it.value.second }) shouldBe xs
+      }
+    }
 
-      fun <A, B, C> Pair<Ior<A, C>, Ior<B, C>>.undistrThesePair(): Ior<Pair<A, B>, C> =
-        when (val l = this.first) {
-          is Ior.Left -> {
-            when (val r = this.second) {
-              is Ior.Left -> Ior.Left(l.value to r.value)
-              is Ior.Both -> Ior.Both(l.value to r.leftValue, r.rightValue)
-              is Ior.Right -> Ior.Right(r.value)
+    "distributivity1" {
+      checkAll(
+        Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+      ) {(x,y,z) ->
+
+        fun <A, B, C> Pair<Ior<A, C>, Ior<B, C>>.undistrThesePair(): Ior<Pair<A, B>, C> =
+          when (val l = this.first) {
+            is Ior.Left -> {
+              when (val r = this.second) {
+                is Ior.Left -> Ior.Left(l.value to r.value)
+                is Ior.Both -> Ior.Both(l.value to r.leftValue, r.rightValue)
+                is Ior.Right -> Ior.Right(r.value)
+              }
             }
+            is Ior.Both -> when (val r = this.second) {
+              is Ior.Left -> Ior.Both(l.leftValue to r.value, l.rightValue)
+              is Ior.Both -> Ior.Both(l.leftValue to r.leftValue, l.rightValue)
+              is Ior.Right -> Ior.Right(l.rightValue)
+            }
+            is Ior.Right -> Ior.Right(l.value)
           }
-          is Ior.Both -> when (val r = this.second) {
-            is Ior.Left -> Ior.Both(l.leftValue to r.value, l.rightValue)
-            is Ior.Both -> Ior.Both(l.leftValue to r.leftValue, l.rightValue)
-            is Ior.Right -> Ior.Right(l.rightValue)
+
+        val ls = x.zip(y).align(z)
+        val rs = x.align(z).zip(y.align(z)).mapValues { it.value.undistrThesePair() }
+
+        ls shouldBe rs
+      }
+    }
+
+    "distributivity2" {
+      checkAll(
+        Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+      ) {(x,y,z) ->
+
+        fun <A, B, C> Pair<Ior<A, B>, C>.distrPairThese(): Ior<Pair<A, C>, Pair<B, C>> =
+          when (val l = this.first) {
+            is Ior.Left -> Ior.Left(l.value to this.second)
+            is Ior.Right -> Ior.Right(l.value to this.second)
+            is Ior.Both -> Ior.Both(l.leftValue to this.second, l.rightValue to this.second)
           }
-          is Ior.Right -> Ior.Right(l.value)
+
+        val ls = x.align(y).zip(z).mapValues { it.value.distrPairThese() }
+        val rs = x.zip(z).align(y.zip(z))
+
+        ls shouldBe rs
+      }
+    }
+
+    "distributivity3" {
+      checkAll(
+        Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+      ) {(x,y,z) ->
+
+        fun <A, B, C> Ior<Pair<A, C>, Pair<B, C>>.undistrPairThese(): Pair<Ior<A, B>, C> =
+          when (val e = this) {
+            is Ior.Left -> Ior.Left(e.value.first) to e.value.second
+            is Ior.Both -> Ior.Both(e.leftValue.first, e.rightValue.first) to e.leftValue.second
+            is Ior.Right -> Ior.Right(e.value.first) to e.value.second
+          }
+
+        val ls = x.align(y).zip(z)
+        val rs = x.zip(z).align(y.zip(z)).mapValues { it.value.undistrPairThese() }
+
+        ls shouldBe rs
+      }
+    }
+
+    "unzip is the inverse of zip" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.string())
+      ) { xs ->
+        val ls = xs.zip(xs).unzip()
+        val rs = xs to xs
+
+        ls shouldBe rs
+      }
+    }
+
+    "zip is the inverse of unzip" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.pair(Arb.string(), Arb.int()))
+      ) { xs ->
+        val (a,b) = xs.unzip()
+        a.zip(b) shouldBe xs
+      }
+    }
+
+    "unzip with" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.pair(Arb.string(), Arb.int()))
+      ) { xs ->
+        xs.unzip { it.value.first to it.value.second } shouldBe xs.unzip()
+      }
+    }
+
+    "unalign with" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.ior(Arb.string(), Arb.int()))
+      ) { xs ->
+        xs.unalign { it.value } shouldBe xs.unalign()
+      }
+    }
+
+    "getOrNone" {
+      checkAll(
+        Arb.map(Arb.int(0 .. 1000), Arb.string())
+      ) { xs ->
+        val (found, notFound) = (0 .. 1000).partition { xs.containsKey(it) }
+
+        found.forAll {
+          xs.getOrNone(it)
+            .shouldBeInstanceOf<Some<String>>()
+            .value.shouldBe(xs[it])
         }
 
-      val ls = x.zip(y).align(z)
-      val rs = x.align(z).zip(y.align(z)).mapValues { it.value.undistrThesePair() }
-
-      ls shouldBe rs
+        notFound.forAll {
+          xs.getOrNone(it)
+            .shouldBeInstanceOf<None>()
+        }
+      }
     }
-  }
 
-  "distributivity2" {
-    checkAll(
-      Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
-    ) {(x,y,z) ->
+    "unalign is the inverse of align" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
+        a.align(b).unalign() shouldBe (a to b)
+      }
+    }
 
-      fun <A, B, C> Pair<Ior<A, B>, C>.distrPairThese(): Ior<Pair<A, C>, Pair<B, C>> =
-        when (val l = this.first) {
-          is Ior.Left -> Ior.Left(l.value to this.second)
-          is Ior.Right -> Ior.Right(l.value to this.second)
-          is Ior.Both -> Ior.Both(l.leftValue to this.second, l.rightValue to this.second)
+    "align is the inverse of unalign" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.ior(Arb.int(), Arb.string()))
+      ) { xs ->
+        val (a,b) = xs.unalign()
+
+        a.align(b) shouldBe xs
+      }
+    }
+
+    "padZip" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.string(), Arb.string())
+      ) { (a, b) ->
+        val x = a.padZip(b)
+
+        a.forAll {
+          val value: Pair<String?, String?> = x[it.key].shouldNotBeNull()
+
+          value.first shouldBe it.value
         }
 
-      val ls = x.align(y).zip(z).mapValues { it.value.distrPairThese() }
-      val rs = x.zip(z).align(y.zip(z))
+        b.forAll {
+          val value: Pair<String?, String?> = x[it.key].shouldNotBeNull()
 
-      ls shouldBe rs
-    }
-  }
-
-  "distributivity3" {
-    checkAll(
-      Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
-    ) {(x,y,z) ->
-
-      fun <A, B, C> Ior<Pair<A, C>, Pair<B, C>>.undistrPairThese(): Pair<Ior<A, B>, C> =
-        when (val e = this) {
-          is Ior.Left -> Ior.Left(e.value.first) to e.value.second
-          is Ior.Both -> Ior.Both(e.leftValue.first, e.rightValue.first) to e.leftValue.second
-          is Ior.Right -> Ior.Right(e.value.first) to e.value.second
+          value.second shouldBe it.value
         }
-
-      val ls = x.align(y).zip(z)
-      val rs = x.zip(z).align(y.zip(z)).mapValues { it.value.undistrPairThese() }
-
-      ls shouldBe rs
-    }
-  }
-
-  "unzip is the inverse of zip" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.string())
-    ) { xs ->
-      val ls = xs.zip(xs).unzip()
-      val rs = xs to xs
-
-      ls shouldBe rs
-    }
-  }
-
-  "zip is the inverse of unzip" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.pair(Arb.string(), Arb.int()))
-    ) { xs ->
-      val (a,b) = xs.unzip()
-      a.zip(b) shouldBe xs
-    }
-  }
-
-  "unzip with" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.pair(Arb.string(), Arb.int()))
-    ) { xs ->
-      xs.unzip { it.value.first to it.value.second } shouldBe xs.unzip()
-    }
-  }
-
-  "unalign with" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.ior(Arb.string(), Arb.int()))
-    ) { xs ->
-      xs.unalign { it.value } shouldBe xs.unalign()
-    }
-  }
-
-  "getOrNone" {
-    checkAll(
-      Arb.map(Arb.int(0 .. 1000), Arb.string())
-    ) { xs ->
-      val (found, notFound) = (0 .. 1000).partition { xs.containsKey(it) }
-
-      found.forAll {
-        xs.getOrNone(it)
-          .shouldBeInstanceOf<Some<String>>()
-          .value.shouldBe(xs[it])
-      }
-
-      notFound.forAll {
-        xs.getOrNone(it)
-          .shouldBeInstanceOf<None>()
       }
     }
-  }
 
-  "unalign is the inverse of align" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int())
-    ) { (a, b) ->
-      a.align(b).unalign() shouldBe (a to b)
-    }
-  }
-
-  "align is the inverse of unalign" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.ior(Arb.int(), Arb.string()))
-    ) { xs ->
-      val (a,b) = xs.unalign()
-
-      a.align(b) shouldBe xs
-    }
-  }
-
-  "padZip" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.string(), Arb.string())
-    ) { (a, b) ->
-      val x = a.padZip(b)
-
-      a.forAll {
-        val value: Pair<String?, String?> = x[it.key].shouldNotBeNull()
-
-        value.first shouldBe it.value
-      }
-
-      b.forAll {
-        val value: Pair<String?, String?> = x[it.key].shouldNotBeNull()
-
-        value.second shouldBe it.value
+    "padZip with" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int()),
+        Arb.functionABCToD<String, Int?, Int?, String>(Arb.string())
+      ) { (a, b), fn ->
+        a.padZip(b, fn) shouldBe a.padZip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
       }
     }
-  }
 
-  "padZip with" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int()),
-      Arb.functionABCToD<String, Int?, Int?, String>(Arb.string())
-    ) { (a, b), fn ->
-      a.padZip(b, fn) shouldBe a.padZip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
-    }
-  }
-
-  "salign" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.string(), Arb.string())
-    ) { (a, b) ->
-      a.salign(Semigroup.string(), b) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
-    }
-  }
-
-  "void" {
-    checkAll(
-      Arb.map(Arb.intSmall(), Arb.intSmall())
-    ) { a ->
-      val result = a.void()
-
-      result.keys shouldBe a.keys
-      result.forAllValues { it shouldBe Unit }
-    }
-  }
-
-  "filterMap" {
-    checkAll(
-      Arb.map(Arb.int(), Arb.boolean())
-    ) { xs ->
-      val rs = xs.filterMap { if(it) true else null }
-
-      xs.forAll {
-        if (it.value)
-          rs shouldContainKey it.key
-        else
-          rs shouldNotContainKey it.key
+    "salign" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.string(), Arb.string())
+      ) { (a, b) ->
+        a.salign(Semigroup.string(), b) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
       }
     }
-  }
 
-  "filterOption" {
-    checkAll(
-      Arb.map(Arb.int(), Arb.option(Arb.string()))
-    ) { xs ->
-      val rs = xs.filterOption()
+    "void" {
+      checkAll(
+        Arb.map(Arb.intSmall(), Arb.intSmall())
+      ) { a ->
+        val result = a.void()
 
-      xs.forAll {
-        val value = it.value
-        if (value is Some<String>)
-          rs shouldContain (it.key to value.value)
-        else
-          rs shouldNotContainKey it.key
+        result.keys shouldBe a.keys
+        result.forAllValues { it shouldBe Unit }
       }
     }
-  }
 
-  "filterInstance" {
-    checkAll(
-      Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.string()))
-    ) { xs ->
-      val a = xs.filterIsInstance<Int, String>()
-      val b = xs.filterIsInstance<Int, Int>()
+    "filterMap" {
+      checkAll(
+        Arb.map(Arb.int(), Arb.boolean())
+      ) { xs ->
+        val rs = xs.filterMap { if(it) true else null }
 
-      (a + b) shouldBe xs
+        xs.forAll {
+          if (it.value)
+            rs shouldContainKey it.key
+          else
+            rs shouldNotContainKey it.key
+        }
+      }
     }
-  }
 
+    "filterOption" {
+      checkAll(
+        Arb.map(Arb.int(), Arb.option(Arb.string()))
+      ) { xs ->
+        val rs = xs.filterOption()
 
-  "zip2" {
-    checkAll(
-      Arb.map2(Arb.string(), Arb.int(), Arb.int())
-    ) { (a, b) ->
-      val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
-        .toMap()
-
-      result shouldBe expected
+        xs.forAll {
+          val value = it.value
+          if (value is Some<String>)
+            rs shouldContain (it.key to value.value)
+          else
+            rs shouldNotContainKey it.key
+        }
+      }
     }
-  }
+
+    "filterInstance" {
+      checkAll(
+        Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.string()))
+      ) { xs ->
+        val a = xs.filterIsInstance<Int, String>()
+        val b = xs.filterIsInstance<Int, Int>()
+
+        (a + b) shouldBe xs
+      }
+    }
+
+    "zip2" {
+      checkAll(
+        Arb.map2(Arb.string(), Arb.int(), Arb.int())
+      ) { (a, b) ->
+        val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
+        val expected = a.filter { (k, _) -> b.containsKey(k) }
+          .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip2 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB) { _, aa, bb -> Pair(aa, bb) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Pair(v, mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
 
     "zip3" {
       checkAll(
@@ -597,6 +595,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Triple(v, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip3 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB) { _, aa, bb, cc -> Triple(aa, bb, cc) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Triple(v, mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -617,6 +632,23 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip4 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB) { _, aa, bb, cc, dd -> Tuple4(aa, bb, cc, dd) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple4(v, mapB[k], mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "zip5" {
       checkAll(
         Arb.map2(Arb.string(), Arb.int(), Arb.int())
@@ -625,6 +657,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple5(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip5 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee -> Tuple5(aa, bb, cc, dd, ee) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple5(v, mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -645,6 +694,23 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip6 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff -> Tuple6(aa, bb, cc, dd, ee, ff) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple6(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "zip7" {
       checkAll(
         Arb.map2(Arb.string(), Arb.int(), Arb.int())
@@ -653,6 +719,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple7(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip7 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg -> Tuple7(aa, bb, cc, dd, ee, ff, gg) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple7(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -668,6 +751,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple8(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip8 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh -> Tuple8(aa, bb, cc, dd, ee, ff, gg, hh) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple8(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -700,6 +800,35 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip9 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
+          Tuple9(
+            aa,
+            bb,
+            cc,
+            dd,
+            ee,
+            ff,
+            gg,
+            hh,
+            ii
+          )
+        }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple9(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "zip10" {
       checkAll(
         Arb.map2(Arb.string(), Arb.int(), Arb.int())
@@ -721,6 +850,36 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip10 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
+          Tuple10(
+            aa,
+            bb,
+            cc,
+            dd,
+            ee,
+            ff,
+            gg,
+            hh,
+            ii,
+            jj
+          )
+        }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple10(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -772,6 +931,22 @@ class MapKTest : StringSpec({
           raise(it.value)
       }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
          .value.all.shouldContainAll(xs.values)
+    }
+  }
+
+  "flatMap with nullables" {
+    checkAll(
+      Arb.list(Arb.string(), 5..5),
+      Arb.list(Arb.intSmall(), 5..5),
+      Arb.list(Arb.string().orNull(), 5..5)
+    ) { keys, a, b ->
+      val mapA = keys.zip(a).toMap()
+      val mapB = keys.zip(b).toMap()
+      val result: Map<String, String?> = mapA.flatMap { mapB }
+      val expected: Map<String, String?> = mapA.filter { (k, _) -> mapB.containsKey(k) }
+        .map { (k, _) -> Pair(k, mapB[k]) }
+        .toMap()
+      result shouldBe expected
     }
   }
 })

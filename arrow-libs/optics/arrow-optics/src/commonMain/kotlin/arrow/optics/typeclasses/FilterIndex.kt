@@ -69,14 +69,14 @@ public fun interface FilterIndex<S, I, A> {
       FilterIndex { p ->
           object : Every<NonEmptyList<A>, A> {
               override fun <R> foldMap(M: Monoid<R>, source: NonEmptyList<A>, map: (A) -> R): R = M.run {
-                  source.foldIndexed(empty()) { index, acc, r ->
-                      if (p(index)) acc.combine(map(r)) else acc
-                  }
+                source.foldIndexed(empty()) { index, acc, r ->
+                  if (p(index)) acc.combine(map(r)) else acc
+                }
               }
 
               override fun modify(source: NonEmptyList<A>, map: (focus: A) -> A): NonEmptyList<A> =
-                      source.mapIndexed { index, a -> if (p(index)) map(a) else a }.toNonEmptyListOrNull()
-                              ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
+                source.mapIndexed { index, a -> if (p(index)) map(a) else a }.toNonEmptyListOrNull()
+                        ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
           }
       }
 

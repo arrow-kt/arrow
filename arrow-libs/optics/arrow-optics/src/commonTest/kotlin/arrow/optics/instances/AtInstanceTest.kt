@@ -16,7 +16,7 @@ import io.kotest.property.arbitrary.string
 class AtInstanceTest : StringSpec({
     testLaws(
       "At map - ",
-      LensLaws.laws(
+      LensLaws(
         lensGen = Arb.string().map { At.map<String, Int>().at(it) },
         aGen = Arb.map(Arb.string(), Arb.int()),
         bGen = Arb.option(Arb.int()),
@@ -26,7 +26,7 @@ class AtInstanceTest : StringSpec({
 
     testLaws(
       "At set - ",
-      LensLaws.laws(
+      LensLaws(
         lensGen = Arb.string().map { At.set<String>().at(it) },
         aGen = Arb.set(Arb.string()),
         bGen = Arb.boolean(),
