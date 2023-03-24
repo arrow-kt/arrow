@@ -18,7 +18,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Lens pair first - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.pairFirst(),
         aGen = Arb.pair(Arb.int(), Arb.string()),
         bGen = Arb.int(),
@@ -28,7 +28,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Lens pair second - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.pairSecond(),
         aGen = Arb.pair(Arb.int(), Arb.string()),
         bGen = Arb.string(),
@@ -38,7 +38,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Lens triple first - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.tripleFirst(),
         aGen = Arb.triple(Arb.int(), Arb.string(), Arb.string()),
         bGen = Arb.int(),
@@ -48,7 +48,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Lens triple second - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.tripleSecond(),
         aGen = Arb.triple(Arb.int(), Arb.string(), Arb.int()),
         bGen = Arb.string(),
@@ -58,7 +58,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Lens triple third - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.tripleThird(),
         aGen = Arb.triple(Arb.int(), Arb.int(), Arb.string()),
         bGen = Arb.string(),
@@ -68,7 +68,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal pair - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.pair(),
         aGen = Arb.pair(Arb.boolean(), Arb.boolean()),
         bGen = Arb.boolean(),
@@ -78,7 +78,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal triple - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.triple(),
         aGen = Arb.triple(Arb.boolean(), Arb.boolean(), Arb.boolean()),
         bGen = Arb.boolean(),

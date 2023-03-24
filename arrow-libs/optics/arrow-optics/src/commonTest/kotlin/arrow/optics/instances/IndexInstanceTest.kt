@@ -18,7 +18,7 @@ class IndexInstanceTest : StringSpec({
 
     testLaws(
       "Index list - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optionalGen = Arb.int().map { Index.list<String>().index(it) },
         aGen = Arb.list(Arb.string()),
         bGen = Arb.string(),
@@ -28,7 +28,7 @@ class IndexInstanceTest : StringSpec({
 
     testLaws(
       "Index sequence - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optionalGen = Arb.int().map { Index.sequence<String>().index(it) },
         aGen = Arb.sequence(Arb.string()),
         bGen = Arb.string(),
@@ -39,7 +39,7 @@ class IndexInstanceTest : StringSpec({
 
     testLaws(
       "Index map - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optionalGen = Arb.int().map { Index.list<String>().index(it) },
         aGen = Arb.list(Arb.string()),
         bGen = Arb.string(),
@@ -49,7 +49,7 @@ class IndexInstanceTest : StringSpec({
 
     testLaws(
       "Index Nel - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optionalGen = Arb.int().map { Index.nonEmptyList<String>().index(it) },
         aGen = Arb.nonEmptyList(Arb.string()),
         bGen = Arb.string(),
@@ -59,7 +59,7 @@ class IndexInstanceTest : StringSpec({
 
     testLaws(
       "Index string - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optionalGen = Arb.int().map { Index.string().index(it) },
         aGen = Arb.string(),
         bGen = Arb.char(),

@@ -3,11 +3,8 @@ package arrow.core.test.laws
 import arrow.core.test.Law
 import arrow.core.test.LawSet
 import arrow.core.test.equalUnderTheLaw
-import arrow.typeclasses.Semiring
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
-import io.kotest.matchers.shouldBe
-import io.kotest.property.PropertyContext
 
 data class SemiringLaws<F>(
   val zero: F,
