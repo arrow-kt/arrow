@@ -12,7 +12,7 @@ import io.kotest.property.arbitrary.string
 
 class GeneratorsTest : StringSpec({
   "Arb.ior should generate Left, Right & Both" {
-    assertSoftly(Arb.list(Arb.ior(Arb.string(), Arb.int())).next()) {
+    assertSoftly(Arb.list(Arb.ior(Arb.string(), Arb.int()), range = 20 .. 100).next()) {
         forAtLeastOne {
           it.isRight().shouldBeTrue()
         }
