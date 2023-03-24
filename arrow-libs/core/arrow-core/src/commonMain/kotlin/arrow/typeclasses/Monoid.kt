@@ -50,6 +50,7 @@ public interface Monoid<A> : Semigroup<A> {
   public fun fold(elems: List<A>): A = elems.fold()
 
   public companion object {
+
     @JvmStatic
     @JvmName("Boolean")
     public fun boolean(): Monoid<Boolean> = AndMonoid
