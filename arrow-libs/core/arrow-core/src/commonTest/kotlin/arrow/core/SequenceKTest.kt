@@ -322,7 +322,7 @@ class SequenceKTest : StringSpec({
     }
 
     "unzipToPair should unzip values in a Pair in a Sequence of Pairs" {
-      checkAll(Arb.list(Arb.pair(Arb.string(), Arb.int()))){pairList ->
+      checkAll(Arb.list(Arb.pair(Arb.string(), Arb.int()))){ pairList ->
         val obtained = pairList.asSequence().unzipToPair()
         val expected = pairList.unzip()
         obtained shouldBe expected
