@@ -125,7 +125,7 @@ import kotlin.time.DurationUnit
  * ```
  * <!--- KNIT example-circuitbreaker-02.kt -->
  */
-@Deprecated(deprecatedInFavorOfArrowFxResilience)
+@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("CircuitBreaker", "arrow.fx.resilience.CircuitBreaker"))
 public class CircuitBreaker
 private constructor(
   private val state: AtomicRef<State>,
@@ -671,13 +671,6 @@ private constructor(
      * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
-    @Deprecated(
-      deprecatedInFavorOfArrowFxResilience,
-      ReplaceWith(
-        "CircuitBreaker.invoke(resetTimeout= resetTimeout, openingStrategy = Count(maxFailures), exponentialBackoffFactor = exponentialBackoffFactor, maxResetTimeout= maxResetTimeout, onRejected = onRejected, onClosed = onClosed, onHalfOpen = onHalfOpen, onOpen = onOpen)",
-        "arrow.fx.resilience.CircuitBreaker", "arrow.fx.resilience.CircuitBreaker.OpeningStrategy.Count"
-      )
-    )
     public suspend fun of(
       maxFailures: Int,
       resetTimeout: Duration,
