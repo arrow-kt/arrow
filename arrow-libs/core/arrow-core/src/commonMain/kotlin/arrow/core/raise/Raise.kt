@@ -7,6 +7,7 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.continuations.EffectScope
 import arrow.core.getOrElse
 import arrow.core.identity
@@ -236,12 +237,16 @@ public interface Raise<in Error> {
   }
 
 
-  @Deprecated("Validated is deprecated in favor of Either.", ReplaceWith("toEither().bind()"))
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
   @RaiseDSL
   public fun <A> Validated<Error, A>.bind(): A = when (this) {
     is Validated.Invalid -> raise(value)
     is Validated.Valid -> value
   }
+
+  @RaiseDSL
+  public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
+    map { it.bind() }
 }
 
 /**
