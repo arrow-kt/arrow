@@ -14,7 +14,7 @@ class StringTest : StringSpec({
 
     testLaws(
       "Iso string to list - ",
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.stringToList(),
         aGen = Arb.string(),
         bGen = Arb.list(Arb.char()),

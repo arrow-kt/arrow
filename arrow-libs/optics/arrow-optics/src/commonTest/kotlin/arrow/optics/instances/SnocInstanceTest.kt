@@ -15,7 +15,7 @@ import io.kotest.property.arbitrary.string
 class SnocInstanceTest : StringSpec({
     testLaws(
       "Snoc list - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Snoc.list<Int>().snoc(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.pair(Arb.list(Arb.int()), Arb.int()),
@@ -24,7 +24,7 @@ class SnocInstanceTest : StringSpec({
     )
     testLaws(
       "Snoc string - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Snoc.string().snoc(),
         aGen = Arb.string(),
         bGen = Arb.pair(Arb.string(), Arb.char()),

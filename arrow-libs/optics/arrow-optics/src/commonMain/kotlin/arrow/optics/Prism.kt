@@ -67,7 +67,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
    */
   override fun <C> first(): PPrism<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     PPrism(
-      { (s, c) -> getOrModify(s).bimap({ it to c }, { it to c }) },
+      { (s, c) -> getOrModify(s).mapLeft { it to c }.map { it to c } },
       { (b, c) -> reverseGet(b) to c }
     )
 
@@ -76,7 +76,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
    */
   override fun <C> second(): PPrism<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     PPrism(
-      { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
+      { (c, s) -> getOrModify(s).mapLeft { c to it }.map { c to it } },
       { (c, b) -> c to reverseGet(b) }
     )
 
@@ -87,7 +87,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     PPrism(
       {
         it.fold(
-          { a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) },
+          { a -> getOrModify(a).mapLeft { l -> Either.Left(l) }.map { r -> Either.Left(r) } },
           { c -> Either.Right(Either.Right(c)) })
       },
       {
@@ -106,7 +106,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
       {
         it.fold(
           { c -> Either.Right(Either.Left(c)) },
-          { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) })
+          { s -> getOrModify(s).mapLeft { l -> Either.Right(l) }.map { r -> Either.Right(r) } })
       },
       { it.map(this::reverseGet) }
     )
@@ -116,7 +116,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
    */
   public infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     PPrism(
-      getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
+      getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).mapLeft{ set(s, it) } } },
       reverseGet = this::reverseGet compose other::reverseGet
     )
 
@@ -125,7 +125,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
@@ -224,7 +224,6 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
  * Can also be used to construct [Prism]
  */
-@Suppress("FunctionName")
 public fun <S, A> Prism(getOption: (source: S) -> Option<A>, reverseGet: (focus: A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }

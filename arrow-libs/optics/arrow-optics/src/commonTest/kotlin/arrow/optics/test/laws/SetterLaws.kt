@@ -7,15 +7,15 @@ import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.checkAll
 
-object SetterLaws {
+data class SetterLaws<A, B>(
+  val setter: Setter<A, B>,
+  val aGen: Arb<A>,
+  val bGen: Arb<B>,
+  val funcGen: Arb<(B) -> B>,
+  val eq: (A, A) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <A, B> laws(
-    setter: Setter<A, B>,
-    aGen: Arb<A>,
-    bGen: Arb<B>,
-    funcGen: Arb<(B) -> B>,
-    eq: (A, A) -> Boolean = { a, b -> a == b }
-  ): List<Law> = listOf(
+  override val laws: List<Law> = listOf(
     Law("Setter law: set is idempotent") { setter.setIdempotent(aGen, bGen, eq) },
     Law("Setter law: modify identity") { setter.modifyIdentity(aGen, eq) },
     Law("Setter law: compose modify") { setter.composeModify(aGen, eq, funcGen) },
