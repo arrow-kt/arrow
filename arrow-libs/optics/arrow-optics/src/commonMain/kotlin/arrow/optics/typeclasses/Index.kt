@@ -224,7 +224,7 @@ public fun interface Index<S, I, A> {
     @JvmStatic
     public fun string(): Index<String, Int, Char> =
       Index { i ->
-        Iso.stringToList() compose Index.list<Char>().index(i)
+        Iso.stringToList() compose list<Char>().index(i)
       }
   }
 }

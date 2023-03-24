@@ -17,7 +17,7 @@ class SetterTest : StringSpec({
 
     testLaws(
       "Setter identity - ",
-      SetterLaws.laws(
+      SetterLaws(
         setter = Setter.id(),
         aGen = Arb.int(),
         bGen = Arb.int(),
@@ -27,7 +27,7 @@ class SetterTest : StringSpec({
 
     testLaws(
       "Setter token - ",
-      SetterLaws.laws(
+      SetterLaws(
         setter = Setter.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),

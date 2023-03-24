@@ -2274,15 +2274,12 @@ public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>)
 }
 
 @Deprecated(
-  RedundantAPI + "Prefer the new recover API",
-  ReplaceWith(
-    "this.recover<A, Nothing, B> { f(it) }",
-    "arrow.core.recover"
-  )
+  RedundantAPI + "Prefer resolving the error with getOrElse.",
+  ReplaceWith("getOrElse(f).right()", "arrow.core.right", "arrow.core.getOrElse")
 )
 public inline fun <A, B> Either<A, B>.handleError(f: (A) -> B): Either<A, B> {
   contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-  return recover { a -> f(a) }
+  return getOrElse(f).right()
 }
 
 @Deprecated(

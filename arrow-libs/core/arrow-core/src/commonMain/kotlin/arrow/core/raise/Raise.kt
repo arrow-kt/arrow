@@ -7,17 +7,15 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.continuations.EffectScope
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.left
 import arrow.core.nonFatalOrThrow
 import arrow.core.recover
-import arrow.core.right
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -29,11 +27,11 @@ public annotation class RaiseDSL
 /**
  * <!--- TEST_NAME RaiseKnitTest -->
  *
- * The [Raise] DSL allows you to work with _logical failures_ of type [R].
+ * The [Raise] DSL allows you to work with _logical failures_ of type [Error].
  * A _logical failure_ does not necessarily mean that the computation has failed,
  * but that it has stopped or _short-circuited_.
  *
- * The [Raise] DSL allows you to [raise] _logical failure_ of type [R], and you can [recover] from them.
+ * The [Raise] DSL allows you to [raise] _logical failure_ of type [Error], and you can [recover] from them.
  *
  * <!--- INCLUDE
  * import arrow.core.raise.Raise
@@ -146,39 +144,39 @@ public annotation class RaiseDSL
  * <!--- KNIT example-raise-dsl-04.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public interface Raise<in R> {
+public interface Raise<in Error> {
 
-  /** Raise a _logical failure_ of type [R] */
+  /** Raise a _logical failure_ of type [Error] */
   @RaiseDSL
-  public fun raise(r: R): Nothing
+  public fun raise(r: Error): Nothing
 
   @Deprecated("Use raise instead", ReplaceWith("raise(r)"))
-  public fun <B> shift(r: R): B = raise(r)
+  public fun <A> shift(r: Error): A = raise(r)
 
   @RaiseDSL
-  public suspend fun <B> arrow.core.continuations.Effect<R, B>.bind(): B =
+  public suspend fun <A> arrow.core.continuations.Effect<Error, A>.bind(): A =
     fold({ raise(it) }, ::identity)
 
   // Added for source compatibility with EffectScope / EagerScope
   @RaiseDSL
-  public suspend fun <B> arrow.core.continuations.EagerEffect<R, B>.bind(): B =
+  public suspend fun <A> arrow.core.continuations.EagerEffect<Error, A>.bind(): A =
     fold({ raise(it) }, ::identity)
 
   @Deprecated(
     "Use getOrElse on Raise, Effect or EagerEffect instead.",
     ReplaceWith("effect { f() }")
   )
-  public suspend fun <E, A> attempt(
+  public suspend fun <OtherError, A> attempt(
     @BuilderInference
-    f: suspend EffectScope<E>.() -> A,
-  ): arrow.core.continuations.Effect<E, A> = arrow.core.continuations.effect(f)
+    f: suspend EffectScope<OtherError>.() -> A,
+  ): arrow.core.continuations.Effect<OtherError, A> = arrow.core.continuations.effect(f)
 
   @Deprecated(
     "Use getOrElse on Raise, Effect or EagerEffect instead.",
     ReplaceWith("fold({ recover(it) }, ::identity)")
   )
-  public suspend infix fun <E, A> arrow.core.continuations.Effect<E, A>.catch(
-    recover: suspend Raise<R>.(E) -> A,
+  public suspend infix fun <OtherError, A> arrow.core.continuations.Effect<OtherError, A>.catch(
+    recover: suspend Raise<Error>.(otherError: OtherError) -> A,
   ): A = fold({ recover(it) }, ::identity)
 
   /**
@@ -188,10 +186,10 @@ public interface Raise<in R> {
    *
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
-  public operator fun <A> EagerEffect<R, A>.invoke(): A = invoke(this@Raise)
+  public operator fun <A> EagerEffect<Error, A>.invoke(): A = invoke(this@Raise)
 
   @RaiseDSL
-  public fun <A> EagerEffect<R, A>.bind(): A = invoke(this@Raise)
+  public fun <A> EagerEffect<Error, A>.bind(): A = invoke(this@Raise)
 
   /**
    * Invoke an [Effect] inside `this` [Raise] context.
@@ -200,10 +198,10 @@ public interface Raise<in R> {
    *
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
-  public suspend operator fun <A> Effect<R, A>.invoke(): A = invoke(this@Raise)
+  public suspend operator fun <A> Effect<Error, A>.invoke(): A = invoke(this@Raise)
 
   @RaiseDSL
-  public suspend fun <A> Effect<R, A>.bind(): A = invoke(this@Raise)
+  public suspend fun <A> Effect<Error, A>.bind(): A = invoke(this@Raise)
 
   /**
    * Extract the [Either.Right] value of an [Either].
@@ -233,23 +231,27 @@ public interface Raise<in R> {
    * <!--- TEST lines.isEmpty() -->
    */
   @RaiseDSL
-  public fun <A> Either<R, A>.bind(): A = when (this) {
+  public fun <A> Either<Error, A>.bind(): A = when (this) {
     is Either.Left -> raise(value)
     is Either.Right -> value
   }
 
 
-  @Deprecated("Validated is deprecated in favor of Either.", ReplaceWith("toEither().bind()"))
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
   @RaiseDSL
-  public fun <A> Validated<R, A>.bind(): A = when (this) {
+  public fun <A> Validated<Error, A>.bind(): A = when (this) {
     is Validated.Invalid -> raise(value)
     is Validated.Valid -> value
   }
+
+  @RaiseDSL
+  public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
+    map { it.bind() }
 }
 
 /**
- * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
- * and recover by providing a transform [E] into a fallback value of type [A].
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
+ * and recover by providing a transform [Error] into a fallback value of type [A].
  * Base implementation of `effect { f() } getOrElse { fallback() }`.
  *
  * <!--- INCLUDE
@@ -271,14 +273,14 @@ public interface Raise<in R> {
  * <!--- TEST lines.isEmpty() -->
  */
 @RaiseDSL
-public inline fun <E, A> recover(
-  @BuilderInference action: Raise<E>.() -> A,
-  @BuilderInference recover: (E) -> A,
-): A = fold(action, { throw it }, recover, ::identity)
+public inline fun <Error, A> recover(
+  @BuilderInference block: Raise<Error>.() -> A,
+  @BuilderInference recover: (error: Error) -> A,
+): A = fold(block, { throw it }, recover, ::identity)
 
 /**
- * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
- * and [recover] by providing a transform [E] into a fallback value of type [A],
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
+ * and [recover] by providing a transform [Error] into a fallback value of type [A],
  * or [catch] any unexpected exceptions by providing a transform [Throwable] into a fallback value of type [A],
  *
  * <!--- INCLUDE
@@ -305,15 +307,15 @@ public inline fun <E, A> recover(
  * <!--- TEST lines.isEmpty() -->
  */
 @RaiseDSL
-public inline fun <E, A> recover(
-  @BuilderInference action: Raise<E>.() -> A,
-  @BuilderInference recover: (E) -> A,
-  @BuilderInference catch: (Throwable) -> A,
-): A = fold(action, catch, recover, ::identity)
+public inline fun <Error, A> recover(
+  @BuilderInference block: Raise<Error>.() -> A,
+  @BuilderInference recover: (error: Error) -> A,
+  @BuilderInference catch: (throwable: Throwable) -> A,
+): A = fold(block, catch, recover, ::identity)
 
 /**
- * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [E],
- * and [recover] by providing a transform [E] into a fallback value of type [A],
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
+ * and [recover] by providing a transform [Error] into a fallback value of type [A],
  * or [catch] any unexpected exceptions by providing a transform [Throwable] into a fallback value of type [A],
  *
  * <!--- INCLUDE
@@ -341,11 +343,11 @@ public inline fun <E, A> recover(
  */
 @RaiseDSL
 @JvmName("recoverReified")
-public inline fun <reified T : Throwable, E, A> recover(
-  @BuilderInference action: Raise<E>.() -> A,
-  @BuilderInference recover: (E) -> A,
-  @BuilderInference catch: (T) -> A,
-): A = fold(action, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
+public inline fun <reified T : Throwable, Error, A> recover(
+  @BuilderInference block: Raise<Error>.() -> A,
+  @BuilderInference recover: (error: Error) -> A,
+  @BuilderInference catch: (t: T) -> A,
+): A = fold(block, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
 
 /**
  * Allows safely catching exceptions without capturing [CancellationException],
@@ -379,9 +381,9 @@ public inline fun <reified T : Throwable, E, A> recover(
  * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
  */
 @RaiseDSL
-public inline fun <A> catch(action: () -> A, catch: (Throwable) -> A): A =
+public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A): A =
   try {
-    action()
+    block()
   } catch (t: Throwable) {
     catch(t.nonFatalOrThrow())
   }
@@ -419,11 +421,11 @@ public inline fun <A> catch(action: () -> A, catch: (Throwable) -> A): A =
  */
 @RaiseDSL
 @JvmName("catchReified")
-public inline fun <reified T : Throwable, A> catch(action: () -> A, catch: (T) -> A): A =
-  catch(action) { t: Throwable -> if (t is T) catch(t) else throw t }
+public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A =
+  catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
 
 @RaiseDSL
-public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
+public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> Error) {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
     returns() implies condition
@@ -432,7 +434,7 @@ public inline fun <R> Raise<R>.ensure(condition: Boolean, raise: () -> R) {
 }
 
 @RaiseDSL
-public inline fun <R, B : Any> Raise<R>.ensureNotNull(value: B?, raise: () -> R): B {
+public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: () -> Error): B {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
     returns() implies (value != null)

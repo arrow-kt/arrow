@@ -15,7 +15,7 @@ import io.kotest.property.arbitrary.string
 class ConsInstanceTest : StringSpec({
     testLaws(
       "Const list - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Cons.list<Int>().cons(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.pair(Arb.int(), Arb.list(Arb.int())),
@@ -25,7 +25,7 @@ class ConsInstanceTest : StringSpec({
 
     testLaws(
       "Cons string - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Cons.string().cons(),
         aGen = Arb.string(),
         bGen = Arb.pair(Arb.char(), Arb.string()),
