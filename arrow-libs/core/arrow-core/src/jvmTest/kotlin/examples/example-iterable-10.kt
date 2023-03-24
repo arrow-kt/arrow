@@ -2,11 +2,9 @@
 package arrow.core.examples.exampleIterable10
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-    listOf("A", "B").align(listOf(1, 2, 3))
-  //sampleEnd
-  println(result)
+fun test() {
+  listOf("A", "B")
+    .align(listOf(1, 2, 3)) shouldBe listOf(Ior.Both("A", 1), Ior.Both("B", 2), Ior.Right(3))
 }

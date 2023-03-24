@@ -236,6 +236,8 @@ public interface Raise<in Error> {
     is Either.Right -> value
   }
 
+  public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
+    mapValues { (_, a) -> a.bind() }
 
   @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
   @RaiseDSL

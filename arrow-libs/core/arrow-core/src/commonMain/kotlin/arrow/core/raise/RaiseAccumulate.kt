@@ -12,6 +12,7 @@ import arrow.core.NonEmptyList
 import arrow.core.Validated
 import arrow.core.collectionSizeOrDefault
 import arrow.core.ValidatedNel
+import arrow.core.mapOrAccumulate
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
 import kotlin.contracts.ExperimentalContracts
@@ -488,6 +489,9 @@ public open class RaiseAccumulate<Error>(
   @RaiseDSL
   public override fun raise(r: Error): Nothing =
     raise.raise(nonEmptyListOf(r))
+
+  public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
+    mapOrAccumulate { (_, a) -> a.bind() }.bindNel()
 
   @RaiseDSL
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
