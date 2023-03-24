@@ -616,13 +616,6 @@ public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Eithe
   mapOrAccumulate { it.bindNel() }
 
 @Deprecated(
-  "Sequence for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("nullable { map { it.bind() } }", "arrow.core.raise.nullable")
-)
-public fun <A> Iterable<A?>.sequence(): List<A>? =
-  traverse(::identity)
-
-@Deprecated(
   "Void is being deprecated in favor of simple Iterable.map.\n$NicheAPI",
   ReplaceWith("map { }")
 )
