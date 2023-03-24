@@ -15,7 +15,7 @@ class ValidatedTest : StringSpec({
 
     testLaws(
       "Iso validated to either - ",
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.validatedToEither(),
         aGen = Arb.validated(Arb.string(), Arb.int()),
         bGen = Arb.either(Arb.string(), Arb.int()),

@@ -654,6 +654,7 @@ public final class arrow/core/IterableKt {
 	public static final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun padZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun prependTo (Ljava/lang/Object;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun reduceOrNull (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
@@ -663,7 +664,6 @@ public final class arrow/core/IterableKt {
 	public static final fun rightPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun rightPadZip (Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun salign (Ljava/lang/Iterable;Larrow/typeclasses/Semigroup;Ljava/lang/Iterable;)Ljava/lang/Iterable;
-	public static final fun salign (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Ljava/lang/Iterable;)Ljava/lang/Iterable;
 	public static final fun separateEither (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun separateIor (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun separateValidated (Ljava/lang/Iterable;)Lkotlin/Pair;
@@ -727,11 +727,14 @@ public final class arrow/core/MapKt {
 	public static final fun fold (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun foldLeft (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun getOrNone (Ljava/util/Map;Ljava/lang/Object;)Larrow/core/Option;
+	public static final fun mapNotNull (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 	public static final fun salign (Ljava/util/Map;Larrow/typeclasses/Semigroup;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun salign (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
 	public static final fun sequence (Ljava/util/Map;)Larrow/core/Either;
 	public static final fun sequence (Ljava/util/Map;)Larrow/core/Option;
 	public static final fun sequence (Ljava/util/Map;Larrow/typeclasses/Semigroup;)Larrow/core/Validated;
@@ -792,10 +795,10 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList {
 	public fun isEmpty ()Z
 	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/NonEmptyList;
 	public final fun padZip (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public final fun padZip (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
 	public final fun plus (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public final fun plus (Ljava/util/List;)Larrow/core/NonEmptyList;
-	public final fun salign (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
 	public final fun salign (Larrow/typeclasses/Semigroup;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun toList ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
@@ -3240,6 +3243,8 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun complete ()Z
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -3262,6 +3267,10 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public final fun bindAllIor (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllIor (Ljava/util/Map;)Ljava/util/Map;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3270,88 +3279,54 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 }
 
 public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun attempt-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/raise/Raise;)Larrow/core/raise/NullableRaise;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public final fun bindAllNullable (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllNullable (Ljava/util/Map;)Ljava/util/Map;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/raise/Raise;)Larrow/core/raise/Raise;
-	public static final fun ensure-impl (Larrow/core/raise/Raise;Z)V
-	public static final fun ensureNotNull-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Object;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/raise/Raise;Larrow/core/raise/Raise;)Z
-	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/raise/Raise;)I
+	public final fun ensure (Z)V
+	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Void;)Ljava/lang/Void;
-	public static fun raise-impl (Larrow/core/raise/Raise;Ljava/lang/Void;)Ljava/lang/Void;
 	public synthetic fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Void;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/raise/Raise;Ljava/lang/Void;)Ljava/lang/Object;
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/raise/Raise;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
 }
 
 public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun attempt-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Option;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/raise/Raise;)Larrow/core/raise/OptionRaise;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public final fun bindAllOption (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllOption (Ljava/util/Map;)Ljava/util/Map;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/raise/Raise;)Larrow/core/raise/Raise;
-	public static final fun ensure-impl (Larrow/core/raise/Raise;Z)V
-	public static final fun ensureNotNull-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Object;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/raise/Raise;Larrow/core/raise/Raise;)Z
-	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/raise/Raise;)I
+	public final fun ensure (Z)V
+	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Larrow/core/None;)Ljava/lang/Void;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
-	public static fun raise-impl (Larrow/core/raise/Raise;Larrow/core/None;)Ljava/lang/Void;
 	public fun shift (Larrow/core/None;)Ljava/lang/Object;
 	public synthetic fun shift (Ljava/lang/Object;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/raise/Raise;Larrow/core/None;)Ljava/lang/Object;
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/raise/Raise;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
 }
 
 public abstract interface class arrow/core/raise/Raise {
@@ -3362,6 +3337,8 @@ public abstract interface class arrow/core/raise/Raise {
 	public abstract fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public abstract fun bindAll (Ljava/util/Map;)Ljava/util/Map;
 	public abstract fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3377,6 +3354,8 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun bind (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bindAll (Larrow/core/raise/Raise;Ljava/lang/Iterable;)Ljava/util/List;
+	public static fun bindAll (Larrow/core/raise/Raise;Ljava/util/Map;)Ljava/util/Map;
 	public static fun catch (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -3392,12 +3371,15 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
 	public final fun bindNel (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bindNel (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getRaise ()Larrow/core/raise/Raise;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -3475,43 +3457,26 @@ public final class arrow/core/raise/RaiseKt {
 }
 
 public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun attempt-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/Validated;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun bind-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final synthetic fun box-impl (Larrow/core/raise/Raise;)Larrow/core/raise/ResultRaise;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public final fun bindAllResult (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllResult (Ljava/util/Map;)Ljava/util/Map;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun catch-impl (Larrow/core/raise/Raise;Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun constructor-impl (Larrow/core/raise/Raise;)Larrow/core/raise/Raise;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Larrow/core/raise/Raise;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Larrow/core/raise/Raise;Larrow/core/raise/Raise;)Z
-	public fun hashCode ()I
-	public static fun hashCode-impl (Larrow/core/raise/Raise;)I
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke-impl (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
-	public static fun raise-impl (Larrow/core/raise/Raise;Ljava/lang/Throwable;)Ljava/lang/Void;
 	public synthetic fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 	public fun shift (Ljava/lang/Throwable;)Ljava/lang/Object;
-	public static fun shift-impl (Larrow/core/raise/Raise;Ljava/lang/Throwable;)Ljava/lang/Object;
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Larrow/core/raise/Raise;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Larrow/core/raise/Raise;
 }
 
 public final class arrow/core/raise/Trace {

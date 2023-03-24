@@ -14,6 +14,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
@@ -110,34 +111,36 @@ class MapKTest : StringSpec({
       }
     }
 
-    "can align maps" {
-      // aligned keySet is union of a's and b's keys
+    "aligned keySet is union of a's and b's keys" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         aligned.size shouldBe (a.keys + b.keys).size
       }
+    }
 
-      // aligned map contains Both for all entries existing in a and b
+    "aligned map contains Both for all entries existing in a and b" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         a.keys.intersect(b.keys).forEach {
-          aligned[it]?.isBoth shouldBe true
+          aligned[it]?.isBoth() shouldBe true
         }
       }
+    }
 
-      // aligned map contains Left for all entries existing only in a
+    "aligned map contains Left for all entries existing only in a" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         (a.keys - b.keys).forEach { key ->
-          aligned[key]?.isLeft shouldBe true
+          aligned[key]?.isLeft() shouldBe true
         }
       }
+    }
 
-      // aligned map contains Right for all entries existing only in b
+    "aligned map contains Right for all entries existing only in b" {
       checkAll(Arb.map(Arb.long(), Arb.boolean()), Arb.map(Arb.long(), Arb.boolean())) { a, b ->
         val aligned = a.align(b)
         (b.keys - a.keys).forEach { key ->
-          aligned[key]?.isRight shouldBe true
+          aligned[key]?.isRight() shouldBe true
         }
       }
     }
@@ -150,6 +153,23 @@ class MapKTest : StringSpec({
         val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip2 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB) { _, aa, bb -> Pair(aa, bb) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Pair(v, mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -171,6 +191,23 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip3 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB) { _, aa, bb, cc -> Triple(aa, bb, cc) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Triple(v, mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "zip4" {
       checkAll(
         Arb.map(Arb.intSmall(), Arb.intSmall()),
@@ -180,6 +217,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple4(v, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip4 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB) { _, aa, bb, cc, dd -> Tuple4(aa, bb, cc, dd) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple4(v, mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -201,6 +255,23 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip5 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee -> Tuple5(aa, bb, cc, dd, ee) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple5(v, mapB[k], mapB[k], mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "zip6" {
       checkAll(
         Arb.map(Arb.intSmall(), Arb.intSmall()),
@@ -210,6 +281,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple6(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip6 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff -> Tuple6(aa, bb, cc, dd, ee, ff) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple6(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -231,6 +319,23 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip7 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg -> Tuple7(aa, bb, cc, dd, ee, ff, gg) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple7(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "zip8" {
       checkAll(
         Arb.map(Arb.intSmall(), Arb.intSmall()),
@@ -241,6 +346,23 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple8(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip8 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh -> Tuple8(aa, bb, cc, dd, ee, ff, gg, hh) }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple8(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -268,6 +390,35 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple9(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
+    "zip9 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
+          Tuple9(
+            aa,
+            bb,
+            cc,
+            dd,
+            ee,
+            ff,
+            gg,
+            hh,
+            ii
+          )
+        }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple9(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected
@@ -302,6 +453,36 @@ class MapKTest : StringSpec({
       }
     }
 
+    "zip10 with nullables" {
+      checkAll(
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall(), 10..10),
+        Arb.list(Arb.intSmall().orNull(), 10..10)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
+          Tuple10(
+            aa,
+            bb,
+            cc,
+            dd,
+            ee,
+            ff,
+            gg,
+            hh,
+            ii,
+            jj
+          )
+        }
+        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, v) -> Pair(k, Tuple10(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+          .toMap()
+
+        result shouldBe expected
+      }
+    }
+
     "flatMap" {
       checkAll(
         Arb.map(Arb.string(), Arb.intSmall()),
@@ -310,6 +491,22 @@ class MapKTest : StringSpec({
         val result: Map<String, String> = a.flatMap { b }
         val expected: Map<String, String> = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, _) -> Pair(k, b[k]!!) }
+          .toMap()
+        result shouldBe expected
+      }
+    }
+
+    "flatMap with nullables" {
+      checkAll(
+        Arb.list(Arb.string(), 5..5),
+        Arb.list(Arb.intSmall(), 5..5),
+        Arb.list(Arb.string().orNull(), 5..5)
+      ) { keys, a, b ->
+        val mapA = keys.zip(a).toMap()
+        val mapB = keys.zip(b).toMap()
+        val result: Map<String, String?> = mapA.flatMap { mapB }
+        val expected: Map<String, String?> = mapA.filter { (k, _) -> mapB.containsKey(k) }
+          .map { (k, _) -> Pair(k, mapB[k]) }
           .toMap()
         result shouldBe expected
       }

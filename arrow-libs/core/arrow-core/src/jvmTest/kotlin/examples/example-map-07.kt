@@ -2,11 +2,11 @@
 package arrow.core.examples.exampleMap07
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-     mapOf("first" to ("A" to 1), "second" to ("B" to 2)).unzip()
-  //sampleEnd
-  println(result)
+fun test() {
+  mapOf(
+    "first" to ("A" to 1),
+    "second" to ("B" to 2)
+  ).unzip() shouldBe Pair(mapOf("first" to "A", "second" to "B"), mapOf("first" to 1, "second" to 2))
 }
