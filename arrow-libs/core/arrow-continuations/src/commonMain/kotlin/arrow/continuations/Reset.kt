@@ -20,7 +20,7 @@ internal object Reset {
    * The usage of `try { ... } catch(e: Throwable) { ... }` will catch the [ShortCircuit] error,
    * and will lead to recover of short-circuiting.
    * You should always prefer to catch the most specific exception class, or
-   * use `Either.catch`, `Validated.catch` etc or `e.nonFatalOrThrow()`
+   * use `Either.catch`, `Raise.catch`, or `e.nonFatalOrThrow()`
    * to ensure you're not catching `ShortCircuit`.
    */
   @Deprecated(deprecateArrowContinuation)
