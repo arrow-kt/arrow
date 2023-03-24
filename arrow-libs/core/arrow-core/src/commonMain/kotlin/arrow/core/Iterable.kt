@@ -10,9 +10,10 @@ import arrow.core.Either.Right
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.either
-import arrow.core.raise.fold
 import arrow.core.raise.mapOrAccumulate
+import arrow.core.raise.nullable
+import arrow.core.raise.option
+import arrow.core.raise.result
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
@@ -317,14 +318,18 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
 }
 
 @Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the either DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  traverse(::identity)
+  let { l -> either { l.bindAll() } }
 
+@Deprecated(
+  "The sequence extension function is being deprecated in favor of the either DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
+)
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
+  let { l -> either { l.bindAll() } }
 
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -346,24 +351,31 @@ public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result
   traverse(f)
 
 @Deprecated(
-  "sequenceResult is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the result DSL.",
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  sequence()
-
-public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
-  traverse(::identity)
+  let { l -> result { l.bindAll() } }
 
 @Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(semigroup, f)", "arrow.core.traverse")
+  "The sequence extension function is being deprecated in favor of the result DSL.",
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
+)
+public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
+  let { l -> result { l.bindAll() } }
+
+@Deprecated(
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public inline fun <E, A, B> Iterable<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, List<B>> =
-  traverse(semigroup, f)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -381,11 +393,14 @@ public inline fun <E, A, B> Iterable<A>.traverse(
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
-  "traverseValidated is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate<E, A, B> { f(it).bindNel() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  traverse(f)
+  mapOrAccumulate { f(it).bindNel() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -400,11 +415,14 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): 
   mapOrAccumulate { f(it).bindNel() }.toValidated()
 
 @Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup)", "arrow.core.sequence")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  sequence(semigroup)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -417,11 +435,14 @@ public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): V
   mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
 
 @Deprecated(
-  "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
+  ReplaceWith(
+    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bindNel() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
+  )
 )
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
-  sequence()
+  mapOrAccumulate { it.bindNel() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -454,14 +475,18 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
 }
 
 @Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the option DSL.",
+  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  sequence()
+  let { l -> option { l.bindAll() } }
 
+@Deprecated(
+  "The sequence extension function is being deprecated in favor of the option DSL.",
+  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
+)
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
+  let { l -> option { l.bindAll() } }
 
 @Deprecated(
   "traverseNullable is being renamed to traverse to simplify the Arrow API",
@@ -486,11 +511,18 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? {
 }
 
 @Deprecated(
-  "sequenceNullable is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the nullable DSL.",
+  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  sequence()
+  let { l -> nullable { l.bindAll() } }
+
+@Deprecated(
+  "The sequence extension function is being deprecated in favor of the nullable DSL.",
+  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
+)
+public fun <A> Iterable<A?>.sequence(): List<A>? =
+  let { l -> nullable { l.bindAll() } }
 
 /**
  * Returns [Either] a [List] containing the results of applying the given [transform] function to each element in the original collection,
@@ -594,9 +626,6 @@ public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<N
 @JvmName("flattenNelOrAccumulate")
 public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
   mapOrAccumulate { it.bindNel() }
-
-public fun <A> Iterable<A?>.sequence(): List<A>? =
-  traverse(::identity)
 
 public fun <A> Iterable<A>.void(): List<Unit> =
   map { }
