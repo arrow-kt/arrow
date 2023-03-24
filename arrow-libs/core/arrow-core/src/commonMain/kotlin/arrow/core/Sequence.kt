@@ -362,7 +362,7 @@ public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Sequence<B>): Sequence<Sequenc
 
 @OverloadResolutionByLambdaReturnType
 @JvmName("crosswalkT")
-public fun <A, B> Sequence<A>.crosswalk(f: (A) -> List<B>): List<List<B>> =
+public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
     f(a).align(bs) { ior ->
       ior.fold(
