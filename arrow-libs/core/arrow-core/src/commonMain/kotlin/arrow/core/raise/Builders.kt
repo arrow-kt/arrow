@@ -56,6 +56,10 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
     return this ?: raise(null)
   }
 
+  @JvmName("bindAllNullable")
+  public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
+
   @RaiseDSL
   @JvmName("bindAllNullable")
   public fun <A> Iterable<A?>.bindAll(): List<A> =
@@ -72,6 +76,10 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   @RaiseDSL
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
 
+  @JvmName("bindAllResult")
+  public fun <K, V> Map<K, Result<V>>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
+
   @RaiseDSL
   @JvmName("bindAllResult")
   public fun <A> Iterable<Result<A>>.bindAll(): List<A> =
@@ -81,6 +89,10 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
 public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
   @RaiseDSL
   public fun <A> Option<A>.bind(): A = getOrElse { raise(None) }
+
+  @JvmName("bindAllOption")
+  public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
 
   @RaiseDSL
   @JvmName("bindAllOption")
@@ -121,6 +133,10 @@ public class IorRaise<Error> @PublishedApi internal constructor(
         rightValue
       }
     }
+
+  @JvmName("bindAllIor")
+  public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
+    mapValues { (_, v) -> v.bind() }
 
   private fun combine(other: Error): Error =
     state.updateAndGet { prev ->
