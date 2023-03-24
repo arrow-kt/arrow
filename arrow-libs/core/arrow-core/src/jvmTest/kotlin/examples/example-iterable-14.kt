@@ -2,13 +2,11 @@
 package arrow.core.examples.exampleIterable14
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-     listOf(1, 2, 3).unalign {
-       it.leftIor()
-     }
-  //sampleEnd
-  println(result)
+fun test() {
+   listOf(1, 2, 3, 4).unalign {
+     if(it % 2 == 0) it.rightIor()
+     else it.leftIor()
+   } shouldBe Pair(listOf(1, 3), listOf(2, 4))
 }
