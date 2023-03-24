@@ -14,7 +14,7 @@ fun test() {
   fun fetchId(): Int = throw RuntimeException("BOOM")
 
   either {
-    catch({ fetchId() }) { t: RuntimeException ->
+    catch({ fetchId() }) { t ->
       raise("something went wrong: ${t.message}")
     }
   } shouldBe Either.Left("something went wrong: BOOM")

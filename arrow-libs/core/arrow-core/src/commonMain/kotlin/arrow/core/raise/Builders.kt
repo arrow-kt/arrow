@@ -13,39 +13,27 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.orElse
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupDeprecation
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
-public inline fun <E, A> either(@BuilderInference block: Raise<E>.() -> A): Either<E, A> =
+public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
-public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(NullableRaise(this)) }, { null }, ::identity)
-}
+public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
+  fold({ block(NullableRaise(this)) }, { null }, ::identity)
 
-public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
-}
+public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
+  fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
 
-public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  return fold({ block(OptionRaise(this)) }, ::identity, ::Some)
-}
+public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
+  fold({ block(OptionRaise(this)) }, ::identity, ::Some)
 
-public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInference block: IorRaise<E>.() -> A): Ior<E, A> {
-  contract { callsInPlace(block, EXACTLY_ONCE) }
-  val state: Atomic<Option<E>> = Atomic(None)
-  return fold<E, A, Ior<E, A>>(
+public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
+  val state: Atomic<Option<Error>> = Atomic(None)
+  return fold<Error, A, Ior<Error, A>>(
     { block(IorRaise(combineError, state, this)) },
     { e -> throw e },
     { e -> Ior.Left(state.get().getOrElse { e }) },
@@ -55,51 +43,76 @@ public inline fun <E, A> ior(noinline combineError: (E, E) -> E, @BuilderInferen
 
 public typealias Null = Nothing?
 
-@JvmInline
-public value class NullableRaise(private val cont: Raise<Null>) : Raise<Null> {
+public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
-  override fun raise(r: Nothing?): Nothing = cont.raise(r)
-  public fun <B> Option<B>.bind(): B = getOrElse { raise(null) }
 
-  public fun <B> B?.bind(): B {
+  @RaiseDSL
+  public fun <A> Option<A>.bind(): A = getOrElse { raise(null) }
+
+  @RaiseDSL
+  public fun <A> A?.bind(): A {
     contract { returns() implies (this@bind != null) }
     return this ?: raise(null)
   }
 
-  public fun <B> ensureNotNull(value: B?): B {
+  @RaiseDSL
+  @JvmName("bindAllNullable")
+  public fun <A> Iterable<A?>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
+  public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
 }
 
-@JvmInline
-public value class ResultRaise(private val cont: Raise<Throwable>) : Raise<Throwable> {
-  override fun raise(r: Throwable): Nothing = cont.raise(r)
-  public fun <B> Result<B>.bind(): B = fold(::identity) { raise(it) }
+public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
+  @RaiseDSL
+  public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
+
+  @RaiseDSL
+  @JvmName("bindAllResult")
+  public fun <A> Iterable<Result<A>>.bindAll(): List<A> =
+    map { it.bind() }
 }
 
-@JvmInline
-public value class OptionRaise(private val cont: Raise<None>) : Raise<None> {
-  override fun raise(r: None): Nothing = cont.raise(r)
-  public fun <B> Option<B>.bind(): B = getOrElse { raise(None) }
+public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
+  @RaiseDSL
+  public fun <A> Option<A>.bind(): A = getOrElse { raise(None) }
+
+  @RaiseDSL
+  @JvmName("bindAllOption")
+  public fun <A> Iterable<Option<A>>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
-  public fun <B> ensureNotNull(value: B?): B {
+  @RaiseDSL
+  public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
   }
 }
 
-public class IorRaise<E> @PublishedApi internal constructor(
-  private val combineError: (E, E) -> E,
-  private val state: Atomic<Option<E>>,
-  private val raise: Raise<E>,
-) : Raise<E> {
+public class IorRaise<Error> @PublishedApi internal constructor(
+  private val combineError: (Error, Error) -> Error,
+  private val state: Atomic<Option<Error>>,
+  private val raise: Raise<Error>,
+) : Raise<Error> {
 
-  override fun raise(r: E): Nothing = raise.raise(combine(r))
+  @RaiseDSL
+  override fun raise(r: Error): Nothing = raise.raise(combine(r))
 
-  public fun <B> Ior<E, B>.bind(): B =
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  public fun <A> Iterable<Ior<Error, A>>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
+  public fun <A> Ior<Error, A>.bind(): A =
     when (this) {
       is Ior.Left -> raise(value)
       is Ior.Right -> value
@@ -109,7 +122,7 @@ public class IorRaise<E> @PublishedApi internal constructor(
       }
     }
 
-  private fun combine(other: E): E =
+  private fun combine(other: Error): Error =
     state.updateAndGet { prev ->
       Some(prev.map { combineError(it, other) }.getOrElse { other })
     }.getOrElse { other }

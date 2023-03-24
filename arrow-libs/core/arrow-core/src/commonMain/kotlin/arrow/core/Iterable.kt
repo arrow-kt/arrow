@@ -313,18 +313,18 @@ public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either
   let { l -> either { l.map { f(it).bind() } } }
 
 @Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the either DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  traverse(::identity)
+  let { l -> either { l.bindAll() } }
 
 @Deprecated(
-  "Sequence for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("either<E, List<A>> { this.map { it.bind() } }", "arrow.core.raise.either")
+  "The sequence extension function is being deprecated in favor of the either DSL.",
+  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
 )
 public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
+  let { l -> either { l.bindAll() } }
 
 @Deprecated(
   "Traverse for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
@@ -343,18 +343,18 @@ public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result
   let { l -> result { l.map { f(it).bind() } } }
 
 @Deprecated(
-  "sequenceResult is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the result DSL.",
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  sequence()
+  let { l -> result { l.bindAll() } }
 
 @Deprecated(
-  "Sequence for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("result<List<A>> { this.map { it.bind() } }", "arrow.core.raise.result")
+  "The sequence extension function is being deprecated in favor of the result DSL.",
+  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
 )
 public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
-  traverse(::identity)
+  let { l -> result { l.bindAll() } }
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -434,7 +434,7 @@ public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): V
   )
 )
 public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
-  sequence()
+  mapOrAccumulate { it.bindNel() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
@@ -463,18 +463,18 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<
   let { l -> option { l.map { f(it).bind() } } }
 
 @Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the option DSL.",
+  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  sequence()
+  let { l -> option { l.bindAll() } }
 
 @Deprecated(
-  "Sequence for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("option<List<A>> { this.map { it.bind() } }", "arrow.core.raise.option")
+  "The sequence extension function is being deprecated in favor of the option DSL.",
+  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
 )
 public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
+  let { l -> option { l.bindAll() } }
 
 @Deprecated(
   "Traverse for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
@@ -499,11 +499,18 @@ public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? =
   let { l -> nullable { l.map { f(it).bind() } } }
 
 @Deprecated(
-  "sequenceNullable is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence()", "arrow.core.sequence")
+  "The sequence extension function is being deprecated in favor of the nullable DSL.",
+  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
 )
 public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  sequence()
+  let { l -> nullable { l.bindAll() } }
+
+@Deprecated(
+  "The sequence extension function is being deprecated in favor of the nullable DSL.",
+  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
+)
+public fun <A> Iterable<A?>.sequence(): List<A>? =
+  let { l -> nullable { l.bindAll() } }
 
 /**
  * Returns [Either] a [List] containing the results of applying the given [transform] function to each element in the original collection,
