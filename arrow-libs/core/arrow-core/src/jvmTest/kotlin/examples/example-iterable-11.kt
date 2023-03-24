@@ -2,11 +2,9 @@
 package arrow.core.examples.exampleIterable11
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-     listOf("A" to 1, "B" to 2).unzip()
-  //sampleEnd
-  println(result)
+fun test() {
+  listOf("A" to 1, "B" to 2)
+    .unzip() shouldBe Pair(listOf("A", "B"), listOf(1, 2))
 }

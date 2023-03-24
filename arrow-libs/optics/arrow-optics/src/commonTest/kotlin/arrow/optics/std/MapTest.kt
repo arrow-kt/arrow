@@ -14,7 +14,7 @@ import io.kotest.property.arbitrary.string
 class MapTest : StringSpec({
 
     testLaws(
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.mapToSet(),
         aGen = Arb.map(Arb.string(), Arb.constant(Unit)),
         bGen = Arb.set(Arb.string()),

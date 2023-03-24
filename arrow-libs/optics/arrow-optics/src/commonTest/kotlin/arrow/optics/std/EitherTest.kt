@@ -13,7 +13,7 @@ import io.kotest.property.arbitrary.string
 
 class EitherTest : StringSpec({
     testLaws(
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.eitherToValidated(),
         aGen = Arb.either(Arb.string(), Arb.int()),
         bGen = Arb.validated(Arb.string(), Arb.int()),
