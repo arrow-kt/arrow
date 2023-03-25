@@ -150,8 +150,8 @@ private fun <A, B> value2(first: Arb<A>, second: Arb<B>): Arb<Pair<Option<A>?, O
     ) { a, b ->
       Option.fromNullable(a) to Option.fromNullable(b)
     },
-    first.map { Option(it) to null },
-    second.map { null to Option(it) }
+    first.map { Option.fromNullable(it) to null },
+    second.map { null to Option.fromNullable(it) }
   )
 
 private fun <A, B, C> value3(first: Arb<A>, second: Arb<B>, third: Arb<C>): Arb<Triple<Option<A>?, Option<B>?, Option<C>?>> =
@@ -181,9 +181,9 @@ private fun <A, B, C> value3(first: Arb<A>, second: Arb<B>, third: Arb<C>): Arb<
     ) {  b,c  ->
       Triple(null, Option.fromNullable(b), Option.fromNullable(c))
     },
-    first.map { Triple(Option(it), null, null )},
-    second.map { Triple(null, Option(it), null ) },
-    third.map { Triple(null, null, Option(it) ) }
+    first.map { Triple(Option.fromNullable(it), null, null )},
+    second.map { Triple(null, Option.fromNullable(it), null ) },
+    third.map { Triple(null, null, Option.fromNullable(it) ) }
   )
 
 private fun <K, A, B, C> Map<K, Triple<Option<A>?, Option<B>?, Option<C>?>>.destructured(): Triple<Map<K, A>, Map<K, B>, Map<K, C>> {
