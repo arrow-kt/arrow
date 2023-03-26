@@ -1195,7 +1195,7 @@ public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
 @Deprecated(
   NicheAPI + "Prefer using the inline ior DSL",
   ReplaceWith(
-    "ior(SA::combine) { Pair(this.bind(), fb.bind()) }",
+    "ior({a, b -> a + b}) { Pair(this.bind(), fb.bind()) }",
     "arrow.core.raise.ior",
     "arrow.typeclasses.combine"
   )
