@@ -9,12 +9,14 @@ import arrow.core.EmptyValue
 import arrow.core.EmptyValue.combine
 import arrow.core.EmptyValue.unbox
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.Validated
 import arrow.core.collectionSizeOrDefault
 import arrow.core.ValidatedNel
 import arrow.core.mapOrAccumulate
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
+import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
@@ -503,7 +505,10 @@ public open class RaiseAccumulate<Error>(
     mapOrAccumulate { it.bind() }
 
   override fun <A> NonEmptyList<Either<Error, A>>.bindAll(): NonEmptyList<A> =
-    requireNotNull(mapOrAccumulate { it.bind() }.toNonEmptyListOrNull())
+    requireNotNull(raise.mapOrAccumulate(this) { it.bind() }.toNonEmptyListOrNull())
+
+  override fun <A> NonEmptySet<Either<Error, A>>.bindAll(): NonEmptySet<A> =
+    requireNotNull(raise.mapOrAccumulate(this) { it.bind() }.toNonEmptySetOrNull())
 
   @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {
