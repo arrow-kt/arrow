@@ -9,10 +9,12 @@ import arrow.core.NonEmptySet
 import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.left
+import arrow.core.memoize
 import arrow.core.right
 import arrow.core.toNonEmptySetOrNull
 import arrow.core.toOption
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
@@ -22,9 +24,12 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.set
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.triple
 import kotlinx.coroutines.Dispatchers
 import kotlin.math.max
 import kotlin.Result.Companion.failure
@@ -48,6 +53,10 @@ fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Seq
 
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
   arb.map { b: B -> { _: A -> b } }
+
+fun <A, B, C, D> Arb.Companion.functionABCToD(arb: Arb<D>): Arb<(A, B, C) -> D> = arbitrary { random ->
+  ({ _: A, _:B, _:C -> arb.next(random)}.memoize())
+}
 
 fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.of(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
@@ -134,3 +143,64 @@ suspend fun <A> A.suspend(): A =
 
     COROUTINE_SUSPENDED
   }
+
+private fun <A, B> value2(first: Arb<A>, second: Arb<B>): Arb<Pair<A?, B?>> =
+  Arb.pair(first.orNull(.2), second.orNull(.2))
+
+private fun <A, B, C> value3(first: Arb<A>, second: Arb<B>, third: Arb<C>): Arb<Triple<A?, B?, C?>> =
+  Arb.triple(first.orNull(.2), second.orNull(.2), third.orNull(.2))
+
+private fun <K, A, B, C> Map<K, Triple<A?, B?, C?>>.destructured(): Triple<Map<K, A>, Map<K, B>, Map<K, C>> {
+  val firstMap = mutableMapOf<K, A>()
+  val secondMap = mutableMapOf<K, B>()
+  val thirdMap = mutableMapOf<K, C>()
+
+  this.forEach { (key, triple) ->
+    val (a, b, c) = triple
+
+    if (a != null) {
+      firstMap[key] = a
+    }
+
+    if (b != null) {
+      secondMap[key] = b
+    }
+
+    if (c != null) {
+      thirdMap[key] = c
+    }
+  }
+
+  return Triple(firstMap, secondMap, thirdMap)
+}
+
+private fun <K, A, B> Map<K, Pair<A?, B?>>.destructured(): Pair<Map<K, A>, Map<K, B>> {
+  val firstMap = mutableMapOf<K, A>()
+  val secondMap = mutableMapOf<K, B>()
+
+  this.forEach { (key, pair) ->
+    val (a, b) = pair
+    if (a != null) {
+      firstMap[key] = a
+    }
+
+    if (b != null) {
+      secondMap[key] = b
+    }
+  }
+
+  return firstMap to secondMap
+}
+
+fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>): Arb<Pair<Map<K, A>, Map<K, B>>> =
+  Arb.map(arbK, value2(arbA, arbB))
+    .map { it.destructured() }
+
+fun <K, A, B, C> Arb.Companion.map3(
+  arbK: Arb<K>,
+  arbA: Arb<A>,
+  arbB: Arb<B>,
+  arbC: Arb<C>
+): Arb<Triple<Map<K, A>, Map<K, B>, Map<K, C>>> =
+  Arb.map(arbK, value3(arbA, arbB, arbC))
+    .map { it.destructured() }

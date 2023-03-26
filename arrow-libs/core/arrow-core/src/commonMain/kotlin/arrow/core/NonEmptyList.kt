@@ -2,9 +2,9 @@
 
 package arrow.core
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
+import arrow.core.raise.option
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupDeprecation
 import arrow.typeclasses.combine
@@ -417,53 +417,57 @@ public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyL
   }
 
 @Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  "Traverse for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
+  ReplaceWith(
+    "let<NonEmptyList<A>, Either<E, NonEmptyList<B>>> { nel -> either<E, NonEmptyList<B>> { nel.map<A, B> { f(it).bind<B>() } } }",
+    "arrow.core.raise.either")
 )
 public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
   traverse(f)
 
+@Deprecated(
+  "Traverse for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
+  ReplaceWith(
+    "let<NonEmptyList<A>, Either<E, NonEmptyList<B>>> { nel -> either<E, NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
+    "arrow.core.raise.either")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  f(head).map { newHead ->
-    val acc = mutableListOf<B>()
-    tail.forEach { a ->
-      when (val res = f(a)) {
-        is Right -> acc.add(res.value)
-        is Left -> return@traverse res
-      }
-    }
-    NonEmptyList(newHead, acc)
-  }
+  let { nel -> either { nel.map { f(it).bind() } } }
 
-@Deprecated("sequenceEither is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "Sequence for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
+  ReplaceWith("either<E, NonEmptyList<A>> { this.map<A> { it.bind<A>() } }", "arrow.core.raise.either")
+)
 public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
   sequence()
 
+@Deprecated(
+  "Sequence for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
+  ReplaceWith("either<E, NonEmptyList<A>> { this.map<A> { it.bind<A>() } }", "arrow.core.raise.either")
+)
 public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<A>> =
   traverse(::identity)
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<E, A, B>({ a, b -> a + b}) { f(it).bind<B>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 public inline fun <E, A, B> NonEmptyList<A>.traverseValidated(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  traverse(semigroup, f)
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<E, A, B>({ a, b -> a + b}) { f(it).bind<B>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 @OptIn(ExperimentalTypeInference::class)
@@ -472,14 +476,13 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
   semigroup: Semigroup<E>,
   f: (A) -> Validated<E, B>
 ): Validated<E, NonEmptyList<B>> =
-  mapOrAccumulate(semigroup::combine) { f(it).bind() }.toValidated()
+  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
 
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<E, A>({ a, b -> a + b }) { it.bind<A>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
@@ -488,9 +491,8 @@ public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Sem
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<E, A>({ a, b -> a + b }) { it.bind<A>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 public fun <E, A> NonEmptyList<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, NonEmptyList<A>> =
@@ -508,30 +510,40 @@ public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 @Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f)", "arrow.core.traverse")
+  "Traverse for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
+  ReplaceWith(
+    "let<NonEmptyList<A>, Option<NonEmptyList<B>>> { nel -> option<NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
+    "arrow.core.raise.option")
 )
 public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
   traverse(f)
 
+@Deprecated(
+  "Traverse for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
+  ReplaceWith(
+    "let<NonEmptyList<A>, Option<NonEmptyList<B>>> { nel -> option<NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
+    "arrow.core.raise.option")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
-  f(head).map { newHead ->
-    val acc = mutableListOf<B>()
-    tail.forEach { a ->
-      when (val res = f(a)) {
-        is Some -> acc.add(res.value)
-        is None -> return@traverse res
-      }
-    }
-    NonEmptyList(newHead, acc)
-  }
+  let { nel -> option { nel.map { f(it).bind() } } }
 
-@Deprecated("sequenceOption is being renamed to sequence to simplify the Arrow API", ReplaceWith("sequence()", "arrow.core.sequence"))
+@Deprecated(
+  "Sequence for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
+  ReplaceWith(
+    "option<NonEmptyList<A>> { this.map<A> { it.bind<A>() } }",
+    "arrow.core.raise.option")
+)
 public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
   sequence()
 
+@Deprecated(
+  "Sequence for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
+  ReplaceWith(
+    "option<NonEmptyList<A>> { this.map<A> { it.bind<A>() } }",
+    "arrow.core.raise.option")
+)
 public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
   traverse(::identity)
 
