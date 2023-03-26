@@ -137,12 +137,11 @@ class NonEmptyListTest : StringSpec({
       }
     }
 
-    "traverse for Validated stack-safe" {
+    "traverse for Validated is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = (0..stackSafeIteration())
-        .toNonEmptyListOrNull()!!
-        .traverse(String::plus) {
+        .toNonEmptyListOrNull()?.traverse(Semigroup.string()) {
           acc.add(it)
           Validated.Valid(it)
         }
