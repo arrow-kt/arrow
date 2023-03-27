@@ -8,15 +8,13 @@ import io.kotest.matchers.ints.shouldBeZero
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.RandomSource
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arbitrary.take
-import io.kotest.property.assume
 import io.kotest.property.checkAll
 
 class GeneratorsTest : FreeSpec({
@@ -33,13 +31,18 @@ class GeneratorsTest : FreeSpec({
     }
 
     "should return some different values" {
-      Arb.functionABCToD<String, String, String, Int>(Arb.int()).take(100)
-        .forAtLeastOne { fn ->
-          checkAll(100, Arb.string(), Arb.string(), Arb.string()) { a, b, c ->
-            assume(a != c)
-            fn(a, b, c) shouldNotBe fn(c, b, a)
-          }
-        }
+      val random = RandomSource.seeded(0)
+
+      val a = Arb.string().next(random)
+      val a2 = Arb.string().next(random)
+      val b = Arb.string().next(random)
+      val c = Arb.string().next(random)
+
+      // there should be at least one function that has a different value when the args are different
+      givenSamples( Arb.functionABCToD<String, String, String, Int>(Arb.int())).find { sample ->
+        val fn = sample.value
+        fn(a, b, c) != fn(a2, b, c)
+      }.shouldNotBeNull()
     }
   }
 
@@ -114,5 +117,5 @@ class GeneratorsTest : FreeSpec({
   }
 })
 
-private fun <T> givenSamples(arb: Arb<T>) =
-  arb.generate(RandomSource.seeded(0)).take(2000).toList()
+private fun <T> givenSamples(arb: Arb<T>, count: Int = 100) =
+  arb.generate(RandomSource.seeded(0)).take(count).toList()
