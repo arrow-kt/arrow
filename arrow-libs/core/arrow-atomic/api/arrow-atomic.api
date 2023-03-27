@@ -46,3 +46,79 @@ public final class arrow/atomic/AtomicLongKt {
 	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;)J
 }
 
+public final class arrow/atomic/AtomicMap : java/util/Map, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun <init> ()V
+	public fun clear ()V
+	public fun compute (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun computeIfAbsent (Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;
+	public fun computeIfPresent (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun containsKey (Ljava/lang/Object;)Z
+	public fun containsValue (Ljava/lang/Object;)Z
+	public final fun entrySet ()Ljava/util/Set;
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getEntries ()Ljava/util/Set;
+	public fun getKeys ()Ljava/util/Set;
+	public fun getSize ()I
+	public fun getValues ()Ljava/util/Collection;
+	public fun isEmpty ()Z
+	public final fun keySet ()Ljava/util/Set;
+	public fun merge (Ljava/lang/Object;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public final fun merge (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+	public fun put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putAll (Ljava/util/Map;)V
+	public fun putIfAbsent (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun putIfAbsent (Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun remove (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun remove (Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun remove (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replace (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun replace (Ljava/lang/Object;Ljava/lang/Object;)V
+	public final fun replace (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun replace (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replaceAll (Ljava/util/function/BiFunction;)V
+	public final fun size ()I
+	public final fun values ()Ljava/util/Collection;
+}
+
+public final class arrow/atomic/AtomicMap$Null {
+	public static final field INSTANCE Larrow/atomic/AtomicMap$Null;
+}
+
+public final class arrow/atomic/DefaultAtomicMap : java/util/Map, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun <init> ()V
+	public fun clear ()V
+	public fun compute (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun computeIfAbsent (Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;
+	public fun computeIfPresent (Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public fun containsKey (Ljava/lang/Object;)Z
+	public fun containsValue (Ljava/lang/Object;)Z
+	public final fun entrySet ()Ljava/util/Set;
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getEntries ()Ljava/util/Set;
+	public fun getKeys ()Ljava/util/Set;
+	public fun getSize ()I
+	public fun getValues ()Ljava/util/Collection;
+	public fun isEmpty ()Z
+	public final fun keySet ()Ljava/util/Set;
+	public fun merge (Ljava/lang/Object;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;
+	public final fun merge (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+	public fun put (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun putAll (Ljava/util/Map;)V
+	public fun putIfAbsent (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun putIfAbsent (Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun remove (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun remove (Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun remove (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replace (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun replace (Ljava/lang/Object;Ljava/lang/Object;)V
+	public final fun replace (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun replace (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z
+	public fun replaceAll (Ljava/util/function/BiFunction;)V
+	public final fun size ()I
+	public final fun values ()Ljava/util/Collection;
+}
+
+public final class arrow/atomic/DefaultAtomicMap$Null {
+	public static final field INSTANCE Larrow/atomic/DefaultAtomicMap$Null;
+}
+
