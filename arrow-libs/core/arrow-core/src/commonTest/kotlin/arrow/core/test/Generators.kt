@@ -51,11 +51,12 @@ fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
 
-fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
-  arb.map { b: B -> { _: A -> b } }
+fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> = arbitrary { random ->
+  { _: A -> arb.next(random) }.memoize()
+}
 
 fun <A, B, C, D> Arb.Companion.functionABCToD(arb: Arb<D>): Arb<(A, B, C) -> D> = arbitrary { random ->
-  ({ _: A, _:B, _:C -> arb.next(random)}.memoize())
+  { _: A, _:B, _:C -> arb.next(random)}.memoize()
 }
 
 fun Arb.Companion.throwable(): Arb<Throwable> =
