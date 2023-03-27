@@ -242,7 +242,7 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("this.fold<C>({ MN.empty() }, { f }, { _, b -> f(b) })")
+    ReplaceWith("this.fold<C>({ empty }, { f }, { _, b -> f(b) })")
   )
   public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
@@ -911,7 +911,7 @@ public sealed class Ior<out A, out B> {
 
 @Deprecated(
   "$SemigroupDeprecation.",
-  ReplaceWith("flatMap(SA::combine, f)", "arrow.typeclasses.combine")
+  ReplaceWith("this.flatMap({a, b -> a + b}, f)")
 )
 public inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> =
   flatMap(SG::combine, f)
@@ -1011,7 +1011,7 @@ public fun <A, B, C> Ior<Validated<A, B>, Validated<A, C>>.bisequenceValidated(S
 
 @Deprecated(
   "$SemigroupDeprecation",
-  ReplaceWith("combine(other, SA::combine, SB::combine)", "arrow.typeclasses.combine")
+  ReplaceWith("combine(other, {a1, a2 -> a1 + a2}, {b1, b2 -> b1 + b2} )")
 )
 public fun <A, B> Ior<A, B>.combine(SA: Semigroup<A>, SB: Semigroup<B>, other: Ior<A, B>): Ior<A, B> =
   combine(other, SA::combine, SB::combine)
@@ -1043,7 +1043,7 @@ public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A,
 @Suppress("NOTHING_TO_INLINE")
 @Deprecated(
   "$SemigroupDeprecation.",
-  ReplaceWith("flatten(SA::combine)", "arrow.typeclasses.combine")
+  ReplaceWith("this.flatten{a1, a2 -> a1 + a2}")
 )
 public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(SA: Semigroup<A>): Ior<A, B> =
   flatMap(SA, ::identity)

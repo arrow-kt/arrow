@@ -220,7 +220,7 @@ public class NonEmptyList<out A>(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
 
-  @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, SA::combine)", "arrow.typeclasses.combine"))
+  @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, {a1, a2 -> a1 + a2})"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     padZip(b, ::identity, ::identity, SA::combine)
 

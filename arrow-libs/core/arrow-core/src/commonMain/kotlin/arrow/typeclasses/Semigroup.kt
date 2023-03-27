@@ -98,7 +98,7 @@ public fun interface Semigroup<A> {
     @JvmStatic
     @Deprecated(
       "$SemigroupDeprecation. Use Either::combine directly instead.",
-      ReplaceWith("{ a: Either<A, B>, b: Either<A, B> -> a.combine(b, SA::combine, SB::combine) }")
+      ReplaceWith("{ a: Either<A, B>, b: Either<A, B> -> a.combine(b, {a1, a2 -> a1 + a2}, {b1, b2 -> b1 + b2}) }")
     )
     public fun <A, B> either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
       EitherSemigroup(SA, SB)
@@ -106,7 +106,7 @@ public fun interface Semigroup<A> {
     @JvmStatic
     @Deprecated(
       "$SemigroupDeprecation. Use Ior::combine directly instead.",
-      ReplaceWith("{ a: Ior<A, B>, b: Ior<A, B> -> a.combine(b, SA::combine, SB::combine) }")
+      ReplaceWith("{ a: Ior<A, B>, b: Ior<A, B> -> a.combine(b, {a1, a2 -> a1 + a2}, {b1, b2 -> b1 + b2}) }")
     )
     public fun <A, B> ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
       IorSemigroup(SA, SB)

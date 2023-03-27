@@ -306,7 +306,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use fold on Either after refactoring instead",
-    ReplaceWith("toEither().fold({ MB.empty() }, f)")
+    ReplaceWith("toEither().fold({ initial }, f)")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -1036,14 +1036,14 @@ public fun <A, B> Validated<A?, B?>.bisequenceNullable(): Validated<A, B>? =
 
 @Deprecated(
   "$MonoidDeprecation\n$DeprAndNicheMsg\nUse fold on Either after refactoring",
-  ReplaceWith("fold({ MA.empty() }, ::identity)")
+  ReplaceWith("fold({ initial }, ::identity)")
 )
 public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A =
   fold({ MA.empty() }, ::identity)
 
 @Deprecated(
   "$MonoidDeprecation\n$DeprAndNicheMsg\nUse fold on Either after refactoring",
-  ReplaceWith("fold({ MA.empty() }, ::identity)", "arrow.core.fold")
+  ReplaceWith("fold({ initial }, ::identity)", "arrow.core.fold")
 )
 public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
@@ -1255,7 +1255,7 @@ public inline fun <A> Validated<A, A>.merge(): A =
 
 @Deprecated(
   ValidatedDeprMsg + "Use Either.zipOrAccumulate instead",
-  ReplaceWith("Either.zipOrAccumulate(SE::combine, toEither(), y.toEither(), SA::combine).toValidated()")
+  ReplaceWith("Either.zipOrAccumulate({e1, e2 -> e1 + e2}, this.toEither(), y.toEither(), {a1, a2 -> a1 + a2} ).toValidated()")
 )
 public fun <E, A> Validated<E, A>.combine(
   SE: Semigroup<E>,

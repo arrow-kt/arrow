@@ -315,9 +315,8 @@ public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, A, B>(semigroup::combine) { f(it.value).bind<B>() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<K, E, A, B>({e1, e2 -> e1 + e2}) { f(it.value).bind<B>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 public inline fun <K, E, A, B> Map<K, A>.traverse(
