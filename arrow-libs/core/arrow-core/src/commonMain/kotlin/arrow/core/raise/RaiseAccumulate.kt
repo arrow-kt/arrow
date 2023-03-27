@@ -485,18 +485,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptyList: NonEmptyList<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): NonEmptyList<B> {
-  val error = mutableListOf<Error>()
-  val results = ArrayList<B>(nonEmptyList.collectionSizeOrDefault(10))
-  for (item in nonEmptyList) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error.addAll(errors) },
-      { results.add(it) }
-    )
-  }
-  return error.toNonEmptyListOrNull()?.let { raise(it) } ?: requireNotNull(results.toNonEmptyListOrNull())
-}
+): NonEmptyList<B> = requireNotNull(mapOrAccumulate(nonEmptyList.all, transform).toNonEmptyListOrNull())
 
 /**
  * Accumulate the errors obtained by executing the [transform] over every element of [NonEmptySet].
@@ -507,7 +496,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): NonEmptySet<B> {
   val error = mutableListOf<Error>()
-  val results = ArrayList<B>(nonEmptySet.collectionSizeOrDefault(10))
+  val results = HashSet<B>(nonEmptySet.collectionSizeOrDefault(10))
   for (item in nonEmptySet) {
     fold<NonEmptyList<Error>, B, Unit>(
       { transform(RaiseAccumulate(this), item) },
