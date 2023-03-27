@@ -9,6 +9,7 @@ import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -90,6 +91,11 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   @JvmName("bindAllResult")
   public fun <A> NonEmptyList<Result<A>>.bindAll(): NonEmptyList<A> =
     map { it.bind() }
+
+  @RaiseDSL
+  @JvmName("bindAllResult")
+  public fun <A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> =
+    map { it.bind() }
 }
 
 public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
@@ -108,6 +114,11 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   @RaiseDSL
   @JvmName("bindAllOption")
   public fun <A> NonEmptyList<Option<A>>.bindAll(): NonEmptyList<A> =
+    map { it.bind() }
+
+  @RaiseDSL
+  @JvmName("bindAllOption")
+  public fun <A> NonEmptySet<Option<A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }
 
   @RaiseDSL
@@ -137,6 +148,11 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   @RaiseDSL
   @JvmName("bindAllIor")
   public fun <A> NonEmptyList<Ior<Error, A>>.bindAll(): NonEmptyList<A> =
+    map { it.bind() }
+
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  public fun <A> NonEmptySet<Ior<Error, A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }
 
   @RaiseDSL
