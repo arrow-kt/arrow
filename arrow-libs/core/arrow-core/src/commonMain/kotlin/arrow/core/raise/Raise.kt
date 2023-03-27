@@ -6,6 +6,7 @@
 package arrow.core.raise
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.Validated
 import arrow.core.ValidatedDeprMsg
 import arrow.core.continuations.EffectScope
@@ -248,6 +249,10 @@ public interface Raise<in Error> {
 
   @RaiseDSL
   public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
+    map { it.bind() }
+
+  @RaiseDSL
+  public fun <A> NonEmptyList<Either<Error, A>>.bindAll(): NonEmptyList<A> =
     map { it.bind() }
 }
 
