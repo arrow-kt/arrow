@@ -2,8 +2,7 @@
 
 package arrow.core
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.loop
+import arrow.atomic.AtomicMap
 import kotlin.jvm.JvmName
 
 /**
@@ -113,24 +112,13 @@ private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(
 }
 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
-  private val cache = AtomicRef(emptyMap<K, R>())
-  operator fun invoke(k: K): R {
-    val cached = cache.get()[k]
-    // No cached value found, compute one
-    return if (cached == null) {
-      val b = k(f)
-      cache.loop { old ->
-        val bb = old[k]
-        // No value is set yet (race condition)
-        if (bb == null) {
-          // Value was set, return the value
-          if (cache.compareAndSet(old, old + Pair(k, b))) return b
-          // keep looping failed to set
-          else Unit
-          // A value was already set first, return it
-        } else return bb
-      }
-      // Cached value found, return it
-    } else cached
-  }
+  private val cache = AtomicMap<K, R>()
+  operator fun invoke(k: K): R =
+    if (cache.containsKey(k))
+      cache.getValue(k)
+    else {
+      val new = k(f)
+      cache.putIfAbsent(k, new)
+      new
+    }
 }
