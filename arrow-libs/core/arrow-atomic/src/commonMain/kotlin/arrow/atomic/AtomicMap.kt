@@ -13,7 +13,7 @@ public expect class AtomicMap<K, V> public constructor() : Map<K, V> {
   public fun replace(key: K, oldValue: V, newValue: V)
 
   /**
-   * Removes the specified [key] only it mapped to the given [value].
+   * Removes the specified [key] only if it was mapped to the given [value].
    */
   public fun remove(key: K, value: V)
 
