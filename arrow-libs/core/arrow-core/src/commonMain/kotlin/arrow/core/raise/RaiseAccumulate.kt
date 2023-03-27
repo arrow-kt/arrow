@@ -502,6 +502,9 @@ public open class RaiseAccumulate<Error>(
   override fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
     mapOrAccumulate { it.bind() }
 
+  override fun <A> NonEmptyList<Either<Error, A>>.bindAll(): NonEmptyList<A> =
+    requireNotNull(mapOrAccumulate { it.bind() }.toNonEmptyListOrNull())
+
   @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {
     is Either.Left -> raise.raise(value)
