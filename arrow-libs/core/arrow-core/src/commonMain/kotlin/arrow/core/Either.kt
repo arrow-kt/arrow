@@ -1201,7 +1201,11 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
-    ReplaceWith("fold({ listOf(it.left()) }, { fa(it).map(::Right) })")
+    ReplaceWith(
+      "fold({ listOf(it.left()) }, { fa(it).map(::Right) })", 
+      "arrow.core.Either.Right",
+      "arrow.core.Either.left"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -1210,7 +1214,12 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
-    ReplaceWith("fold({ Some(it.left()) }, { right -> fa(right).map(::Right) })")
+    ReplaceWith(
+      "fold({ Some(it.left()) }, { right -> fa(right).map(::Right) })",
+      "arrow.core.Either.Right",
+      "arrow.core.Some",
+      "arrow.core.left"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
@@ -2581,7 +2590,11 @@ public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
     "this.fold<Option<Either<A, B>>>({ Some(it.left()) }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
-    "arrow.core.right", "arrow.core.left"
+    "arrow.core.Either",
+    "arrow.core.Option",
+    "arrow.core.Some",
+    "arrow.core.left",
+    "arrow.core.right"
   )
 )
 public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
@@ -2591,7 +2604,11 @@ public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
     "this.fold<Option<Either<A, B>>>({ Some(it.left()) }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
-    "arrow.core.right", "arrow.core.left"
+    "arrow.core.Either",
+    "arrow.core.Option",
+    "arrow.core.Some",
+    "arrow.core.left",
+    "arrow.core.right"
   )
 )
 public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
@@ -2601,6 +2618,7 @@ public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
     "this.fold<Either<A, B>?>({ it.left() }, { it?.right() })",
+    "arrow.core.Either",
     "arrow.core.right",
     "arrow.core.left"
   )
@@ -2612,6 +2630,7 @@ public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
   "Prefer Kotlin nullable syntax",
   ReplaceWith(
     "this.fold<Either<A, B>?>({ it.left() }, { it?.right() })",
+    "arrow.core.Either",
     "arrow.core.right",
     "arrow.core.left"
   )

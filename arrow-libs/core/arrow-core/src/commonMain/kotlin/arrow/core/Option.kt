@@ -1129,7 +1129,9 @@ public sealed class Option<out A> {
     NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
     ReplaceWith(
       "fold({ listOf(None) }) { a -> fa(a).map(::Some) }",
-      "arrow.core.Some")
+      "arrow.core.None",
+      "arrow.core.Some"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
