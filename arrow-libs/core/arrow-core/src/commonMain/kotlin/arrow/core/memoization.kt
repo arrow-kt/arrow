@@ -113,26 +113,22 @@ private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(
 }
 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
-  private val cache = AtomicRef(emptyMap<K, Option<R>>())
+  private val cache = AtomicRef(emptyMap<K, R>())
 
-  @Suppress("UNCHECKED_CAST")
-  operator fun invoke(k: K): R {
-    val cached = cache.get()[k]
-    // No cached value found, compute one
-    return if (cached == null) {
+  operator fun invoke(k: K): R = when (k) {
+    in cache.get() -> cache.get().getValue(k)
+    else -> {
       val b = k(f)
       cache.loop { old ->
-        val bb = old[k]
-        // No value is set yet (race condition)
-        if (bb == null) {
-          // Value was set, return the value
-          if (cache.compareAndSet(old, old + Pair(k, Option.fromNullable(b)))) return b
-          // keep looping failed to set
-          else Unit
-          // A value was already set first, return it
-        } else return bb.getOrNull() as R
+        when (k) {
+          in old ->
+            return@invoke old.getValue(k)
+          else -> {
+            if (cache.compareAndSet(old, old + Pair(k, b)))
+              return@invoke b
+          }
+        }
       }
-      // Cached value found, return it
-    } else (cached.getOrNull() as R)
+    }
   }
 }
