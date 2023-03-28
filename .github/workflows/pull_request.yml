@@ -52,7 +52,7 @@ jobs:
       - name: macos and tvos tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test --parallel  --scan
+          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
 
       - name: Upload reports
         if: failure()
@@ -79,7 +79,7 @@ jobs:
       - name: mingwX64Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: mingwX64Test --scan
+          arguments: mingwX64Test  --scan
 
       - name: Upload reports
         if: failure()
