@@ -16,7 +16,7 @@ public actual class AtomicMap<K, V>: Map<K, V> {
    * If the specified [key] is not already associated with a value, associates it with the given [value].
    * Otherwise, applies the [combine] value to merge those.
    */
-  public actual fun merge(key: K, value: V, combine: (old: V, new: V) -> V) {
+  public actual fun merge(key: K, value: V, combine: (oldValue: V, newValue: V) -> V) {
     map.merge(key, value ?: Null) { old, new ->
       combine(unwrapNull(old), unwrapNull(new)) ?: Null
     }

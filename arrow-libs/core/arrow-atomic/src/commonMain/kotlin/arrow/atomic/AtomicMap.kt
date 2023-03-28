@@ -5,7 +5,7 @@ public expect class AtomicMap<K, V> public constructor() : Map<K, V> {
    * If the specified [key] is not already associated with a value, associates it with the given [value].
    * Otherwise, applies the [combine] value to merge those.
    */
-  public fun merge(key: K, value: V, combine: (old: V, new: V) -> V)
+  public fun merge(key: K, value: V, combine: (oldValue: V, newValue: V) -> V)
 
   /**
    * Replaces the specified [key] with [newValue], only if it was mapped to the given [oldValue].
@@ -38,44 +38,43 @@ public class DefaultAtomicMap<K, V>: Map<K, V> {
 
   private val map: Atomic<Map<K, Any>> = Atomic(mapOf())
 
-  /**
-   * If the specified [key] is not already associated with a value, associates it with the given [value].
-   * Otherwise, applies the [combine] value to merge those.
-   */
-  public fun merge(key: K, value: V, combine: (old: V, new: V) -> V) {
+  private inline fun loop(crossinline block: (Map<K, Any>) -> Map<K, Any>) {
     while (true) {
-      val old = map.get()
-      val newValue =
-        if (old.containsKey(key)) combine(unwrapNull(old.getValue(key)), value) else value
-      if (map.compareAndSet(old, old + Pair(key, newValue ?: Null)))
+      val oldMap = map.get()
+      val newMap = block(oldMap)
+      if (oldMap == newMap || map.compareAndSet(oldMap, newMap))
         return
     }
   }
 
   /**
+   * If the specified [key] is not already associated with a value, associates it with the given [value].
+   * Otherwise, applies the [combine] value to merge those.
+   */
+  public fun merge(key: K, value: V, combine: (oldValue: V, newValue: V) -> V): Unit = loop { oldMap ->
+    val newValue =
+      if (oldMap.containsKey(key)) combine(unwrapNull(oldMap.getValue(key)), value) else value
+    oldMap + Pair(key, newValue ?: Null)
+  }
+
+  /**
    * Replaces the specified [key] with [newValue], only if it was mapped to the given [oldValue].
    */
-  public fun replace(key: K, oldValue: V, newValue: V) {
-    while (true) {
-      val old = map.get()
-      if (old[key] == (oldValue ?: Null)) {
-        if (map.compareAndSet(old, old + Pair(key, newValue ?: Null)))
-          return
-      }
-    }
+  public fun replace(key: K, oldValue: V, newValue: V): Unit = loop { oldMap ->
+    if (oldMap[key] == (oldValue ?: Null))
+      oldMap + Pair(key, newValue ?: Null)
+    else
+      oldMap
   }
 
   /**
    * Removes the specified [key] only it mapped to the given [value].
    */
-  public fun remove(key: K, value: V) {
-    while (true) {
-      val old = map.get()
-      if (old[key] == (value ?: Null)) {
-        if (map.compareAndSet(old, old - key))
-          return
-      }
-    }
+  public fun remove(key: K, value: V): Unit = loop { oldMap ->
+    if (oldMap[key] == (value ?: Null))
+      oldMap - key
+    else
+      oldMap
   }
 
   /**
