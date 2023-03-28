@@ -231,15 +231,16 @@ private fun <K, A, B> Map<K, Pair<Option<A>?, Option<B>?>>.destructured(): Pair<
   return (firstMap to secondMap) as Pair<Map<K, A>, Map<K, B>>
 }
 
-fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>): Arb<Pair<Map<K, A>, Map<K, B>>> =
-  Arb.map(arbK, value2(arbA, arbB))
+fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>, size: IntRange = 0 .. 20): Arb<Pair<Map<K, A>, Map<K, B>>> =
+  Arb.map(keyArb = arbK, valueArb = value2(arbA, arbB), minSize = size.first, maxSize = size.last)
     .map { it.destructured() }
 
 fun <K, A, B, C> Arb.Companion.map3(
   arbK: Arb<K>,
   arbA: Arb<A>,
   arbB: Arb<B>,
-  arbC: Arb<C>
+  arbC: Arb<C>,
+  size: IntRange = 0 .. 20
 ): Arb<Triple<Map<K, A>, Map<K, B>, Map<K, C>>> =
-  Arb.map(arbK, value3(arbA, arbB, arbC))
+  Arb.map(arbK, value3(arbA, arbB, arbC), minSize = size.first, maxSize = size.last)
     .map { it.destructured() }
