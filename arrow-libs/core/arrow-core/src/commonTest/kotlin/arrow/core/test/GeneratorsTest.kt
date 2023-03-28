@@ -16,10 +16,7 @@ import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
-@OptIn(ExperimentalTime::class)
 class GeneratorsTest : FreeSpec({
   "functionABCToD: should return same result when invoked multiple times" {
     checkAll(
@@ -114,35 +111,7 @@ class GeneratorsTest : FreeSpec({
       .forAtLeastOne { sample -> sample.value.second.values.forAtLeastOne { it.shouldBeNull() } }
       .forAtLeastOne { sample -> sample.value.third.values.forAtLeastOne { it.shouldBeNull() } }
   }
-
-  "Arb.map3: time" {
-    val random = RandomSource.seeded(0)
-    val arb = Arb.map3(Arb.string(), Arb.boolean().orNull(), Arb.boolean().orNull(), Arb.boolean().orNull()).generate(random).iterator()
-
-    checkAll(Arb.boolean()) { _ ->
-      val time = measureTime {
-        arb.next()
-      }
-
-      collect("Arb.map3 time", time.inWholeMilliseconds)
-
-    }
-  }
-
-  "Arb.map2: time" {
-    val random = RandomSource.seeded(0)
-    val arb = Arb.map2(Arb.string(), Arb.boolean().orNull(), Arb.boolean().orNull()).generate(random).iterator()
-
-    checkAll(Arb.boolean()) { _ ->
-      val time = measureTime {
-        arb.next()
-      }
-
-      collect("Arb.map3 time", time.inWholeMilliseconds)
-
-    }
-  }
 })
 
-private fun <T> givenSamples(arb: Arb<T>, count: Int = 100) =
+private fun <T> givenSamples(arb: Arb<T>, count: Int = 250) =
   arb.generate(RandomSource.seeded(0)).take(count).toList()
