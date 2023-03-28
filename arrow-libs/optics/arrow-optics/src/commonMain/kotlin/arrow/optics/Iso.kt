@@ -12,7 +12,6 @@ import arrow.core.Validated.Valid
 import arrow.core.compose
 import arrow.core.identity
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidDeprecation
 import kotlin.jvm.JvmStatic
 
 /**
@@ -66,11 +65,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
   override fun modify(source: S, map: (focus: A) -> B): T =
     reverseGet(map(get(source)))
 
-  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(empty, {r1, r2 -> r1 + r2}, source, map)", "arrow.optics.foldMap"))
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    map(get(source))
-
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**

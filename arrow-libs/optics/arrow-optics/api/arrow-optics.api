@@ -88,6 +88,7 @@ public final class arrow/optics/Fold$DefaultImpls {
 	public static fun firstOrNull (Larrow/optics/Fold;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun fold (Larrow/optics/Fold;Larrow/typeclasses/Monoid;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun fold (Larrow/optics/Fold;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun foldMap (Larrow/optics/Fold;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/Fold;Ljava/lang/Object;)Ljava/util/List;
 	public static fun isEmpty (Larrow/optics/Fold;Ljava/lang/Object;)Z
 	public static fun isNotEmpty (Larrow/optics/Fold;Ljava/lang/Object;)Z
@@ -104,7 +105,6 @@ public abstract interface class arrow/optics/Getter : arrow/optics/Fold {
 	public abstract fun compose (Larrow/optics/Getter;)Larrow/optics/Getter;
 	public abstract fun first ()Larrow/optics/Getter;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun get (Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun left ()Larrow/optics/Getter;
 	public abstract fun plus (Larrow/optics/Getter;)Larrow/optics/Getter;
@@ -173,7 +173,6 @@ public abstract interface class arrow/optics/PEvery : arrow/optics/Fold, arrow/o
 	public abstract fun compose (Larrow/optics/PEvery;)Larrow/optics/PEvery;
 	public static fun either ()Larrow/optics/PEvery;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getEvery (Larrow/optics/PIso;)Larrow/optics/PEvery;
 	public abstract fun getEvery (Larrow/optics/PLens;)Larrow/optics/PEvery;
 	public abstract fun getEvery (Larrow/optics/POptional;)Larrow/optics/PEvery;
@@ -235,6 +234,7 @@ public final class arrow/optics/PEvery$DefaultImpls {
 	public static fun firstOrNull (Larrow/optics/PEvery;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun fold (Larrow/optics/PEvery;Larrow/typeclasses/Monoid;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun fold (Larrow/optics/PEvery;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun foldMap (Larrow/optics/PEvery;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/PEvery;Ljava/lang/Object;)Ljava/util/List;
 	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
 	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PIso;)Larrow/optics/PEvery;
@@ -264,7 +264,6 @@ public abstract interface class arrow/optics/PIso : arrow/optics/Fold, arrow/opt
 	public static fun eitherToValidated ()Larrow/optics/PIso;
 	public abstract fun first ()Larrow/optics/PIso;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun get (Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
 	public abstract fun left ()Larrow/optics/PIso;
@@ -386,7 +385,6 @@ public abstract interface class arrow/optics/PLens : arrow/optics/Getter, arrow/
 	public abstract fun compose (Larrow/optics/PLens;)Larrow/optics/PLens;
 	public abstract fun first ()Larrow/optics/PLens;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun get (Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
 	public static fun nonEmptyListHead ()Larrow/optics/PLens;
@@ -492,7 +490,6 @@ public abstract interface class arrow/optics/POptional : arrow/optics/PEvery, ar
 	public abstract fun compose (Larrow/optics/POptional;)Larrow/optics/POptional;
 	public abstract fun first ()Larrow/optics/POptional;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
 	public static fun listHead ()Larrow/optics/POptional;
 	public static fun listTail ()Larrow/optics/POptional;
@@ -573,7 +570,6 @@ public abstract interface class arrow/optics/POptionalGetter : arrow/optics/Fold
 	public static fun filter (Lkotlin/jvm/functions/Function1;)Larrow/optics/POptionalGetter;
 	public abstract fun first ()Larrow/optics/POptionalGetter;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
 	public abstract fun getOrNull (Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun plus (Larrow/optics/POptionalGetter;)Larrow/optics/POptionalGetter;
@@ -622,7 +618,6 @@ public abstract interface class arrow/optics/PPrism : arrow/optics/PEvery, arrow
 	public static fun eitherRight ()Larrow/optics/PPrism;
 	public abstract fun first ()Larrow/optics/PPrism;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
 	public abstract fun left ()Larrow/optics/PPrism;
 	public abstract fun liftNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;

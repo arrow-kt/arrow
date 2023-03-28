@@ -43,9 +43,6 @@ public fun interface FilterIndex<S, I, A> {
 
           override fun modify(source: List<A>, map: (focus: A) -> A): List<A> =
             source.mapIndexed { index, a -> if (p(index)) map(a) else a }
-
-          override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: List<A>, map: (focus: A) -> R): R =
-            source.foldIndexed(empty) { index, acc, a -> if (p(index)) combine(acc, map(a)) else acc }
         }
       }
 
@@ -61,9 +58,6 @@ public fun interface FilterIndex<S, I, A> {
 
           override fun modify(source: Map<K, V>, map: (focus: V) -> V): Map<K, V> =
             source.mapValues { (k, v) -> if (p(k)) map(v) else v }
-
-          override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Map<K, V>, map: (focus: V) -> R): R =
-            source.entries.fold(empty) { acc, (k, v) -> if (p(k)) combine(acc, map(v)) else acc }
         }
       }
 
@@ -83,9 +77,6 @@ public fun interface FilterIndex<S, I, A> {
               override fun modify(source: NonEmptyList<A>, map: (focus: A) -> A): NonEmptyList<A> =
                 source.mapIndexed { index, a -> if (p(index)) map(a) else a }.toNonEmptyListOrNull()
                         ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
-
-            override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: NonEmptyList<A>, map: (focus: A) -> R): R =
-              source.foldIndexed(empty) { index, acc, r -> if (p(index)) combine(acc, map(r)) else acc }
           }
       }
 
@@ -101,9 +92,6 @@ public fun interface FilterIndex<S, I, A> {
 
           override fun modify(source: Sequence<A>, map: (focus: A) -> A): Sequence<A> =
             source.mapIndexed { index, a -> if (p(index)) map(a) else a }
-
-          override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Sequence<A>, map: (focus: A) -> R): R =
-            source.foldIndexed(empty) { index, acc, a -> if (p(index)) combine(acc, map(a)) else acc }
         }
       }
 

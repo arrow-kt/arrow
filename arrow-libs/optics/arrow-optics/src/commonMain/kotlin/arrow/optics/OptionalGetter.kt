@@ -7,7 +7,6 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidDeprecation
 import kotlin.jvm.JvmStatic
 
 /**
@@ -38,12 +37,8 @@ public interface POptionalGetter<S, T, A>: Fold<S, A> {
   public fun getOrNull(source: S): A? =
     getOrModify(source).getOrNull()
 
-  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(empty, {r1, r2 -> r1 + r2}, source, map)", "arrow.optics.foldMap"))
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrModify(source).map(map).getOrElse { M.empty() }
-
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).getOrElse { empty }
 
   /**
    * Join two [POptionalGetter] with the same focus

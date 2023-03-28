@@ -10,7 +10,6 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidDeprecation
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -42,12 +41,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
 
   public fun reverseGet(focus: B): T
 
-  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(empty, {r1, r2 -> r1 + r2}, source, map)", "arrow.optics.foldMap"))
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrNull(source)?.let(map) ?: M.empty()
-
-  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
-    getOrNull(source)?.let(map) ?: empty
 
   /**
    * Modify the focus of a [PPrism] with a function
