@@ -10,6 +10,7 @@ import arrow.core.identity
 import arrow.core.prependTo
 import arrow.core.toOption
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import kotlin.jvm.JvmStatic
 
 /**
@@ -72,8 +73,13 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
    */
   override fun getOrModify(source: S): Either<T, A>
 
+  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(empty, {r1, r2 -> r1 + r2}, source, map)", "arrow.optics.foldMap"))
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     getOrModify(source).map(map).getOrElse { M.empty() }
+
+  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    getOrModify(source).map(map).getOrElse { empty }
+
 
   /**
    * Modify the focus of a [POptional] with a function [map]

@@ -28,6 +28,8 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
    */
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
 
+  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R
+
   override fun modify(source: S, map: (focus: A) -> B): T
 
   /**
@@ -40,6 +42,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
       override fun modify(source: S, map: (focus: C) -> D): T =
         this@PEvery.modify(source) { b -> other.modify(b, map) }
+
+      override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: C) -> R): R =
+        this@PEvery.foldMap(empty, combine, source) { c -> other.foldMap(empty, combine, c, map) }
     }
 
   public operator fun <C, D> plus(other: PEvery<in A, out B, out C, in D>): PEvery<S, T, C, D> =
@@ -50,6 +55,8 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
       object : Every<S, A> {
         override fun <R> foldMap(M: Monoid<R>, source: S, map: (A) -> R): R = F.foldMap(M, source, map)
         override fun modify(source: S, map: (focus: A) -> A): S = T.modify(source, map)
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+          F.foldMap(empty, combine, source, map)
       }
 
     /**
@@ -63,6 +70,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
         override fun <R> foldMap(M: Monoid<R>, source: List<A>, map: (focus: A) -> R): R =
           source.foldMap(M, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: List<A>, map: (focus: A) -> R): R =
+          source.fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -78,6 +88,10 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
         override fun <A> foldMap(M: Monoid<A>, source: Either<L, R>, map: (focus: R) -> A): A =
           source.fold({ M.empty() }, map)
+
+        override fun <A> foldMap(empty: A, combine: (A, A) -> A, source: Either<L, R>, map: (focus: R) -> A): A =
+          source.fold({ empty }, map)
+
       }
 
     @JvmStatic
@@ -89,6 +103,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Map<K, V>, map: (focus: V) -> R): R = M.run {
           source.fold(empty()) { acc, (_, v) -> acc.combine(map(v)) }
         }
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Map<K, V>, map: (focus: V) -> R): R =
+          source.fold(empty) { acc, (_, v) -> combine(acc, map(v)) }
       }
 
     /**
@@ -105,6 +122,10 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
         override fun <R> foldMap(M: Monoid<R>, source: NonEmptyList<A>, map: (focus: A) -> R): R =
           source.foldMap(M, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: NonEmptyList<A>, map: (focus: A) -> R): R =
+          source.fold(empty) { acc, a -> combine(acc, map(a)) }
+
       }
 
     /**
@@ -121,6 +142,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
         override fun <R> foldMap(M: Monoid<R>, source: Option<A>, map: (focus: A) -> R): R =
           source.fold({ M.empty() }, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Option<A>, map: (focus: A) -> R): R =
+          source.fold({ empty }, map)
       }
 
     @JvmStatic
@@ -131,6 +155,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
 
         override fun <R> foldMap(M: Monoid<R>, source: Sequence<A>, map: (focus: A) -> R): R =
           source.foldMap(M, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Sequence<A>, map: (focus: A) -> R): R =
+          source.fold(empty){ acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -148,6 +175,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: String, map: (focus: Char) -> R): R = M.run {
           source.fold(empty()) { acc, char -> acc.combine(map(char)) }
         }
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: String, map: (focus: Char) -> R): R =
+          source.fold(empty) { acc, char -> combine(acc, map(char)) }
       }
 
     /**
@@ -162,6 +192,10 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Pair<A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second)
             .foldMap(M, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Pair<A, A>, map: (focus: A) -> R): R =
+          listOf(source.first, source.second).fold(empty) { acc, a -> combine(acc, map(a)) }
+
       }
 
     /**
@@ -176,6 +210,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Triple<A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third)
             .foldMap(M, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Triple<A, A, A>, map: (focus: A) -> R): R  =
+          listOf(source.first, source.second, source.third).fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -190,6 +227,9 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple4<A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth)
             .foldMap(M, map)
+
+        override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: Tuple4<A, A, A, A>, map: (focus: A) -> R): R =
+          listOf(source.first, source.second, source.third, source.fourth).fold(empty) { acc, a -> combine(acc, map(a))}
       }
 
     /**
@@ -204,6 +244,15 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple5<A, A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth, source.fifth)
             .foldMap(M, map)
+
+        override fun <R> foldMap(
+          empty: R,
+          combine: (R, R) -> R,
+          source: Tuple5<A, A, A, A, A>,
+          map: (focus: A) -> R
+        ): R =
+          listOf(source.first, source.second, source.third, source.fourth, source.fifth)
+            .fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -225,6 +274,15 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple6<A, A, A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth)
             .foldMap(M, map)
+
+        override fun <R> foldMap(
+          empty: R,
+          combine: (R, R) -> R,
+          source: Tuple6<A, A, A, A, A, A>,
+          map: (focus: A) -> R
+        ): R =
+          listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth)
+            .fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -247,6 +305,15 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple7<A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh)
             .foldMap(M, map)
+
+        override fun <R> foldMap(
+          empty: R,
+          combine: (R, R) -> R,
+          source: Tuple7<A, A, A, A, A, A, A>,
+          map: (focus: A) -> R
+        ): R =
+          listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh)
+            .fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -273,6 +340,15 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple8<A, A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth)
             .foldMap(M, map)
+
+        override fun <R> foldMap(
+          empty: R,
+          combine: (R, R) -> R,
+          source: Tuple8<A, A, A, A, A, A, A, A>,
+          map: (focus: A) -> R
+        ): R =
+          listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth)
+            .fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -300,6 +376,15 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple9<A, A, A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth, source.ninth)
             .foldMap(M, map)
+
+        override fun <R> foldMap(
+          empty: R,
+          combine: (R, R) -> R,
+          source: Tuple9<A, A, A, A, A, A, A, A, A>,
+          map: (focus: A) -> R
+        ): R =
+          listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth, source.ninth)
+            .fold(empty) { acc, a -> combine(acc, map(a)) }
       }
 
     /**
@@ -328,6 +413,15 @@ public interface PEvery<S, T, A, B> : PTraversal<S, T, A, B>, Fold<S, A>, PSette
         override fun <R> foldMap(M: Monoid<R>, source: Tuple10<A, A, A, A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
           listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth, source.ninth, source.tenth)
             .foldMap(M, map)
+
+        override fun <R> foldMap(
+          empty: R,
+          combine: (R, R) -> R,
+          source: Tuple10<A, A, A, A, A, A, A, A, A, A>,
+          map: (focus: A) -> R
+        ): R =
+          listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth, source.ninth, source.tenth)
+            .fold(empty) { acc, a -> combine(acc, map(a)) }
       }
   }
 

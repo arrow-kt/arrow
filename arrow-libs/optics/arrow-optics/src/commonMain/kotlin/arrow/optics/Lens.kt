@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import kotlin.jvm.JvmStatic
 
 /**
@@ -38,7 +39,11 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
   override fun getOrModify(source: S): Either<T, A> =
     Either.Right(get(source))
 
+  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(empty, {r1, r2 -> r1 + r2}, source, map)", "arrow.optics.foldMap"))
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+    map(get(source))
+
+  override fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**
