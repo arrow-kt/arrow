@@ -34,7 +34,10 @@ import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
+@OptIn(ExperimentalTime::class)
 class MapKTest : StringSpec({
     testLaws(
       MonoidLaws(
@@ -328,32 +331,46 @@ class MapKTest : StringSpec({
     }
 
     "distributivity1" {
-      checkAll(
-        Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
-      ) {(x,y,z) ->
+      val total = measureTime {
+        checkAll(
+          Arb.map3(Arb.string(), Arb.string(), Arb.string(), Arb.string())
+        ) { (x, y, z) ->
 
-        fun <A, B, C> Pair<Ior<A, C>, Ior<B, C>>.undistrThesePair(): Ior<Pair<A, B>, C> =
-          when (val l = this.first) {
-            is Ior.Left -> {
-              when (val r = this.second) {
-                is Ior.Left -> Ior.Left(l.value to r.value)
-                is Ior.Both -> Ior.Both(l.value to r.leftValue, r.rightValue)
-                is Ior.Right -> Ior.Right(r.value)
+          val shared = x.keys.intersect(y.keys).intersect(z.keys)
+
+          collect("shared keys", shared.size)
+
+          val time = measureTime {
+            fun <A, B, C> Pair<Ior<A, C>, Ior<B, C>>.undistrThesePair(): Ior<Pair<A, B>, C> =
+              when (val l = this.first) {
+                is Ior.Left -> {
+                  when (val r = this.second) {
+                    is Ior.Left -> Ior.Left(l.value to r.value)
+                    is Ior.Both -> Ior.Both(l.value to r.leftValue, r.rightValue)
+                    is Ior.Right -> Ior.Right(r.value)
+                  }
+                }
+
+                is Ior.Both -> when (val r = this.second) {
+                  is Ior.Left -> Ior.Both(l.leftValue to r.value, l.rightValue)
+                  is Ior.Both -> Ior.Both(l.leftValue to r.leftValue, l.rightValue)
+                  is Ior.Right -> Ior.Right(l.rightValue)
+                }
+
+                is Ior.Right -> Ior.Right(l.value)
               }
-            }
-            is Ior.Both -> when (val r = this.second) {
-              is Ior.Left -> Ior.Both(l.leftValue to r.value, l.rightValue)
-              is Ior.Both -> Ior.Both(l.leftValue to r.leftValue, l.rightValue)
-              is Ior.Right -> Ior.Right(l.rightValue)
-            }
-            is Ior.Right -> Ior.Right(l.value)
+
+            val ls = x.zip(y).align(z)
+            val rs = x.align(z).zip(y.align(z)).mapValues { it.value.undistrThesePair() }
+
+            ls shouldBe rs
           }
 
-        val ls = x.zip(y).align(z)
-        val rs = x.align(z).zip(y.align(z)).mapValues { it.value.undistrThesePair() }
-
-        ls shouldBe rs
+          collect("time for test", time.inWholeMilliseconds)
+        }
       }
+
+      println("Total ${total.inWholeMilliseconds}")
     }
 
     "distributivity2" {
