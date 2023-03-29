@@ -533,6 +533,16 @@ class IterableTest : StringSpec({
       }
     }
 
+  "partitionMap" {
+    checkAll(Arb.list(Arb.int())) { ints ->
+      val partitioned = ints.partitionMap {
+        if (it % 2 == 0) it.left()
+        else it.right()
+      }
+      partitioned shouldBe ints.partition { it % 2 == 0 }
+    }
+  }
+
     "separateEither" {
       checkAll(Arb.list(Arb.int())) { ints ->
         val list = ints.map {
