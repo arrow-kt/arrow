@@ -449,8 +449,9 @@ public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> =
 /**
  * Returns a Map containing all elements that are instances of specified type parameter R.
  */
+@Suppress("UNCHECKED_CAST")
 public inline fun <K, reified R> Map<K, *>.filterIsInstance(): Map<K, R> =
-  mapNotNull { it as? R }
+  filterValues { it is R } as Map<K, R>
 
 /**
  * Combines two structures by taking the union of their shapes and using Ior to hold the elements.
