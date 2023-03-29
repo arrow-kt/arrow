@@ -1128,14 +1128,16 @@ public sealed class Option<out A> {
   @Deprecated(
     NicheAPI + "Prefer using the Option DSL, or explicit fold or when",
     ReplaceWith(
-      "fold({ emptyList() }) { a -> fa(a).map(::Some) }",
-      "arrow.core.Some")
+      "fold({ listOf(None) }) { a -> fa(a).map(::Some) }",
+      "arrow.core.None",
+      "arrow.core.Some"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> {
     contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
-    return fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
+    return fold({ listOf(None) }, { a -> fa(a).map { Some(it) } })
   }
 
   @Deprecated(

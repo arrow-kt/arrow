@@ -1201,21 +1201,30 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
-    ReplaceWith("fold({ emptyList() }, { fa(it).map(::Right) })")
+    ReplaceWith(
+      "fold({ listOf(it.left()) }, { fa(it).map(::Right) })", 
+      "arrow.core.Either.Right",
+      "arrow.core.Either.left"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Iterable<C>): List<Either<A, C>> =
-    fold({ emptyList() }, { fa(it).map(::Right) })
+    fold({ listOf(it.left()) }, { fa(it).map(::Right) })
 
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
-    ReplaceWith("fold({ None }, { right -> fa(right).map(::Right) })")
+    ReplaceWith(
+      "fold({ Some(it.left()) }, { right -> fa(right).map(::Right) })",
+      "arrow.core.Either.Right",
+      "arrow.core.Some",
+      "arrow.core.left"
+    )
   )
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   public inline fun <C> traverse(fa: (B) -> Option<C>): Option<Either<A, C>> =
-    fold({ None }, { right -> fa(right).map(::Right) })
+    fold({ Some(it.left()) }, { right -> fa(right).map(::Right) })
 
   @Deprecated("traverseOption is being renamed to traverse to simplify the Arrow API", ReplaceWith("traverse(fa)"))
   public inline fun <C> traverseOption(fa: (B) -> Option<C>): Option<Either<A, C>> =
@@ -1223,10 +1232,10 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     RedundantAPI + "Use orNull() and Kotlin nullable types",
-    ReplaceWith("orNull()?.let(fa)?.right()")
+    ReplaceWith("fold({ it.left() }) { fa(it)?.right() }", "arrow.core.left", "arrow.core.right")
   )
   public inline fun <C> traverseNullable(fa: (B) -> C?): Either<A, C>? =
-    orNull()?.let(fa)?.right()
+    fold({ it.left() }) { fa(it)?.right() }
 
   @Deprecated(
     NicheAPI + "Prefer using the Either DSL, or explicit fold or when",
@@ -2570,18 +2579,22 @@ public inline fun <A, B, C, D> Either<A, B>.redeemWith(fa: (A) -> Either<C, D>, 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "fold({ listOf<Either<A, B>>() }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
-    "arrow.core.right",
+    "fold({ listOf<Either<A, B>>(it.left()) }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
+    "arrow.core.right", "arrow.core.left"
   )
 )
 public fun <A, B> Either<A, Iterable<B>>.sequence(): List<Either<A, B>> =
-  fold({ emptyList() }, { iterable -> iterable.map { it.right() } })
+  fold({ listOf(it.left()) }, { iterable -> iterable.map { it.right() } })
 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "this.fold<Option<Either<A, B>>>({ None }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
-    "arrow.core.right",
+    "this.fold<Option<Either<A, B>>>({ Some(it.left()) }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
+    "arrow.core.Either",
+    "arrow.core.Option",
+    "arrow.core.Some",
+    "arrow.core.left",
+    "arrow.core.right"
   )
 )
 public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
@@ -2590,20 +2603,22 @@ public fun <A, B> Either<A, Option<B>>.sequenceOption(): Option<Either<A, B>> =
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
-    "orNull()?.orNull()?.right<B>().toOption<Either<A, B>>()",
-    "arrow.core.toOption",
-    "arrow.core.right",
-    "arrow.core.left"
+    "this.fold<Option<Either<A, B>>>({ Some(it.left()) }, { iterable -> iterable.map<B, Either<A, B>> { it.right() } })",
+    "arrow.core.Either",
+    "arrow.core.Option",
+    "arrow.core.Some",
+    "arrow.core.left",
+    "arrow.core.right"
   )
 )
 public fun <A, B> Either<A, Option<B>>.sequence(): Option<Either<A, B>> =
-  orNull()?.orNull()?.right().toOption()
+  fold({ Some(it.left()) }) { it.map { it.right() } }
 
 @Deprecated(
   "Prefer Kotlin nullable syntax inside either DSL, or replace with explicit fold",
   ReplaceWith(
     "this.fold<Either<A, B>?>({ it.left() }, { it?.right() })",
-    "arrow.core.toOption",
+    "arrow.core.Either",
     "arrow.core.right",
     "arrow.core.left"
   )
@@ -2613,10 +2628,15 @@ public fun <A, B> Either<A, B?>.sequenceNullable(): Either<A, B>? =
 
 @Deprecated(
   "Prefer Kotlin nullable syntax",
-  ReplaceWith("orNull()?.right()", "arrow.core.right")
+  ReplaceWith(
+    "this.fold<Either<A, B>?>({ it.left() }, { it?.right() })",
+    "arrow.core.Either",
+    "arrow.core.right",
+    "arrow.core.left"
+  )
 )
 public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
-  orNull()?.right()
+  this.fold<Either<A, B>?>({ it.left() }, { it?.right() })
 
 @Deprecated(
   "sequenceValidated is being renamed to sequence to simplify the Arrow API",
