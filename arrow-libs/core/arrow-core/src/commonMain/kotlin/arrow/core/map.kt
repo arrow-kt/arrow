@@ -301,7 +301,7 @@ public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>>
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, A, B>(semigroup::combine) { f(it.value).bind<B>() }.toValidated()",
+    "mapOrAccumulate<K, E, A, B>({e1, e2 -> e1 + e2}) { f(it.value).bind<B>() }.toValidated()",
     "arrow.core.mapOrAccumulate",
     "arrow.typeclasses.combine"
   )
@@ -353,7 +353,7 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, Validated<E, A>, A>(semigroup::combine) { it.value.bind<A>() }.toValidated()",
+    "mapOrAccumulate<K, E, Validated<E, A>, A>({e1, e2 -> e1 + e2}) { it.value.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate",
     "arrow.typeclasses.combine"
   )
@@ -364,7 +364,7 @@ public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigr
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, Validated<E, A>, A>(semigroup::combine) { it.value.bind<A>() }.toValidated()",
+    "mapOrAccumulate<K, E, Validated<E, A>, A>({e1, e2 -> e1 + e2}) { it.value.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate",
     "arrow.typeclasses.combine"
   )

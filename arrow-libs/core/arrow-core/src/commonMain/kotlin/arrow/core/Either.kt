@@ -904,7 +904,7 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith(" fold({ empty }, f)")
+    ReplaceWith("fold({ empty }, f)")
   )
   public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C =
     fold({ MN.empty() }, f)
