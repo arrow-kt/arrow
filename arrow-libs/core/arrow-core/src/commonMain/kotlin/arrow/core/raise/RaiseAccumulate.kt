@@ -11,6 +11,7 @@ import arrow.core.EmptyValue.unbox
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.collectionSizeOrDefault
 import arrow.core.ValidatedNel
 import arrow.core.mapOrAccumulate
@@ -554,6 +555,7 @@ public open class RaiseAccumulate<Error>(
     is Either.Right -> value
   }
 
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bindNel()"))
   @RaiseDSL
   public fun <A> ValidatedNel<Error, A>.bindNel(): A = when (this) {
     is Validated.Invalid -> raise.raise(value)

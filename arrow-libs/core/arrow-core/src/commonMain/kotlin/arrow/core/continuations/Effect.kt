@@ -6,6 +6,7 @@ import arrow.core.NonFatal
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
@@ -89,7 +90,6 @@ import kotlin.coroutines.resumeWithException
  * import arrow.core.Either
  * import arrow.core.Ior
  * import arrow.core.None
- * import arrow.core.Validated
  * import arrow.core.continuations.Effect
  * import arrow.core.continuations.effect
  * import arrow.core.continuations.ensureNotNull
@@ -139,7 +139,6 @@ import kotlin.coroutines.resumeWithException
  * ```kotlin
  * suspend fun main() {
  *    readFile("").toEither() shouldBe Either.Left(EmptyPath)
- *    readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
  *    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
  *    readFile("README.MD").toOption { None } shouldBe None
  *
@@ -696,6 +695,7 @@ public interface Effect<out R, out A> {
    * [fold] the [Effect] into an [Validated]. Where the shifted value [R] is mapped to
    * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
    */
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither()"))
   public suspend fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 

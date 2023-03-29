@@ -7,6 +7,7 @@ import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -15,7 +16,9 @@ public suspend fun <Error, A> Effect<Error, A>.toEither(): Either<Error, A> = ei
 public fun <Error, A> EagerEffect<Error, A>.toEither(): Either<Error, A> = either { invoke() }
 
 /** Run the [Effect] by returning [Validated.Valid] of [A], or [Validated.Invalid] of [Error]. */
+@Deprecated(ValidatedDeprMsg, ReplaceWith("toEither()"))
 public suspend fun <Error, A> Effect<Error, A>.toValidated(): Validated<Error, A> = fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
+@Deprecated(ValidatedDeprMsg, ReplaceWith("toEither()"))
 public fun <Error, A> EagerEffect<Error, A>.toValidated(): Validated<Error, A> = fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 
 /** Run the [Effect] by returning [Ior.Right] of [A], or [Ior.Left] of [Error]. */

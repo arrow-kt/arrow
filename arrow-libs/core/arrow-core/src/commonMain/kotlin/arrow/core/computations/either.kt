@@ -4,6 +4,7 @@ import arrow.continuations.Effect
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
@@ -22,7 +23,8 @@ public fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
       is Either.Right -> value
       is Left -> control().shift(this@bind)
     }
-  
+
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
   public suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value
