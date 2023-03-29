@@ -692,7 +692,7 @@ public fun <A> Sequence<A>.salign(
 /**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
- * @receiver Iterable of Validated
+ * @receiver Iterable of [Either]
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
 @Deprecated(
@@ -726,7 +726,6 @@ public fun <A, B> Sequence<Either<A, B>>.separateEitherToPair(): Pair<List<A>, L
   "${ValidatedDeprMsg}SemigroupDeprecation\n$NicheAPI",
   ReplaceWith("separateEither()")
 )
-
 public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A>, Sequence<B>> =
   fold(sequenceOf<A>() to sequenceOf<B>()) { (invalids, valids), validated ->
     when (validated) {

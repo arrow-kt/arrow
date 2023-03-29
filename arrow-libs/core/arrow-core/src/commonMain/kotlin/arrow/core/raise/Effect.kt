@@ -80,12 +80,10 @@ import kotlin.jvm.JvmName
  * import arrow.core.Either
  * import arrow.core.Ior
  * import arrow.core.None
- * import arrow.core.Validated
  * import arrow.core.raise.Effect
  * import arrow.core.raise.effect
  * import arrow.core.raise.fold
  * import arrow.core.raise.toEither
- * import arrow.core.raise.toValidated
  * import arrow.core.raise.toIor
  * import arrow.core.raise.toOption
  * import arrow.core.raise.ensureNotNull
@@ -136,7 +134,6 @@ import kotlin.jvm.JvmName
  * ```kotlin
  * suspend fun main() {
  *    readFile("").toEither() shouldBe Either.Left(EmptyPath)
- *    readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
  *    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
  *    readFile("README.MD").toOption { None } shouldBe None
  *

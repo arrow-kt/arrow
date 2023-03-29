@@ -404,6 +404,7 @@ public sealed class Validated<out E, out A> {
   /**
    * Converts the value to an Either<E, A>
    */
+  @Deprecated(ValidatedDeprMsg + "Drop this call after refactoring")
   public fun toEither(): Either<E, A> =
     fold(::Left, ::Right)
 
@@ -452,6 +453,10 @@ public sealed class Validated<out E, out A> {
    *
    * Apply a function to an Invalid or Valid value, returning a new Invalid or Valid value respectively.
    */
+  @Deprecated(
+    ValidatedDeprMsg + "Use map and mapLeft on Either after refactoring",
+    ReplaceWith("toEither().mapLeft(fe).map(fa)")
+  )
   public inline fun <EE, B> bimap(fe: (E) -> EE, fa: (A) -> B): Validated<EE, B> =
     fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
 
