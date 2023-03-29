@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -45,11 +46,11 @@ class IorSpec : StringSpec({
   }
 
   "Concurrent - arrow.ior bind" {
-    checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
-      ior(List<String>::plus) {
-        strs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
+    checkAll(Arb.list(Arb.int(), 1..100)) { xs ->
+      ior(List<Int>::plus) {
+        xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
       }
-        .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
+        .mapLeft { it.toSet() } shouldBe Ior.Both(xs.toSet(), xs.indices.toList())
     }
   }
 
