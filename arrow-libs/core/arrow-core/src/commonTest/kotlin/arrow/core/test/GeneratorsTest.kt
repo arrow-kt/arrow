@@ -29,12 +29,10 @@ class GeneratorsTest : FreeSpec({
   }
 
   "functionABCToD: should return some different values" {
-    val random = RandomSource.seeded(0)
-
-    val a = Arb.int().next(random)
-    val a2 = Arb.int().next(random)
-    val b = Arb.int().next(random)
-    val c = Arb.int().next(random)
+    val a = Arb.int().next(fixedRandom)
+    val a2 = Arb.int().next(fixedRandom)
+    val b = Arb.int().next(fixedRandom)
+    val c = Arb.int().next(fixedRandom)
 
     // there should be at least one function that has a different value when the args are different
     givenSamples(Arb.functionABCToD<Int, Int, Int, Int>(Arb.int())).find { sample ->
@@ -113,4 +111,6 @@ class GeneratorsTest : FreeSpec({
 })
 
 private fun <T> givenSamples(arb: Arb<T>, count: Int = 250) =
-  arb.generate(RandomSource.seeded(0)).take(count).toList()
+  arb.generate(fixedRandom).take(count).toList()
+
+private val fixedRandom = RandomSource.seeded(0)
