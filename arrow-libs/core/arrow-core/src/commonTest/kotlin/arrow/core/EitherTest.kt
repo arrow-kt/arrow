@@ -469,7 +469,7 @@ class EitherTest : StringSpec({
     }
 
 
-  "combine should combine list of eithers " {
+  "combineAll replacement should work " {
     checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
       val obtained = list.fold<Either<String, Int>, Either<String, Int>>(0.right()) { x, y ->
         Either.zipOrAccumulate<String, Int, Int, Int>(
@@ -478,7 +478,7 @@ class EitherTest : StringSpec({
           y,
           { b1, b2 -> b1 + b2 })
       }
-      val expected = list[0]
+      val expected = list.combineAll(Monoid.string(), Monoid.int())
       obtained shouldBe expected
     }
   }
