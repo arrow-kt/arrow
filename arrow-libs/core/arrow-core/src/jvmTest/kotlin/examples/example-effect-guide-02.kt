@@ -4,7 +4,6 @@ package arrow.core.examples.exampleEffectGuide02
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.None
-import arrow.core.Validated
 import arrow.core.continuations.Effect
 import arrow.core.continuations.effect
 import arrow.core.continuations.ensureNotNull
@@ -39,7 +38,6 @@ fun readFile(path: String?): Effect<FileError, Content> = effect {
 
 suspend fun main() {
    readFile("").toEither() shouldBe Either.Left(EmptyPath)
-   readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
    readFile("README.MD").toOption { None } shouldBe None
 

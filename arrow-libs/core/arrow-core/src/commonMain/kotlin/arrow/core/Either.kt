@@ -2645,7 +2645,10 @@ public fun <A, B> Either<A, B?>.sequence(): Either<A, B>? =
 public fun <A, B, C> Either<A, Validated<B, C>>.sequenceValidated(): Validated<B, Either<A, C>> =
   sequence()
 
-// TODO deprecate for mapAccumulating after back-port.
+@Deprecated(
+  ValidatedDeprMsg + NicheAPI,
+  ReplaceWith("fold({ Valid(Left(it)) }) { it.fold({ Invalid(it) }) { Valid(Right(it)) } }")
+)
 public fun <A, B, C> Either<A, Validated<B, C>>.sequence(): Validated<B, Either<A, C>> =
   traverse(::identity)
 
@@ -2658,6 +2661,10 @@ public fun <A, B> Either<Option<A>, Option<B>>.bisequenceOption(): Option<Either
 public fun <A, B> Either<A?, B?>.bisequenceNullable(): Either<A, B>? =
   bitraverseNullable(::identity, ::identity)
 
+@Deprecated(
+  ValidatedDeprMsg + NicheAPI,
+  ReplaceWith("fold({ it.fold({ Invalid(it) }) { Valid(Left(it)) } }) { it.fold({ Invalid(it) }) { Valid(Right(it)) } }")
+)
 public fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)
 

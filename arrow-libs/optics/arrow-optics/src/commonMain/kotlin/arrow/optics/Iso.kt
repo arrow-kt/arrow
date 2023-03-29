@@ -172,6 +172,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
      * [PIso] that defines the equality between [Either] and [Validated]
      */
     @JvmStatic
+    @Deprecated("Validated functionality is being merged into Either.\n Consider using `id` after migration.")
     public fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
       PIso(
         get = { it.fold(::Invalid, ::Valid) },
@@ -182,6 +183,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
      * [Iso] that defines the equality between [Either] and [Validated]
      */
     @JvmStatic
+    @Deprecated("Validated functionality is being merged into Either.\n Consider using `id` after migration.")
     public fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
       eitherToPValidated()
 
