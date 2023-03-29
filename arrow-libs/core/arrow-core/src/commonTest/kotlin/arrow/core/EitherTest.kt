@@ -456,12 +456,12 @@ class EitherTest : StringSpec({
         val obtained = e1.combine(e2, { l1, l2 -> l1 + l2 }, { r1, r2 -> r1 + r2 })
         val expected = when(e1){
           is Left -> when(e2) {
-            is Left -> e1.value + e2.value
+            is Left -> Left(e1.value + e2.value)
             is Right -> e1
           }
           is Right -> when(e2) {
             is Left -> e2
-            is Right -> e1.value + e2.value
+            is Right -> Right(e1.value + e2.value)
           }
         }
         obtained shouldBe expected
