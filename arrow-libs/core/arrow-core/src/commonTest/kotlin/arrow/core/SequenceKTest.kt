@@ -4,6 +4,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
+import arrow.core.test.unit
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
@@ -258,13 +259,13 @@ class SequenceKTest : StringSpec({
     }
 
     "can align sequences - 1" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
       }
     }
 
     "can align sequences - 2" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
           it.isBoth() shouldBe true
         }
@@ -272,7 +273,7 @@ class SequenceKTest : StringSpec({
     }
 
     "can align sequences - 3" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()
         a.align(b).drop(min(ls.size, rs.size)).forEach {
