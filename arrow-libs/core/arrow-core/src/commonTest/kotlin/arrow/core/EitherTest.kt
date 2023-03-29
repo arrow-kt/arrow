@@ -329,7 +329,7 @@ class EitherTest : StringSpec({
       }
     }
     
-    "traverse should return list of Right when Right and empty list when Left" {
+    "traverse should return list of Right when Right and singleton list when Left" {
       checkAll(
         Arb.int(),
         Arb.int(),
@@ -337,7 +337,7 @@ class EitherTest : StringSpec({
       ) { a: Int, b: Int, c: Int ->
         Right(a).traverse { emptyList<Int>() } shouldBe emptyList<Int>()
         Right(a).traverse { listOf(b, c) } shouldBe listOf(Right(b), Right(c))
-        Left(a).traverse { listOf(b, c) } shouldBe emptyList<Int>()
+        Left(a).traverse { listOf(b, c) } shouldBe listOf(Left(a))
       }
     }
     
@@ -456,7 +456,7 @@ class EitherTest : StringSpec({
       val left: Either<String, Int> = Left("foo")
       
       right.traverse { listOf(it, 2, 3) } shouldBe listOf(Right(1), Right(2), Right(3))
-      left.traverse { listOf(it, 2, 3) } shouldBe emptyList()
+      left.traverse { listOf(it, 2, 3) } shouldBe listOf(left)
     }
     
     "sequence should be consistent with traverse" {
@@ -471,13 +471,14 @@ class EitherTest : StringSpec({
       
       right.traverseNullable { it } shouldBe Right(1)
       right.traverseNullable { null } shouldBe null
-      left.traverseNullable { it } shouldBe null
+      left.traverseNullable { it } shouldBe left
     }
     
     "sequence for Nullable should be consistent with traverseNullable" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.map { it }.sequence() shouldBe either.traverseNullable { it }
-        either.map { null }.sequence() shouldBe null
+        // wrong! if you map a `Left`, you should get a `Left` back, not null
+        // either.map { null }.sequence() shouldBe null
       }
     }
     
@@ -486,7 +487,9 @@ class EitherTest : StringSpec({
       val left: Either<String, Int> = Left("foo")
       
       right.traverse { Some(it) } shouldBe Some(Right(1))
-      left.traverse { Some(it) } shouldBe None
+      right.traverse { None } shouldBe None
+      left.traverse { Some(it) } shouldBe Some(left)
+      left.traverse { None } shouldBe Some(left)
     }
     
     "sequence for Option should be consistent with traverseOption" {

@@ -27,9 +27,7 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arbitrary.triple
 import kotlinx.coroutines.Dispatchers
 import kotlin.math.max
 import kotlin.Result.Companion.failure
@@ -145,56 +143,97 @@ suspend fun <A> A.suspend(): A =
     COROUTINE_SUSPENDED
   }
 
-private fun <A, B> value2(first: Arb<A>, second: Arb<B>): Arb<Pair<A?, B?>> =
-  Arb.pair(first.orNull(.2), second.orNull(.2))
+private fun <A, B> value2(first: Arb<A>, second: Arb<B>): Arb<Pair<Option<A>?, Option<B>?>> =
+  Arb.choice(
+    Arb.bind(
+      first,
+      second
+    ) { a, b ->
+      Option.fromNullable(a) to Option.fromNullable(b)
+    },
+    first.map { Option.fromNullable(it) to null },
+    second.map { null to Option.fromNullable(it) }
+  )
 
-private fun <A, B, C> value3(first: Arb<A>, second: Arb<B>, third: Arb<C>): Arb<Triple<A?, B?, C?>> =
-  Arb.triple(first.orNull(.2), second.orNull(.2), third.orNull(.2))
+private fun <A, B, C> value3(first: Arb<A>, second: Arb<B>, third: Arb<C>): Arb<Triple<Option<A>?, Option<B>?, Option<C>?>> =
+  Arb.choice(
+    Arb.bind(
+      first,
+      second,
+      third
+    ) { a, b,c  ->
+      Triple(Option.fromNullable(a), Option.fromNullable(b), Option.fromNullable(c))
+    },
+    Arb.bind(
+      first,
+      second
+    ) { a, b  ->
+      Triple(Option.fromNullable(a), Option.fromNullable(b), null)
+    },
+    Arb.bind(
+      first,
+      third
+    ) { a, c  ->
+      Triple(Option.fromNullable(a), null, Option.fromNullable(c))
+    },
+    Arb.bind(
+      second,
+      third
+    ) {  b,c  ->
+      Triple(null, Option.fromNullable(b), Option.fromNullable(c))
+    },
+    first.map { Triple(Option.fromNullable(it), null, null )},
+    second.map { Triple(null, Option.fromNullable(it), null ) },
+    third.map { Triple(null, null, Option.fromNullable(it) ) }
+  )
 
-private fun <K, A, B, C> Map<K, Triple<A?, B?, C?>>.destructured(): Triple<Map<K, A>, Map<K, B>, Map<K, C>> {
-  val firstMap = mutableMapOf<K, A>()
-  val secondMap = mutableMapOf<K, B>()
-  val thirdMap = mutableMapOf<K, C>()
+private fun <K, A, B, C> Map<K, Triple<Option<A>?, Option<B>?, Option<C>?>>.destructured(): Triple<Map<K, A>, Map<K, B>, Map<K, C>> {
+  val firstMap = mutableMapOf<K, A?>()
+  val secondMap = mutableMapOf<K, B?>()
+  val thirdMap = mutableMapOf<K, C?>()
 
   this.forEach { (key, triple) ->
     val (a, b, c) = triple
 
     if (a != null) {
-      firstMap[key] = a
+      firstMap[key] = a.getOrNull()
     }
 
     if (b != null) {
-      secondMap[key] = b
+      secondMap[key] = b.getOrNull()
     }
 
     if (c != null) {
-      thirdMap[key] = c
+      thirdMap[key] = c.getOrNull()
     }
   }
 
-  return Triple(firstMap, secondMap, thirdMap)
+  @Suppress("UNCHECKED_CAST")
+  return Triple(firstMap, secondMap, thirdMap) as Triple<Map<K, A>, Map<K, B>, Map<K, C>>
 }
 
-private fun <K, A, B> Map<K, Pair<A?, B?>>.destructured(): Pair<Map<K, A>, Map<K, B>> {
-  val firstMap = mutableMapOf<K, A>()
-  val secondMap = mutableMapOf<K, B>()
+private fun <K, A, B> Map<K, Pair<Option<A>?, Option<B>?>>.destructured(): Pair<Map<K, A>, Map<K, B>> {
+  val firstMap = mutableMapOf<K, A?>()
+  val secondMap = mutableMapOf<K, B?>()
 
   this.forEach { (key, pair) ->
     val (a, b) = pair
+
     if (a != null) {
-      firstMap[key] = a
+      firstMap[key] = a.getOrNull()
     }
 
     if (b != null) {
-      secondMap[key] = b
+      secondMap[key] = b.getOrNull()
     }
   }
 
-  return firstMap to secondMap
+  @Suppress("UNCHECKED_CAST")
+  return (firstMap to secondMap) as Pair<Map<K, A>, Map<K, B>>
 }
 
 fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>): Arb<Pair<Map<K, A>, Map<K, B>>> =
-  Arb.map(arbK, value2(arbA, arbB))
+  Arb.map(keyArb = arbK, valueArb = value2(arbA, arbB))
     .map { it.destructured() }
 
 fun <K, A, B, C> Arb.Companion.map3(
