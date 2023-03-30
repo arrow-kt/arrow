@@ -1166,7 +1166,7 @@ public fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
-  partitionMap(::identity)
+  separateEither(::identity)
 
 /**
  * Applies a function [f] to each element and returns a pair of arrays:
@@ -1179,7 +1179,7 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  * ```kotlin
  * fun test() {
  *   listOf(1, 2, 3, 4)
- *     .partitionMap {
+ *     .separateEither {
  *       if (it % 2 == 0) "even: $it".right() else "odd: $it".left()
  *     } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))
  * }
@@ -1187,7 +1187,7 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  * <!--- KNIT example-iterable-20.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <T, A, B> Iterable<T>.partitionMap(f: (T) -> Either<A, B>): Pair<List<A>, List<B>> {
+public inline fun <T, A, B> Iterable<T>.separateEither(f: (T) -> Either<A, B>): Pair<List<A>, List<B>> {
   val left = mutableListOf<A>()
   val right = mutableListOf<B>()
 
