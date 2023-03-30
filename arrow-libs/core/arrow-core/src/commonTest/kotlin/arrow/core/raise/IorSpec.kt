@@ -2,6 +2,7 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.test.nonEmptyList
 import arrow.typeclasses.Semigroup
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -46,7 +47,7 @@ class IorSpec : StringSpec({
   }
 
   "Concurrent - arrow.ior bind" {
-    checkAll(Arb.list(Arb.int(), 1..100)) { xs ->
+    checkAll(Arb.nonEmptyList(Arb.int())) { xs ->
       ior(List<Int>::plus) {
         xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
       }

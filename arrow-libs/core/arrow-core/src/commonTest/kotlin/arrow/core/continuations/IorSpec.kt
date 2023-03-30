@@ -2,6 +2,7 @@ package arrow.core.continuations
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.test.nonEmptyList
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -33,7 +34,7 @@ class IorSpec :
     }
 
     "Concurrent - arrow.ior bind" {
-      checkAll(Arb.list(Arb.int(), 1 .. 100)) { xs ->
+      checkAll(Arb.nonEmptyList(Arb.int())) { xs ->
         ior(Semigroup.list()) {
           xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
         }
