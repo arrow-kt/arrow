@@ -48,9 +48,9 @@ import kotlin.time.TimeSource
  * ```kotlin
  * import arrow.core.Either
  * import arrow.resilience.CircuitBreaker
+ * import kotlinx.coroutines.delay
  * import kotlin.time.Duration.Companion.seconds
  * import kotlin.time.ExperimentalTime
- * import kotlinx.coroutines.delay
  *
  * @ExperimentalTime
  * suspend fun main(): Unit {
@@ -90,9 +90,9 @@ import kotlin.time.TimeSource
  * import arrow.resilience.CircuitBreaker
  * import arrow.resilience.Schedule
  * import arrow.resilience.retry
+ * import kotlinx.coroutines.delay
  * import kotlin.time.Duration.Companion.seconds
  * import kotlin.time.ExperimentalTime
- * import kotlinx.coroutines.delay
  *
  * @ExperimentalTime
  * suspend fun main(): Unit {

@@ -13,8 +13,8 @@ import kotlin.time.Duration.Companion.ZERO
  * @see [Schedule] for how to build a schedule.
  *
  * ```kotlin
- * import kotlinx.coroutines.flow.*
  * import arrow.resilience.*
+ * import kotlinx.coroutines.flow.*
  *
  * suspend fun main(): Unit {
  *   var counter = 0
