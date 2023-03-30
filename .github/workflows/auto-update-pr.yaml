@@ -10,5 +10,5 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.TOKEN_GITHUB_ACTION }}"
           PR_FILTER: "ready_for_review"
-          EXCLUDED_LABELS: "dependencies,wontfix"
+          EXCLUDED_LABELS: "Skip Auto Update PRs"
           MERGE_MSG: "Branch was auto-updated."
