@@ -220,7 +220,7 @@ public class NonEmptyList<out A>(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
 
-  @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, SA::combine)", "arrow.typeclasses.combine"))
+  @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, {a1, a2 -> a1 + a2})"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     padZip(b, ::identity, ::identity, SA::combine)
 
@@ -481,7 +481,7 @@ public inline fun <E, A, B> NonEmptyList<A>.traverse(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "this.mapOrAccumulate<E, A>({ a, b -> a + b }) { it.bind<A>() }.toValidated()",
+    "this.mapOrAccumulate<E, A>({ e1, e2 -> e1 + e2 }) { it.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )
@@ -491,7 +491,7 @@ public fun <E, A> NonEmptyList<Validated<E, A>>.sequenceValidated(semigroup: Sem
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "this.mapOrAccumulate<E, A>({ a, b -> a + b }) { it.bind<A>() }.toValidated()",
+    "this.mapOrAccumulate<E, A>({ e1, e2 -> e1 + e2 }) { it.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate"
   )
 )

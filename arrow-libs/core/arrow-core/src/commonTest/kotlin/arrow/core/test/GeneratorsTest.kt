@@ -17,6 +17,26 @@ import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
 
 class GeneratorsTest : FreeSpec({
+  "functionAToB: should return same result when invoked multiple times" {
+    checkAll(
+      Arb.int(),
+      Arb.functionAToB<Int, Int>(Arb.int())
+    ) { a, fn ->
+      fn(a) shouldBe fn(a)
+    }
+  }
+
+  "functionAToB: should return some different values" {
+    val a = Arb.int().next(fixedRandom)
+    val a2 = Arb.int().next(fixedRandom)
+
+    // there should be at least one function that has a different value when the args are different
+    givenSamples(Arb.functionAToB<Int, Int>(Arb.int())).find { sample ->
+      val fn = sample.value
+      fn(a) != fn(a2)
+    }.shouldNotBeNull()
+  }
+
   "functionABCToD: should return same result when invoked multiple times" {
     checkAll(
       Arb.int(),

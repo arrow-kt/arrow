@@ -449,8 +449,42 @@ class EitherTest : StringSpec({
         }
       }
     }
-    
-    "traverse should return list if either is right" {
+
+    "combine should combine 2 eithers" {
+      checkAll(Arb.either(Arb.string(), Arb.int()), Arb.either(Arb.string(), Arb.int())) { e1, e2 ->
+        val obtained = e1.combine(e2, { l1, l2 -> l1 + l2 }, { r1, r2 -> r1 + r2 })
+        val expected = when(e1){
+          is Left -> when(e2) {
+            is Left -> Left(e1.value + e2.value)
+            is Right -> e1
+          }
+          is Right -> when(e2) {
+            is Left -> e2
+            is Right -> Right(e1.value + e2.value)
+          }
+        }
+        obtained shouldBe expected
+      }
+    }
+
+
+  "combineAll replacement should work " {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val obtained = list.fold<Either<String, Int>, Either<String, Int>>(0.right()) { x, y ->
+        Either.zipOrAccumulate<String, Int, Int, Int>(
+          { a1, a2 -> a1 + a2 },
+          x,
+          y,
+          { b1, b2 -> b1 + b2 })
+      }
+      val expected = list.combineAll(Monoid.string(), Monoid.int())
+      obtained shouldBe expected
+    }
+  }
+
+
+
+  "traverse should return list if either is right" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
       

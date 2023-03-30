@@ -823,7 +823,7 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
 /**
  * aligns two structures and combine them with the given [Semigroup.combine]
  */
-@Deprecated(SemigroupDeprecation, ReplaceWith("padZip(other, { it }, { it }, SG::combine)", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("this.padZip<A, A, A>(other, { it }, { it }, {a1, a2 -> a1 + a2})"))
 public fun <A> Iterable<A>.salign(
   SG: Semigroup<A>,
   other: Iterable<A>
@@ -928,7 +928,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = separa
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
 
-@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("fold(MA.empty(), MA::combine)", "arrow.typeclasses.combine"))
+@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("this.fold(initial){a1, a2 -> a1 + a2}"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
   fold(MA.empty(), MA::combine)
 
@@ -1235,11 +1235,11 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
-@Deprecated(MonoidDeprecation, ReplaceWith("fold(MA.empty(), MA::combine)", "arrow.typeclasses.combine"))
+@Deprecated(MonoidDeprecation, ReplaceWith("this.fold(initial, {a1, a2 -> a1 + a2})"))
 public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
   fold(MA.empty(), MA::combine)
 
-@Deprecated(MonoidDeprecation, ReplaceWith("fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }"))
+@Deprecated(MonoidDeprecation, ReplaceWith("this.fold(initial) { acc, a -> combine(acc, f(a)) }"))
 public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
   fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
 
