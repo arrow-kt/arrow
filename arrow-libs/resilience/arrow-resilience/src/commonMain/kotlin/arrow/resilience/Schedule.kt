@@ -10,18 +10,19 @@ import arrow.core.nonFatalOrThrow
 import arrow.core.right
 import arrow.core.some
 import arrow.resilience.Schedule.Companion.identity
+import arrow.resilience.Schedule.Decision
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.retry
 import kotlin.jvm.JvmInline
 import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.nanoseconds
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.flow.retry
 
 public typealias ScheduleStep<Input, Output> =
   suspend (Input) -> Schedule.Decision<Input, Output>

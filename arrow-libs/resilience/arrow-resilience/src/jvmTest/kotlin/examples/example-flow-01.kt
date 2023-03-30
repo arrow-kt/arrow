@@ -1,8 +1,8 @@
 // This file was automatically generated from flow.kt by Knit tool. Do not edit.
 package arrow.resilience.examples.exampleFlow01
 
-import kotlinx.coroutines.flow.*
 import arrow.resilience.*
+import kotlinx.coroutines.flow.*
 
 suspend fun main(): Unit {
   var counter = 0

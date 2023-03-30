@@ -14,7 +14,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -409,7 +408,7 @@ private constructor(
      *    - If a request is made after the configured [resetTimeout] passes, the [CircuitBreaker] is tripped into the a [HalfOpen] state, allowing one request to go through as a test.
      *
      * @param openingStrategy is the strategy that will decide if the circuit breaker should open after some failures.
-     * 
+     *
      * @param startedAt is the [TimeMark] when the transition to [Open] happened.
      *
      * @param resetTimeout is the current `resetTimeout` that is applied to this [Open] state, to be multiplied by the

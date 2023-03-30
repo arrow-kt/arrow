@@ -3,19 +3,13 @@ package arrow.resilience
 import arrow.atomic.AtomicLong
 import arrow.atomic.updateAndGet
 import arrow.core.Either
-import arrow.resilience.Schedule
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
-import arrow.resilience.retry
-import arrow.resilience.retryOrElseEither
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlin.math.pow
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
+import kotlin.math.pow
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -23,6 +17,9 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 internal data class SideEffect(var counter: Int = 0) {
   fun increment() {

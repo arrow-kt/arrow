@@ -3,9 +3,9 @@ package arrow.resilience
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.updateAndGet
 import arrow.core.nonFatalOrThrow
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 
 /**

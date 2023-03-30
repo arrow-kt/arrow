@@ -1,10 +1,8 @@
 package arrow.resilience
 
 import arrow.core.Either
-import arrow.resilience.CircuitBreaker
 import arrow.resilience.CircuitBreaker.OpeningStrategy
 import arrow.resilience.CircuitBreaker.OpeningStrategy.SlidingWindow
-import arrow.resilience.Schedule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

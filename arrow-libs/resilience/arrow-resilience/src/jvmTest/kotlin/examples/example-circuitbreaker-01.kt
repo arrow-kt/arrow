@@ -3,9 +3,9 @@ package arrow.resilience.examples.exampleCircuitbreaker01
 
 import arrow.core.Either
 import arrow.resilience.CircuitBreaker
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.delay
 
 @ExperimentalTime
 suspend fun main(): Unit {

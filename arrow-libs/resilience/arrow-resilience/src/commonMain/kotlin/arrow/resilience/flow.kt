@@ -1,9 +1,9 @@
 package arrow.resilience
 
-import kotlin.time.Duration.Companion.ZERO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.retryWhen
+import kotlin.time.Duration.Companion.ZERO
 
 /**
  * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
