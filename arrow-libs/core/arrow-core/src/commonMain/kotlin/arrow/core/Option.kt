@@ -1057,7 +1057,7 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ empty }, f)")
+    ReplaceWith("fold({ ifEmpty }, f)")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -1417,7 +1417,7 @@ public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -
 
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or map",
-  ReplaceWith("this.map { a -> List(n) { a }.fold(intialValue){a1, a2 -> a1 + a2} }")
+  ReplaceWith("this.map { a -> List(n) { a }.fold(initial){a1, a2 -> a1 + a2} }")
 )
 public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> =
   map { a -> List(n) { a }.fold(MA.empty(), MA::combine) }

@@ -242,7 +242,7 @@ public sealed class Ior<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("this.fold<C>({ empty }, { f }, { _, b -> f(b) })")
+    ReplaceWith("this.fold<C>({ leftValue }, { f }, { _, b -> f(b) })")
   )
   public inline fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }

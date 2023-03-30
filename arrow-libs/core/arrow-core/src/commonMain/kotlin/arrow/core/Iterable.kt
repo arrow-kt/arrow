@@ -928,7 +928,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> = separa
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
 
-@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("this.fold(initialValue){a1, a2 -> a1 + a2}"))
+@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("this.fold(initial){a1, a2 -> a1 + a2}"))
 public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
   fold(MA.empty(), MA::combine)
 
@@ -1239,7 +1239,7 @@ public fun <B, A : B> List<A>.widen(): List<B> =
 public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
   fold(MA.empty(), MA::combine)
 
-@Deprecated(MonoidDeprecation, ReplaceWith("this.fold(empty) { acc, a -> combine(acc, f(a)) }"))
+@Deprecated(MonoidDeprecation, ReplaceWith("this.fold(initial) { acc, a -> combine(acc, f(a)) }"))
 public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
   fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
 

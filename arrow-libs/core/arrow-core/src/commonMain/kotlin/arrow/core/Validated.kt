@@ -306,7 +306,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use fold on Either after refactoring instead",
-    ReplaceWith("toEither().fold({ initial }, f)")
+    ReplaceWith("toEither().fold({ invalidValue }, f)")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -1030,14 +1030,14 @@ public fun <A, B> Validated<A?, B?>.bisequenceNullable(): Validated<A, B>? =
 
 @Deprecated(
   "$MonoidDeprecation\n$DeprAndNicheMsg\nUse fold on Either after refactoring",
-  ReplaceWith("fold({ initial }, ::identity)")
+  ReplaceWith("fold({ invalidValue }, ::identity)")
 )
 public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A =
   fold({ MA.empty() }, ::identity)
 
 @Deprecated(
   "$MonoidDeprecation\n$DeprAndNicheMsg\nUse fold on Either after refactoring",
-  ReplaceWith("fold({ initial }, ::identity)", "arrow.core.fold")
+  ReplaceWith("fold({ invalidValue }, ::identity)", "arrow.core.fold")
 )
 public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)

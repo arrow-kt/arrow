@@ -904,7 +904,7 @@ public sealed class Either<out A, out B> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ empty }, f)")
+    ReplaceWith("fold({ ifLeft }, f)")
   )
   public fun <C> foldMap(MN: Monoid<C>, f: (B) -> C): C =
     fold({ MN.empty() }, f)
@@ -2551,7 +2551,7 @@ public inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Either<A, B>.zip(
 
 @Deprecated(
   NicheAPI + "Prefer using the Either DSL, or map",
-  ReplaceWith("if (n <= 0) Either.Right(empty) else this.map { b -> List(n) { b }.fold(empty){r, t -> r + t} }")
+  ReplaceWith("if (n <= 0) Either.Right(initial) else this.map { b -> List(n) { b }.fold(initial){r, t -> r + t} }")
 )
 public fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   map { b -> List(n) { b }.fold(MB.empty(), MB::combine) }
