@@ -17,9 +17,6 @@ arrow.retrofit.adapter.either.networkhandling
 module:arrow-fx-coroutines
 arrow.fx.coroutines
 arrow.fx.coroutines.continuations
-module:arrow-fx-resilience
-arrow.fx.resilience
-arrow.fx.resilience.common
 module:arrow-fx-stm
 arrow.fx.stm
 module:arrow-optics
@@ -28,3 +25,6 @@ arrow.optics.dsl
 arrow.optics.typeclasses
 module:arrow-optics-reflect
 arrow.optics
+module:arrow-resilience
+arrow.resilience
+arrow.resilience.common

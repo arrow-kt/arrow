@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Decision</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../../index.html">
+<span>Arrow</span>            </a>    </div>
+    <div>1.1.6-alpha.81.1+3ec5134
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-resilience:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageids="arrow-resilience::arrow.resilience/Schedule.Decision///PointingToDeclaration//-1537784738">
+  <div class="breadcrumbs"><a href="../../../index.html">arrow-resilience</a><span class="delimiter">/</span><a href="../../index.html">arrow.resilience</a><span class="delimiter">/</span><a href="../index.html">Schedule</a><span class="delimiter">/</span><span class="current">Decision</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Decision</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">Decision</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">Output</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/resilience/arrow-resilience/src/commonMain/kotlin/arrow/resilience/Schedule.kt#L325">source</a>)</span></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button><button class="section-tab" data-togglable="Inheritors">Inheritors</button></div>
+    <div class="tabs-section-body">
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-783472714%2FClasslikes%2F-1537784738" anchor-label="Continue" id="-783472714%2FClasslikes%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-continue/index.html"><span><span>Continue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-783472714%2FClasslikes%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-continue/index.html">Continue</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="-continue/index.html">Input</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="-continue/index.html">Output</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>output<span class="token operator">: </span><a href="-continue/index.html">Output</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>delay<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>step<span class="token operator">: </span><a href="../../index.html#-568189963%2FClasslikes%2F-1537784738">ScheduleStep</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-continue/index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-continue/index.html">Output</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-continue/index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-continue/index.html">Output</a><span class="token operator">&gt; </span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="926946107%2FClasslikes%2F-1537784738" anchor-label="Done" id="926946107%2FClasslikes%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-done/index.html"><span><span>Done</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="926946107%2FClasslikes%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-done/index.html">Done</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="-done/index.html">Output</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>output<span class="token operator">: </span><a href="-done/index.html">Output</a></span></span><span class="token punctuation">)</span> : <a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="-done/index.html">Output</a><span class="token operator">&gt; </span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-938956616%2FFunctions%2F-1537784738" anchor-label="and" id="-938956616%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="and.html"><span><span>and</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-938956616%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="and.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="and.html">C</a><span class="token operator">&gt; </span><a href="and.html"><span class="token function">and</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="and.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">transform<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span>output<span class="token operator">: </span><a href="index.html">Output</a><span class="token punctuation">, </span><span class="token keyword"></span>b<span class="token operator">: </span><a href="and.html">B</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="and.html">C</a><span class="token punctuation">, </span></span><span class="parameter ">combineDuration<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span>left<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span><span class="token keyword"></span>right<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="and.html">C</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="818194264%2FFunctions%2F-1537784738" anchor-label="andThen" id="818194264%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="and-then.html"><span>and</span><wbr><span><span>Then</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="818194264%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="and-then.html"><span class="token function">andThen</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Output</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">Output</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="and-then.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="and-then.html">B</a><span class="token operator">&gt; </span><a href="and-then.html"><span class="token function">andThen</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="and-then.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">ifLeft<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">Output</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="and-then.html">B</a><span class="token punctuation">, </span></span><span class="parameter ">ifRight<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="and-then.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="and-then.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="and-then.html">B</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-947327086%2FFunctions%2F-1537784738" anchor-label="contramap" id="-947327086%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="contramap.html"><span><span>contramap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-947327086%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="contramap.html">A</a><span class="token operator">&gt; </span><a href="contramap.html"><span class="token function">contramap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="contramap.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">Input</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="contramap.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">Output</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-419393470%2FFunctions%2F-1537784738" anchor-label="delayed" id="-419393470%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="delayed.html"><span><span>delayed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-419393470%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="delayed.html"><span class="token function">delayed</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">Output</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">Output</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="190553299%2FFunctions%2F-1537784738" anchor-label="map" id="190553299%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="map.html"><span><span>map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="190553299%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map.html">A</a><span class="token operator">&gt; </span><a href="map.html"><span class="token function">map</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span>output<span class="token operator">: </span><a href="index.html">Output</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="map.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map.html">A</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="771460572%2FFunctions%2F-1537784738" anchor-label="or" id="771460572%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="or.html"><span><span>or</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="771460572%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="or.html">B</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="or.html">C</a><span class="token operator">&gt; </span><a href="or.html"><span class="token function">or</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="or.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">transform<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span>output<span class="token operator">: </span><a href="index.html">Output</a><span class="token operator">?</span><span class="token punctuation">, </span><span class="token keyword"></span>b<span class="token operator">: </span><a href="or.html">B</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="or.html">C</a><span class="token punctuation">, </span></span><span class="parameter ">combineDuration<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span>left<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator">?</span><span class="token punctuation">, </span><span class="token keyword"></span>right<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="or.html">C</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1951693307%2FFunctions%2F-1537784738" anchor-label="recursiveMap" id="-1951693307%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="recursive-map.html"><span>recursive</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1951693307%2FFunctions%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="recursive-map.html"><span class="token function">recursiveMap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">Output</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><span><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unsafe-variance/index.html"><span class="token annotation builtin">UnsafeVariance</span></a>&nbsp;</span><a href="index.html">Output</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Schedule.Decision</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Input</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">Output</a><span class="token operator">&gt;</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="-781636313%2FProperties%2F-1537784738" anchor-label="output" id="-781636313%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="output.html"><span><span>output</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-781636313%2FProperties%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><a data-name="-781636313%2FProperties%2F-1537784738" anchor-label="output" id="-781636313%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="output.html">output</a><span class="token operator">: </span><a href="index.html">Output</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Inheritors</h2>
+      <div class="table" data-togglable="Inheritors"><a data-name="926946107%2FInheritors%2F-1537784738" anchor-label="Done" id="926946107%2FInheritors%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-done/index.html">Done</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="926946107%2FInheritors%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+<a data-name="-783472714%2FInheritors%2F-1537784738" anchor-label="Continue" id="-783472714%2FInheritors%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-continue/index.html">Continue</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-783472714%2FInheritors%2F-1537784738"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+
+</body></html>
+
