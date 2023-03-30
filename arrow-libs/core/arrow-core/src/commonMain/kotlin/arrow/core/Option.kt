@@ -1057,7 +1057,7 @@ public sealed class Option<out A> {
 
   @Deprecated(
     NicheAPI + "Prefer when or fold instead",
-    ReplaceWith("fold({ MB.empty() }, f)")
+    ReplaceWith("fold({ ifEmpty }, f)")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -1314,11 +1314,11 @@ public fun <A> A.some(): Option<A> = Some(this)
 
 public fun <A> none(): Option<A> = None
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("fold(none<A>()) { x, y -> x.combine(y, MA::combine) }", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("fold(none<A>()) { x, y -> x.combine(y){a1, a2 -> a1 + a2} }"))
 public fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
   fold(none<A>()) { x, y -> x.combine(y, MA::combine) }
 
-@Deprecated("use getOrElse instead", ReplaceWith("getOrElse { MA.empty() }"))
+@Deprecated("use getOrElse instead", ReplaceWith("getOrElse { empty }"))
 public fun <A> Option<A>.combineAll(MA: Monoid<A>): A =
   getOrElse { MA.empty() }
 
@@ -1417,7 +1417,7 @@ public inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -
 
 @Deprecated(
   NicheAPI + "Prefer using the Option DSL or map",
-  ReplaceWith("map { a -> List(n) { a }.fold(MA.empty(), MA::combine) }", "arrow.typeclasses.combine")
+  ReplaceWith("this.map { a -> List(n) { a }.fold(initial){a1, a2 -> a1 + a2} }")
 )
 public fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> =
   map { a -> List(n) { a }.fold(MA.empty(), MA::combine) }
@@ -1635,7 +1635,7 @@ public fun <A> Option<A>.combine(other: Option<A>, combine: (A, A) -> A): Option
     None -> other
   }
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b, SGA::combine)", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("this.combine<A>(b){a1, a2 -> a1 + a2}"))
 public fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
   combine(b, SGA::combine)
 
