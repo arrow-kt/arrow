@@ -879,12 +879,34 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  * <!--- KNIT example-iterable-18.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
+public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
+  separateEither(::identity)
+
+/**
+ * Applies a function [f] to each element and returns a pair of arrays:
+ * the first one made of those values returned by [f] that were wrapped in [Either.Left],
+ * and the second one made of those wrapped in [Either.Right].
+ * <!--- INCLUDE
+ * import arrow.core.*
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   listOf(1, 2, 3, 4)
+ *     .separateEither {
+ *       if (it % 2 == 0) "even: $it".right() else "odd: $it".left()
+ *     } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))
+ * }
+ * ```
+ * <!--- KNIT example-iterable-19.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+public inline fun <T, A, B> Iterable<T>.separateEither(f: (T) -> Either<A, B>): Pair<List<A>, List<B>> {
   val left = mutableListOf<A>()
   val right = mutableListOf<B>()
 
-  for (either in this) {
-    when (either) {
+  for (item in this) {
+    when (val either = f(item)) {
       is Left -> left.add(either.value)
       is Right -> right.add(either.value)
     }

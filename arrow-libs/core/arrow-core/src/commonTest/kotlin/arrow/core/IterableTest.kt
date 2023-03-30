@@ -297,11 +297,11 @@ class IterableTest : StringSpec({
 
     "separateEither" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val list = ints.map {
+        val list = ints.separateEither {
           if (it % 2 == 0) it.left()
           else it.right()
         }
-        list.separateEither() shouldBe ints.partition { it % 2 == 0 }
+        list shouldBe ints.partition { it % 2 == 0 }
       }
     }
 

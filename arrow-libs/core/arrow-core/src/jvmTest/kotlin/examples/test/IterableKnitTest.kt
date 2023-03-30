@@ -72,6 +72,10 @@ class IterableKnitTest : StringSpec({
     arrow.core.examples.exampleIterable18.test()
   }
 
+  "ExampleIterable19" {
+    arrow.core.examples.exampleIterable19.test()
+  }
+
 }) {
   override fun timeout(): Long = 1000
 }
