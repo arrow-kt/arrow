@@ -4,6 +4,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
+import arrow.core.test.unit
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
@@ -239,32 +240,32 @@ class SequenceKTest : StringSpec({
     }
 
     "crosswalk the sequence to a List function" {
-      checkAll(Arb.list(Arb.string())){ strList ->
-        val obtained = strList.asSequence().crosswalk { listOf(it.length) }
-        val expected = if (strList.isEmpty()) emptyList()
-                      else listOf(strList.map { it.length })
+      checkAll(Arb.list(Arb.int())){ list ->
+        val obtained = list.asSequence().crosswalk { listOf(it) }
+        val expected = if (list.isEmpty()) emptyList()
+                      else listOf(list.map { it })
         obtained.map{ it.sorted() } shouldBe expected.map { it.sorted() }
       }
     }
 
     "crosswalk the sequence to a nullable function" {
-      checkAll(Arb.list(Arb.string())){ strList ->
+      checkAll(Arb.list(Arb.int())){ list ->
         fun nullEvens(i: Int): Int? = if(i % 2 == 0) i else null
 
-        val obtained = strList.asSequence().crosswalkNullList { nullEvens(it.length) }
-        val expected = strList.map { nullEvens(it.length) }
+        val obtained = list.asSequence().crosswalkNullList { nullEvens(it) }
+        val expected = list.map { nullEvens(it) }
         obtained?.size shouldBe expected.filterNotNull().size
       }
     }
 
     "can align sequences - 1" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
       }
     }
 
     "can align sequences - 2" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
           it.isBoth() shouldBe true
         }
@@ -272,7 +273,7 @@ class SequenceKTest : StringSpec({
     }
 
     "can align sequences - 3" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()
         a.align(b).drop(min(ls.size, rs.size)).forEach {
@@ -322,7 +323,7 @@ class SequenceKTest : StringSpec({
     }
 
     "unzipToPair should unzip values in a Pair in a Sequence of Pairs" {
-      checkAll(Arb.list(Arb.pair(Arb.string(), Arb.int()))){ pairList ->
+      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))){ pairList ->
         val obtained = pairList.asSequence().unzipToPair()
         val expected = pairList.unzip()
         obtained shouldBe expected
@@ -330,9 +331,9 @@ class SequenceKTest : StringSpec({
     }
 
     "unzipToPair should unzip values in a Pair in a Sequence" {
-      checkAll(Arb.list(Arb.string())){ strList ->
-        val obtained = strList.asSequence().unzipToPair { str -> Pair(str, str.length)}
-        val expected = strList.unzip { str -> Pair(str, str.length) }
+      checkAll(Arb.list(Arb.int())){ list ->
+        val obtained = list.asSequence().unzipToPair { n -> Pair(n, n)}
+        val expected = list.unzip { n -> Pair(n, n) }
         obtained shouldBe expected
       }
     }

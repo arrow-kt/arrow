@@ -2,11 +2,13 @@ package arrow.core.continuations
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.test.nonEmptyList
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -32,11 +34,11 @@ class IorSpec :
     }
 
     "Concurrent - arrow.ior bind" {
-      checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
+      checkAll(Arb.nonEmptyList(Arb.int())) { xs ->
         ior(Semigroup.list()) {
-          strs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
+          xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
         }
-          .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
+          .mapLeft { it.toSet() } shouldBe Ior.Both(xs.toSet(), xs.indices.toList())
       }
     }
 

@@ -230,7 +230,7 @@ class MapKTest : StringSpec({
     "zip with" {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-        Arb.functionABCToD<Int, Int, Int, String>(Arb.string())
+        Arb.functionABCToD<Int, Int, Int, Int>(Arb.int())
       ) { (a, b), fn ->
         a.zip(b, fn) shouldBe a.zip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
       }
