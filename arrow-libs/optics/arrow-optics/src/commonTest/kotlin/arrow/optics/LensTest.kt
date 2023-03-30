@@ -7,7 +7,6 @@ import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -20,31 +19,38 @@ class LensTest : StringSpec({
 
     testLaws(
       "TokenLens - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string())
       ),
 
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Lens.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       ),
 
-      OptionalLaws.laws(
+      OptionalLaws(
         optional = Lens.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       ),
+
+      SetterLaws(
+        setter = Lens.token(),
+        aGen = Arb.token(),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string()),
+      )
     )
 
     testLaws(
       "Identity Lens - ",
-      LensLaws.laws(
+      LensLaws(
         lens = Lens.id(),
         aGen = Arb.int(),
         bGen = Arb.int(),
@@ -76,15 +82,9 @@ class LensTest : StringSpec({
       }
     }
 
-    "asFold should behave as valid Fold: combineAll" {
-      checkAll(Arb.token()) { token ->
-        Lens.token().fold(Monoid.string(), token) shouldBe token.value
-      }
-    }
-
     "asFold should behave as valid Fold: fold" {
       checkAll(Arb.token()) { token ->
-        Lens.token().fold(Monoid.string(), token) shouldBe token.value
+        Lens.token().fold("", { x, y -> x + y }, token) shouldBe token.value
       }
     }
 

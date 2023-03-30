@@ -9,7 +9,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.foldLeft
+import arrow.core.fold
 import arrow.core.foldMap
 import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
@@ -40,12 +40,9 @@ public object Every {
       override fun modify(source: Either<L, R>, map: (focus: R) -> R): Either<L, R> =
         source.map(map)
 
-      override fun <A> foldMap(M: Monoid<A>, source: Either<L, R>, map: (focus: R) -> A): A =
-        when (source) {
-          is Either.Left<L> -> M.empty()
-          is Either.Right<R> -> map(source.value)
-        }
-    }
+        override fun <A> foldMap(M: Monoid<A>, source: Either<L, R>, map: (focus: R) -> A): A =
+          source.fold({ M.empty() }, map)
+      }
 
   @JvmStatic
   public fun <K, V> map(): Traversal<Map<K, V>, V> =
@@ -55,11 +52,11 @@ public object Every {
 
       override fun <R> foldMap(M: Monoid<R>, source: Map<K, V>, map: (focus: V) -> R): R =
         M.run {
-          source.foldLeft(empty()) { acc, (_, v) ->
-            acc.combine(map(v))
+          source.fold(empty()) { acc, (_, v) ->
+            acc.combine(map(v))}
           }
         }
-    }
+
 
   /**
    * [Traversal] for [NonEmptyList] that has focus in each [A].
@@ -90,7 +87,7 @@ public object Every {
         source.map(map)
 
       override fun <R> foldMap(M: Monoid<R>, source: Option<A>, map: (focus: A) -> R): R =
-        source.foldMap(M, map)
+        source.fold({ M.empty() }, map)
     }
 
   @JvmStatic
@@ -100,11 +97,8 @@ public object Every {
         source.map(map)
 
       override fun <R> foldMap(M: Monoid<R>, source: Sequence<A>, map: (focus: A) -> R): R =
-        M.run {
-          source.fold(empty()) { acc, a ->
-            acc.combine(map(a))
-          }
-        }
+
+          source.foldMap(M, map)
     }
 
   /**
@@ -135,9 +129,8 @@ public object Every {
         Pair(map(source.first), map(source.second))
 
       override fun <R> foldMap(M: Monoid<R>, source: Pair<A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first).combine(map(source.second))
-        }
+        listOf(source.first, source.second)
+        .foldMap(M, map)
     }
 
   /**
@@ -150,11 +143,8 @@ public object Every {
         Triple(map(source.first), map(source.second), map(source.third))
 
       override fun <R> foldMap(M: Monoid<R>, source: Triple<A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-        }
+        listOf(source.first, source.second, source.third)
+        .foldMap(M, map)
     }
 
   /**
@@ -167,12 +157,8 @@ public object Every {
         Tuple4(map(source.first), map(source.second), map(source.third), map(source.fourth))
 
       override fun <R> foldMap(M: Monoid<R>, source: Tuple4<A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-        }
+        listOf(source.first, source.second, source.third, source.fourth)
+        .foldMap(M, map)
     }
 
   /**
@@ -185,13 +171,8 @@ public object Every {
         Tuple5(map(source.first), map(source.second), map(source.third), map(source.fourth), map(source.fifth))
 
       override fun <R> foldMap(M: Monoid<R>, source: Tuple5<A, A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-            .combine(map(source.fifth))
-        }
+        listOf(source.first, source.second, source.third, source.fourth, source.fifth)
+        .foldMap(M, map)
     }
 
   /**
@@ -211,14 +192,8 @@ public object Every {
         )
 
       override fun <R> foldMap(M: Monoid<R>, source: Tuple6<A, A, A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-            .combine(map(source.fifth))
-            .combine(map(source.sixth))
-        }
+        listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth)
+        .foldMap(M, map)
     }
 
   /**
@@ -239,15 +214,8 @@ public object Every {
         )
 
       override fun <R> foldMap(M: Monoid<R>, source: Tuple7<A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-            .combine(map(source.fifth))
-            .combine(map(source.sixth))
-            .combine(map(source.seventh))
-        }
+        listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh)
+        .foldMap(M, map)
     }
 
   /**
@@ -272,16 +240,8 @@ public object Every {
         )
 
       override fun <R> foldMap(M: Monoid<R>, source: Tuple8<A, A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-            .combine(map(source.fifth))
-            .combine(map(source.sixth))
-            .combine(map(source.seventh))
-            .combine(map(source.eighth))
-        }
+        listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth)
+        .foldMap(M, map)
     }
 
   /**
@@ -307,17 +267,8 @@ public object Every {
         )
 
       override fun <R> foldMap(M: Monoid<R>, source: Tuple9<A, A, A, A, A, A, A, A, A>, map: (focus: A) -> R): R =
-        M.run {
-          map(source.first)
-            .combine(map(source.second))
-            .combine(map(source.third))
-            .combine(map(source.fourth))
-            .combine(map(source.fifth))
-            .combine(map(source.sixth))
-            .combine(map(source.seventh))
-            .combine(map(source.eighth))
-            .combine(map(source.ninth))
-        }
+        listOf(source.first, source.second, source.third, source.fourth, source.fifth, source.sixth, source.seventh, source.eighth, source.ninth)
+        .foldMap(M, map)
     }
 
 }

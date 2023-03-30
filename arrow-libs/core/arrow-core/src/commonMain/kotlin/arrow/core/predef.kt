@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupDeprecation
 
 public inline fun <A> identity(a: A): A = a
 
@@ -24,6 +25,6 @@ internal object EmptyValue {
  * Like [Semigroup.maybeCombine] but for using with [EmptyValue]
  */
 @PublishedApi
+@Deprecated(SemigroupDeprecation, ReplaceWith("EmptyValue.combine(first, second) { x, y -> x.combine(y) }", "arrow.core.EmptyValue"))
 internal fun <T> Semigroup<T>.emptyCombine(first: Any?, second: T): T =
-  if (first === EmptyValue) second else (first as T).combine(second)
-
+  EmptyValue.combine(first, second) { x, y -> x.combine(y) }

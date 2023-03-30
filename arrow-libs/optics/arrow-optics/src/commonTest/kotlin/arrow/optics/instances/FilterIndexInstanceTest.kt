@@ -17,7 +17,7 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex list - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.list<String>().filter { true },
         aGen = Arb.list(Arb.string()),
         bGen = Arb.string(),
@@ -27,7 +27,7 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex sequence - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.sequence<String>().filter { true },
         aGen = Arb.list(Arb.string()).map { it.asSequence() },
         bGen = Arb.string(),
@@ -37,7 +37,7 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex Nel - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.nonEmptyList<String>().filter { true },
         aGen = Arb.nonEmptyList(Arb.string()),
         bGen = Arb.string(),
@@ -47,7 +47,7 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex map - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.map<Char, Int>().filter { true },
         aGen = Arb.map(Arb.char(), Arb.int()),
         bGen = Arb.int(),
@@ -57,7 +57,7 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex string - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.string().filter { true },
         aGen = Arb.string(),
         bGen = Arb.char(),

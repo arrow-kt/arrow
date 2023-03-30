@@ -6,7 +6,6 @@ import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -20,21 +19,21 @@ class PrismTest : StringSpec({
 
     testLaws(
       "Prism sum - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.sumType(),
         aGen = Arb.sumType(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       ),
 
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Prism.sumType(),
         aGen = Arb.sumType(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
       ),
 
-      OptionalLaws.laws(
+      OptionalLaws(
         optional = Prism.sumType(),
         aGen = Arb.sumType(),
         bGen = Arb.string(),
@@ -44,7 +43,7 @@ class PrismTest : StringSpec({
 
     testLaws(
       "Prism sum first - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.sumType().first(),
         aGen = Arb.pair(Arb.sumType(), Arb.int()),
         bGen = Arb.pair(Arb.string(), Arb.int()),
@@ -54,7 +53,7 @@ class PrismTest : StringSpec({
 
     testLaws(
       "Prism sum second - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.sumType().second(),
         aGen = Arb.pair(Arb.int(), Arb.sumType()),
         bGen = Arb.pair(Arb.int(), Arb.string()),
@@ -64,7 +63,7 @@ class PrismTest : StringSpec({
 
     testLaws(
       "Prism sum right - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.sumType().right(),
         aGen = Arb.either(Arb.int(), Arb.sumType()),
         bGen = Arb.either(Arb.int(), Arb.string()),
@@ -74,7 +73,7 @@ class PrismTest : StringSpec({
 
     testLaws(
       "Prism sum left - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.sumType().left(),
         aGen = Arb.either(Arb.sumType(), Arb.int()),
         bGen = Arb.either(Arb.string(), Arb.int()),
@@ -84,7 +83,7 @@ class PrismTest : StringSpec({
 
     testLaws(
       "Prism identity - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.id(),
         aGen = Arb.either(Arb.int(), Arb.int()),
         bGen = Arb.either(Arb.int(), Arb.int()),
@@ -117,17 +116,10 @@ class PrismTest : StringSpec({
         }
       }
 
-      "asFold should behave as valid Fold: combineAll" {
-        checkAll(Arb.sumType()) { sum: SumType ->
-          fold(Monoid.string(), sum) shouldBe
-            (Prism.sumType().getOrNull(sum) ?: Monoid.string().empty())
-        }
-      }
-
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.sumType()) { sum: SumType ->
-          fold(Monoid.string(), sum) shouldBe
-            (Prism.sumType().getOrNull(sum) ?: Monoid.string().empty())
+          fold("", { x, y -> x + y }, sum) shouldBe
+            (Prism.sumType().getOrNull(sum) ?: "")
         }
       }
 

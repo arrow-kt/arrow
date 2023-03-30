@@ -38,7 +38,7 @@ kotlin {
       }
       jvmTest {
         dependencies {
-          implementation(libs.kotlin.stdlibJDK8)
+          implementation(libs.kotlin.stdlib)
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.junitJupiterEngine)
           implementation(libs.kotlin.reflect)
@@ -48,7 +48,7 @@ kotlin {
 
     jvmMain {
       dependencies {
-        implementation(libs.kotlin.stdlibJDK8)
+        implementation(libs.kotlin.stdlib)
         api(libs.kotlin.reflect)
       }
     }

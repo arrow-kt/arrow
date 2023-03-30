@@ -2,161 +2,176 @@ package arrow.fx.resilience
 
 import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
-import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.ints.shouldBeExactly
-import io.kotest.matchers.shouldBe
-import io.kotest.property.Arb
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
-import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.test.runTest
+import kotlin.random.Random
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.fail
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("unused")
-class SagaSpec : StringSpec({
-  "Saga returns action result" {
-    checkAll(Arb.int()) { i ->
-      val saga = saga({ i }) { fail("Doesn't run") }
-      saga.transact() shouldBeExactly i
-    }
+class SagaSpec {
+
+  @Test
+  fun sagaReturnsActionResult(): TestResult = runTest {
+    val value = Random.nextInt()
+    val saga = saga({ value }) { fail("Doesn't run") }
+    assertEquals(value, saga.transact())
   }
 
-  class SagaFailed : RuntimeException()
+  data class SagaFailed(val tag: String) : RuntimeException()
 
-  "Saga runs compensation if throw in builder & rethrows exception" {
-    checkAll(Arb.int()) { i ->
-      val compensation = CompletableDeferred<Int>()
-      val saga = saga {
-        saga({ i }) { compensation.complete(it) }
-        throw SagaFailed()
-      }
-      shouldThrow<SagaFailed> { saga.transact() }
-      compensation.await() shouldBeExactly i
+  @Test
+  fun sagaRunsCompensationIfThrowInBuilderAndRethrowsException(): TestResult = runTest {
+    val value = Random.nextInt()
+    val compensation = CompletableDeferred<Int>()
+    val saga = saga {
+      saga({ value }) { compensation.complete(it) }
+      throw SagaFailed("Exception in builder")
     }
+    assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(value, compensation.await())
   }
 
-  "Saga runs compensation if throw in saga & rethrows exception" {
-    checkAll(Arb.int()) { i ->
-      val compensation = CompletableDeferred<Int>()
-      val saga = saga {
-        saga({ i }) { compensation.complete(it) }
-        saga({ throw SagaFailed() }) { fail("Doesn't run") }
-      }
-      shouldThrow<SagaFailed> { saga.transact() }
-      compensation.await() shouldBeExactly i
+  @Test
+  fun sagaRunsCompensationIfThrowInSagaAndRethrowsException(): TestResult = runTest {
+    val value = Random.nextInt()
+    val compensation = CompletableDeferred<Int>()
+    val saga = saga {
+      saga({ value }) { compensation.complete(it) }
+      saga({ throw SagaFailed("Exception in saga") }) { fail("Doesn't run") }
     }
+    assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(value, compensation.await())
   }
 
-  "Saga runs compensation in order & rethrows exception" {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
-      val compensations = Channel<Int>(2)
-      val saga = saga {
-        saga({ a }) { compensations.send(it) }
-        saga({ b }) { compensations.send(it) }
-        saga({ throw SagaFailed() }) { fail("Doesn't run") }
-      }
-      shouldThrow<SagaFailed> { saga.transact() }
-      compensations.receive() shouldBeExactly b
-      compensations.receive() shouldBeExactly a
-      compensations.close()
+  @Test
+  fun sagaRunsCompensationInOrderAndRethrowsException(): TestResult = runTest {
+    val valueA = Random.nextInt()
+    val valueB = Random.nextInt()
+
+    val compensations = Channel<Int>(2)
+    val saga = saga {
+      saga({ valueA }) { compensations.send(it) }
+      saga({ valueB }) { compensations.send(it) }
+      saga({ throw SagaFailed("Exception in saga") }) { fail("Doesn't run") }
     }
+    assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(valueB, compensations.receive())
+    assertEquals(valueA, compensations.receive())
+    compensations.close()
   }
 
-  "Sage composes compensation errors" {
-    checkAll(Arb.int()) { a ->
-      val compensationA = CompletableDeferred<Int>()
-      val original = SagaFailed()
-      val compensation = SagaFailed()
-      val saga = saga {
-        saga({ a }) { compensationA.complete(it) }
-        saga({}) { throw compensation }
-        saga({ throw original }) { fail("Doesn't run") }
-      }
-      val res = shouldThrow<SagaFailed> { saga.transact() }
-      res shouldBe original
-      res.suppressedExceptions[0] shouldBe compensation
-      compensationA.await() shouldBeExactly a
+  @Test
+  fun sagaComposesCompensationErrors(): TestResult = runTest {
+    val value = Random.nextInt()
+    val compensationA = CompletableDeferred<Int>()
+    val original = SagaFailed("Exception in saga")
+    val compensation = SagaFailed("Exception in compensation")
+    val saga = saga {
+      saga({ value }) { compensationA.complete(it) }
+      saga({}) { throw compensation }
+      saga({ throw original }) { fail("Doesn't run") }
     }
+
+    val res = assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(original, res)
+    assertEquals(compensation, res.suppressedExceptions[0])
+    assertEquals(value, compensationA.await())
   }
 
-  "Sage composes compensation errors when thrown in block" {
-    checkAll(Arb.int()) { a ->
-      val compensationA = CompletableDeferred<Int>()
-      val original = SagaFailed()
-      val compensation = SagaFailed()
-      val saga = saga {
-        saga({ a }) { compensationA.complete(it) }
-        saga({}) { throw compensation }
-        throw original
-      }
-      val res = shouldThrow<SagaFailed> { saga.transact() }
-      res shouldBe original
-      res.suppressedExceptions[0] shouldBe compensation
-      compensationA.await() shouldBeExactly a
+  @Test
+  fun sagaComposesCompensationErrorsWhenThrownInBlock(): TestResult = runTest {
+    val value = Random.nextInt()
+    val compensationA = CompletableDeferred<Int>()
+    val original = SagaFailed("Exception in builder")
+    val compensation = SagaFailed("Exception in compensation")
+
+    val saga = saga {
+      saga({ value }) { compensationA.complete(it) }
+      saga({}) { throw compensation }
+      throw original
     }
+
+    val res = assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(original, res)
+    assertEquals(compensation, res.suppressedExceptions[0])
+    assertEquals(value, compensationA.await())
   }
 
-  "Saga can traverse" {
-    checkAll(Arb.list(Arb.int())) { iis ->
-      saga { iis.map { saga({ it }) { fail("Doesn't run") } } }.transact() shouldBe iis
-    }
+  @Test
+  fun sagaCanTraverse(): TestResult = runTest {
+    val valueA = Random.nextInt()
+    val valueB = Random.nextInt()
+    val valueC = Random.nextInt()
+    val values = listOf(valueA, valueB, valueC)
+
+    val result = saga { values.map { saga({ it }) { fail("Doesn't run") } } }.transact()
+    assertEquals(values, result)
   }
 
-  "Saga can parTraverse" {
-    checkAll(Arb.list(Arb.int())) { iis ->
-      saga { iis.parMap { saga({ it }) { fail("Doesn't run") } } }.transact() shouldBe iis
-    }
+  @Test
+  fun sagaCanParTraverse(): TestResult = runTest {
+    val valueA = Random.nextInt()
+    val valueB = Random.nextInt()
+    val valueC = Random.nextInt()
+    val values = listOf(valueA, valueB, valueC)
+
+    val result = saga { values.parMap(Dispatchers.Default) { saga({ it }) { fail("Doesn't run") } } }.transact()
+    assertEquals(values, result)
   }
 
-  "parZip runs left compensation" {
-    checkAll(Arb.int()) { a ->
-      val compensationA = CompletableDeferred<Int>()
-      val latch = CompletableDeferred<Unit>()
-      val saga = saga {
-        parZip(
-          {
-            saga({
-              latch.complete(Unit)
-              a
-            }) { compensationA.complete(it) }
-          },
-          {
-            saga({
-              latch.await()
-              throw SagaFailed()
-            }) { fail("Doesn't run") }
-          }
-        ) { _, _ -> }
-      }
-      shouldThrow<SagaFailed> { saga.transact() }
-      compensationA.await() shouldBeExactly a
+  @Test
+  fun parZipRunsLeftCompensation(): TestResult = runTest {
+    val value = Random.nextInt()
+
+    val compensationA = CompletableDeferred<Int>()
+    val latch = CompletableDeferred<Unit>()
+    val saga = saga {
+      parZip({
+        saga({
+          latch.complete(Unit)
+          value
+        }) { compensationA.complete(it) }
+      }, {
+        saga({
+          latch.await()
+          throw SagaFailed("Exception in saga")
+        }) { fail("Doesn't run") }
+      }) { _, _ -> }
     }
+
+    assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(value, compensationA.await())
   }
 
-  "parZip runs right compensation" {
-    checkAll(Arb.int()) { a ->
-      val compensationB = CompletableDeferred<Int>()
-      val latch = CompletableDeferred<Unit>()
-      val saga = saga {
-        parZip(
-          {
-            saga({
-              latch.await()
-              throw SagaFailed()
-            }) { fail("Doesn't run") }
-          },
-          {
-            saga({
-              latch.complete(Unit)
-              a
-            }) { compensationB.complete(it) }
-          }
-        ) { _, _ -> }
-      }
-      shouldThrow<SagaFailed> { saga.transact() }
-      compensationB.await() shouldBeExactly a
+  @Test
+  fun parZipRunsRightCompensation(): TestResult = runTest {
+    val value = Random.nextInt()
+
+    val compensationB = CompletableDeferred<Int>()
+    val latch = CompletableDeferred<Unit>()
+    val saga = saga {
+      parZip({
+        saga({
+          latch.await()
+          throw SagaFailed("Exception in saga")
+        }) { fail("Doesn't run") }
+      }, {
+        saga({
+          latch.complete(Unit)
+          value
+        }) { compensationB.complete(it) }
+      }) { _, _ -> }
     }
+
+    assertFailsWith<SagaFailed> { saga.transact() }
+    assertEquals(value, compensationB.await())
   }
-})
+}

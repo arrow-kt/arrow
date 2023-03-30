@@ -17,17 +17,24 @@ class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal list - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.list(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       ),
+
+      SetterLaws(
+        setter = Traversal.list(),
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
+      )
     )
 
     testLaws(
       "Traversal Nel - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.nonEmptyList(),
         aGen = Arb.nonEmptyList(Arb.string()),
         bGen = Arb.string(),
@@ -37,7 +44,7 @@ class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal sequence - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.sequence(),
         aGen = Arb.list(Arb.string()).map { it.asSequence() },
         bGen = Arb.string(),
@@ -48,7 +55,7 @@ class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal map - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.map(),
         aGen = Arb.map(Arb.int(), Arb.string()),
         bGen = Arb.string(),
@@ -58,7 +65,7 @@ class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal option - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.option(),
         aGen = Arb.option(Arb.string()),
         bGen = Arb.string(),
@@ -68,7 +75,7 @@ class TraversalTest : StringSpec({
 
     testLaws(
       "Traversal string - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.string(),
         aGen = Arb.string(),
         bGen = Arb.char(),

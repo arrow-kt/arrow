@@ -36,7 +36,7 @@ class EitherTest : StringSpec({
   val ARB = Arb.either(Arb.string(), Arb.int())
 
     testLaws(
-      MonoidLaws.laws(Monoid.either(Monoid.string(), Monoid.int()), ARB),
+      MonoidLaws(0.right(), { x, y -> x.combine(y, String::plus, Int::plus) }, ARB)
     )
     
     "isLeft should return true if Left and false if Right" {
@@ -313,6 +313,8 @@ class EitherTest : StringSpec({
         val expected: Either<Int, List<Int>> = Right(emptyList())
         
         Right(a).replicate(n) shouldBe expected
+
+
         Left(a).replicate(n) shouldBe expected
       }
     }

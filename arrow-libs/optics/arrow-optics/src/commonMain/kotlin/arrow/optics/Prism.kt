@@ -69,7 +69,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
    */
   override fun <C> first(): PPrism<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     PPrism(
-      { (s, c) -> getOrModify(s).bimap({ it to c }, { it to c }) },
+      { (s, c) -> getOrModify(s).mapLeft { it to c }.map { it to c } },
       { (b, c) -> reverseGet(b) to c }
     )
 
@@ -78,7 +78,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
    */
   override fun <C> second(): PPrism<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     PPrism(
-      { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
+      { (c, s) -> getOrModify(s).mapLeft { c to it }.map { c to it } },
       { (c, b) -> c to reverseGet(b) }
     )
 
@@ -89,8 +89,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     PPrism(
       {
         it.fold(
-          { a -> getOrModify(a).bimap(::Left, ::Left) },
-          { c -> Right(Right(c)) })
+          { a -> getOrModify(a).mapLeft { l -> Either.Left(l) }.map { r -> Either.Left(r) } },
+          { c -> Either.Right(Either.Right(c)) })
       },
       {
         when (it) {
@@ -107,8 +107,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     PPrism(
       {
         it.fold(
-          { c -> Right(Left(c)) },
-          { s -> getOrModify(s).bimap(::Right, ::Right) })
+          { c -> Either.Right(Either.Left(c)) },
+          { s -> getOrModify(s).mapLeft { l -> Either.Right(l) }.map { r -> Either.Right(r) } })
       },
       { it.map(this::reverseGet) }
     )
@@ -118,7 +118,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
    */
   public infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     PPrism(
-      getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
+      getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).mapLeft{ set(s, it) } } },
       reverseGet = this::reverseGet compose other::reverseGet
     )
 

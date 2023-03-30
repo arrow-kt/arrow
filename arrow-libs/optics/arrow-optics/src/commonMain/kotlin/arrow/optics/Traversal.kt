@@ -67,7 +67,7 @@ public interface PTraversal<S, T, A, B> {
 
       override fun modify(source: Either<S, U>, map: (focus: A) -> B): Either<T, V> =
         source.fold(
-          { a -> Either.Left(this@PTraversal.modify(a, map)) },
+          { a -> Either.Left(this.modify(a, map)) },
           { u -> Either.Right(other.modify(u, map)) }
         )
     }
@@ -81,7 +81,7 @@ public interface PTraversal<S, T, A, B> {
         this@PTraversal.foldMap(M, source) { c -> other.foldMap(M, c, map) }
 
       override fun modify(source: S, map: (focus: C) -> D): T =
-        this@PTraversal.modify(source) { b -> other.modify(b, map) }
+        this.modify(source) { b -> other.modify(b, map) }
     }
 
   public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
@@ -205,7 +205,7 @@ public interface PTraversal<S, T, A, B> {
         override fun modify(source: Either<S, S>, map: (focus: S) -> S): Either<S, S> =
           source.bimap(map, map)
       }
-      // Traversal { s, f -> s.bimap(f, f) }
+      // Traversal { s, f -> s.mapLeft(f).map(f) }
 
     /**
      * [PTraversal] that points to nothing
@@ -606,8 +606,7 @@ public interface PTraversal<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Optional] for a structure [S] to see all its foci [A]
@@ -626,7 +625,6 @@ public interface PTraversal<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   public val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
+    get() = this@every.compose(this@PTraversal)
 
 }

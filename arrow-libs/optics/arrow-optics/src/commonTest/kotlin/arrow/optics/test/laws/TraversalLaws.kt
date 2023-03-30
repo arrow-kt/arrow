@@ -8,15 +8,15 @@ import io.kotest.property.PropertyContext
 import io.kotest.property.checkAll
 import kotlin.math.max
 
-object TraversalLaws {
+data class TraversalLaws<A, B>(
+  val traversal: Traversal<A, B>,
+  val aGen: Arb<A>,
+  val bGen: Arb<B>,
+  val funcGen: Arb<(B) -> B>,
+  val eq: (A, A) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <A, B : Any> laws(
-    traversal: Traversal<A, B>,
-    aGen: Arb<A>,
-    bGen: Arb<B>,
-    funcGen: Arb<(B) -> B>,
-    eq: (A, A) -> Boolean = { a, b -> a == b }
-  ): List<Law> = listOf(
+  override val laws: List<Law> = listOf(
     Law("Traversal law: set is idempotent") { traversal.setIdempotent(aGen, bGen, eq) },
     Law("Traversal law: modify identity") { traversal.modifyIdentity(aGen, eq) },
     Law("Traversal law: compose modify") { traversal.composeModify(aGen, funcGen, eq) }

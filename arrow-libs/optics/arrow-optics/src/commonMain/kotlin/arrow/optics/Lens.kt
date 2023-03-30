@@ -45,7 +45,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
    */
   public infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
     { ss -> ss.fold(this::get, other::get) },
-    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
+    { ss, b -> ss.mapLeft { s -> set(s, b) }.map { s -> other.set(s, b) } }
   )
 
   /**
@@ -96,7 +96,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
      */
     public fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
       get = { it.fold(::identity, ::identity) },
-      set = { s, b -> s.bimap({ b }, { b }) }
+      set = { s, b -> s.mapLeft { b }.map { b } }
     )
 
     /**

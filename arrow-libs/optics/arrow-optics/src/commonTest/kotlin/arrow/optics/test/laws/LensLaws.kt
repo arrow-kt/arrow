@@ -8,16 +8,25 @@ import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
-object LensLaws {
+data class LensLaws<A, B>(
+  val lensGen: Arb<Lens<A, B>>,
+  val aGen: Arb<A>,
+  val bGen: Arb<B>,
+  val funcGen: Arb<(B) -> B>,
+  val eqa: (A, A) -> Boolean = { a, b -> a == b },
+  val eqb: (B, B) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <A, B> laws(
-    lensGen: Arb<Lens<A, B>>,
+  constructor(
+    lens: Lens<A, B>,
     aGen: Arb<A>,
     bGen: Arb<B>,
     funcGen: Arb<(B) -> B>,
     eqa: (A, A) -> Boolean = { a, b -> a == b },
     eqb: (B, B) -> Boolean = { a, b -> a == b }
-  ): List<Law> =
+  ): this(Arb.constant(lens), aGen, bGen, funcGen, eqa, eqb)
+
+  override val laws: List<Law> =
     listOf(
       Law("Lens law: get set") { lensGetSet(lensGen, aGen, eqa) },
       Law("Lens law: set get") { lensSetGet(lensGen, aGen, bGen, eqb) },
@@ -26,15 +35,6 @@ object LensLaws {
       Law("Lens law: compose modify") { lensComposeModify(lensGen, aGen, funcGen, eqa) },
       Law("Lens law: consistent set modify") { lensConsistentSetModify(lensGen, aGen, bGen, eqa) }
     )
-
-  fun <A, B> laws(
-    lens: Lens<A, B>,
-    aGen: Arb<A>,
-    bGen: Arb<B>,
-    funcGen: Arb<(B) -> B>,
-    eqa: (A, A) -> Boolean = { a, b -> a == b },
-    eqb: (B, B) -> Boolean = { a, b -> a == b }
-  ): List<Law> = laws(Arb.constant(lens), aGen, bGen, funcGen, eqa, eqb)
 
   private suspend fun <A, B> lensGetSet(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen) { lens, a ->

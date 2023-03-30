@@ -4,7 +4,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
-import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.property.Arb
@@ -12,6 +12,7 @@ import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.arbitrary.string
 import kotlin.math.max
@@ -19,7 +20,7 @@ import kotlin.math.min
 
 class SequenceKTest : StringSpec({
 
-    testLaws(MonoidLaws.laws(Monoid.sequence(), Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
+    testLaws(MonoidLaws(emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
@@ -155,6 +156,25 @@ class SequenceKTest : StringSpec({
       }
     }
 
+    "crosswalk the sequence to a List function" {
+      checkAll(Arb.list(Arb.string())){ strList ->
+        val obtained = strList.asSequence().crosswalk { listOf(it.length) }
+        val expected = if (strList.isEmpty()) emptyList()
+                      else listOf(strList.map { it.length })
+        obtained.map{ it.sorted() } shouldBe expected.map { it.sorted() }
+      }
+    }
+
+    "crosswalk the sequence to a nullable function" {
+      checkAll(Arb.list(Arb.string())){ strList ->
+        fun nullEvens(i: Int): Int? = if(i % 2 == 0) i else null
+
+        val obtained = strList.asSequence().crosswalkNullList { nullEvens(it.length) }
+        val expected = strList.map { nullEvens(it.length) }
+        obtained?.size shouldBe expected.filterNotNull().size
+      }
+    }
+
     "can align sequences - 1" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
@@ -164,7 +184,7 @@ class SequenceKTest : StringSpec({
     "can align sequences - 2" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
-          it.isBoth shouldBe true
+          it.isBoth() shouldBe true
         }
       }
     }
@@ -174,11 +194,8 @@ class SequenceKTest : StringSpec({
         val ls = a.toList()
         val rs = b.toList()
         a.align(b).drop(min(ls.size, rs.size)).forEach {
-          if (ls.size < rs.size) {
-            it.isRight shouldBe true
-          } else {
-            it.isLeft shouldBe true
-          }
+          if (ls.size < rs.size) it.isRight() shouldBe true
+          else it.isLeft() shouldBe true
         }
       }
     }
@@ -222,7 +239,24 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "filterOption should filter None" {
+    "unzipToPair should unzip values in a Pair in a Sequence of Pairs" {
+      checkAll(Arb.list(Arb.pair(Arb.string(), Arb.int()))){ pairList ->
+        val obtained = pairList.asSequence().unzipToPair()
+        val expected = pairList.unzip()
+        obtained shouldBe expected
+      }
+    }
+
+    "unzipToPair should unzip values in a Pair in a Sequence" {
+      checkAll(Arb.list(Arb.string())){ strList ->
+        val obtained = strList.asSequence().unzipToPair { str -> Pair(str, str.length)}
+        val expected = strList.unzip { str -> Pair(str, str.length) }
+        obtained shouldBe expected
+      }
+    }
+
+
+  "filterOption should filter None" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
@@ -235,9 +269,9 @@ class SequenceKTest : StringSpec({
           else it.right()
         }
 
-        val (lefts, rights) = sequence.separateEither()
+        val (lefts, rights) = sequence.separateEitherToPair()
 
-        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
+        lefts to rights shouldBe ints.partition { it % 2 == 0 }
       }
     }
 

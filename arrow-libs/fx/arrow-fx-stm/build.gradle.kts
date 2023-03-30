@@ -46,7 +46,7 @@ kotlin {
     }
     jvmMain {
       dependencies {
-        implementation(libs.kotlin.stdlibJDK8)
+        implementation(libs.kotlin.stdlib)
       }
     }
     jsMain {

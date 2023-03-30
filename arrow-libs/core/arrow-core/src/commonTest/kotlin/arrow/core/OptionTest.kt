@@ -4,7 +4,6 @@ import arrow.core.raise.option
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.testLaws
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -22,7 +21,7 @@ class OptionTest : StringSpec({
   val none: Option<String> = None
 
     testLaws(
-      MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
+      MonoidLaws(None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
     )
 
     "ensure null in option computation" {
