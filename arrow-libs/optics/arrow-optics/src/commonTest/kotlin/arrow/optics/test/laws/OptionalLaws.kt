@@ -8,16 +8,25 @@ import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.checkAll
 
-object OptionalLaws {
+data class OptionalLaws<A, B>(
+  val optionalGen: Arb<Optional<A, B>>,
+  val aGen: Arb<A>,
+  val bGen: Arb<B>,
+  val funcGen: Arb<(B) -> B>,
+  val eqa: (A, A) -> Boolean = { a, b -> a == b },
+  val eqb: (B?, B?) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <A, B> laws(
-    optionalGen: Arb<Optional<A, B>>,
+  constructor(
+    optional: Optional<A, B>,
     aGen: Arb<A>,
     bGen: Arb<B>,
     funcGen: Arb<(B) -> B>,
     eqa: (A, A) -> Boolean = { a, b -> a == b },
     eqb: (B?, B?) -> Boolean = { a, b -> a == b }
-  ): List<Law> = listOf(
+  ): this(Arb.constant(optional), aGen, bGen, funcGen, eqa, eqb)
+
+  override val laws: List<Law> = listOf(
     Law("Optional Law: set what you get") { getOptionSet(optionalGen, aGen, eqa) },
     Law("Optional Law: set what you get") { setGetOption(optionalGen, aGen, bGen, eqb) },
     Law("Optional Law: set is idempotent") { setIdempotent(optionalGen, aGen, bGen, eqa) },
@@ -25,18 +34,6 @@ object OptionalLaws {
     Law("Optional Law: compose modify") { composeModify(optionalGen, aGen, funcGen, eqa) },
     Law("Optional Law: consistent set with modify") { consistentSetModify(optionalGen, aGen, bGen, eqa) }
   )
-
-  /**
-   * Warning: Use only when a `Gen.constant()` applies
-   */
-  fun <A, B> laws(
-    optional: Optional<A, B>,
-    aGen: Arb<A>,
-    bGen: Arb<B>,
-    funcGen: Arb<(B) -> B>,
-    eqa: (A, A) -> Boolean = { a, b -> a == b },
-    eqb: (B?, B?) -> Boolean = { a, b -> a == b }
-  ): List<Law> = laws(Arb.constant(optional), aGen, bGen, funcGen, eqa, eqb)
 
   private suspend fun <A, B> getOptionSet(
     optionalGen: Arb<Optional<A, B>>,

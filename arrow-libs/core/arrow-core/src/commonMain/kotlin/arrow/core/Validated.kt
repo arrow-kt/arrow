@@ -306,7 +306,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use fold on Either after refactoring instead",
-    ReplaceWith("toEither().fold({ MB.empty() }, f)")
+    ReplaceWith("toEither().fold({ invalidValue }, f)")
   )
   public inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
     fold({ MB.empty() }, f)
@@ -404,6 +404,7 @@ public sealed class Validated<out E, out A> {
   /**
    * Converts the value to an Either<E, A>
    */
+  @Deprecated(ValidatedDeprMsg + "Drop this call after refactoring")
   public fun toEither(): Either<E, A> =
     fold(::Left, ::Right)
 
@@ -452,6 +453,10 @@ public sealed class Validated<out E, out A> {
    *
    * Apply a function to an Invalid or Valid value, returning a new Invalid or Valid value respectively.
    */
+  @Deprecated(
+    ValidatedDeprMsg + "Use map and mapLeft on Either after refactoring",
+    ReplaceWith("toEither().mapLeft(fe).map(fa)")
+  )
   public inline fun <EE, B> bimap(fe: (E) -> EE, fa: (A) -> B): Validated<EE, B> =
     fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
 
@@ -559,9 +564,8 @@ public sealed class Validated<out E, out A> {
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), fb.toEither(), ::Pair).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), fb.toEither(), ::Pair).toValidated()",
+    "arrow.core.Either"
   )
 )
 public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
@@ -570,9 +574,8 @@ public fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>):
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, Z> Validated<E, A>.zip(
@@ -585,9 +588,8 @@ public inline fun <E, A, B, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, Z> Validated<E, A>.zip(
@@ -601,9 +603,8 @@ public inline fun <E, A, B, C, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
@@ -618,9 +619,8 @@ public inline fun <E, A, B, C, D, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
@@ -637,9 +637,8 @@ public inline fun <E, A, B, C, D, EE, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
@@ -665,9 +664,8 @@ public inline fun <E, A, B, C, D, EE, FF, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
@@ -695,9 +693,8 @@ public inline fun <E, A, B, C, D, EE, F, G, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
@@ -727,9 +724,8 @@ public inline fun <E, A, B, C, D, EE, F, G, H, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
@@ -761,9 +757,8 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, Z> Validated<E, A>.zip(
 @Deprecated(
   ValidatedDeprMsg + "zipOrAccumulate for Either now exposes this same functionality",
   ReplaceWith(
-    "Either.zipOrAccumulate(SE::combine, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), j.toEither(), f).toValidated()",
-    "arrow.core.Either",
-    "arrow.typeclasses.combine"
+    "Either.zipOrAccumulate({ e1, e2 -> e1 + e2 }, toEither(), b.toEither(), c.toEither(), d.toEither(), e.toEither(), ff.toEither(), g.toEither(), h.toEither(), i.toEither(), j.toEither(), f).toValidated()",
+    "arrow.core.Either"
   )
 )
 public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> Validated<E, A>.zip(
@@ -981,8 +976,7 @@ public fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
 @Deprecated(
   DeprAndNicheMsg + "Prefer using the Either DSL, or map",
   ReplaceWith(
-    "(0 until (n.coerceAtLeast(0))).mapOrAccumulate(SE::combine) { bind() }.toValidated()",
-    "arrow.typeclasses.combine"
+    "(0 until (n.coerceAtLeast(0))).mapOrAccumulate({ e1, e2 -> e1 + e2 }) { bind() }.toValidated()"
   )
 )
 public fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int): Validated<E, List<A>> =
@@ -1036,14 +1030,14 @@ public fun <A, B> Validated<A?, B?>.bisequenceNullable(): Validated<A, B>? =
 
 @Deprecated(
   "$MonoidDeprecation\n$DeprAndNicheMsg\nUse fold on Either after refactoring",
-  ReplaceWith("fold({ MA.empty() }, ::identity)")
+  ReplaceWith("fold({ invalidValue }, ::identity)")
 )
 public fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A =
   fold({ MA.empty() }, ::identity)
 
 @Deprecated(
   "$MonoidDeprecation\n$DeprAndNicheMsg\nUse fold on Either after refactoring",
-  ReplaceWith("fold({ MA.empty() }, ::identity)", "arrow.core.fold")
+  ReplaceWith("fold({ invalidValue }, ::identity)", "arrow.core.fold")
 )
 public fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
   fold(MA)
@@ -1160,9 +1154,8 @@ public inline fun <E, A> Validated<E, A>.valueOr(f: (E) -> A): A =
 @Deprecated(
   DeprAndNicheMsg + "Use recover on Either after refactoring",
   ReplaceWith(
-    "toEither().recover { e -> that().mapLeft { ee -> SE.combine(e, ee) }.bind() }.toValidated()",
-    "arrow.core.recover",
-    "arrow.typeclasses.combine"
+    "toEither().recover { e -> that().mapLeft { ee -> e + ee }.bind() }.toValidated()",
+    "arrow.core.recover"
   )
 )
 public inline fun <E, A> Validated<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
@@ -1255,7 +1248,7 @@ public inline fun <A> Validated<A, A>.merge(): A =
 
 @Deprecated(
   ValidatedDeprMsg + "Use Either.zipOrAccumulate instead",
-  ReplaceWith("Either.zipOrAccumulate(SE::combine, toEither(), y.toEither(), SA::combine).toValidated()")
+  ReplaceWith("Either.zipOrAccumulate({e1, e2 -> e1 + e2}, this.toEither(), y.toEither(), {a1, a2 -> a1 + a2} ).toValidated()")
 )
 public fun <E, A> Validated<E, A>.combine(
   SE: Semigroup<E>,
@@ -1267,9 +1260,8 @@ public fun <E, A> Validated<E, A>.combine(
 @Deprecated(
   DeprAndNicheMsg,
   ReplaceWith(
-    "toEither().recover { e -> y.toEither().recover { ee -> raise(SE.combine(e, ee)) }.bind() }.toValidated()",
-    "arrow.core.recover",
-    "arrow.typeclasses.combine"
+    "toEither().recover { e -> y.toEither().recover { ee -> raise { e + ee }} }.bind() }.toValidated()",
+    "arrow.core.recover"
   )
 )
 public fun <E, A> Validated<E, A>.combineK(SE: Semigroup<E>, y: Validated<E, A>): Validated<E, A> =

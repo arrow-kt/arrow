@@ -8,7 +8,6 @@ import arrow.core.toOption
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.testLaws
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -25,7 +24,7 @@ class OptionalTest : StringSpec({
 
     testLaws(
       "Optional identity - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optional = Optional.id(),
         aGen = Arb.int(),
         bGen = Arb.int(),
@@ -35,7 +34,7 @@ class OptionalTest : StringSpec({
 
     testLaws(
       "Optional first head - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optional = Optional.listHead<Int>().first(),
         aGen = Arb.pair(Arb.list(Arb.int()), Arb.boolean()),
         bGen = Arb.pair(Arb.int(), Arb.boolean()),
@@ -45,7 +44,7 @@ class OptionalTest : StringSpec({
 
     testLaws(
       "Optional second head - ",
-      OptionalLaws.laws(
+      OptionalLaws(
         optional = Optional.listHead<Int>().second(),
         aGen = Arb.pair(Arb.boolean(), Arb.list(Arb.int())),
         bGen = Arb.pair(Arb.boolean(), Arb.int()),
@@ -70,13 +69,13 @@ class OptionalTest : StringSpec({
 
       "asFold should behave as valid Fold: nonEmpty" {
         checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          isNotEmpty(ints) shouldBe ints.firstOrNull().toOption().nonEmpty()
+          isNotEmpty(ints) shouldBe ints.firstOrNull().toOption().isSome()
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
         checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          isEmpty(ints) shouldBe ints.firstOrNull().toOption().isEmpty()
+          isEmpty(ints) shouldBe ints.firstOrNull().toOption().isNone()
         }
       }
 
@@ -86,17 +85,10 @@ class OptionalTest : StringSpec({
         }
       }
 
-      "asFold should behave as valid Fold: combineAll" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          fold(Monoid.int(), ints) shouldBe
-            ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
-        }
-      }
-
       "asFold should behave as valid Fold: fold" {
         checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          fold(Monoid.int(), ints) shouldBe
-            ints.firstOrNull().toOption().fold({ Monoid.int().empty() }, ::identity)
+          fold(0, { x, y -> x + y }, ints) shouldBe
+            ints.firstOrNull().toOption().fold({ 0 }, ::identity)
         }
       }
     }

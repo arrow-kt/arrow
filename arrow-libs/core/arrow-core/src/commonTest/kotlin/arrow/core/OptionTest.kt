@@ -352,7 +352,7 @@ class OptionTest : StringSpec({
       val some: Option<String> = Some("value")
       val none: Option<String> = None
       some.traverse { listOf(it) } shouldBe listOf(Some("value"))
-      none.traverse { listOf(it) } shouldBe emptyList()
+      none.traverse { listOf(it) } shouldBe listOf(None)
     }
 
     "sequence should be consistent with traverse" {

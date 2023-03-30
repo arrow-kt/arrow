@@ -5,6 +5,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.flatMap
+import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.core.toOption
@@ -17,7 +18,6 @@ import kotlin.jvm.JvmStatic
  */
 public typealias Optional<S, A> = POptional<S, S, A, A>
 
-@Suppress("FunctionName")
 public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
   POptional({ s -> getOption(s).toEither { s } }, set)
 
@@ -73,7 +73,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
   override fun getOrModify(source: S): Either<T, A>
 
   override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).fold({ M.empty() }, ::identity)
+    getOrModify(source).map(map).getOrElse { M.empty() }
 
   /**
    * Modify the focus of a [POptional] with a function [map]
@@ -103,15 +103,15 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
       { sources ->
         sources.fold(
           { leftSource ->
-            getOrModify(leftSource).bimap({ Either.Left(it) }, ::identity)
+            getOrModify(leftSource).mapLeft { Either.Left(it) }
           },
           { rightSource ->
-            other.getOrModify(rightSource).bimap({ Either.Right(it) }, ::identity)
+            other.getOrModify(rightSource).mapLeft { Either.Right(it) }
           }
         )
       },
       { sources, focus ->
-        sources.bimap({ leftSource -> this.set(leftSource, focus) }, { rightSource -> other.set(rightSource, focus) })
+        sources.mapLeft { leftSource -> this.set(leftSource, focus) }.map { rightSource -> other.set(rightSource, focus) }
       }
     )
 
@@ -120,7 +120,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
    */
   public override fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     POptional(
-      { (source, c) -> getOrModify(source).bimap({ Pair(it, c) }, { Pair(it, c) }) },
+      { (source, c) -> getOrModify(source).mapLeft { Pair(it, c) }.map { Pair(it, c) } },
       { (source, c2), (update, c) -> setNullable(source, update)?.let { Pair(it, c) } ?: Pair(set(source, update), c2) }
     )
 
@@ -129,8 +129,8 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
    */
   public override fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     POptional(
-      { (c, s) -> getOrModify(s).bimap({ c to it }, { c to it }) },
-      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: c2 to set(s, b) }
+      { (c, s) -> getOrModify(s).mapLeft { c to it }.map { c to it } },
+      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: (c2 to set(s, b)) }
     )
 
   /**
@@ -140,7 +140,7 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
     POptional(
       { source ->
         getOrModify(source).flatMap { a ->
-          other.getOrModify(a).bimap({ b -> set(source, b) }, ::identity)
+          other.getOrModify(a).mapLeft { b -> set(source, b) }
         }
       },
       { source, d -> modify(source) { a -> other.set(a, d) } }
@@ -151,14 +151,14 @@ public interface POptional<S, T, A, B> : PSetter<S, T, A, B>, POptionalGetter<S,
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id<S>()
+    public fun <S> id(): PIso<S, S, S, S> = PIso.id()
 
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].
      */
     public fun <S> codiagonal(): Optional<Either<S, S>, S> = POptional(
       { sources -> sources.fold({ Either.Right(it) }, { Either.Right(it) }) },
-      { sources, focus -> sources.bimap({ focus }, { focus }) }
+      { sources, focus -> sources.mapLeft { focus }.map { focus } }
     )
 
     /**

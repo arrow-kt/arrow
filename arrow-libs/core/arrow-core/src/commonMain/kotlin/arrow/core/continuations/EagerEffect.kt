@@ -5,6 +5,7 @@ import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import kotlin.coroutines.Continuation
@@ -82,6 +83,7 @@ public interface EagerEffect<out R, out A> {
    * [fold] the [EagerEffect] into an [Validated]. Where the shifted value [R] is mapped to
    * [Validated.Invalid], and result value [A] is mapped to [Validated.Valid].
    */
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither()"))
   public fun toValidated(): Validated<R, A> =
     fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
 

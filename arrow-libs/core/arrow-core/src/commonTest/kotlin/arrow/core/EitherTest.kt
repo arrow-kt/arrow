@@ -329,7 +329,7 @@ class EitherTest : StringSpec({
       }
     }
     
-    "traverse should return list of Right when Right and empty list when Left" {
+    "traverse should return list of Right when Right and singleton list when Left" {
       checkAll(
         Arb.int(),
         Arb.int(),
@@ -337,7 +337,7 @@ class EitherTest : StringSpec({
       ) { a: Int, b: Int, c: Int ->
         Right(a).traverse { emptyList<Int>() } shouldBe emptyList<Int>()
         Right(a).traverse { listOf(b, c) } shouldBe listOf(Right(b), Right(c))
-        Left(a).traverse { listOf(b, c) } shouldBe emptyList<Int>()
+        Left(a).traverse { listOf(b, c) } shouldBe listOf(Left(a))
       }
     }
     
@@ -450,13 +450,47 @@ class EitherTest : StringSpec({
         }
       }
     }
-    
-    "traverse should return list if either is right" {
+
+    "combine should combine 2 eithers" {
+      checkAll(Arb.either(Arb.string(), Arb.int()), Arb.either(Arb.string(), Arb.int())) { e1, e2 ->
+        val obtained = e1.combine(e2, { l1, l2 -> l1 + l2 }, { r1, r2 -> r1 + r2 })
+        val expected = when(e1){
+          is Left -> when(e2) {
+            is Left -> Left(e1.value + e2.value)
+            is Right -> e1
+          }
+          is Right -> when(e2) {
+            is Left -> e2
+            is Right -> Right(e1.value + e2.value)
+          }
+        }
+        obtained shouldBe expected
+      }
+    }
+
+
+  "combineAll replacement should work " {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val obtained = list.fold<Either<String, Int>, Either<String, Int>>(0.right()) { x, y ->
+        Either.zipOrAccumulate<String, Int, Int, Int>(
+          { a1, a2 -> a1 + a2 },
+          x,
+          y,
+          { b1, b2 -> b1 + b2 })
+      }
+      val expected = list.combineAll(Monoid.string(), Monoid.int())
+      obtained shouldBe expected
+    }
+  }
+
+
+
+  "traverse should return list if either is right" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
       
       right.traverse { listOf(it, 2, 3) } shouldBe listOf(Right(1), Right(2), Right(3))
-      left.traverse { listOf(it, 2, 3) } shouldBe emptyList()
+      left.traverse { listOf(it, 2, 3) } shouldBe listOf(left)
     }
     
     "sequence should be consistent with traverse" {
@@ -471,13 +505,14 @@ class EitherTest : StringSpec({
       
       right.traverseNullable { it } shouldBe Right(1)
       right.traverseNullable { null } shouldBe null
-      left.traverseNullable { it } shouldBe null
+      left.traverseNullable { it } shouldBe left
     }
     
     "sequence for Nullable should be consistent with traverseNullable" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.map { it }.sequence() shouldBe either.traverseNullable { it }
-        either.map { null }.sequence() shouldBe null
+        // wrong! if you map a `Left`, you should get a `Left` back, not null
+        // either.map { null }.sequence() shouldBe null
       }
     }
     
@@ -486,7 +521,9 @@ class EitherTest : StringSpec({
       val left: Either<String, Int> = Left("foo")
       
       right.traverse { Some(it) } shouldBe Some(Right(1))
-      left.traverse { Some(it) } shouldBe None
+      right.traverse { None } shouldBe None
+      left.traverse { Some(it) } shouldBe Some(left)
+      left.traverse { None } shouldBe Some(left)
     }
     
     "sequence for Option should be consistent with traverseOption" {
