@@ -50,9 +50,13 @@ jobs:
           java-version: 11
 
       - name: macos and tvos tests
+        id: gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
+
+      - name: "Add build scan URL"
+        run: echo "${{ steps.gradle.outputs.build-scan-url }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload reports
         if: failure()
@@ -131,9 +135,13 @@ jobs:
           java-version: 11
 
       - name: jvmTest
+        id: gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: jvmTest --scan
+
+      - name: "Add build scan URL"
+        run: echo "${{ steps.gradle.outputs.build-scan-url }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
