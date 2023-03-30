@@ -301,7 +301,7 @@ public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>>
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, A, B>(semigroup::combine) { f(it.value).bind<B>() }.toValidated()",
+    "mapOrAccumulate<K, E, A, B>({e1, e2 -> e1 + e2}) { f(it.value).bind<B>() }.toValidated()",
     "arrow.core.mapOrAccumulate",
     "arrow.typeclasses.combine"
   )
@@ -315,9 +315,8 @@ public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, A, B>(semigroup::combine) { f(it.value).bind<B>() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<K, E, A, B>({e1, e2 -> e1 + e2}) { f(it.value).bind<B>() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 public inline fun <K, E, A, B> Map<K, A>.traverse(
@@ -354,7 +353,7 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, Validated<E, A>, A>(semigroup::combine) { it.value.bind<A>() }.toValidated()",
+    "mapOrAccumulate<K, E, Validated<E, A>, A>({e1, e2 -> e1 + e2}) { it.value.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate",
     "arrow.typeclasses.combine"
   )
@@ -365,7 +364,7 @@ public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigr
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate<K, E, Validated<E, A>, A>(semigroup::combine) { it.value.bind<A>() }.toValidated()",
+    "mapOrAccumulate<K, E, Validated<E, A>, A>({e1, e2 -> e1 + e2}) { it.value.bind<A>() }.toValidated()",
     "arrow.core.mapOrAccumulate",
     "arrow.typeclasses.combine"
   )
@@ -507,7 +506,7 @@ public fun <K, A> Map<K, A>.salign(other: Map<K, A>, combine: (A, A) -> A): Map<
 
 @Deprecated(
   "${SemigroupDeprecation}\n use align instead",
-  ReplaceWith("salign(other, SG::combine)", "arrow.typeclasses.combine")
+  ReplaceWith("salign(other){a1, a2 -> a1 + a2}")
 )
 public fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> =
   salign(other, SG::combine)
@@ -657,16 +656,15 @@ public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map
   if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
   else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(a, it) } ?: a) }
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b, SG::combine)", "arrow.typeclasses.combine"))
+@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b){a1, a2 -> a1 + a2}"))
 public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
   combine(b, SG::combine)
 
 @Deprecated(
   "Use fold & Map.combine instead.\n$NicheAPI",
   ReplaceWith(
-    "fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }",
-    "arrow.core.combine",
-    "arrow.typeclasses.combine"
+    "fold(emptyMap()) { acc, map -> acc.combine(map){a1, a2 -> a1 + a2} }",
+    "arrow.core.combine"
   )
 )
 public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =

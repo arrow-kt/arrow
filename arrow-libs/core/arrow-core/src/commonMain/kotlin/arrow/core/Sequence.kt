@@ -426,7 +426,7 @@ public fun <A> Sequence<A>.fold(MA: Monoid<A>): A = MA.run {
 
 @Deprecated(
   "$MonoidDeprecation\n$NicheAPI",
-  ReplaceWith("fold(initial){ acc, a -> acc, f(a) } }", "arrow.core.sequence")
+  ReplaceWith("this.fold(initial){ acc, a -> acc + f(a) }")
 )
 public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   this@foldMap.fold(empty()) { acc, a ->
@@ -757,9 +757,8 @@ public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
 @Deprecated(
   ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
   ReplaceWith(
-    "mapOrAccumulate(semigroup::combine) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
+    "this.mapOrAccumulate<Nel<A>, Validated<E, A>, A>({e1, e2 -> e1 + e1}) { it.bind() }.toValidated()",
+    "arrow.core.mapOrAccumulate"
   )
 )
 public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
@@ -767,7 +766,7 @@ public fun <E, A> Sequence<Validated<E, A>>.sequence(semigroup: Semigroup<E>): V
 
 @Deprecated(
   "sequenceValidated is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence(semigroup).map { it.asSequence() }", "arrow.core.sequence")
+  ReplaceWith("this.mapOrAccumulate<Nel<A>, Validated<E, A>, A>({e1, e2 -> e1 + e1}) { it.bind() }.toValidated().map { it.asSequence() }", "arrow.core.mapOrAccumulate")
 )
 public fun <E, A> Sequence<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Sequence<A>> =
   sequence(semigroup).map { it.asSequence() }
