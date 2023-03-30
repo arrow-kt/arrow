@@ -136,18 +136,15 @@ import kotlin.time.TimeSource
 public class CircuitBreaker
 private constructor(
   private val state: AtomicRef<State>,
-  private val resetTimeoutNanos: Double,
+  private val resetTimeout: Duration,
   private val exponentialBackoffFactor: Double,
-  private val maxResetTimeoutNanos: Double,
+  private val maxResetTimeout: Duration,
   private val timeSource: TimeSource,
   private val onRejected: suspend () -> Unit,
   private val onClosed: suspend () -> Unit,
   private val onHalfOpen: suspend () -> Unit,
   private val onOpen: suspend () -> Unit
 ) {
-
-  private val resetTimeout: Duration = resetTimeoutNanos.nanoseconds
-  private val maxResetTimeout: Duration = maxResetTimeoutNanos.nanoseconds
 
   /** Returns the current [State], meant for debugging purposes.*/
   public suspend fun state(): State = state.get()
@@ -297,9 +294,9 @@ private constructor(
   public fun doOnRejectedTask(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      resetTimeout = resetTimeout,
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      maxResetTimeout = maxResetTimeout,
       onRejected = suspend { onRejected.invoke(); callback.invoke() },
       timeSource = timeSource,
       onClosed = onClosed,
@@ -323,9 +320,9 @@ private constructor(
   public fun doOnClosed(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      resetTimeout = resetTimeout,
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      maxResetTimeout = maxResetTimeout,
       onRejected = onRejected,
       timeSource = timeSource,
       onClosed = suspend { onClosed.invoke(); callback.invoke(); },
@@ -349,9 +346,9 @@ private constructor(
   public fun doOnHalfOpen(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      resetTimeout = resetTimeout,
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      maxResetTimeout = maxResetTimeout,
       timeSource = timeSource,
       onRejected = onRejected,
       onClosed = onClosed,
@@ -375,9 +372,9 @@ private constructor(
   public fun doOnOpen(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
       state = state,
-      resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      resetTimeout = resetTimeout,
       exponentialBackoffFactor = exponentialBackoffFactor,
-      maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
+      maxResetTimeout = maxResetTimeout,
       timeSource = timeSource,
       onRejected = onRejected,
       onClosed = onClosed,
@@ -525,17 +522,15 @@ private constructor(
     ): CircuitBreaker =
       CircuitBreaker(
         state = AtomicRef(Closed(openingStrategy)),
-        resetTimeoutNanos = resetTimeout
+        resetTimeout = resetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } }
-          .toDouble(DurationUnit.NANOSECONDS),
+          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
         exponentialBackoffFactor = exponentialBackoffFactor
           .takeIf { it > 0 }
           .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
-        maxResetTimeoutNanos = maxResetTimeout
+        maxResetTimeout = maxResetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } }
-          .toDouble(DurationUnit.NANOSECONDS),
+          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } },
         timeSource = timeSource,
         onRejected = onRejected,
         onClosed = onClosed,
