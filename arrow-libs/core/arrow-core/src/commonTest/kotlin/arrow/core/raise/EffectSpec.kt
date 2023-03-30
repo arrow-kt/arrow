@@ -608,8 +608,8 @@ class EffectSpec : StringSpec({
   }
 
   "accumulate, returns no error" {
-    checkAll(Arb.list(Arb.string())) { elements ->
-      either<NonEmptyList<Int>, List<String>> {
+    checkAll(Arb.list(Arb.int())) { elements ->
+      either<NonEmptyList<Int>, List<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
     }
@@ -624,8 +624,8 @@ class EffectSpec : StringSpec({
   }
 
   "NonEmptyList - mapOrAccumulate, returns no error" {
-    checkAll(Arb.nonEmptyList(Arb.string())) { elements ->
-      either<NonEmptyList<Int>, NonEmptyList<String>> {
+    checkAll(Arb.nonEmptyList(Arb.int())) { elements ->
+      either<NonEmptyList<Int>, NonEmptyList<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
     }
@@ -640,15 +640,15 @@ class EffectSpec : StringSpec({
   }
 
   "NonEmptySet - mapOrAccumulate, returns no error" {
-    checkAll(Arb.nonEmptySet(Arb.string())) { elements ->
-      either<NonEmptyList<Int>, NonEmptySet<String>> {
+    checkAll(Arb.nonEmptySet(Arb.int())) { elements ->
+      either<NonEmptyList<Int>, NonEmptySet<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
     }
   }
 
   "bindAll fails on first error" {
-    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
       either {
         eithers.bindAll()
@@ -659,11 +659,11 @@ class EffectSpec : StringSpec({
   fun <E, A> Either<E, A>.leftOrNull(): E? = fold(::identity) { null }
 
   "accumulate - bindAll" {
-    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
-      either<NonEmptyList<String>, List<Int>> {
+      either<NonEmptyList<Int>, List<Int>> {
         zipOrAccumulate(
           { eithers.bindAll() },
           { emptyList<Int>() }
@@ -673,7 +673,7 @@ class EffectSpec : StringSpec({
   }
 
   "NonEmptyList - bindAll fails on first error" {
-    checkAll(Arb.nonEmptyList(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
       either {
         eithers.bindAll()
@@ -682,11 +682,11 @@ class EffectSpec : StringSpec({
   }
 
   "NonEmptyList - bindAll accumulate errors" {
-    checkAll(Arb.nonEmptyList(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
-      either<NonEmptyList<String>, NonEmptyList<Int>> {
+      either<NonEmptyList<Int>, NonEmptyList<Int>> {
         zipOrAccumulate(
           { eithers.bindAll() },
           { emptyList<Int>() }
@@ -696,7 +696,7 @@ class EffectSpec : StringSpec({
   }
 
   "NonEmptySet - bindAll fails on first error" {
-    checkAll(Arb.nonEmptySet(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
       either {
         eithers.bindAll()
@@ -705,11 +705,11 @@ class EffectSpec : StringSpec({
   }
 
   "NonEmptySet - bindAll accumulate errors" {
-    checkAll(Arb.nonEmptySet(Arb.either(Arb.string(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
 
-      either<NonEmptyList<String>, NonEmptySet<Int>> {
+      either<NonEmptyList<Int>, NonEmptySet<Int>> {
         zipOrAccumulate(
           { eithers.bindAll() },
           { emptySet<Int>() }

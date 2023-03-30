@@ -126,7 +126,7 @@ class NonEmptyListTest : StringSpec({
     }
 
     "unzip with split function" {
-      checkAll(Arb.nonEmptyList(Arb.pair(Arb.int(), Arb.string()))) { nel ->
+      checkAll(Arb.nonEmptyList(Arb.pair(Arb.int(), Arb.int()))) { nel ->
         val unzipped = nel.unzip(::identity)
 
         unzipped.first shouldBe nel.map { it.first }

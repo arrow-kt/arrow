@@ -25,8 +25,6 @@ fun generateOptionalDsl(ele: ADT, optic: DataClassDsl): Snippet {
 fun generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet {
   val (className, import) = resolveClassName(ele)
   return Snippet(
-fun generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet =
-  Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
     content = processPrismSyntax(ele, isoOptic, className),
