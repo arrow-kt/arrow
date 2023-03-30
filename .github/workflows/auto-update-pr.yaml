@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: docker://chinthakagodawita/autoupdate-action:v1
         env:
-          GITHUB_TOKEN: "${{ secrets.TOKEN_GITHUB_ACTION }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           PR_FILTER: "ready_for_review"
           EXCLUDED_LABELS: "Skip Auto Update PRs"
           MERGE_MSG: "Branch was auto-updated."
