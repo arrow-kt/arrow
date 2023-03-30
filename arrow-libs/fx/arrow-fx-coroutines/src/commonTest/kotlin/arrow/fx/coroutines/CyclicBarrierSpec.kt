@@ -32,7 +32,7 @@ class CyclicBarrierSpec : StringSpec({
   "awaiting all in parallel resumes all coroutines" {
     checkAll(Arb.int(1, 100)) { i ->
       val barrier = CyclicBarrier(i)
-      (0 until i).parTraverse { barrier.await() }
+      (0 until i).parMap { barrier.await() }
     }
   }
   

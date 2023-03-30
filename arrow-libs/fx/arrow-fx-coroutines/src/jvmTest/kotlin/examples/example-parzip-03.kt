@@ -1,0 +1,17 @@
+// This file was automatically generated from ParZip.kt by Knit tool. Do not edit.
+package arrow.fx.coroutines.examples.exampleParzip03
+
+import arrow.fx.coroutines.*
+
+suspend fun main(): Unit {
+  //sampleStart
+  val result = parZip(
+    { "First one is on ${Thread.currentThread().name}" },
+    { "Second one is on ${Thread.currentThread().name}" },
+    { "Third one is on ${Thread.currentThread().name}" }
+  ) { a, b, c ->
+      "$a\n$b\n$c"
+    }
+  //sampleEnd
+ println(result)
+}

@@ -38,13 +38,6 @@ class LensTest : StringSpec({
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
-      ),
-
-      SetterLaws(
-        setter = Lens.token(),
-        aGen = Arb.token(),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
       )
     )
 

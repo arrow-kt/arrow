@@ -11,7 +11,6 @@ import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -43,8 +42,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
 
   public fun reverseGet(focus: B): T
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrNull(source)?.let(map) ?: M.empty()
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    getOrNull(source)?.let(map) ?: initial
 
   /**
    * Modify the focus of a [PPrism] with a function

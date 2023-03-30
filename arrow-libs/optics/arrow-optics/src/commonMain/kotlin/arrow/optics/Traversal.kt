@@ -10,7 +10,6 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.identity
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -35,7 +34,8 @@ public interface PTraversal<S, T, A, B> {
   /**
    * Map each target to a type R and use a Monoid to fold the results
    */
-  public fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
+  public fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R
+
 
   /**
    * Modify polymorphically the focus of a [PTraversal] with a function [map].
@@ -59,15 +59,19 @@ public interface PTraversal<S, T, A, B> {
    */
   public fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> =
     object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
-      override fun <R> foldMap(M: Monoid<R>, source: Either<S, U>, map: (A) -> R): R =
-        source.fold(
-          { a -> this@PTraversal.foldMap(M, a, map) },
-          { u -> other.foldMap(M, u, map) }
-        )
+      override fun <R> foldMap(
+        initial: R,
+        combine: (R, R) -> R,
+        source: Either<S, U>,
+        map: (focus: A) -> R
+      ): R = source.fold(
+        { a -> this@PTraversal.foldMap(initial, combine, a, map) },
+        { u -> other.foldMap(initial, combine, u, map) }
+      )
 
       override fun modify(source: Either<S, U>, map: (focus: A) -> B): Either<T, V> =
         source.fold(
-          { a -> Either.Left(this.modify(a, map)) },
+          { a -> Either.Left(this@PTraversal.modify(a, map)) },
           { u -> Either.Right(other.modify(u, map)) }
         )
     }
@@ -77,11 +81,11 @@ public interface PTraversal<S, T, A, B> {
    */
   public infix fun <C, D> compose(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     object : PTraversal<S, T, C, D> {
-      override fun <R> foldMap(M: Monoid<R>, source: S, map: (C) -> R): R =
-        this@PTraversal.foldMap(M, source) { c -> other.foldMap(M, c, map) }
+      override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: C) -> R): R =
+        this@PTraversal.foldMap(initial, combine, source) { c -> other.foldMap(initial, combine, c, map) }
 
       override fun modify(source: S, map: (focus: C) -> D): T =
-        this.modify(source) { b -> other.modify(b, map) }
+        this@PTraversal.modify(source) { b -> other.modify(b, map) }
     }
 
   public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
@@ -91,25 +95,25 @@ public interface PTraversal<S, T, A, B> {
    * Calculate the number of targets
    */
   public fun size(source: S): Int =
-    foldMap(Monoid.int(), source) { 1 }
+    foldMap(0, Int::plus, source) { 1 }
 
   /**
    * Check if all targets satisfy the predicate
    */
   public fun all(source: S, predicate: (focus: A) -> Boolean): Boolean =
-    foldMap(Monoid.boolean(), source, predicate)
+    foldMap(true, Boolean::and, source, predicate)
 
   /**
    * Returns `true` if at least one focus matches the given [predicate].
    */
   public fun any(source: S, predicate: (focus: A) -> Boolean): Boolean =
-    foldMap(Monoid.booleanOr(), source, predicate)
+    foldMap(false, Boolean::or, source, predicate)
 
   /**
    * Check if there is no target
    */
   public fun isEmpty(source: S): Boolean =
-    foldMap(Monoid.boolean(), source) { false }
+    foldMap(true, { _, _ -> false }, source) { false }
 
   /**
    * Check if there is at least one target
@@ -120,75 +124,44 @@ public interface PTraversal<S, T, A, B> {
   /**
    * Get the first target or null
    */
-  @Suppress("UNCHECKED_CAST")
-  public fun firstOrNull(source: S): A? {
-    val fold = ::fold as (Monoid<Any?>, S) -> Any?
-    val res = fold(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun append(a: Any?, b: Any?): Any? =
-        if (a === EMPTY_VALUE) b else a
-    }, source)
-    return EMPTY_VALUE.unbox(res)
-  }
+  public fun firstOrNull(source: S): A? =
+    EMPTY_VALUE.unbox(foldMap(EMPTY_VALUE, { x, y -> if (x === EMPTY_VALUE) y else x }, source, ::identity))
 
   /**
    * Get the last target or null
    */
-  @Suppress("UNCHECKED_CAST")
-  public fun lastOrNull(source: S): A? {
-    val fold = ::fold as (Monoid<Any?>, S) -> Any?
-    val res = fold(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun append(a: Any?, b: Any?): Any? =
-        if (b !== EMPTY_VALUE) b else a
-    }, source)
-    return EMPTY_VALUE.unbox(res)
-  }
+  public fun lastOrNull(source: S): A? =
+    EMPTY_VALUE.unbox(foldMap(EMPTY_VALUE, { x, y -> if (y != EMPTY_VALUE) y else x }, source, ::identity))
 
   /**
-   * Fold using the given [Monoid] instance.
+   * Fold using the given [initial] value and [combine] function.
    */
-  public fun fold(M: Monoid<@UnsafeVariance A>, source: S): A =
-    foldMap(M, source, ::identity)
-
-  /**
-   * Alias for fold.
-   */
-  @Deprecated("use fold instead", ReplaceWith("fold(M, source)"))
-  public fun combineAll(M: Monoid<@UnsafeVariance A>, source: S): A =
-    fold(M, source)
+  public fun fold(initial: A, combine: (A, A) -> A, source: S): A =
+    foldMap(initial, combine, source, ::identity)
 
   /**
    * Get all targets of the [Traversal]
    */
   public fun getAll(source: S): List<A> =
-    foldMap(Monoid.list(), source, ::listOf)
+    foldMap(emptyList(), { x, y -> x + y }, source) { listOf(it) }
 
   /**
    * Find the first element matching the predicate, if one exists.
    */
-  public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? {
-    val res = foldMap(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun append(a: Any?, b: Any?): Any? =
-        if (a === EMPTY_VALUE) b else a
-    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
-    return EMPTY_VALUE.unbox(res)
-  }
+  public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? =
+    EMPTY_VALUE.unbox(
+      foldMap(EMPTY_VALUE, { x, y -> if (x == EMPTY_VALUE) y else x }, source) { focus ->
+        if (predicate(focus)) focus else EMPTY_VALUE
+      }
+    )
 
   /**
    * Check whether at least one element satisfies the predicate.
    *
    * If there are no elements, the result is false.
    */
-  public fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean {
-    val res = foldMap(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun append(a: Any?, b: Any?): Any? =
-        if (a === EMPTY_VALUE) b else a
-    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
-    return res !== EMPTY_VALUE
-  }
+  public fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean =
+    any(source, predicate)
 
   public companion object {
 
@@ -196,16 +169,16 @@ public interface PTraversal<S, T, A, B> {
 
     public fun <S> codiagonal(): Traversal<Either<S, S>, S> =
       object : Traversal<Either<S, S>, S> {
-        override fun <R> foldMap(M: Monoid<R>, source: Either<S, S>, map: (focus: S) -> R): R =
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: Either<S, S>, map: (focus: S) -> R): R =
           source.fold(
             { a -> map(a) },
             { u -> map(u) }
           )
 
         override fun modify(source: Either<S, S>, map: (focus: S) -> S): Either<S, S> =
-          source.bimap(map, map)
+          source.map(map).mapLeft(map)
       }
-      // Traversal { s, f -> s.mapLeft(f).map(f) }
+    // Traversal { s, f -> s.mapLeft(f).map(f) }
 
     /**
      * [PTraversal] that points to nothing
@@ -222,10 +195,11 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s))))
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), s)
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(f(get1(s)), f(get2(s)))
+
+        override fun modify(s: S, transform: (focus: A) -> B): T =
+          set(transform(get1(s)), transform(get2(s)), s)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -235,8 +209,9 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(combine(f(get1(s)), f(get2(s))), f(get3(s)))
+
         override fun modify(s: S, f: (focus: A) -> B): T =
           set(f(get1(s)), f(get2(s)), f(get3(s)), s)
       }
@@ -249,8 +224,9 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get4(s)))
+
         override fun modify(s: S, f: (focus: A) -> B): T =
           set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), s)
       }
@@ -264,8 +240,9 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s)))
+
         override fun modify(s: S, f: (focus: A) -> B): T =
           set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), s)
       }
@@ -280,8 +257,9 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))), f(get6(s)))
+
         override fun modify(s: S, f: (focus: A) -> B): T =
           set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), s)
       }
@@ -297,8 +275,12 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(
+            combine(combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))), f(get6(s))),
+            f(get7(s))
+          )
+
         override fun modify(s: S, f: (focus: A) -> B): T =
           set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), s)
       }
@@ -315,8 +297,16 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(
+            combine(
+              combine(
+                combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))),
+                f(get6(s))
+              ), f(get7(s))
+            ), f(get8(s))
+          )
+
         override fun modify(s: S, f: (focus: A) -> B): T =
           set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), s)
       }
@@ -334,10 +324,31 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(
+            combine(
+              combine(
+                combine(
+                  combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))),
+                  f(get6(s))
+                ), f(get7(s))
+              ), f(get8(s))
+            ), f(get9(s))
+          )
+
         override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), s)
+          set(
+            f(get1(s)),
+            f(get2(s)),
+            f(get3(s)),
+            f(get4(s)),
+            f(get5(s)),
+            f(get6(s)),
+            f(get7(s)),
+            f(get8(s)),
+            f(get9(s)),
+            s
+          )
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -354,10 +365,36 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(M: Monoid<R>, s: S, f: (focus: A) -> R): R =
-          M.fold(listOf(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s))))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+          combine(
+            combine(
+              combine(
+                combine(
+                  combine(
+                    combine(
+                      combine(combine(f(get1(s)), f(get2(s))), f(get3(s))),
+                      f(get5(s))
+                    ), f(get6(s))
+                  ), f(get7(s))
+                ), f(get8(s))
+              ), f(get9(s))
+            ), f(get10(s))
+          )
+
         override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), f(get9(s)), f(get10(s)), s)
+          set(
+            f(get1(s)),
+            f(get2(s)),
+            f(get3(s)),
+            f(get4(s)),
+            f(get5(s)),
+            f(get6(s)),
+            f(get7(s)),
+            f(get8(s)),
+            f(get9(s)),
+            f(get10(s)),
+            s
+          )
       }
 
     /**

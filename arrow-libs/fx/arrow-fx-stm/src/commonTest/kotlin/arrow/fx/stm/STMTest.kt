@@ -1,6 +1,6 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.parTraverse
+import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely
 import io.kotest.assertions.throwables.shouldThrow
@@ -246,7 +246,7 @@ class STMTest : StringSpec({
         parZip(
           {
             // producers
-            (0..4).parTraverse {
+            (0..4).parMap {
               for (i in (it * 20 + 1)..(it * 20 + 20)) {
                 atomically { tq.write(i) }
               }

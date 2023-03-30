@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
-@file:Suppress("DEPRECATION")
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 
@@ -8,9 +7,6 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.Validated
-import arrow.core.ValidatedDeprMsg
-import arrow.core.continuations.EffectScope
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
@@ -93,7 +89,6 @@ public annotation class RaiseDSL
  * import arrow.core.raise.effect
  * import arrow.core.raise.ior
  * import arrow.core.raise.toEither
- * import arrow.typeclasses.Semigroup
  * import io.kotest.matchers.shouldBe
  *
  * fun Raise<String>.failure(): Int = raise("failed")

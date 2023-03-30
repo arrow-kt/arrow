@@ -2,18 +2,8 @@
 
 package arrow.core
 
-import arrow.typeclasses.SemigroupDeprecation
-import kotlin.experimental.ExperimentalTypeInference
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import kotlin.collections.flatMap as _flatMap
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.either
 import arrow.core.raise.fold
-import arrow.core.raise.nullable
-import arrow.core.raise.option
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
@@ -263,72 +253,6 @@ public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K
     }
   }
 
-@Deprecated(
-  "Traverse for Either is being deprecated in favor of Either DSL + Map.mapValues.\n$NicheAPI",
-  ReplaceWith(
-    "let<Map<K, A>, Either<E, Map<K, B>>> { m -> either<E, Map<K, B>> { m.mapValues<K, A, B> { (_, a) -> f(a).bind<B>() } } }",
-    "arrow.core.raise.either"
-  )
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <K, E, A, B> Map<K, A>.traverse(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
-  let { m -> either { m.mapValues { (_, a) -> f(a).bind() } } }
-
-@Deprecated(
-  "Traverse for Either is being deprecated in favor of Either DSL + Map.mapValues.\n$NicheAPI",
-  ReplaceWith(
-    "let<Map<K, A>, Either<E, Map<K, B>>> { m -> either<E, Map<K, B>> { m.mapValues<K, A, B> { (_, a) -> f(a).bind<B>() } } }",
-    "arrow.core.raise.either"
-  )
-)
-public inline fun <K, E, A, B> Map<K, A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Map<K, B>> =
-  let { m -> either { m.mapValues { (_, a) -> f(a).bind() } } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the either DSL.",
-  ReplaceWith("let<Map<K, Either<E, A>>, Either<E, Map<K, A>>> { m -> either<E, Map<K, A>> { m.bindAll<K, A>() } }", "arrow.core.raise.either")
-)
-public fun <K, E, A> Map<K, Either<E, A>>.sequence(): Either<E, Map<K, A>> =
-  let { m -> either { m.bindAll() } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the either DSL.",
-  ReplaceWith(
-    "let<Map<K, Either<E, A>>, Either<E, Map<K, A>>> { m -> either<E, Map<K, A>> { m.bindAll<K, A>() } }",
-    "arrow.core.raise.either"
-  )
-)
-public fun <K, E, A> Map<K, Either<E, A>>.sequenceEither(): Either<E, Map<K, A>> =
-  let { m -> either { m.bindAll() } }
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<K, E, A, B>({e1, e2 -> e1 + e2}) { f(it.value).bind<B>() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
-  )
-)
-public inline fun <K, E, A, B> Map<K, A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> =
-  mapOrAccumulate(semigroup::combine) { f(it.value).bind() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "this.mapOrAccumulate<K, E, A, B>({e1, e2 -> e1 + e2}) { f(it.value).bind<B>() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public inline fun <K, E, A, B> Map<K, A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, Map<K, B>> =
-  mapOrAccumulate(semigroup::combine) { f(it.value).bind() }.toValidated()
-
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
   @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
@@ -354,77 +278,6 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<K, E, Validated<E, A>, A>({e1, e2 -> e1 + e2}) { it.value.bind<A>() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
-  )
-)
-public fun <K, E, A> Map<K, Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  sequence(semigroup)
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<K, E, Validated<E, A>, A>({e1, e2 -> e1 + e2}) { it.value.bind<A>() }.toValidated()",
-    "arrow.core.mapOrAccumulate",
-    "arrow.typeclasses.combine"
-  )
-)
-public fun <K, E, A> Map<K, Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, Map<K, A>> =
-  mapOrAccumulate(semigroup::combine) { it.value.bind() }.toValidated()
-
-@Deprecated(
-  "Traverse for Option is being deprecated in favor of Option DSL + Map.mapValues.\n$NicheAPI",
-  ReplaceWith(
-    "let<Map<K, A>, Option<Map<K, B>>> { m -> option<Map<K, B>> { m.mapValues<K, A, B> { (_, a) -> f(a).bind<B>() } } }",
-    "arrow.core.raise.option"
-  )
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <K, A, B> Map<K, A>.traverse(f: (A) -> Option<B>): Option<Map<K, B>> =
-  let { m -> option { m.mapValues { (_, a) -> f(a).bind() } } }
-
-@Deprecated(
-  "Traverse for Option is being deprecated in favor of Option DSL + Map.mapValues.\n$NicheAPI",
-  ReplaceWith(
-    "let<Map<K, A>, Option<Map<K, B>>> { m -> option<Map<K, B>> { m.mapValues<K, A, B> { (_, a) -> f(a).bind<B>() } } }",
-    "arrow.core.raise.option"
-  )
-)
-public inline fun <K, A, B> Map<K, A>.traverseOption(f: (A) -> Option<B>): Option<Map<K, B>> =
-  let { m -> option { m.mapValues { (_, a) -> f(a).bind() } } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the option DSL.",
-  ReplaceWith(
-    "let<Map<K, Option<V>>, Option<Map<K, V>>> { m -> option<Map<K, V>> { m.bindAll<K, V>() } }",
-    "arrow.core.raise.option"
-  )
-)
-public fun <K, V> Map<K, Option<V>>.sequenceOption(): Option<Map<K, V>> =
-  let { m -> option { m.bindAll() } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the option DSL.",
-  ReplaceWith(
-    "let<Map<K, Option<V>>, Option<Map<K, V>>> { m -> option<Map<K, V>> { m.bindAll<K, V>() } }",
-    "arrow.core.raise.option"
-  )
-)
-public fun <K, V> Map<K, Option<V>>.sequence(): Option<Map<K, V>> =
-  let { m -> option { m.bindAll() } }
-
-@Deprecated(
-  "Void is being deprecated in favor of simple Map.mapValues.\n$NicheAPI",
-  ReplaceWith("this.mapValues { }")
-)
-public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
-  mapValues { }
-
 public fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
 
@@ -434,13 +287,6 @@ public fun <K, A, B> Map<K, A>.mapNotNull(transform: (Map.Entry<K, A>) -> B?): M
       transform(entry)?.let { put(entry.key, it) }
     }
   }
-
-@Deprecated(
-  "filterMap is being deprecated in favor of mapNotNull to align with Kotlin Std naming.",
-  ReplaceWith("mapNotNull { (_, a) -> f(a) }", "arrow.core.mapNotNull")
-)
-public fun <K, A, B> Map<K, A>.filterMap(f: (A) -> B?): Map<K, B> =
-  mapNotNull { (_, a) -> f(a) }
 
 public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> =
   buildMap {
@@ -508,13 +354,6 @@ private class Entry<K, V>(override val key: K, override val value: V) : Map.Entr
 public fun <K, A> Map<K, A>.salign(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
   padZip(other, { _, a -> a }, { _, b -> b }) { _, a, b -> combine(a, b) }
 
-@Deprecated(
-  "${SemigroupDeprecation}\n use align instead",
-  ReplaceWith("salign(other){a1, a2 -> a1 + a2}")
-)
-public fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> =
-  salign(other, SG::combine)
-
 /**
  * Align two structures as in zip, but filling in blanks with null.
  */
@@ -524,6 +363,7 @@ public fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
 public fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K, C> =
   padZip(other, { k, a -> fa(k, a, null) }, { k, b -> fa(k, null, b) }) { k, a, b -> fa(k, a, b) }
 
+@Suppress("UNCHECKED_CAST")
 public inline fun <K, A, B, C> Map<K, A>.padZip(
   other: Map<K, B>,
   left: (K, A) -> C,
@@ -660,33 +500,8 @@ public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map
   if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
   else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(a, it) } ?: a) }
 
-@Deprecated(SemigroupDeprecation, ReplaceWith("combine(b){a1, a2 -> a1 + a2}"))
-public fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> =
-  combine(b, SG::combine)
-
-@Deprecated(
-  "Use fold & Map.combine instead.\n$NicheAPI",
-  ReplaceWith(
-    "fold(emptyMap()) { acc, map -> acc.combine(map){a1, a2 -> a1 + a2} }",
-    "arrow.core.combine"
-  )
-)
-public fun <K, A> Iterable<Map<K, A>>.combineAll(SG: Semigroup<A>): Map<K, A> =
-  fold(emptyMap()) { acc, map -> acc.combine(map, SG::combine) }
-
 public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
   var accumulator = initial
   forEach { accumulator = operation(accumulator, it) }
   return accumulator
 }
-
-@Deprecated("Use fold instead foldLeft", ReplaceWith("fold<K, A, B>(b, f)"))
-public inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B =
-  fold(b, f)
-
-@Deprecated("Internal method will be removed from binary in 2.0.0")
-internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
-  when (this) {
-    null -> emptyList()
-    else -> listOf(this)
-  }

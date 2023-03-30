@@ -2,7 +2,6 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Ior
-import arrow.typeclasses.Semigroup
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

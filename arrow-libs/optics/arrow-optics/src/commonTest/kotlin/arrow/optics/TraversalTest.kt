@@ -22,13 +22,6 @@ class TraversalTest : StringSpec({
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
-      ),
-
-      SetterLaws(
-        setter = Traversal.list(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 

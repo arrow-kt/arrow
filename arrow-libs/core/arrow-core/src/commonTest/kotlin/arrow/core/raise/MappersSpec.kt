@@ -45,14 +45,12 @@ class MappersSpec : StringSpec({
 
   "effect - getOrNull" {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
-      effect { a.bind() }.orNull() shouldBe a.getOrNull()
       effect { a.bind() }.getOrNull() shouldBe a.getOrNull()
     }
   }
 
   "eagerEffect - getOrNull" {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
-      eagerEffect { a.bind() }.orNull() shouldBe a.getOrNull()
       eagerEffect { a.bind() }.getOrNull() shouldBe a.getOrNull()
     }
   }

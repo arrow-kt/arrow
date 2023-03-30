@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.ior
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
@@ -25,73 +24,6 @@ class IorTest : StringSpec({
       a.combine(b, String::plus, Int::plus)
     }, ARB)
   )
-
-    val nullableLongSemigroup =
-      Semigroup<Long?> { a, b -> Nullable.zip(a, b) { aa, bb -> aa + bb } }
-
-  "zip identity" {
-    checkAll(Arb.ior(Arb.long().orNull(), Arb.int().orNull())) { ior ->
-      val res = ior.zip(nullableLongSemigroup, Ior.Right(Unit)) { a, _ -> a }
-      res shouldBe ior
-    }
-  }
-
-  "zip is derived from flatMap" {
-    checkAll(
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull()),
-      Arb.ior(Arb.long().orNull(), Arb.int().orNull())
-    ) { a, b, c, d, e, f, g, h, i, j ->
-      val res = a.zip(
-        nullableLongSemigroup,
-        b, c, d, e, f, g, h, i, j
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        Nullable.zip(
-          a,
-          b,
-          c,
-          d,
-          e,
-          f,
-          g,
-          h,
-          i,
-          j
-        ) { a, b, c, d, e, f, g, h, i, j -> a + b + c + d + e + f + g + h + i + j }
-      }
-
-      val expected = listOf(a, b, c, d, e, f, g, h, i, j)
-        .fold<Ior<Long?, Int?>, Ior<Long?, Int?>>(Ior.Right(0)) { acc, ior ->
-          val mid = acc.flatMap(nullableLongSemigroup) { a -> ior.map { b -> Nullable.zip(a, b) { a, b -> a + b } } }
-          mid
-        }
-
-      res shouldBe expected
-    }
-  }
-
-  "zip should combine left values in correct order" {
-    Ior.Both("fail1", -1).zip(
-      Semigroup.string(),
-      Ior.Left("fail2"),
-      Ior.Right(-1)
-    ) { _, _, _ -> "success!" } shouldBe Ior.Left("fail1fail2")
-  }
-
-  "bimap() should allow modify both value" {
-    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-      Ior.Right(b).bimap({ "5" }, { a * 2 }) shouldBe Ior.Right(a * 2)
-      Ior.Left(a).bimap({ a * 3 }, { "5" }) shouldBe Ior.Left(a * 3)
-      Ior.Both(a, b).bimap({ 2 }, { "power of $it" }) shouldBe Ior.Both(2, "power of $b")
-    }
-  }
 
   "map() should just right side of an Ior" {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
@@ -130,27 +62,11 @@ class IorTest : StringSpec({
     }
   }
 
-  "padNull() should return the correct Pair of nullables" {
-    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-      Ior.Left(a).padNull() shouldBe Pair(a, null)
-      Ior.Right(b).padNull() shouldBe Pair(null, b)
-      Ior.Both(a, b).padNull() shouldBe Pair(a, b)
-    }
-  }
-
   "toEither() should convert values into a valid Either" {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Left(a).toEither() shouldBe Either.Left(a)
       Ior.Right(b).toEither() shouldBe Either.Right(b)
       Ior.Both(a, b).toEither() shouldBe Either.Right(b)
-    }
-  }
-
-  "orNull() should convert right values into a nullable" {
-    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-      Ior.Left(a).orNull() shouldBe null
-      Ior.Right(b).orNull() shouldBe b
-      Ior.Both(a, b).orNull() shouldBe b
     }
   }
 
@@ -189,36 +105,6 @@ class IorTest : StringSpec({
   "bothNel() should build a correct Ior" {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.bothNel(a, b) shouldBe Ior.Both(nonEmptyListOf(a), b)
-    }
-  }
-
-  "lift(f) should apply the input function to an Ior correctly" {
-    checkAll(Arb.string()) { a: String ->
-      val f = Ior.lift<Nothing, String, String> { s: String -> "Hello $s" }
-      f(Ior.Right(a)) shouldBe Ior.Right("Hello $a")
-    }
-  }
-
-  "lift(fa, fb) should apply the input functions to an Ior correctly" {
-    checkAll(Arb.string(), Arb.string()) { a: String, b: String ->
-      val fa = { s1: String -> "Hello $s1" }
-      val fb = { s2: String -> s2.length }
-      val f = Ior.lift(fa, fb)
-      f(Ior.Right(b)) shouldBe Ior.Right(b.length)
-      f(Ior.Left(a)) shouldBe Ior.Left("Hello $a")
-      f(Ior.Both(a, b)) shouldBe Ior.Both("Hello $a", b.length)
-    }
-  }
-
-  "foldLeft should fold an Ior correctly" {
-    checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-      val left = Ior.Left(a)
-      val right = Ior.Right(b)
-      val both = Ior.Both(a, b)
-      val f = { c: Int, b: String -> c + b.length }
-      left.foldLeft(0, f) shouldBe 0
-      right.foldLeft(0, f) shouldBe b.length
-      both.foldLeft(0, f) shouldBe b.length
     }
   }
 

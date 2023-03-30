@@ -1,7 +1,6 @@
 package arrow.optics.typeclasses
 
 import arrow.core.Either
-import arrow.core.Nullable
 import arrow.core.left
 import arrow.core.right
 import arrow.optics.Optional
@@ -69,7 +68,9 @@ public fun interface Snoc<S, A> {
       Snoc {
         object : Prism<List<A>, Pair<List<A>, A>> {
           override fun getOrModify(source: List<A>): Either<List<A>, Pair<List<A>, A>> =
-            Nullable.zip(source.dropLast(1), source.lastOrNull(), ::Pair)?.right() ?: source.left()
+            source.lastOrNull()?.let { last ->
+              Pair(source.dropLast(1), last)
+            }?.right() ?: source.left()
 
           override fun reverseGet(focus: Pair<List<A>, A>): List<A> =
             focus.first + focus.second

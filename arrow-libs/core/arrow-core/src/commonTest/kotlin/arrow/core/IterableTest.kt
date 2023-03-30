@@ -2,9 +2,7 @@ package arrow.core
 
 import arrow.core.test.either
 import arrow.core.test.ior
-import arrow.core.test.functionAToB
 import arrow.core.test.option
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -207,16 +205,16 @@ class IterableTest : StringSpec({
 
       checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).take(min(a.size, b.size)).forEach {
-          it.isBoth shouldBe true
+          it.isBoth() shouldBe true
         }
       }
 
       checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).drop(min(a.size, b.size)).forEach {
           if (a.size < b.size) {
-            it.isRight shouldBe true
+            it.isRight() shouldBe true
           } else {
-            it.isLeft shouldBe true
+            it.isLeft() shouldBe true
           }
         }
       }
@@ -287,13 +285,13 @@ class IterableTest : StringSpec({
 
     "filterOption" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { listOfOption ->
-        listOfOption.filterOption() shouldBe listOfOption.mapNotNull { it.orNull() }
+        listOfOption.filterOption() shouldBe listOfOption.mapNotNull { it.getOrNull() }
       }
     }
 
     "flattenOption" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { listOfOption ->
-        listOfOption.flattenOption() shouldBe listOfOption.mapNotNull { it.orNull() }
+        listOfOption.flattenOption() shouldBe listOfOption.mapNotNull { it.getOrNull() }
       }
     }
 
@@ -354,12 +352,6 @@ class IterableTest : StringSpec({
   "unalign(fn)" {
     checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
       xs.unalign { it } shouldBe xs.unalign()
-    }
-  }
-
-  "salign" {
-    checkAll(Arb.list(Arb.int())) { xs ->
-      xs.salign(Semigroup.int(), xs) shouldBe xs.map { it + it }
     }
   }
 

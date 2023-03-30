@@ -54,7 +54,7 @@ class OptionTest : StringSpec({
     "tap applies effects returning the original value" {
       checkAll(Arb.option(Arb.long())) { option ->
         var effect = 0
-        val res = option.tap { effect += 1 }
+        val res = option.onSome { effect += 1 }
         val expected = when (option) {
           is Some -> 1
           is None -> 0
@@ -67,7 +67,7 @@ class OptionTest : StringSpec({
     "tapNone applies effects returning the original value" {
       checkAll(Arb.option(Arb.long())) { option ->
         var effect = 0
-        val res = option.tapNone { effect += 1 }
+        val res = option.onNone { effect += 1 }
         val expected = when (option) {
           is Some -> 0
           is None -> 1
@@ -95,28 +95,14 @@ class OptionTest : StringSpec({
       none.getOrElse { "java" } shouldBe "java"
     }
 
-    "orNull" {
-      some.orNull() shouldNotBe null
-      none.orNull() shouldBe null
+    "getOrNull" {
+      some.getOrNull() shouldNotBe null
+      none.getOrNull() shouldBe null
     }
 
     "map" {
       some.map(String::uppercase) shouldBe Some("KOTLIN")
       none.map(String::uppercase) shouldBe None
-    }
-
-    "zip" {
-      checkAll(Arb.int()) { a: Int ->
-        val op: Option<Int> = a.some()
-        some.zip(op) { a, b -> a + b } shouldBe Some("kotlin$a")
-        none.zip(op) { a, b -> a + b } shouldBe None
-        some.zip(op) shouldBe Some(Pair("kotlin", a))
-      }
-    }
-
-    "mapNotNull" {
-      some.mapNotNull { it.toIntOrNull() } shouldBe None
-      some.mapNotNull { it.uppercase() } shouldBe Some("KOTLIN")
     }
 
     "fold" {
@@ -127,27 +113,6 @@ class OptionTest : StringSpec({
     "flatMap" {
       some.flatMap { Some(it.uppercase()) } shouldBe Some("KOTLIN")
       none.flatMap { Some(it.uppercase()) } shouldBe None
-    }
-
-    "align" {
-      some align some shouldBe Some(Ior.Both("kotlin", "kotlin"))
-      some align none shouldBe Some(Ior.Left("kotlin"))
-      none align some shouldBe Some(Ior.Right("kotlin"))
-      none align none shouldBe None
-
-      some.align(some) { "$it" } shouldBe Some("Ior.Both(kotlin, kotlin)")
-      some.align(none) { "$it" } shouldBe Some("Ior.Left(kotlin)")
-      none.align(some) { "$it" } shouldBe Some("Ior.Right(kotlin)")
-      none.align(none) { "$it" } shouldBe None
-
-      val nullable = null.some()
-      some align nullable shouldBe Some(Ior.Both("kotlin", null))
-      nullable align some shouldBe Some(Ior.Both(null, "kotlin"))
-      nullable align nullable shouldBe Some(Ior.Both(null, null))
-
-      some.align(nullable) { "$it" } shouldBe Some("Ior.Both(kotlin, null)")
-      nullable.align(some) { "$it" } shouldBe Some("Ior.Both(null, kotlin)")
-      nullable.align(nullable) { "$it" } shouldBe Some("Ior.Both(null, null)")
     }
 
     "filter" {
@@ -174,23 +139,6 @@ class OptionTest : StringSpec({
       val noneAny: Option<Any> = none
       noneAny.filterIsInstance<String>() shouldBe None
       noneAny.filterIsInstance<Int>() shouldBe None
-    }
-
-    "exists" {
-      some.exists { it.startsWith('k') } shouldBe true
-      some.exists { it.startsWith('j') } shouldBe false
-      none.exists { it.startsWith('k') } shouldBe false
-    }
-
-    "all" {
-      some.all { it.startsWith('k') } shouldBe true
-      some.all { it.startsWith('j') } shouldBe false
-      none.all { it.startsWith('k') } shouldBe true
-    }
-
-    "orElse" {
-      some.orElse { Some("java") } shouldBe Some("kotlin")
-      none.orElse { Some("java") } shouldBe Some("java")
     }
 
     "toList" {
@@ -302,42 +250,10 @@ class OptionTest : StringSpec({
       nullableList.elementAtOrNone(index = 3 - 1) shouldBe Some(null)
     }
 
-    "and" {
-      val x = Some(2)
-      val y = Some("Foo")
-      x and y shouldBe Some("Foo")
-      x and None shouldBe None
-      None and x shouldBe None
-      None and None shouldBe None
-    }
-
-    "or" {
-      val x = Some(2)
-      val y = Some(100)
-      x or y shouldBe Some(2)
-      x or None shouldBe Some(2)
-      None or x shouldBe Some(2)
-      None or None shouldBe None
-    }
-
     "toLeftOption" {
       1.leftIor().leftOrNull() shouldBe 1
       2.rightIor().leftOrNull() shouldBe null
       (1 to 2).bothIor().leftOrNull() shouldBe 1
-    }
-
-    "pairLeft" {
-      val some: Option<Int> = Some(2)
-      val none: Option<Int> = None
-      some.pairLeft("key") shouldBe Some("key" to 2)
-      none.pairLeft("key") shouldBe None
-    }
-
-    "pairRight" {
-      val some: Option<Int> = Some(2)
-      val none: Option<Int> = None
-      some.pairRight("right") shouldBe Some(2 to "right")
-      none.pairRight("right") shouldBe None
     }
 
     "Option<Pair<L, R>>.toMap()" {
@@ -374,14 +290,6 @@ class OptionTest : StringSpec({
       }
     }
 
-    "lift" {
-      val f: (Int) -> String = { a -> a.toString() }
-      val lifted = Option.lift(f)
-      checkAll(Arb.int()) { a: Int ->
-        lifted(Some(a)) shouldBe Some(a.toString())
-      }
-    }
-
     "isNone should return true if None and false if Some" {
       none.isNone() shouldBe true
       none.isSome() shouldBe false
@@ -390,11 +298,6 @@ class OptionTest : StringSpec({
     "isSome should return true if Some and false if None" {
       some.isSome() shouldBe true
       some.isNone() shouldBe false
-    }
-
-    "getOrNull" {
-      none.getOrNull() shouldBe null
-      some.getOrNull() shouldBe "kotlin"
     }
 
     "isSome with predicate" {
@@ -407,25 +310,6 @@ class OptionTest : StringSpec({
       checkAll(Arb.int()) { a: Int ->
         Some(Some(a)).flatten() shouldBe Some(a)
         Some(None).flatten() shouldBe None
-      }
-    }
-
-    "unzip Some values" {
-      checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
-        val op: Option<Pair<Int, String>> = Pair(a, b).toOption()
-        op.unzip() shouldBe Pair(Option(a), Option(b))
-      }
-    }
-
-    "unzip None values" {
-      val op: Option<Pair<Int, String>> = None
-      op.unzip() shouldBe Pair(None, None)
-    }
-
-    "unzip with function" {
-      val f: (Int) -> Pair<String, Long> = { c -> Pair(c.toString(), c.toLong()) }
-      checkAll(Arb.int()) { c: Int ->
-        Option(c).unzip(f) shouldBe Pair(Option(c.toString()), Option(c.toLong()))
       }
     }
 

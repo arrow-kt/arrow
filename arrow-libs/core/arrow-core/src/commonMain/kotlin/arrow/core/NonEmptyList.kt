@@ -3,15 +3,9 @@
 package arrow.core
 
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.either
-import arrow.core.raise.option
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupDeprecation
-import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
-import kotlin.jvm.JvmStatic
 
 public typealias Nel<A> = NonEmptyList<A>
 
@@ -216,10 +210,6 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
     NonEmptyList(all.align(b))
 
-  @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, {a1, a2 -> a1 + a2})"))
-  public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    padZip(b, ::identity, ::identity, SA::combine)
-
   public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
     padZip(other, { it to null }, { null to it }, { a, b -> a to b })
 
@@ -363,40 +353,6 @@ public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyL
     }
   }
 
-@Deprecated(
-  "Traverse for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
-  ReplaceWith(
-    "let<NonEmptyList<A>, Either<E, NonEmptyList<B>>> { nel -> either<E, NonEmptyList<B>> { nel.map<A, B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.either")
-)
-public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  traverse(f)
-
-@Deprecated(
-  "Traverse for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
-  ReplaceWith(
-    "let<NonEmptyList<A>, Either<E, NonEmptyList<B>>> { nel -> either<E, NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.either")
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> NonEmptyList<A>.traverse(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
-  let { nel -> either { nel.map { f(it).bind() } } }
-
-@Deprecated(
-  "Sequence for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
-  ReplaceWith("either<E, NonEmptyList<A>> { this.map<A> { it.bind<A>() } }", "arrow.core.raise.either")
-)
-public fun <E, A> NonEmptyList<Either<E, A>>.sequenceEither(): Either<E, NonEmptyList<A>> =
-  sequence()
-
-@Deprecated(
-  "Sequence for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
-  ReplaceWith("either<E, NonEmptyList<A>> { this.map<A> { it.bind<A>() } }", "arrow.core.raise.either")
-)
-public fun <E, A> NonEmptyList<Either<E, A>>.sequence(): Either<E, NonEmptyList<A>> =
-  traverse(::identity)
-
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   combine: (E, E) -> E,
   @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
@@ -407,26 +363,6 @@ public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
 ): Either<NonEmptyList<E>, NonEmptyList<B>> =
   all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
-
-@Deprecated(
-  "Traverse for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
-  ReplaceWith(
-    "let<NonEmptyList<A>, Option<NonEmptyList<B>>> { nel -> option<NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.option")
-)
-public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
-  traverse(f)
-
-@Deprecated(
-  "Traverse for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
-  ReplaceWith(
-    "let<NonEmptyList<A>, Option<NonEmptyList<B>>> { nel -> option<NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.option")
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
-  let { nel -> option { nel.map { f(it).bind() } } }
 
 @JvmName("toNonEmptyListOrNull")
 public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =

@@ -309,7 +309,7 @@ public interface ResourceScope {
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A {
     val a = bind()
-    return install({ a }) { a, _ -> release(a) }
+    return install({ a }) { aa, _ -> release(aa) }
   }
   
   /** Composes a [releaseCase] action to a [Resource] value before binding. */
@@ -477,7 +477,9 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
       is ExitCase.Cancelled -> e.exception
       is ExitCase.Failure -> e.failure
     }
-    Platform.composeErrors(original, suppressed)?.let { throw it }
+    original?.apply {
+      suppressed?.let(::addSuppressed)
+    }?.let { throw it }
   }
   return Pair(allocated, release)
 }
@@ -500,7 +502,9 @@ private value class ResourceScopeImpl(
       if (ex != ExitCase.Completed) {
         val e = cancelAll(ex)
         val e2 = kotlin.runCatching { release(a, ex) }.exceptionOrNull()
-        Platform.composeErrors(e, e2)?.let { throw it }
+        e?.apply {
+          e2?.let(::addSuppressed)
+        }?.let { throw it }
       }
     })
   

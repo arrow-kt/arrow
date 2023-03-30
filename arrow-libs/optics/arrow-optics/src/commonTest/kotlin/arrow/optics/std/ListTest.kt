@@ -25,12 +25,6 @@ class ListTest : StringSpec({
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
-      ),
-      SetterLaws(
-        setter = Optional.listHead(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -41,16 +35,6 @@ class ListTest : StringSpec({
         aGen = Arb.list(Arb.int()),
         bGen = Arb.list(Arb.int()),
         funcGen = Arb.functionAToB(Arb.list(Arb.int())),
-      )
-    )
-
-    testLaws(
-      "Iso list to Option Nel - ",
-      IsoLaws(
-        iso = Iso.listToOptionNel(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.option(Arb.nonEmptyList(Arb.int())),
-        funcGen = Arb.functionAToB(Arb.option(Arb.nonEmptyList(Arb.int()))),
       )
     )
 

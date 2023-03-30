@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.identity
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -17,18 +16,6 @@ public fun <Error, A> EagerEffect<Error, A>.toEither(): Either<Error, A> = eithe
 /** Run the [Effect] by returning [Ior.Right] of [A], or [Ior.Left] of [Error]. */
 public suspend fun <Error, A> Effect<Error, A>.toIor(): Ior<Error, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
 public fun <Error, A> EagerEffect<Error, A>.toIor(): Ior<Error, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
-
-@Deprecated(
-  "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
-  ReplaceWith("getOrNull()", "arrow.core.raise.getOrNull")
-)
-public suspend fun <Error, A> Effect<Error, A>.orNull(): A? = getOrElse { null }
-
-@Deprecated(
-  "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
-  ReplaceWith("getOrNull()", "arrow.core.raise.getOrNull")
-)
-public fun <Error, A> EagerEffect<Error, A>.orNull(): A? = getOrElse { null }
 
 /** Run the [Effect] by returning [A], or `null` if raised with [Error]. */
 public suspend fun <Error, A> Effect<Error, A>.getOrNull(): A? = getOrElse { null }

@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.identity
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -37,7 +36,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
   override fun getOrModify(source: S): Either<T, A> =
     Either.Right(get(source))
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**

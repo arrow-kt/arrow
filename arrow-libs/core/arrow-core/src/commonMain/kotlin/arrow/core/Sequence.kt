@@ -9,13 +9,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.fold
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidDeprecation
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupDeprecation
-import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmName
 
 /** Adds [kotlin.sequences.zip] support for 3 parameters */
 public fun <B, C, D, E> Sequence<B>.zip(
@@ -341,27 +335,7 @@ private fun <X, Y, Z> alignRec(
   }
 }
 
-@Deprecated("use fold instead", ReplaceWith("fold(MA)", "arrow.core.fold"))
-public fun <A> Sequence<A>.combineAll(MA: Monoid<A>): A =
-  fold(MA)
-
-@Deprecated(
-  "This function is actually terminal. Use crosswalk(f:A -> List<B>) instead.",
-  ReplaceWith("this.crosswalk{a -> f(a).toList()}")
-)
-public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Sequence<B>): Sequence<Sequence<B>> =
-  fold(emptySequence()) { bs, a ->
-    f(a).align(bs) { ior ->
-      ior.fold(
-        { sequenceOf(it) },
-        ::identity,
-        { l, r -> sequenceOf(l) + r }
-      )
-    }
-  }
-
 @OverloadResolutionByLambdaReturnType
-@JvmName("crosswalkT")
 public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
     f(a).align(bs) { ior ->
@@ -371,35 +345,6 @@ public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
         { l, r -> listOf(l) + r }
       )
     }
-  }
-
-
-@Deprecated(
-  "This function is actually terminal. Use crosswalk(f:A -> List<B>) instead.",
-  ReplaceWith("this.crosswalk{a -> f(a).toList()}")
-)
-public fun <A, K, V> Sequence<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, Sequence<V>> =
-  fold(emptyMap()) { bs, a ->
-    f(a).align(bs) { (_, ior) ->
-      ior.fold(
-        { sequenceOf(it) },
-        ::identity,
-        { l, r -> sequenceOf(l) + r }
-      )
-    }
-  }
-
-@Deprecated(
-  "This function is actually terminal. Use crosswalkNullList(f) instead.",
-  ReplaceWith("this.crosswalk{a -> f(a).toList()}")
-)
-public fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): Sequence<B>? =
-  fold<A, Sequence<B>?>(emptySequence()) { bs, a ->
-    Ior.fromNullables(f(a), bs)?.fold(
-      { sequenceOf(it) },
-      ::identity,
-      { l, r -> sequenceOf(l) + r }
-    )
   }
 
 public fun <A, B> Sequence<A>.crosswalkNullList(f: (A) -> B?): List<B>? =
@@ -413,53 +358,6 @@ public fun <A, B> Sequence<A>.crosswalkNullList(f: (A) -> B?): List<B>? =
 
 public fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
   flatMap(::identity)
-
-@Deprecated(
-  "$MonoidDeprecation\n$NicheAPI",
-  ReplaceWith("this.fold(initial){ acc, a -> acc + a }", "arrow.core.sequence")
-)
-public fun <A> Sequence<A>.fold(MA: Monoid<A>): A = MA.run {
-  this@fold.fold(empty()) { acc, a ->
-    acc.combine(a)
-  }
-}
-
-@Deprecated(
-  "$MonoidDeprecation\n$NicheAPI",
-  ReplaceWith("this.fold(initial){ acc, a -> acc + f(a) }")
-)
-public fun <A, B> Sequence<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
-  this@foldMap.fold(empty()) { acc, a ->
-    acc.combine(f(a))
-  }
-}
-
-/**
- * Logical conditional. The equivalent of Prolog's soft-cut.
- * If its first argument succeeds at all, then the results will be
- * fed into the success branch. Otherwise, the failure branch is taken.
- *
- * ```kotlin
- * import arrow.core.ifThen
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    sequenceOf(1,2,3).ifThen(sequenceOf("empty")) { i ->
- *      sequenceOf("$i, ${i + 1}")
- *    }
- *   //sampleEnd
- *   println(result.toList())
- * }
- * ```
- * <!--- KNIT example-sequence-03.kt -->
- */
-@Deprecated(
-  "Use flatMap and ifEmpty instead.\n$NicheAPI",
-  ReplaceWith("flatMap(ffa).ifEmpty { fb }")
-)
-public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): Sequence<B> =
-  flatMap(ffa).ifEmpty { fb }
 
 /**
  * Interleaves the elements of `this` [Sequence] with those of [other] [Sequence].
@@ -476,7 +374,7 @@ public fun <A, B> Sequence<A>.ifThen(fb: Sequence<B>, ffa: (A) -> Sequence<B>): 
  *   tags.interleave(numbers).toList() shouldBe listOf("#", 0, "#", 1, "#", 2, "#", "#")
  * }
  * ```
- * <!--- KNIT example-sequence-04.kt -->
+ * <!--- KNIT example-sequence-03.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
@@ -512,7 +410,7 @@ public fun <A> Sequence<A>.interleave(other: Sequence<A>): Sequence<A> =
  *   println("both = $both")
  * }
  * ```
- * <!--- KNIT example-sequence-05.kt -->
+ * <!--- KNIT example-sequence-04.kt -->
  */
 public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> C): Sequence<C> =
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
@@ -537,7 +435,7 @@ public fun <A, B, C> Sequence<A>.leftPadZip(other: Sequence<B>, fab: (A?, B) -> 
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-sequence-06.kt -->
+ * <!--- KNIT example-sequence-05.kt -->
  */
 public fun <A, B> Sequence<A>.leftPadZip(other: Sequence<B>): Sequence<Pair<A?, B>> =
   this.leftPadZip(other) { a, b -> a to b }
@@ -568,7 +466,7 @@ public fun <A> Sequence<A>.once(): Sequence<A> =
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-sequence-07.kt -->
+ * <!--- KNIT example-sequence-06.kt -->
  */
 public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>> =
   alignRec(
@@ -597,7 +495,7 @@ public fun <A, B> Sequence<A>.padZip(other: Sequence<B>): Sequence<Pair<A?, B?>>
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-sequence-08.kt -->
+ * <!--- KNIT example-sequence-07.kt -->
  */
 public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): Sequence<C> =
   alignRec(
@@ -607,18 +505,6 @@ public fun <A, B, C> Sequence<A>.padZip(other: Sequence<B>, fa: (A?, B?) -> C): 
     { b -> fa(null, b) },
     { a, b -> fa(a, b) }
   )
-
-@Deprecated(
-  "$SemigroupDeprecation\n$NicheAPI",
-  ReplaceWith("Sequence<Sequence<A>> { List<Sequence<A>>(n) { this }.iterator() }")
-)
-public fun <A> Sequence<A>.replicate(n: Int): Sequence<Sequence<A>> =
-  Sequence { List(n) { this@replicate }.iterator() }
-
-@Deprecated(NicheAPI)
-public fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
-  if (n <= 0) sequenceOf(MA.empty())
-  else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
 /**
  * Returns a [Sequence<C>] containing the result of applying some transformation `(A, B?) -> C`
@@ -640,7 +526,7 @@ public fun <A> Sequence<A>.replicate(n: Int, MA: Monoid<A>): Sequence<A> =
  *   println("both = $both")
  * }
  * ```
- * <!--- KNIT example-sequence-09.kt -->
+ * <!--- KNIT example-sequence-08.kt -->
  */
 public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> C): Sequence<C> =
   other.leftPadZip(this) { a, b -> fa(b, a) }
@@ -665,7 +551,7 @@ public fun <A, B, C> Sequence<A>.rightPadZip(other: Sequence<B>, fa: (A, B?) -> 
  *   println("noPadding = $noPadding")
  * }
  * ```
- * <!--- KNIT example-sequence-10.kt -->
+ * <!--- KNIT example-sequence-09.kt -->
  */
 public fun <A, B> Sequence<A>.rightPadZip(other: Sequence<B>): Sequence<Pair<A, B?>> =
   this.rightPadZip(other) { a, b -> a to b }
@@ -679,28 +565,8 @@ public fun <A> Sequence<A>.salign(
 ): Sequence<A> =
   align(other) { it.fold(::identity, ::identity, combine) }
 
-/**
- * aligns two structures and combine them with the given [Semigroup.append]
- */
-@Deprecated(SemigroupDeprecation, ReplaceWith("salign(other, {a, b -> a + b})", "arrow.typeclasses.combine"))
-public fun <A> Sequence<A>.salign(
-  SG: Semigroup<A>,
-  other: Sequence<A>
-): Sequence<A> =
-  salign(other, SG::combine)
-
-/**
- * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
- *
- * @receiver Iterable of [Either]
- * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
- */
-@Deprecated(
-  "This function is actually terminal. Use separateEitherToPair instead.",
-  ReplaceWith("separateEitherToPair()")
-)
-public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> =
-  fold(sequenceOf<A>() to sequenceOf<B>()) { (lefts, rights), either ->
+public fun <A, B> Sequence<Either<A, B>>.separateEitherToPair(): Pair<List<A>, List<B>> =
+  fold(listOf<A>() to listOf<B>()) { (lefts, rights), either ->
     when (either) {
       is Left -> lefts + either.value to rights
       is Right -> lefts to rights + either.value
@@ -710,27 +576,8 @@ public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Seq
 public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
   traverse(::identity)
 
-@Deprecated(
-  "sequenceEither is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
-)
-public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
-  sequence().map { it.asSequence() }
-
 public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
   traverse(::identity)
-
-@Deprecated(
-  "sequenceOption is being renamed to sequence to simplify the Arrow API",
-  ReplaceWith("sequence().map { it.asSequence() }", "arrow.core.sequence")
-)
-public fun <A> Sequence<Option<A>>.sequenceOption(): Option<Sequence<A>> =
-  sequence().map { it.asSequence() }
-
-@Deprecated("some is being deprecated in favor of map", ReplaceWith("map { generateSequence { this } }"))
-public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
-  if (none()) emptySequence()
-  else map { generateSequence { it } }
 
 /**
  * attempt to split the computation, giving access to the first result.
@@ -747,7 +594,7 @@ public fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
  *   emptySequence<String>().split() shouldBe null
  * }
  * ```
- * <!--- KNIT example-sequence-11.kt -->
+ * <!--- KNIT example-sequence-10.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
@@ -775,13 +622,6 @@ public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, Lis
   return acc.toList().right()
 }
 
-@Deprecated(
-  "traverseEither is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
-)
-public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
-  traverse(f).map { it.asSequence() }
-
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
@@ -797,13 +637,6 @@ public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
   }
   return Some(acc)
 }
-
-@Deprecated(
-  "traverseOption is being renamed to traverse to simplify the Arrow API",
-  ReplaceWith("traverse(f).map { it.asSequence() }", "arrow.core.traverse")
-)
-public fun <A, B> Sequence<A>.traverseOption(f: (A) -> Option<B>): Option<Sequence<B>> =
-  traverse(f).map { it.asSequence() }
 
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
@@ -841,7 +674,7 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
  *   println("(${result.first}, ${result.second})")
  * }
  * ```
- * <!--- KNIT example-sequence-12.kt -->
+ * <!--- KNIT example-sequence-11.kt -->
  */
 public fun <A, B> Sequence<Ior<A, B>>.unalignToPair(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
@@ -851,14 +684,6 @@ public fun <A, B> Sequence<Ior<A, B>>.unalignToPair(): Pair<List<A>, List<B>> =
       { a, b -> l + a to r + b }
     )
   }
-
-
-@Deprecated(
-  "This function is actually terminal. Use unalignToPair instead.",
-  ReplaceWith("unalignToPair(fa)")
-)
-public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
-  map(fa).unalign()
 
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
@@ -874,21 +699,10 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
- * <!--- KNIT example-sequence-13.kt -->
+ * <!--- KNIT example-sequence-12.kt -->
  */
 public fun <A, B, C> Sequence<C>.unalignToPair(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalignToPair()
-
-@Deprecated(
-  NicheAPI + "Prefer using flatMap + fold",
-  ReplaceWith(
-    "flatMap { either -> either.fold<Sequence<B>>({ emptySequence() }, { b -> sequenceOf(b) }) }"
-  )
-)
-public fun <A, B> Sequence<Either<A, B>>.uniteEither(): Sequence<B> =
-  flatMap { either ->
-    either.fold({ emptySequence() }, { b -> sequenceOf(b) })
-  }
 
 /**
  * Fair conjunction. Similarly to interleave
@@ -903,21 +717,12 @@ public fun <A, B> Sequence<Either<A, B>>.uniteEither(): Sequence<B> =
  *   println(result.toList())
  * }
  * ```
- * <!--- KNIT example-sequence-14.kt -->
+ * <!--- KNIT example-sequence-13.kt -->
  */
 public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptySequence()
-
-@Deprecated(
-  "This function is actually terminal. Use unzipToPair instead.",
-  ReplaceWith("unzipToPair()")
-)
-public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
-  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
-    l + x.first to r + x.second
-  }
 
 /**
  * unzips the structure holding the resulting elements in an `Pair`
@@ -932,20 +737,12 @@ public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
  *   println("(${result.first}, ${result.second})")
  * }
  * ```
- * <!--- KNIT example-sequence-15.kt -->
+ * <!--- KNIT example-sequence-14.kt -->
  */
 public fun <A, B> Sequence<Pair<A, B>>.unzipToPair(): Pair<List<A>, List<B>> =
   fold(emptyList<A>() to emptyList()) { (l, r), x ->
     l + x.first to r + x.second
   }
-
-
-@Deprecated(
-  "This function is actually terminal. Use unzipToPair instead.",
-  ReplaceWith("unzipToPair(fc)")
-)
-public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
-  map(fc).unzip()
 
 /**
  * after applying the given function unzip the resulting structure into its elements.
@@ -965,18 +762,10 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
  *   println("(${result.first}, ${result.second})")
  * }
  * ```
- * <!--- KNIT example-sequence-16.kt -->
+ * <!--- KNIT example-sequence-15.kt -->
  */
 public fun <A, B, C> Sequence<C>.unzipToPair(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzipToPair()
-
-
-@Deprecated(
-  "void is being deprecated in favor of simple Iterable.map.\n$NicheAPI",
-  ReplaceWith("map { }")
-)
-public fun <A> Sequence<A>.void(): Sequence<Unit> =
-  map { Unit }
 
 /**
  * Given [A] is a subtype of [B], re-type this value from Sequence<A> to Sequence<B>
@@ -989,7 +778,7 @@ public fun <A> Sequence<A>.void(): Sequence<Unit> =
  *   val result: Sequence<CharSequence> = original.widen()
  * }
  * ```
- * <!--- KNIT example-sequence-17.kt -->
+ * <!--- KNIT example-sequence-16.kt -->
  */
 public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
   this
@@ -1012,7 +801,7 @@ public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
  *   .toList() shouldBe listOf(0, 2, 4, 6, 8)
  * }
  * ```
- * <!--- KNIT example-sequence-18.kt -->
+ * <!--- KNIT example-sequence-17.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> =

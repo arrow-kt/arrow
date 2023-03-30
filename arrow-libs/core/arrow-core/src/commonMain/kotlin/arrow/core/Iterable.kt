@@ -11,14 +11,6 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapOrAccumulate
-import arrow.core.raise.nullable
-import arrow.core.raise.option
-import arrow.core.raise.result
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidDeprecation
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupDeprecation
-import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 
@@ -296,222 +288,6 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
 internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
-@Deprecated(
-  "Traverse for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("let<Iterable<A>, Either<E, List<B>>> { l -> either<E, List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.either")
-)
-public inline fun <E, A, B> Iterable<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  let { l -> either { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "Traverse for Either is being deprecated in favor of Either DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("let<Iterable<A>, Either<E, List<B>>> { l -> either<E, List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.either")
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> =
-  let { l -> either { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the either DSL.",
-  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
-)
-public fun <E, A> Iterable<Either<E, A>>.sequenceEither(): Either<E, List<A>> =
-  let { l -> either { l.bindAll() } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the either DSL.",
-  ReplaceWith("let { l -> either<E, List<A>> { l.bindAll() } }", "arrow.core.raise.either")
-)
-public fun <E, A> Iterable<Either<E, A>>.sequence(): Either<E, List<A>> =
-  let { l -> either { l.bindAll() } }
-
-@Deprecated(
-  "Traverse for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("let<Iterable<A>, Result<List<B>>> { l -> result<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.result")
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Result<B>): Result<List<B>> =
-  let { l -> result { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "Traverse for Result is being deprecated in favor of Result DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("let<Iterable<A>, Result<List<B>>> { l -> result<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.result")
-)
-public inline fun <A, B> Iterable<A>.traverseResult(f: (A) -> Result<B>): Result<List<B>> =
-  let { l -> result { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the result DSL.",
-  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
-)
-public fun <A> Iterable<Result<A>>.sequenceResult(): Result<List<A>> =
-  let { l -> result { l.bindAll() } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the result DSL.",
-  ReplaceWith("let { l -> result<List<A>> { l.bindAll() } }", "arrow.core.raise.result")
-)
-public fun <A> Iterable<Result<A>>.sequence(): Result<List<A>> =
-  let { l -> result { l.bindAll() } }
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public inline fun <E, A, B> Iterable<A>.traverseValidated(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { f(it).bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(
-  semigroup: Semigroup<E>,
-  f: (A) -> Validated<E, B>
-): Validated<E, List<B>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { f(it).bind() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<E, A, B> { f(it).bindNel() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public inline fun <E, A, B> Iterable<A>.traverseValidated(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  mapOrAccumulate { f(it).bindNel() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<E, A, B> { f(it).bindNel() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <E, A, B> Iterable<A>.traverse(f: (A) -> ValidatedNel<E, B>): ValidatedNel<E, List<B>> =
-  mapOrAccumulate { f(it).bindNel() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public fun <E, A> Iterable<Validated<E, A>>.sequenceValidated(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate({ a, b -> semigroup.run { a.combine(b)  } }) { it.bind() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public fun <E, A> Iterable<Validated<E, A>>.sequence(semigroup: Semigroup<E>): Validated<E, List<A>> =
-  mapOrAccumulate({ a, b -> semigroup.run { a.combine(b) } }) { it.bind() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bindNel() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public fun <E, A> Iterable<ValidatedNel<E, A>>.sequenceValidated(): ValidatedNel<E, List<A>> =
-  mapOrAccumulate { it.bindNel() }.toValidated()
-
-@Deprecated(
-  ValidatedDeprMsg + "Use the mapOrAccumulate API instead",
-  ReplaceWith(
-    "mapOrAccumulate<E, ValidatedNel<E, A>, A> { it.bindNel() }.toValidated()",
-    "arrow.core.mapOrAccumulate"
-  )
-)
-public fun <E, A> Iterable<ValidatedNel<E, A>>.sequence(): ValidatedNel<E, List<A>> =
-  mapOrAccumulate { it.bindNel() }.toValidated()
-
-@Deprecated(
-  "Traverse for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("let<Iterable<A>, Option<List<B>>> { l -> option<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.option")
-)
-public inline fun <A, B> Iterable<A>.traverseOption(f: (A) -> Option<B>): Option<List<B>> =
-  let { l -> option { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "Traverse for Option is being deprecated in favor of Option DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith("let<Iterable<A>, Option<List<B>>> { l -> option<List<B>> { l.map<A, B> { f(it).bind<B>() } } }", "arrow.core.raise.option")
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> Option<B>): Option<List<B>> =
-  let { l -> option { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the option DSL.",
-  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
-)
-public fun <A> Iterable<Option<A>>.sequenceOption(): Option<List<A>> =
-  let { l -> option { l.bindAll() } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the option DSL.",
-  ReplaceWith("let { l -> option<List<A>> { l.bindAll() } }", "arrow.core.raise.option")
-)
-public fun <A> Iterable<Option<A>>.sequence(): Option<List<A>> =
-  let { l -> option { l.bindAll() } }
-
-@Deprecated(
-  "Traverse for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith(
-    "let<Iterable<A>, List<B & Any>?> { l -> nullable<List<B & Any>> { l.map<A, B & Any> { f(it).bind<B & Any>() } } }",
-    "arrow.core.raise.nullable"
-  )
-)
-public inline fun <A, B> Iterable<A>.traverseNullable(f: (A) -> B?): List<B>? =
-  traverse(f)
-
-@Deprecated(
-  "Traverse for nullable is being deprecated in favor of Nullable DSL + Iterable.map.\n$NicheAPI",
-  ReplaceWith(
-    "let<Iterable<A>, List<B & Any>?> { l -> nullable<List<B & Any>> { l.map<A, B & Any> { f(it).bind<B & Any>() } } }",
-    "arrow.core.raise.nullable"
-  )
-)
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public inline fun <A, B> Iterable<A>.traverse(f: (A) -> B?): List<B>? =
-  let { l -> nullable { l.map { f(it).bind() } } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the nullable DSL.",
-  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
-)
-public fun <A> Iterable<A?>.sequenceNullable(): List<A>? =
-  let { l -> nullable { l.bindAll() } }
-
-@Deprecated(
-  "The sequence extension function is being deprecated in favor of the nullable DSL.",
-  ReplaceWith("let { l -> nullable<List<A>> { l.bindAll() } }", "arrow.core.raise.nullable")
-)
-public fun <A> Iterable<A?>.sequence(): List<A>? =
-  let { l -> nullable { l.bindAll() } }
-
 /**
  * Returns [Either] a [List] containing the results of applying the given [transform] function to each element in the original collection,
  * **or** accumulate all the _logical errors_ that were _raised_ while transforming the collection using the [combine] function is used to accumulate all the _logical errors_.
@@ -614,13 +390,6 @@ public fun <Error, A> Iterable<Either<Error, A>>.flattenOrAccumulate(): Either<N
 @JvmName("flattenNelOrAccumulate")
 public fun <Error, A> Iterable<EitherNel<Error, A>>.flattenOrAccumulate(): Either<NonEmptyList<Error>, List<A>> =
   mapOrAccumulate { it.bindNel() }
-
-@Deprecated(
-  "Void is being deprecated in favor of simple Iterable.map.\n$NicheAPI",
-  ReplaceWith("map { }")
-)
-public fun <A> Iterable<A>.void(): List<Unit> =
-  map { }
 
 public inline fun <A, B> Iterable<A>.reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? {
   val iterator = this.iterator()
@@ -821,15 +590,6 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   this.align(b, ::identity)
 
 /**
- * aligns two structures and combine them with the given [Semigroup.append]
- */
-@Deprecated(SemigroupDeprecation, ReplaceWith("this.padZip<A, A, A>(other, { it }, { it }, {a1, a2 -> a1 + a2})"))
-public fun <A> Iterable<A>.salign(
-  SG: Semigroup<A>,
-  other: Iterable<A>,
-): Iterable<A> = padZip(other, { it }, { it }, SG::combine)
-
-/**
  * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin
@@ -918,7 +678,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A?>, List<B?>> =
  *    listOf(1, 2, 3, 4).unalign {
  *      if(it % 2 == 0) it.rightIor()
  *      else it.leftIor()
- *    } shouldBe Pair(listOf(1, 3), listOf(2, 4))
+ *    } shouldBe Pair(listOf(1, null, 3, null), listOf(null, 2, null, 4))
  * }
  * ```
  * <!--- KNIT example-iterable-14.kt -->
@@ -926,10 +686,6 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A?>, List<B?>> =
  */
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A?>, List<B?>> =
   map(fa).unalign()
-
-@Deprecated("Use fold from Kotlin Std instead", ReplaceWith("this.fold(initial){a1, a2 -> a1 + a2}"))
-public fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A =
-  fold(MA.empty(), MA::combine)
 
 /**
  * Returns the first element as [Some], or [None] if the iterable is empty.
@@ -1109,40 +865,6 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   } ?: emptyList()
 
 /**
- * Logical conditional. The equivalent of Prolog's soft-cut.
- * If its first argument succeeds at all, then the results will be
- * fed into the success branch. Otherwise, the failure branch is taken.
- *
- * ```kotlin
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result =
- *    listOf(1,2,3).ifThen(listOf("empty")) { i ->
- *      listOf("$i, ${i + 1}")
- *    }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- * <!--- KNIT example-iterable-18.kt -->
- */
-@Deprecated(
-  "Use flatMap and ifEmpty instead.\n$NicheAPI",
-  ReplaceWith("flatMap(ffa).ifEmpty<List<B>, Iterable<B>> { fb }")
-)
-public inline fun <A, B> Iterable<A>.ifThen(fb: Iterable<B>, ffa: (A) -> Iterable<B>): Iterable<B> =
-  flatMap(ffa).ifEmpty { fb }
-
-@Deprecated(
-  "Use mapNotNull and getOrNull instead.\n$NicheAPI",
-  ReplaceWith("mapNotNull { it.getOrNull() }")
-)
-public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
-  mapNotNull { it.getOrNull() }
-
-/**
  * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
  *
  * ```kotlin
@@ -1154,7 +876,7 @@ public fun <A, B> Iterable<Either<A, B>>.uniteEither(): List<B> =
  *     .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))
  * }
  * ```
- * <!--- KNIT example-iterable-19.kt -->
+ * <!--- KNIT example-iterable-18.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
@@ -1204,14 +926,6 @@ public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
 public fun <B, A : B> List<A>.widen(): List<B> =
   this
 
-@Deprecated(MonoidDeprecation, ReplaceWith("this.fold(initial, {a1, a2 -> a1 + a2})"))
-public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
-  fold(MA.empty(), MA::combine)
-
-@Deprecated(MonoidDeprecation, ReplaceWith("this.fold(initial) { acc, a -> combine(acc, f(a)) }"))
-public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
-  fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
-
 public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
     f(a).align(bs) { ior ->
@@ -1242,23 +956,6 @@ public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
       { l, r -> listOf(l) + r }
     )
   }
-
-@Deprecated("Not being used anymore. Will be removed from the binary in 2.0.0")
-@PublishedApi
-internal val listUnit: List<Unit> =
-  listOf(Unit)
-
-@Deprecated(
-  NicheAPI,
-  ReplaceWith("toList().let { l -> List(n) { l } }")
-)
-public fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
-  toList().let { l -> List(n) { l } }
-
-@Deprecated(NicheAPI)
-public fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
-  if (n <= 0) listOf(MA.empty())
-  else this@replicate.zip(replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
 public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
   align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }

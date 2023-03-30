@@ -94,7 +94,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal tuple4 - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.tuple4(),
         aGen = Arb.tuple4(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
         bGen = Arb.boolean(),
@@ -104,7 +104,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal tuple5 - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.tuple5(),
         aGen = Arb.tuple5(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
         bGen = Arb.boolean(),
@@ -114,7 +114,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal tuple6 - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.tuple6(),
         aGen = Arb.tuple6(Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean(), Arb.boolean()),
         bGen = Arb.boolean(),
@@ -124,7 +124,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal tuple7 - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.tuple7(),
         aGen = Arb.tuple7(
           Arb.boolean(),
@@ -142,7 +142,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal tuple8 - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.tuple8(),
         aGen = Arb.tuple8(
           Arb.boolean(),
@@ -161,7 +161,7 @@ class TupleTest : StringSpec({
 
     testLaws(
       "Traversal tuple9 - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.tuple9(),
         aGen = Arb.tuple9(
           Arb.boolean(),

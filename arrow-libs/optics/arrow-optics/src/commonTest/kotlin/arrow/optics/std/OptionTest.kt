@@ -31,25 +31,4 @@ class OptionTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.constant(Unit)),
       )
     )
-
-    testLaws(
-      "Iso option to nullable - ",
-      IsoLaws(
-        iso = Iso.optionToNullable<Int>().reverse(),
-        aGen = Arb.int().orNull(),
-        bGen = Arb.option(Arb.int()),
-        funcGen = Arb.functionAToB(Arb.option(Arb.int()))
-      )
-    )
-
-    testLaws(
-      "Iso option to either - ",
-      IsoLaws(
-        iso = Iso.optionToEither(),
-        aGen = Arb.option(Arb.int()),
-        bGen = Arb.either(Arb.constant(Unit), Arb.int()),
-        funcGen = Arb.functionAToB(Arb.either(Arb.constant(Unit), Arb.int())),
-      )
-    )
-
 })

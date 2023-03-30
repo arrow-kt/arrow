@@ -10,7 +10,6 @@ import arrow.core.test.map2
 import arrow.core.test.map3
 import arrow.core.test.option
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAllValues
@@ -179,8 +178,8 @@ class MapKTest : StringSpec({
       ) {
           (a,b),f,g ->
 
-        val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
-        val r = a.align(b).mapValues { it.value.bimap(f,g)}
+        val l = a.mapValues{ f(it.value) }.align(b.mapValues{ g(it.value) })
+        val r = a.align(b).mapValues { it.value.map(g).mapLeft(f) }
 
         l shouldBe r
       }
@@ -409,26 +408,15 @@ class MapKTest : StringSpec({
       checkAll(
         Arb.map2(Arb.int(), Arb.intSmall(), Arb.intSmall())
       ) { (a, b) ->
-        a.salign(Semigroup.int(), b) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
+        a.salign(b, Int::plus) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
       }
     }
 
-    "void" {
-      checkAll(
-        Arb.map(Arb.intSmall(), Arb.intSmall())
-      ) { a ->
-        val result = a.void()
-
-        result.keys shouldBe a.keys
-        result.forAllValues { it shouldBe Unit }
-      }
-    }
-
-    "filterMap" {
+    "mapNotNull" {
       checkAll(
         Arb.map(Arb.int(), Arb.boolean())
       ) { xs ->
-        val rs = xs.filterMap { if(it) true else null }
+        val rs = xs.mapNotNull { (_, pred) -> if(pred) true else null }
 
         xs.forAll {
           if (it.value)

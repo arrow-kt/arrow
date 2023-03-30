@@ -4,7 +4,6 @@ import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.nonEmptyList
 import arrow.core.test.stackSafeIteration
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.shouldForAll

@@ -9,7 +9,6 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.core.toOption
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -78,8 +77,8 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
   public fun getOrNull(source: S): A? =
     getOrModify(source).getOrNull()
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrModify(source).map(map).getOrElse { M.empty() }
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    getOrModify(source).map(map).getOrElse { initial }
 
   /**
    * Modify the focus of a [POptional] with a function [map]

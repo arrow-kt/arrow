@@ -1,7 +1,6 @@
 package arrow.core.test
 
 import arrow.core.Either
-import arrow.core.Endo
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
@@ -66,8 +65,6 @@ fun Arb.Companion.intSmall(factor: Int = 10000): Arb<Int> =
 
 fun Arb.Companion.longSmall(): Arb<Long> =
   Arb.long((Long.MIN_VALUE / 100000L)..(Long.MAX_VALUE / 100000L))
-
-fun <A> Arb.Companion.endo(arb: Arb<A>): Arb<Endo<A>> = arb.map { a: A -> Endo { a } }
 
 fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
   arb.orNull().map { it.toOption() }
