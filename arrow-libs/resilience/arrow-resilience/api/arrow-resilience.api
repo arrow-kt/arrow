@@ -264,10 +264,6 @@ public final class arrow/resilience/ScheduleKt {
 	public static final fun retryOrElseEither-aZo8_V4 (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/resilience/TimeInMillisKt {
-	public static final fun timeInMillis ()J
-}
-
 public final class arrow/resilience/common/Platform : java/lang/Enum {
 	public static final field JS Larrow/resilience/common/Platform;
 	public static final field JVM Larrow/resilience/common/Platform;
