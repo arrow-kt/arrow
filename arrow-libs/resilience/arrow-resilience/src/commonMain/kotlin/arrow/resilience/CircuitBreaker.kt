@@ -399,7 +399,7 @@ private constructor(
      *    - A successful request will reset the failure counter to zero
      *    - When the failure counter reaches the [maxFailures] threshold, the breaker is tripped into the [Open] state
      *
-     * @param failures is the current failures count
+     * @param openingStrategy is the strategy that will decide if the circuit breaker should open after some failures.
      */
     public class Closed(public override val openingStrategy: OpeningStrategy) : State()
 
@@ -408,6 +408,8 @@ private constructor(
      *    - All requests short-circuit/fail-fast with [ExecutionRejected]
      *    - If a request is made after the configured [resetTimeout] passes, the [CircuitBreaker] is tripped into the a [HalfOpen] state, allowing one request to go through as a test.
      *
+     * @param openingStrategy is the strategy that will decide if the circuit breaker should open after some failures.
+     * 
      * @param startedAt is the [TimeMark] when the transition to [Open] happened.
      *
      * @param resetTimeout is the current `resetTimeout` that is applied to this [Open] state, to be multiplied by the
