@@ -8,7 +8,9 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
 import arrow.core.raise.fold
+import arrow.core.raise.option
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
 import arrow.typeclasses.Semigroup
@@ -389,25 +391,12 @@ public fun <A, K, V> Sequence<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, Seque
     }
   }
 
-@Deprecated(
-  "This function is actually terminal. Use crosswalkNullList(f) instead.",
-  ReplaceWith("this.crosswalk{a -> f(a).toList()}")
-)
 public fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): Sequence<B>? =
   fold<A, Sequence<B>?>(emptySequence()) { bs, a ->
     Ior.fromNullables(f(a), bs)?.fold(
       { sequenceOf(it) },
       ::identity,
       { l, r -> sequenceOf(l) + r }
-    )
-  }
-
-public fun <A, B> Sequence<A>.crosswalkNullList(f: (A) -> B?): List<B>? =
-  fold<A, List<B>?>(emptyList()) { bs, a ->
-    Ior.fromNullables(f(a), bs)?.fold(
-      { listOf(it) },
-      ::identity,
-      { l, r -> listOf(l) + r }
     )
   }
 
@@ -695,10 +684,6 @@ public fun <A> Sequence<A>.salign(
  * @receiver Iterable of [Either]
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
-@Deprecated(
-  "This function is actually terminal. Use separateEitherToPair instead.",
-  ReplaceWith("separateEitherToPair()")
-)
 public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Sequence<B>> =
   fold(sequenceOf<A>() to sequenceOf<B>()) { (lefts, rights), either ->
     when (either) {
@@ -706,15 +691,6 @@ public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<Sequence<A>, Seq
       is Right -> lefts to rights + either.value
     }
   }
-
-public fun <A, B> Sequence<Either<A, B>>.separateEitherToPair(): Pair<List<A>, List<B>> =
-  fold(listOf<A>() to listOf<B>()) { (lefts, rights), either ->
-    when (either) {
-      is Left -> lefts + either.value to rights
-      is Right -> lefts to rights + either.value
-    }
-  }
-
 
 /**
  * Separate the inner [Validated] values into the [Validated.Invalid] and [Validated.Valid].
@@ -734,8 +710,12 @@ public fun <A, B> Sequence<Validated<A, B>>.separateValidated(): Pair<Sequence<A
     }
   }
 
+@Deprecated(
+  "The sequence extension function is being deprecated in favor of the DSL.\n$NicheAPI",
+  ReplaceWith("let<Sequence<Either<E, A>>, Either<E, List<A>>> { s -> either<E, List<A>> { s.map<Either<E, A>, A> { it.bind<A>() }.toList<A>() } }", "arrow.core.raise.either")
+)
 public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
+  let { s -> either { s.map { it.bind() }.toList() } }
 
 @Deprecated(
   "sequenceEither is being renamed to sequence to simplify the Arrow API",
@@ -744,8 +724,12 @@ public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
 public fun <E, A> Sequence<Either<E, A>>.sequenceEither(): Either<E, Sequence<A>> =
   sequence().map { it.asSequence() }
 
+@Deprecated(
+  "The sequence extension function is being deprecated in favor of the Option DSL.\n$NicheAPI",
+  ReplaceWith("let<Sequence<Option<A>>, Option<List<A>>> { s -> option<List<A>> { s.map<Option<A>, A> { it.bind<A>() }.toList<A>() } }", "arrow.core.raise.option")
+)
 public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
+  let { s -> option { s.map { it.bind() }.toList() } }
 
 @Deprecated(
   "sequenceOption is being renamed to sequence to simplify the Arrow API",
@@ -803,21 +787,14 @@ public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
+@Deprecated(
+  "Traverse for Sequence is being deprecated in favor of Either DSL.\n$NicheAPI",
+  ReplaceWith("let<Sequence<A>, Either<E, List<B>>> { s -> either<E, List<B>> { s.map<A, B> { f(it).bind<B>() }.toList<B>() } }", "arrow.core.raise.either")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
-  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
-  //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverse res
-    }
-  }
-  return acc.toList().right()
-}
+public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> =
+  let { s -> either { s.map { f(it).bind() }.toList() } }
 
 @Deprecated(
   "traverseEither is being renamed to traverse to simplify the Arrow API",
@@ -826,21 +803,14 @@ public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, Lis
 public fun <E, A, B> Sequence<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, Sequence<B>> =
   traverse(f).map { it.asSequence() }
 
+@Deprecated(
+  "Traverse for Sequence is being deprecated in favor of Either DSL.\n$NicheAPI",
+  ReplaceWith("let<Sequence<A>, Option<List<B>>> { s -> option<List<B>> { s.map<A, B> { f(it).bind<B>() }.toList<B>() } }", "arrow.core.raise.option")
+)
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
-  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
-  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
-  //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Some -> acc.add(res.value)
-      is None -> return@traverse res
-    }
-  }
-  return Some(acc)
-}
+public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> =
+  let { s -> option { s.map { f(it).bind() }.toList() } }
 
 @Deprecated(
   "traverseOption is being renamed to traverse to simplify the Arrow API",
@@ -898,10 +868,23 @@ public fun <E, A, B> Sequence<A>.traverseValidated(
 ): Validated<E, Sequence<B>> =
   traverse(semigroup, f).map { it.asSequence() }
 
-@Deprecated(
-  "This function is actually terminal. Use unalignToPair instead.",
-  ReplaceWith("unalignToPair()")
-)
+/**
+ * splits an union into its component parts.
+ *
+ * ```kotlin
+ * import arrow.core.bothIor
+ * import arrow.core.leftIor
+ * import arrow.core.unalign
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalign()
+ *   //sampleEnd
+ *   println("(${result.first}, ${result.second})")
+ * }
+ * ```
+ * <!--- KNIT example-sequence-12.kt -->
+ */
 public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
   fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
     x.fold(
@@ -912,57 +895,23 @@ public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> 
   }
 
 /**
- * splits an union into its component parts.
- *
- * ```kotlin
- * import arrow.core.bothIor
- * import arrow.core.leftIor
- * import arrow.core.unalignToPair
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalignToPair()
- *   //sampleEnd
- *   println("(${result.first}, ${result.second})")
- * }
- * ```
- * <!--- KNIT example-sequence-12.kt -->
- */
-public fun <A, B> Sequence<Ior<A, B>>.unalignToPair(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
-    x.fold(
-      { l + it to r },
-      { l to r + it },
-      { a, b -> l + a to r + b }
-    )
-  }
-
-
-@Deprecated(
-  "This function is actually terminal. Use unalignToPair instead.",
-  ReplaceWith("unalignToPair(fa)")
-)
-public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
-  map(fa).unalign()
-
-/**
  * after applying the given function, splits the resulting union shaped structure into its components parts
  *
  * ```kotlin
  * import arrow.core.leftIor
- * import arrow.core.unalignToPair
+ * import arrow.core.unalign
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val result = sequenceOf(1, 2, 3).unalignToPair { it.leftIor() }
+ *   val result = sequenceOf(1, 2, 3).unalign { it.leftIor() }
  *   //sampleEnd
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
  * <!--- KNIT example-sequence-13.kt -->
  */
-public fun <A, B, C> Sequence<C>.unalignToPair(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
-  map(fa).unalignToPair()
+public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
+  map(fa).unalign()
 
 @Deprecated(
   NicheAPI + "Prefer using flatMap + fold",
@@ -1007,53 +956,36 @@ public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptySequence()
 
-@Deprecated(
-  "This function is actually terminal. Use unzipToPair instead.",
-  ReplaceWith("unzipToPair()")
-)
-public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
-  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
-    l + x.first to r + x.second
-  }
-
 /**
  * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin
- * import arrow.core.unzipToPair
+ * import arrow.core.unzip
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val result = sequenceOf("A" to 1, "B" to 2).unzipToPair()
+ *   val result = sequenceOf("A" to 1, "B" to 2).unzip()
  *   //sampleEnd
  *   println("(${result.first}, ${result.second})")
  * }
  * ```
  * <!--- KNIT example-sequence-15.kt -->
  */
-public fun <A, B> Sequence<Pair<A, B>>.unzipToPair(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
+public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
+  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
     l + x.first to r + x.second
   }
-
-
-@Deprecated(
-  "This function is actually terminal. Use unzipToPair instead.",
-  ReplaceWith("unzipToPair(fc)")
-)
-public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
-  map(fc).unzip()
 
 /**
  * after applying the given function unzip the resulting structure into its elements.
  *
  * ```kotlin
- * import arrow.core.unzipToPair
+ * import arrow.core.unzip
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *    sequenceOf("A:1", "B:2", "C:3").unzipToPair { e ->
+ *    sequenceOf("A:1", "B:2", "C:3").unzip { e ->
  *      e.split(":").let {
  *        it.first() to it.last()
  *      }
@@ -1064,9 +996,8 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
  * ```
  * <!--- KNIT example-sequence-16.kt -->
  */
-public fun <A, B, C> Sequence<C>.unzipToPair(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
-  map(fc).unzipToPair()
-
+public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
+  map(fc).unzip()
 
 @Deprecated(
   "void is being deprecated in favor of simple Iterable.map.\n$NicheAPI",
