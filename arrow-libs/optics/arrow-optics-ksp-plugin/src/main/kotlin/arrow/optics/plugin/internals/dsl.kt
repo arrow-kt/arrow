@@ -12,21 +12,9 @@ fun generateLensDsl(ele: ADT, optic: DataClassDsl): Snippet {
   )
 }
 
-fun generateOptionalDsl(ele: ADT, optic: DataClassDsl): Snippet {
-  val (className, import) = resolveClassName(ele)
-  return Snippet(
-    `package` = ele.packageName,
-    name = ele.simpleName,
-    content = processOptionalSyntax(ele, optic, className),
-    imports = setOf(import)
-  )
-}
-
 fun generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet {
   val (className, import) = resolveClassName(ele)
   return Snippet(
-fun generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet =
-  Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
     content = processPrismSyntax(ele, isoOptic, className),
@@ -79,7 +67,6 @@ private fun processPrismSyntax(ele: ADT, dsl: SealedClassDsl, className: String)
     |""".trimMargin()
     }
   }
-}
 
 private fun resolveClassName(ele: ADT): Pair<String, String> = if (hasPackageCollisions(ele)) {
   val classNameAlias = ele.sourceClassName.replace(".", "")

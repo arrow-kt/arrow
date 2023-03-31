@@ -31,9 +31,9 @@ class IterableTest : StringSpec({
   }
 
   "flattenOrAccumulate" {
-    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { list ->
       val expected =
-        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<Int>>()
           .map { it.value }.toNonEmptyListOrNull().shouldNotBeNull().left()
         else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
 
@@ -317,7 +317,7 @@ class IterableTest : StringSpec({
   }
 
   "unzip(fn)" {
-    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string()))) { xs ->
+    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { xs ->
       xs.unzip { it } shouldBe xs.unzip()
     }
   }
@@ -326,7 +326,7 @@ class IterableTest : StringSpec({
     fun <A, B> Pair<List<A?>, List<B?>>.fix(): Pair<List<A>, List<B>> =
       first.mapNotNull { it } to second.mapNotNull { it }
 
-    checkAll(Arb.list(Arb.int()), Arb.list(Arb.string())) { a, b ->
+    checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
       a.align(b).unalign().fix() shouldBe (a to b)
     }
   }
@@ -341,7 +341,7 @@ class IterableTest : StringSpec({
         }
       })
 
-    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
+    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.int()))) { xs ->
       val (a, b) = xs.unalign()
       a.align(b) {
         it.fix()
@@ -350,13 +350,13 @@ class IterableTest : StringSpec({
   }
 
   "unalign(fn)" {
-    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.string()))) { xs ->
+    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.int()))) { xs ->
       xs.unalign { it } shouldBe xs.unalign()
     }
   }
 
   "reduceOrNull is compatible with reduce from stdlib" {
-    checkAll(Arb.list(Arb.string())) { xs ->
+    checkAll(Arb.list(Arb.int())) { xs ->
 
       val rs = xs.reduceOrNull({ it }) { a, b ->
         a + b
@@ -366,14 +366,14 @@ class IterableTest : StringSpec({
         rs.shouldBeNull()
       } else {
         rs shouldBe xs.reduce {
-            a,b -> a +b
+            a,b -> a + b
         }
       }
     }
   }
 
   "reduceRightNull is compatible with reduce from stdlib" {
-    checkAll(Arb.list(Arb.string())) { xs ->
+    checkAll(Arb.list(Arb.int())) { xs ->
 
       val rs = xs.reduceRightNull({ it }) { a, b ->
         a + b

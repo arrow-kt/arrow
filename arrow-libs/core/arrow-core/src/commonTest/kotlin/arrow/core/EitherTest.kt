@@ -6,6 +6,7 @@ import arrow.core.test.any
 import arrow.core.test.either
 import arrow.core.test.intSmall
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.nonEmptyList
 import arrow.core.test.suspendFunThatReturnsAnyLeft
 import arrow.core.test.suspendFunThatReturnsAnyRight
 import arrow.core.test.suspendFunThatReturnsEitherAnyOrAnyOrThrows
@@ -24,7 +25,6 @@ import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.nonPositiveInt
 import io.kotest.property.arbitrary.short
@@ -253,19 +253,16 @@ class EitherTest : StringSpec({
   }
 
   "zipOrAccumulate EitherNel results in all Right transformed, or all Left in a NonEmptyList" {
-    fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>): Arb<NonEmptyList<A>> =
-      Arb.list(arb, 1..100).map { it.toNonEmptyListOrNull()!! }
-
     checkAll(
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.short()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.byte()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.int()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.long()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.float()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.double()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.char()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.string()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.boolean())
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.short()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.byte()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.int()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.long()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.float()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.double()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.char()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.string()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.boolean())
     ) { a, b, c, d, e, f, g, h, i ->
       val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9)
       val all = listOf(a, b, c, d, e, f, g, h, i)
