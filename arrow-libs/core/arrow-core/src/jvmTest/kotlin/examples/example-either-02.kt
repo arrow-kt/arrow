@@ -3,8 +3,8 @@ package arrow.core.examples.exampleEither02
 
 import arrow.core.Either
 
-val right: Either<String, Int> =
- Either.Right(5)
+val left: Either<String, Int> =
+ Either.Left("Something went wrong")
 fun main() {
- println(right)
+ println(left)
 }

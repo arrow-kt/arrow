@@ -13,6 +13,7 @@ import arrow.core.Tuple9
 import arrow.core.foldMap
 import arrow.core.identity
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import kotlin.jvm.JvmStatic
 
 /**
@@ -26,33 +27,43 @@ import kotlin.jvm.JvmStatic
 public interface Fold<S, A> {
 
   /**
+   * Map each target to a type [R] and combine the results as a fold.
+   */
+  public fun <R> foldMap(empty: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    foldMap(object : Monoid<R> {
+      override fun empty(): R = empty
+      override fun R.combine(b: R): R = combine(this, b)
+    }, source, map)
+
+  /**
    * Map each target to a type R and use a Monoid to fold the results
    */
+  @Deprecated(MonoidDeprecation, ReplaceWith("foldMap(M.empty(), M::combine, source, map)", "arrow.optics.foldMap", "arrow.typeclasses.combine"))
   public fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R
 
   /**
    * Calculate the number of targets
    */
   public fun size(source: S): Int =
-    foldMap(Monoid.int(), source) { 1 }
+    foldMap(0, { x, y -> x + y }, source) { 1 }
 
   /**
    * Check if all targets satisfy the predicate
    */
   public fun all(source: S, predicate: (focus: A) -> Boolean): Boolean =
-    foldMap(Monoid.boolean(), source, predicate)
+    foldMap(true, { x, y -> x && y }, source, predicate)
 
   /**
    * Returns `true` if at least one focus matches the given [predicate].
    */
   public fun any(source: S, predicate: (focus: A) -> Boolean): Boolean =
-    foldMap(Monoid.booleanOr(), source, predicate)
+    foldMap(false, { x, y -> x || y }, source, predicate)
 
   /**
    * Check if there is no target
    */
   public fun isEmpty(source: S): Boolean =
-    foldMap(Monoid.boolean(), source) { false }
+    foldMap(true, { _, _ -> false }, source) { false }
 
   /**
    * Check if there is at least one target
@@ -63,34 +74,25 @@ public interface Fold<S, A> {
   /**
    * Get the first target or null
    */
-  @Suppress("UNCHECKED_CAST")
-  public fun firstOrNull(source: S): A? {
-    val fold = ::fold as (Monoid<Any?>, S) -> Any?
-    val res = fold(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (this === EMPTY_VALUE) b else this
-    }, source)
-    return EMPTY_VALUE.unbox(res)
-  }
+  public fun firstOrNull(source: S): A? =
+    EMPTY_VALUE.unbox(foldMap(EMPTY_VALUE, { x, y -> if (x === EMPTY_VALUE) y else x }, source, ::identity))
 
   /**
    * Get the last target or null
    */
-  @Suppress("UNCHECKED_CAST")
-  public fun lastOrNull(source: S): A? {
-    val fold = ::fold as (Monoid<Any?>, S) -> Any?
-    val res = fold(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (b !== EMPTY_VALUE) b else this
-    }, source)
-    return EMPTY_VALUE.unbox(res)
-  }
+  public fun lastOrNull(source: S): A? =
+    EMPTY_VALUE.unbox(foldMap(EMPTY_VALUE, { x, y -> if (y != EMPTY_VALUE) y else x }, source, ::identity))
+
+  /**
+   * Fold using the given [empty] element and [combine].
+   */
+  public fun fold(empty: A, combine: (A, A) -> A, source: S): A =
+    foldMap(empty, combine, source, ::identity)
 
   /**
    * Fold using the given [Monoid] instance.
    */
+  @Deprecated(MonoidDeprecation, ReplaceWith("fold(M.empty(), M::combine, source)", "arrow.optics.fold", "arrow.typeclasses.combine"))
   public fun fold(M: Monoid<A>, source: S): A =
     foldMap(M, source, ::identity)
 
@@ -105,33 +107,25 @@ public interface Fold<S, A> {
    * Get all targets of the [Fold]
    */
   public fun getAll(source: S): List<A> =
-    foldMap(Monoid.list(), source, ::listOf)
+    foldMap(emptyList(), { x, y -> x + y }, source) { listOf(it) }
 
   /**
    * Find the first element matching the predicate, if one exists.
    */
-  public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? {
-    val res = foldMap(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (this === EMPTY_VALUE) b else this
-    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
-    return EMPTY_VALUE.unbox(res)
-  }
+  public fun findOrNull(source: S, predicate: (focus: A) -> Boolean): A? =
+    EMPTY_VALUE.unbox(
+      foldMap(EMPTY_VALUE, { x, y -> if (x == EMPTY_VALUE) y else x }, source) { focus ->
+        if (predicate(focus)) focus else EMPTY_VALUE
+      }
+    )
 
   /**
    * Check whether at least one element satisfies the predicate.
    *
    * If there are no elements, the result is false.
    */
-  public fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean {
-    val res = foldMap(object : Monoid<Any?> {
-      override fun empty(): Any = EMPTY_VALUE
-      override fun Any?.combine(b: Any?): Any? =
-        if (this === EMPTY_VALUE) b else this
-    }, source) { focus -> if (predicate(focus)) focus else EMPTY_VALUE }
-    return res !== EMPTY_VALUE
-  }
+  public fun exists(source: S, predicate: (focus: A) -> Boolean): Boolean =
+    any(source, predicate)
 
   /**
    * Join two [Fold] with the same target
@@ -218,7 +212,6 @@ public interface Fold<S, A> {
     /**
      * [Traversal] for [Either] that has focus in each [Either.Right].
      *
-     * @receiver [Traversal.Companion] to make it statically available.
      * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
      */
     @JvmStatic

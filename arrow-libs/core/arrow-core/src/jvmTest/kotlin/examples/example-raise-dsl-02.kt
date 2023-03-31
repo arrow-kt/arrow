@@ -1,30 +1,25 @@
 // This file was automatically generated from Raise.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleRaiseDsl02
 
-import arrow.core.Either
-import arrow.core.Ior
-import arrow.core.raise.Effect
+import arrow.core.getOrElse
+import arrow.core.left
 import arrow.core.raise.Raise
-import arrow.core.raise.either
 import arrow.core.raise.effect
-import arrow.core.raise.ior
-import arrow.core.raise.toEither
-import arrow.typeclasses.Semigroup
+import arrow.core.raise.recover
+import arrow.core.raise.getOrElse
 import io.kotest.matchers.shouldBe
 
 fun Raise<String>.failure(): Int = raise("failed")
 
-suspend fun test() {
-  val either: Either<String, Int> =
-    either { failure() }
+fun Raise<List<Char>>.recovered(): Int =
+  recover({ failure() }) { msg: String -> raise(msg.toList()) }
 
-  val effect: Effect<String, Int> =
-    effect { failure() }
+suspend fun Raise<List<Char>>.recovered2(): Int =
+  effect { failure() } getOrElse { msg: String -> raise(msg.toList()) }
 
-  val ior: Ior<String, Int> =
-    ior(Semigroup.string()) { failure() }
+fun Raise<List<Char>>.recovered3(): Int =
+  "failed".left() getOrElse { msg: String -> raise(msg.toList()) }
 
-  either shouldBe Either.Left("failed")
-  effect.toEither() shouldBe Either.Left("failed")
-  ior shouldBe Ior.Left("failed")
+fun test(): Unit {
+  recover({ "failed".left().bind() }) { 1 } shouldBe "failed".left().getOrElse { 1 }
 }

@@ -18,37 +18,37 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex list - ",
-      TraversalLaws.laws(
-        traversal = FilterIndex.list<String>().filter { true },
-        aGen = Arb.list(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+      TraversalLaws(
+        traversal = FilterIndex.list<Int>().filter { true },
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       "FilterIndex sequence - ",
-      TraversalLaws.laws(
-        traversal = FilterIndex.sequence<String>().filter { true },
-        aGen = Arb.sequence(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+      TraversalLaws(
+        traversal = FilterIndex.sequence<Int>().filter { true },
+        aGen = Arb.sequence(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       ) { a, b -> a.toList() == b.toList() }
     )
 
     testLaws(
       "FilterIndex Nel - ",
-      TraversalLaws.laws(
-        traversal = FilterIndex.nonEmptyList<String>().filter { true },
-        aGen = Arb.nonEmptyList(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+      TraversalLaws(
+        traversal = FilterIndex.nonEmptyList<Int>().filter { true },
+        aGen = Arb.nonEmptyList(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       "FilterIndex map - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.map<Char, Int>().filter { true },
         aGen = Arb.map(Arb.char(), Arb.int()),
         bGen = Arb.int(),
@@ -58,7 +58,7 @@ class FilterIndexInstanceTest : StringSpec({
 
     testLaws(
       "FilterIndex string - ",
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = FilterIndex.string().filter { true },
         aGen = Arb.string(),
         bGen = Arb.char(),

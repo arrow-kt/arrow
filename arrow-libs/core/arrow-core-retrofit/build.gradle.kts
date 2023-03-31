@@ -21,7 +21,7 @@ if (enableCompatibilityMetadataVariant) {
 }
 
 dependencies {
-  compileOnly(libs.kotlin.stdlibJDK8)
+  compileOnly(libs.kotlin.stdlib)
   compileOnly(projects.arrowCore)
   compileOnly(libs.squareup.retrofit)
 

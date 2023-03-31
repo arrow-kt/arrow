@@ -2,15 +2,12 @@
 package arrow.core.examples.exampleMap05
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-   mapOf(
-     "first" to ("A" to 1).bothIor(),
-     "second" to ("B" to 2).bothIor(),
-     "third" to "C".leftIor()
-   ).unalign()
-  //sampleEnd
-  println(result)
+fun test() {
+  mapOf(
+    "first" to Ior.Both("A", 1),
+    "second" to Ior.Both("B", 2),
+    "third" to Ior.Left("C")
+  ).unalign() shouldBe Pair(mapOf("first" to "A", "second" to "B", "third" to "C"), mapOf("first" to 1, "second" to 2))
 }

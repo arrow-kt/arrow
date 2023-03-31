@@ -2,14 +2,26 @@
 package arrow.core.examples.exampleEither08
 
 import arrow.core.Either
+import arrow.core.flatMap
 
 fun parse(s: String): Either<NumberFormatException, Int> =
   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
   else Either.Left(NumberFormatException("$s is not a valid integer."))
 
-val notANumber = parse("Not a number")
-val number2 = parse("2")
+fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
+  if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
+  else Either.Right(1.0 / i)
+
+fun stringify(d: Double): String = d.toString()
+
+fun magic(s: String): Either<Exception, String> =
+  parse(s).flatMap{ reciprocal(it) }.map{ stringify(it) }
+
+val magic0 = magic("0")
+val magic1 = magic("1")
+val magicNotANumber = magic("Not a number")
 fun main() {
- println("notANumber = $notANumber")
- println("number2 = $number2")
+ println("magic0 = $magic0")
+ println("magic1 = $magic1")
+ println("magicNotANumber = $magicNotANumber")
 }

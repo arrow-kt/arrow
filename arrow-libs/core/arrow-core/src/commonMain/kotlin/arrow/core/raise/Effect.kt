@@ -80,12 +80,10 @@ import kotlin.jvm.JvmName
  * import arrow.core.Either
  * import arrow.core.Ior
  * import arrow.core.None
- * import arrow.core.Validated
  * import arrow.core.raise.Effect
  * import arrow.core.raise.effect
  * import arrow.core.raise.fold
  * import arrow.core.raise.toEither
- * import arrow.core.raise.toValidated
  * import arrow.core.raise.toIor
  * import arrow.core.raise.toOption
  * import arrow.core.raise.ensureNotNull
@@ -136,7 +134,6 @@ import kotlin.jvm.JvmName
  * ```kotlin
  * suspend fun main() {
  *    readFile("").toEither() shouldBe Either.Left(EmptyPath)
- *    readFile("knit.properties").toValidated() shouldBe  Validated.Invalid(FileNotFound("knit.properties"))
  *    readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))
  *    readFile("README.MD").toOption { None } shouldBe None
  *
@@ -666,14 +663,14 @@ import kotlin.jvm.JvmName
  * ```
  * <!--- KNIT example-raise-13.kt -->
  */
-public typealias Effect<R, A> = suspend Raise<R>.() -> A
+public typealias Effect<Error, A> = suspend Raise<Error>.() -> A
 
-public inline fun <R, A> effect(@BuilderInference noinline block: suspend Raise<R>.() -> A): Effect<R, A> = block
+public inline fun <Error, A> effect(@BuilderInference noinline block: suspend Raise<Error>.() -> A): Effect<Error, A> = block
 
 /** The same behavior and API as [Effect] except without requiring _suspend_. */
-public typealias EagerEffect<R, A> = Raise<R>.() -> A
+public typealias EagerEffect<Error, A> = Raise<Error>.() -> A
 
-public inline fun <R, A> eagerEffect(@BuilderInference noinline block: Raise<R>.() -> A): EagerEffect<R, A> = block
+public inline fun <Error, A> eagerEffect(@BuilderInference noinline block: Raise<Error>.() -> A): EagerEffect<Error, A> = block
 
 public suspend fun <A> Effect<A, A>.merge(): A = getOrElse(::identity)
 public fun <A> EagerEffect<A, A>.merge(): A = getOrElse(::identity)

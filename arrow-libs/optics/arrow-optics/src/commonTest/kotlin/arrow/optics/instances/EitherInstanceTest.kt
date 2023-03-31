@@ -12,7 +12,7 @@ import io.kotest.property.arbitrary.string
 
 class EitherInstanceTest : StringSpec({
     testLaws(
-      TraversalLaws.laws(
+      TraversalLaws(
         traversal = Traversal.either(),
         aGen = Arb.either(Arb.string(), Arb.int()),
         bGen = Arb.int(),

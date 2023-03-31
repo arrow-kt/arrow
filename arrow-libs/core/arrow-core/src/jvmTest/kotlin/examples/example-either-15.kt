@@ -1,13 +1,10 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither15
 
-import arrow.core.Either
+import arrow.core.right
 
-val r : Either<Int, Int> = Either.Right(7)
-val rightMapLeft = r.mapLeft {it + 1}
-val l: Either<Int, Int> = Either.Left(7)
-val leftMapLeft = l.mapLeft {it + 1}
+val right7 =
+  7.right()
 fun main() {
- println("rightMapLeft = $rightMapLeft")
- println("leftMapLeft = $leftMapLeft")
+ println(right7)
 }

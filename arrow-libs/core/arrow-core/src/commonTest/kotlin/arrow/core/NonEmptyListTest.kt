@@ -2,23 +2,28 @@ package arrow.core
 
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.nonEmptyList
+import arrow.core.test.stackSafeIteration
 import arrow.core.test.testLaws
 import arrow.typeclasses.Semigroup
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.negativeInt
+import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
 class NonEmptyListTest : StringSpec({
 
-    testLaws(SemigroupLaws.laws(Semigroup.nonEmptyList(), Arb.nonEmptyList(Arb.int())))
+    testLaws(SemigroupLaws(NonEmptyList<Int>::plus, Arb.nonEmptyList(Arb.int())))
 
     "iterable.toNonEmptyListOrNull should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
@@ -32,15 +37,21 @@ class NonEmptyListTest : StringSpec({
       }
     }
 
+    "flatten" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nel ->
+        nonEmptyListOf(nel).flatten() shouldBe nel
+      }
+    }
+
     "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).toNonEmptyListOrNull()?.traverse { a ->
+      val res = (0..stackSafeIteration()).toNonEmptyListOrNull()?.traverse { a ->
         acc.add(a)
         Either.Right(a)
       }
       res shouldBe Either.Right(acc.toNonEmptyListOrNull())
-      res shouldBe Either.Right((0..20_000).toNonEmptyListOrNull())
+      res shouldBe Either.Right((0..stackSafeIteration()).toNonEmptyListOrNull())
     }
 
     "traverse for Either short-circuit" {
@@ -62,29 +73,31 @@ class NonEmptyListTest : StringSpec({
 
     "sequence for Either should be consistent with traverseEither" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Either.Right(it) else Either.Left(it) }.sequence() shouldBe
-          ints.traverse { if (it % 2 == 0) Either.Right(it) else Either.Left(it) }
+        fun onlyEven(i: Int) = if (i % 2 == 0) Either.Right(i) else Either.Left(i)
+        ints.map { onlyEven(it) }.sequence() shouldBe ints.traverse { onlyEven(it) }
       }
     }
 
     "traverse for Option is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).toNonEmptyListOrNull()?.traverse { a ->
+      val res = (0..stackSafeIteration()).toNonEmptyListOrNull()?.traverse { a ->
         acc.add(a)
         Some(a)
       }
       res shouldBe Some(acc.toNonEmptyListOrNull())
-      res shouldBe Some((0..20_000).toNonEmptyListOrNull())
+      res shouldBe Some((0..stackSafeIteration()).toNonEmptyListOrNull())
     }
 
     "traverse for Option short-circuits" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          (it % 2 == 0).maybe {
-            acc.add(it)
-            it
+        val evens = ints.traverse { a ->
+          if ((a % 2 == 0)) {
+            acc.add(a)
+            Some(a)
+          } else {
+            None
           }
         }
         acc shouldBe ints.takeWhile { it % 2 == 0 }
@@ -94,30 +107,49 @@ class NonEmptyListTest : StringSpec({
 
     "sequence for Option yields some when all entries in the list are some" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
+        val evens = ints.map { a ->
+          if ((a % 2 == 0)) {
+            Some(a)
+          } else {
+            None
+          }
+        }.sequence()
         evens.fold({ Unit }) { it shouldBe ints }
       }
     }
 
     "sequence for Option should be consistent with traverseOption" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { (it % 2 == 0).maybe { it } }.sequence() shouldBe
-          ints.traverse { (it % 2 == 0).maybe { it } }
+        ints.map { a->
+          if ((a % 2 == 0)) {
+            Some(a)
+          } else {
+            None
+          }
+        }.sequence() shouldBe
+          ints.traverse { a->
+            if ((a % 2 == 0)) {
+              Some(a)
+            } else {
+              None
+            }
+          }
       }
     }
 
-    "traverse for Validated stack-safe" {
+    "traverse for Validated is stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).traverse(Semigroup.string()) {
-        acc.add(it)
-        Validated.Valid(it)
-      }
+      val res = (0..stackSafeIteration())
+        .toNonEmptyListOrNull()?.traverse(Semigroup.string()) {
+          acc.add(it)
+          Validated.Valid(it)
+        }
       res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
+      res shouldBe Validated.Valid((0..stackSafeIteration()).toList())
     }
 
-    "traverse for Validated acummulates" {
+    "traverse for Validated accumulates" {
       checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
         val res: ValidatedNel<Int, NonEmptyList<Int>> =
           ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
@@ -129,22 +161,101 @@ class NonEmptyListTest : StringSpec({
       }
     }
 
-    "sequence for Validated should be consistent with traverseValidated" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { if (it % 2 == 0) Valid(it) else Invalid(it) }.sequence(Semigroup.int()) shouldBe
-          ints.traverse(Semigroup.int()) { if (it % 2 == 0) Valid(it) else Invalid(it) }
+    "can align lists with different lengths" {
+      checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->
+        val result = a.align(b)
+
+        result.size shouldBe max(a.size, b.size)
+        result.take(min(a.size, b.size)).shouldForAll {
+          it.isBoth() shouldBe true
+        }
+        result.drop(min(a.size, b.size)).shouldForAll {
+          if (a.size < b.size) {
+            it.isRight() shouldBe true
+          } else {
+            it.isLeft() shouldBe true
+          }
+        }
       }
     }
 
-    "can align lists with different lengths" {
-      checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->
-        a.align(b).size shouldBe max(a.size, b.size)
-      }
-
-      checkAll(Arb.nonEmptyList(Arb.boolean()), Arb.nonEmptyList(Arb.boolean())) { a, b ->
-        a.align(b).all.take(min(a.size, b.size)).forEach {
-          it.isBoth shouldBe true
+    "mapOrAccumulate is stack-safe, and runs in original order" {
+      val acc = mutableListOf<Int>()
+      val res = (0..stackSafeIteration())
+        .toNonEmptyListOrNull()!!
+        .mapOrAccumulate(String::plus) {
+          acc.add(it)
+          it
         }
+      res shouldBe Either.Right(acc)
+      res shouldBe Either.Right((0..stackSafeIteration()).toList())
+    }
+
+    "mapOrAccumulate accumulates errors" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nel ->
+        val res = nel.mapOrAccumulate { i ->
+          if (i % 2 == 0) i else raise(i)
+        }
+
+        val expected = nel.filterNot { it % 2 == 0 }
+          .toNonEmptyListOrNull()?.left() ?: nel.filter { it % 2 == 0 }.right()
+
+        res shouldBe expected
+      }
+    }
+
+    "mapOrAccumulate accumulates errors with combine function" {
+      checkAll(Arb.nonEmptyList(Arb.negativeInt())) { nel ->
+        val res = nel.mapOrAccumulate(String::plus) { i ->
+          if (i > 0) i else raise("Negative")
+        }
+
+        res shouldBe nel.map { "Negative" }.joinToString("").left()
+      }
+    }
+
+    "padZip" {
+      checkAll(Arb.nonEmptyList(Arb.int()), Arb.nonEmptyList(Arb.int())) { a, b ->
+        val result = a.padZip(b)
+        val left = a + List(max(0, b.size - a.size)) { null }
+        val right = b + List(max(0, a.size - b.size)) { null }
+
+        result shouldBe left.zip(right)
+      }
+    }
+
+    "padZip with transformation" {
+      checkAll(Arb.nonEmptyList(Arb.int()), Arb.nonEmptyList(Arb.int())) { a, b ->
+        val result = a.padZip(b, { it * 2 }, { it * 3 }, { x, y -> x + y })
+
+        val minSize = min(a.size, b.size)
+        result.size shouldBe max(a.size, b.size)
+        result.take(minSize) shouldBe a.take(minSize).zip(b.take(minSize)) { x, y -> x + y }
+
+        if (a.size > b.size)
+          result.drop(minSize) shouldBe a.drop(minSize).map { it * 2 }
+        else
+          result.drop(minSize) shouldBe b.drop(minSize).map { it * 3 }
+      }
+    }
+
+    "unzip is the inverse of zip" {
+      checkAll(Arb.nonEmptyList(Arb.int())) { nel ->
+        val zipped = nel.zip(nel)
+        val left = zipped.map { it.first }
+        val right = zipped.map { it.second }
+
+        left shouldBe nel
+        right shouldBe nel
+      }
+    }
+
+    "unzip with split function" {
+      checkAll(Arb.nonEmptyList(Arb.pair(Arb.int(), Arb.int()))) { nel ->
+        val unzipped = nel.unzip(::identity)
+
+        unzipped.first shouldBe nel.map { it.first }
+        unzipped.second shouldBe nel.map { it.second }
       }
     }
 

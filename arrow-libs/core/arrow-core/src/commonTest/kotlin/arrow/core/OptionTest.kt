@@ -5,7 +5,6 @@ import arrow.core.continuations.option
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.testLaws
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -23,23 +22,7 @@ class OptionTest : StringSpec({
   val none: Option<String> = None
 
     testLaws(
-      MonoidLaws.laws(Monoid.option(Monoid.int()), Arb.option(Arb.int())),
-      /*FxLaws.suspended<OptionEffect<*>, Option<String>, String>(
-        Arb.string().map(Option.Companion::invoke),
-        Arb.option(Arb.string()),
-        Option<String>::equals,
-        option::invoke
-      ) {
-        it.bind()
-      },
-      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(
-        Arb.string().map(Option.Companion::invoke),
-        Arb.option(Arb.string()),
-        Option<String>::equals,
-        option::eager
-      ) {
-        it.bind()
-      }*/
+      MonoidLaws(None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
     )
 
     "ensure null in option computation" {
@@ -369,7 +352,7 @@ class OptionTest : StringSpec({
       val some: Option<String> = Some("value")
       val none: Option<String> = None
       some.traverse { listOf(it) } shouldBe listOf(Some("value"))
-      none.traverse { listOf(it) } shouldBe emptyList()
+      none.traverse { listOf(it) } shouldBe listOf(None)
     }
 
     "sequence should be consistent with traverse" {

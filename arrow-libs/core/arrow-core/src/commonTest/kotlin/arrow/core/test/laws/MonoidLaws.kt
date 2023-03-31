@@ -1,40 +1,45 @@
 package arrow.core.test.laws
 
 import arrow.core.test.Law
+import arrow.core.test.LawSet
 import arrow.core.test.equalUnderTheLaw
-import arrow.typeclasses.Monoid
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.list
 
-object MonoidLaws {
+data class MonoidLaws<F>(
+  val empty: F,
+  val combine: (F, F) -> F,
+  val GEN: Arb<F>,
+  val eq: (F, F) -> Boolean = { a, b -> a == b }
+): LawSet {
 
-  fun <F> laws(M: Monoid<F>, GEN: Arb<F>, eq: (F, F) -> Boolean = { a, b -> a == b }): List<Law> =
-    SemigroupLaws.laws(M, GEN, eq) +
+  override val laws: List<Law> =
+    SemigroupLaws(combine, GEN, eq).laws +
       listOf(
-        Law("Monoid Laws: Left identity") { M.monoidLeftIdentity(GEN, eq) },
-        Law("Monoid Laws: Right identity") { M.monoidRightIdentity(GEN, eq) },
-        Law("Monoid Laws: combineAll should be derived") { M.combineAllIsDerived(GEN, eq) },
-        Law("Monoid Laws: combineAll of empty list is empty") { M.combineAllOfEmptyIsEmpty(eq) }
+        Law("Monoid Laws: Left identity") { monoidLeftIdentity() },
+        Law("Monoid Laws: Right identity") { monoidRightIdentity() },
+        Law("Monoid Laws: combineAll should be derived") { combineAllIsDerived() },
+        Law("Monoid Laws: combineAll of empty list is empty") { combineAllOfEmptyIsEmpty() }
       )
 
-  private suspend fun <F> Monoid<F>.monoidLeftIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+  private suspend fun monoidLeftIdentity(): PropertyContext =
     checkAll(GEN) { a ->
-      (empty().combine(a)).equalUnderTheLaw(a, eq)
+      combine(empty, a).equalUnderTheLaw(a, eq)
     }
 
-  private suspend fun <F> Monoid<F>.monoidRightIdentity(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+  private suspend fun monoidRightIdentity(): PropertyContext =
     checkAll(GEN) { a ->
-      a.combine(empty()).equalUnderTheLaw(a, eq)
+      combine(a, empty).equalUnderTheLaw(a, eq)
     }
 
-  private suspend fun <F> Monoid<F>.combineAllIsDerived(GEN: Arb<F>, eq: (F, F) -> Boolean): PropertyContext =
+  private suspend fun combineAllIsDerived(): PropertyContext =
     checkAll(5, Arb.list(GEN)) { list ->
-      list.fold().equalUnderTheLaw(if (list.isEmpty()) empty() else list.reduce { acc, f -> acc.combine(f) }, eq)
+      list.fold(empty, combine).equalUnderTheLaw(if (list.isEmpty()) empty else list.reduce(combine), eq)
     }
 
-  private fun <F> Monoid<F>.combineAllOfEmptyIsEmpty(eq: (F, F) -> Boolean): Unit =
-    emptyList<F>().fold().equalUnderTheLaw(empty(), eq) shouldBe true
+  private fun combineAllOfEmptyIsEmpty(): Unit =
+    emptyList<F>().fold(empty, combine).equalUnderTheLaw(empty, eq) shouldBe true
 }

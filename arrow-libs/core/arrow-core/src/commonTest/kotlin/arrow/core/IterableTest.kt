@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.core.test.either
 import arrow.core.test.functionAToB
+import arrow.core.test.ior
 import arrow.core.test.option
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
@@ -14,6 +15,7 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.math.max
@@ -33,9 +35,9 @@ class IterableTest : StringSpec({
   }
 
   "flattenOrAccumulate" {
-    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { list ->
       val expected =
-        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
+        if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<Int>>()
           .map { it.value }.toNonEmptyListOrNull().shouldNotBeNull().left()
         else list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
 
@@ -264,13 +266,13 @@ class IterableTest : StringSpec({
     "sequence Either traverse Nullable interoperate - and proof map + sequence equality with traverse" {
       checkAll(
         Arb.list(Arb.int()),
-        Arb.functionAToB<Int, Either<String, Int>?>(Arb.either(Arb.string(), Arb.int()).orNull())
+        Arb.functionAToB<Int, Either<Int, Int>?>(Arb.either(Arb.int(), Arb.int()).orNull())
       ) { ints, f ->
 
-        val res: Either<String, List<Int>>? =
+        val res: Either<Int, List<Int>>? =
           ints.traverse(f)?.sequence()
 
-        val expected: Either<String, List<Int>>? =
+        val expected: Either<Int, List<Int>>? =
           ints.map(f).sequence()?.sequence()
 
         res shouldBe expected
@@ -533,11 +535,11 @@ class IterableTest : StringSpec({
 
     "separateEither" {
       checkAll(Arb.list(Arb.int())) { ints ->
-        val list = ints.map {
+        val list = ints.separateEither {
           if (it % 2 == 0) it.left()
           else it.right()
         }
-        list.separateEither() shouldBe ints.partition { it % 2 == 0 }
+        list shouldBe ints.partition { it % 2 == 0 }
       }
     }
 
@@ -551,4 +553,79 @@ class IterableTest : StringSpec({
       }
     }
 
+  "unzip is the inverse of zip" {
+    checkAll(Arb.list(Arb.int())) { xs ->
+
+      val zipped = xs.zip(xs)
+      val ls = zipped.unzip()
+      val rs = xs to xs
+
+      ls shouldBe rs
+    }
+  }
+
+  "unzip(fn)" {
+    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { xs ->
+      xs.unzip { it } shouldBe xs.unzip()
+    }
+  }
+
+  "unalign is the inverse of align" {
+    checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
+      a.align(b).unalign() shouldBe (a to b)
+    }
+  }
+
+  "align is the inverse of unalign" {
+    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.int()))) { xs ->
+      val (a, b) = xs.unalign()
+      a.align(b) shouldBe xs
+    }
+  }
+
+  "unalign(fn)" {
+    checkAll(Arb.list(Arb.ior(Arb.int(), Arb.int()))) { xs ->
+      xs.unalign { it } shouldBe xs.unalign()
+    }
+  }
+
+  "salign" {
+    checkAll(Arb.list(Arb.int())) { xs ->
+      xs.salign(Semigroup.int(), xs) shouldBe xs.map { it + it }
+    }
+  }
+
+  "reduceOrNull is compatible with reduce from stdlib" {
+    checkAll(Arb.list(Arb.int())) { xs ->
+
+      val rs = xs.reduceOrNull({ it }) { a, b ->
+        a + b
+      }
+
+      if (xs.isEmpty()) {
+        rs.shouldBeNull()
+      } else {
+        rs shouldBe xs.reduce {
+            a,b -> a + b
+        }
+      }
+    }
+  }
+
+  "reduceRightNull is compatible with reduce from stdlib" {
+    checkAll(Arb.list(Arb.int())) { xs ->
+
+      val rs = xs.reduceRightNull({ it }) { a, b ->
+        a + b
+      }
+
+      if (xs.isEmpty()) {
+        rs.shouldBeNull()
+      } else {
+        rs shouldBe xs.reduceRight {
+            a,b -> a +b
+        }
+      }
+    }
+  }
 })

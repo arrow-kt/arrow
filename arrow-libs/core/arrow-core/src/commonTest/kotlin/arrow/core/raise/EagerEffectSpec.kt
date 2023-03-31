@@ -64,7 +64,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
           raise(l)
-        } recover { ll ->
+        } getOrElse  { ll ->
           ll shouldBe l
           i
         }
@@ -77,7 +77,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
           i
-        } recover { ll ->
+        } getOrElse  { ll ->
           ll shouldBe l
           i + 1
         }
@@ -90,7 +90,7 @@ class EagerEffectSpec : StringSpec({
       eagerEffect {
         eagerEffect<Long, Int> {
           raise(l)
-        } recover { ll ->
+        } getOrElse  { ll ->
           ll shouldBe l
           raise(error)
         }
