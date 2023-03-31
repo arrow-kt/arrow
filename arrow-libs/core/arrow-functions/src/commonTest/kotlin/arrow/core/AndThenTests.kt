@@ -1,16 +1,25 @@
 package arrow.core
 
-import arrow.core.test.functionAToB
-import arrow.core.test.stackSafeIteration
+import io.kotest.common.Platform
+import io.kotest.common.platform
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
+import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.next
 import io.kotest.property.checkAll
 
 class AndThenTests : StringSpec({
-  val count = stackSafeIteration()
+  val count = when (platform) {
+    Platform.JVM -> 200_000
+    else -> 1000
+  }
+
+  fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> = arbitrary { random ->
+    { _: A -> arb.next(random) }.memoize()
+  }
 
   "AndThen0 - compose a chain of functions with andThen should be same with AndThen" {
     checkAll(Arb.int(), Arb.list(Arb.functionAToB<Int, Int>(Arb.int()))) { i, fs ->
