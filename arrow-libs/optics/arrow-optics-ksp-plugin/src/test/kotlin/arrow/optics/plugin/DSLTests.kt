@@ -61,5 +61,20 @@ class DSLTests {
       """.compilationSucceeds()
   }
 
+  @Test
+  fun `DSL for a class in a package including keywords, issue #2996`() {
+    """
+      |package id.co.app_name.features.main.transaction.internal.outgoing.data.OutgoingInternalTransaction
+      |
+      |$imports
+      |
+      |@optics
+      |data class Source(val program: String) {
+      |  companion object
+      |}
+      |
+      """.compilationSucceeds()
+  }
+
   // Db.content.at(At.map(), One).set(db, None)
 }
