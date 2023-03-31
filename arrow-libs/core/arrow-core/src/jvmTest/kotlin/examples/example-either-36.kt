@@ -2,13 +2,9 @@
 package arrow.core.examples.exampleEither36
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import io.kotest.matchers.shouldBe
-import io.kotest.assertions.fail
 
 fun test() {
-  Either.Right(1)
-    .fold({ fail("Cannot be left") }, { it + 1 }) shouldBe 2
-
-  Either.Left(RuntimeException("Boom!"))
-    .fold({ -1 }, { fail("Cannot be right") }) shouldBe -1
+  Either.Left(12) getOrElse { it + 5 } shouldBe 17
 }

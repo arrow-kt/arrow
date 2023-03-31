@@ -4,64 +4,64 @@ package arrow.core.examples.test
 import io.kotest.core.spec.style.StringSpec
 
 class EitherKnitTest : StringSpec({
-  "ExampleEither34" {
-    arrow.core.examples.exampleEither34.test()
+  "ExampleEither21" {
+    arrow.core.examples.exampleEither21.test()
   }
 
-  "ExampleEither35" {
-    arrow.core.examples.exampleEither35.test()
+  "ExampleEither22" {
+    arrow.core.examples.exampleEither22.test()
+  }
+
+  "ExampleEither23" {
+    arrow.core.examples.exampleEither23.test()
+  }
+
+  "ExampleEither25" {
+    arrow.core.examples.exampleEither25.test()
+  }
+
+  "ExampleEither26" {
+    arrow.core.examples.exampleEither26.test()
+  }
+
+  "ExampleEither27" {
+    arrow.core.examples.exampleEither27.test()
+  }
+
+  "ExampleEither28" {
+    arrow.core.examples.exampleEither28.test()
+  }
+
+  "ExampleEither30" {
+    arrow.core.examples.exampleEither30.test()
+  }
+
+  "ExampleEither31" {
+    arrow.core.examples.exampleEither31.test()
+  }
+
+  "ExampleEither32" {
+    arrow.core.examples.exampleEither32.test()
   }
 
   "ExampleEither36" {
     arrow.core.examples.exampleEither36.test()
   }
 
-  "ExampleEither38" {
-    arrow.core.examples.exampleEither38.test()
-  }
-
-  "ExampleEither39" {
-    arrow.core.examples.exampleEither39.test()
-  }
-
-  "ExampleEither40" {
-    arrow.core.examples.exampleEither40.test()
-  }
-
   "ExampleEither41" {
     arrow.core.examples.exampleEither41.test()
-  }
-
-  "ExampleEither43" {
-    arrow.core.examples.exampleEither43.test()
-  }
-
-  "ExampleEither44" {
-    arrow.core.examples.exampleEither44.test()
   }
 
   "ExampleEither45" {
     arrow.core.examples.exampleEither45.test()
   }
 
-  "ExampleEither49" {
-    arrow.core.examples.exampleEither49.test()
+  "ExampleEither46" {
+    arrow.core.examples.exampleEither46.test()
   }
 
-  "ExampleEither54" {
-    arrow.core.examples.exampleEither54.test()
-  }
-
-  "ExampleEither58" {
-    arrow.core.examples.exampleEither58.test()
-  }
-
-  "ExampleEither59" {
-    arrow.core.examples.exampleEither59.test()
-  }
-
-  "ExampleEither60" {
-    arrow.core.examples.exampleEither60.test()
+  "ExampleEither47" {
+    arrow.core.examples.exampleEither47.test()
   }
 
 }) {
