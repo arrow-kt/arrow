@@ -8,6 +8,7 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
 import arrow.core.raise.fold
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -347,7 +348,7 @@ public fun <A, B> Sequence<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
     }
   }
 
-public fun <A, B> Sequence<A>.crosswalkNullList(f: (A) -> B?): List<B>? =
+public fun <A, B> Sequence<A>.crosswalkNull(f: (A) -> B?): List<B>? =
   fold<A, List<B>?>(emptyList()) { bs, a ->
     Ior.fromNullables(f(a), bs)?.fold(
       { listOf(it) },
@@ -565,19 +566,20 @@ public fun <A> Sequence<A>.salign(
 ): Sequence<A> =
   align(other) { it.fold(::identity, ::identity, combine) }
 
-public fun <A, B> Sequence<Either<A, B>>.separateEitherToPair(): Pair<List<A>, List<B>> =
+
+/**
+ * Separate the inner [Either] values into the [Either.Left] and [Either.Right].
+ *
+ * @receiver Iterable of [Either]
+ * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
+ */
+public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
   fold(listOf<A>() to listOf<B>()) { (lefts, rights), either ->
     when (either) {
       is Left -> lefts + either.value to rights
       is Right -> lefts to rights + either.value
     }
   }
-
-public fun <E, A> Sequence<Either<E, A>>.sequence(): Either<E, List<A>> =
-  traverse(::identity)
-
-public fun <A> Sequence<Option<A>>.sequence(): Option<List<A>> =
-  traverse(::identity)
 
 /**
  * attempt to split the computation, giving access to the first result.
@@ -606,38 +608,6 @@ public fun <A> Sequence<A>.split(): Pair<Sequence<A>, A>? =
 public fun <A> Sequence<A>.tail(): Sequence<A> =
   drop(1)
 
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public fun <E, A, B> Sequence<A>.traverse(f: (A) -> Either<E, B>): Either<E, List<B>> {
-  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
-  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
-  //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Right -> acc.add(res.value)
-      is Left -> return@traverse res
-    }
-  }
-  return acc.toList().right()
-}
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-public fun <A, B> Sequence<A>.traverse(f: (A) -> Option<B>): Option<List<B>> {
-  // Note: Using a mutable list here avoids the stackoverflows one can accidentally create when using
-  //  Sequence.plus instead. But we don't convert the sequence to a list beforehand to avoid
-  //  forcing too much of the sequence to be evaluated.
-  val acc = mutableListOf<B>()
-  forEach { a ->
-    when (val res = f(a)) {
-      is Some -> acc.add(res.value)
-      is None -> return@traverse res
-    }
-  }
-  return Some(acc)
-}
-
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
@@ -665,19 +635,19 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
  * ```kotlin
  * import arrow.core.bothIor
  * import arrow.core.leftIor
- * import arrow.core.unalignToPair
+ * import arrow.core.unalign
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalignToPair()
+ *   val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalign()
  *   //sampleEnd
  *   println("(${result.first}, ${result.second})")
  * }
  * ```
  * <!--- KNIT example-sequence-11.kt -->
  */
-public fun <A, B> Sequence<Ior<A, B>>.unalignToPair(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
+public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
+  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
     x.fold(
       { l + it to r },
       { l to r + it },
@@ -690,19 +660,19 @@ public fun <A, B> Sequence<Ior<A, B>>.unalignToPair(): Pair<List<A>, List<B>> =
  *
  * ```kotlin
  * import arrow.core.leftIor
- * import arrow.core.unalignToPair
+ * import arrow.core.unalign
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val result = sequenceOf(1, 2, 3).unalignToPair { it.leftIor() }
+ *   val result = sequenceOf(1, 2, 3).unalign { it.leftIor() }
  *   //sampleEnd
  *   println("(${result.first.toList()}, ${result.second.toList()})")
  * }
  * ```
  * <!--- KNIT example-sequence-12.kt -->
  */
-public fun <A, B, C> Sequence<C>.unalignToPair(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
-  map(fa).unalignToPair()
+public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>, Sequence<B>> =
+  map(fa).unalign()
 
 /**
  * Fair conjunction. Similarly to interleave
@@ -728,19 +698,19 @@ public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
  * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin
- * import arrow.core.unzipToPair
+ * import arrow.core.unzip
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val result = sequenceOf("A" to 1, "B" to 2).unzipToPair()
+ *   val result = sequenceOf("A" to 1, "B" to 2).unzip()
  *   //sampleEnd
  *   println("(${result.first}, ${result.second})")
  * }
  * ```
  * <!--- KNIT example-sequence-14.kt -->
  */
-public fun <A, B> Sequence<Pair<A, B>>.unzipToPair(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
+public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
+  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
     l + x.first to r + x.second
   }
 
@@ -748,12 +718,12 @@ public fun <A, B> Sequence<Pair<A, B>>.unzipToPair(): Pair<List<A>, List<B>> =
  * after applying the given function unzip the resulting structure into its elements.
  *
  * ```kotlin
- * import arrow.core.unzipToPair
+ * import arrow.core.unzip
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *    sequenceOf("A:1", "B:2", "C:3").unzipToPair { e ->
+ *    sequenceOf("A:1", "B:2", "C:3").unzip { e ->
  *      e.split(":").let {
  *        it.first() to it.last()
  *      }
@@ -764,8 +734,8 @@ public fun <A, B> Sequence<Pair<A, B>>.unzipToPair(): Pair<List<A>, List<B>> =
  * ```
  * <!--- KNIT example-sequence-15.kt -->
  */
-public fun <A, B, C> Sequence<C>.unzipToPair(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
-  map(fc).unzipToPair()
+public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>, Sequence<B>> =
+  map(fc).unzip()
 
 /**
  * Given [A] is a subtype of [B], re-type this value from Sequence<A> to Sequence<B>

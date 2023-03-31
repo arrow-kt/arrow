@@ -165,16 +165,6 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "crosswalk the sequence to a nullable function" {
-      checkAll(Arb.list(Arb.int())){ list ->
-        fun nullEvens(i: Int): Int? = if(i % 2 == 0) i else null
-
-        val obtained = list.asSequence().crosswalkNullList { nullEvens(it) }
-        val expected = list.map { nullEvens(it) }
-        obtained?.size shouldBe expected.filterNotNull().size
-      }
-    }
-
     "can align sequences - 1" {
       checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
@@ -239,23 +229,6 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "unzipToPair should unzip values in a Pair in a Sequence of Pairs" {
-      checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))){ pairList ->
-        val obtained = pairList.asSequence().unzipToPair()
-        val expected = pairList.unzip()
-        obtained shouldBe expected
-      }
-    }
-
-    "unzipToPair should unzip values in a Pair in a Sequence" {
-      checkAll(Arb.list(Arb.int())){ list ->
-        val obtained = list.asSequence().unzipToPair { n -> Pair(n, n)}
-        val expected = list.unzip { n -> Pair(n, n) }
-        obtained shouldBe expected
-      }
-    }
-
-
   "filterOption should filter None" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
@@ -269,9 +242,9 @@ class SequenceKTest : StringSpec({
           else it.right()
         }
 
-        val (lefts, rights) = sequence.separateEitherToPair()
+        val (lefts, rights) = sequence.separateEither()
 
-        lefts to rights shouldBe ints.partition { it % 2 == 0 }
+        lefts.toList() to rights.toList() shouldBe ints.partition { it % 2 == 0 }
       }
     }
 

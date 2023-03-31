@@ -3,11 +3,11 @@ package arrow.core.examples.exampleSequence11
 
 import arrow.core.bothIor
 import arrow.core.leftIor
-import arrow.core.unalignToPair
+import arrow.core.unalign
 
 fun main(args: Array<String>) {
   //sampleStart
-  val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalignToPair()
+  val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalign()
   //sampleEnd
   println("(${result.first}, ${result.second})")
 }
