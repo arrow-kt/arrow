@@ -3,7 +3,6 @@ package arrow.core
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
@@ -91,6 +90,8 @@ class CurryingTest : StringSpec({
     }
   }
 
+  /* Waiting for Kotest 5.6.0 to be released
+
   "A 13-arity curried function returns the same result as the function before being curried" {
     checkAll(PropTestConfig(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb()) { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 ->
       val add = { p1:  String, p2:  String, p3:  String, p4:  String, p5:  String, p6:  String, p7:  String, p8:  String, p9:  String, p10: String, p11: String, p12: String, p13: String -> p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + p11 + p12 + p13 }
@@ -160,6 +161,8 @@ class CurryingTest : StringSpec({
       add.curried()(a1)(a2)(a3)(a4)(a5)(a6)(a7)(a8)(a9)(a10)(a11)(a12)(a13)(a14)(a15)(a16)(a17)(a18)(a19)(a20)(a21)(a22) shouldBe add(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22)
     }
   }
+
+  */
 
   //endregion
 
@@ -253,6 +256,8 @@ class CurryingTest : StringSpec({
     }
   }
 
+  /* Waiting for Kotest 5.6.0 to be released
+
   "A 13-arity curried function returns the same result as the function after being uncurried" {
     checkAll(PropTestConfig(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb()) { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 ->
       val add = { p1: String, p2: String, p3: String, p4: String, p5: String, p6: String, p7: String, p8: String, p9: String, p10: String, p11: String, p12: String, p13: String-> p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + p11 + p12 + p13 }
@@ -332,6 +337,8 @@ class CurryingTest : StringSpec({
       curriedAdd(a1)(a2)(a3)(a4)(a5)(a6)(a7)(a8)(a9)(a10)(a11)(a12)(a13)(a14)(a15)(a16)(a17)(a18)(a19)(a20)(a21)(a22) shouldBe curriedAdd.uncurried()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22)
     }
   }
+
+  */
 
   // endregion
 
@@ -414,6 +421,8 @@ class CurryingTest : StringSpec({
     }
   }
 
+  /* Waiting for Kotest 5.6.0 to be released
+
   "A 13-arity curried effect returns the same result as the effect before being curried" {
     checkAll(PropTestConfig(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb()) { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 ->
       val add: suspend (String, String, String, String, String, String, String, String, String, String, String, String, String) -> String = { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 -> p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + p11 + p12 + p13 }
@@ -483,6 +492,8 @@ class CurryingTest : StringSpec({
       add.curried()(a1)(a2)(a3)(a4)(a5)(a6)(a7)(a8)(a9)(a10)(a11)(a12)(a13)(a14)(a15)(a16)(a17)(a18)(a19)(a20)(a21)(a22) shouldBe add(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22)
     }
   }
+
+  */
 
   // endregion
 
@@ -576,6 +587,8 @@ class CurryingTest : StringSpec({
     }
   }
 
+  /* Waiting for Kotest 5.6.0 to be released
+
   "A 13-arity curried effect returns the same result as the effect after being uncurried" {
     checkAll(PropTestConfig(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb(), arb()) { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 ->
       val add: suspend (String, String, String, String, String, String, String, String, String, String, String, String, String) -> String = { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 -> p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + p11 + p12 + p13 }
@@ -655,6 +668,8 @@ class CurryingTest : StringSpec({
       curriedAdd(a1)(a2)(a3)(a4)(a5)(a6)(a7)(a8)(a9)(a10)(a11)(a12)(a13)(a14)(a15)(a16)(a17)(a18)(a19)(a20)(a21)(a22) shouldBe curriedAdd.uncurried()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21, a22)
     }
   }
+
+  */
 
   // endregion
 })
