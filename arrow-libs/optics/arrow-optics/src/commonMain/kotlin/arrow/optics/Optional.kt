@@ -156,7 +156,7 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
 
   public companion object {
 
-    public fun <S> id(): Optional<S, S> = PLens.id()
+    public fun <S> id(): Iso<S, S> = PIso.id()
 
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].

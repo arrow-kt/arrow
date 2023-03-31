@@ -31,10 +31,13 @@ val KSClassDeclaration.nameWithParentClass: String
   }
 
 enum class OpticsTarget {
+  ISO,
   LENS,
   PRISM,
   DSL
 }
+
+typealias IsoTarget = Target.Iso
 
 typealias PrismTarget = Target.Prism
 
@@ -44,13 +47,19 @@ typealias SealedClassDsl = Target.SealedClassDsl
 
 typealias DataClassDsl = Target.DataClassDsl
 
+typealias ValueClassDsl = Target.ValueClassDsl
+
 sealed class Target {
   abstract val foci: List<Focus>
 
   data class Prism(override val foci: List<Focus>) : Target()
   data class Lens(override val foci: List<Focus>) : Target()
+  data class Iso(override val foci: List<Focus>) : Target()
   data class SealedClassDsl(override val foci: List<Focus>) : Target()
   data class DataClassDsl(override val foci: List<Focus>) : Target()
+  data class ValueClassDsl(val focus: Focus) : Target() {
+    override val foci = listOf(focus)
+  }
 }
 
 data class Focus(
@@ -70,6 +79,7 @@ data class Focus(
 }
 
 const val Lens = "arrow.optics.Lens"
+const val Iso = "arrow.optics.Iso"
 const val Optional = "arrow.optics.Optional"
 const val Prism = "arrow.optics.Prism"
 const val Traversal = "arrow.optics.Traversal"

@@ -85,10 +85,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
 
   public companion object {
 
-    public fun <S> id(): Lens<S, S> = Lens(
-      get = { it },
-      set = { _, s -> s }
-    )
+    public fun <S> id(): Iso<S, S> = PIso.id()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
