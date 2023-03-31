@@ -12,6 +12,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 
@@ -38,9 +39,9 @@ class TraversalTest : StringSpec({
       "Traversal Nel - ",
       TraversalLaws(
         traversal = Traversal.nonEmptyList(),
-        aGen = Arb.nonEmptyList(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+        aGen = Arb.nonEmptyList(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
@@ -48,9 +49,9 @@ class TraversalTest : StringSpec({
       "Traversal sequence - ",
       TraversalLaws(
         traversal = Traversal.sequence(),
-        aGen = Arb.sequence(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+        aGen = Arb.sequence(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
         eq = { a, b -> a.toList() == b.toList() }
       )
     )
@@ -59,8 +60,8 @@ class TraversalTest : StringSpec({
       "Traversal map - ",
       TraversalLaws(
         traversal = Traversal.map(),
-        aGen = Arb.map(Arb.int(), Arb.string()),
-        bGen = Arb.string(),
+        aGen = Arb.map(Arb.int(), Arb.long()),
+        bGen = Arb.long(),
         funcGen = Arb.functionAToB(Arb.string()),
       )
     )
