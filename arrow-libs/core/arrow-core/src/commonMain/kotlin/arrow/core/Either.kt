@@ -55,25 +55,6 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *
  * How then do we communicate an error? By making it explicit in the data type we return.
  *
- * ## Either vs Validated
- *
- * In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation
- * upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
- *
- * By convention, the right side of an `Either` is used to hold successful values.
- *
- * ```kotlin
- * import arrow.core.Either
- *
- * val right: Either<String, Int> =
- * //sampleStart
- *  Either.Right(5)
- * //sampleEnd
- * fun main() {
- *  println(right)
- * }
- * ```
- * <!--- KNIT example-either-02.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -86,7 +67,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println(left)
  * }
  * ```
- * <!--- KNIT example-either-03.kt -->
+ * <!--- KNIT example-either-02.kt -->
  *
  * Because `Either` is right-biased, it is possible to define a Monad instance for it.
  *
@@ -107,7 +88,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-04.kt -->
+ * <!--- KNIT example-either-03.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -121,7 +102,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-05.kt -->
+ * <!--- KNIT example-either-04.kt -->
  *
  * ## Using Either instead of exceptions
  *
@@ -149,7 +130,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  * fun stringify(d: Double): String = d.toString()
  * //sampleEnd
  * ```
- * <!--- KNIT example-either-06.kt -->
+ * <!--- KNIT example-either-05.kt -->
  *
  * Instead, let's make the fact that some of our functions can fail explicit in the return type.
  *
@@ -175,7 +156,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *   parse(s).flatMap { reciprocal(it) }.map { stringify(it) }
  * //sampleEnd
  * ```
- * <!--- KNIT example-either-07.kt -->
+ * <!--- KNIT example-either-06.kt -->
  *
  * These calls to `parse` return a [Left] and [Right] value
  *
@@ -195,7 +176,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("number2 = $number2")
  * }
  * ```
- * <!--- KNIT example-either-08.kt -->
+ * <!--- KNIT example-either-07.kt -->
  *
  * Now, using combinators like `flatMap` and `map`, we can compose our functions together.
  *
@@ -227,7 +208,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("magicNotANumber = $magicNotANumber")
  * }
  * ```
- * <!--- KNIT example-either-09.kt -->
+ * <!--- KNIT example-either-08.kt -->
  *
  * In the following exercise, we pattern-match on every case in which the `Either` returned by `magic` can be in.
  * Note the `when` clause in the [Left] - the compiler will complain if we leave that out because it knows that,
@@ -268,7 +249,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-10.kt -->
+ * <!--- KNIT example-either-09.kt -->
  *
  * Instead of using exceptions as our error value, let's instead enumerate explicitly the things that
  * can go wrong in our program.
@@ -298,7 +279,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *   parse(s).flatMap{reciprocal(it)}.map{ stringify(it) }
  * //sampleEnd
  * ```
- * <!--- KNIT example-either-11.kt -->
+ * <!--- KNIT example-either-10.kt -->
  *
  * For our little module, we enumerate any and all errors that can occur. Then, instead of using
  * exception classes as error values, we use one of the enumerated cases. Now, when we pattern match,
@@ -341,7 +322,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-12.kt -->
+ * <!--- KNIT example-either-11.kt -->
  *
  * ## Either.catch exceptions
  *
@@ -366,99 +347,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *   object SpecificError : Error()
  * }
  * ```
- * <!--- KNIT example-either-13.kt -->
- *
- * ## Resolve Either into one type of value
- * In some cases you can not use Either as a value. For instance, when you need to respond to an HTTP request. To resolve Either into one type of value, you can use the resolve function.
- * In the case of an HTTP endpoint you most often need to return some (framework specific) response object which holds the result of the request. The result can be expected and positive, this is the success flow.
- * Or the result can be expected but negative, this is the error flow. Or the result can be unexpected and negative, in this case an unhandled exception was thrown.
- * In all three cases, you want to use the same kind of response object. But probably you want to respond slightly different in each case. This can be achieved by providing specific functions for the success, error and throwable cases.
- *
- * Example:
- *
- * ```kotlin
- * import arrow.core.Either
- * import arrow.core.flatMap
- * import arrow.core.left
- * import arrow.core.right
- *
- * //sampleStart
- * suspend fun httpEndpoint(request: String = "Hello?") =
- *   Either.resolve(
- *     f = {
- *       if (request == "Hello?") "HELLO WORLD!".right()
- *       else Error.SpecificError.left()
- *     },
- *     success = { a -> handleSuccess({ a: Any -> log(Level.INFO, "This is a: $a") }, a) },
- *     error = { e -> handleError({ e: Any -> log(Level.WARN, "This is e: $e") }, e) },
- *     throwable = { throwable -> handleThrowable({ throwable: Throwable -> log(Level.ERROR, "Log the throwable: $throwable.") }, throwable) },
- *     unrecoverableState = { _ -> Unit.right() }
- *   )
- * //sampleEnd
- * suspend fun main() {
- *  println("httpEndpoint().status = ${httpEndpoint().status}")
- * }
- *
- * @Suppress("UNUSED_PARAMETER")
- * suspend fun <A> handleSuccess(log: suspend (a: A) -> Either<Throwable, Unit>, a: A): Either<Throwable, Response> =
- *   Either.catch {
- *     Response.Builder(HttpStatus.OK)
- *       .header(CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
- *       .body(a)
- *       .build()
- *   }
- *
- * @Suppress("UNUSED_PARAMETER")
- * suspend fun <E> handleError(log: suspend (e: E) -> Either<Throwable, Unit>, e: E): Either<Throwable, Response> =
- *   createErrorResponse(HttpStatus.NOT_FOUND, ErrorResponse("$ERROR_MESSAGE_PREFIX $e"))
- *
- * suspend fun handleThrowable(log: suspend (throwable: Throwable) -> Either<Throwable, Unit>, throwable: Throwable): Either<Throwable, Response> =
- *   log(throwable)
- *     .flatMap { createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorResponse("$THROWABLE_MESSAGE_PREFIX $throwable")) }
- *
- * suspend fun createErrorResponse(httpStatus: HttpStatus, errorResponse: ErrorResponse): Either<Throwable, Response> =
- *   Either.catch {
- *     Response.Builder(httpStatus)
- *       .header(CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
- *       .body(errorResponse)
- *       .build()
- *   }
- *
- * suspend fun log(level: Level, message: String): Either<Throwable, Unit> =
- *   Unit.right() // Should implement logging.
- *
- * enum class HttpStatus(val value: Int) { OK(200), NOT_FOUND(404), INTERNAL_SERVER_ERROR(500) }
- *
- * class Response private constructor(
- *   val status: HttpStatus,
- *   val headers: Map<String, String>,
- *   val body: Any?
- * ) {
- *
- *   data class Builder(
- *     val status: HttpStatus,
- *     var headers: Map<String, String> = emptyMap(),
- *     var body: Any? = null
- *   ) {
- *     fun header(key: String, value: String) = apply { this.headers = this.headers + mapOf<String, String>(key to value) }
- *     fun body(body: Any?) = apply { this.body = body }
- *     fun build() = Response(status, headers, body)
- *   }
- * }
- *
- * val CONTENT_TYPE = "Content-Type"
- * val CONTENT_TYPE_APPLICATION_JSON = "application/json"
- * val ERROR_MESSAGE_PREFIX = "An error has occurred. The error is:"
- * val THROWABLE_MESSAGE_PREFIX = "An exception was thrown. The exception is:"
- * sealed class Error {
- *   object SpecificError : Error()
- * }
- * data class ErrorResponse(val errorMessage: String)
- * enum class Level { INFO, WARN, ERROR }
- * ```
- * <!--- KNIT example-either-14.kt -->
- *
- * There are far more use cases for the resolve function, the HTTP endpoint example is just one of them.
+ * <!--- KNIT example-either-12.kt -->
  *
  * ## Syntax
  *
@@ -478,7 +367,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("leftMapLeft = $leftMapLeft")
  * }
  * ```
- * <!--- KNIT example-either-15.kt -->
+ * <!--- KNIT example-either-13.kt -->
  *
  * `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
  *
@@ -494,10 +383,10 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("swapped = $swapped")
  * }
  * ```
- * <!--- KNIT example-either-16.kt -->
+ * <!--- KNIT example-either-14.kt -->
  *
  * For using Either's syntax on arbitrary data types.
- * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` methods:
+ * This will make possible to use the `left()`, `right()`, `getOrElse()` methods:
  *
  * ```kotlin
  * import arrow.core.right
@@ -510,7 +399,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println(right7)
  * }
  * ```
- * <!--- KNIT example-either-17.kt -->
+ * <!--- KNIT example-either-15.kt -->
  *
  * ```kotlin
  * import arrow.core.left
@@ -523,21 +412,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println(leftHello)
  * }
  * ```
- * <!--- KNIT example-either-18.kt -->
- *
- * ```kotlin
- * import arrow.core.right
- * import arrow.core.contains
- *
- * //sampleStart
- * val x = 7.right()
- * val contains7 = x.contains(7)
- * //sampleEnd
- * fun main() {
- *  println("contains7 = $contains7")
- * }
- * ```
- * <!--- KNIT example-either-19.kt -->
+ * <!--- KNIT example-either-16.kt -->
  *
  * ```kotlin
  * import arrow.core.left
@@ -545,57 +420,13 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *
  * //sampleStart
  * val x = "hello".left()
- * val getOr7 = x.getOrElse { 7 }
- * //sampleEnd
- * fun main() {
- *  println("getOr7 = $getOr7")
- * }
- * ```
- * <!--- KNIT example-either-20.kt -->
- *
- * ```kotlin
- * import arrow.core.left
- * import arrow.core.getOrHandle
- *
- * //sampleStart
- * val x = "hello".left()
- * val value = x.getOrHandle { "$it world!" }
+ * val value = x.getOrElse { "$it world!" }
  * //sampleEnd
  * fun main() {
  *  println("value = $value")
  * }
  * ```
- * <!--- KNIT example-either-21.kt -->
- *
- * For creating Either instance based on a predicate, use `Either.conditionally()` method. It will evaluate an expression
- * passed as first parameter, in case the expression evaluates to `false` it will give an `Either.Left<L>` build from the second parameter.
- * If the expression evaluates to a `true` it will take the third parameter and give an `Either.Right<R>`:
- *
- * ```kotlin
- * import arrow.core.Either
- *
- * val value =
- * //sampleStart
- *  Either.conditionally(true, { "Error" }, { 42 })
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-22.kt -->
- *
- * ```kotlin
- * import arrow.core.Either
- *
- * val value =
- * //sampleStart
- *  Either.conditionally(false, { "Error" }, { 42 })
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-23.kt -->
+ * <!--- KNIT example-either-17.kt -->
  *
  * Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is [Left]
  *
@@ -611,7 +442,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("fold = $fold")
  * }
  * ```
- * <!--- KNIT example-either-24.kt -->
+ * <!--- KNIT example-either-18.kt -->
  *
  * ```kotlin
  * import arrow.core.Either
@@ -625,7 +456,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("fold = $fold")
  * }
  * ```
- * <!--- KNIT example-either-25.kt -->
+ * <!--- KNIT example-either-19.kt -->
  *
  * The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
  * the value of [Left]. This can be useful when mapping to a single result type is required like `fold()`, but without
@@ -635,11 +466,11 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *
  * ```kotlin
  * import arrow.core.Either
- * import arrow.core.getOrHandle
+ * import arrow.core.getOrElse
  *
  * //sampleStart
  * val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
- * val httpStatusCode = r.getOrHandle {
+ * val httpStatusCode = r.getOrElse {
  *   when(it) {
  *     is NumberFormatException -> 400
  *     else -> 500
@@ -650,123 +481,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  *  println("httpStatusCode = $httpStatusCode")
  * }
  * ```
- * <!--- KNIT example-either-26.kt -->
- *
- * The ```leftIfNull``` operation transforms a null `Either.Right` value to the specified ```Either.Left``` value.
- * If the value is non-null, the value wrapped into a non-nullable ```Either.Right``` is returned (very useful to
- * skip null-check further down the call chain).
- * If the operation is called on an ```Either.Left```, the same ```Either.Left``` is returned.
- *
- * See the examples below:
- *
- * ```kotlin
- * import arrow.core.Either.Right
- * import arrow.core.leftIfNull
- *
- * fun main() {
- *   val value =
- *   //sampleStart
- *     Right(12).leftIfNull({ -1 })
- *   //sampleEnd
- *   println(value)
- * }
- * ```
- * <!--- KNIT example-either-27.kt -->
- *
- * ```kotlin
- * import arrow.core.Either.Right
- * import arrow.core.leftIfNull
- *
- * val value =
- * //sampleStart
- *  Right(null).leftIfNull({ -1 })
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-28.kt -->
- *
- * ```kotlin
- * import arrow.core.Either.Left
- * import arrow.core.leftIfNull
- *
- * val value =
- * //sampleStart
- *  Left(12).leftIfNull({ -1 })
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-29.kt -->
- *
- * Another useful operation when working with null is `rightIfNotNull`.
- * If the value is null, it will be transformed to the specified `Either.Left` and, if it's not null, the type will
- * be wrapped to `Either.Right`.
- *
- * Example:
- *
- * ```kotlin
- * import arrow.core.rightIfNotNull
- *
- * val value =
- * //sampleStart
- *  "value".rightIfNotNull { "left" }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-30.kt -->
- *
- * ```kotlin
- * import arrow.core.rightIfNotNull
- *
- * val value =
- * //sampleStart
- *  null.rightIfNotNull { "left" }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-31.kt -->
- *
- * The inverse of `rightIfNotNull`, `rightIfNull`.
- * If the value is null it will be transformed to the specified `Either.right` and the type will be `Nothing?`.
- * If the value is not null than it will be transformed to the specified `Either.Left`.
- *
- * Example:
- *
- * ```kotlin
- * import arrow.core.rightIfNull
- *
- * val value =
- * //sampleStart
- *  "value".rightIfNull { "left" }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-32.kt -->
- *
- * ```kotlin
- * import arrow.core.rightIfNull
- *
- * val value =
- * //sampleStart
- *  null.rightIfNull { "left" }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- * <!--- KNIT example-either-33.kt -->
- *
- * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
- * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
+ * <!--- KNIT example-either-20.kt -->
  */
 public sealed class Either<out A, out B> {
 
