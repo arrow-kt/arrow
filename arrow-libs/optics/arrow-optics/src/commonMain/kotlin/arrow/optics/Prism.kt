@@ -126,10 +126,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
 
   public companion object {
 
-    public fun <S> id(): Prism<S, S> = PPrism(
-      getOrModify = { it.right() },
-      reverseGet = ::identity
-    )
+    public fun <S> id(): Iso<S, S> = PIso.id()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.

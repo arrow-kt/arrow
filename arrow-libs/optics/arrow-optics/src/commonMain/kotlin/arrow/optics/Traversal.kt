@@ -165,7 +165,7 @@ public interface PTraversal<S, T, A, B> {
 
   public companion object {
 
-    public fun <S> id(): Traversal<S, S> = PLens.id()
+    public fun <S> id(): Iso<S, S> = PIso.id()
 
     public fun <S> codiagonal(): Traversal<Either<S, S>, S> =
       object : Traversal<Either<S, S>, S> {

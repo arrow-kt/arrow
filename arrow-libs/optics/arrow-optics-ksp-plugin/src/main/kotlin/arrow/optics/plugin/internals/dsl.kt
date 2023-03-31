@@ -22,6 +22,16 @@ fun generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet {
   )
 }
 
+fun generateIsoDsl(ele: ADT, isoOptic: ValueClassDsl): Snippet {
+  val (className, import) = resolveClassName(ele)
+  return Snippet(
+    `package` = ele.packageName,
+    name = ele.simpleName,
+    content = processIsoSyntax(ele, isoOptic, className),
+    imports = setOf(import)
+  )
+}
+
 private fun processLensSyntax(ele: ADT, foci: List<Focus>, className: String): String {
   return if (ele.typeParameters.isEmpty()) {
     foci.joinToString(separator = "\n") { focus ->
@@ -61,6 +71,34 @@ private fun processPrismSyntax(ele: ADT, dsl: SealedClassDsl, className: String)
         else -> focus.refinedArguments.joinToString(separator=",")
       }
     """
+    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Optional<S, $sourceClassNameWithParams>.${focus.paramName}(): $Optional<S, ${focus.className}> = this + ${className}.${focus.paramName}()
+    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Prism<S, $sourceClassNameWithParams>.${focus.paramName}(): $Prism<S, ${focus.className}> = this + ${className}.${focus.paramName}()
+    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Traversal<S, $sourceClassNameWithParams>.${focus.paramName}(): $Traversal<S, ${focus.className}> = this + ${className}.${focus.paramName}()
+    |""".trimMargin()
+    }
+  }
+
+private fun processIsoSyntax(ele: ADT, dsl: ValueClassDsl, className: String): String =
+  if (ele.typeParameters.isEmpty()) {
+    dsl.foci.joinToString(separator = "\n\n") { focus ->
+      """
+    |${ele.visibilityModifierName} inline val <S> $Iso<S, ${ele.sourceClassName}>.${focus.paramName}: $Iso<S, ${focus.className}> inline get() = this + ${className}.${focus.paramName}
+    |${ele.visibilityModifierName} inline val <S> $Lens<S, ${ele.sourceClassName}>.${focus.paramName}: $Lens<S, ${focus.className}> inline get() = this + ${className}.${focus.paramName}
+    |${ele.visibilityModifierName} inline val <S> $Optional<S, ${ele.sourceClassName}>.${focus.paramName}: $Optional<S, ${focus.className}> inline get() = this + ${className}.${focus.paramName}
+    |${ele.visibilityModifierName} inline val <S> $Prism<S, ${ele.sourceClassName}>.${focus.paramName}: $Prism<S, ${focus.className}> inline get() = this + ${className}.${focus.paramName}
+    |${ele.visibilityModifierName} inline val <S> $Traversal<S, ${ele.sourceClassName}>.${focus.paramName}: $Traversal<S, ${focus.className}> inline get() = this + ${className}.${focus.paramName}
+    |""".trimMargin()
+    }
+  } else {
+    dsl.foci.joinToString(separator = "\n\n") { focus ->
+      val sourceClassNameWithParams = focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameters}"
+      val joinedTypeParams = when {
+        focus.refinedArguments.isEmpty() -> ""
+        else -> focus.refinedArguments.joinToString(separator=",")
+      }
+      """
+    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Iso<S, $sourceClassNameWithParams>.${focus.paramName}(): $Iso<S, ${focus.className}> = this + ${className}.${focus.paramName}()
+    |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Lens<S, $sourceClassNameWithParams>.${focus.paramName}(): $Lens<S, ${focus.className}> = this + ${className}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Optional<S, $sourceClassNameWithParams>.${focus.paramName}(): $Optional<S, ${focus.className}> = this + ${className}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Prism<S, $sourceClassNameWithParams>.${focus.paramName}(): $Prism<S, ${focus.className}> = this + ${className}.${focus.paramName}()
     |${ele.visibilityModifierName} inline fun <S,$joinedTypeParams> $Traversal<S, $sourceClassNameWithParams>.${focus.paramName}(): $Traversal<S, ${focus.className}> = this + ${className}.${focus.paramName}()
