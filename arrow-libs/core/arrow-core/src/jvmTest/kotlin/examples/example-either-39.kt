@@ -1,10 +1,14 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither39
 
+import arrow.core.Either.*
 import arrow.core.Either
-import io.kotest.matchers.shouldBe
+import arrow.core.filterOrElse
 
-fun test() {
- Either.Right(12).mapLeft { _: Nothing -> "flower" } shouldBe Either.Right(12)
- Either.Left(12).mapLeft { _: Int -> "flower" }  shouldBe Either.Left("flower")
+fun main() {
+  Right(12).filterOrElse({ it > 10 }, { -1 }) // Result: Right(12)
+  Right(7).filterOrElse({ it > 10 }, { -1 })  // Result: Left(-1)
+
+  val left: Either<Int, Int> = Left(12)
+  left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
 }

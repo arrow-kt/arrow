@@ -3,29 +3,22 @@ package arrow.core.examples.exampleEither10
 
 import arrow.core.Either
 import arrow.core.flatMap
+// Either with ADT Style
 
-fun parse(s: String): Either<NumberFormatException, Int> =
+sealed class Error {
+  object NotANumber : Error()
+  object NoZeroReciprocal : Error()
+}
+
+fun parse(s: String): Either<Error, Int> =
   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
-  else Either.Left(NumberFormatException("$s is not a valid integer."))
+  else Either.Left(Error.NotANumber)
 
-fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
-  if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
+fun reciprocal(i: Int): Either<Error, Double> =
+  if (i == 0) Either.Left(Error.NoZeroReciprocal)
   else Either.Right(1.0 / i)
 
 fun stringify(d: Double): String = d.toString()
 
-fun magic(s: String): Either<Exception, String> =
-  parse(s).flatMap{ reciprocal(it) }.map{ stringify(it) }
-
-val x = magic("2")
-val value = when(x) {
-  is Either.Left -> when (x.value) {
-    is NumberFormatException -> "Not a number!"
-    is IllegalArgumentException -> "Can't take reciprocal of 0!"
-    else -> "Unknown error"
-  }
-  is Either.Right -> "Got reciprocal: ${x.value}"
-}
-fun main() {
- println("value = $value")
-}
+fun magic(s: String): Either<Error, String> =
+  parse(s).flatMap{reciprocal(it)}.map{ stringify(it) }

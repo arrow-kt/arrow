@@ -1,11 +1,10 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither16
 
-import arrow.core.Either.Left
-import arrow.core.Either
+import arrow.core.left
 
-val r: Either<String, Int> = Either.Right(7)
-val swapped = r.swap()
+ val leftHello =
+ "hello".left()
 fun main() {
- println("swapped = $swapped")
+ println(leftHello)
 }

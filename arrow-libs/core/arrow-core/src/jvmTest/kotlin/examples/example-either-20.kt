@@ -1,11 +1,16 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither20
 
-import arrow.core.left
+import arrow.core.Either
 import arrow.core.getOrElse
 
-val x = "hello".left()
-val getOr7 = x.getOrElse { 7 }
+val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
+val httpStatusCode = r.getOrElse {
+  when(it) {
+    is NumberFormatException -> 400
+    else -> 500
+  }
+}
 fun main() {
- println("getOr7 = $getOr7")
+ println("httpStatusCode = $httpStatusCode")
 }
