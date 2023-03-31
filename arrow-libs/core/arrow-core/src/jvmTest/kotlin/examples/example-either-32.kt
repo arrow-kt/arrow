@@ -1,10 +1,12 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither32
 
-import arrow.core.rightIfNull
+import arrow.core.Either
+import arrow.core.Some
+import arrow.core.None
+import io.kotest.matchers.shouldBe
 
-val value =
- "value".rightIfNull { "left" }
-fun main() {
- println(value)
+fun test() {
+  Either.Right(12).getOrNone() shouldBe Some(12)
+  Either.Left(12).getOrNone() shouldBe None
 }

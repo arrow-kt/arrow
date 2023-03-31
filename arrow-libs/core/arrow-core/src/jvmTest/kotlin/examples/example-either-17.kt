@@ -1,10 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither17
 
-import arrow.core.right
+import arrow.core.left
+import arrow.core.getOrElse
 
-val right7 =
-  7.right()
+val x = "hello".left()
+val value = x.getOrElse { "$it world!" }
 fun main() {
- println(right7)
+ println("value = $value")
 }

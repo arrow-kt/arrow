@@ -1,10 +1,13 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither44
 
-import arrow.core.Either
-import io.kotest.matchers.shouldBe
+import arrow.core.*
 
-fun test() {
-  Either.Right(12).leftOrNull() shouldBe null
-  Either.Left(12).leftOrNull() shouldBe 12
+fun main(args: Array<String>) {
+  //sampleStart
+  val string: Either<Int, String> = "Hello".right()
+  val chars: Either<Int, CharSequence> =
+    string.widen<Int, CharSequence, String>()
+  //sampleEnd
+  println(chars)
 }
