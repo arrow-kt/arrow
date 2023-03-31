@@ -118,7 +118,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
   public infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     PPrism(
       getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).mapLeft{ set(s, it) } } },
-      reverseGet = this::reverseGet compose other::reverseGet
+      reverseGet = { reverseGet(other.reverseGet(it)) }
     )
 
   public operator fun <C, D> plus(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
