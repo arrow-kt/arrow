@@ -4,8 +4,12 @@ package arrow.core.examples.exampleEither05
 import arrow.core.Either
 import arrow.core.flatMap
 
-val left: Either<String, Int> = Either.Left("Something went wrong")
-val value = left.flatMap{ Either.Right(it + 1) }
-fun main() {
- println("value = $value")
-}
+fun parse(s: String): Int =
+  if (s.matches(Regex("-?[0-9]+"))) s.toInt()
+  else throw NumberFormatException("$s is not a valid integer.")
+
+fun reciprocal(i: Int): Double =
+  if (i == 0) throw IllegalArgumentException("Cannot take reciprocal of 0.")
+  else 1.0 / i
+
+fun stringify(d: Double): String = d.toString()

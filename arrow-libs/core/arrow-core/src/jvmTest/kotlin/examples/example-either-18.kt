@@ -1,10 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither18
 
-import arrow.core.left
+import arrow.core.Either
+import arrow.core.right
 
- val leftHello =
- "hello".left()
+val x : Either<Int, Int> = 7.right()
+val fold = x.fold({ 1 }, { it + 3 })
 fun main() {
- println(leftHello)
+ println("fold = $fold")
 }

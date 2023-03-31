@@ -2,15 +2,9 @@
 package arrow.core.examples.exampleEither26
 
 import arrow.core.Either
-import arrow.core.getOrHandle
+import io.kotest.matchers.shouldBe
 
-val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
-val httpStatusCode = r.getOrHandle {
-  when(it) {
-    is NumberFormatException -> 400
-    else -> 500
-  }
-}
-fun main() {
- println("httpStatusCode = $httpStatusCode")
+fun test() {
+ Either.Right(12).mapLeft { _: Nothing -> "flower" } shouldBe Either.Right(12)
+ Either.Left(12).mapLeft { _: Int -> "flower" }  shouldBe Either.Left("flower")
 }
