@@ -18,30 +18,30 @@ class FilterIndexInstanceTest : StringSpec({
     testLaws(
       "FilterIndex list - ",
       TraversalLaws(
-        traversal = FilterIndex.list<String>().filter { true },
-        aGen = Arb.list(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+        traversal = FilterIndex.list<Int>().filter { true },
+        aGen = Arb.list(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
     testLaws(
       "FilterIndex sequence - ",
       TraversalLaws(
-        traversal = FilterIndex.sequence<String>().filter { true },
-        aGen = Arb.list(Arb.string()).map { it.asSequence() },
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+        traversal = FilterIndex.sequence<Int>().filter { true },
+        aGen = Arb.list(Arb.int()).map { it.asSequence() },
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       ) { a, b -> a.toList() == b.toList() }
     )
 
     testLaws(
       "FilterIndex Nel - ",
       TraversalLaws(
-        traversal = FilterIndex.nonEmptyList<String>().filter { true },
-        aGen = Arb.nonEmptyList(Arb.string()),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
+        traversal = FilterIndex.nonEmptyList<Int>().filter { true },
+        aGen = Arb.nonEmptyList(Arb.int()),
+        bGen = Arb.int(),
+        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
