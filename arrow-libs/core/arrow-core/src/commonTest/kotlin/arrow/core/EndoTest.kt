@@ -10,7 +10,7 @@ import io.kotest.property.arbitrary.int
 class EndoTest : StringSpec({
 
     testLaws(
-      MonoidLaws(Endo(::identity), { f, g -> Endo(f.f.compose(g.f)) }, Arb.endo(Arb.int())) { a, b ->
+      MonoidLaws("Endo", Endo(::identity), { f, g -> Endo(f.f.compose(g.f)) }, Arb.endo(Arb.int())) { a, b ->
         a.f(1) == b.f(1)
       }
     )
