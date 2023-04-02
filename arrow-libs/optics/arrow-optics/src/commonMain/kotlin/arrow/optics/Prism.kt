@@ -6,7 +6,6 @@ import arrow.core.Either.Right
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.left
