@@ -5,7 +5,6 @@ import arrow.core.test.functionAToB
 import arrow.core.test.intSmall
 import arrow.core.test.ior
 import arrow.core.test.laws.MonoidLaws
-import arrow.core.test.longSmall
 import arrow.core.test.map2
 import arrow.core.test.map3
 import arrow.core.test.option
@@ -30,14 +29,14 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.checkAll
 
 class MapKTest : StringSpec({
     testLaws(
       MonoidLaws(
+        "Map",
         emptyMap(),
         { a, b -> a.combine(b, Int::plus) },
         Arb.map(Arb.int(), Arb.intSmall(), maxSize = 10)
