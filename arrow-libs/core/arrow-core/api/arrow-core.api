@@ -24,13 +24,6 @@ public final class arrow/core/ComparisonKt {
 	public static final fun sort (S[S)Ljava/util/List;
 }
 
-public final class arrow/core/Composition {
-	public static final fun andThen (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function0;
-	public static final fun andThen (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-	public static final fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
-	public static final fun compose (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-}
-
 public abstract class arrow/core/Either {
 	public static final field Companion Larrow/core/Either$Companion;
 	public static final fun catch (Lkotlin/jvm/functions/Function0;)Larrow/core/Either;

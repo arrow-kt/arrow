@@ -6,7 +6,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Either.Right
 import arrow.core.Some
-import arrow.core.compose
 import arrow.core.identity
 import kotlin.jvm.JvmStatic
 
@@ -120,9 +119,8 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B> {
    * Compose a [PIso] with a [PIso]
    */
   public infix fun <C, D> compose(other: PIso<in A, out B, out C, in D>): PIso<S, T, C, D> = PIso(
-    other::get compose this::get,
-    this::reverseGet compose other::reverseGet
-  )
+    { s -> other.get(get(s)) }
+  ) { d -> reverseGet(other.reverseGet(d)) }
 
   public operator fun <C, D> plus(other: PIso<in A, out B, out C, in D>): PIso<S, T, C, D> =
     this compose other
