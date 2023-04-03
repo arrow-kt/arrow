@@ -11,3 +11,6 @@ val KSClassDeclaration.isSealed
 
 val KSClassDeclaration.isData
   get() = modifiers.contains(Modifier.DATA)
+
+val KSClassDeclaration.isValue
+  get() = modifiers.contains(Modifier.VALUE)
