@@ -1,5 +1,7 @@
 package arrow.optics.plugin.internals
 
+import arrow.optics.plugin.isValue
+
 internal fun generateIsos(ele: ADT, target: IsoTarget) =
   Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target))
 
@@ -63,12 +65,13 @@ private fun processElement(iso: ADT, target: Target): String {
         "tuple: ${focusType()} -> ${(foci.indices).joinToString(prefix = "${iso.sourceClassName}(", postfix = ")", transform = { "tuple.${letters[it]}" })}"
     }
 
+  val isoName = if (iso.declaration.isValue) target.foci.first().paramName else "iso"
   val sourceClassNameWithParams = "${iso.sourceClassName}${iso.angledTypeParameters}"
   val firstLine = when {
     iso.typeParameters.isEmpty() ->
-      "${iso.visibilityModifierName} inline val ${iso.sourceClassName}.Companion.iso: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()"
+      "${iso.visibilityModifierName} inline val ${iso.sourceClassName}.Companion.$isoName: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()"
     else ->
-      "${iso.visibilityModifierName} inline fun ${iso.angledTypeParameters} ${iso.sourceClassName}.Companion.iso(): $Iso<$sourceClassNameWithParams, ${focusType()}>"
+      "${iso.visibilityModifierName} inline fun ${iso.angledTypeParameters} ${iso.sourceClassName}.Companion.$isoName(): $Iso<$sourceClassNameWithParams, ${focusType()}>"
   }
 
   return """

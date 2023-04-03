@@ -50,6 +50,8 @@ typealias SealedClassDsl = Target.SealedClassDsl
 
 typealias DataClassDsl = Target.DataClassDsl
 
+typealias ValueClassDsl = Target.ValueClassDsl
+
 sealed class Target {
   abstract val foci: List<Focus>
 
@@ -59,6 +61,9 @@ sealed class Target {
   data class Optional(override val foci: List<Focus>) : Target()
   data class SealedClassDsl(override val foci: List<Focus>) : Target()
   data class DataClassDsl(override val foci: List<Focus>) : Target()
+  data class ValueClassDsl(val focus: Focus) : Target() {
+    override val foci = listOf(focus)
+  }
 }
 
 typealias NonNullFocus = Focus.NonNull
