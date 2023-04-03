@@ -5,7 +5,7 @@ val String.otherClassTypeErrorMessage
     """
       |$this cannot be annotated with @optics
       | ^
-      |Only data and sealed classes can be annotated with @optics""".trimMargin()
+      |Only data, sealed, and value classes can be annotated with @optics""".trimMargin()
 
 val String.typeParametersErrorMessage
   get() =
@@ -47,7 +47,7 @@ val String.isoErrorMessage
       |Cannot generate arrow.optics.Iso for $this
       |                                      ^
       |arrow.optics.OpticsTarget.ISO is an invalid @optics argument for $this.
-      |It is only valid for data classes.
+      |It is only valid for data and value classes.
       """.trimMargin()
 
 val String.isoTooBigErrorMessage

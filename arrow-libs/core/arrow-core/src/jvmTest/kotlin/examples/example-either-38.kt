@@ -1,10 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither38
 
-import arrow.core.Either
-import io.kotest.matchers.shouldBe
+import arrow.core.Either.Right
+import arrow.core.Either.Left
+import arrow.core.getOrHandle
 
-fun test() {
-  Either.Right(12).map { _: Int ->"flower" } shouldBe Either.Right("flower")
-  Either.Left(12).map { _: Nothing -> "flower" } shouldBe Either.Left(12)
+fun main() {
+  Right(12).getOrHandle { 17 } // Result: 12
+  Left(12).getOrHandle { it + 5 } // Result: 17
 }

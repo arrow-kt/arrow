@@ -3,14 +3,11 @@ package arrow.core.examples.exampleEither13
 
 import arrow.core.Either
 
-fun potentialThrowingCode(): String = throw RuntimeException("Blow up!")
-
-suspend fun makeSureYourLogicDoesNotHaveSideEffects(): Either<Error, String> =
-  Either.catch { potentialThrowingCode() }.mapLeft { Error.SpecificError }
-suspend fun main() {
-  println("makeSureYourLogicDoesNotHaveSideEffects().isLeft() = ${makeSureYourLogicDoesNotHaveSideEffects().isLeft()}")
-}
-
-sealed class Error {
-  object SpecificError : Error()
+val r : Either<Int, Int> = Either.Right(7)
+val rightMapLeft = r.mapLeft {it + 1}
+val l: Either<Int, Int> = Either.Left(7)
+val leftMapLeft = l.mapLeft {it + 1}
+fun main() {
+ println("rightMapLeft = $rightMapLeft")
+ println("leftMapLeft = $leftMapLeft")
 }

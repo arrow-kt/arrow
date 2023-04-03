@@ -99,4 +99,31 @@ class IsoTests {
       |}
       """.failsWith { it.contains("${`package`.removePrefix("package ")}.IsoXXL".isoTooBigErrorMessage) }
   }
+
+  @Test
+  fun `Isos will be generated for value class`() {
+    """
+      |$`package`
+      |$imports
+      |@optics @JvmInline
+      |value class IsoData(
+      |  val field1: String
+      |) { companion object }
+      |
+      |val i: Iso<IsoData, String> = IsoData.field1
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Iso generation requires companion object declaration, value class`() {
+    """
+      |$`package`
+      |$imports
+      |@optics @JvmInline
+      |value class IsoNoCompanion(
+      |  val field1: String
+      |)
+      """.failsWith { it.contains("IsoNoCompanion".noCompanion) }
+  }
 }
