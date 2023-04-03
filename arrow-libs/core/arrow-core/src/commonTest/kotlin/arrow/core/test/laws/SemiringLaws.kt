@@ -7,6 +7,7 @@ import io.kotest.property.Arb
 import io.kotest.property.checkAll
 
 data class SemiringLaws<F>(
+  val name: String,
   val zero: F,
   val combine: (F, F) -> F,
   val one: F,
@@ -17,18 +18,18 @@ data class SemiringLaws<F>(
 
   override val laws: List<Law> =
     listOf(
-      Law("Semiring: Additive commutativity") { semiringAdditiveCommutativity() },
-      Law("Semiring: Additive left identity") { semiringAdditiveLeftIdentity() },
-      Law("Semiring: Additive right identity") { semiringAdditiveRightIdentity() },
-      Law("Semiring: Additive associativity") { semiringAdditiveAssociativity() },
-      Law("Semiring: Multiplicative commutativity") { semiringMultiplicativeCommutativity() },
-      Law("Semiring: Multiplicative left identity") { semiringMultiplicativeLeftIdentity() },
-      Law("Semiring: Multiplicative right identity") { semiringMultiplicativeRightIdentity() },
-      Law("Semiring: Multiplicative associativity") { semiringMultiplicativeAssociativity() },
-      Law("Semiring: Right distributivity") { semiringRightDistributivity() },
-      Law("Semiring: Left distributivity") { semiringLeftDistributivity() },
-      Law("Semiring: Multiplicative left absorption") { semiringMultiplicativeLeftAbsorption() },
-      Law("Semiring: Multiplicative right absorption") { semiringMultiplicativeRightAbsorption() },
+      Law("Semiring Laws ($name): Additive commutativity") { semiringAdditiveCommutativity() },
+      Law("Semiring Laws ($name): Additive left identity") { semiringAdditiveLeftIdentity() },
+      Law("Semiring Laws ($name): Additive right identity") { semiringAdditiveRightIdentity() },
+      Law("Semiring Laws ($name): Additive associativity") { semiringAdditiveAssociativity() },
+      Law("Semiring Laws ($name): Multiplicative commutativity") { semiringMultiplicativeCommutativity() },
+      Law("Semiring Laws ($name): Multiplicative left identity") { semiringMultiplicativeLeftIdentity() },
+      Law("Semiring Laws ($name): Multiplicative right identity") { semiringMultiplicativeRightIdentity() },
+      Law("Semiring Laws ($name): Multiplicative associativity") { semiringMultiplicativeAssociativity() },
+      Law("Semiring Laws ($name): Right distributivity") { semiringRightDistributivity() },
+      Law("Semiring Laws ($name): Left distributivity") { semiringLeftDistributivity() },
+      Law("Semiring Laws ($name): Multiplicative left absorption") { semiringMultiplicativeLeftAbsorption() },
+      Law("Semiring Laws ($name): Multiplicative right absorption") { semiringMultiplicativeRightAbsorption() },
     )
 
   // a + b = b + a
