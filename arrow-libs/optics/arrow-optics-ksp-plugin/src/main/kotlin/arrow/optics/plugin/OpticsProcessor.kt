@@ -32,7 +32,7 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
 
   private fun processClass(klass: KSClassDeclaration) {
     // check that it is sealed or data
-    if (!klass.isSealed && !klass.isData) {
+    if (!klass.isSealed && !klass.isData && !klass.isValue) {
       logger.error(klass.qualifiedNameOrSimpleName.otherClassTypeErrorMessage, klass)
       return
     }
