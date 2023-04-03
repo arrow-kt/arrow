@@ -11,7 +11,7 @@ import io.kotest.property.checkAll
 
 class ListKTest : StringSpec({
 
-    testLaws(MonoidLaws(emptyList(), List<Int>::plus, Arb.list(Arb.int())))
+    testLaws(MonoidLaws("List", emptyList(), List<Int>::plus, Arb.list(Arb.int())))
 
     "mapNotNull() should map list and filter out null values" {
       checkAll(Arb.list(Arb.int())) { listk ->

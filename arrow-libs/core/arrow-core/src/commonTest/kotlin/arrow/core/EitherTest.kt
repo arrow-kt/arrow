@@ -26,9 +26,9 @@ import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.nonPositiveInt
 import io.kotest.property.arbitrary.short
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
 class EitherTest : StringSpec({
@@ -36,7 +36,7 @@ class EitherTest : StringSpec({
   val ARB = Arb.either(Arb.string(), Arb.int())
 
     testLaws(
-      MonoidLaws(0.right(), { x, y -> x.combine(y, String::plus, Int::plus) }, ARB)
+      MonoidLaws("Either", 0.right(), { x, y -> x.combine(y, String::plus, Int::plus) }, ARB)
     )
     
     "isLeft should return true if Left and false if Right" {
