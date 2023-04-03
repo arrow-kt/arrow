@@ -1,8 +1,9 @@
 name: auto-update-pr
 on:
-  push: {}
-  branches-ignore:
-    - main
+  push:
+    branches-ignore:
+      - main
+
 jobs:
   autoupdate:
     name: Auto update PR

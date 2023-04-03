@@ -1,9 +1,8 @@
 name: githubpages
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
@@ -20,7 +19,7 @@ jobs:
 
       - name: Dokka
         id: Dokka
-        run: ./gradlew cleanDocs dokkaHtmlMultiModule -Pgithubpages=true
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} cleanDocs dokkaHtmlMultiModule -Pgithubpages=true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
