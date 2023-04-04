@@ -19,7 +19,7 @@ jobs:
 
       - name: Dokka
         id: Dokka
-        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} cleanDocs dokkaHtmlMultiModule -Pgithubpages=true
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3

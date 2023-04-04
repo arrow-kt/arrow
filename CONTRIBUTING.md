@@ -139,33 +139,6 @@ public sealed class Option<out A> {
 
 If your snippet is showing examples on how to use the public APIs in a broader scenario (like describing FP patterns or similar), then you'll add those snippets to the described docs Markdown file.
 
-## How to run the website in your local workspace
-
-```sh
-./gradlew :arrow-site:buildSite
-```
-
-That Gradle task is equivalent to run Dokka and Jekyll build:
-
-```bash
-./gradlew dokkaGfm
-cd arrow-site
-bundle install --gemfile Gemfile --path vendor/bundle
-bundle exec jekyll serve -s build/site
-```
-
-This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
-
-If you get an error while installing the Ruby gem _http_parser_, check if the path to your Arrow directory contains spaces. According to this [issue](https://github.com/tmm1/http_parser.rb/issues/47), the installation with spaces in the path is currently not working.
-
-### How to test links
-
-Test for broken links in documentation using
-
-```sh
-wget --spider -r -nd -nv -l 5 http://127.0.0.1:4000
-```
-
 ## How to propose an improvement 
 
 If it's the first time you contribute with a GitHub repository, take a look at [Collaborating with issues and pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
@@ -295,8 +268,6 @@ This short guideline provides all the things to keep in mind when adding a new m
   - Add `<module>/gradle.properties`
   - Add `<module>/build.gradle.kts`
   - Update `settings.gradle.kts`
-- Website:
-  - Update [sidebar files](arrow-site/docs/_data)
 - Utilities:
   - Update BOM file: [build.gradle](arrow-stack/build.gradle)
   
