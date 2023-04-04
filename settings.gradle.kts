@@ -66,10 +66,6 @@ project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-o
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
 
-// SITE
-include("arrow-site")
-project(":arrow-site").projectDir = file("arrow-site")
-
 gradleEnterprise {
   buildScan {
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
