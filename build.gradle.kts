@@ -111,15 +111,7 @@ tasks {
   val undocumentedProjects =
     listOf(project(":arrow-optics-ksp-plugin"))
 
-  dokkaGfmMultiModule {
-    dependsOn("copyCNameFile")
-    removeChildTasks(undocumentedProjects)
-  }
   dokkaHtmlMultiModule {
-    dependsOn("copyCNameFile")
-    removeChildTasks(undocumentedProjects)
-  }
-  dokkaJekyllMultiModule {
     dependsOn("copyCNameFile")
     removeChildTasks(undocumentedProjects)
   }
