@@ -122,13 +122,7 @@ tasks {
 }
 
 apiValidation {
-  val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
-    listOf("arrow-optics-ksp-plugin")
-  } else {
-    listOf("arrow-optics-ksp-plugin")
-  }
-
-  ignoredProjects.addAll(ignoreApiValidation)
+  ignoredProjects.add("arrow-optics-ksp-plugin")
 }
 
 rootProject.plugins.withType<YarnPlugin> {
