@@ -111,9 +111,10 @@ tasks {
   val undocumentedProjects =
     listOf(project(":arrow-optics-ksp-plugin"))
 
-  dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
-  dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
-  dokkaJekyllMultiModule { removeChildTasks(undocumentedProjects) }
+  dokkaHtmlMultiModule {
+    dependsOn("copyCNameFile")
+    removeChildTasks(undocumentedProjects)
+  }
 
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
 
@@ -126,6 +127,11 @@ tasks {
     val folder = docFolder()
     val content = folder.listFiles()?.filter { it != folder }
     delete(content)
+  }
+
+  register<Copy>("copyCNameFile") {
+    from(layout.projectDirectory.dir("static").file("CNAME"))
+    into(layout.projectDirectory.dir("docs"))
   }
 }
 
