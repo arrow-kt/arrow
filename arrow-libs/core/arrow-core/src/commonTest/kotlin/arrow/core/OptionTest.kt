@@ -21,7 +21,7 @@ class OptionTest : StringSpec({
   val none: Option<String> = None
 
     testLaws(
-      MonoidLaws(None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
+      MonoidLaws("Option", None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
     )
 
     "ensure null in option computation" {

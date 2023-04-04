@@ -1,8 +1,11 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import kotlinx.knit.KnitPluginExtension
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 
 buildscript {
   repositories {
@@ -31,12 +34,11 @@ plugins {
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
-   alias(libs.plugins.arrowGradleConfig.versioning)
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
 
-configure<kotlinx.knit.KnitPluginExtension> {
+configure<KnitPluginExtension> {
   siteRoot = "https://arrow-kt.io/"
   rootDir = file("arrow-libs")
   files = fileTree(file("arrow-libs")) {
@@ -56,7 +58,6 @@ koverMerged {
       excludes.addAll(
         listOf(
           ":arrow-annotations",
-          ":arrow-site",
           ":arrow-stack",
           ":arrow-optics-ksp-plugin"
         )
@@ -99,52 +100,33 @@ subprojects {
 }
 
 tasks {
-  val generateDoc by creating(Exec::class) {
-    group = "documentation"
-    commandLine("sh", "gradlew", "dokkaGfm")
-  }
-  val buildDoc by creating(Exec::class) {
-    group = "documentation"
-    description = "Generates and validates the documentation"
-    dependsOn(generateDoc)
-  }
-
   val undocumentedProjects =
     listOf(project(":arrow-optics-ksp-plugin"))
 
-  dokkaGfmMultiModule { removeChildTasks(undocumentedProjects) }
-  dokkaHtmlMultiModule { removeChildTasks(undocumentedProjects) }
-  dokkaJekyllMultiModule { removeChildTasks(undocumentedProjects) }
+  dokkaHtmlMultiModule {
+    dependsOn("copyCNameFile")
+    removeChildTasks(undocumentedProjects)
+  }
 
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
 
   withType<DokkaMultiModuleTask>().configureEach {
-    outputDirectory.set(docFolder())
+    outputDirectory.set(file("docs"))
     moduleName.set("Arrow")
   }
 
-  register<Delete>("cleanDocs") {
-    val folder = docFolder()
-    val content = folder.listFiles()?.filter { it != folder }
-    delete(content)
+  register<Copy>("copyCNameFile") {
+    from(layout.projectDirectory.dir("static").file("CNAME"))
+    into(layout.projectDirectory.dir("docs"))
   }
 }
-
-fun docFolder(): File =
-  project.properties["githubpages"]?.let { file("docs").also { it.mkdir() } } ?: rootDir.resolve("arrow-site/docs/apidocs")
 
 apiValidation {
-  val ignoreApiValidation = if (!enableCompatibilityMetadataVariant) {
-    listOf("arrow-optics-ksp-plugin", "arrow-site")
-  } else {
-    listOf("arrow-optics-ksp-plugin")
-  }
-
-  ignoredProjects.addAll(ignoreApiValidation)
+  ignoredProjects.add("arrow-optics-ksp-plugin")
 }
 
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-  rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().apply {
+rootProject.plugins.withType<YarnPlugin> {
+  rootProject.configure<NodeJsRootExtension> {
     versions.webpackDevServer.version = "4.11.1"
     versions.webpack.version = "5.75.0"
     versions.webpackCli.version = "4.10.0"

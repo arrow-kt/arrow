@@ -31,7 +31,24 @@ val String.isoErrorMessage
       |Cannot generate arrow.optics.Iso for $this
       |                                      ^
       |arrow.optics.OpticsTarget.ISO is an invalid @optics argument for $this.
-      |It is only valid for value classes.
+      |It is only valid for data and value classes.
+      """.trimMargin()
+
+val String.isoTooBigErrorMessage
+  get() =
+    """
+      |Cannot generate arrow.optics.Iso for $this
+      |                                      ^
+      |Iso generation is supported for data classes with up to 22 constructor parameters.
+      """.trimMargin()
+
+val String.dslErrorMessage
+  get() =
+    """
+      |Cannot generate DSL (arrow.optics.BoundSetter) for $this
+      |                                                    ^
+      |arrow.optics.OpticsTarget.DSL is an invalid @optics argument for $this.
+      |It is only valid for data classes and sealed classes.
       """.trimMargin()
 
 val String.noCompanion

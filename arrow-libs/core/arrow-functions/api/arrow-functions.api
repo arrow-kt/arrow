@@ -89,6 +89,7 @@ public final class arrow/core/Currying {
 	public static final fun uncurriedEffect (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function7;
 	public static final fun uncurriedEffect (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function8;
 	public static final fun uncurriedEffect (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function9;
+	public static final fun uncurriedEffect (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/FunctionN;
 }
 
 public final class arrow/core/Memoization {

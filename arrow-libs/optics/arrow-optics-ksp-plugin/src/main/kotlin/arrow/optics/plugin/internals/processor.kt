@@ -36,6 +36,9 @@ internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
       isValue ->
         listOf(OpticsTarget.ISO, OpticsTarget.DSL)
           .filter { targets.isEmpty() || it in targets }
+      isValue ->
+        listOf(OpticsTarget.ISO, OpticsTarget.DSL)
+          .filter { targets.isEmpty() || it in targets }
       else ->
         listOf(OpticsTarget.LENS, OpticsTarget.DSL)
           .filter { targets.isEmpty() || it in targets }

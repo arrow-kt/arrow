@@ -9,20 +9,19 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.negativeInt
 import io.kotest.property.arbitrary.pair
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
 class NonEmptyListTest : StringSpec({
 
-    testLaws(SemigroupLaws(NonEmptyList<Int>::plus, Arb.nonEmptyList(Arb.int())))
+    testLaws(SemigroupLaws("NonEmptyList", NonEmptyList<Int>::plus, Arb.nonEmptyList(Arb.int())))
 
     "iterable.toNonEmptyListOrNull should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->

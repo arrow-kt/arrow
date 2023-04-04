@@ -6,9 +6,9 @@ import arrow.core.test.testLaws
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
-import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
@@ -20,7 +20,7 @@ class IorTest : StringSpec({
   val ARB = Arb.ior(Arb.string(), Arb.int())
 
   testLaws(
-    SemigroupLaws({ a, b ->
+    SemigroupLaws("Ior", { a, b ->
       a.combine(b, String::plus, Int::plus)
     }, ARB)
   )

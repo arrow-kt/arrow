@@ -7,20 +7,19 @@ import arrow.core.test.testLaws
 import arrow.core.test.unit
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
-import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.positiveInt
-import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
 class SequenceKTest : StringSpec({
 
-    testLaws(MonoidLaws(emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
+    testLaws(MonoidLaws("Sequence", emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
