@@ -1,4 +1,4 @@
-<a href="https://arrow-kt.io" title="Arrow website"><img src="img/logo/arrow-dark.svg" width="200" alt=""></a>
+<a href="https://arrow-kt.io" title="Arrow website"><img src="https://arrow-kt.io/img/arrow-brand.svg" width="200" alt=""></a>
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Kotlin version](https://img.shields.io/badge/Kotlin-1.8.10-blue)](https://kotlinlang.org/docs/whatsnew18.html)
@@ -11,24 +11,24 @@
 
 Arrow aims to provide a [*lingua franca*](https://en.wikipedia.org/wiki/Lingua_franca) of interfaces
 and abstractions across Kotlin libraries. For this, it includes the most popular data types such
-as `Option`, `Either`, `Validated` etc and functional operators such as `traverse` and computation
+as `Option`, and `Either`, functional operators such as `zipOrAccumulate`, and computation
 blocks to empower users to write pure FP apps and libraries built atop higher order abstractions.
 
-Use the list below to learn more about Λrrow's main features.
+## [Documentation](http://arrow-kt.io)
 
-- [Documentation](http://arrow-kt.io)
-  - [Core](https://arrow-kt.io/docs/core/): error handling and monads
-  - [Fx](https://arrow-kt.io/docs/fx/): interfacing with external systems
-  - [Optics](https://arrow-kt.io/docs/optics/): inspecting and modifying data structures
+- [Quickstart and setup](https://arrow-kt.io/learn/quickstart/)
+- [Typed errors](https://arrow-kt.io/learn/typed-errors/)
+- [Coroutines and resources](https://arrow-kt.io/learn/coroutines/)
+- [Resilience](https://arrow-kt.io/learn/resilience/)
+- [Immutable data](https://arrow-kt.io/learn/immutable-data/)
+- [Collections and functions](https://arrow-kt.io/learn/collections-functions/)
 
-#### Curated external links
-
-- [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
-
-If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR
-to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo.
+The documentation is hosted in a [separate repository](https://github.com/arrow-kt/arrow-website).
 
 ## Arrow 2.0
+
+⚠️ _**Every new API has been backported to Arrow 1.2**. We strongly discourage from using Arrow 2.0
+at this point, except for testing purposes, and use Arrow 1.2 instead._
 
 The next version of Arrow is [in active development](https://github.com/arrow-kt/arrow/pull/2778).
 If you want to try it, you need to add the following repository in your build file:
@@ -55,184 +55,6 @@ please follow us here and say hello!
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
 Find more details in [CONTRIBUTING](CONTRIBUTING.md).
-
-## Setup
-
-### JDK
-
-Make sure to have the latest version of JDK 1.8 (or higher) installed.
-
-### Android
-
-Arrow supports Android starting on API 21 and up.
-
-### Gradle
-
-#### Basic Setup
-
-In your project's root `build.gradle`, append this repository to your list:
-
-```groovy
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-```
-
-Add the dependencies into the project's `build.gradle`:
-
-##### Λrrow Core
-
-```groovy
-def arrow_version = "1.0.1"
-dependencies {
-    implementation "io.arrow-kt:arrow-core:$arrow_version"
-}
-```
-
-##### Λrrow Core + Λrrow Optics
-
-```groovy
-apply plugin: 'kotlin-kapt'
-
-def arrow_version = "1.0.1"
-dependencies {
-    implementation "io.arrow-kt:arrow-optics:$arrow_version"
-    kapt "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-##### Λrrow Core + Λrrow Fx
-
-```groovy
-def arrow_version = "1.0.1"
-dependencies {
-    implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
-}
-```
-
-#### BOM file
-
-To avoid specifying the Arrow version for every dependency, a BOM file is available:
-
-```
-    implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
-
-    implementation "io.arrow-kt:arrow-core"
-    implementation "io.arrow-kt:arrow-fx-coroutines"
-    ...
-```
-
-### Maven
-
-#### Basic Setup
-
-Make sure to have at least the latest version of JDK 1.8 installed. Add to your `pom.xml` file the
-following properties:
-
-```xml
-<properties>
-    <kotlin.version>1.5.31</kotlin.version>
-    <arrow.version>1.0.1</arrow.version>
-</properties>
-```
-
-Add the dependencies that you want to use:
-
-```xml
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-```
-
-#### Enabling kapt for the Optics DSL
-
-For the Optics DSL, enable annotation processing using Kotlin plugin:
-
-```xml
-<plugin>
-    <groupId>org.jetbrains.kotlin</groupId>
-    <artifactId>kotlin-maven-plugin</artifactId>
-    <version>${kotlin.version}</version>
-    <executions>
-        <execution>
-            <id>kapt</id>
-            <goals>
-                <goal>kapt</goal>
-            </goals>
-            <configuration>
-                <sourceDirs>
-                    <sourceDir>src/main/kotlin</sourceDir>
-                </sourceDirs>
-                <annotationProcessorPaths>
-                    <annotationProcessorPath>
-                        <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-meta</artifactId>
-                        <version>${arrow.version}</version>
-                    </annotationProcessorPath>
-                </annotationProcessorPaths>
-            </configuration>
-        </execution>
-        <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-                <goal>compile</goal>
-            </goals>
-            <configuration>
-                <sourceDirs>
-                    <sourceDir>src/main/kotlin</sourceDir>
-                </sourceDirs>
-            </configuration>
-        </execution>
-        <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
-            <goals>
-                <goal>test-compile</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
-```
-
-#### BOM file
-
-To avoid specifying the Arrow version for every dependency, a BOM file is available:
-
-```
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.arrow-kt</groupId>
-        <artifactId>arrow-stack</artifactId>
-        <version>${arrow.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  <dependencies>
-    ...
-  </dependencies>
-```
-
-## Next development version
-
-If you want to try the latest features, replace `1.0.1` with `1.0.2-SNAPSHOT` and add this
-repository:
-
-```groovy
-allprojects {
-    repositories {
-        ...
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-}
-```
 
 ## License
 
