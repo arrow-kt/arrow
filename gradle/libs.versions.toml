@@ -11,11 +11,11 @@ jUnitVintage = "5.9.2"
 kotest = "5.5.4"
 kotestGradle = "5.5.4"
 kover = "0.6.1"
-kotlin = "1.8.10"
+kotlin = "1.8.20"
 kotlinBinaryCompatibilityValidator = "0.13.0"
 kotlinCompileTesting = "1.5.0"
 knit = "0.4.0"
-kspVersion = "1.8.10-1.0.9"
+kspVersion = "1.8.20-1.0.10"
 kotlinxSerialization = "1.5.0"
 mockWebServer = "4.10.0"
 retrofit = "2.9.0"
@@ -57,6 +57,7 @@ arrowGradleConfig-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter"
 arrowGradleConfig-kotlin = { id = "io.arrow-kt.arrow-gradle-config-kotlin", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-nexus = { id = "io.arrow-kt.arrow-gradle-config-nexus", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", version.ref = "arrowGradleConfig" }
+arrowGradleConfig-versioning = { id = "io.arrow-kt.arrow-gradle-config-versioning", version.ref = "arrowGradleConfig" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
