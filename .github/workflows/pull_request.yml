@@ -5,6 +5,9 @@ on: pull_request
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
+concurrency:
+  group: pull_request-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   ios_watchos:
