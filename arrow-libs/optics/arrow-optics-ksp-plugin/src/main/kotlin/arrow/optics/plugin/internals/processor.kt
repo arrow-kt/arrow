@@ -1,6 +1,6 @@
 package arrow.optics.plugin.internals
 
-import arrow.optics.plugin.isData
+import arrow.optics.plugin.isDataClass
 import arrow.optics.plugin.isSealed
 import arrow.optics.plugin.isValue
 import com.google.devtools.ksp.processing.KSPLogger
@@ -100,7 +100,7 @@ internal fun evalAnnotatedDataClass(
   logger: KSPLogger
 ): List<Focus> =
   when {
-    element.isData ->
+    element.isDataClass ->
       element
         .getConstructorTypesNames()
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
@@ -112,7 +112,7 @@ internal fun evalAnnotatedDataClass(
 
 internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLogger): Target =
   when {
-    element.isData ->
+    element.isDataClass ->
       DataClassDsl(
         element
           .getConstructorTypesNames()
@@ -133,7 +133,7 @@ internal fun evalAnnotatedIsoElement(
   logger: KSPLogger
 ): List<Focus> =
   when {
-    element.isData ->
+    element.isDataClass ->
       element
         .getConstructorTypesNames()
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
