@@ -477,6 +477,68 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
 public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A =
   catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
 
+/**
+ * Ensures that the [condition] is met;
+ * otherwise, [Raise.raise]s a logical failure of type [Error].
+ *
+ * In summary, this is a type-safe alternative to [require], using the [Raise] API.
+ *
+ * ### Example:
+ * ```
+ * @JvmInline
+ * value class CountryCode(val code: String)
+ *
+ * sealed interface CountryCodeError {
+ *     data class InvalidLength(val length: Int) : CountryCodeError
+ *     object ContainsInvalidChars : CountryCodeError
+ * }
+ *
+ * context(Raise<CountryCodeError>)
+ * fun countryCode(rawCode: String): CountryCode {
+ *     ensure(rawCode.length == 2) { CountryCodeError.InvalidLength(rawCode.length) }
+ *     ensure(rawCode.any { !it.isLetter() }) { CountryCodeError.ContainsInvalidChars }
+ *     return CountryCode(rawCode)
+ * }
+ *
+ * fun main() {
+ *     recover({
+ *         countryCode("US") // valid
+ *         countryCode("ABC") // raises CountryCode.InvalidLength error
+ *         countryCode("A1") // raises CountryCode.ContainsInvalidChar
+ *     }) { error ->
+ *         // Handle errors in a type-safe manner
+ *         when (error) {
+ *             CountryCodeError.ContainsInvalidChars -> {}
+ *             is CountryCodeError.InvalidLength -> {}
+ *         }
+ *     }
+ *
+ *     // Can call it w/o error handling => prone to runtime errors
+ *     countryCodeOrThrow("Will fail")
+ *     countryCode("Will fail") // this line won't compile => we're protected
+ *
+ *     try {
+ *         countryCodeOrThrow("US") // valid
+ *         countryCodeOrThrow("ABC") // throw IllegalArgumentException
+ *         countryCodeOrThrow("A1") // throw IllegalArgumentException
+ *     } catch (e: IllegalArgumentException) {
+ *         // Not easy to handle
+ *     }
+ * }
+ *
+ * // Not type-safe alternative using require
+ * @Throws(IllegalArgumentException::class)
+ * fun countryCodeOrThrow(rawCode: String): CountryCode {
+ *     require(rawCode.length == 2) { CountryCodeError.InvalidLength(rawCode.length) }
+ *     require(rawCode.any { !it.isLetter() }) { CountryCodeError.ContainsInvalidChars }
+ *     return CountryCode(rawCode)
+ * }
+ * ```
+ *
+ * @param condition the condition that must be true.
+ * @param raise a lambda that produces an error of type [Error] when the [condition] is false.
+ *
+ */
 @RaiseDSL
 public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> Error) {
   contract {
