@@ -6,6 +6,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.identity
 import arrow.core.raise.fold
 import kotlin.contracts.ExperimentalContracts
@@ -116,6 +117,7 @@ public interface EagerEffectScope<in R> {
    * ```
    * <!--- KNIT example-eager-effect-scope-04.kt -->
    */
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
   public suspend fun <B> Validated<R, B>.bind(): B =
     when (this) {
       is Validated.Valid -> value

@@ -17,8 +17,6 @@ projects.version=0.11.0-SNAPSHOT
 projects.latestVersion=0.10.5
 ```
 2. Update versions in `README.md`
-3. Update versions in [the QuickStart section of the website](arrow-site/docs/docs/quickstart/README.md).
-4. Update versions in [the sidebar](arrow-site/docs/_data/doc-versions.yml).
 
 When merging that pull request, these things will happen automatically:
 
@@ -37,7 +35,7 @@ Then, close and release the Sonatype repository to sync with Maven Central:
 4. Select the staging repository and **Release** to sync with Maven Central
 5. **Drop** and repeat if there are issues.
 
-NOTE: [This plugin](https://github.com/gradle-nexus/publish-plugin) provides tasks for closing and releasing the staging repositories. However, that plugin must be applied to the root project and it would be necessary to discard modules for publication. Let's keep this note here to give it a try later on.
+NOTE: [This plugin](https://github.com/gradle-nexus/publish-plugin) provides tasks for closing and releasing the staging repositories. However, that plugin must be applied to the root project, and it would be necessary to discard modules for publication. Let's keep this note here to give it a try later on.
 
 ### About signing artifacts with GPG/PGP
 
@@ -55,7 +53,7 @@ To verify artifacts during **Close** task, the public key must be distributed to
 Context:
 
 * Latest release has a bug and `main` branch already has other additional features.
-* A released version has a bug and it's not the latest release.
+* A released version has a bug, and it's not the latest release.
 
 How to fix a `<major.minor.patch>` version in some of those contexts:
 
@@ -63,14 +61,12 @@ How to fix a `<major.minor.patch>` version in some of those contexts:
 2. Apply the fix into the new branch:
    * Via pull request for new changes.
    * Directly for existing changes (cherry-pick).
-3. Check that new `<major.minor.(patch + 1)-SNAPSHOT>` artifacts are deployed into [Sonatype OSSRH](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/) with the fixes.
+3. Check that new `<major.minor.(patch + 1)-SNAPSHOT>` artifacts are deployed into [Sonatype OSS](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/) with the fixes.
 4. Try the new `<major.minor.(patch + 1)-SNAPSHOT>` version.
 5. Create a pull request into `main` branch if the fix must be applied to the new versions as well.
 6. Create a pull request into `release/<major.minor.(patch + 1)>` branch to release the fix:
     * Change just `projects.latestVersion` in `arrow-libs/gradle.properties`.
     * Update the version in `README.md`.
-    * Update the version in [the QuickStart section of the website](arrow-site/docs/docs/quickstart/README.md).
-    * Update [the sidebar](arrow-site/docs/_data/doc-versions.yml).
 
 What will happen when merging the last pull request?
 
@@ -81,7 +77,3 @@ What will happen when merging the last pull request?
 TODO: Release notes and GitHub release must be created manually.
 
 Then, close and release the Sonatype repository to sync with Maven Central in the same way as other versions.
-
-Last step:
-
-* Update [the sidebar](arrow-site/docs/_data/doc-versions.yml) in the `main` branch to show the new latest version for `major.minor`.

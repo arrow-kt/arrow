@@ -49,8 +49,8 @@ project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-corout
 include("arrow-fx-stm")
 project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
 
-include("arrow-fx-resilience")
-project(":arrow-fx-resilience").projectDir = file("arrow-libs/fx/arrow-fx-resilience")
+include("arrow-resilience")
+project(":arrow-resilience").projectDir = file("arrow-libs/resilience/arrow-resilience")
 
 // OPTICS
 include("arrow-optics")
@@ -65,10 +65,6 @@ project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-o
 // STACK
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
-
-// SITE
-include("arrow-site")
-project(":arrow-site").projectDir = file("arrow-site")
 
 gradleEnterprise {
   buildScan {

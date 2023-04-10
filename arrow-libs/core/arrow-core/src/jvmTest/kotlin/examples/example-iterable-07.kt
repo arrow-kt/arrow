@@ -2,13 +2,10 @@
 package arrow.core.examples.exampleIterable07
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-val left = listOf(1, 2).rightPadZip(listOf("a")) { l, r -> l to r }      // Result: [Pair(1, "a"), Pair(null, "b")]
-val right = listOf(1).rightPadZip(listOf("a", "b")) { l, r -> l to r }   // Result: [Pair(1, "a")]
-val both = listOf(1, 2).rightPadZip(listOf("a", "b")) { l, r -> l to r } // Result: [Pair(1, "a"), Pair(2, "b")]
-
-fun main() {
-  println("left = $left")
-  println("right = $right")
-  println("both = $both")
+fun test() {
+  listOf(1, 2).rightPadZip(listOf("a")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to null)
+  listOf(1).rightPadZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a")
+  listOf(1, 2).rightPadZip(listOf("a", "b")) { l, r -> l to r } shouldBe listOf(1 to "a", 2 to "b")
 }

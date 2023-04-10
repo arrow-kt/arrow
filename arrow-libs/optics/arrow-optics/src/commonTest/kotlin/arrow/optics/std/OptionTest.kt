@@ -18,7 +18,7 @@ class OptionTest : StringSpec({
 
     testLaws(
       "Prism some - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.some(),
         aGen = Arb.option(Arb.int()),
         bGen = Arb.int(),
@@ -28,7 +28,7 @@ class OptionTest : StringSpec({
 
     testLaws(
       "Prism none - ",
-      PrismLaws.laws(
+      PrismLaws(
         prism = Prism.none(),
         aGen = Arb.option(Arb.int()),
         bGen = Arb.constant(Unit),
@@ -38,7 +38,7 @@ class OptionTest : StringSpec({
 
     testLaws(
       "Iso option to nullable - ",
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.optionToNullable<Int>().reverse(),
         aGen = Arb.int().orNull(),
         bGen = Arb.option(Arb.int()),
@@ -48,7 +48,7 @@ class OptionTest : StringSpec({
 
     testLaws(
       "Iso option to either - ",
-      IsoLaws.laws(
+      IsoLaws(
         iso = Iso.optionToEither(),
         aGen = Arb.option(Arb.int()),
         bGen = Arb.either(Arb.constant(Unit), Arb.int()),

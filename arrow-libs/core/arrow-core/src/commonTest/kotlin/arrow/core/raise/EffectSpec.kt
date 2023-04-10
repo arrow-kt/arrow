@@ -2,9 +2,13 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.core.test.either
+import arrow.core.test.nonEmptyList
+import arrow.core.test.nonEmptySet
 import arrow.core.toNonEmptyListOrNull
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
@@ -604,10 +608,113 @@ class EffectSpec : StringSpec({
   }
 
   "accumulate, returns no error" {
-    checkAll(Arb.list(Arb.string())) { elements ->
-      either<NonEmptyList<Int>, List<String>> {
+    checkAll(Arb.list(Arb.int())) { elements ->
+      either<NonEmptyList<Int>, List<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
+    }
+  }
+
+  "NonEmptyList - mapOrAccumulate, returns every error" {
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 2..100)) { errors ->
+      either<NonEmptyList<Int>, NonEmptyList<String>> {
+        mapOrAccumulate(errors) { raise(it) }
+      } shouldBe errors.toNonEmptyListOrNull()!!.left()
+    }
+  }
+
+  "NonEmptyList - mapOrAccumulate, returns no error" {
+    checkAll(Arb.nonEmptyList(Arb.int())) { elements ->
+      either<NonEmptyList<Int>, NonEmptyList<Int>> {
+        mapOrAccumulate(elements) { it }
+      } shouldBe elements.right()
+    }
+  }
+
+  "NonEmptySet - mapOrAccumulate, returns every error" {
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 2..100)) { errors ->
+      either<NonEmptyList<Int>, NonEmptySet<String>> {
+        mapOrAccumulate(errors) { raise(it) }
+      } shouldBe errors.toNonEmptyListOrNull()!!.left()
+    }
+  }
+
+  "NonEmptySet - mapOrAccumulate, returns no error" {
+    checkAll(Arb.nonEmptySet(Arb.int())) { elements ->
+      either<NonEmptyList<Int>, NonEmptySet<Int>> {
+        mapOrAccumulate(elements) { it }
+      } shouldBe elements.right()
+    }
+  }
+
+  "bindAll fails on first error" {
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+      val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
+      either {
+        eithers.bindAll()
+      } shouldBe expected
+    }
+  }
+
+  fun <E, A> Either<E, A>.leftOrNull(): E? = fold(::identity) { null }
+
+  "accumulate - bindAll" {
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+      val expected =
+        eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
+
+      either<NonEmptyList<Int>, List<Int>> {
+        zipOrAccumulate(
+          { eithers.bindAll() },
+          { emptyList<Int>() }
+        ) { a, b -> a + b }
+      } shouldBe expected
+    }
+  }
+
+  "NonEmptyList - bindAll fails on first error" {
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+      val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
+      either {
+        eithers.bindAll()
+      } shouldBe expected
+    }
+  }
+
+  "NonEmptyList - bindAll accumulate errors" {
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+      val expected =
+        eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
+
+      either<NonEmptyList<Int>, NonEmptyList<Int>> {
+        zipOrAccumulate(
+          { eithers.bindAll() },
+          { emptyList<Int>() }
+        ) { a, b -> a + b }
+      } shouldBe expected
+    }
+  }
+
+  "NonEmptySet - bindAll fails on first error" {
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+      val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
+      either {
+        eithers.bindAll()
+      } shouldBe expected
+    }
+  }
+
+  "NonEmptySet - bindAll accumulate errors" {
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+      val expected =
+        eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
+
+      either<NonEmptyList<Int>, NonEmptySet<Int>> {
+        zipOrAccumulate(
+          { eithers.bindAll() },
+          { emptySet<Int>() }
+        ) { a, b -> a + b }
+      } shouldBe expected
     }
   }
 

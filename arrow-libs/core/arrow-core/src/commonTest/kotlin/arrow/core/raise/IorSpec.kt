@@ -2,12 +2,14 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.test.nonEmptyList
 import arrow.typeclasses.Semigroup
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.filter
+import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -45,11 +47,11 @@ class IorSpec : StringSpec({
   }
 
   "Concurrent - arrow.ior bind" {
-    checkAll(Arb.list(Arb.string()).filter(List<String>::isNotEmpty)) { strs ->
-      ior(List<String>::plus) {
-        strs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
+    checkAll(Arb.nonEmptyList(Arb.int())) { xs ->
+      ior(List<Int>::plus) {
+        xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
       }
-        .mapLeft { it.toSet() } shouldBe Ior.Both(strs.toSet(), strs.indices.toList())
+        .mapLeft { it.toSet() } shouldBe Ior.Both(xs.toSet(), xs.indices.toList())
     }
   }
 

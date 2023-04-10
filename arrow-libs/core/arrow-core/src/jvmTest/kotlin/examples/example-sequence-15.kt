@@ -7,5 +7,5 @@ fun main(args: Array<String>) {
   //sampleStart
   val result = sequenceOf("A" to 1, "B" to 2).unzip()
   //sampleEnd
-  println("(${result.first.toList()}, ${result.second.toList()})")
+  println("(${result.first}, ${result.second})")
 }

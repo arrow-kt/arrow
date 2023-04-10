@@ -54,7 +54,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
   override fun reverseGet(focus: B): T
 
   override fun getOrModify(source: S): Either<T, A> =
-    Either.Right(get(source))
+    Right(get(source))
 
   override fun set(source: S, focus: B): T =
     set(focus)
@@ -65,7 +65,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
   override fun modify(source: S, map: (focus: A) -> B): T =
     reverseGet(map(get(source)))
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (A) -> R): R =
+  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**
@@ -109,16 +109,16 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
    * Create a sum of the [PIso] and a type [C]
    */
   override fun <C> left(): PIso<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PIso(
-    { it.bimap(this::get, ::identity) },
-    { it.bimap(this::reverseGet, ::identity) }
+    { it.mapLeft(this::get) },
+    { it.mapLeft(this::reverseGet) }
   )
 
   /**
    * Create a sum of a type [C] and the [PIso]
    */
   override fun <C> right(): PIso<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PIso(
-    { it.bimap(::identity, this::get) },
-    { it.bimap(::identity, this::reverseGet) }
+    { it.map(this::get) },
+    { it.map(this::reverseGet) }
   )
 
   /**
@@ -172,6 +172,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
      * [PIso] that defines the equality between [Either] and [Validated]
      */
     @JvmStatic
+    @Deprecated("Validated functionality is being merged into Either.\n Consider using `id` after migration.")
     public fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
       PIso(
         get = { it.fold(::Invalid, ::Valid) },
@@ -182,6 +183,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
      * [Iso] that defines the equality between [Either] and [Validated]
      */
     @JvmStatic
+    @Deprecated("Validated functionality is being merged into Either.\n Consider using `id` after migration.")
     public fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
       eitherToPValidated()
 
@@ -192,7 +194,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
     public fun <K> mapToSet(): Iso<Map<K, Unit>, Set<K>> =
       Iso(
         get = { it.keys },
-        reverseGet = { keys -> keys.map { it to Unit }.toMap() }
+        reverseGet = { keys -> keys.associateWith { } }
       )
 
     /**

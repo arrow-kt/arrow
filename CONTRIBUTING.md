@@ -15,7 +15,6 @@ In this page you'll find these guidelines for contributions:
 
 - [How to build the libraries](#how-to-build-the-libraries)
 - [How to generate and validate the documentation](#how-to-generate-and-validate-the-documentation)
-- [How to run the website in your local workspace](#how-to-run-the-website-in-your-local-workspace)
 - [How to propose an improvement](#how-to-propose-an-improvement)
 - [Notes](#notes)
    - [How to upgrade Gradle](#how-to-upgrade-gradle)
@@ -55,7 +54,7 @@ Root project 'arrow'
 +--- Project ':arrow-core'
 ```
 
-2.  Append `:build` after the subproject name and run this task. See also Gradle documentation [how to run subproject tasks.](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html#sec:executing_tasks_by_fully_qualified_name)
+2. Append `:build` after the subproject name and run this task. See also Gradle documentation [how to run subproject tasks.](https://docs.gradle.org/current/userguide/intro_multi_project_builds.html#sec:executing_tasks_by_fully_qualified_name)
 
 ```bash
 ./gradlew :arrow-core:build
@@ -127,46 +126,21 @@ for example
  *  println("value = $someValue")
  *  println("emptyValue = $emptyValue")
  * }
- * ```
+ *
  * <!--- KNIT example-option-01.kt -->
  *  
  * (...)
  */ 
 public sealed class Option<out A> {
+  
+}
 ```
 
 #### 2. Snippets for broader samples
 
 If your snippet is showing examples on how to use the public APIs in a broader scenario (like describing FP patterns or similar), then you'll add those snippets to the described docs Markdown file.
 
-## How to run the website in your local workspace
-
-```sh
-./gradlew :arrow-site:buildSite
-```
-
-That Gradle task is equivalent to run Dokka and Jekyll build:
-
-```bash
-./gradlew dokkaGfm
-cd arrow-site
-bundle install --gemfile Gemfile --path vendor/bundle
-bundle exec jekyll serve -s build/site
-```
-
-This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
-
-If you get an error while installing the Ruby gem _http_parser_, check if the path to your Arrow directory contains spaces. According to this [issue](https://github.com/tmm1/http_parser.rb/issues/47), the installation with spaces in the path is currently not working.
-
-### How to test links
-
-Test for broken links in documentation using
-
-```sh
-wget --spider -r -nd -nv -l 5 http://127.0.0.1:4000
-```
-
-## How to propose an improvement 
+## How to propose an improvement
 
 If it's the first time you contribute with a GitHub repository, take a look at [Collaborating with issues and pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
 
@@ -176,11 +150,11 @@ Please, follow the link to [create an issue](https://github.com/arrow-kt/arrow/i
 
 ### How to create a pull request
 
-The easiest way to contribute to Arrow is to create a branch from a fork, and then create a PR on Github from your branch.
+The easiest way to contribute to Arrow is to create a branch from a fork, and then create a PR on GitHub from your branch.
 
 Arrow is a large project that uses several tools to verify that the code is formatted consistently, and that we don't break downstream projects that rely on Arrow's API across versions. 
 
-For code formatting we use [Spotless](https://github.com/diffplug/spotless/tree/main/plugin-gradle) with [KtFmt](https://github.com/facebookincubator/ktfmt) and for API binary compatibility we use [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator). They need to run before you commit and push your code to Github.
+For code formatting we use [Spotless](https://github.com/diffplug/spotless/tree/main/plugin-gradle) with [KtFmt](https://github.com/facebookincubator/ktfmt) and for API binary compatibility we use [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator). They need to run before you commit and push your code to GitHub.
 
 If you've included those changes for binary compatibility and formatted the code correctly it's time to open your PR and get your contribution into Arrow. Thanks ahead of time for your effort and contributions 🙏
 
@@ -207,7 +181,7 @@ Note: if, when running `build`, you see the following error:
 > Task :arrow-core:apiCheck FAILED
 ```
 
-This means you have changed (advertently or not) some public API. In this case read in the next point below how to resolve this.
+This means you have changed (inadvertently or not) some public API. In this case read in the next point below how to resolve this.
 
 * The approval by 2 maintainers of the Arrow Community.
 
@@ -261,11 +235,11 @@ This will generate updated `.api` files which you can then manually review (if t
 
 Both successful or failed build checks allow to download the tests report to review it:
 
-![how-to-download-tests-report](img/doc/download-report.png)
+![how-to-download-tests-report](static/img/doc/download-report.png)
 
 #### What happens when merging a pull request
 
-When merging the pull request, a new SNAPSHOT library will be published into [Sonatype OSSRH](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/).
+When merging the pull request, a new SNAPSHOT library will be published into [Sonatype OSS](https://oss.sonatype.org/service/local/repositories/snapshots/content/io/arrow-kt/).
 
 On the other hand, the documentation for the next version (SNAPSHOT) will be updated:
 
@@ -281,7 +255,7 @@ If any of these actions fails, an issue will be created to be solved as soon as 
 
 The use of Gradle appears in several subprojects: `arrow-core`, `arrow-stack`, etc.
 
-However, links are being used so it's just necessary to upgrade Gradle in the project root directory:
+However, links are being used, so it's just necessary to upgrade Gradle in the project root directory:
 
 ```
 ./gradlew wrapper --gradle-version <new-version>
@@ -295,19 +269,17 @@ This short guideline provides all the things to keep in mind when adding a new m
   - Add `<module>/gradle.properties`
   - Add `<module>/build.gradle.kts`
   - Update `settings.gradle.kts`
-- Website:
-  - Update [sidebar files](arrow-site/docs/_data)
 - Utilities:
-  - Update BOM file: [build.gradle](arrow-stack/build.gradle)
+  - Update BOM file: [build.gradle](arrow-libs/stack/build.gradle.kts)
   
 ### Gradle dependency configurations
 
-| Configuration | Use | Note |
-| ------------- | --- | ---- |
-| `api` | compilation | exported to consumers for compilation |
-| `implementation` | compilation + runtime | exported to consumers for runtime | 
-| `compileOnly` | just compilation | not exported to consumers | 
-| `runtimeOnly` | just runtime | exported to consumers for runtime | 
-| `testImplementation` | test compilation + test runtime |  | 
-| `testCompileOnly` | test compilation |  | 
-| `testRuntimeOnly` | test runtime |  |
+| Configuration        | Use                             | Note                                  |
+|----------------------|---------------------------------|---------------------------------------|
+| `api`                | compilation                     | exported to consumers for compilation |
+| `implementation`     | compilation + runtime           | exported to consumers for runtime     | 
+| `compileOnly`        | just compilation                | not exported to consumers             | 
+| `runtimeOnly`        | just runtime                    | exported to consumers for runtime     | 
+| `testImplementation` | test compilation + test runtime |                                       | 
+| `testCompileOnly`    | test compilation                |                                       | 
+| `testRuntimeOnly`    | test runtime                    |                                       |

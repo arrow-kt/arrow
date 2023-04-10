@@ -9,6 +9,7 @@ internal fun ADT.snippets(): List<Snippet> =
       is OptionalTarget -> generateOptionals(this, it)
       is SealedClassDsl -> generatePrismDsl(this, it)
       is DataClassDsl -> generateOptionalDsl(this, it) + generateLensDsl(this, it)
+      is ValueClassDsl -> generateIsoDsl(this, it)
     }
   }
 

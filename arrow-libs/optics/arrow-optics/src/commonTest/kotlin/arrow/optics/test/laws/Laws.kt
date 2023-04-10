@@ -7,10 +7,18 @@ import io.kotest.core.spec.style.scopes.StringSpecScope
 import io.kotest.core.spec.style.scopes.addTest
 import io.kotest.core.test.TestContext
 
+interface LawSet {
+  val laws: List<Law>
+}
+
 data class Law(val name: String, val test: suspend TestContext.() -> Unit)
 
-fun <A> A.equalUnderTheLaw(b: A, f: (A, A) -> Boolean = { a, b -> a == b }): Boolean =
+fun <A> A.equalUnderTheLaw(b: A, f: (A, A) -> Boolean = { x, y -> x == y }): Boolean =
   if (f(this, b)) true else fail("Found $this but expected: $b")
+
+fun StringSpec.testLaws(vararg lawSets: LawSet): Unit = testLaws(lawSets.flatMap { it.laws })
+
+fun StringSpec.testLaws(prefix: String, vararg lawSets: LawSet): Unit = testLaws(prefix, lawSets.flatMap { it.laws })
 
 fun StringSpec.testLaws(vararg laws: List<Law>): Unit = laws
   .flatMap { list: List<Law> -> list.asIterable() }

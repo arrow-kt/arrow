@@ -3,18 +3,21 @@
 @file:JvmName("RaiseKt")
 package arrow.core.raise
 
-import arrow.core.mapOrAccumulate
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.EmptyValue
 import arrow.core.EmptyValue.combine
 import arrow.core.EmptyValue.unbox
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.Validated
+import arrow.core.ValidatedDeprMsg
 import arrow.core.collectionSizeOrDefault
 import arrow.core.ValidatedNel
+import arrow.core.mapOrAccumulate
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
+import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
@@ -476,6 +479,34 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   return error.toNonEmptyListOrNull()?.let { raise(it) } ?: results
 }
 
+/**
+ * Accumulate the errors obtained by executing the [transform] over every element of [NonEmptyList].
+ */
+@RaiseDSL
+public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  nonEmptyList: NonEmptyList<A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+): NonEmptyList<B> = requireNotNull(mapOrAccumulate(nonEmptyList.all, transform).toNonEmptyListOrNull())
+
+/**
+ * Accumulate the errors obtained by executing the [transform] over every element of [NonEmptySet].
+ */
+@RaiseDSL
+public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  nonEmptySet: NonEmptySet<A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+): NonEmptySet<B> {
+  val error = mutableListOf<Error>()
+  val results = HashSet<B>(nonEmptySet.collectionSizeOrDefault(10))
+  for (item in nonEmptySet) {
+    fold<NonEmptyList<Error>, B, Unit>(
+      { transform(RaiseAccumulate(this), item) },
+      { errors -> error.addAll(errors) },
+      { results.add(it) }
+    )
+  }
+  return error.toNonEmptyListOrNull()?.let { raise(it) } ?: requireNotNull(results.toNonEmptySetOrNull())
+}
 
 /**
  * Receiver type belonging to [mapOrAccumulate].
@@ -490,12 +521,41 @@ public open class RaiseAccumulate<Error>(
   public override fun raise(r: Error): Nothing =
     raise.raise(nonEmptyListOf(r))
 
+  public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
+    mapOrAccumulate { (_, a) -> a.bind() }.bindNel()
+
+  @RaiseDSL
+  public inline fun <A, B> Iterable<A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(A) -> B
+  ): List<B> = raise.mapOrAccumulate(this, transform)
+
+  @RaiseDSL
+  public inline fun <A, B> NonEmptyList<A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(A) -> B
+  ): NonEmptyList<B> = raise.mapOrAccumulate(this, transform)
+
+  @RaiseDSL
+  public inline fun <A, B> NonEmptySet<A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(A) -> B
+  ): NonEmptySet<B> = raise.mapOrAccumulate(this, transform)
+
+  @RaiseDSL
+  override fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
+    mapOrAccumulate { it.bind() }
+
+  override fun <A> NonEmptyList<Either<Error, A>>.bindAll(): NonEmptyList<A> =
+    mapOrAccumulate { it.bind() }
+
+  override fun <A> NonEmptySet<Either<Error, A>>.bindAll(): NonEmptySet<A> =
+    mapOrAccumulate { it.bind() }
+
   @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {
     is Either.Left -> raise.raise(value)
     is Either.Right -> value
   }
 
+  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bindNel()"))
   @RaiseDSL
   public fun <A> ValidatedNel<Error, A>.bindNel(): A = when (this) {
     is Validated.Invalid -> raise.raise(value)

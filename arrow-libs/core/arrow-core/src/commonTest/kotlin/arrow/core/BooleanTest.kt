@@ -8,6 +8,6 @@ import io.kotest.property.arbitrary.boolean
 
 class BooleanTest : StringSpec({
     testLaws(
-      MonoidLaws(true, { x, y -> x && y }, Arb.boolean())
+      MonoidLaws("Boolean", true, { x, y -> x && y }, Arb.boolean())
     )
 })

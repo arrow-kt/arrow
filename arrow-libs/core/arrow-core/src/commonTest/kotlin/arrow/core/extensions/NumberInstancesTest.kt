@@ -13,6 +13,7 @@ import io.kotest.property.arbitrary.short
 class NumberInstancesTest : StringSpec({
 
   fun <F> testAllLaws(
+    name: String,
     zero: F,
     combine: (F, F) -> F,
     one: F,
@@ -20,13 +21,13 @@ class NumberInstancesTest : StringSpec({
     GEN: Arb<F>,
     eq: (F, F) -> Boolean = { a, b -> a == b }
   ) {
-    testLaws(SemiringLaws(zero, combine, one, combineMultiplicate, GEN, eq))
-    testLaws(MonoidLaws(zero, combine, GEN, eq))
+    testLaws(SemiringLaws(name, zero, combine, one, combineMultiplicate, GEN, eq))
+    testLaws(MonoidLaws(name, zero, combine, GEN, eq))
   }
 
-    testAllLaws(0, { x, y -> (x + y).toByte() }, 1, { x, y -> (x * y).toByte() }, Arb.byte())
-    testAllLaws(0, { x, y -> (x + y).toShort() }, 1, { x, y -> (x * y).toShort() }, Arb.short())
-    testAllLaws(0, { x, y -> x + y }, 1, { x, y -> x * y }, Arb.int())
-    testAllLaws(0, { x, y -> x + y }, 1, { x, y -> x * y }, Arb.long())
+    testAllLaws("Byte", 0, { x, y -> (x + y).toByte() }, 1, { x, y -> (x * y).toByte() }, Arb.byte())
+    testAllLaws("Short", 0, { x, y -> (x + y).toShort() }, 1, { x, y -> (x * y).toShort() }, Arb.short())
+    testAllLaws("Int", 0, Int::plus, 1, Int::times, Arb.int())
+    testAllLaws("Long", 0, Long::plus, 1, Long::times, Arb.long())
 
 })

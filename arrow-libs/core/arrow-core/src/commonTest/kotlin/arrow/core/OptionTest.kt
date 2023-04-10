@@ -22,7 +22,7 @@ class OptionTest : StringSpec({
   val none: Option<String> = None
 
     testLaws(
-      MonoidLaws(None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
+      MonoidLaws("Option", None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
     )
 
     "ensure null in option computation" {
@@ -352,7 +352,7 @@ class OptionTest : StringSpec({
       val some: Option<String> = Some("value")
       val none: Option<String> = None
       some.traverse { listOf(it) } shouldBe listOf(Some("value"))
-      none.traverse { listOf(it) } shouldBe emptyList()
+      none.traverse { listOf(it) } shouldBe listOf(None)
     }
 
     "sequence should be consistent with traverse" {

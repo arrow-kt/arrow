@@ -12,5 +12,5 @@ fun main(args: Array<String>) {
      }
    }
   //sampleEnd
-  println("(${result.first.toList()}, ${result.second.toList()})")
+  println("(${result.first}, ${result.second})")
 }

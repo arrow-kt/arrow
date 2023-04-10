@@ -2,10 +2,9 @@
 package arrow.core.examples.exampleEither24
 
 import arrow.core.Either
-import arrow.core.right
+import io.kotest.matchers.shouldBe
 
-val x : Either<Int, Int> = 7.right()
-val fold = x.fold({ 1 }, { it + 3 })
-fun main() {
- println("fold = $fold")
+fun test() {
+  Either.Left("left").swap() shouldBe Either.Right("left")
+  Either.Right("right").swap() shouldBe Either.Left("right")
 }

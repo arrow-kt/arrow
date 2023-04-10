@@ -4,22 +4,23 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
+import arrow.core.test.unit
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
-import io.kotest.property.Arb
-import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.positiveInt
-import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
 
 class SequenceKTest : StringSpec({
 
-    testLaws(MonoidLaws(emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
+    testLaws(MonoidLaws("Sequence", emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
     "traverse for Either stack-safe" {
       // also verifies result order and execution order (l to r)
@@ -40,24 +41,26 @@ class SequenceKTest : StringSpec({
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
       val res = generateSequence(0) { it + 1 }.traverse { a ->
-        (a <= 20_000).maybe {
+        if ((a <= 20_000)) {
           acc.add(a)
-          a
+          Some(a)
+        } else {
+          None
         }
       }
       acc shouldBe (0..20_000).toList()
       res shouldBe None
     }
 
-    "traverse for Validated stack-safe" {
+    "mapOrAccumlate for Either stack-safe" {
       // also verifies result order and execution order (l to r)
       val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().traverse(Semigroup.string()) {
+      val res = (0..20_000).asSequence().mapOrAccumulate(String::plus) {
         acc.add(it)
-        Validated.Valid(it)
+        Either.Right(it).bind()
       }.map { it.toList() }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..20_000).toList())
+      res shouldBe Either.Right(acc)
+      res shouldBe Either.Right((0..20_000).toList())
     }
 
     "traverse for Validated acummulates" {
@@ -235,30 +238,36 @@ class SequenceKTest : StringSpec({
       }
     }
 
+    "crosswalk the sequence to a List function" {
+      checkAll(Arb.list(Arb.int())){ list ->
+        val obtained = list.asSequence().crosswalk { listOf(it) }
+        val expected = if (list.isEmpty()) emptyList()
+                      else listOf(list.map { it })
+        obtained.map{ it.sorted() } shouldBe expected.map { it.sorted() }
+      }
+    }
+
     "can align sequences - 1" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
       }
     }
 
     "can align sequences - 2" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
-          it.isBoth shouldBe true
+          it.isBoth() shouldBe true
         }
       }
     }
 
     "can align sequences - 3" {
-      checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.string())) { a, b ->
+      checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()
         a.align(b).drop(min(ls.size, rs.size)).forEach {
-          if (ls.size < rs.size) {
-            it.isRight shouldBe true
-          } else {
-            it.isLeft shouldBe true
-          }
+          if (ls.size < rs.size) it.isRight() shouldBe true
+          else it.isLeft() shouldBe true
         }
       }
     }
@@ -302,7 +311,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "filterOption should filter None" {
+  "filterOption should filter None" {
       checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }

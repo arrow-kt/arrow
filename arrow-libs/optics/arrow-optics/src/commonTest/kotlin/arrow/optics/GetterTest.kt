@@ -2,7 +2,6 @@ package arrow.optics
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.typeclasses.Monoid
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -37,15 +36,9 @@ class GetterTest : StringSpec({
       }
     }
 
-    "asFold should behave as valid Fold: combineAll" {
-      checkAll(Arb.token()) { token ->
-        Getter.token().fold(Monoid.string(), token) shouldBe token.value
-      }
-    }
-
     "asFold should behave as valid Fold: fold" {
       checkAll(Arb.token()) { token ->
-        Getter.token().fold(Monoid.string(), token) shouldBe token.value
+        Getter.token().fold("", { x, y -> x + y }, token) shouldBe token.value
       }
     }
 

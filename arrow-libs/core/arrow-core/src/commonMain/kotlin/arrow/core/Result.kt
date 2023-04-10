@@ -29,13 +29,12 @@ public inline fun <A, B> Result<A>.flatMap(transform: (value: A) -> Result<B>): 
  * Compose a recovering [transform] operation on the failure value [Throwable] whilst flattening [Result].
  * @see recoverCatching if you want run a function that catches and maps recovers with `(Throwable) -> A`.
  */
-public inline fun <A> Result<A>.handleErrorWith(transform: (throwable: Throwable) -> Result<A>): Result<A> {
-  contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-  return when (val exception = exceptionOrNull()) {
-    null -> this
-    else -> transform(exception)
-  }
-}
+@Deprecated(
+  "Prefer Kotlin Std Result.recoverCatching instead of handleErrorWith",
+  ReplaceWith("recoverCatching { transform(it).getOrThrow() }")
+)
+public inline fun <A> Result<A>.handleErrorWith(transform: (throwable: Throwable) -> Result<A>): Result<A> =
+  recoverCatching { transform(it).getOrThrow() }
 
 /**
  * Compose both:
@@ -44,6 +43,10 @@ public inline fun <A> Result<A>.handleErrorWith(transform: (throwable: Throwable
  *
  * Combining the powers of [flatMap] and [handleErrorWith].
  */
+@Deprecated(
+  "Prefer Kotlin Std Result.fold instead of redeemWith",
+  ReplaceWith("fold(transform, handleErrorWith)")
+)
 public inline fun <A, B> Result<A>.redeemWith(
   handleErrorWith: (throwable: Throwable) -> Result<B>,
   transform: (value: A) -> Result<B>

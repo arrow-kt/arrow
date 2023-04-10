@@ -6,6 +6,7 @@ import arrow.core.test.any
 import arrow.core.test.either
 import arrow.core.test.intSmall
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.nonEmptyList
 import arrow.core.test.suspendFunThatReturnsAnyLeft
 import arrow.core.test.suspendFunThatReturnsAnyRight
 import arrow.core.test.suspendFunThatReturnsEitherAnyOrAnyOrThrows
@@ -25,10 +26,9 @@ import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.nonPositiveInt
 import io.kotest.property.arbitrary.short
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
 class EitherTest : StringSpec({
@@ -36,7 +36,7 @@ class EitherTest : StringSpec({
   val ARB = Arb.either(Arb.string(), Arb.int())
 
     testLaws(
-      MonoidLaws(0.right(), { x, y -> x.combine(y, String::plus, Int::plus) }, ARB)
+      MonoidLaws("Either", 0.right(), { x, y -> x.combine(y, String::plus, Int::plus) }, ARB)
     )
     
     "isLeft should return true if Left and false if Right" {
@@ -329,7 +329,7 @@ class EitherTest : StringSpec({
       }
     }
     
-    "traverse should return list of Right when Right and empty list when Left" {
+    "traverse should return list of Right when Right and singleton list when Left" {
       checkAll(
         Arb.int(),
         Arb.int(),
@@ -337,7 +337,7 @@ class EitherTest : StringSpec({
       ) { a: Int, b: Int, c: Int ->
         Right(a).traverse { emptyList<Int>() } shouldBe emptyList<Int>()
         Right(a).traverse { listOf(b, c) } shouldBe listOf(Right(b), Right(c))
-        Left(a).traverse { listOf(b, c) } shouldBe emptyList<Int>()
+        Left(a).traverse { listOf(b, c) } shouldBe listOf(Left(a))
       }
     }
     
@@ -450,13 +450,47 @@ class EitherTest : StringSpec({
         }
       }
     }
-    
-    "traverse should return list if either is right" {
+
+    "combine should combine 2 eithers" {
+      checkAll(Arb.either(Arb.string(), Arb.int()), Arb.either(Arb.string(), Arb.int())) { e1, e2 ->
+        val obtained = e1.combine(e2, { l1, l2 -> l1 + l2 }, { r1, r2 -> r1 + r2 })
+        val expected = when(e1){
+          is Left -> when(e2) {
+            is Left -> Left(e1.value + e2.value)
+            is Right -> e1
+          }
+          is Right -> when(e2) {
+            is Left -> e2
+            is Right -> Right(e1.value + e2.value)
+          }
+        }
+        obtained shouldBe expected
+      }
+    }
+
+
+  "combineAll replacement should work " {
+    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+      val obtained = list.fold<Either<String, Int>, Either<String, Int>>(0.right()) { x, y ->
+        Either.zipOrAccumulate<String, Int, Int, Int>(
+          { a1, a2 -> a1 + a2 },
+          x,
+          y,
+          { b1, b2 -> b1 + b2 })
+      }
+      val expected = list.combineAll(Monoid.string(), Monoid.int())
+      obtained shouldBe expected
+    }
+  }
+
+
+
+  "traverse should return list if either is right" {
       val right: Either<String, Int> = Right(1)
       val left: Either<String, Int> = Left("foo")
       
       right.traverse { listOf(it, 2, 3) } shouldBe listOf(Right(1), Right(2), Right(3))
-      left.traverse { listOf(it, 2, 3) } shouldBe emptyList()
+      left.traverse { listOf(it, 2, 3) } shouldBe listOf(left)
     }
     
     "sequence should be consistent with traverse" {
@@ -471,13 +505,14 @@ class EitherTest : StringSpec({
       
       right.traverseNullable { it } shouldBe Right(1)
       right.traverseNullable { null } shouldBe null
-      left.traverseNullable { it } shouldBe null
+      left.traverseNullable { it } shouldBe left
     }
     
     "sequence for Nullable should be consistent with traverseNullable" {
       checkAll(Arb.either(Arb.string(), Arb.int())) { either ->
         either.map { it }.sequence() shouldBe either.traverseNullable { it }
-        either.map { null }.sequence() shouldBe null
+        // wrong! if you map a `Left`, you should get a `Left` back, not null
+        // either.map { null }.sequence() shouldBe null
       }
     }
     
@@ -486,7 +521,9 @@ class EitherTest : StringSpec({
       val left: Either<String, Int> = Left("foo")
       
       right.traverse { Some(it) } shouldBe Some(Right(1))
-      left.traverse { Some(it) } shouldBe None
+      right.traverse { None } shouldBe None
+      left.traverse { Some(it) } shouldBe Some(left)
+      left.traverse { None } shouldBe Some(left)
     }
     
     "sequence for Option should be consistent with traverseOption" {
@@ -629,19 +666,16 @@ class EitherTest : StringSpec({
   }
 
   "zipOrAccumulate EitherNel results in all Right transformed, or all Left in a NonEmptyList" {
-    fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>): Arb<NonEmptyList<A>> =
-      Arb.list(arb, 1..100).map { it.toNonEmptyListOrNull()!! }
-
     checkAll(
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.short()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.byte()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.int()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.long()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.float()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.double()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.char()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.string()),
-      Arb.either(Arb.nonEmptyList(Arb.string()), Arb.boolean())
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.short()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.byte()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.int()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.long()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.float()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.double()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.char()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.string()),
+      Arb.either(Arb.nonEmptyList(Arb.int()), Arb.boolean())
     ) { a, b, c, d, e, f, g, h, i ->
       val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9)
       val all = listOf(a, b, c, d, e, f, g, h, i)
