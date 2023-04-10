@@ -548,6 +548,43 @@ public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> E
   return if (condition) Unit else raise(raise())
 }
 
+/**
+ * Ensures that the [value] is not null;
+ * otherwise, [Raise.raise]s a logical failure of type [Error].
+ *
+ * In summary, this is a type-safe alternative to [requireNotNull], using the [Raise] API.
+ *
+ * ### Example
+ * ```
+ *@JvmInline
+ * value class FullName(val name: String)
+ *
+ * sealed interface NameError {
+ *     object NullValue : NameError
+ * }
+ *
+ * context(Raise<NameError>)
+ * fun fullName(name: String?): FullName {
+ *     val nonNullName = ensureNotNull(name) { NameError.NullValue }
+ *     return FullName(nonNullName)
+ * }
+ *
+ * fun main() {
+ *     recover({
+ *         fullName("John Doe") // valid
+ *         fullName(null) // raises NameError.NullValue error
+ *     }) { error ->
+ *         // Handle errors in a type-safe manner
+ *         when (error) {
+ *             NameError.NullValue -> {}
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * @param value the value that must be non-null.
+ * @param raise a lambda that produces an error of type [Error] when the [value] is null.
+ */
 @RaiseDSL
 public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: () -> Error): B {
   contract {
