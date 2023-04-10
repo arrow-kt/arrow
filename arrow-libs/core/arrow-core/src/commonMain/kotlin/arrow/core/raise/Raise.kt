@@ -145,7 +145,65 @@ public annotation class RaiseDSL
  */
 public interface Raise<in Error> {
 
-  /** Raise a _logical failure_ of type [Error] */
+  /**
+   * Raises a _logical failure_ of type [Error].
+   * This function behaves like a _return statement_,
+   * immediately short-circuiting and terminating the computation.
+   *
+   * __Alternatives:__ Common ways to raise errors include: [ensure], [ensureNotNull], and [bind].
+   * Consider using them to make your code more concise and expressive.
+   *
+   * __Handling raised errors:__ Refer to [recover] and [mapOrAccumulate].
+   *
+   * @param r an error of type [Error] that will short-circuit the computation.
+   * Behaves similarly to _return_ or _throw_.
+   *
+   * ### Example:
+   * ```
+   * import arrow.core.Either
+   * import arrow.core.mapOrAccumulate
+   * import arrow.core.raise.*
+   *
+   * enum class ServiceType { Free, Paid }
+   *
+   * data class Config(val mode: Int, val role: String, val serviceType: ServiceType)
+   *
+   * context(Raise<String>)
+   * fun readConfig(): Config {
+   *     val mode = ensureNotNull(readln().toIntOrNull()) {
+   *         "Mode should be a valid integer"
+   *     }
+   *     val role = readln()
+   *     ensure(role in listOf("Manager", "Admin")) {
+   *         "$role should be either a \"Manager\" or an \"Admin\""
+   *     }
+   *     val serviceType = parseServiceType(readln()).bind()
+   *
+   *     return Config(
+   *         mode = mode,
+   *         role = role,
+   *         serviceType = serviceType
+   *     )
+   * }
+   *
+   * private fun parseServiceType(rawString: String): Either<String, ServiceType> = catch({
+   *     val serviceType = ServiceType.valueOf(rawString)
+   *     Either.Right(serviceType)
+   * }) {
+   *     Either.Left("$rawString is not a valid service type")
+   * }
+   *
+   * fun main() {
+   *     val config = recover(::readConfig) { errMsg ->
+   *         error("Invalid config, error: $errMsg")
+   *     }
+   *     // Read 3 additional configs and return Either.Right only if all of them are valid
+   *     val additionalConfigs = (1..3).mapOrAccumulate { readConfig() }
+   *     println(config) // valid Config
+   *     println(additionalConfigs) //  Either<NonEmptyList<String>, List<Config>>
+   * }
+   * ```
+   */
   @RaiseDSL
   public fun raise(r: Error): Nothing
 
