@@ -553,6 +553,26 @@ class IterableTest : StringSpec({
       }
     }
 
+  "flatten" {
+    checkAll(Arb.pair(Arb.list(Arb.int()), Arb.list(Arb.int()))) { (a, b) ->
+      listOf(a, b).flatten() shouldBe a + b
+    }
+  }
+
+  "widen(Iterable)" {
+    checkAll(Arb.list(Arb.string())) { orig: Iterable<String> ->
+      val result: Iterable<CharSequence> = orig.widen()
+      result shouldContainExactly orig
+    }
+  }
+
+  "widen(List)" {
+    checkAll(Arb.list(Arb.string())) { orig: List<String> ->
+      val result: List<CharSequence> = orig.widen()
+      result shouldContainExactly orig
+    }
+  }
+
   "unzip is the inverse of zip" {
     checkAll(Arb.list(Arb.int())) { xs ->
 
@@ -628,4 +648,19 @@ class IterableTest : StringSpec({
       }
     }
   }
+
+  "compareTo returns 0 if other has same elements" {
+    checkAll(Arb.list(Arb.int())) { ints ->
+      ints.compareTo(ints) shouldBe 0
+    }
+  }
+
+  "compareTo returns -1 if other have greater element at the same position"{
+    listOf(1,2,3).compareTo(listOf(1,4,3)) shouldBe -1
+  }
+
+  "compareTo returns 1 if other have smaller element at the same position"{
+    listOf(1,2,3).compareTo(listOf(1,1,3)) shouldBe 1
+  }
+
 })
