@@ -17,6 +17,7 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.char
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
@@ -661,6 +662,34 @@ class IterableTest : StringSpec({
 
   "compareTo returns 1 if other have smaller element at the same position"{
     listOf(1,2,3).compareTo(listOf(1,1,3)) shouldBe 1
+  }
+
+  "crosswalk" {
+    checkAll(Arb.pair(Arb.list(Arb.int()), Arb.list(Arb.char()))) { (ints, chars) ->
+      val res = ints.crosswalk { i -> chars.map { c -> "${c}${i}" } }
+      val expected =
+        if (ints.isNotEmpty()) chars.map { c -> ints.reversed().map { i -> "${c}${i}" } }
+        else emptyList()
+      res shouldBe expected
+    }
+  }
+
+  "crosswalkMap" {
+    checkAll(Arb.pair(Arb.list(Arb.int()), Arb.list(Arb.char()))) { (ints, chars) ->
+      val res = ints.crosswalkMap { i -> chars.map { c -> c to i }.toMap() }
+      val expected =
+        if (ints.isNotEmpty()) chars.map { c -> c to ints.reversed() }.toMap()
+        else emptyMap()
+      res shouldBe expected
+    }
+  }
+
+  "crosswalkNull" {
+    checkAll(Arb.list(Arb.int())) { ints ->
+      val res = ints.crosswalkNull { i -> if (i % 2 == 0) "x${i}" else null }
+      val expected = ints.mapNotNull { i -> if (i % 2 == 0 ) "x${i}" else null }.reversed()
+      res shouldBe expected
+    }
   }
 
 })
