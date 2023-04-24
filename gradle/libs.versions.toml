@@ -19,7 +19,7 @@ kspVersion = "1.8.10-1.0.9"
 kotlinxSerialization = "1.4.1"
 mockWebServer = "4.10.0"
 retrofit = "2.9.0"
-retrofitKotlinxSerialization = "0.8.0"
+retrofitKotlinxSerialization = "1.0.0"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
