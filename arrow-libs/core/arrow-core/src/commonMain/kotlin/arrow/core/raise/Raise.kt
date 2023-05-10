@@ -6,6 +6,7 @@
 package arrow.core.raise
 
 import arrow.core.Either
+import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Validated
@@ -237,6 +238,14 @@ public interface Raise<in Error> {
     is Either.Left -> raise(value)
     is Either.Right -> value
   }
+
+  @RaiseDSL
+  public fun <A> Ior<Error, A>.bind(): A =
+    when (this) {
+      is Ior.Left -> raise(value)
+      is Ior.Right -> value
+      is Ior.Both -> rightValue
+    }
 
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     mapValues { (_, a) -> a.bind() }

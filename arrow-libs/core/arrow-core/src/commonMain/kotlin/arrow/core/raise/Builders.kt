@@ -156,7 +156,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
     map { it.bind() }
 
   @RaiseDSL
-  public fun <A> Ior<Error, A>.bind(): A =
+  public override fun <A> Ior<Error, A>.bind(): A =
     when (this) {
       is Ior.Left -> raise(value)
       is Ior.Right -> value
