@@ -32,7 +32,7 @@ class CyclicBarrierSpec : StringSpec({
   "awaiting all in parallel resumes all coroutines" {
     checkAll(Arb.int(1, 100)) { i ->
       val barrier = CyclicBarrier(i)
-      (0 until i).parTraverse { barrier.await() }
+      (0 until i).parMap { barrier.await() }
     }
   }
   
@@ -66,6 +66,41 @@ class CyclicBarrierSpec : StringSpec({
       launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }.cancelAndJoin()
       
       barrier.capacity shouldBe 2
+      barrier.numberWaiting shouldBe 0
+    }
+  }
+
+  "reset cancels all awaiting" {
+    checkAll(Arb.int(2, 100)) { i ->
+      val barrier = CyclicBarrier(i)
+      val exitCase = CompletableDeferred<ExitCase>()
+
+      val jobs =
+        (1 until i).map {
+          launch(start = CoroutineStart.UNDISPATCHED) {
+            guaranteeCase({ barrier.await() }, exitCase::complete)
+          }
+        }
+
+      barrier.reset()
+      jobs.map { it.isCancelled shouldBe true }
+    }
+  }
+
+  "should clean up upon reset" {
+    checkAll(Arb.int(1, 100)) { i ->
+      val barrier = CyclicBarrier(i)
+      val exitCase = CompletableDeferred<ExitCase>()
+
+      launch(start = CoroutineStart.UNDISPATCHED) {
+        guaranteeCase({ barrier.await() }, exitCase::complete)
+      }
+
+      barrier.reset()
+
+      barrier.numberWaiting shouldBe 0
+
+      (0 until i).parMap { barrier.await() }
     }
   }
   
