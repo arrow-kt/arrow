@@ -43,6 +43,16 @@ class CyclicBarrierSpec : StringSpec({
       barrier.capacity shouldBe 2
     }
   }
+
+  "executes runnable once full" {
+    checkAll(Arb.constant(Unit)) {
+      var barrierRunnableInvoked = false
+      val barrier = CyclicBarrier(2) { barrierRunnableInvoked = true }
+      parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
+      barrier.capacity shouldBe 2
+      barrierRunnableInvoked shouldBe true
+    }
+  }
   
   "await is cancelable" {
     checkAll(Arb.int(2, Int.MAX_VALUE)) { i ->
