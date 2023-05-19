@@ -364,5 +364,24 @@ class FlowTest : StringSpec({
         buffer.size shouldBe 4
       }
     }
+  
+    "mapIndexed" {
+      runTest {
+        val flow = flowOf(1, 2, 3)
+          .mapIndexed { index, value -> IndexedValue(index, value) }
+
+        flow.toList() shouldBe listOf(
+          IndexedValue(0, 1),
+          IndexedValue(1, 2),
+          IndexedValue(2, 3)
+        )
+
+        flow.toList() shouldBe listOf(
+          IndexedValue(0, 1),
+          IndexedValue(1, 2),
+          IndexedValue(2, 3)
+        )
+      }
+    }
   }
 )
