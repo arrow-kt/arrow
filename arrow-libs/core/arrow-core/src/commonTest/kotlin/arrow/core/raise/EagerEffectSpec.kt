@@ -240,4 +240,33 @@ class EagerEffectSpec : StringSpec({
         .fold({ unreachable() }, { unreachable() })
     }.message shouldBe "Boom!"
   }
+
+  "mapError - raise and transform error" {
+    checkAll(Arb.long(), Arb.string()) { l, s ->
+      (eagerEffect<Long, Int> {
+        raise(l)
+      } mapError { ll ->
+        ll shouldBe l
+        s
+      }).fold(::identity) { unreachable() } shouldBe s
+    }
+  }
+
+  "mapError - raise and raise other error" {
+    checkAll(Arb.long(), Arb.string()) { l, s ->
+      (eagerEffect<Long, Int> {
+        raise(l)
+      } mapError { ll ->
+        ll shouldBe l
+        raise(s)
+      }).fold(::identity) { unreachable() } shouldBe s
+    }
+  }
+
+  "mapError - success" {
+    checkAll(Arb.int()) { i ->
+      (eagerEffect<Long, Int> { i } mapError { unreachable() })
+        .get() shouldBe i
+    }
+  }
 })

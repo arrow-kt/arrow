@@ -11,7 +11,7 @@ import kotlin.jvm.JvmName
 /**
  * Catch the raised value [Error] of the `Effect`.
  * You can either return a value a new value of [A],
- * or short-circuit the effect by raising with a value of [Error],
+ * or short-circuit the effect by raising with a value of [OtherError],
  * or raise an exception into [suspend].
  *
  * ```kotlin
@@ -96,6 +96,29 @@ public fun <Error, A> Effect<Error, A>.catch(): Effect<Error, Result<A>> =
 public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: suspend (error: Error) -> A): A =
   recover({ invoke() }) { recover(it) }
 
+/**
+ * Transform the raised value [Error] of the `Effect` into [OtherError],
+ * or raise an exception into [suspend].
+ * This results in an `Effect` that returns a value of [A] or raises [OtherError].
+ *
+ * ```kotlin
+ * import arrow.core.raise.effect
+ * import arrow.core.raise.mapError
+ *
+ * object User
+ * object Error
+ *
+ * val error = effect<Error, User> { raise(Error) } // Raise(error)
+ *
+ * val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
+ * val b = error.mapError<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
+ * val c = error.mapError<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * ```
+ * <!--- KNIT example-effect-error-04.kt -->
+ */
+public infix fun <Error, OtherError, A> Effect<Error, A>.mapError(@BuilderInference transform: suspend Raise<OtherError>.(error: Error) -> OtherError): Effect<OtherError, A> =
+  effect { withError({ transform(it) }) { invoke() } }
+
 public infix fun <Error, OtherError, A> EagerEffect<Error, A>.recover(@BuilderInference recover: Raise<OtherError>.(error: Error) -> A): EagerEffect<OtherError, A> =
   eagerEffect { recover({ invoke() }) { recover(it) } }
 
@@ -110,3 +133,24 @@ public inline infix fun <reified T : Throwable, Error, A> EagerEffect<Error, A>.
 
 public inline infix fun <Error, A> EagerEffect<Error, A>.getOrElse(recover: (error: Error) -> A): A =
   recover({ invoke() }, recover)
+
+/**
+ * Transform the raised value [Error] of the `EagerEffect` into [OtherError].
+ * This results in an `EagerEffect` that returns a value of [A] or raises [OtherError].
+ *
+ * ```kotlin
+ * import arrow.core.raise.eagerEffect
+ * import arrow.core.raise.mapError
+ *
+ * object User
+ * object Error
+ *
+ * val error = eagerEffect<Error, User> { raise(Error) } // Raise(error)
+ *
+ * val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
+ * val b = error.mapError<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
+ * ```
+ * <!--- KNIT example-effect-error-05.kt -->
+ */
+public infix fun <Error, OtherError, A> EagerEffect<Error, A>.mapError(@BuilderInference transform: Raise<OtherError>.(error: Error) -> OtherError): EagerEffect<OtherError, A> =
+  eagerEffect { withError({ transform(it) }) { invoke() } }

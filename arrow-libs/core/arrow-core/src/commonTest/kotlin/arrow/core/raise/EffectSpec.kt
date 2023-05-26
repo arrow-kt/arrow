@@ -758,6 +758,41 @@ class EffectSpec : StringSpec({
         }) { fail("Cannot be here") }
     }.message shouldStartWith "raise or bind was called outside of its DSL scope"
   }
+
+  "mapError - raise and transform error" {
+    checkAll(
+      Arb.long().suspend(),
+      Arb.string().suspend()
+    ) { l, s ->
+      (effect<Long, Int> {
+        raise(l())
+      } mapError { ll ->
+        ll shouldBe l()
+        s()
+      }).fold(::identity) { unreachable() } shouldBe s()
+    }
+  }
+
+  "mapError - raise and raise other error" {
+    checkAll(
+      Arb.long().suspend(),
+      Arb.string().suspend()
+    ) { l, s ->
+      (effect<Long, Int> {
+        raise(l())
+      } mapError { ll ->
+        ll shouldBe l()
+        raise(s())
+      }).fold(::identity) { unreachable() } shouldBe s()
+    }
+  }
+
+  "mapError - success" {
+    checkAll(Arb.int().suspend()) { i ->
+      (effect<Long, Int> { i() } mapError { unreachable() })
+        .get() shouldBe i()
+    }
+  }
 })
 
 private data class Failure(val msg: String)
