@@ -118,4 +118,12 @@ class NullableSpec : StringSpec({
       either.bind() + 3
     } shouldBe 7
   }
+
+  "Recover works as expected" {
+    nullable {
+      val one: Int = recover({ null.bind<Int>() }) { 1 }
+      val two = 2.bind()
+      one + two
+    } shouldBe 3
+  }
 })

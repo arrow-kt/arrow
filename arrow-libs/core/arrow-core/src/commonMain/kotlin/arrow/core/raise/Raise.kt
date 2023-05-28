@@ -239,14 +239,6 @@ public interface Raise<in Error> {
     is Either.Right -> value
   }
 
-  @RaiseDSL
-  public fun <A> Ior<Error, A>.bind(): A =
-    when (this) {
-      is Ior.Left -> raise(value)
-      is Ior.Right -> value
-      is Ior.Both -> rightValue
-    }
-
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     mapValues { (_, a) -> a.bind() }
 

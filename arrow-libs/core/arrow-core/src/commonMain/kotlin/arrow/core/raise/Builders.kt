@@ -7,6 +7,7 @@ package arrow.core.raise
 import arrow.atomic.Atomic
 import arrow.atomic.updateAndGet
 import arrow.core.Either
+import arrow.core.EmptyValue.combine
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
@@ -72,6 +73,15 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { null }
   }
+
+  @RaiseDSL
+  public inline fun <A> recover(
+    @BuilderInference block: NullableRaise.() -> A,
+    @BuilderInference recover: () -> A,
+  ): A = when (val nullable = nullable(block)) {
+    null -> recover()
+    else -> nullable
+  }
 }
 
 public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
@@ -96,6 +106,15 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   @JvmName("bindAllResult")
   public fun <A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }
+
+  @RaiseDSL
+  public inline fun <A> recover(
+    @BuilderInference block: ResultRaise.() -> A,
+    @BuilderInference recover: (Throwable) -> A,
+  ): A = result(block).fold(
+    onSuccess = { it },
+    onFailure =  { recover(it) }
+  )
 }
 
 public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
@@ -129,10 +148,19 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
     contract { returns() implies (value != null) }
     return ensureNotNull(value) { None }
   }
+
+  @RaiseDSL
+  public inline fun <A> recover(
+    @BuilderInference block: OptionRaise.() -> A,
+    @BuilderInference recover: () -> A,
+  ): A = when (val option = option(block)) {
+    is None -> recover()
+    is Some<A> -> option.value
+  }
 }
 
 public class IorRaise<Error> @PublishedApi internal constructor(
-  private val combineError: (Error, Error) -> Error,
+  @PublishedApi internal val combineError: (Error, Error) -> Error,
   private val state: Atomic<Option<Error>>,
   private val raise: Raise<Error>,
 ) : Raise<Error> {
@@ -156,7 +184,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
     map { it.bind() }
 
   @RaiseDSL
-  public override fun <A> Ior<Error, A>.bind(): A =
+  public fun <A> Ior<Error, A>.bind(): A =
     when (this) {
       is Ior.Left -> raise(value)
       is Ior.Right -> value
@@ -170,8 +198,23 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
     mapValues { (_, v) -> v.bind() }
 
-  private fun combine(other: Error): Error =
+  @PublishedApi
+  internal fun combine(other: Error): Error =
     state.updateAndGet { prev ->
       Some(prev.map { combineError(it, other) }.getOrElse { other })
     }.getOrElse { other }
+
+  @RaiseDSL
+  public inline fun <A> recover(
+    @BuilderInference block: IorRaise<Error>.() -> A,
+    @BuilderInference recover: (error: Error) -> A,
+  ): A = when (val ior = ior(combineError, block)) {
+    is Ior.Both -> {
+      combine(ior.leftValue)
+      ior.rightValue
+    }
+
+    is Ior.Left -> recover(ior.value)
+    is Ior.Right -> ior.value
+  }
 }
