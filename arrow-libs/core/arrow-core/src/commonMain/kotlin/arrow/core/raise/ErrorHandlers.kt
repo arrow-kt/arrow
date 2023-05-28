@@ -111,12 +111,12 @@ public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: s
  * val error = effect<Error, User> { raise(Error) } // Raise(error)
  *
  * val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
- * val b = error.mapError<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
+ * val b = error.mapError<Error, String, User>(Any::toString) // Raise(Error)
  * val c = error.mapError<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
  * <!--- KNIT example-effect-error-04.kt -->
  */
-public infix fun <Error, OtherError, A> Effect<Error, A>.mapError(@BuilderInference transform: suspend Raise<OtherError>.(error: Error) -> OtherError): Effect<OtherError, A> =
+public infix fun <Error, OtherError, A> Effect<Error, A>.mapError(@BuilderInference transform: suspend (error: Error) -> OtherError): Effect<OtherError, A> =
   effect { withError({ transform(it) }) { invoke() } }
 
 public infix fun <Error, OtherError, A> EagerEffect<Error, A>.recover(@BuilderInference recover: Raise<OtherError>.(error: Error) -> A): EagerEffect<OtherError, A> =
@@ -148,9 +148,9 @@ public inline infix fun <Error, A> EagerEffect<Error, A>.getOrElse(recover: (err
  * val error = eagerEffect<Error, User> { raise(Error) } // Raise(error)
  *
  * val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
- * val b = error.mapError<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
+ * val b = error.mapError<Error, String, User>(Any::toString) // Raise(Error)
  * ```
  * <!--- KNIT example-effect-error-05.kt -->
  */
-public infix fun <Error, OtherError, A> EagerEffect<Error, A>.mapError(@BuilderInference transform: Raise<OtherError>.(error: Error) -> OtherError): EagerEffect<OtherError, A> =
+public infix fun <Error, OtherError, A> EagerEffect<Error, A>.mapError(@BuilderInference transform: (error: Error) -> OtherError): EagerEffect<OtherError, A> =
   eagerEffect { withError({ transform(it) }) { invoke() } }

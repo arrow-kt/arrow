@@ -773,20 +773,6 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "mapError - raise and raise other error" {
-    checkAll(
-      Arb.long().suspend(),
-      Arb.string().suspend()
-    ) { l, s ->
-      (effect<Long, Int> {
-        raise(l())
-      } mapError { ll ->
-        ll shouldBe l()
-        raise(s())
-      }).fold(::identity) { unreachable() } shouldBe s()
-    }
-  }
-
   "mapError - success" {
     checkAll(Arb.int().suspend()) { i ->
       (effect<Long, Int> { i() } mapError { unreachable() })

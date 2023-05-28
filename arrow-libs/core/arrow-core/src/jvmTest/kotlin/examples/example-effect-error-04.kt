@@ -10,5 +10,5 @@ object Error
 val error = effect<Error, User> { raise(Error) } // Raise(error)
 
 val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
-val b = error.mapError<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
+val b = error.mapError<Error, String, User>(Any::toString) // Raise(Error)
 val c = error.mapError<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)

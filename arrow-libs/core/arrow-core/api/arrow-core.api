@@ -3436,8 +3436,8 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ior (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
-	public static final fun mapError (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
-	public static final fun mapError (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun mapError (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public static final fun mapError (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
