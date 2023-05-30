@@ -6,7 +6,6 @@
 package arrow.core.raise
 
 import arrow.core.Either
-import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Validated
