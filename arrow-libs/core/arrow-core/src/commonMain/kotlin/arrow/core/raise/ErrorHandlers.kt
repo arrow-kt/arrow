@@ -116,7 +116,7 @@ public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: s
  * ```
  * <!--- KNIT example-effect-error-04.kt -->
  */
-public infix fun <Error, OtherError, A> Effect<Error, A>.mapError(@BuilderInference transform: suspend (error: Error) -> OtherError): Effect<OtherError, A> =
+public infix fun <Error, OtherError, A> Effect<Error, A>.mapError(transform: suspend (error: Error) -> OtherError): Effect<OtherError, A> =
   effect { withError({ transform(it) }) { invoke() } }
 
 public infix fun <Error, OtherError, A> EagerEffect<Error, A>.recover(@BuilderInference recover: Raise<OtherError>.(error: Error) -> A): EagerEffect<OtherError, A> =
@@ -152,5 +152,5 @@ public inline infix fun <Error, A> EagerEffect<Error, A>.getOrElse(recover: (err
  * ```
  * <!--- KNIT example-effect-error-05.kt -->
  */
-public infix fun <Error, OtherError, A> EagerEffect<Error, A>.mapError(@BuilderInference transform: (error: Error) -> OtherError): EagerEffect<OtherError, A> =
+public infix fun <Error, OtherError, A> EagerEffect<Error, A>.mapError(transform: (error: Error) -> OtherError): EagerEffect<OtherError, A> =
   eagerEffect { withError({ transform(it) }) { invoke() } }

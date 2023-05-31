@@ -456,7 +456,7 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [OtherError],
- * and recover by providing a transform [OtherError] into [Error], which is raised to the outer [Raise].
+ * and transform any raised [OtherError] into [Error], which is raised to the outer [Raise].
  *
  * <!--- INCLUDE
  * import arrow.core.Either
