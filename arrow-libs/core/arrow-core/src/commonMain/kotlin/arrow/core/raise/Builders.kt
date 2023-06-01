@@ -207,7 +207,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   @RaiseDSL
   public inline fun <A> recover(
     @BuilderInference block: IorRaise<Error>.() -> A,
-    @BuilderInference recover: (error: Error) -> A,
+    recover: (error: Error) -> A,
   ): A = when (val ior = ior(combineError, block)) {
     is Ior.Both -> {
       combine(ior.leftValue)
