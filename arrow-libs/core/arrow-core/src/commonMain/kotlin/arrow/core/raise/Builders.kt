@@ -110,7 +110,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   @RaiseDSL
   public inline fun <A> recover(
     @BuilderInference block: ResultRaise.() -> A,
-    @BuilderInference recover: (Throwable) -> A,
+    recover: (Throwable) -> A,
   ): A = result(block).fold(
     onSuccess = { it },
     onFailure =  { recover(it) }
