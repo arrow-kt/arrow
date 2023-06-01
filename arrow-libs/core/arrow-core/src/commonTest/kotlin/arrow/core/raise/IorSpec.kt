@@ -3,15 +3,11 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.test.nonEmptyList
-import arrow.typeclasses.Semigroup
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -78,5 +74,14 @@ class IorSpec : StringSpec({
        throw boom
       }
     }.message shouldBe "Boom!"
+  }
+
+  "Recover works as expected" {
+    ior(String::plus) {
+      val one = recover({ Ior.Left("Hello").bind() }) { 1 }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Both(", World", 6)
   }
 })
