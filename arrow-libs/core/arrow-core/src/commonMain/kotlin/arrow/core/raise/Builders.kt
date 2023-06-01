@@ -77,7 +77,7 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
   @RaiseDSL
   public inline fun <A> recover(
     @BuilderInference block: NullableRaise.() -> A,
-    @BuilderInference recover: () -> A,
+    recover: () -> A,
   ): A = when (val nullable = nullable(block)) {
     null -> recover()
     else -> nullable
