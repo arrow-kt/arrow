@@ -152,7 +152,7 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   @RaiseDSL
   public inline fun <A> recover(
     @BuilderInference block: OptionRaise.() -> A,
-    @BuilderInference recover: () -> A,
+    recover: () -> A,
   ): A = when (val option = option(block)) {
     is None -> recover()
     is Some<A> -> option.value
