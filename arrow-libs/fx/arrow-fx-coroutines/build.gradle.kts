@@ -27,7 +27,6 @@ kotlin {
         api(projects.arrowCore)
         api(libs.coroutines.core)
         implementation(libs.kotlin.stdlibCommon)
-        implementation(libs.coroutines.test)
       }
     }
 
@@ -37,6 +36,7 @@ kotlin {
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
+          implementation(libs.coroutines.test)
         }
       }
       jvmTest {

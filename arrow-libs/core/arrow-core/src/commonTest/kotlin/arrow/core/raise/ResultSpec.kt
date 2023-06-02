@@ -20,4 +20,12 @@ class ResultSpec : StringSpec({
   "Result - raise" {
     result { raise(boom) } shouldBe Result.failure(boom)
   }
+
+  "Recover works as expected" {
+    result {
+      val one: Int = recover({ Result.failure<Int>(boom).bind() }) { 1 }
+      val two = Result.success(2).bind()
+      one + two
+    } shouldBe Result.success(3)
+  }
 })

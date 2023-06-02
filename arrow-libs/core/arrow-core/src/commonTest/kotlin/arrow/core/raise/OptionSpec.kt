@@ -1,6 +1,7 @@
 package arrow.core.raise
 
 import arrow.core.None
+import arrow.core.Some
 import arrow.core.some
 import arrow.core.toOption
 import io.kotest.core.spec.style.StringSpec
@@ -38,5 +39,13 @@ class OptionSpec : StringSpec({
       ensureNotNull<Int>(null)
       throw IllegalStateException("This should not be executed")
     } shouldBe None
+  }
+
+  "Recover works as expected" {
+    option {
+      val one: Int = recover({ None.bind<Int>() }) { 1 }
+      val two = Some(2).bind()
+      one + two
+    } shouldBe Some(3)
   }
 })

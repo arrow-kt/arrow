@@ -76,5 +76,23 @@ class DSLTests {
       """.compilationSucceeds()
   }
 
+  @Test
+  fun `DSL works with variance, issue #3057`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |sealed interface ITest {
+      |  data class Test1(val test: String) : ITest
+      |}
+      |
+      |interface Extendable<T>
+      |@optics
+      |data class TestClass(val details: Extendable<out ITest>) {
+      |  companion object
+      |}
+      """.compilationSucceeds()
+  }
+
   // Db.content.at(At.map(), One).set(db, None)
 }
