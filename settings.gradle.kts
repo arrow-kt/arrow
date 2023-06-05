@@ -11,7 +11,8 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.11.4"
+  id("com.gradle.enterprise") version "3.13.3"
+  id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
 }
 
 dependencyResolutionManagement {
@@ -24,7 +25,7 @@ dependencyResolutionManagement {
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .forUseAtConfigurationTime().orNull?.toBoolean() == true
+    .orNull?.toBoolean() == true
 
 //CORE
 include("arrow-annotations")
