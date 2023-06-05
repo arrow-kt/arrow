@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
@@ -226,9 +227,12 @@ public fun fixedRate(
     }
   }
 
-public inline fun <A, B> Flow<A>.mapIndexed(crossinline f: suspend (Int, A) -> B): Flow<B> {
-  var index = 0
-  return map { value ->
-    f(index++, value)
+/**
+ * Returns a flow containing the results of applying the given [f] function
+ * to each value and its index in the original flow.
+ */
+public inline fun <A, B> Flow<A>.mapIndexed(crossinline f: suspend (index: Int, value: A) -> B): Flow<B> = flow {
+  collectIndexed { index, value ->
+    emit(f(index, value))
   }
 }

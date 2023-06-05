@@ -284,4 +284,22 @@ class EagerEffectSpec : StringSpec({
         }) { fail("Cannot be here") }
     }.message shouldStartWith "raise or bind was called outside of its DSL scope"
   }
+
+  "mapError - raise and transform error" {
+    checkAll(Arb.long(), Arb.string()) { l, s ->
+      (eagerEffect<Long, Int> {
+        raise(l)
+      } mapError { ll ->
+        ll shouldBe l
+        s
+      }).fold(::identity) { unreachable() } shouldBe s
+    }
+  }
+
+  "mapError - success" {
+    checkAll(Arb.int()) { i ->
+      (eagerEffect<Long, Int> { i } mapError { unreachable() })
+        .get() shouldBe i
+    }
+  }
 })
