@@ -552,3 +552,5 @@ public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
 
 public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
   toNonEmptyListOrNull().toOption()
+
+public fun <A> A.toNonEmptyList(): NonEmptyList<A> = nonEmptyListOf(this)

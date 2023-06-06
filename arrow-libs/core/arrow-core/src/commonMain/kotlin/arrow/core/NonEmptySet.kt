@@ -47,3 +47,5 @@ public fun <A> Set<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
 
 public fun <A> Set<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()
+
+public fun <A> A.toNonEmptySet(): NonEmptySet<A> = nonEmptySetOf(this)
