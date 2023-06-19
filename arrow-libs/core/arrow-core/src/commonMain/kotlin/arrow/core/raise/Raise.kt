@@ -486,3 +486,27 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   }
   return recover(block) { raise(transform(it)) }
 }
+
+/**
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [A].
+ * Does not distinguish between normal results and errors, thus you can consider
+ * `return` and `raise` to be semantically equivalent inside.
+ *
+ * <!--- INCLUDE
+ * import arrow.core.raise.merge
+ * import io.kotest.matchers.shouldBe
+ * import kotlin.random.Random
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   merge { if(Random.nextBoolean()) raise("failed") else "failed" } shouldBe "failed"
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-12.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+@JvmName("_merge")
+public inline fun <A> merge(
+  @BuilderInference block: Raise<A>.() -> A,
+): A = recover(block, ::identity)
