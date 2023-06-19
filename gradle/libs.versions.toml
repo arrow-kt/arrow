@@ -1,18 +1,18 @@
 [versions]
 animalSniffer = "1.6.0"
-arrowGradleConfig = "0.11.0-alpha.1"
-assertj = "3.23.1"
+arrowGradleConfig = "0.12.0-rc.3"
+assertj = "3.24.2"
 coroutines = "1.7.1"
-classgraph = "4.8.151"
-dokka = "1.8.10"
+classgraph = "4.8.160"
+dokka = "1.8.20"
 jUnit = "4.13.2"
-jUnitJupiter = "5.8.2"
-jUnitVintage = "5.8.2"
-kotest = "5.5.4"
-kotestGradle = "5.5.4"
+jUnitJupiter = "5.9.2"
+jUnitVintage = "5.9.2"
+kotest = "5.6.2"
+kotestGradle = "5.6.2"
 kover = "0.6.1"
 kotlin = "1.8.21"
-kotlinBinaryCompatibilityValidator = "0.12.1"
+kotlinBinaryCompatibilityValidator = "0.13.1"
 kotlinCompileTesting = "1.5.0"
 knit = "0.4.0"
 kspVersion = "1.8.21-1.0.11"
@@ -57,6 +57,7 @@ arrowGradleConfig-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter"
 arrowGradleConfig-kotlin = { id = "io.arrow-kt.arrow-gradle-config-kotlin", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-nexus = { id = "io.arrow-kt.arrow-gradle-config-nexus", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", version.ref = "arrowGradleConfig" }
+arrowGradleConfig-versioning = { id = "io.arrow-kt.arrow-gradle-config-versioning", version.ref = "arrowGradleConfig" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
