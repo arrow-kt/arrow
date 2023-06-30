@@ -6,9 +6,8 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.kotest.multiplatform)
 }
-
-apply(plugin = "io.kotest.multiplatform")
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
