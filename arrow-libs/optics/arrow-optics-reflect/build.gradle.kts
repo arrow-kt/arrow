@@ -5,9 +5,9 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.arrowGradleConfig.versioning)
+  alias(libs.plugins.kotlinx.kover)
 }
 
-apply(from = property("TEST_COVERAGE"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
