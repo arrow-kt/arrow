@@ -11,7 +11,6 @@ kotlin {
   explicitApi = null
 }
 
-apply(from = property("TEST_COVERAGE"))
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
