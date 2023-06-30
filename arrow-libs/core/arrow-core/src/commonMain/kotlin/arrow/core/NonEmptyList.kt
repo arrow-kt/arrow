@@ -153,9 +153,9 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  */
 public class NonEmptyList<out A>(
-  public val head: A,
+  public override val head: A,
   public val tail: List<A>
-) : AbstractList<A>() {
+) : AbstractList<A>(), NonEmptyCollection<A> {
 
   private constructor(list: List<A>) : this(list[0], list.drop(1))
 
@@ -174,20 +174,21 @@ public class NonEmptyList<out A>(
 
   public fun toList(): List<A> = listOf(head) + tail
 
-  public inline fun <B> map(f: (A) -> B): NonEmptyList<B> =
-    NonEmptyList(f(head), tail.map(f))
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+    NonEmptyList(transform(head), tail.map(transform))
 
   public inline fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
     f(head) + tail.flatMap { f(it).all }
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    NonEmptyList(all + l.all)
+    this + l.all
 
-  public operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> =
-    NonEmptyList(all + l)
+  public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptyList<A> =
+    NonEmptyList(all + elements)
 
-  public operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> =
-    NonEmptyList(all + a)
+  public override operator fun plus(element: @UnsafeVariance A): NonEmptyList<A> =
+    NonEmptyList(all + element)
 
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     this.tail.fold(f(b, this.head), f)
