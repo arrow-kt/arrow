@@ -149,7 +149,7 @@ jobs:
         id: kover
         uses: mi-kas/kover-report@v1
         with:
-          path: build/reports/kover/xml/report.xml
+          path: build/reports/kover/report.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           title: Kover Report
           update-comment: true
