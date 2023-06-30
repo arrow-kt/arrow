@@ -5,10 +5,10 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.arrowGradleConfig.versioning)
+  alias(libs.plugins.kotlinx.kover)
 }
 
 apply(plugin = "io.kotest.multiplatform")
-apply(from = property("TEST_COVERAGE"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
