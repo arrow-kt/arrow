@@ -782,15 +782,14 @@ public abstract interface class arrow/core/NonEmptyCollection : java/util/Collec
 	public abstract fun map (Lkotlin/jvm/functions/Function1;)Larrow/core/NonEmptyCollection;
 	public abstract fun plus (Ljava/lang/Iterable;)Larrow/core/NonEmptyCollection;
 	public abstract fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyCollection;
+	public abstract fun toNonEmptyList ()Larrow/core/NonEmptyList;
+	public abstract fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
 }
 
 public final class arrow/core/NonEmptyCollection$DefaultImpls {
 	public static fun isEmpty (Larrow/core/NonEmptyCollection;)Z
-}
-
-public final class arrow/core/NonEmptyCollectionKt {
-	public static final fun toNonEmptyList (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyList;
-	public static final fun toNonEmptySet (Larrow/core/NonEmptyCollection;)Ljava/util/Set;
+	public static fun toNonEmptyList (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyList;
+	public static fun toNonEmptySet-5sCjGKo (Larrow/core/NonEmptyCollection;)Ljava/util/Set;
 }
 
 public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList, arrow/core/NonEmptyCollection {
@@ -823,6 +822,8 @@ public final class arrow/core/NonEmptyList : kotlin/collections/AbstractList, ar
 	public fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyList;
 	public final fun salign (Larrow/typeclasses/Semigroup;Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun toList ()Ljava/util/List;
+	public fun toNonEmptyList ()Larrow/core/NonEmptyList;
+	public fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
 	public fun toString ()Ljava/lang/String;
 	public final fun zip (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
 	public final fun zip (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function10;)Larrow/core/NonEmptyList;
@@ -909,6 +910,10 @@ public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/
 	public synthetic fun size ()I
 	public fun toArray ()[Ljava/lang/Object;
 	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
+	public fun toNonEmptyList ()Larrow/core/NonEmptyList;
+	public static fun toNonEmptyList-impl (Ljava/util/Set;)Larrow/core/NonEmptyList;
+	public fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
+	public static fun toNonEmptySet-5sCjGKo (Ljava/util/Set;)Ljava/util/Set;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Ljava/util/Set;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Ljava/util/Set;
