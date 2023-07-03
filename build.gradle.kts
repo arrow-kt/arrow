@@ -1,6 +1,7 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import kotlinx.knit.KnitPluginExtension
+import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -51,19 +52,17 @@ configure<KnitPluginExtension> {
   }
 }
 
-koverMerged {
-  enable()
-  filters {
-    projects {
-      excludes.addAll(
-        listOf(
-          ":arrow-annotations",
-          ":arrow-stack",
-          ":arrow-optics-ksp-plugin"
-        )
-      )
-    }
-  }
+dependencies {
+  kover(projects.arrowAtomic)
+  kover(projects.arrowContinuations)
+  kover(projects.arrowCore)
+  kover(projects.arrowCoreRetrofit)
+  kover(projects.arrowFxCoroutines)
+  kover(projects.arrowFxStm)
+  kover(projects.arrowOptics)
+  kover(projects.arrowOpticsKspPlugin)
+  kover(projects.arrowOpticsReflect)
+  kover(projects.arrowResilience)
 }
 
 allprojects {
