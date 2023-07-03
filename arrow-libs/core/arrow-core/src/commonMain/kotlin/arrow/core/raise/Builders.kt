@@ -26,7 +26,7 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
 public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
-  fold({ block(NullableRaise(this)) }, { null }, ::identity)
+  merge { block(NullableRaise(this)) }
 
 public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
   fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)

@@ -65,7 +65,8 @@ sealed class Target {
 data class Focus(
   val className: String,
   val paramName: String,
-  val refinedType: KSType?
+  val refinedType: KSType?,
+  val onlyOneSealedSubclass: Boolean = false
 ) {
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {

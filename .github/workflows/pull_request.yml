@@ -142,14 +142,14 @@ jobs:
         if: "! github.event.pull_request.head.repo.fork "
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: koverMergedReport
+          arguments: koverXmlReport
 
       - name: Add coverage report to PR
         if: "! github.event.pull_request.head.repo.fork "
         id: kover
         uses: mi-kas/kover-report@v1
         with:
-          path: build/reports/kover/merged/xml/report.xml
+          path: build/reports/kover/report.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           title: Kover Report
           update-comment: true
