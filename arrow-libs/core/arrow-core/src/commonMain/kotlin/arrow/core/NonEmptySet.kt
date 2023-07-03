@@ -15,12 +15,11 @@ public value class NonEmptySet<out A> private constructor(
   public override operator fun plus(element: @UnsafeVariance A): NonEmptySet<A> =
     NonEmptySet(this.elements + element)
 
-  public override fun <R> map(transform: (@UnsafeVariance A) -> R): NonEmptySet<R> =
-    NonEmptySet(elements.mapTo(mutableSetOf(), transform))
-
   override fun isEmpty(): Boolean = false
 
   override val head: A get() = elements.first()
+
+  override fun lastOrNull(): A = elements.last()
 
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 

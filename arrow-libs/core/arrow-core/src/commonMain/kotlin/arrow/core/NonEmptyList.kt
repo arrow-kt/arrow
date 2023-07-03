@@ -174,12 +174,17 @@ public class NonEmptyList<out A>(
 
   public fun toList(): List<A> = listOf(head) + tail
 
+  override fun lastOrNull(): A = when {
+    tail.isNotEmpty() -> tail.last()
+    else -> head
+  }
+
   @Suppress("OVERRIDE_BY_INLINE")
   public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
     NonEmptyList(transform(head), tail.map(transform))
 
-  public inline fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
-    f(head) + tail.flatMap { f(it).all }
+  override fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+    transform(head).toNonEmptyList() + tail.flatMap(transform)
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     this + l.all
