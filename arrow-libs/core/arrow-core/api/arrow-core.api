@@ -443,6 +443,23 @@ public final class arrow/core/Eval$Now$Companion {
 	public final fun getUnit ()Larrow/core/Eval;
 }
 
+public final class arrow/core/Eval2Kt {
+	public static final fun flatMap (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function3;
+	public static final fun foldEval2 (Ljava/util/List;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function3;
+	public static final fun foldRightEval2 (Ljava/util/List;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function3;
+	public static final fun map (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function3;
+	public static final fun memoize (Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function3;
+	public static final fun value (Lkotlin/jvm/functions/Function3;)Ljava/lang/Object;
+}
+
+public final class arrow/core/Eval2Utils {
+	public static final field INSTANCE Larrow/core/Eval2Utils;
+	public final fun always (Lkotlin/jvm/functions/Function0;)Lkotlin/jvm/functions/Function3;
+	public final fun defer (Lkotlin/jvm/functions/Function0;)Lkotlin/jvm/functions/Function3;
+	public final fun later (Lkotlin/jvm/functions/Function0;)Lkotlin/jvm/functions/Function3;
+	public final fun now (Ljava/lang/Object;)Lkotlin/jvm/functions/Function3;
+}
+
 public final class arrow/core/EvalKt {
 	public static final fun iterateRight (Ljava/util/Iterator;Larrow/core/Eval;Lkotlin/jvm/functions/Function2;)Larrow/core/Eval;
 	public static final fun replicate (Larrow/core/Eval;I)Larrow/core/Eval;
@@ -1656,6 +1673,10 @@ public final class arrow/core/SortedMapKKt {
 
 public final class arrow/core/StringKt {
 	public static final fun escaped (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class arrow/core/Token {
+	public static final field INSTANCE Larrow/core/Token;
 }
 
 public final class arrow/core/Tuple10 {
