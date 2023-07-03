@@ -15,7 +15,7 @@ import kotlin.experimental.ExperimentalTypeInference
 
 /** Context of the [Effect] DSL. */
 @Deprecated(
-  "Use the arrow.core.raise.Raise type instead, which is more general and can be used to  and can be used to raise typed errors or _logical failures_\n" +
+  "Use the arrow.core.raise.Raise type instead, which is more general and can be used to raise typed errors or _logical failures_\n" +
     "The Raise<R> type is source compatible, a simple find & replace of arrow.core.continuations.* to arrow.core.raise.* will do the trick.",
   ReplaceWith("Raise<R>", "arrow.core.raise.Raise")
 )
