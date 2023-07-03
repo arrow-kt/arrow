@@ -12,10 +12,9 @@ public interface NonEmptyCollection<out E> : Collection<E> {
   public operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptyCollection<E>
 
   public fun <B> map(transform: (E) -> B): NonEmptyCollection<B>
+  public fun toNonEmptySet(): NonEmptySet<E> =
+    toNonEmptySetOrNull()!!
+
+  public fun toNonEmptyList(): NonEmptyList<E> =
+    toNonEmptyListOrNull()!!
 }
-
-public fun <E> NonEmptyCollection<E>.toNonEmptySet(): NonEmptySet<E> =
-  toNonEmptySetOrNull()!!
-
-public fun <E> NonEmptyCollection<E>.toNonEmptyList(): NonEmptyList<E> =
-  toNonEmptyListOrNull()!!
