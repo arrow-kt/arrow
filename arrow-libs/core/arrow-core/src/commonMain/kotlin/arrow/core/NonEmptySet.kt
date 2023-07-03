@@ -3,19 +3,19 @@ package arrow.core
 import kotlin.jvm.JvmInline
 
 @JvmInline
-public value class NonEmptySet<out T> private constructor(
-  private val elements: Set<T>
-) : Set<T> by elements {
+public value class NonEmptySet<out A> private constructor(
+  private val elements: Set<A>
+) : Set<A> by elements {
 
-  public constructor(first: T, rest: Set<T>) : this(setOf(first) + rest)
+  public constructor(first: A, rest: Set<A>) : this(setOf(first) + rest)
 
-  public operator fun plus(set: Set<@UnsafeVariance T>): NonEmptySet<T> =
+  public operator fun plus(set: Set<@UnsafeVariance A>): NonEmptySet<A> =
     NonEmptySet(elements + set)
 
-  public operator fun plus(element: @UnsafeVariance T): NonEmptySet<T> =
+  public operator fun plus(element: @UnsafeVariance A): NonEmptySet<A> =
     NonEmptySet(elements + element)
 
-  public fun <R> map(transform: (@UnsafeVariance T) -> R): NonEmptySet<R> =
+  public fun <R> map(transform: (@UnsafeVariance A) -> R): NonEmptySet<R> =
     NonEmptySet(elements.mapTo(mutableSetOf(), transform))
 
   override fun isEmpty(): Boolean = false
@@ -33,17 +33,17 @@ public value class NonEmptySet<out T> private constructor(
     elements.hashCode()
 }
 
-public fun <T> nonEmptySetOf(first: T, vararg rest: T): NonEmptySet<T> =
+public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
   NonEmptySet(first, rest.toSet())
 
-public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? =
+public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
   firstOrNull()?.let { NonEmptySet(it, minus(it).toSet()) }
 
-public fun <T> Iterable<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
+public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()
 
-public fun <T> Set<T>.toNonEmptySetOrNull(): NonEmptySet<T>? =
+public fun <A> Set<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
   firstOrNull()?.let { NonEmptySet(it, minus(it)) }
 
-public fun <T> Set<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
+public fun <A> Set<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()

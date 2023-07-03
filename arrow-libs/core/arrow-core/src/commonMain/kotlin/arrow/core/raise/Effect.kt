@@ -3,7 +3,6 @@
 @file:OptIn(ExperimentalTypeInference::class)
 package arrow.core.raise
 
-import arrow.core.identity
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
@@ -672,11 +671,9 @@ public typealias EagerEffect<Error, A> = Raise<Error>.() -> A
 
 public inline fun <Error, A> eagerEffect(@BuilderInference noinline block: Raise<Error>.() -> A): EagerEffect<Error, A> = block
 
-public suspend fun <A> Effect<A, A>.merge(): A = getOrElse(::identity)
-public fun <A> EagerEffect<A, A>.merge(): A = getOrElse(::identity)
+public suspend fun <A> Effect<A, A>.merge(): A = merge { invoke() }
+public fun <A> EagerEffect<A, A>.merge(): A = merge { invoke() }
 
-@Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
-public suspend fun <A> Effect<Nothing, A>.get(): A = getOrElse(::identity)
+public suspend fun <A> Effect<Nothing, A>.get(): A = merge()
 
-@Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
-public fun <A> EagerEffect<Nothing, A>.get(): A = getOrElse(::identity)
+public fun <A> EagerEffect<Nothing, A>.get(): A = merge()

@@ -4,10 +4,11 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.arrowGradleConfig.versioning)
+  alias(libs.plugins.kotlinx.kover)
 }
 
 apply(plugin = "io.kotest.multiplatform")
-apply(from = property("TEST_COVERAGE"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
@@ -26,7 +27,6 @@ kotlin {
         api(projects.arrowCore)
         api(libs.coroutines.core)
         implementation(libs.kotlin.stdlibCommon)
-        implementation(libs.coroutines.test)
       }
     }
 
@@ -36,6 +36,7 @@ kotlin {
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
+          implementation(libs.coroutines.test)
         }
       }
       jvmTest {

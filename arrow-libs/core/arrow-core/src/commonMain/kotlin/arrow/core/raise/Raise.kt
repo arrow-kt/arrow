@@ -610,3 +610,60 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
   }
   return value ?: raise(raise())
 }
+
+/**
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [OtherError],
+ * and transform any raised [OtherError] into [Error], which is raised to the outer [Raise].
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.either
+ * import arrow.core.raise.withError
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   either<Int, String> {
+ *     withError(String::length) {
+ *       raise("failed")
+ *     }
+ *   } shouldBe Either.Left(6)
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-11.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+public inline fun <Error, OtherError, A> Raise<Error>.withError(
+  transform: (OtherError) -> Error,
+  @BuilderInference block: Raise<OtherError>.() -> A
+): A {
+  contract {
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return recover(block) { raise(transform(it)) }
+}
+
+/**
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [A].
+ * Does not distinguish between normal results and errors, thus you can consider
+ * `return` and `raise` to be semantically equivalent inside.
+ *
+ * <!--- INCLUDE
+ * import arrow.core.raise.merge
+ * import io.kotest.matchers.shouldBe
+ * import kotlin.random.Random
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   merge { if(Random.nextBoolean()) raise("failed") else "failed" } shouldBe "failed"
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-12.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+@JvmName("_merge")
+public inline fun <A> merge(
+  @BuilderInference block: Raise<A>.() -> A,
+): A = recover(block, ::identity)

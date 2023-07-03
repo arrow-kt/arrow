@@ -16,8 +16,7 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1
-      |val r = i != null
-      """.evals("r" to true)
+      """.compilationSucceeds(allWarningsAsErrors = true)
   }
 
   @Test
@@ -32,8 +31,21 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed<String, String>, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1()
-      |val r = i != null
-      """.evals("r" to true)
+      """.compilationSucceeds(allWarningsAsErrors = true)
+  }
+
+  @Test
+  fun `Prism will be generated without warning for sealed class with only one subclass`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class PrismSealed(val field: String, val nullable: String?) {
+      | data class PrismSealed1(private val a: String?) : PrismSealed("", a)
+      | companion object
+      |}
+      |val i: Prism<PrismSealed, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1
+      """.compilationSucceeds(allWarningsAsErrors = true)
   }
 
   @Test

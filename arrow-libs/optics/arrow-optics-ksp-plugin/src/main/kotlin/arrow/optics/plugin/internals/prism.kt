@@ -1,7 +1,5 @@
 package arrow.optics.plugin.internals
 
-import com.google.devtools.ksp.symbol.KSTypeParameter
-
 internal fun generatePrisms(ele: ADT, target: PrismTarget) =
   Snippet(
     `package` = ele.packageName,
@@ -26,12 +24,16 @@ private fun processElement(ele: ADT, foci: List<Focus>): String {
         "${ele.visibilityModifierName} inline fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
     }
 
+    val elseBranch = if (focus.onlyOneSealedSubclass) "" else """
+  |      else -> ${ele.sourceName}.left()
+    """.trimMargin()
+
     """
   |$firstLine = $Prism(
   |  getOrModify = { ${ele.sourceName}: $sourceClassNameWithParams ->
   |    when (${ele.sourceName}) {
   |      is ${focus.className} -> ${ele.sourceName}.right()
-  |      else -> ${ele.sourceName}.left()
+  |      $elseBranch
   |    }
   |  },
   |  reverseGet = ::identity

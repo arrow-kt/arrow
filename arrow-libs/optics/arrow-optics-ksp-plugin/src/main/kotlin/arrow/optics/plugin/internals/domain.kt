@@ -75,11 +75,31 @@ typealias NullableFocus = Focus.Nullable
 sealed class Focus {
 
   companion object {
-    operator fun invoke(fullName: String, paramName: String, refinedType: KSType? = null): Focus =
+    operator fun invoke(
+      fullName: String,
+      paramName: String,
+      refinedType: KSType? = null,
+      onlyOneSealedSubclass: Boolean = false,
+    ): Focus =
       when {
-        fullName.endsWith("?") -> Nullable(fullName, paramName, refinedType)
-        fullName.startsWith("`arrow`.`core`.`Option`") -> Option(fullName, paramName, refinedType)
-        else -> NonNull(fullName, paramName, refinedType)
+        fullName.endsWith("?") -> Nullable(
+          fullName,
+          paramName,
+          refinedType,
+          onlyOneSealedSubclass = onlyOneSealedSubclass,
+        )
+        fullName.startsWith("`arrow`.`core`.`Option`") -> Option(
+          fullName,
+          paramName,
+          refinedType,
+          onlyOneSealedSubclass = onlyOneSealedSubclass,
+        )
+        else -> NonNull(
+          fullName,
+          paramName,
+          refinedType,
+          onlyOneSealedSubclass = onlyOneSealedSubclass,
+        )
       }
   }
 
@@ -87,6 +107,7 @@ sealed class Focus {
   abstract val paramName: String
   // only used for type-refining prisms
   abstract val refinedType: KSType?
+  abstract val onlyOneSealedSubclass: Boolean
 
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
@@ -96,7 +117,8 @@ sealed class Focus {
   data class Nullable(
     override val className: String,
     override val paramName: String,
-    override val refinedType: KSType?
+    override val refinedType: KSType?,
+    override val onlyOneSealedSubclass: Boolean,
   ) : Focus() {
     val nonNullClassName = className.dropLast(1)
   }
@@ -104,7 +126,8 @@ sealed class Focus {
   data class Option(
     override val className: String,
     override val paramName: String,
-    override val refinedType: KSType?
+    override val refinedType: KSType?,
+    override val onlyOneSealedSubclass: Boolean,
   ) : Focus() {
     val nestedClassName =
       Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(className)!!.groupValues[1]
@@ -113,7 +136,8 @@ sealed class Focus {
   data class NonNull(
     override val className: String,
     override val paramName: String,
-    override val refinedType: KSType?
+    override val refinedType: KSType?,
+    override val onlyOneSealedSubclass: Boolean,
   ) : Focus()
 }
 

@@ -41,6 +41,7 @@ data class MonoidLaws<F>(
       list.fold(empty, combine).equalUnderTheLaw(if (list.isEmpty()) empty else list.reduce(combine), eq)
     }
 
-  private fun combineAllOfEmptyIsEmpty(): Unit =
+  private fun combineAllOfEmptyIsEmpty() {
     emptyList<F>().fold(empty, combine).equalUnderTheLaw(empty, eq) shouldBe true
+  }
 }
