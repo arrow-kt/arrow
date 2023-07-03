@@ -5,6 +5,7 @@ import arrow.optics.plugin.isSealed
 import arrow.optics.plugin.isValue
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.Variance.INVARIANT
 import java.util.Locale
 
 internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
@@ -153,12 +154,12 @@ internal fun evalAnnotatedIsoElement(
 internal fun KSClassDeclaration.getConstructorTypesNames(): List<String> =
   primaryConstructor?.parameters?.map { it.type.resolve().qualifiedString() }.orEmpty()
 
-internal fun KSType.qualifiedString(): String = when (declaration) {
+internal fun KSType.qualifiedString(prefix: String = ""): String = when (declaration) {
   is KSTypeParameter -> {
-    val n = declaration.simpleName.asSanitizedString()
+    val n = declaration.simpleName.asSanitizedString(prefix = prefix)
     if (isMarkedNullable) "$n?" else n
   }
-  else -> when (val qname = declaration.qualifiedName?.asSanitizedString()) {
+  else -> when (val qname = declaration.qualifiedName?.asSanitizedString(prefix = prefix)) {
     null -> toString()
     else -> {
       val withArgs = when {
@@ -172,7 +173,7 @@ internal fun KSType.qualifiedString(): String = when (declaration) {
 
 internal fun KSTypeArgument.qualifiedString(): String = when (val ty = type?.resolve()) {
   null -> toString()
-  else -> ty.qualifiedString()
+  else -> ty.qualifiedString(prefix = "${variance.label} ".takeIf { variance != INVARIANT }.orEmpty())
 }
 
 internal fun KSClassDeclaration.getConstructorParamNames(): List<String> =
