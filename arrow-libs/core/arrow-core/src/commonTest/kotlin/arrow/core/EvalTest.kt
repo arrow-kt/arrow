@@ -10,15 +10,15 @@ internal data class SideEffect(var counter: Int = 0) {
   }
 }
 
-private fun recur(limit: Int, sideEffect: SideEffect): (Int) -> Eval<Int> {
+private fun recur(limit: Int, sideEffect: SideEffect): (Int) -> Eval2<Int> {
   return { num ->
     if (num <= limit) {
       sideEffect.increment()
-      Eval.defer {
+      Eval2Utils.defer {
         recur(limit, sideEffect).invoke(num + 1)
       }
     } else {
-      Eval.now(-1)
+      Eval2Utils.now(-1)
     }
   }
 }
@@ -27,7 +27,7 @@ class EvalTest : StringSpec({
 
     "should map wrapped value" {
       val sideEffect = SideEffect()
-      val mapped = Eval.now(0)
+      val mapped = Eval2Utils.now(0)
         .map { sideEffect.increment(); it + 1 }
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 1
@@ -40,7 +40,7 @@ class EvalTest : StringSpec({
 
     "later should lazily evaluate values once" {
       val sideEffect = SideEffect()
-      val mapped = Eval.later { sideEffect.increment(); sideEffect.counter }
+      val mapped = Eval2Utils.later { sideEffect.increment(); sideEffect.counter }
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 1
       sideEffect.counter shouldBe 1
@@ -52,7 +52,7 @@ class EvalTest : StringSpec({
 
     "later should memoize values" {
       val sideEffect = SideEffect()
-      val mapped = Eval.later { sideEffect.increment(); sideEffect.counter }.memoize()
+      val mapped = Eval2Utils.later { sideEffect.increment(); sideEffect.counter }.memoize()
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 1
       sideEffect.counter shouldBe 1
@@ -64,7 +64,7 @@ class EvalTest : StringSpec({
 
     "always should lazily evaluate values repeatedly" {
       val sideEffect = SideEffect()
-      val mapped = Eval.always { sideEffect.increment(); sideEffect.counter }
+      val mapped = Eval2Utils.always { sideEffect.increment(); sideEffect.counter }
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 1
       sideEffect.counter shouldBe 1
@@ -76,7 +76,7 @@ class EvalTest : StringSpec({
 
     "always should memoize values" {
       val sideEffect = SideEffect()
-      val mapped = Eval.always { sideEffect.increment(); sideEffect.counter }.memoize()
+      val mapped = Eval2Utils.always { sideEffect.increment(); sideEffect.counter }.memoize()
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 1
       sideEffect.counter shouldBe 1
@@ -88,7 +88,7 @@ class EvalTest : StringSpec({
 
     "defer should lazily evaluate other Evals" {
       val sideEffect = SideEffect()
-      val mapped = Eval.defer { sideEffect.increment(); Eval.later { sideEffect.increment(); sideEffect.counter } }
+      val mapped = Eval2Utils.defer { sideEffect.increment(); Eval2Utils.later { sideEffect.increment(); sideEffect.counter } }
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 2
       sideEffect.counter shouldBe 2
@@ -100,7 +100,7 @@ class EvalTest : StringSpec({
 
     "defer should memoize Eval#later" {
       val sideEffect = SideEffect()
-      val mapped = Eval.defer { sideEffect.increment(); Eval.later { sideEffect.increment(); sideEffect.counter } }.memoize()
+      val mapped = Eval2Utils.defer { sideEffect.increment(); Eval2Utils.later { sideEffect.increment(); sideEffect.counter } }.memoize()
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 2
       sideEffect.counter shouldBe 2
@@ -112,7 +112,7 @@ class EvalTest : StringSpec({
 
     "defer should memoize Eval#now" {
       val sideEffect = SideEffect()
-      val mapped = Eval.defer { sideEffect.increment(); Eval.now(sideEffect.counter) }.memoize()
+      val mapped = Eval2Utils.defer { sideEffect.increment(); Eval2Utils.now(sideEffect.counter) }.memoize()
       sideEffect.counter shouldBe 0
       mapped.value() shouldBe 1
       sideEffect.counter shouldBe 1
@@ -125,7 +125,7 @@ class EvalTest : StringSpec({
     "flatMap should complete without blowing up the stack" {
       val limit = stackSafeIteration()
       val sideEffect = SideEffect()
-      val flatMapped = Eval.now(0).flatMap(recur(limit, sideEffect))
+      val flatMapped = Eval2Utils.now(0).flatMap(recur(limit, sideEffect))
       sideEffect.counter shouldBe 0
       flatMapped.value() shouldBe -1
       sideEffect.counter shouldBe limit + 1
