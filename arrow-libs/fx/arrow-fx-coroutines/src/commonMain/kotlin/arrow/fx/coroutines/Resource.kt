@@ -422,7 +422,7 @@ public fun <A> resource(
  * }
  *
  * suspend fun main() {
- *   Path.of("example.kt")
+ *   Path("example.kt")
  *     .readAll()
  *     .collect(::println)
  * }

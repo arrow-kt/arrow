@@ -18,7 +18,7 @@ fun Path.readAll(): Flow<String> = flow {
 }
 
 suspend fun main() {
-  Path.of("example.kt")
+  Path("example.kt")
     .readAll()
     .collect(::println)
 }
