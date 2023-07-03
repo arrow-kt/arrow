@@ -33,3 +33,9 @@ kotlin {
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))
+
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.annotations"
+  }
+}
