@@ -148,7 +148,65 @@ public annotation class RaiseDSL
  */
 public interface Raise<in Error> {
 
-  /** Raise a _logical failure_ of type [Error] */
+  /**
+   * Raises a _logical failure_ of type [Error].
+   * This function behaves like a _return statement_,
+   * immediately short-circuiting and terminating the computation.
+   *
+   * __Alternatives:__ Common ways to raise errors include: [ensure], [ensureNotNull], and [bind].
+   * Consider using them to make your code more concise and expressive.
+   *
+   * __Handling raised errors:__ Refer to [recover] and [mapOrAccumulate].
+   *
+   * @param r an error of type [Error] that will short-circuit the computation.
+   * Behaves similarly to _return_ or _throw_.
+   *
+   * ### Example:
+   * ```
+   * import arrow.core.Either
+   * import arrow.core.mapOrAccumulate
+   * import arrow.core.raise.*
+   *
+   * enum class ServiceType { Free, Paid }
+   *
+   * data class Config(val mode: Int, val role: String, val serviceType: ServiceType)
+   *
+   * context(Raise<String>)
+   * fun readConfig(): Config {
+   *     val mode = ensureNotNull(readln().toIntOrNull()) {
+   *         "Mode should be a valid integer"
+   *     }
+   *     val role = readln()
+   *     ensure(role in listOf("Manager", "Admin")) {
+   *         "$role should be either a \"Manager\" or an \"Admin\""
+   *     }
+   *     val serviceType = parseServiceType(readln()).bind()
+   *
+   *     return Config(
+   *         mode = mode,
+   *         role = role,
+   *         serviceType = serviceType
+   *     )
+   * }
+   *
+   * private fun parseServiceType(rawString: String): Either<String, ServiceType> = catch({
+   *     val serviceType = ServiceType.valueOf(rawString)
+   *     Either.Right(serviceType)
+   * }) {
+   *     Either.Left("$rawString is not a valid service type")
+   * }
+   *
+   * fun main() {
+   *     val config = recover(::readConfig) { errMsg ->
+   *         error("Invalid config, error: $errMsg")
+   *     }
+   *     // Read 3 additional configs and return Either.Right only if all of them are valid
+   *     val additionalConfigs = (1..3).mapOrAccumulate { readConfig() }
+   *     println(config) // valid Config
+   *     println(additionalConfigs) //  Either<NonEmptyList<String>, List<Config>>
+   * }
+   * ```
+   */
   @RaiseDSL
   public fun raise(r: Error): Nothing
 
@@ -436,6 +494,68 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
 public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A =
   catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
 
+/**
+ * Ensures that the [condition] is met;
+ * otherwise, [Raise.raise]s a logical failure of type [Error].
+ *
+ * In summary, this is a type-safe alternative to [require], using the [Raise] API.
+ *
+ * ### Example:
+ * ```
+ * @JvmInline
+ * value class CountryCode(val code: String)
+ *
+ * sealed interface CountryCodeError {
+ *     data class InvalidLength(val length: Int) : CountryCodeError
+ *     object ContainsInvalidChars : CountryCodeError
+ * }
+ *
+ * context(Raise<CountryCodeError>)
+ * fun countryCode(rawCode: String): CountryCode {
+ *     ensure(rawCode.length == 2) { CountryCodeError.InvalidLength(rawCode.length) }
+ *     ensure(rawCode.any { !it.isLetter() }) { CountryCodeError.ContainsInvalidChars }
+ *     return CountryCode(rawCode)
+ * }
+ *
+ * fun main() {
+ *     recover({
+ *         countryCode("US") // valid
+ *         countryCode("ABC") // raises CountryCode.InvalidLength error
+ *         countryCode("A1") // raises CountryCode.ContainsInvalidChar
+ *     }) { error ->
+ *         // Handle errors in a type-safe manner
+ *         when (error) {
+ *             CountryCodeError.ContainsInvalidChars -> {}
+ *             is CountryCodeError.InvalidLength -> {}
+ *         }
+ *     }
+ *
+ *     // Can call it w/o error handling => prone to runtime errors
+ *     countryCodeOrThrow("Will fail")
+ *     countryCode("Will fail") // this line won't compile => we're protected
+ *
+ *     try {
+ *         countryCodeOrThrow("US") // valid
+ *         countryCodeOrThrow("ABC") // throw IllegalArgumentException
+ *         countryCodeOrThrow("A1") // throw IllegalArgumentException
+ *     } catch (e: IllegalArgumentException) {
+ *         // Not easy to handle
+ *     }
+ * }
+ *
+ * // Not type-safe alternative using require
+ * @Throws(IllegalArgumentException::class)
+ * fun countryCodeOrThrow(rawCode: String): CountryCode {
+ *     require(rawCode.length == 2) { CountryCodeError.InvalidLength(rawCode.length) }
+ *     require(rawCode.any { !it.isLetter() }) { CountryCodeError.ContainsInvalidChars }
+ *     return CountryCode(rawCode)
+ * }
+ * ```
+ *
+ * @param condition the condition that must be true.
+ * @param raise a lambda that produces an error of type [Error] when the [condition] is false.
+ *
+ */
 @RaiseDSL
 public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> Error) {
   contract {
@@ -445,6 +565,43 @@ public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> E
   return if (condition) Unit else raise(raise())
 }
 
+/**
+ * Ensures that the [value] is not null;
+ * otherwise, [Raise.raise]s a logical failure of type [Error].
+ *
+ * In summary, this is a type-safe alternative to [requireNotNull], using the [Raise] API.
+ *
+ * ### Example
+ * ```
+ *@JvmInline
+ * value class FullName(val name: String)
+ *
+ * sealed interface NameError {
+ *     object NullValue : NameError
+ * }
+ *
+ * context(Raise<NameError>)
+ * fun fullName(name: String?): FullName {
+ *     val nonNullName = ensureNotNull(name) { NameError.NullValue }
+ *     return FullName(nonNullName)
+ * }
+ *
+ * fun main() {
+ *     recover({
+ *         fullName("John Doe") // valid
+ *         fullName(null) // raises NameError.NullValue error
+ *     }) { error ->
+ *         // Handle errors in a type-safe manner
+ *         when (error) {
+ *             NameError.NullValue -> {}
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * @param value the value that must be non-null.
+ * @param raise a lambda that produces an error of type [Error] when the [value] is null.
+ */
 @RaiseDSL
 public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: () -> Error): B {
   contract {
