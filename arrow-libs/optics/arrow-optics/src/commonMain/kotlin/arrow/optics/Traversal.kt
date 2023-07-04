@@ -504,8 +504,11 @@ public fun interface PTraversal<S, T, A, B> : PSetter<S, T, A, B> {
    * @receiver [Traversal] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
+  //e: arrow/arrow-libs/optics/arrow-optics/src/commonMain/kotlin/arrow/optics/Traversal.kt:508:24 None of the following functions are applicable: [fun <C, D> compose(other: PTraversal<in S, out T, out C, in D>): PTraversal<U, V, C, D>, fun <C, D> compose(other: PSetter<in S, out T, out C, in D>): PSetter<U, V, C, D>]
+  // https://youtrack.jetbrains.com/issue/KT-49015/Qualified-this-change-behavior-in-case-of-potential-label-conflicts
   public val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() = this@every.compose(this@PTraversal)
+//  get() = this@every.compose(this@PTraversal)
+    get() = TODO()
 
   /**
    * DSL to compose [Traversal] with a [PEvery] for a structure [S] to see all its foci [A]

@@ -22,11 +22,12 @@ public value class NonEmptySet<out A> private constructor(
 
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
-  override fun equals(other: Any?): Boolean = when (other) {
-    is NonEmptySet<*> -> elements == other.elements
-    else -> elements == other
-  }
+  //e: file:///Users/simonvergauwen/Developer/arrow/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/core/NonEmptySet.kt:28:44 Symbol val elements: Set<Any?> is invisible
+//  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
+//  override fun equals(other: Any?): Boolean = when (other) {
+//    is NonEmptySet<*> -> elements == other.elements
+//    else -> elements == other
+//  }
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =

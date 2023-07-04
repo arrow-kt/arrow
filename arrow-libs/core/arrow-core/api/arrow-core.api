@@ -34,6 +34,7 @@ public final class arrow/core/Composition {
 public final class arrow/core/Const {
 	public static final field Companion Larrow/core/Const$Companion;
 	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
 	public final fun copy (Ljava/lang/Object;)Larrow/core/Const;
 	public static synthetic fun copy$default (Larrow/core/Const;Ljava/lang/Object;ILjava/lang/Object;)Larrow/core/Const;
 	public fun equals (Ljava/lang/Object;)Z
@@ -374,6 +375,7 @@ public abstract class arrow/core/Eval {
 
 public final class arrow/core/Eval$Always : arrow/core/Eval {
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function0;
 	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/core/Eval$Always;
 	public static synthetic fun copy$default (Larrow/core/Eval$Always;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/core/Eval$Always;
 	public fun equals (Ljava/lang/Object;)Z
@@ -415,6 +417,7 @@ public abstract class arrow/core/Eval$FlatMap : arrow/core/Eval {
 
 public final class arrow/core/Eval$Later : arrow/core/Eval {
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function0;
 	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/core/Eval$Later;
 	public static synthetic fun copy$default (Larrow/core/Eval$Later;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/core/Eval$Later;
 	public fun equals (Ljava/lang/Object;)Z

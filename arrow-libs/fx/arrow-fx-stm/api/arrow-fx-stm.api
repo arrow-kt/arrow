@@ -111,6 +111,7 @@ public final class arrow/fx/stm/STMKt {
 
 public final class arrow/fx/stm/TArray {
 	public static final field Companion Larrow/fx/stm/TArray$Companion;
+	public final fun component1 ()[Larrow/fx/stm/TVar;
 	public final fun copy ([Larrow/fx/stm/TVar;)Larrow/fx/stm/TArray;
 	public static synthetic fun copy$default (Larrow/fx/stm/TArray;[Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TArray;
 	public fun equals (Ljava/lang/Object;)Z
@@ -135,6 +136,7 @@ public final class arrow/fx/stm/TArrayKt {
 
 public final class arrow/fx/stm/TMVar {
 	public static final field Companion Larrow/fx/stm/TMVar$Companion;
+	public final fun component1 ()Larrow/fx/stm/TVar;
 	public final fun copy (Larrow/fx/stm/TVar;)Larrow/fx/stm/TMVar;
 	public static synthetic fun copy$default (Larrow/fx/stm/TMVar;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TMVar;
 	public fun equals (Ljava/lang/Object;)Z
@@ -154,6 +156,8 @@ public final class arrow/fx/stm/TMVarKt {
 
 public final class arrow/fx/stm/TMap {
 	public static final field Companion Larrow/fx/stm/TMap$Companion;
+	public final fun component1 ()Larrow/fx/stm/internal/Hamt;
+	public final fun component2 ()Lkotlin/jvm/functions/Function1;
 	public final fun copy (Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;)Larrow/fx/stm/TMap;
 	public static synthetic fun copy$default (Larrow/fx/stm/TMap;Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/stm/TMap;
 	public fun equals (Ljava/lang/Object;)Z
@@ -173,6 +177,8 @@ public final class arrow/fx/stm/TMapKt {
 
 public final class arrow/fx/stm/TQueue {
 	public static final field Companion Larrow/fx/stm/TQueue$Companion;
+	public final fun component1 ()Larrow/fx/stm/TVar;
+	public final fun component2 ()Larrow/fx/stm/TVar;
 	public final fun copy (Larrow/fx/stm/TVar;Larrow/fx/stm/TVar;)Larrow/fx/stm/TQueue;
 	public static synthetic fun copy$default (Larrow/fx/stm/TQueue;Larrow/fx/stm/TVar;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TQueue;
 	public fun equals (Ljava/lang/Object;)Z
@@ -190,6 +196,7 @@ public final class arrow/fx/stm/TQueueKt {
 
 public final class arrow/fx/stm/TSemaphore {
 	public static final field Companion Larrow/fx/stm/TSemaphore$Companion;
+	public final fun component1 ()Larrow/fx/stm/TVar;
 	public final fun copy (Larrow/fx/stm/TVar;)Larrow/fx/stm/TSemaphore;
 	public static synthetic fun copy$default (Larrow/fx/stm/TSemaphore;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TSemaphore;
 	public fun equals (Ljava/lang/Object;)Z
@@ -207,6 +214,8 @@ public final class arrow/fx/stm/TSemaphoreKt {
 
 public final class arrow/fx/stm/TSet {
 	public static final field Companion Larrow/fx/stm/TSet$Companion;
+	public final fun component1 ()Larrow/fx/stm/internal/Hamt;
+	public final fun component2 ()Lkotlin/jvm/functions/Function1;
 	public final fun copy (Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;)Larrow/fx/stm/TSet;
 	public static synthetic fun copy$default (Larrow/fx/stm/TSet;Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/stm/TSet;
 	public fun equals (Ljava/lang/Object;)Z
