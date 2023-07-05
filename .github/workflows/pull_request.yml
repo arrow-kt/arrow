@@ -256,12 +256,12 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: apiDump
+      - name: spotlessApply
         uses: gradle/gradle-build-action@v2
         with:
           arguments: spotlessApply
 
-      - name: "Apply formatting"
+      - name: "Commit newly formatted files"
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Apply
