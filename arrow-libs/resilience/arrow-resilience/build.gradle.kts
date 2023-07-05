@@ -15,16 +15,6 @@ spotless {
   }
 }
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
-  }
-}
-
 kotlin {
   sourceSets {
     commonMain {
@@ -35,13 +25,11 @@ kotlin {
         implementation("org.jetbrains.kotlin:kotlin-stdlib")
       }
     }
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowFxCoroutines)
-          implementation(libs.coroutines.test)
-          implementation(kotlin("test"))
-        }
+    commonTest {
+      dependencies {
+        implementation(projects.arrowFxCoroutines)
+        implementation(libs.coroutines.test)
+        implementation(kotlin("test"))
       }
     }
   }
