@@ -510,8 +510,9 @@ public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Ljava/util/Set;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Ljava/util/Set;
-	public fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
-	public static fun zip-impl (Ljava/util/Set;Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
+	public synthetic fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
+	public fun zip-0-xjo5U (Larrow/core/NonEmptyCollection;)Ljava/util/List;
+	public static fun zip-0-xjo5U (Ljava/util/Set;Larrow/core/NonEmptyCollection;)Ljava/util/List;
 }
 
 public final class arrow/core/NonEmptySetKt {
