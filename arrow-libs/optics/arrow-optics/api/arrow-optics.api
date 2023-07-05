@@ -1,10 +1,12 @@
 public abstract interface class arrow/optics/Copy {
+	public abstract fun getRef (Larrow/optics/PSetter;)Larrow/optics/Reference;
 	public abstract fun inside (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
 	public abstract fun set (Larrow/optics/PSetter;Ljava/lang/Object;)V
 	public abstract fun transform (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class arrow/optics/Copy$DefaultImpls {
+	public static fun getRef (Larrow/optics/Copy;Larrow/optics/PSetter;)Larrow/optics/Reference;
 	public static fun inside (Larrow/optics/Copy;Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
 }
 
@@ -155,6 +157,9 @@ public final class arrow/optics/ListKt {
 	public static final fun snoc (Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;
 	public static final fun uncons (Ljava/util/List;)Lkotlin/Pair;
 	public static final fun unsnoc (Ljava/util/List;)Lkotlin/Pair;
+}
+
+public abstract interface annotation class arrow/optics/OpticsCopy : java/lang/annotation/Annotation {
 }
 
 public abstract interface annotation class arrow/optics/OpticsCopyMarker : java/lang/annotation/Annotation {
@@ -826,6 +831,16 @@ public final class arrow/optics/PTraversal$DefaultImpls {
 
 public final class arrow/optics/PrismKt {
 	public static final fun Prism (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/optics/PPrism;
+}
+
+public final class arrow/optics/Reference {
+	public fun <init> (Larrow/optics/Copy;Larrow/optics/PSetter;)V
+	public final fun assign (Ljava/lang/Object;)V
+	public final fun copy (Larrow/optics/Copy;Larrow/optics/PSetter;)Larrow/optics/Reference;
+	public static synthetic fun copy$default (Larrow/optics/Reference;Larrow/optics/Copy;Larrow/optics/PSetter;ILjava/lang/Object;)Larrow/optics/Reference;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class arrow/optics/dsl/AtKt {
