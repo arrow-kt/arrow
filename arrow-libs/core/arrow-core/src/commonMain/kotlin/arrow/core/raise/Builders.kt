@@ -105,7 +105,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   @RaiseDSL
   @JvmName("bindAllResult")
   public fun <A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }
+    map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
   public inline fun <A> recover(
@@ -138,7 +138,7 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   @RaiseDSL
   @JvmName("bindAllOption")
   public fun <A> NonEmptySet<Option<A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }
+    map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { None }
@@ -181,7 +181,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   @RaiseDSL
   @JvmName("bindAllIor")
   public fun <A> NonEmptySet<Ior<Error, A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }
+    map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
   public fun <A> Ior<Error, A>.bind(): A =

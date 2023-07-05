@@ -303,7 +303,37 @@ public final class arrow/core/MapKt {
 	public static final fun zip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 }
 
-public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal/markers/KMappedMarker {
+public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
+	public abstract fun distinct-1X0FA-Y ()Ljava/util/List;
+	public abstract fun distinctBy-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public abstract fun firstOrNull ()Ljava/lang/Object;
+	public abstract fun flatMap-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public abstract fun getHead ()Ljava/lang/Object;
+	public abstract fun isEmpty ()Z
+	public abstract fun lastOrNull ()Ljava/lang/Object;
+	public abstract fun map-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public abstract fun mapIndexed-0-xjo5U (Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public abstract fun plus (Ljava/lang/Iterable;)Larrow/core/NonEmptyCollection;
+	public abstract fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyCollection;
+	public abstract fun toNonEmptyList-1X0FA-Y ()Ljava/util/List;
+	public abstract fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
+	public abstract fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
+}
+
+public final class arrow/core/NonEmptyCollection$DefaultImpls {
+	public static fun distinct-1X0FA-Y (Larrow/core/NonEmptyCollection;)Ljava/util/List;
+	public static fun distinctBy-0-xjo5U (Larrow/core/NonEmptyCollection;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static fun firstOrNull (Larrow/core/NonEmptyCollection;)Ljava/lang/Object;
+	public static fun flatMap-0-xjo5U (Larrow/core/NonEmptyCollection;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static fun isEmpty (Larrow/core/NonEmptyCollection;)Z
+	public static fun map-0-xjo5U (Larrow/core/NonEmptyCollection;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static fun mapIndexed-0-xjo5U (Larrow/core/NonEmptyCollection;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static fun toNonEmptyList-1X0FA-Y (Larrow/core/NonEmptyCollection;)Ljava/util/List;
+	public static fun toNonEmptySet-5sCjGKo (Larrow/core/NonEmptyCollection;)Ljava/util/Set;
+	public static fun zip (Larrow/core/NonEmptyCollection;Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
+}
+
+public final class arrow/core/NonEmptyList : arrow/core/NonEmptyCollection, java/util/List, kotlin/jvm/internal/markers/KMappedMarker {
 	public static final field Companion Larrow/core/NonEmptyList$Companion;
 	public fun add (ILjava/lang/Object;)V
 	public fun add (Ljava/lang/Object;)Z
@@ -319,16 +349,24 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 	public static fun contains-impl (Ljava/util/List;Ljava/lang/Object;)Z
 	public fun containsAll (Ljava/util/Collection;)Z
 	public static fun containsAll-impl (Ljava/util/List;Ljava/util/Collection;)Z
+	public fun distinct-1X0FA-Y ()Ljava/util/List;
+	public static fun distinct-1X0FA-Y (Ljava/util/List;)Ljava/util/List;
+	public static fun distinctBy-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun distinctBy-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (Ljava/util/List;Ljava/lang/Object;)Z
 	public static final fun equals-impl0 (Ljava/util/List;Ljava/util/List;)Z
 	public static final fun extract-impl (Ljava/util/List;)Ljava/lang/Object;
-	public static final fun flatMap-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun firstOrNull ()Ljava/lang/Object;
+	public static fun firstOrNull-impl (Ljava/util/List;)Ljava/lang/Object;
+	public static fun flatMap-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun flatMap-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun foldLeft-impl (Ljava/util/List;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public fun get (I)Ljava/lang/Object;
 	public static fun get-impl (Ljava/util/List;I)Ljava/lang/Object;
 	public final fun getAll ()Ljava/util/List;
-	public static final fun getHead-impl (Ljava/util/List;)Ljava/lang/Object;
+	public fun getHead ()Ljava/lang/Object;
+	public static fun getHead-impl (Ljava/util/List;)Ljava/lang/Object;
 	public fun getSize ()I
 	public static fun getSize-impl (Ljava/util/List;)I
 	public static final fun getTail-impl (Ljava/util/List;)Ljava/util/List;
@@ -342,15 +380,24 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 	public static fun iterator-impl (Ljava/util/List;)Ljava/util/Iterator;
 	public fun lastIndexOf (Ljava/lang/Object;)I
 	public static fun lastIndexOf-impl (Ljava/util/List;Ljava/lang/Object;)I
+	public fun lastOrNull ()Ljava/lang/Object;
+	public static fun lastOrNull-impl (Ljava/util/List;)Ljava/lang/Object;
 	public fun listIterator ()Ljava/util/ListIterator;
 	public fun listIterator (I)Ljava/util/ListIterator;
 	public static fun listIterator-impl (Ljava/util/List;)Ljava/util/ListIterator;
 	public static fun listIterator-impl (Ljava/util/List;I)Ljava/util/ListIterator;
-	public static final fun map-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static fun map-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun map-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static fun mapIndexed-0-xjo5U (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public fun mapIndexed-0-xjo5U (Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun padZip-YfahJLU (Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun padZip-vcjLgH4 (Ljava/util/List;Ljava/util/List;)Ljava/util/List;
-	public static final fun plus-0-xjo5U (Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;
-	public static final fun plus-0-xjo5U (Ljava/util/List;Ljava/util/List;)Ljava/util/List;
+	public synthetic fun plus (Ljava/lang/Iterable;)Larrow/core/NonEmptyCollection;
+	public synthetic fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyCollection;
+	public fun plus-0-xjo5U (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun plus-0-xjo5U (Ljava/lang/Object;)Ljava/util/List;
+	public static fun plus-0-xjo5U (Ljava/util/List;Ljava/lang/Iterable;)Ljava/util/List;
+	public static fun plus-0-xjo5U (Ljava/util/List;Ljava/lang/Object;)Ljava/util/List;
 	public static final fun plus-vcjLgH4 (Ljava/util/List;Ljava/util/List;)Ljava/util/List;
 	public fun remove (I)Ljava/lang/Object;
 	public fun remove (Ljava/lang/Object;)Z
@@ -365,9 +412,14 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 	public fun toArray ()[Ljava/lang/Object;
 	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
 	public static final fun toList-impl (Ljava/util/List;)Ljava/util/List;
+	public fun toNonEmptyList-1X0FA-Y ()Ljava/util/List;
+	public static fun toNonEmptyList-1X0FA-Y (Ljava/util/List;)Ljava/util/List;
+	public fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
+	public static fun toNonEmptySet-5sCjGKo (Ljava/util/List;)Ljava/util/Set;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Ljava/util/List;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Ljava/util/List;
+	public fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
 	public static final fun zip-BdUWqYY (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function5;)Ljava/util/List;
 	public static final fun zip-EkAgaZI (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function10;)Ljava/util/List;
 	public static final fun zip-FrVv2gs (Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
@@ -375,6 +427,7 @@ public final class arrow/core/NonEmptyList : java/util/List, kotlin/jvm/internal
 	public static final fun zip-Sy0iXXA (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function4;)Ljava/util/List;
 	public static final fun zip-Vwi0aTY (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function7;)Ljava/util/List;
 	public static final fun zip-e5uF9gA (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function6;)Ljava/util/List;
+	public static fun zip-impl (Ljava/util/List;Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
 	public static final fun zip-oYG1GSg (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function8;)Ljava/util/List;
 	public static final fun zip-vcjLgH4 (Ljava/util/List;Ljava/util/List;)Ljava/util/List;
 	public static final fun zip-vi6g5TI (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Lkotlin/jvm/functions/Function9;)Ljava/util/List;
@@ -401,7 +454,7 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun unzip-ZALtuoE (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 }
 
-public final class arrow/core/NonEmptySet : java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {
+public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {
 	public fun add (Ljava/lang/Object;)Z
 	public fun addAll (Ljava/util/Collection;)Z
 	public static final synthetic fun box-impl (Ljava/util/Set;)Larrow/core/NonEmptySet;
@@ -411,9 +464,19 @@ public final class arrow/core/NonEmptySet : java/util/Set, kotlin/jvm/internal/m
 	public static fun contains-impl (Ljava/util/Set;Ljava/lang/Object;)Z
 	public fun containsAll (Ljava/util/Collection;)Z
 	public static fun containsAll-impl (Ljava/util/Set;Ljava/util/Collection;)Z
+	public fun distinct-1X0FA-Y ()Ljava/util/List;
+	public static fun distinct-1X0FA-Y (Ljava/util/Set;)Ljava/util/List;
+	public static fun distinctBy-0-xjo5U (Ljava/util/Set;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun distinctBy-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (Ljava/util/Set;Ljava/lang/Object;)Z
 	public static final fun equals-impl0 (Ljava/util/Set;Ljava/util/Set;)Z
+	public fun firstOrNull ()Ljava/lang/Object;
+	public static fun firstOrNull-impl (Ljava/util/Set;)Ljava/lang/Object;
+	public static fun flatMap-0-xjo5U (Ljava/util/Set;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun flatMap-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun getHead ()Ljava/lang/Object;
+	public static fun getHead-impl (Ljava/util/Set;)Ljava/lang/Object;
 	public fun getSize ()I
 	public static fun getSize-impl (Ljava/util/Set;)I
 	public fun hashCode ()I
@@ -422,18 +485,33 @@ public final class arrow/core/NonEmptySet : java/util/Set, kotlin/jvm/internal/m
 	public static fun isEmpty-impl (Ljava/util/Set;)Z
 	public fun iterator ()Ljava/util/Iterator;
 	public static fun iterator-impl (Ljava/util/Set;)Ljava/util/Iterator;
-	public static final fun map-J9TPrxk (Ljava/util/Set;Lkotlin/jvm/functions/Function1;)Ljava/util/Set;
-	public static final fun plus-J9TPrxk (Ljava/util/Set;Ljava/lang/Object;)Ljava/util/Set;
-	public static final fun plus-J9TPrxk (Ljava/util/Set;Ljava/util/Set;)Ljava/util/Set;
+	public fun lastOrNull ()Ljava/lang/Object;
+	public static fun lastOrNull-impl (Ljava/util/Set;)Ljava/lang/Object;
+	public static fun map-0-xjo5U (Ljava/util/Set;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun map-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static fun mapIndexed-0-xjo5U (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public fun mapIndexed-0-xjo5U (Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public synthetic fun plus (Ljava/lang/Iterable;)Larrow/core/NonEmptyCollection;
+	public synthetic fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyCollection;
+	public fun plus-J9TPrxk (Ljava/lang/Iterable;)Ljava/util/Set;
+	public fun plus-J9TPrxk (Ljava/lang/Object;)Ljava/util/Set;
+	public static fun plus-J9TPrxk (Ljava/util/Set;Ljava/lang/Iterable;)Ljava/util/Set;
+	public static fun plus-J9TPrxk (Ljava/util/Set;Ljava/lang/Object;)Ljava/util/Set;
 	public fun remove (Ljava/lang/Object;)Z
 	public fun removeAll (Ljava/util/Collection;)Z
 	public fun retainAll (Ljava/util/Collection;)Z
 	public synthetic fun size ()I
 	public fun toArray ()[Ljava/lang/Object;
 	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
+	public fun toNonEmptyList-1X0FA-Y ()Ljava/util/List;
+	public static fun toNonEmptyList-1X0FA-Y (Ljava/util/Set;)Ljava/util/List;
+	public fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
+	public static fun toNonEmptySet-5sCjGKo (Ljava/util/Set;)Ljava/util/Set;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Ljava/util/Set;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Ljava/util/Set;
+	public fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
+	public static fun zip-impl (Ljava/util/Set;Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
 }
 
 public final class arrow/core/NonEmptySetKt {

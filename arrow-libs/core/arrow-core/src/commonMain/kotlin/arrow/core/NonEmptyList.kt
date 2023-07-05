@@ -151,7 +151,7 @@ public typealias Nel<A> = NonEmptyList<A>
 @JvmInline
 public value class NonEmptyList<out A> @PublishedApi internal constructor(
   public val all: List<A>
-) : List<A> by all {
+) : List<A> by all, NonEmptyCollection<A> {
 
   public constructor(head: A, tail: List<A>): this(listOf(head) + tail)
 
@@ -168,26 +168,33 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
 
   public fun toList(): List<A> = all
 
-  public val head: A
+  public override val head: A
     get() = all.first()
 
   public val tail: List<A>
     get() = all.drop(1)
 
-  public inline fun <B> map(f: (A) -> B): NonEmptyList<B> =
-    NonEmptyList(all.map(f))
+  override fun lastOrNull(): A = when {
+    tail.isNotEmpty() -> tail.last()
+    else -> head
+  }
 
-  public inline fun <B> flatMap(f: (A) -> NonEmptyList<B>): NonEmptyList<B> =
-    NonEmptyList(all.flatMap { f(it).all })
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+    NonEmptyList(all.map(transform))
+
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+    NonEmptyList(all.flatMap(transform))
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
-    NonEmptyList(all + l.all)
+    this + l.all
 
-  public operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> =
-    NonEmptyList(all + l)
+  public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptyList<A> =
+    NonEmptyList(all + elements)
 
-  public operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> =
-    NonEmptyList(all + a)
+  public override operator fun plus(element: @UnsafeVariance A): NonEmptyList<A> =
+    NonEmptyList(all + element)
 
   public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     all.fold(b, f)
