@@ -5,20 +5,21 @@ import kotlin.jvm.JvmInline
 @JvmInline
 public value class NonEmptySet<out A> private constructor(
   private val elements: Set<A>
-) : Set<A> by elements {
+) : Set<A> by elements, NonEmptyCollection<A> {
 
   public constructor(first: A, rest: Set<A>) : this(setOf(first) + rest)
 
-  public operator fun plus(set: Set<@UnsafeVariance A>): NonEmptySet<A> =
-    NonEmptySet(elements + set)
+  public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptySet<A> =
+    NonEmptySet(this.elements + elements)
 
-  public operator fun plus(element: @UnsafeVariance A): NonEmptySet<A> =
-    NonEmptySet(elements + element)
-
-  public fun <R> map(transform: (@UnsafeVariance A) -> R): NonEmptySet<R> =
-    NonEmptySet(elements.mapTo(mutableSetOf(), transform))
+  public override operator fun plus(element: @UnsafeVariance A): NonEmptySet<A> =
+    NonEmptySet(this.elements + element)
 
   override fun isEmpty(): Boolean = false
+
+  override val head: A get() = elements.first()
+
+  override fun lastOrNull(): A = elements.last()
 
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 

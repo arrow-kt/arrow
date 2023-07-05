@@ -316,7 +316,7 @@ public interface Raise<in Error> {
 
   @RaiseDSL
   public fun <A> NonEmptySet<Either<Error, A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }
+    map { it.bind() }.toNonEmptySet()
 }
 
 /**
