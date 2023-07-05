@@ -13,7 +13,7 @@ public sealed class CallError
 public data class HttpError(
   val code: Int,
   val message: String,
-  val body: String
+  val body: String,
 ) : CallError()
 
 /**

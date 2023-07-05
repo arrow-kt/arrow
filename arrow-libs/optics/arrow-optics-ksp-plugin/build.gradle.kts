@@ -6,6 +6,13 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.spotless)
+}
+
+spotless {
+  kotlin {
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+  }
 }
 
 kotlin {
