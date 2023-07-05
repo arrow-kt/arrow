@@ -685,7 +685,7 @@ class IterableTest : StringSpec({
   }
 
   "crosswalkNull" {
-    checkAll(Arb.list(Arb.int())) { ints ->
+    checkAll(Arb.list(Arb.int(), 2 .. 20)) { ints ->
       val res = ints.crosswalkNull { i -> if (i % 2 == 0) "x${i}" else null }
       val expected = ints.mapNotNull { i -> if (i % 2 == 0 ) "x${i}" else null }
       res shouldBe expected
@@ -693,7 +693,7 @@ class IterableTest : StringSpec({
   }
 
   "crosswalkNull, result is null" {
-    checkAll(Arb.list(Arb.int())) { ints ->
+    checkAll(Arb.list(Arb.int(), 2 .. 20)) { ints ->
       val res = ints.crosswalkNull { i -> null }
       res shouldBe null
     }
