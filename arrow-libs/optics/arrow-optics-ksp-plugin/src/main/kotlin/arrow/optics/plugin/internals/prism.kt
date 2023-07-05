@@ -1,6 +1,8 @@
 package arrow.optics.plugin.internals
 
-internal fun generatePrisms(ele: ADT, target: PrismTarget) =
+import arrow.optics.plugin.OpticsProcessorOptions
+
+internal fun OpticsProcessorOptions.generatePrisms(ele: ADT, target: PrismTarget) =
   Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
@@ -9,7 +11,7 @@ internal fun generatePrisms(ele: ADT, target: PrismTarget) =
     content = processElement(ele, target.foci),
   )
 
-private fun processElement(ele: ADT, foci: List<Focus>): String {
+private fun OpticsProcessorOptions.processElement(ele: ADT, foci: List<Focus>): String {
   return foci.joinToString(separator = "\n\n") { focus ->
     val sourceClassNameWithParams =
       focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameters}"
@@ -19,9 +21,9 @@ private fun processElement(ele: ADT, foci: List<Focus>): String {
     }
     val firstLine = when {
       ele.typeParameters.isEmpty() ->
-        "${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()"
+        "${ele.visibilityModifierName} $inlineText val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> $inlineText get()"
       else ->
-        "${ele.visibilityModifierName} inline fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
+        "${ele.visibilityModifierName} $inlineText fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
     }
 
     val elseBranch = if (focus.onlyOneSealedSubclass) {
