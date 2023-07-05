@@ -14,7 +14,7 @@ internal inline fun <E, R, T> onResponseFn(
   bodyType: Type,
   response: Response<R>,
   newResponseFn: (R, Response<R>) -> Response<T>,
-  errorResponseFn: (E, Response<R>) -> Response<T>
+  errorResponseFn: (E, Response<R>) -> Response<T>,
 ) {
   if (response.isSuccessful) {
     val body = response.body()

@@ -51,7 +51,7 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
           .createNewFile(
             Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
             it.`package`,
-            it.name + "__Optics"
+            it.name + "__Optics",
           )
           .writer()
       writer.write(it.asFileText())

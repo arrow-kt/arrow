@@ -5,8 +5,8 @@ internal fun generateOptionals(ele: ADT, target: OptionalTarget) =
     `package` = ele.packageName,
     name = ele.simpleName,
     imports =
-      setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
-    content = processElement(ele, target.foci)
+    setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
+    content = processElement(ele, target.foci),
   )
 
 private fun processElement(ele: ADT, foci: List<Focus>): String =
@@ -30,7 +30,7 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
       "{ ${ele.sourceName}: $sourceClassNameWithParams -> ${ele.sourceName}.${
         focus.paramName.plusIfNotBlank(
           prefix = "`",
-          postfix = "`"
+          postfix = "`",
         )
       }$toNullable?.right() ?: ${ele.sourceName}.left() }"
     fun setF(fromNullable: String = "") =
@@ -48,5 +48,6 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
       |  getOrModify = $getOrModify,
       |  set = { ${ele.sourceName}: $sourceClassNameWithParams, value: $targetClassName -> $set }
       |)
-      |""".trimMargin()
+      |
+    """.trimMargin()
   }
