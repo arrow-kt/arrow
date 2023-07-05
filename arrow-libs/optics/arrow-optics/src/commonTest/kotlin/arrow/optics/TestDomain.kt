@@ -62,7 +62,11 @@ internal data class Token(val value: String) {
 internal fun Arb.Companion.token(): Arb<Token> =
   Arb.string().map { Token(it) }
 
-internal data class User(val token: Token)
+internal data class User(val token: Token) {
+  companion object {
+    val token: Setter<User, String> = PLens.user() + PSetter.token()
+  }
+}
 
 internal fun Arb.Companion.user(): Arb<User> =
   Arb.token().map { User(it) }

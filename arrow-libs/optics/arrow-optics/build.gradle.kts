@@ -5,6 +5,7 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.arrowGradleConfig.versioning)
+  alias(libs.plugins.kotlin.assignment)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.spotless)
@@ -65,6 +66,10 @@ kotlin {
       }
     }
   }
+}
+
+assignment {
+  annotation("arrow.optics.OpticsCopy")
 }
 
 //fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {

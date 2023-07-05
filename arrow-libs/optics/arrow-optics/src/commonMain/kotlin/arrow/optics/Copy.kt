@@ -2,6 +2,17 @@ package arrow.optics
 
 import kotlin.experimental.ExperimentalTypeInference
 
+// used by the Kotlin assignment plug-in
+public annotation class OpticsCopy
+
+@OpticsCopy
+public data class Reference<A, B>(
+  private val copy: Copy<A>,
+  private val setter: Setter<A, B>
+) {
+  public fun assign(b: B) { with(copy) { setter.set(b) } }
+}
+
 @DslMarker
 public annotation class OpticsCopyMarker
 
@@ -11,6 +22,9 @@ public interface Copy<A> {
    * Changes the value of the element(s) pointed by the [Setter].
    */
   public infix fun <B> Setter<A, B>.set(b: B)
+
+  public val <B> Setter<A, B>.ref: Reference<A, B> get() =
+    Reference(this@Copy, this)
 
   /**
    * Transforms the value of the element(s) pointed by the [Traversal].
