@@ -899,9 +899,8 @@ class MapKTest : StringSpec({
 
   "mapOrAccumulate accumulates errors" {
     checkAll(
-      Arb.map(Arb.int(), Arb.int())
+      Arb.map(Arb.int(), Arb.int(), minSize = 1)
     ) { xs ->
-
        xs.mapOrAccumulate {
           raise(it.value)
       }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
