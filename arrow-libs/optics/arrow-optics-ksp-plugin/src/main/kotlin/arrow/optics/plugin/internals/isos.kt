@@ -32,7 +32,7 @@ private fun processElement(iso: ADT, target: Target): String {
     "nineteenth",
     "twentieth",
     "twentyFirst",
-    "twentySecond"
+    "twentySecond",
   )
 
   fun Focus.format(): String =
@@ -79,5 +79,6 @@ private fun processElement(iso: ADT, target: Target): String {
         |  get = { ${iso.sourceName}: $sourceClassNameWithParams -> ${tupleConstructor()} },
         |  reverseGet = { ${classConstructorFromTuple()} }
         |)
-        |""".trimMargin()
+        |
+  """.trimMargin()
 }

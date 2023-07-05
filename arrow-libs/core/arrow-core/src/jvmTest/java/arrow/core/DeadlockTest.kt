@@ -8,74 +8,73 @@ import kotlinx.coroutines.runBlocking
 
 class DeadlockTest : StringSpec({
 
-    "classloader should not deadlock Validated initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              Validated.Invalid(Unit)
-            } else {
-              Validated.Valid(null)
-            }
+  "classloader should not deadlock Validated initialization" {
+    runBlocking {
+      (0..10).map { i ->
+        GlobalScope.launch {
+          if (i % 2 == 0) {
+            Validated.Invalid(Unit)
+          } else {
+            Validated.Valid(null)
           }
-        }.joinAll()
-      }
+        }
+      }.joinAll()
     }
+  }
 
-    "classloader should not deadlock Either initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              Either.Left(Unit)
-            } else {
-              Either.Right(null)
-            }
+  "classloader should not deadlock Either initialization" {
+    runBlocking {
+      (0..10).map { i ->
+        GlobalScope.launch {
+          if (i % 2 == 0) {
+            Either.Left(Unit)
+          } else {
+            Either.Right(null)
           }
-        }.joinAll()
-      }
+        }
+      }.joinAll()
     }
+  }
 
-    "classloader should not deadlock Option initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              None
-            } else {
-              Some(null)
-            }
+  "classloader should not deadlock Option initialization" {
+    runBlocking {
+      (0..10).map { i ->
+        GlobalScope.launch {
+          if (i % 2 == 0) {
+            None
+          } else {
+            Some(null)
           }
-        }.joinAll()
-      }
+        }
+      }.joinAll()
     }
+  }
 
-    "classloader should not deadlock Ior initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              Ior.Left(Unit)
-            } else {
-              Ior.Right(null)
-            }
+  "classloader should not deadlock Ior initialization" {
+    runBlocking {
+      (0..10).map { i ->
+        GlobalScope.launch {
+          if (i % 2 == 0) {
+            Ior.Left(Unit)
+          } else {
+            Ior.Right(null)
           }
-        }.joinAll()
-      }
+        }
+      }.joinAll()
     }
+  }
 
-    "classloader should not deadlock Eval initialization" {
-      runBlocking {
-        (0..10).map { i ->
-          GlobalScope.launch {
-            if (i % 2 == 0) {
-              Eval.Now(Unit)
-            } else {
-              Eval.Later { null }
-            }
+  "classloader should not deadlock Eval initialization" {
+    runBlocking {
+      (0..10).map { i ->
+        GlobalScope.launch {
+          if (i % 2 == 0) {
+            Eval.Now(Unit)
+          } else {
+            Eval.Later { null }
           }
-        }.joinAll()
-      }
+        }
+      }.joinAll()
     }
-
+  }
 })

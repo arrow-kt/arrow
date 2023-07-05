@@ -13,7 +13,7 @@ import java.io.IOException
 import java.lang.reflect.Type
 
 internal class NetworkEitherCallAdapter<R>(
-  private val successType: Type
+  private val successType: Type,
 ) : CallAdapter<R, Call<Either<CallError, R?>>> {
 
   override fun adapt(call: Call<R?>): Call<Either<CallError, R?>> = EitherCall(call, successType)
@@ -23,7 +23,7 @@ internal class NetworkEitherCallAdapter<R>(
 
 private class EitherCall<R>(
   private val delegate: Call<R>,
-  private val successType: Type
+  private val successType: Type,
 ) : Call<Either<CallError, R>> {
 
   override fun enqueue(callback: Callback<Either<CallError, R>>) = delegate.enqueue(
@@ -40,7 +40,7 @@ private class EitherCall<R>(
           return HttpError(
             code = code(),
             message = message(),
-            body = errorBody
+            body = errorBody,
           ).left()
         }
 
@@ -57,8 +57,8 @@ private class EitherCall<R>(
             IllegalStateException(
               "Response code is ${code()} but body is null.\n" +
                 "If you expect response body to be null then define your API method as returning Unit:\n" +
-                "@POST fun postSomething(): Either<CallError, Unit>"
-            )
+                "@POST fun postSomething(): Either<CallError, Unit>",
+            ),
           ).left()
         }
       }
@@ -71,7 +71,7 @@ private class EitherCall<R>(
         }
         callback.onResponse(this@EitherCall, Response.success(error.left()))
       }
-    }
+    },
   )
 
   override fun timeout(): Timeout = delegate.timeout()
