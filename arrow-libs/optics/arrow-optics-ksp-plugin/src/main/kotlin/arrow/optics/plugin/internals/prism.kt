@@ -5,8 +5,8 @@ internal fun generatePrisms(ele: ADT, target: PrismTarget) =
     `package` = ele.packageName,
     name = ele.simpleName,
     imports =
-      setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
-    content = processElement(ele, target.foci)
+    setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
+    content = processElement(ele, target.foci),
   )
 
 private fun processElement(ele: ADT, foci: List<Focus>): String {
@@ -24,7 +24,9 @@ private fun processElement(ele: ADT, foci: List<Focus>): String {
         "${ele.visibilityModifierName} inline fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
     }
 
-    val elseBranch = if (focus.onlyOneSealedSubclass) "" else """
+    val elseBranch = if (focus.onlyOneSealedSubclass) {
+      ""
+    } else """
   |      else -> ${ele.sourceName}.left()
     """.trimMargin()
 
@@ -38,6 +40,7 @@ private fun processElement(ele: ADT, foci: List<Focus>): String {
   |  },
   |  reverseGet = ::identity
   |)
-  |""".trimMargin()
+  |
+    """.trimMargin()
   }
 }

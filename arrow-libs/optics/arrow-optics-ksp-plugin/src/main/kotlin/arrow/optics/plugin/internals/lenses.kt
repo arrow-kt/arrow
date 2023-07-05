@@ -6,7 +6,7 @@ internal fun generateLenses(ele: ADT, target: LensTarget) =
   Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
-    content = processElement(ele, target.foci)
+    content = processElement(ele, target.foci),
   )
 
 private fun String.toUpperCamelCase(): String =
@@ -17,7 +17,7 @@ private fun String.toUpperCamelCase(): String =
         it.replaceFirstChar {
           if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
         }
-      }
+      },
     )
 
 private fun processElement(adt: ADT, foci: List<Focus>): String {
@@ -34,17 +34,18 @@ private fun processElement(adt: ADT, foci: List<Focus>): String {
   |  get = { ${adt.sourceName}: $sourceClassNameWithParams -> ${adt.sourceName}.${
       focus.paramName.plusIfNotBlank(
         prefix = "`",
-        postfix = "`"
+        postfix = "`",
       )
     } },
   |  set = { ${adt.sourceName}: $sourceClassNameWithParams, value: ${focus.className} -> ${adt.sourceName}.copy(${
       focus.paramName.plusIfNotBlank(
         prefix = "`",
-        postfix = "`"
+        postfix = "`",
       )
     } = value) }
   |)
-  |""".trimMargin()
+  |
+    """.trimMargin()
   }
 }
 

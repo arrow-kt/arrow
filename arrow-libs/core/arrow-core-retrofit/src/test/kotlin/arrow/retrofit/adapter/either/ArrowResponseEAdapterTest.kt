@@ -18,85 +18,84 @@ class ArrowResponseEAdapterTest : StringSpec({
   lateinit var server: MockWebServer
   lateinit var service: SuspendApiTestClient
 
-    beforeAny {
-      server = MockWebServer()
-      server.start()
-      service = Retrofit.Builder()
-        .baseUrl(server.url("/"))
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(EitherCallAdapterFactory.create())
-        .build()
-        .create(SuspendApiTestClient::class.java)
+  beforeAny {
+    server = MockWebServer()
+    server.start()
+    service = Retrofit.Builder()
+      .baseUrl(server.url("/"))
+      .addConverterFactory(GsonConverterFactory.create())
+      .addCallAdapterFactory(EitherCallAdapterFactory.create())
+      .build()
+      .create(SuspendApiTestClient::class.java)
+  }
+
+  afterAny { server.shutdown() }
+
+  "should return ResponseMock for 200 with valid JSON" {
+    server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+
+    val responseE = service.getResponseE()
+
+    with(responseE) {
+      code shouldBe 200
+      body shouldBe ResponseMock("Arrow rocks").right()
     }
+  }
 
-    afterAny { server.shutdown() }
+  "should return Unit when service method returns Unit and null body received" {
+    server.enqueue(MockResponse().setResponseCode(204))
 
-    "should return ResponseMock for 200 with valid JSON" {
-      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+    val responseE = service.postSomethingResponseE("Sample string")
 
-      val responseE = service.getResponseE()
-
-      with(responseE) {
-        code shouldBe 200
-        body shouldBe ResponseMock("Arrow rocks").right()
-      }
+    with(responseE) {
+      code shouldBe 204
+      body shouldBe Unit.right()
     }
+  }
 
-    "should return Unit when service method returns Unit and null body received" {
-      server.enqueue(MockResponse().setResponseCode(204))
+  "should return Unit when service method returns Unit and JSON body received" {
+    server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
-      val responseE = service.postSomethingResponseE("Sample string")
+    val responseE = service.postSomethingResponseE("Sample string")
 
-      with(responseE) {
-        code shouldBe 204
-        body shouldBe Unit.right()
-      }
+    with(responseE) {
+      code shouldBe 200
+      body shouldBe Unit.right()
     }
+  }
 
-    "should return Unit when service method returns Unit and JSON body received" {
-      server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
+  "should return ErrorMock for 400 with valid JSON" {
+    server.enqueue(MockResponse().setBody("""{"errorCode":42}""").setResponseCode(400))
 
-      val responseE = service.postSomethingResponseE("Sample string")
+    val responseE = service.getResponseE()
 
-      with(responseE) {
-        code shouldBe 200
-        body shouldBe Unit.right()
-      }
+    with(responseE) {
+      code shouldBe 400
+      body shouldBe ErrorMock(42).left()
     }
+  }
 
-    "should return ErrorMock for 400 with valid JSON" {
-      server.enqueue(MockResponse().setBody("""{"errorCode":42}""").setResponseCode(400))
+  "should throw for 200 with invalid JSON" {
+    server.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
-      val responseE = service.getResponseE()
+    val responseE = runCatching { service.getResponseE() }
 
-      with(responseE) {
-        code shouldBe 400
-        body shouldBe ErrorMock(42).left()
-      }
-    }
+    responseE.isFailure shouldBe true
+  }
 
-    "should throw for 200 with invalid JSON" {
-      server.enqueue(MockResponse().setBody("""not a valid JSON"""))
+  "should throw for 400 and invalid JSON" {
+    server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
 
-      val responseE = runCatching { service.getResponseE() }
+    val responseE = runCatching { service.getResponseE() }
 
-      responseE.isFailure shouldBe true
-    }
+    responseE.isFailure shouldBe true
+  }
 
-    "should throw for 400 and invalid JSON" {
-      server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
+  "should throw when server disconnects" {
+    server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
 
-      val responseE = runCatching { service.getResponseE() }
+    val responseE = runCatching { service.getResponseE() }
 
-      responseE.isFailure shouldBe true
-    }
-
-    "should throw when server disconnects" {
-      server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
-
-      val responseE = runCatching { service.getResponseE() }
-
-      responseE.isFailure shouldBe true
-    }
-
+    responseE.isFailure shouldBe true
+  }
 })

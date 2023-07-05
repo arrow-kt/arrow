@@ -32,7 +32,7 @@ private data class DeepEval(val eval: Eval<Int>) {
         arbitrary { O.Map { it + 1 } },
         arbitrary { O.FlatMap { Eval.Now(it) } },
         arbitrary { O.Memoize() },
-        arbitrary { O.Defer() }
+        arbitrary { O.Defer() },
       )
     }
   }

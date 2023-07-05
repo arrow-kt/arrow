@@ -10,9 +10,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.spec.style.stringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import java.net.SocketException
-import java.net.SocketTimeoutException
-import java.util.concurrent.TimeUnit
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,6 +21,9 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 
 @ExperimentalSerializationApi
 class NetworkEitherCallAdapterTestSuite : StringSpec({
@@ -33,7 +33,7 @@ class NetworkEitherCallAdapterTestSuite : StringSpec({
 })
 
 private fun networkEitherCallAdapterTests(
-  jsonConverterFactory: Converter.Factory
+  jsonConverterFactory: Converter.Factory,
 ) = stringSpec {
   var server: MockWebServer? = null
   var service: CallErrorTestClient? = null
@@ -70,7 +70,7 @@ private fun networkEitherCallAdapterTests(
     body shouldBe HttpError(
       code = 400,
       message = "Client Error",
-      body = """{"errorCode":666}"""
+      body = """{"errorCode":666}""",
     ).left()
   }
 
@@ -91,7 +91,7 @@ private fun networkEitherCallAdapterTests(
     body shouldBe HttpError(
       code = 400,
       message = "Client Error",
-      body = """not a valid JSON"""
+      body = """not a valid JSON""",
     ).left()
   }
 
