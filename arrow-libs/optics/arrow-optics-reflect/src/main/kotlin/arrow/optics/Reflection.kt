@@ -3,21 +3,23 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import kotlin.reflect.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.safeCast
 
 /** Focuses on those elements of the specified [klass] */
-public fun <S: Any, A: S> instance(klass: KClass<A>): Prism<S, A> =
-  object: Prism<S, A> {
+public fun <S : Any, A : S> instance(klass: KClass<A>): Prism<S, A> =
+  object : Prism<S, A> {
     override fun getOrModify(source: S): Either<S, A> =
       klass.safeCast(source)?.right() ?: source.left()
     override fun reverseGet(focus: A): S = focus
   }
 
 /** Focuses on those elements of the specified class */
-public inline fun <S: Any, reified A: S> instance(): Prism<S, A> =
-  object: Prism<S, A> {
+public inline fun <S : Any, reified A : S> instance(): Prism<S, A> =
+  object : Prism<S, A> {
     override fun getOrModify(source: S): Either<S, A> =
       (source as? A)?.right() ?: source.left()
     override fun reverseGet(focus: A): S = focus
@@ -36,7 +38,7 @@ public val <S, A> ((S) -> A).ogetter: Getter<S, A>
 public val <S, A> KProperty1<S, A>.lens: Lens<S, A>
   get() = PLens(
     get = this,
-    set = { s, a -> clone(this, s, a) }
+    set = { s, a -> clone(this, s, a) },
   )
 
 /** [Optional] that focuses on a nullable field */

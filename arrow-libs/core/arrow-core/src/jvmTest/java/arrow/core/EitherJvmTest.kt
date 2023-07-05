@@ -11,7 +11,7 @@ class EitherJvmTest : StringSpec({
   "resolve should throw a Throwable when a fatal Throwable is thrown" {
     checkAll(
       Arb.suspendFunThatThrowsFatalThrowable(),
-      Arb.any()
+      Arb.any(),
     ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
 
       val comparator: Comparator<Person> =
@@ -24,7 +24,7 @@ class EitherJvmTest : StringSpec({
           success = { a -> handleWithPureFunction(a, returnObject) },
           error = { e -> handleWithPureFunction(e, returnObject) },
           throwable = { t -> handleWithPureFunction(t, returnObject) },
-          unrecoverableState = { handleWithPureFunction(it) }
+          unrecoverableState = { handleWithPureFunction(it) },
         )
       }
     }
