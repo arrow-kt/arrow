@@ -1276,7 +1276,7 @@ public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
  * fun test() {
  *   val ints = listOf(1, 2)
  *   val res = ints.crosswalk { i -> listOf("a${i}", "b${i}", "c${i}") }
- *   res shouldBe listOf(listOf("a2", "a1"), listOf("b2", "b1"), listOf("c2", "c1"))
+ *   res shouldBe listOf(listOf("a1", "a2"), listOf("b1", "b2"), listOf("c1", "c2"))
  * }
  * ```
  */
@@ -1286,7 +1286,7 @@ public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
       ior.fold(
         { listOf(it) },
         ::identity,
-        { l, r -> listOf(l) + r }
+        { l, r -> r + l }
       )
     }
   }
@@ -1302,7 +1302,7 @@ public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
  * fun test() {
  *   val ints = listOf(1, 2)
  *   val res = ints.crosswalkMap { i -> mapOf("a" to i, "b" to i, "c" to i) }
- *   res shouldBe listOf("a", "b", "c").map { a -> a to ints.reversed() }.toMap()
+ *   res shouldBe listOf("a", "b", "c").map { a -> a to ints }.toMap()
  * }
  * ```
  */
@@ -1312,7 +1312,7 @@ public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<
       ior.fold(
         { listOf(it) },
         ::identity,
-        { l, r -> listOf(l) + r }
+        { l, r -> r + l }
       )
     }
   }
@@ -1333,13 +1333,7 @@ public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<
  * ```
  */
 public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
-  fold<A, List<B>?>(emptyList()) { bs, a ->
-    Ior.fromNullables(f(a), bs)?.fold(
-      { listOf(it) },
-      ::identity,
-      { l, r -> listOf(l) + r }
-    )
-  }
+  mapNotNull(f).takeIf { it.isNotEmpty() || !this.any() }
 
 @Deprecated("Not being used anymore. Will be removed from the binary in 2.0.0")
 @PublishedApi

@@ -668,7 +668,7 @@ class IterableTest : StringSpec({
     checkAll(Arb.pair(Arb.list(Arb.int()), Arb.list(Arb.char()))) { (ints, chars) ->
       val res = ints.crosswalk { i -> chars.map { c -> "${c}${i}" } }
       val expected =
-        if (ints.isNotEmpty()) chars.map { c -> ints.reversed().map { i -> "${c}${i}" } }
+        if (ints.isNotEmpty()) chars.map { c -> ints.map { i -> "${c}${i}" } }
         else emptyList()
       res shouldBe expected
     }
@@ -678,7 +678,7 @@ class IterableTest : StringSpec({
     checkAll(Arb.pair(Arb.list(Arb.int()), Arb.list(Arb.char()))) { (ints, chars) ->
       val res = ints.crosswalkMap { i -> chars.map { c -> c to i }.toMap() }
       val expected =
-        if (ints.isNotEmpty()) chars.map { c -> c to ints.reversed() }.toMap()
+        if (ints.isNotEmpty()) chars.map { c -> c to ints }.toMap()
         else emptyMap()
       res shouldBe expected
     }
@@ -687,8 +687,15 @@ class IterableTest : StringSpec({
   "crosswalkNull" {
     checkAll(Arb.list(Arb.int())) { ints ->
       val res = ints.crosswalkNull { i -> if (i % 2 == 0) "x${i}" else null }
-      val expected = ints.mapNotNull { i -> if (i % 2 == 0 ) "x${i}" else null }.reversed()
+      val expected = ints.mapNotNull { i -> if (i % 2 == 0 ) "x${i}" else null }
       res shouldBe expected
+    }
+  }
+
+  "crosswalkNull, result is null" {
+    checkAll(Arb.list(Arb.int())) { ints ->
+      val res = ints.crosswalkNull { i -> null }
+      res shouldBe null
     }
   }
 
