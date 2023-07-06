@@ -1,14 +1,15 @@
 package arrow.optics.plugin.internals
 
+import arrow.optics.plugin.OpticsProcessorOptions
 import arrow.optics.plugin.isValue
 
-internal fun generateIsos(ele: ADT, target: IsoTarget) =
+internal fun OpticsProcessorOptions.generateIsos(ele: ADT, target: IsoTarget) =
   Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target))
 
 inline val Target.targetNames
   inline get() = foci.map(Focus::className)
 
-private fun processElement(iso: ADT, target: Target): String {
+private fun OpticsProcessorOptions.processElement(iso: ADT, target: Target): String {
   val foci = target.foci
   val letters = listOf(
     "first",
@@ -69,9 +70,9 @@ private fun processElement(iso: ADT, target: Target): String {
   val sourceClassNameWithParams = "${iso.sourceClassName}${iso.angledTypeParameters}"
   val firstLine = when {
     iso.typeParameters.isEmpty() ->
-      "${iso.visibilityModifierName} inline val ${iso.sourceClassName}.Companion.$isoName: $Iso<${iso.sourceClassName}, ${focusType()}> inline get()"
+      "${iso.visibilityModifierName} $inlineText val ${iso.sourceClassName}.Companion.$isoName: $Iso<${iso.sourceClassName}, ${focusType()}> $inlineText get()"
     else ->
-      "${iso.visibilityModifierName} inline fun ${iso.angledTypeParameters} ${iso.sourceClassName}.Companion.$isoName(): $Iso<$sourceClassNameWithParams, ${focusType()}>"
+      "${iso.visibilityModifierName} $inlineText fun ${iso.angledTypeParameters} ${iso.sourceClassName}.Companion.$isoName(): $Iso<$sourceClassNameWithParams, ${focusType()}>"
   }
 
   return """
