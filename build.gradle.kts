@@ -127,10 +127,10 @@ apiValidation {
 
 rootProject.plugins.withType<YarnPlugin> {
   rootProject.configure<NodeJsRootExtension> {
-    versions.webpackDevServer.version = "4.11.1"
-    versions.webpack.version = "5.75.0"
+    versions.webpackDevServer.version = "4.15.1"
+    versions.webpack.version = "5.88.1"
     versions.webpackCli.version = "4.10.0"
-    versions.karma.version = "6.4.1"
+    versions.karma.version = "6.4.2"
     versions.mocha.version = "10.2.0"
   }
 }

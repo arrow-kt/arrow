@@ -64,3 +64,9 @@ kotlin {
     }
   }
 }
+
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.fx.stm"
+  }
+}
