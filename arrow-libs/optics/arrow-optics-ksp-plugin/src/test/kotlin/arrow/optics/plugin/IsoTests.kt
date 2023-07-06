@@ -32,4 +32,3 @@ class IsoTests {
       """.failsWith { it.contains("IsoNoCompanion".noCompanion) }
   }
 }
-

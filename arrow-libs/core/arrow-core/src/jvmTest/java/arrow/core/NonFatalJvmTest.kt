@@ -12,7 +12,7 @@ class NonFatalJvmTest : StringSpec({
       OutOfMemoryError(),
       LinkageError(),
       object : VirtualMachineError() {
-      }
+      },
     )
 
   "Test fatals using #invoke()" {

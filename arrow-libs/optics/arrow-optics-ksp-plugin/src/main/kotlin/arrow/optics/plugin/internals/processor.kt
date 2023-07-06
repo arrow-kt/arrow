@@ -4,7 +4,11 @@ import arrow.optics.plugin.isDataClass
 import arrow.optics.plugin.isSealed
 import arrow.optics.plugin.isValue
 import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Variance.INVARIANT
 import java.util.Locale
 
@@ -21,11 +25,11 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
           evalAnnotatedValueClass(c, c.qualifiedNameOrSimpleName.isoErrorMessage, logger)
             .let(::IsoTarget)
         OpticsTarget.PRISM ->
-          evalAnnotatedPrismElement(c, c.qualifiedNameOrSimpleName.prismErrorMessage,logger)
+          evalAnnotatedPrismElement(c, c.qualifiedNameOrSimpleName.prismErrorMessage, logger)
             .let(::PrismTarget)
         OpticsTarget.DSL -> evalAnnotatedDslElement(c, logger)
       }
-    }
+    },
   )
 
 internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
@@ -52,7 +56,7 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget
     ?.arguments
     ?.flatMap { arg -> (arg.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
     ?.mapNotNull {
-      when (it.qualifiedString() ) {
+      when (it.qualifiedString()) {
         "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
         "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
         "arrow.optics.OpticsTarget.PRISM" -> OpticsTarget.PRISM
@@ -64,7 +68,7 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget
 internal fun evalAnnotatedPrismElement(
   element: KSClassDeclaration,
   errorMessage: String,
-  logger: KSPLogger
+  logger: KSPLogger,
 ): List<Focus> =
   when {
     element.isSealed -> {
@@ -74,7 +78,7 @@ internal fun evalAnnotatedPrismElement(
           it.primaryConstructor?.returnType?.resolve()?.qualifiedString() ?: it.qualifiedNameOrSimpleName,
           it.simpleName.asString().replaceFirstChar { c -> c.lowercase(Locale.getDefault()) },
           it.superTypes.first().resolve(),
-          onlyOneSealedSubclass = sealedSubclasses.size == 1
+          onlyOneSealedSubclass = sealedSubclasses.size == 1,
         )
       }
     }
@@ -90,7 +94,7 @@ internal val KSDeclaration.qualifiedNameOrSimpleName: String
 internal fun evalAnnotatedDataClass(
   element: KSClassDeclaration,
   errorMessage: String,
-  logger: KSPLogger
+  logger: KSPLogger,
 ): List<Focus> =
   when {
     element.isDataClass ->
@@ -106,7 +110,7 @@ internal fun evalAnnotatedDataClass(
 internal fun evalAnnotatedValueClass(
   element: KSClassDeclaration,
   errorMessage: String,
-  logger: KSPLogger
+  logger: KSPLogger,
 ): List<Focus> =
   when {
     element.isValue ->
@@ -123,11 +127,11 @@ internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLog
       DataClassDsl(
         element
           .getConstructorTypesNames()
-          .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
+          .zip(element.getConstructorParamNames(), Focus.Companion::invoke),
       )
     element.isValue ->
       ValueClassDsl(
-        Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first())
+        Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()),
       )
     element.isSealed ->
       SealedClassDsl(evalAnnotatedPrismElement(element, element.qualifiedNameOrSimpleName.prismErrorMessage, logger))
@@ -137,7 +141,7 @@ internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLog
 internal fun evalAnnotatedIsoElement(
   element: KSClassDeclaration,
   errorMessage: String,
-  logger: KSPLogger
+  logger: KSPLogger,
 ): List<Focus> =
   when {
     element.isDataClass ->

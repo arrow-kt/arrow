@@ -35,6 +35,7 @@ plugins {
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
+  alias(libs.plugins.spotless) apply false
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)

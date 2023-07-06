@@ -5,7 +5,8 @@ val String.otherClassTypeErrorMessage
     """
       |$this cannot be annotated with @optics
       | ^
-      |Only data, sealed, and value classes can be annotated with @optics""".trimMargin()
+      |Only data, sealed, and value classes can be annotated with @optics
+    """.trimMargin()
 
 val String.lensErrorMessage
   get() =
@@ -14,7 +15,7 @@ val String.lensErrorMessage
       |                                       ^
       |arrow.optics.OpticsTarget.LENS is an invalid @optics argument for $this.
       |It is only valid for data classes.
-      """.trimMargin()
+    """.trimMargin()
 
 val String.prismErrorMessage
   get() =
@@ -23,7 +24,7 @@ val String.prismErrorMessage
       |                                        ^
       |arrow.optics.OpticsTarget.PRISM is an invalid @optics argument for $this.
       |It is only valid for sealed classes.
-      """.trimMargin()
+    """.trimMargin()
 
 val String.isoErrorMessage
   get() =
@@ -32,7 +33,7 @@ val String.isoErrorMessage
       |                                      ^
       |arrow.optics.OpticsTarget.ISO is an invalid @optics argument for $this.
       |It is only valid for data and value classes.
-      """.trimMargin()
+    """.trimMargin()
 
 val String.isoTooBigErrorMessage
   get() =
@@ -40,7 +41,7 @@ val String.isoTooBigErrorMessage
       |Cannot generate arrow.optics.Iso for $this
       |                                      ^
       |Iso generation is supported for data classes with up to 22 constructor parameters.
-      """.trimMargin()
+    """.trimMargin()
 
 val String.dslErrorMessage
   get() =
@@ -49,11 +50,12 @@ val String.dslErrorMessage
       |                                                    ^
       |arrow.optics.OpticsTarget.DSL is an invalid @optics argument for $this.
       |It is only valid for data classes and sealed classes.
-      """.trimMargin()
+    """.trimMargin()
 
 val String.noCompanion
   get() =
     """
       |$this must declare a companion object
       | ^
-      |A companion object is required for the generated optics""".trimMargin()
+      |A companion object is required for the generated optics
+    """.trimMargin()

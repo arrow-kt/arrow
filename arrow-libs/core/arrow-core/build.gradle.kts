@@ -9,6 +9,13 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.kotest.multiplatform)
+  alias(libs.plugins.spotless)
+}
+
+spotless {
+  kotlin {
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+  }
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))

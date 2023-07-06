@@ -6,6 +6,13 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.kotlinx.serialization) // Needed for testing only
   alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.spotless)
+}
+
+spotless {
+  kotlin {
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+  }
 }
 
 apply(from = property("ANIMALSNIFFER"))

@@ -78,7 +78,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
       val name = parseTypeName(returnType)
       throw IllegalArgumentException(
         "Return type must be parameterized as " +
-          "$name<Foo> or $name<out Foo>"
+          "$name<Foo> or $name<out Foo>",
       )
     }
 
@@ -90,16 +90,17 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
 
   private fun eitherAdapter(
     returnType: ParameterizedType,
-    retrofit: Retrofit
+    retrofit: Retrofit,
   ): CallAdapter<Type, out Call<out Any>>? {
     val wrapperType = getParameterUpperBound(0, returnType)
     return when (getRawType(wrapperType)) {
       Either::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
-        if (errorType == CallError::class.java)
+        if (errorType == CallError::class.java) {
           NetworkEitherCallAdapter(bodyType)
-        else
+        } else {
           ArrowEitherCallAdapter<Any, Type>(retrofit, errorType, bodyType)
+        }
       }
       ResponseE::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
@@ -114,7 +115,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
       val name = parseTypeName(returnType)
       throw IllegalArgumentException(
         "Return type must be parameterized as " +
-          "$name<ErrorBody, ResponseBody> or $name<out ErrorBody, out ResponseBody>"
+          "$name<ErrorBody, ResponseBody> or $name<out ErrorBody, out ResponseBody>",
       )
     }
     val errorType = getParameterUpperBound(0, wrapperType)

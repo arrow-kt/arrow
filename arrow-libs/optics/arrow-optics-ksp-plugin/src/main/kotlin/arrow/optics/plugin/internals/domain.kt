@@ -2,7 +2,11 @@ package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.companionObject
 import com.google.devtools.ksp.getVisibility
-import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSName
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeParameter
+import com.google.devtools.ksp.symbol.Visibility
 import java.util.Locale
 
 data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
@@ -34,7 +38,7 @@ enum class OpticsTarget {
   ISO,
   LENS,
   PRISM,
-  DSL
+  DSL,
 }
 
 typealias IsoTarget = Target.Iso
@@ -66,7 +70,7 @@ data class Focus(
   val className: String,
   val paramName: String,
   val refinedType: KSType?,
-  val onlyOneSealedSubclass: Boolean = false
+  val onlyOneSealedSubclass: Boolean = false,
 ) {
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
@@ -89,7 +93,7 @@ data class Snippet(
   val `package`: String,
   val name: String,
   val imports: Set<String> = emptySet(),
-  val content: String
+  val content: String,
 ) {
   val fqName = "$`package`.$name"
 }
@@ -99,4 +103,4 @@ fun Snippet.asFileText(): String =
             |${if (`package`.isNotBlank() && `package` != "`unnamed package`") "package $`package`" else ""}
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}
             |$content
-            """.trimMargin()
+  """.trimMargin()
