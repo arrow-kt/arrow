@@ -75,14 +75,17 @@ internal fun evalAnnotatedPrismElement(
   logger: KSPLogger
 ): List<Focus> =
   when {
-    element.isSealed ->
-      element.getSealedSubclasses().map {
+    element.isSealed -> {
+      val sealedSubclasses = element.getSealedSubclasses().toList()
+      sealedSubclasses.map {
         Focus(
           it.primaryConstructor?.returnType?.resolve()?.qualifiedString() ?: it.qualifiedNameOrSimpleName,
           it.simpleName.asString().replaceFirstChar { c -> c.lowercase(Locale.getDefault()) },
-          it.superTypes.first().resolve()
+          it.superTypes.first().resolve(),
+          onlyOneSealedSubclass = sealedSubclasses.size == 1
         )
-      }.toList()
+      }
+    }
     else -> {
       logger.error(errorMessage, element)
       emptyList()

@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.loop
 import arrow.core.continuations.update
+import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 
@@ -29,12 +30,6 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
 
   private sealed class State {
     abstract val epoch: Long
-
-    fun nextEpoch() = Awaiting(
-      awaitingNow = 0,
-      epoch = epoch + 1,
-      unblock = CompletableDeferred()
-    )
   }
 
   private data class Awaiting(
@@ -42,87 +37,50 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     val awaitingNow: Int,
     override val epoch: Long,
     val unblock: CompletableDeferred<Unit>
-  ) : State() {
-
-    fun incrementAwaiting(): State {
-      check(awaitingNow >= 0)
-      return Awaiting(
-        awaitingNow = awaitingNow + 1,
-        epoch = epoch,
-        unblock = unblock
-      )
-    }
-  }
-
-  private data class Resetting(
-    override val epoch: Long,
-    /** Barrier used to ensure all awaiting threads are ready to reset. **/
-    val resetBarrier: CyclicBarrier
   ) : State()
 
-  private inner class StateMachine {
-    val state: AtomicRef<State> = AtomicRef(Awaiting(0, 0, CompletableDeferred()))
-
-    fun get() = state.get()
-
-    fun tryIncrementAwaiting(expected: Awaiting) = state.compareAndSet(expected, expected.incrementAwaiting())
-
-    fun tryStartNextEpoch(expected: Awaiting): Boolean {
-      return state.compareAndSet(expected, expected.nextEpoch())
-    }
-
-    fun startNextEpoch() {
-      val current = state.get()
-      check(current is Awaiting)
-      state.update { s -> s.nextEpoch() }
-    }
-
-    fun startReset() {
-      state.loop { current ->
-        if (current is Awaiting) {
-          val resetState = Resetting(
-            epoch = current.epoch,
-            resetBarrier = CyclicBarrier(
-              capacity = current.awaitingNow,
-              barrierAction = { tryStartNextEpoch(current) })
-          )
-          if (state.compareAndSet(current, resetState)) {
-            current.unblock.cancel()
-            return
-          }
-        }
-      }
-    }
-  }
-
-  private val state = StateMachine()
+  private data class Resetting(
+    val awaitingNow: Int,
+    override val epoch: Long,
+    /** Barrier used to ensure all awaiting threads are ready to reset. **/
+    val unblock: CompletableDeferred<Unit>
+  ) : State()
 
   /** The number of parties currently waiting. **/
-  public val numberWaiting: Int
-    get() = state.state.get()
-      .let {
-        return when (it) {
-          is Awaiting -> it.awaitingNow
-          is Resetting -> 0
-        }
-      }
+  public val peekWaiting: Int
+    get() = when (val state = state.get()) {
+      is Awaiting -> capacity - state.awaitingNow
+      is Resetting -> 0
+    }
+
+  private val state: AtomicRef<State> = AtomicRef(Awaiting(capacity, 0, CompletableDeferred()))
 
   /**
    * When called, all waiting coroutines will be cancelled with [CancellationException].
-   * When all threads have been cancelled the barrier will cycle.
+   * When all coroutines have been cancelled the barrier will cycle.
    */
-  public fun reset(): Unit = if (numberWaiting == 0) {
-    state.startNextEpoch()
-  } else {
-    state.startReset()
+  public suspend fun reset() {
+    when (val original = state.get()) {
+      is Awaiting -> {
+        val resetBarrier = CompletableDeferred<Unit>()
+        if (state.compareAndSet(original, Resetting(original.awaitingNow, original.epoch, resetBarrier))) {
+          original.unblock.cancel(CyclicBarrierCancellationException())
+          resetBarrier.await()
+        } else reset()
+      }
+
+      // We're already resetting, await all waiters to finish
+      is Resetting -> original.unblock.await()
+    }
   }
 
   private fun attemptBarrierAction(unblock: CompletableDeferred<Unit>) {
     try {
       barrierAction.invoke()
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       val cancellationException =
-        CancellationException("CyclicBarrier barrierAction failed with exception.", e)
+        if (e is CancellationException) e
+        else CancellationException("CyclicBarrier barrierAction failed with exception.", e.nonFatalOrThrow())
       unblock.cancel(cancellationException)
       throw cancellationException
     }
@@ -133,44 +91,70 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
    * Once the [capacity] of the barrier has been reached, the coroutine will be released and continue execution.
    */
   public suspend fun await() {
-    while (true) {
-
-      when (val current = state.state.get()) {
-        is Resetting -> {
-          current.resetBarrier.await()
-          throw CancellationException("CyclicBarrier was reset.")
-        }
+    state.loop { state ->
+      when (state) {
         is Awaiting -> {
-          val (remaining, epoch, unblock) = current
-          val remainingNow = remaining - 1
-
-          if (remainingNow == 0) {
-            if (state.tryStartNextEpoch(current)) {
-              attemptBarrierAction(unblock = unblock)
-              unblock.complete(Unit)
-              return
-            } else continue
-          } else if (state.tryIncrementAwaiting(current)) {
+          val (awaiting, epoch, unblock) = state
+          val awaitingNow = awaiting - 1
+          println("awaitingNow: $awaitingNow")
+          if (awaitingNow == 0 && this.state.compareAndSet(
+              state,
+              Awaiting(capacity, epoch + 1, CompletableDeferred())
+            )
+          ) {
+            attemptBarrierAction(unblock)
+            unblock.complete(Unit)
+            return
+          } else if (this.state.compareAndSet(state, Awaiting(awaitingNow, epoch, unblock))) {
             return try {
               unblock.await()
+            } catch (c: CyclicBarrierCancellationException) {
+              countdown(state, c)
+              throw c
             } catch (cancelled: CancellationException) {
-              val cancelledState = state.get()
-              when (cancelledState) {
-                is Resetting -> {
-                  cancelledState.resetBarrier.await()
-                  throw CancellationException("CyclicBarrier was reset.")
-                }
-                is Awaiting -> {
-                  state.state.update { s ->
-                    if (s.epoch == cancelledState.epoch) cancelledState.copy(awaitingNow = cancelledState.awaitingNow + 1) else s
-                  }
-                  throw cancelled
+              this.state.update { s ->
+                when {
+                  s is Awaiting && s.epoch == epoch -> s.copy(awaitingNow = s.awaitingNow + 1)
+                  else -> s
                 }
               }
+              throw cancelled
+
             }
           }
+        }
+
+        is Resetting -> {
+          state.unblock.await()
+          // State resets to `Awaiting` after `reset.unblock`.
+          // Unless there is another racing reset, it will be in `Awaiting` in next loop.
+          await()
         }
       }
     }
   }
+
+  private fun countdown(original: Awaiting, ex: CyclicBarrierCancellationException): Boolean {
+    state.loop { state ->
+      when (state) {
+        is Resetting -> {
+          val awaitingNow = state.awaitingNow + 1
+          if (awaitingNow < capacity && this.state.compareAndSet(state, state.copy(awaitingNow = awaitingNow))) {
+            return false
+          } else if (awaitingNow == capacity && this.state.compareAndSet(
+              state, Awaiting(capacity, state.epoch + 1, CompletableDeferred())
+            )
+          ) {
+            return state.unblock.complete(Unit)
+          } else countdown(original, ex)
+        }
+
+        is Awaiting -> throw IllegalStateException("Awaiting appeared during resetting.")
+      }
+    }
+  }
+
 }
+
+public class CyclicBarrierCancellationException : CancellationException("CyclicBarrier was cancelled")
+

@@ -26,8 +26,8 @@ fun String.compilationFails() {
   Assertions.assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
 }
 
-fun String.compilationSucceeds() {
-  val compilationResult = compile(this)
+fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
+  val compilationResult = compile(this, allWarningsAsErrors = allWarningsAsErrors)
   Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
 }
 
@@ -42,8 +42,8 @@ fun String.evals(thing: Pair<String, Any?>) {
 // UTILITY FUNCTIONS COPIED FROM META-TEST
 // =======================================
 
-internal fun compile(text: String): KotlinCompilation.Result {
-  val compilation = buildCompilation(text)
+internal fun compile(text: String, allWarningsAsErrors: Boolean = false): KotlinCompilation.Result {
+  val compilation = buildCompilation(text, allWarningsAsErrors = allWarningsAsErrors)
   // fix problems with double compilation and KSP
   // as stated in https://github.com/tschuchortdev/kotlin-compile-testing/issues/72
   val pass1 = compilation.compile()
@@ -58,7 +58,7 @@ internal fun compile(text: String): KotlinCompilation.Result {
     .compile()
 }
 
-fun buildCompilation(text: String) = KotlinCompilation().apply {
+fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = KotlinCompilation().apply {
   classpaths = listOf(
     "arrow-annotations:$arrowVersion",
     "arrow-core:$arrowVersion",
@@ -67,6 +67,7 @@ fun buildCompilation(text: String) = KotlinCompilation().apply {
   symbolProcessorProviders = listOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
   verbose = false
+  this.allWarningsAsErrors = allWarningsAsErrors
 }
 
 private fun classpathOf(dependency: String): File {
