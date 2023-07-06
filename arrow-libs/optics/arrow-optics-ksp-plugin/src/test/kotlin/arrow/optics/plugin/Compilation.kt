@@ -62,7 +62,7 @@ fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = Kotli
   classpaths = listOf(
     "arrow-annotations:$arrowVersion",
     "arrow-core:$arrowVersion",
-    "arrow-optics:$arrowVersion"
+    "arrow-optics:$arrowVersion",
   ).map { classpathOf(it) }
   symbolProcessorProviders = listOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))

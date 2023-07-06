@@ -16,7 +16,11 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 
-class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KSPLogger) :
+class OpticsProcessor(
+  private val codegen: CodeGenerator,
+  private val logger: KSPLogger,
+  private val options: OpticsProcessorOptions,
+) :
   SymbolProcessor {
   override fun process(resolver: Resolver): List<KSAnnotated> {
     resolver
@@ -44,14 +48,14 @@ class OpticsProcessor(private val codegen: CodeGenerator, private val logger: KS
     }
 
     val adts = adt(klass, logger)
-    val snippets = adts.snippets()
+    val snippets = adts.snippets(options)
     snippets.groupBy(Snippet::fqName).values.map(List<Snippet>::join).forEach {
       val writer =
         codegen
           .createNewFile(
             Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
             it.`package`,
-            it.name + "__Optics"
+            it.name + "__Optics",
           )
           .writer()
       writer.write(it.asFileText())
