@@ -1,9 +1,9 @@
 [versions]
-animalSniffer = "1.7.0"
+animalSniffer = "1.7.1"
 arrowGradleConfig = "0.12.0-rc.3"
 assertj = "3.24.2"
 coroutines = "1.7.2"
-classgraph = "4.8.160"
+classgraph = "4.8.161"
 dokka = "1.8.20"
 jUnit = "4.13.2"
 jUnitJupiter = "5.9.3"
