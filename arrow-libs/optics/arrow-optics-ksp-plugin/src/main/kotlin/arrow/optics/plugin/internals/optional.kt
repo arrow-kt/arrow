@@ -1,15 +1,17 @@
 package arrow.optics.plugin.internals
 
-internal fun generateOptionals(ele: ADT, target: OptionalTarget) =
+import arrow.optics.plugin.OpticsProcessorOptions
+
+internal fun OpticsProcessorOptions.generateOptionals(ele: ADT, target: OptionalTarget) =
   Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
     imports =
-      setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
-    content = processElement(ele, target.foci)
+    setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.toOption"),
+    content = processElement(ele, target.foci),
   )
 
-private fun processElement(ele: ADT, foci: List<Focus>): String =
+private fun OpticsProcessorOptions.processElement(ele: ADT, foci: List<Focus>): String =
   foci.joinToString(separator = "\n") { focus ->
 
     val targetClassName = when (focus) {
@@ -21,16 +23,16 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
     val sourceClassNameWithParams = "${ele.sourceClassName}${ele.angledTypeParameters}"
     val firstLine = when {
       ele.typeParameters.isEmpty() ->
-        "${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()"
+        "${ele.visibilityModifierName} $inlineText val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> $inlineText get()"
       else ->
-        "${ele.visibilityModifierName} inline fun ${ele.angledTypeParameters} ${ele.sourceClassName}.Companion.${focus.paramName}(): $Optional<$sourceClassNameWithParams, $targetClassName>"
+        "${ele.visibilityModifierName} $inlineText fun ${ele.angledTypeParameters} ${ele.sourceClassName}.Companion.${focus.paramName}(): $Optional<$sourceClassNameWithParams, $targetClassName>"
     }
 
     fun getOrModifyF(toNullable: String = "") =
       "{ ${ele.sourceName}: $sourceClassNameWithParams -> ${ele.sourceName}.${
         focus.paramName.plusIfNotBlank(
           prefix = "`",
-          postfix = "`"
+          postfix = "`",
         )
       }$toNullable?.right() ?: ${ele.sourceName}.left() }"
     fun setF(fromNullable: String = "") =
@@ -48,5 +50,6 @@ private fun processElement(ele: ADT, foci: List<Focus>): String =
       |  getOrModify = $getOrModify,
       |  set = { ${ele.sourceName}: $sourceClassNameWithParams, value: $targetClassName -> $set }
       |)
-      |""".trimMargin()
+      |
+    """.trimMargin()
   }

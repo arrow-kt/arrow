@@ -2,7 +2,11 @@ package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.companionObject
 import com.google.devtools.ksp.getVisibility
-import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSName
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeParameter
+import com.google.devtools.ksp.symbol.Visibility
 import java.util.Locale
 
 data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
@@ -35,7 +39,7 @@ enum class OpticsTarget {
   LENS,
   PRISM,
   OPTIONAL,
-  DSL
+  DSL,
 }
 
 typealias IsoTarget = Target.Iso
@@ -75,18 +79,40 @@ typealias NullableFocus = Focus.Nullable
 sealed class Focus {
 
   companion object {
-    operator fun invoke(fullName: String, paramName: String, refinedType: KSType? = null): Focus =
+    operator fun invoke(
+      fullName: String,
+      paramName: String,
+      refinedType: KSType? = null,
+      onlyOneSealedSubclass: Boolean = false,
+    ): Focus =
       when {
-        fullName.endsWith("?") -> Nullable(fullName, paramName, refinedType)
-        fullName.startsWith("`arrow`.`core`.`Option`") -> Option(fullName, paramName, refinedType)
-        else -> NonNull(fullName, paramName, refinedType)
+        fullName.endsWith("?") -> Nullable(
+          fullName,
+          paramName,
+          refinedType,
+          onlyOneSealedSubclass = onlyOneSealedSubclass,
+        )
+        fullName.startsWith("`arrow`.`core`.`Option`") -> Option(
+          fullName,
+          paramName,
+          refinedType,
+          onlyOneSealedSubclass = onlyOneSealedSubclass,
+        )
+        else -> NonNull(
+          fullName,
+          paramName,
+          refinedType,
+          onlyOneSealedSubclass = onlyOneSealedSubclass,
+        )
       }
   }
 
   abstract val className: String
   abstract val paramName: String
+
   // only used for type-refining prisms
   abstract val refinedType: KSType?
+  abstract val onlyOneSealedSubclass: Boolean
 
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
@@ -96,7 +122,8 @@ sealed class Focus {
   data class Nullable(
     override val className: String,
     override val paramName: String,
-    override val refinedType: KSType?
+    override val refinedType: KSType?,
+    override val onlyOneSealedSubclass: Boolean,
   ) : Focus() {
     val nonNullClassName = className.dropLast(1)
   }
@@ -104,7 +131,8 @@ sealed class Focus {
   data class Option(
     override val className: String,
     override val paramName: String,
-    override val refinedType: KSType?
+    override val refinedType: KSType?,
+    override val onlyOneSealedSubclass: Boolean,
   ) : Focus() {
     val nestedClassName =
       Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(className)!!.groupValues[1]
@@ -113,7 +141,8 @@ sealed class Focus {
   data class NonNull(
     override val className: String,
     override val paramName: String,
-    override val refinedType: KSType?
+    override val refinedType: KSType?,
+    override val onlyOneSealedSubclass: Boolean,
   ) : Focus()
 }
 
@@ -134,7 +163,7 @@ data class Snippet(
   val `package`: String,
   val name: String,
   val imports: Set<String> = emptySet(),
-  val content: String
+  val content: String,
 ) {
   val fqName = "$`package`.$name"
 }
@@ -144,4 +173,4 @@ fun Snippet.asFileText(): String =
             |${if (`package`.isNotBlank() && `package` != "`unnamed package`") "package $`package`" else ""}
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}
             |$content
-            """.trimMargin()
+  """.trimMargin()

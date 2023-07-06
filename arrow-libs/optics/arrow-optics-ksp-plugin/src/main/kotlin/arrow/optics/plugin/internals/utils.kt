@@ -15,7 +15,6 @@ fun String.plusIfNotBlank(prefix: String = "", postfix: String = "") =
 fun KSName.asSanitizedString(delimiter: String = ".", prefix: String = "") =
   asString().splitToSequence(delimiter).joinToString(delimiter, prefix) { if (it in kotlinKeywords) "`$it`" else it }
 
-
 private val kotlinKeywords = setOf(
   // Hard keywords
   "as",

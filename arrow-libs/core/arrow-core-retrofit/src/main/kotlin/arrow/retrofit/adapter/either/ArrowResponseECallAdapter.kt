@@ -16,7 +16,7 @@ import java.lang.reflect.Type
 internal class ArrowResponseECallAdapter<E, R>(
   retrofit: Retrofit,
   errorType: Type,
-  private val bodyType: Type
+  private val bodyType: Type,
 ) : CallAdapter<R, Call<ResponseE<E, R>>> {
 
   private val errorConverter: Converter<ResponseBody, E> =
@@ -29,7 +29,7 @@ internal class ArrowResponseECallAdapter<E, R>(
   class ResponseECall<E, R>(
     private val original: Call<R>,
     private val errorConverter: Converter<ResponseBody, E>,
-    private val bodyType: Type
+    private val bodyType: Type,
   ) : Call<ResponseE<E, R>> {
 
     override fun enqueue(callback: Callback<ResponseE<E, R>>) {
@@ -51,7 +51,7 @@ internal class ArrowResponseECallAdapter<E, R>(
             },
             { errorBody, responseV ->
               Response.success(ResponseE(responseV.raw(), errorBody.left()))
-            }
+            },
           )
         }
       })

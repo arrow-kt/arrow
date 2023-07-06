@@ -1,17 +1,17 @@
 package arrow.optics.plugin.internals
 
-import com.google.devtools.ksp.symbol.KSTypeParameter
+import arrow.optics.plugin.OpticsProcessorOptions
 
-internal fun generatePrisms(ele: ADT, target: PrismTarget) =
+internal fun OpticsProcessorOptions.generatePrisms(ele: ADT, target: PrismTarget) =
   Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
     imports =
-      setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
-    content = processElement(ele, target.foci)
+    setOf("import arrow.core.left", "import arrow.core.right", "import arrow.core.identity"),
+    content = processElement(ele, target.foci),
   )
 
-private fun processElement(ele: ADT, foci: List<Focus>): String {
+private fun OpticsProcessorOptions.processElement(ele: ADT, foci: List<Focus>): String {
   return foci.joinToString(separator = "\n\n") { focus ->
     val sourceClassNameWithParams =
       focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameters}"
@@ -21,21 +21,28 @@ private fun processElement(ele: ADT, foci: List<Focus>): String {
     }
     val firstLine = when {
       ele.typeParameters.isEmpty() ->
-        "${ele.visibilityModifierName} inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> inline get()"
+        "${ele.visibilityModifierName} $inlineText val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> $inlineText get()"
       else ->
-        "${ele.visibilityModifierName} inline fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
+        "${ele.visibilityModifierName} $inlineText fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
     }
+
+    val elseBranch = if (focus.onlyOneSealedSubclass) {
+      ""
+    } else """
+  |      else -> ${ele.sourceName}.left()
+    """.trimMargin()
 
     """
   |$firstLine = $Prism(
   |  getOrModify = { ${ele.sourceName}: $sourceClassNameWithParams ->
   |    when (${ele.sourceName}) {
   |      is ${focus.className} -> ${ele.sourceName}.right()
-  |      else -> ${ele.sourceName}.left()
+  |      $elseBranch
   |    }
   |  },
   |  reverseGet = ::identity
   |)
-  |""".trimMargin()
+  |
+    """.trimMargin()
   }
 }
