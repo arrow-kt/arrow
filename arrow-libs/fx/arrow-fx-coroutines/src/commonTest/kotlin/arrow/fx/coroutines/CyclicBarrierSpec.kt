@@ -1,9 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.assertions.timing.eventually
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -12,9 +10,6 @@ import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.*
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTimedValue
 
 class CyclicBarrierSpec : StringSpec({
   "should raise an exception when constructed with a negative or zero capacity" {
@@ -34,7 +29,7 @@ class CyclicBarrierSpec : StringSpec({
   "awaiting all in parallel resumes all coroutines" {
     checkAll(Arb.int(1, 100)) { i ->
       val barrier = CyclicBarrier(i)
-      (0 until i).parTraverse { barrier.await() }
+      (0 until i).parMap { barrier.await() }
     }
   }
 
@@ -43,6 +38,16 @@ class CyclicBarrierSpec : StringSpec({
       val barrier = CyclicBarrier(2)
       parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
       barrier.capacity shouldBe 2
+    }
+  }
+
+  "executes runnable once full" {
+    checkAll(Arb.constant(Unit)) {
+      var barrierRunnableInvoked = false
+      val barrier = CyclicBarrier(2) { barrierRunnableInvoked = true }
+      parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
+      barrier.capacity shouldBe 2
+      barrierRunnableInvoked shouldBe true
     }
   }
 
@@ -68,6 +73,41 @@ class CyclicBarrierSpec : StringSpec({
       launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }.cancelAndJoin()
 
       barrier.capacity shouldBe 2
+      barrier.peekWaiting shouldBe 0
+    }
+  }
+
+  "reset cancels all awaiting" {
+    checkAll(Arb.int(2, 100)) { i ->
+      val barrier = CyclicBarrier(i)
+      val exitCase = CompletableDeferred<ExitCase>()
+
+      val jobs =
+        (1 until i).map {
+          launch(start = CoroutineStart.UNDISPATCHED) {
+            guaranteeCase({ barrier.await() }, exitCase::complete)
+          }
+        }
+
+      barrier.reset()
+      jobs.map { it.isCancelled shouldBe true }
+    }
+  }
+
+  "should clean up upon reset" {
+    checkAll(Arb.int(2, 100)) { i ->
+      val barrier = CyclicBarrier(i)
+      val exitCase = CompletableDeferred<ExitCase>()
+
+      launch(start = CoroutineStart.UNDISPATCHED) {
+        guaranteeCase({ barrier.await() }, exitCase::complete)
+      }
+
+      barrier.reset()
+
+      barrier.peekWaiting shouldBe 0
+
+      (0 until i).parMap { barrier.await() }
     }
   }
 
