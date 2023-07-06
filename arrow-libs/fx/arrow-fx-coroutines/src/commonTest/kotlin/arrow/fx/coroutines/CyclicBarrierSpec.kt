@@ -9,7 +9,10 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 
 class CyclicBarrierSpec : StringSpec({
   "should raise an exception when constructed with a negative or zero capacity" {

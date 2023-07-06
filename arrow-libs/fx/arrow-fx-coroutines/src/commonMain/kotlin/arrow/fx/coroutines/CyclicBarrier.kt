@@ -96,7 +96,6 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
         is Awaiting -> {
           val (awaiting, epoch, unblock) = state
           val awaitingNow = awaiting - 1
-          println("awaitingNow: $awaitingNow")
           if (awaitingNow == 0 && this.state.compareAndSet(
               state,
               Awaiting(capacity, epoch + 1, CompletableDeferred())
