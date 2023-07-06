@@ -1,12 +1,14 @@
 package arrow.optics.plugin.internals
 
-internal fun ADT.snippets(): List<Snippet> =
+import arrow.optics.plugin.OpticsProcessorOptions
+
+internal fun ADT.snippets(options: OpticsProcessorOptions): List<Snippet> =
   targets.map {
     when (it) {
-      is IsoTarget -> generateIsos(this, it)
-      is PrismTarget -> generatePrisms(this, it)
-      is LensTarget -> generateLenses(this, it)
-      is OptionalTarget -> generateOptionals(this, it)
+      is IsoTarget -> options.generateIsos(this, it)
+      is PrismTarget -> options.generatePrisms(this, it)
+      is LensTarget -> options.generateLenses(this, it)
+      is OptionalTarget -> options.generateOptionals(this, it)
       is SealedClassDsl -> generatePrismDsl(this, it)
       is DataClassDsl -> generateOptionalDsl(this, it) + generateLensDsl(this, it)
       is ValueClassDsl -> generateIsoDsl(this, it)

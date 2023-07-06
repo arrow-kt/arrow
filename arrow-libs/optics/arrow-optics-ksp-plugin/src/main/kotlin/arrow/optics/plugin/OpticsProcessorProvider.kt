@@ -6,5 +6,5 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
 class OpticsProcessorProvider : SymbolProcessorProvider {
   override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
-    OpticsProcessor(environment.codeGenerator, environment.logger)
+    OpticsProcessor(environment.codeGenerator, environment.logger, OpticsProcessorOptions.from(environment.options))
 }
