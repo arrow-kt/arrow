@@ -28,8 +28,8 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     }
   }
 
-  private sealed class State {
-    abstract val epoch: Long
+  private interface State {
+    val epoch: Long
   }
 
   private data class Awaiting(
