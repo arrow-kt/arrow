@@ -73,3 +73,9 @@ kotlin {
 //dependencies {
 //  kspTest(projects.arrowOpticsKspPlugin)
 //}
+
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.optics"
+  }
+}

@@ -34,3 +34,9 @@ kotlin {
     }
   }
 }
+
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.resilience"
+  }
+}
