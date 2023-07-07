@@ -525,36 +525,36 @@ public open class RaiseAccumulate<Error>(
     mapOrAccumulate { (_, a) -> a.bind() }.bindNel()
 
   @RaiseDSL
-  @JvmName("mapOrAccumulateExt")
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
   ): List<B> = raise.mapOrAccumulate(this, transform)
 
   @RaiseDSL
-  @JvmName("mapOrAccumulateExt")
   public inline fun <A, B> NonEmptyList<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
   ): NonEmptyList<B> = raise.mapOrAccumulate(this, transform)
 
   @RaiseDSL
-  @JvmName("mapOrAccumulateExt")
   public inline fun <A, B> NonEmptySet<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
   ): NonEmptySet<B> = raise.mapOrAccumulate(this, transform)
 
   @RaiseDSL
+  @JvmName("_mapOrAccumulate")
   public inline fun <A, B> mapOrAccumulate(
     iterable: Iterable<A>,
     transform: RaiseAccumulate<Error>.(A) -> B
   ): List<B> = raise.mapOrAccumulate(iterable, transform)
 
   @RaiseDSL
+  @JvmName("_mapOrAccumulate")
   public inline fun <A, B> mapOrAccumulate(
     list: NonEmptyList<A>,
     transform: RaiseAccumulate<Error>.(A) -> B
   ): NonEmptyList<B> = raise.mapOrAccumulate(list, transform)
 
   @RaiseDSL
+  @JvmName("_mapOrAccumulate")
   public inline fun <A, B> mapOrAccumulate(
     set: NonEmptySet<A>,
     transform: RaiseAccumulate<Error>.(A) -> B
