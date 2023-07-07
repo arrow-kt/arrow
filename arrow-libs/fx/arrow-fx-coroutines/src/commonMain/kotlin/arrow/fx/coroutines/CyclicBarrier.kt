@@ -28,7 +28,7 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     }
   }
 
-  private interface State {
+  private sealed interface State {
     val epoch: Long
   }
 
@@ -37,14 +37,14 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     val awaitingNow: Int,
     override val epoch: Long,
     val unblock: CompletableDeferred<Unit>
-  ) : State()
+  ) : State
 
   private data class Resetting(
     val awaitingNow: Int,
     override val epoch: Long,
     /** Barrier used to ensure all awaiting threads are ready to reset. **/
     val unblock: CompletableDeferred<Unit>
-  ) : State()
+  ) : State
 
   /** The number of parties currently waiting. **/
   public val peekWaiting: Int
