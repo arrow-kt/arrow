@@ -7,7 +7,6 @@ package arrow.core.raise
 import arrow.atomic.Atomic
 import arrow.atomic.updateAndGet
 import arrow.core.Either
-import arrow.core.EmptyValue.combine
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
@@ -22,18 +21,69 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+/**
+ * Runs a computation [block] using [Raise], and return its outcome as [Either].
+ * - [Either.Right] represents success,
+ * - [Either.Left] represents logical failure.
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
 public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
+/**
+ * Runs a computation [block] using [Raise], and return its outcome as nullable type,
+ * where `null` represents logical failure.
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
 public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
   merge { block(NullableRaise(this)) }
 
+/**
+ * Runs a computation [block] using [Raise], and return its outcome as [Result].
+ *
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
 public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
   fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
 
+/**
+ * Runs a computation [block] using [Raise], and return its outcome as [Option].
+ * - [Some] represents success,
+ * - [None] represents logical failure.
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
 public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
   fold({ block(OptionRaise(this)) }, ::identity, ::Some)
 
+/**
+ * Runs a computation [block] using [Raise], and return its outcome as [Ior].
+ * - [Ior.Right] represents success,
+ * - [Ior.Left] represents logical failure which made it impossible to continue,
+ * - [Ior.Both] represents that some logical failures were raised,
+ *   but it was possible to continue until producing a final value.
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ *
+ * In both [Ior.Left] and [Ior.Both] cases, if more than one logical failure
+ * has been raised, they are combined using [combineError].
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
 public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
   val state: Atomic<Option<Error>> = Atomic(None)
   return fold<Error, A, Ior<Error, A>>(
@@ -46,6 +96,10 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
 
 public typealias Null = Nothing?
 
+/**
+ * Implementation of [Raise] used by [nullable].
+ * You should never use this directly.
+ */
 public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
@@ -84,6 +138,10 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
   }
 }
 
+/**
+ * Implementation of [Raise] used by [result].
+ * You should never use this directly.
+ */
 public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
   @RaiseDSL
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
@@ -117,6 +175,10 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   )
 }
 
+/**
+ * Implementation of [Raise] used by [option].
+ * You should never use this directly.
+ */
 public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
   @RaiseDSL
   public fun <A> Option<A>.bind(): A = getOrElse { raise(None) }
@@ -159,6 +221,10 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   }
 }
 
+/**
+ * Implementation of [Raise] used by [ior].
+ * You should never use this directly.
+ */
 public class IorRaise<Error> @PublishedApi internal constructor(
   @PublishedApi internal val combineError: (Error, Error) -> Error,
   private val state: Atomic<Option<Error>>,

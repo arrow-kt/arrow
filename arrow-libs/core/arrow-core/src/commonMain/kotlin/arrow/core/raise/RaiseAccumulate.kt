@@ -27,6 +27,10 @@ import kotlin.jvm.JvmName
 
 /**
  * Accumulate the errors from running both [action1] and [action2] using the given [combine] function.
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C> Raise<Error>.zipOrAccumulate(
@@ -47,6 +51,10 @@ public inline fun <Error, A, B, C> Raise<Error>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], and [action3] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D> Raise<Error>.zipOrAccumulate(
@@ -69,6 +77,10 @@ public inline fun <Error, A, B, C, D> Raise<Error>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], and [action4] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E> Raise<Error>.zipOrAccumulate(
@@ -93,6 +105,10 @@ public inline fun <Error, A, B, C, D, E> Raise<Error>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], and [action5] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F> Raise<Error>.zipOrAccumulate(
@@ -119,6 +135,10 @@ public inline fun <Error, A, B, C, D, E, F> Raise<Error>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G> Raise<Error>.zipOrAccumulate(
@@ -147,6 +167,10 @@ public inline fun <Error, A, B, C, D, E, F, G> Raise<Error>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G, H> Raise<Error>.zipOrAccumulate(
@@ -177,6 +201,10 @@ public inline fun <Error, A, B, C, D, E, F, G, H> Raise<Error>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<Error>.zipOrAccumulate(
@@ -209,6 +237,10 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<Error>.zipOrAccumulat
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<Error>.zipOrAccumulate(
@@ -241,6 +273,10 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<Error>.zipOrAccumu
 
 /**
  * Accumulate the errors from running both [action1] and [action2].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -259,6 +295,10 @@ public inline fun <Error, A, B, C> Raise<NonEmptyList<Error>>.zipOrAccumulate(
 
 /**
  * Accumulate the errors from running [action1], [action2], and [action3].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -279,6 +319,10 @@ public inline fun <Error, A, B, C, D> Raise<NonEmptyList<Error>>.zipOrAccumulate
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], and [action4].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -301,6 +345,10 @@ public inline fun <Error, A, B, C, D, E> Raise<NonEmptyList<Error>>.zipOrAccumul
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], and [action5].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -325,6 +373,10 @@ public inline fun <Error, A, B, C, D, E, F> Raise<NonEmptyList<Error>>.zipOrAccu
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -351,6 +403,10 @@ public inline fun <Error, A, B, C, D, E, F, G> Raise<NonEmptyList<Error>>.zipOrA
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G, H> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -379,6 +435,10 @@ public inline fun <Error, A, B, C, D, E, F, G, H> Raise<NonEmptyList<Error>>.zip
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -409,6 +469,10 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -440,6 +504,10 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
 
 /**
  * Transform every element of [iterable] using the given [transform], or accumulate all the occurred errors using [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
@@ -461,6 +529,10 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
 
 /**
  * Accumulate the errors obtained by executing the [transform] over every element of [iterable].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
@@ -481,6 +553,10 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 
 /**
  * Accumulate the errors obtained by executing the [transform] over every element of [NonEmptyList].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
@@ -490,6 +566,10 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 
 /**
  * Accumulate the errors obtained by executing the [transform] over every element of [NonEmptySet].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(

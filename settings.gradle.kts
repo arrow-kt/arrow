@@ -43,6 +43,9 @@ project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continu
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 
+include("arrow-core-serialization")
+project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-core-serialization")
+
 // FX
 include("arrow-fx-coroutines")
 project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-coroutines")
