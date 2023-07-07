@@ -49,8 +49,6 @@ public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Result].
  *
- * Note that [Result.isFailure] is `true` only when [block] ends in _logical failure_.
- * Any exception thrown within the [Raise] block is re-thrown.
  *
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
