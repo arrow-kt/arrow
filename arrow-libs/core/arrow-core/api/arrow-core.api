@@ -3455,6 +3455,9 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 
 public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
+	public final fun _mapOrAccumulate (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
+	public final fun _mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public final fun _mapOrAccumulate (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
