@@ -215,6 +215,21 @@ class MemoizationTest : StringSpec({
     memoized(1, 2, 3, 4, 5) shouldBe null
     runs shouldBe 1
   }
+
+  "Recursive memoization" {
+    var runs = 0
+    val memoizedDeepRecursiveFibonacci: DeepRecursiveFunction<Int, Int> =
+      MemoizedDeepRecursiveFunction { n ->
+        when (n) {
+          0 -> 0.also { runs++ }
+          1 -> 1
+          else -> callRecursive(n - 1) + callRecursive(n - 2)
+        }
+      }
+    val result = memoizedDeepRecursiveFibonacci(5)
+    result shouldBe 5
+    runs shouldBe 1
+  }
 })
 
 private fun consecSumResult(n: Int): Int = (n * (n + 1)) / 2
