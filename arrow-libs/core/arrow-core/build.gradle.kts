@@ -75,3 +75,9 @@ kotlin {
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
+
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.core"
+  }
+}

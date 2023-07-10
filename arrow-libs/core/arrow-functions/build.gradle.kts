@@ -70,7 +70,8 @@ kotlin {
   }
 }
 
-// enables context receivers for Jvm Tests
-tasks.named<KotlinCompile>("compileTestKotlinJvm") {
-  kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.continuations"
+  }
 }

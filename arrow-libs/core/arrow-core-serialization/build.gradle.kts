@@ -5,17 +5,11 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.arrowGradleConfig.versioning)
-  alias(libs.plugins.kotlinx.kover)
-  alias(libs.plugins.spotless)
+  alias(libs.plugins.kotest.multiplatform)
+  id(libs.plugins.kotlinx.serialization.get().pluginId)
 }
 
-spotless {
-  kotlin {
-    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
-  }
-}
-
-apply(plugin = "io.kotest.multiplatform")
+apply(from = property("ANIMALSNIFFER_MPP"))
 
 val enableCompatibilityMetadataVariant =
   providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
@@ -32,42 +26,25 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        api(libs.coroutines.core)
-        implementation(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlinx.serializationCore)
       }
     }
-
     if (!enableCompatibilityMetadataVariant) {
       commonTest {
         dependencies {
-          implementation(projects.arrowCore)
+          implementation(libs.kotlinx.serializationJson)
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
-          implementation(libs.coroutines.test)
         }
       }
+
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
         }
       }
     }
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
-      }
-    }
-  }
-}
-
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
   }
 }
