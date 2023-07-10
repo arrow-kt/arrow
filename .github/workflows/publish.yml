@@ -42,8 +42,7 @@ jobs:
       - name: assemble
         uses: gradle/gradle-build-action@v2
         with:
-#          arguments: assemble -Pversion=${{ inputs.version }} -Pkotlin.mpp.enableCompatibilityMetadataVariant=true
-          arguments: assemble -Pversion=2.0.0-SNAPSHOT -Pkotlin.mpp.enableCompatibilityMetadataVariant=true
+          arguments:  assemble -Psemver.stage=snapshot -Psemver.scope=major
 
       - name: Upload reports
         if: failure()
@@ -55,4 +54,4 @@ jobs:
       - name: Publish next major SNAPSHOT version
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true -Pversion=2.0.0-SNAPSHOT  publishToSonatype closeSonatypeStagingRepository
+          arguments: -Psemver.stage=snapshot -Psemver.scope=major publishToSonatype closeSonatypeStagingRepository
