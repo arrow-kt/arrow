@@ -18,9 +18,8 @@ public fun <T, R> MemoizedDeepRecursiveFunction(
 ): DeepRecursiveFunction<T, R> {
   val cache = Atomic(emptyMap<T, R>())
   return DeepRecursiveFunction { x ->
-    when (x) {
-      in cache.get() -> cache.get().getValue(x)
-      else -> {
+    when (val v = cache.get()[x]) {
+      null -> {
         val result = block(x)
         cache.loop { old ->
           when (x) {
@@ -33,6 +32,7 @@ public fun <T, R> MemoizedDeepRecursiveFunction(
           }
         }
       }
+      else -> v
     }
   }
 }
