@@ -3,7 +3,6 @@
 plugins {
   `java-platform`
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
 }
 
 group = property("projects.group").toString()
