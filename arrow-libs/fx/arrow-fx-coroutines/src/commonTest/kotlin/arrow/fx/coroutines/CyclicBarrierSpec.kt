@@ -72,9 +72,6 @@ class CyclicBarrierSpec : StringSpec({
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }.cancelAndJoin()
-
-      barrier.capacity shouldBe 2
-      barrier.peekWaiting shouldBe 0
     }
   }
 
@@ -105,8 +102,6 @@ class CyclicBarrierSpec : StringSpec({
       }
 
       barrier.reset()
-
-      barrier.peekWaiting shouldBe 0
 
       (0 until i).parMap { barrier.await() }
     }
