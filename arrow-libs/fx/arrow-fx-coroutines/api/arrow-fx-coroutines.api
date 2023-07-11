@@ -109,7 +109,6 @@ public final class arrow/fx/coroutines/CyclicBarrier {
 	public synthetic fun <init> (ILkotlin/jvm/functions/Function0;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun await (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getCapacity ()I
-	public final fun getPeekWaiting ()I
 	public final fun reset (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
