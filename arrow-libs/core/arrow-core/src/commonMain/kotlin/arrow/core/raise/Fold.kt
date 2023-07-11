@@ -37,6 +37,13 @@ public suspend fun <Error, A, B> Effect<Error, A>.fold(
   return fold({ invoke() }, { catch(it) }, { recover(it) }, { transform(it) })
 }
 
+/**
+ * `invoke` the [Effect] and [fold] the result:
+ *  - _success_ [transform] result of [A] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *
+ * This function re-throws any exceptions thrown within the [Effect].
+ */
 public suspend fun <Error, A, B> Effect<Error, A>.fold(
   recover: suspend (error: Error) -> B,
   transform: suspend (value: A) -> B,
@@ -48,6 +55,15 @@ public suspend fun <Error, A, B> Effect<Error, A>.fold(
   return fold({ throw it }, recover, transform)
 }
 
+/**
+ * `invoke` the [EagerEffect] and [fold] the result:
+ *  - _success_ [transform] result of [A] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *  - _exception_ [catch] from [Throwable] by transforming value into [B].
+ *
+ * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+ * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
+ */
 public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
   catch: (throwable: Throwable) -> B,
   recover: (error: Error) -> B,
@@ -61,6 +77,13 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
   return fold({ invoke(this) }, catch, recover, transform)
 }
 
+/**
+ * `invoke` the [EagerEffect] and [fold] the result:
+ *  - _success_ [transform] result of [A] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *
+ * This function re-throws any exceptions thrown within the [Effect].
+ */
 public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Error) -> B, transform: (value: A) -> B): B {
   contract {
     callsInPlace(recover, AT_MOST_ONCE)
@@ -69,6 +92,14 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Erro
   return fold({ throw it }, recover, transform)
 }
 
+/**
+ * The most general way to execute a computation using [Raise].
+ * Depending on the outcome of the block, one of the two continuations is run:
+ * - _success_ [transform] result of [A] to a value of [B].
+ * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ */
 @JvmName("_foldOrThrow")
 public inline fun <Error, A, B> fold(
   @BuilderInference block: Raise<Error>.() -> A,
@@ -82,6 +113,16 @@ public inline fun <Error, A, B> fold(
   return fold(block, { throw it }, recover, transform)
 }
 
+/**
+ * The most general way to execute a computation using [Raise].
+ * Depending on the outcome of the block, one of the three continuations is run:
+ * - _success_ [transform] result of [A] to a value of [B].
+ * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ * - _exception_ [catch] from [Throwable] by transforming value into [B].
+ *
+ * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+ * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
+ */
 @JvmName("_fold")
 public inline fun <Error, A, B> fold(
   @BuilderInference block: Raise<Error>.() -> A,

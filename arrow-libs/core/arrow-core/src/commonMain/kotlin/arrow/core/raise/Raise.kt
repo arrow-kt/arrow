@@ -31,7 +31,9 @@ public annotation class RaiseDSL
  *
  * The [Raise] DSL allows you to work with _logical failures_ of type [Error].
  * A _logical failure_ does not necessarily mean that the computation has failed,
- * but that it has stopped or _short-circuited_.
+ * but that it has stopped or _short-circuited_. The Arrow website has a
+ * [guide](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/)
+ * introducing [Raise] and how to use it effectively.
  *
  * The [Raise] DSL allows you to [raise] _logical failure_ of type [Error], and you can [recover] from them.
  *
@@ -248,6 +250,13 @@ public interface Raise<in Error> {
    */
   public operator fun <A> EagerEffect<Error, A>.invoke(): A = invoke(this@Raise)
 
+  /**
+   * Invoke an [EagerEffect] inside `this` [Raise] context.
+   * Any _logical failure_ is raised in `this` [Raise] context,
+   * and thus short-circuits the computation.
+   *
+   * @see [recover] if you want to attempt to recover from any _logical failure_.
+   */
   @RaiseDSL
   public fun <A> EagerEffect<Error, A>.bind(): A = invoke(this@Raise)
 
@@ -260,6 +269,13 @@ public interface Raise<in Error> {
    */
   public suspend operator fun <A> Effect<Error, A>.invoke(): A = invoke(this@Raise)
 
+  /**
+   * Invoke an [Effect] inside `this` [Raise] context.
+   * Any _logical failure_ raised are raised in `this` [Raise] context,
+   * and thus short-circuits the computation.
+   *
+   * @see [recover] if you want to attempt to recover from any _logical failure_.
+   */
   @RaiseDSL
   public suspend fun <A> Effect<Error, A>.bind(): A = invoke(this@Raise)
 
@@ -296,6 +312,11 @@ public interface Raise<in Error> {
     is Either.Right -> value
   }
 
+  /**
+   * Extracts all the values in the [Map], raising every [Either.Left]
+   * as a _logical failure_. In other words, executed [bind] over every
+   * value in this [Map].
+   */
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     mapValues { (_, a) -> a.bind() }
 
@@ -306,14 +327,29 @@ public interface Raise<in Error> {
     is Validated.Valid -> value
   }
 
+  /**
+   * Extracts all the values in the [Iterable], raising every [Either.Left]
+   * as a _logical failure_. In other words, executed [bind] over every
+   * value in this [Iterable].
+   */
   @RaiseDSL
   public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
     map { it.bind() }
 
+  /**
+   * Extracts all the values in the [NonEmptyList], raising every [Either.Left]
+   * as a _logical failure_. In other words, executed [bind] over every
+   * value in this [NonEmptyList].
+   */
   @RaiseDSL
   public fun <A> NonEmptyList<Either<Error, A>>.bindAll(): NonEmptyList<A> =
     map { it.bind() }
 
+  /**
+   * Extracts all the values in the [NonEmptySet], raising every [Either.Left]
+   * as a _logical failure_. In other words, executed [bind] over every
+   * value in this [NonEmptySet].
+   */
   @RaiseDSL
   public fun <A> NonEmptySet<Either<Error, A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }.toNonEmptySet()
