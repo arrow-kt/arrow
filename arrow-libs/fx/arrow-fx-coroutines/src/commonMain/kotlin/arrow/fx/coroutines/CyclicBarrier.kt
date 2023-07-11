@@ -46,13 +46,6 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     val unblock: CompletableDeferred<Unit>
   ) : State
 
-  /** The number of parties currently waiting. **/
-  public val peekWaiting: Int
-    get() = when (val state = state.get()) {
-      is Awaiting -> capacity - state.awaitingNow
-      is Resetting -> 0
-    }
-
   private val state: AtomicRef<State> = AtomicRef(Awaiting(capacity, 0, CompletableDeferred()))
 
   /**
