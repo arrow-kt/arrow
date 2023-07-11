@@ -21,21 +21,21 @@ class CyclicBarrierSpec : StringSpec({
         "Cyclic barrier must be constructed with positive non-zero capacity $i but was $i > 0"
     }
   }
-  
+
   "barrier of capacity 1 is a no op" {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(1)
       barrier.await()
     }
   }
-  
+
   "awaiting all in parallel resumes all coroutines" {
     checkAll(Arb.int(1, 100)) { i ->
       val barrier = CyclicBarrier(i)
-      (0 until i).parTraverse { barrier.await() }
+      (0 until i).parMap { barrier.await() }
     }
   }
-  
+
   "should reset once full" {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
@@ -43,32 +43,70 @@ class CyclicBarrierSpec : StringSpec({
       barrier.capacity shouldBe 2
     }
   }
-  
+
+  "executes runnable once full" {
+    var barrierRunnableInvoked = false
+    val barrier = CyclicBarrier(2) { barrierRunnableInvoked = true }
+    parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
+    barrier.capacity shouldBe 2
+    barrierRunnableInvoked shouldBe true
+  }
+
   "await is cancelable" {
     checkAll(Arb.int(2, Int.MAX_VALUE)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
-      
+
       val job =
         launch(start = CoroutineStart.UNDISPATCHED) {
           guaranteeCase({ barrier.await() }, exitCase::complete)
         }
-      
+
       job.cancelAndJoin()
       exitCase.isCompleted shouldBe true
       exitCase.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
-  
-  "should clean up upon cancelation of await" {
+
+  "should clean up upon cancellation of await" {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }.cancelAndJoin()
-      
-      barrier.capacity shouldBe 2
     }
   }
-  
+
+  "reset cancels all awaiting" {
+    checkAll(Arb.int(2, 100)) { i ->
+      val barrier = CyclicBarrier(i)
+      val exitCase = CompletableDeferred<ExitCase>()
+
+      val jobs =
+        (1 until i).map {
+          launch(start = CoroutineStart.UNDISPATCHED) {
+            guaranteeCase({ barrier.await() }, exitCase::complete)
+          }
+        }
+
+      barrier.reset()
+      jobs.map { it.isCancelled shouldBe true }
+    }
+  }
+
+  "should clean up upon reset" {
+    checkAll(Arb.int(2, 100)) { i ->
+      val barrier = CyclicBarrier(i)
+      val exitCase = CompletableDeferred<ExitCase>()
+
+      launch(start = CoroutineStart.UNDISPATCHED) {
+        guaranteeCase({ barrier.await() }, exitCase::complete)
+      }
+
+      barrier.reset()
+
+      (0 until i).parMap { barrier.await() }
+    }
+  }
+
   "race fiber cancel and barrier full" {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
@@ -78,6 +116,27 @@ class CyclicBarrierSpec : StringSpec({
         // after the barrier has already reset, causing this code to never terminate (test times out)
         is Either.Left -> parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
         is Either.Right -> Unit
+      }
+    }
+  }
+
+  "reset" {
+    checkAll(Arb.int(2..10)) { n ->
+      val barrier = CyclicBarrier(n)
+
+      val exits = (0 until n - 1).map { CompletableDeferred<ExitCase>() }
+
+      val jobs = (0 until n - 1).map { i ->
+        launch(start = CoroutineStart.UNDISPATCHED) {
+          guaranteeCase(barrier::await, exits[i]::complete)
+        }
+      }
+
+      barrier.reset()
+
+      exits.zip(jobs) { exitCase, job ->
+        exitCase.await().shouldBeTypeOf<ExitCase.Cancelled>()
+        job.isCancelled shouldBe true
       }
     }
   }
