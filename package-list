@@ -14,6 +14,8 @@ arrow.typeclasses
 module:arrow-core-retrofit
 arrow.retrofit.adapter.either
 arrow.retrofit.adapter.either.networkhandling
+module:arrow-core-serialization
+arrow.core.serialization
 module:arrow-fx-coroutines
 arrow.fx.coroutines
 arrow.fx.coroutines.continuations

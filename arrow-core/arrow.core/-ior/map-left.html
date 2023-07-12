@@ -34,7 +34,7 @@
     <div class="library-name">
 <a href="../../../index.html">
 <span>Arrow</span>            </a>    </div>
-    <div>1.2.0-RC
+    <div>1.2.0
     </div>
     <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section">
@@ -49,18 +49,18 @@
         <div id="sideMenu"></div>
     </div>
     <div id="main">
-<div class="main-content" id="content" pageids="arrow-core::arrow.core/Ior/mapLeft/#kotlin.Function1[TypeParam(bounds=[kotlin.Any?]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//601698448">
+<div class="main-content" data-page-type="member" id="content" pageids="arrow-core::arrow.core/Ior/mapLeft/#kotlin.Function1[TypeParam(bounds=[kotlin.Any?]),TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//601698448">
   <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core</a><span class="delimiter">/</span><a href="index.html">Ior</a><span class="delimiter">/</span><span class="current">mapLeft</span></div>
   <div class="cover ">
     <h1 class="cover"><span>map</span><wbr><span><span>Left</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-left.html">C</a><span class="token operator">&gt; </span><a href="map-left.html"><span class="token function">mapLeft</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fa<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="map-left.html">C</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Ior</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-left.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/core/Ior.kt#L329">source</a>)</span></span></div><p class="paragraph">The given function is applied if this is a <a href="-left/index.html">Left</a> or <a href="-both/index.html">Both</a> to <code class="lang-kotlin">A</code>.</p><p class="paragraph">Example:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Ior<br><br>fun main() {<br>  Ior.Right(12).mapLeft { "flower" } // Result: Right(12)<br>  Ior.Left(12).mapLeft { "flower" }  // Result: Left("power")<br>  Ior.Both(12, "power").mapLeft { "flower $it" }  // Result: Both("flower 12", "power")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-ior-06.kt --></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-left.html">C</a><span class="token operator">&gt; </span><a href="map-left.html"><span class="token function">mapLeft</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">fa<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="map-left.html">C</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Ior</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-left.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">B</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/core/Ior.kt#L344">source</a>)</span></span></div><p class="paragraph">The given function is applied if this is a <a href="-left/index.html">Left</a> or <a href="-both/index.html">Both</a> to <code class="lang-kotlin">A</code>.</p><p class="paragraph">Example:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Ior<br><br>fun main() {<br>  Ior.Right(12).mapLeft { "flower" } // Result: Right(12)<br>  Ior.Left(12).mapLeft { "flower" }  // Result: Left("power")<br>  Ior.Both(12, "power").mapLeft { "flower $it" }  // Result: Both("flower 12", "power")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-ior-06.kt --></div></div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
     </div>
 </div>
-
-</body></html>
+</body>
+</html>
 

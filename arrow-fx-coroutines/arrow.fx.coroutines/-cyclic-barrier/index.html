@@ -34,7 +34,7 @@
     <div class="library-name">
 <a href="../../../index.html">
 <span>Arrow</span>            </a>    </div>
-    <div>1.2.0-RC
+    <div>1.2.0
     </div>
     <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section">
@@ -49,61 +49,82 @@
         <div id="sideMenu"></div>
     </div>
     <div id="main">
-<div class="main-content" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/CyclicBarrier///PointingToDeclaration//-245591949">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/CyclicBarrier///PointingToDeclaration//-245591949">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">CyclicBarrier</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Cyclic</span><wbr><span><span>Barrier</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CyclicBarrier</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>capacity<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/CyclicBarrier.kt#L9">source</a>)</span></span></div><p class="paragraph">A <a href="index.html">CyclicBarrier</a> is a synchronization mechanism that allows a set of coroutines to wait for each other to reach a certain point before continuing execution. It is called a "cyclic" barrier because it can be reused after all coroutines have reached the barrier and released.</p><p class="paragraph">To use a CyclicBarrier, each coroutine must call the <a href="await.html">await</a> method on the barrier object, which will cause the coroutine to suspend until the required number of coroutines have reached the barrier. Once all coroutines have reached the barrier they will <i>resume</i> execution.</p><p class="paragraph">Models the behavior of java.util.concurrent.CyclicBarrier in Kotlin with <code class="lang-kotlin">suspend</code>.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CyclicBarrier</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>capacity<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">barrierAction<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}</span></span><span class="token punctuation">)</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/CyclicBarrier.kt#L24">source</a>)</span></span></div><p class="paragraph">A <a href="index.html">CyclicBarrier</a> is a synchronization mechanism that allows a set of coroutines to wait for each other to reach a certain point before continuing execution. It is called a "cyclic" barrier because it can be reused after all coroutines have reached the barrier and released.</p><p class="paragraph">To use a CyclicBarrier, each coroutine must call the <a href="await.html">await</a> method on the barrier object, which will cause the coroutine to suspend until the required number of coroutines have reached the barrier. Once all coroutines have reached the barrier they will <i>resume</i> execution.</p><p class="paragraph">Models the behavior of java.util.concurrent.CyclicBarrier in Kotlin with <code class="lang-kotlin">suspend</code>.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>capacity</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The number of coroutines that must await until the barrier cycles and all are released.</p></div></div></div></div><div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>barrier</span><wbr><span><span>Action</span></span></u></div></span></div><div><div class="title"><p class="paragraph">An optional runnable that will be executed when the barrier is cycled, but before releasing.</p></div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="tabbedcontent">Constructors</h2>
-      <div class="table" data-togglable="Constructors"><a data-name="-593472341%2FConstructors%2F-245591949" anchor-label="CyclicBarrier" id="-593472341%2FConstructors%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue TabbedContent">
-            <div class=""><span class="inline-flex">
-                <div><a href="-cyclic-barrier.html"><span>Cyclic</span><wbr><span><span>Barrier</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-593472341%2FConstructors%2F-245591949"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-cyclic-barrier.html"><span class="token function">CyclicBarrier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">capacity<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-2112962286%2FConstructors%2F-245591949" anchor-label="CyclicBarrier" id="-2112962286%2FConstructors%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyclic-barrier.html"><span>Cyclic</span><wbr><span><span>Barrier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2112962286%2FConstructors%2F-245591949"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">capacity<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">barrierAction<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Functions</h2>
-      <div class="table" data-togglable="Functions"><a data-name="-437698667%2FFunctions%2F-245591949" anchor-label="await" id="-437698667%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="await.html"><span><span>await</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-437698667%2FFunctions%2F-245591949"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="await.html"><span class="token function">await</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">When <a href="await.html">await</a> is called the function will suspend until the required number of coroutines have reached the barrier. Once the <a href="capacity.html">capacity</a> of the barrier has been reached, the coroutine will be released and continue execution.</p></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <h2 class="">Properties</h2>
-      <div class="table" data-togglable="Properties"><a data-name="-1163367147%2FProperties%2F-245591949" anchor-label="capacity" id="-1163367147%2FProperties%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="capacity.html"><span><span>capacity</span></span></a></div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-1163367147%2FProperties%2F-245591949" anchor-label="capacity" id="-1163367147%2FProperties%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="capacity.html"><span><span>capacity</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1163367147%2FProperties%2F-245591949"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><a data-name="-1163367147%2FProperties%2F-245591949" anchor-label="capacity" id="-1163367147%2FProperties%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="capacity.html">capacity</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="capacity.html">capacity</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-437698667%2FFunctions%2F-245591949" anchor-label="await" id="-437698667%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="await.html"><span><span>await</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-437698667%2FFunctions%2F-245591949"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="await.html"><span class="token function">await</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">When <a href="await.html">await</a> is called the function will suspend until the required number of coroutines have called <a href="await.html">await</a>. Once the <a href="capacity.html">capacity</a> of the barrier has been reached, the coroutine will be released and continue execution.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="321967548%2FFunctions%2F-245591949" anchor-label="reset" id="321967548%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reset.html"><span><span>reset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="321967548%2FFunctions%2F-245591949"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="reset.html"><span class="token function">reset</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">When called, all waiting coroutines will be cancelled with <a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-cancellation-exception/index.html">CancellationException</a>. When all coroutines have been cancelled the barrier will cycle.</p></div></div></div>
+                </div>
               </div>
             </div>
           </div>
@@ -117,6 +138,6 @@
       </div>
     </div>
 </div>
-
-</body></html>
+</body>
+</html>
 

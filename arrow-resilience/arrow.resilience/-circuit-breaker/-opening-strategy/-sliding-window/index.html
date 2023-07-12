@@ -34,7 +34,7 @@
     <div class="library-name">
 <a href="../../../../../index.html">
 <span>Arrow</span>            </a>    </div>
-    <div>1.2.0-RC
+    <div>1.2.0
     </div>
     <div class="pull-right d-flex">
         <div class="filter-section" id="filter-section">
@@ -49,106 +49,112 @@
         <div id="sideMenu"></div>
     </div>
     <div id="main">
-<div class="main-content" id="content" pageids="arrow-resilience::arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow///PointingToDeclaration//-1537784738">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-resilience::arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow///PointingToDeclaration//-1537784738">
   <div class="breadcrumbs"><a href="../../../../index.html">arrow-resilience</a><span class="delimiter">/</span><a href="../../../index.html">arrow.resilience</a><span class="delimiter">/</span><a href="../../index.html">CircuitBreaker</a><span class="delimiter">/</span><a href="../index.html">OpeningStrategy</a><span class="delimiter">/</span><span class="current">SlidingWindow</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Sliding</span><wbr><span><span>Window</span></span></h1>
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">SlidingWindow</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>timeSource<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-source/index.html">TimeSource</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>failures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowDuration<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>maxFailures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span> : <a href="../index.html">CircuitBreaker.OpeningStrategy</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/resilience/arrow-resilience/src/commonMain/kotlin/arrow/resilience/CircuitBreaker.kt#L573">source</a>)</span></span></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
-      <h2 class="tabbedcontent">Constructors</h2>
-      <div class="table" data-togglable="Constructors"><a data-name="-52205606%2FConstructors%2F-1537784738" anchor-label="SlidingWindow" id="-52205606%2FConstructors%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue TabbedContent">
-            <div class=""><span class="inline-flex">
-                <div><a href="-sliding-window.html"><span>Sliding</span><wbr><span><span>Window</span></span></a></div>
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-52205606%2FConstructors%2F-1537784738" anchor-label="SlidingWindow" id="-52205606%2FConstructors%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sliding-window.html"><span>Sliding</span><wbr><span><span>Window</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-52205606%2FConstructors%2F-1537784738"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-sliding-window.html"><span class="token function">SlidingWindow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">timeSource<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-source/index.html">TimeSource</a><span class="token punctuation">, </span></span><span class="parameter ">failures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">windowDuration<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter ">maxFailures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">timeSource<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-source/index.html">TimeSource</a><span class="token punctuation">, </span></span><span class="parameter ">failures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">windowDuration<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token punctuation">, </span></span><span class="parameter ">maxFailures<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Types</h2>
-      <div class="table" data-togglable="Types"><a data-name="1329341514%2FClasslikes%2F-1537784738" anchor-label="Companion" id="1329341514%2FClasslikes%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="1329341514%2FClasslikes%2F-1537784738" anchor-label="Companion" id="1329341514%2FClasslikes%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1329341514%2FClasslikes%2F-1537784738"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <h2 class="">Properties</h2>
-      <div class="table" data-togglable="Properties"><a data-name="335430574%2FProperties%2F-1537784738" anchor-label="failures" id="335430574%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="failures.html"><span><span>failures</span></span></a></div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="335430574%2FProperties%2F-1537784738" anchor-label="failures" id="335430574%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="failures.html"><span><span>failures</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="335430574%2FProperties%2F-1537784738"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><a data-name="335430574%2FProperties%2F-1537784738" anchor-label="failures" id="335430574%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="failures.html">failures</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a><span class="token operator">&gt;</span></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="failures.html">failures</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="-1186135946%2FProperties%2F-1537784738" anchor-label="maxFailures" id="-1186135946%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="max-failures.html"><span>max</span><wbr><span><span>Failures</span></span></a></div>
+          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-failures.html"><span>max</span><wbr><span><span>Failures</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1186135946%2FProperties%2F-1537784738"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><a data-name="-1186135946%2FProperties%2F-1537784738" anchor-label="maxFailures" id="-1186135946%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="max-failures.html">maxFailures</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="max-failures.html">maxFailures</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="-1408252689%2FProperties%2F-1537784738" anchor-label="timeSource" id="-1408252689%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="time-source.html"><span>time</span><wbr><span><span>Source</span></span></a></div>
+          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="time-source.html"><span>time</span><wbr><span><span>Source</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1408252689%2FProperties%2F-1537784738"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><a data-name="-1408252689%2FProperties%2F-1537784738" anchor-label="timeSource" id="-1408252689%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="time-source.html">timeSource</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-source/index.html">TimeSource</a></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="time-source.html">timeSource</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-source/index.html">TimeSource</a></div></div></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 <a data-name="-1549479149%2FProperties%2F-1537784738" anchor-label="windowDuration" id="-1549479149%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-        <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
-          <div class="main-subrow keyValue ">
-            <div class=""><span class="inline-flex">
-                <div><a href="window-duration.html"><span>window</span><wbr><span><span>Duration</span></span></a></div>
+          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="window-duration.html"><span>window</span><wbr><span><span>Duration</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1549479149%2FProperties%2F-1537784738"></span>
-                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                </span></span></div>
-            <div>
-              <div class="title">
-                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><a data-name="-1549479149%2FProperties%2F-1537784738" anchor-label="windowDuration" id="-1549479149%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="window-duration.html">windowDuration</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></div></div></div>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="window-duration.html">windowDuration</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></div></div></div>
+                </div>
               </div>
             </div>
           </div>
@@ -162,6 +168,6 @@
       </div>
     </div>
 </div>
-
-</body></html>
+</body>
+</html>
 
