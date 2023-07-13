@@ -113,4 +113,21 @@ class LensTests {
       |val r = i != null && j != null
       """.evals("r" to true)
   }
+
+  @Test
+  fun `Lenses for STAR arguments`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class GenericType<A>(
+      |  val field1: A
+      |) { companion object }
+      |
+      |@optics
+      |data class IsoData(val genericType: GenericType<*>) {
+      |  companion object
+      |}
+      """.compilationSucceeds()
+  }
 }
