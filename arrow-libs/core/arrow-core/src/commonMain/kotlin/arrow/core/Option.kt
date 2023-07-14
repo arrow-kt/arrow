@@ -540,7 +540,7 @@ public sealed class Option<out A> {
    * <!--- KNIT example-option-22.kt -->
    */
   @Deprecated(
-    "tap is being renamed to onNone to be more consistent with the Kotlin Standard Library naming",
+    "tap is being renamed to onSome to be more consistent with the Kotlin Standard Library naming",
     ReplaceWith("onSome(f)")
   )
   public inline fun tap(f: (A) -> Unit): Option<A> {
