@@ -4,7 +4,6 @@ plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
 }

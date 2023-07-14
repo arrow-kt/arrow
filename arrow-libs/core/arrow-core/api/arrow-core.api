@@ -776,6 +776,10 @@ public final class arrow/core/Memoization {
 	public static final fun memoize (Lkotlin/jvm/functions/Function5;)Lkotlin/jvm/functions/Function5;
 }
 
+public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
+	public static final fun MemoizedDeepRecursiveFunction (Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
+}
+
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
 	public abstract fun distinct ()Larrow/core/NonEmptyList;
 	public abstract fun distinctBy (Lkotlin/jvm/functions/Function1;)Larrow/core/NonEmptyList;

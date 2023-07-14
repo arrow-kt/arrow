@@ -33,7 +33,6 @@ plugins {
   alias(libs.plugins.kotlinx.serialization) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
-  alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.spotless) apply false
 }
 
@@ -95,6 +94,10 @@ subprojects {
         }
       }
     }
+  }
+
+  tasks.withType<AbstractPublishToMaven> {
+    dependsOn(tasks.withType<Sign>())
   }
 }
 
