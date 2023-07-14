@@ -24,10 +24,8 @@ public value class NonEmptySet<out A> private constructor(
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
-  override fun equals(other: Any?): Boolean = when (other) {
-    is NonEmptySet<*> -> elements == other.elements
-    else -> elements == other
-  }
+  override fun equals(other: Any?): Boolean =
+    elements == other
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =
