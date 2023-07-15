@@ -38,11 +38,24 @@ class NonEmptySetTest : StringSpec({
     val initialSet: NonEmptySet<Int> = nonEmptySetOf(element) + Arb.nonEmptySet(Arb.int()).next()
     initialSet.plus(element) shouldBe initialSet
   }
+
   "NonEmptySet equals Set" {
     checkAll(
       Arb.nonEmptySet(Arb.int())
     ) { nes ->
       val s = nes.toSet()
+      withClue("$nes should be equal to $s") {
+        (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
+        nes.hashCode() shouldBe s.hashCode()
+      }
+    }
+  }
+
+  "NonEmptySet equals NonEmptySet" {
+    checkAll(
+      Arb.nonEmptySet(Arb.int())
+    ) { nes ->
+      val s = nes.toSet().toNonEmptySetOrNull()!!
       withClue("$nes should be equal to $s") {
         (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
         nes.hashCode() shouldBe s.hashCode()
