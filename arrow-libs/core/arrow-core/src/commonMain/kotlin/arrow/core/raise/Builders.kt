@@ -94,18 +94,33 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
   )
 }
 
+public interface RaiseAny<in Error> : Raise<Error> {
+  @RaiseDSL
+  public fun raiseAny(e: Any?): Nothing
+
+  @RaiseDSL
+  public fun ensure(condition: Boolean): Unit =
+    if (condition) Unit else raiseAny(null)
+
+  @RaiseDSL
+  public fun <A> Option<A>.bind(): A = getOrElse { raiseAny(null) }
+
+  @RaiseDSL
+  public fun <A> Either<Any?, A>.bindAny(): A = when (this) {
+    is Either.Left -> raiseAny(value)
+    is Either.Right -> value
+  }
+}
+
 public typealias Null = Nothing?
 
 /**
  * Implementation of [Raise] used by [nullable].
  * You should never use this directly.
  */
-public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
+public class NullableRaise(private val raise: Raise<Null>) : RaiseAny<Null>, Raise<Null> by raise {
   @RaiseDSL
-  public fun ensure(value: Boolean): Unit = ensure(value) { null }
-
-  @RaiseDSL
-  public fun <A> Option<A>.bind(): A = getOrElse { raise(null) }
+  override fun raiseAny(e: Any?): Nothing = raise(null)
 
   @RaiseDSL
   public fun <A> A?.bind(): A {
@@ -113,6 +128,7 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
     return this ?: raise(null)
   }
 
+  @RaiseDSL
   @JvmName("bindAllNullable")
   public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> =
     mapValues { (_, v) -> v.bind() }
@@ -179,10 +195,11 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
  * Implementation of [Raise] used by [option].
  * You should never use this directly.
  */
-public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
+public class OptionRaise(private val raise: Raise<None>) : RaiseAny<None>, Raise<None> by raise {
   @RaiseDSL
-  public fun <A> Option<A>.bind(): A = getOrElse { raise(None) }
+  override fun raiseAny(e: Any?): Nothing = raise(None)
 
+  @RaiseDSL
   @JvmName("bindAllOption")
   public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> =
     mapValues { (_, v) -> v.bind() }
@@ -201,9 +218,6 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   @JvmName("bindAllOption")
   public fun <A> NonEmptySet<Option<A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }.toNonEmptySet()
-
-  @RaiseDSL
-  public fun ensure(value: Boolean): Unit = ensure(value) { None }
 
   @RaiseDSL
   public fun <A> ensureNotNull(value: A?): A {

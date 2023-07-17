@@ -69,6 +69,22 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
+  "binding either in nullable" {
+    nullable {
+      val number = Either.Right("s".length)
+      val string = number.map(Int::toString).bind()
+      string
+    } shouldBe "1"
+  }
+
+  "binding either in nullable, with any" {
+    nullable {
+      val number: Either<Boolean, Int> = Either.Right("s".length)
+      val string = number.map(Int::toString).bindAny()
+      string
+    } shouldBe "1"
+  }
+
   "short circuit option" {
     nullable<Int> {
       val number = Some("s".length)
