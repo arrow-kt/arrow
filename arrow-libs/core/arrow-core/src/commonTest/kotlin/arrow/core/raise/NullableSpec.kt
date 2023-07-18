@@ -79,7 +79,7 @@ class NullableSpec : StringSpec({
 
   "binding either in nullable, ignore errors" {
     nullable {
-      val number: Either<Boolean Int> = Either.Right("s".length)
+      val number = Either.Right("s".length) as Either<Boolean, Int>
       val string = ignoreErrors { number.map(Int::toString).bind() }
       string
     } shouldBe "1"
