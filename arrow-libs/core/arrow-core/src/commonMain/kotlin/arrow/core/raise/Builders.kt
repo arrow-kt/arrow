@@ -95,7 +95,8 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
 }
 
 /**
- * Implementation of [Raise] that ignores errors.
+ * Implementation of [Raise] used by `ignoreErrors`.
+ * You should never use this directly.
  */
 public class IgnoreErrorsRaise<N>(
   private val raise: Raise<N>,
@@ -167,6 +168,10 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
     else -> nullable
   }
 
+  /**
+   * Introduces a scope where you can [bind] errors of any type,
+   * but no information is saved in the [raise] case.
+   */
   @RaiseDSL
   public inline fun <A> ignoreErrors(
     @BuilderInference block: IgnoreErrorsRaise<Null>.() -> A,
@@ -255,6 +260,10 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
     is Some<A> -> option.value
   }
 
+  /**
+   * Introduces a scope where you can [bind] errors of any type,
+   * but no information is saved in the [raise] case.
+   */
   @RaiseDSL
   public inline fun <A> ignoreErrors(
     @BuilderInference block: IgnoreErrorsRaise<None>.() -> A,
