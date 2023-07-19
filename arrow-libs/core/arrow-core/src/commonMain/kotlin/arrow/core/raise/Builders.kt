@@ -94,6 +94,37 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
   )
 }
 
+/**
+ * Implementation of [Raise] used by `ignoreErrors`.
+ * You should never use this directly.
+ */
+public class IgnoreErrorsRaise<N>(
+  private val raise: Raise<N>,
+  private val error: () -> N
+) : Raise<Any?> {
+  @RaiseDSL
+  override fun raise(r: Any?): Nothing =
+    raise.raise(error())
+
+  @RaiseDSL
+  public fun ensure(value: Boolean): Unit = ensure(value) { null }
+
+  @RaiseDSL
+  public fun <A> Option<A>.bind(): A = getOrElse { raise(null) }
+
+  @RaiseDSL
+  public fun <A> A?.bind(): A {
+    contract { returns() implies (this@bind != null) }
+    return this ?: raise(null)
+  }
+
+  @RaiseDSL
+  public fun <A> ensureNotNull(value: A?): A {
+    contract { returns() implies (value != null) }
+    return ensureNotNull(value) { null }
+  }
+}
+
 public typealias Null = Nothing?
 
 /**
@@ -136,6 +167,15 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
     null -> recover()
     else -> nullable
   }
+
+  /**
+   * Introduces a scope where you can [bind] errors of any type,
+   * but no information is saved in the [raise] case.
+   */
+  @RaiseDSL
+  public inline fun <A> ignoreErrors(
+    @BuilderInference block: IgnoreErrorsRaise<Null>.() -> A,
+  ): A = block(IgnoreErrorsRaise(this) { null })
 }
 
 /**
@@ -219,6 +259,15 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
     is None -> recover()
     is Some<A> -> option.value
   }
+
+  /**
+   * Introduces a scope where you can [bind] errors of any type,
+   * but no information is saved in the [raise] case.
+   */
+  @RaiseDSL
+  public inline fun <A> ignoreErrors(
+    @BuilderInference block: IgnoreErrorsRaise<None>.() -> A,
+  ): A = block(IgnoreErrorsRaise(this) { None })
 }
 
 /**
