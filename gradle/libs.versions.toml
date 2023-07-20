@@ -20,7 +20,7 @@ kotlinxSerialization = "1.5.1"
 mockWebServer = "4.11.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
-spotlessVersion = "6.19.0"
+spotlessVersion = "6.20.0"
 
 [libraries]
 arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
