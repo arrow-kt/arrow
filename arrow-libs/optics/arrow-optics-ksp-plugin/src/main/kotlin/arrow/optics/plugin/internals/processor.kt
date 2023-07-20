@@ -42,17 +42,21 @@ internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
       isSealed ->
         if (targets.isEmpty()) {
           listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
-        } else targets.filter { it == OpticsTarget.PRISM || it == OpticsTarget.DSL }
+        } else {
+          targets.filter { it == OpticsTarget.PRISM || it == OpticsTarget.DSL }
+        }
       isValue ->
         listOf(OpticsTarget.ISO, OpticsTarget.DSL)
           .filter { targets.isEmpty() || it in targets }
       else ->
         if (targets.isEmpty()) {
           listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
-        } else targets.filter {
-          when (it) {
-            OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
-            else -> false
+        } else {
+          targets.filter {
+            when (it) {
+              OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
+              else -> false
+            }
           }
         }
     }

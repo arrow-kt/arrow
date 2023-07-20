@@ -28,7 +28,7 @@ jobs:
       - name: ios and watchos tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel --scan
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
 
       - name: Upload reports
         if: failure()
