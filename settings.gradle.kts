@@ -23,10 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
 //CORE
 include("arrow-annotations")
 project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotations")

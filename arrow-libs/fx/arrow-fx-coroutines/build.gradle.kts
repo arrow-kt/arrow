@@ -16,16 +16,6 @@ spotless {
 
 apply(plugin = "io.kotest.multiplatform")
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
-  }
-}
-
 kotlin {
   sourceSets {
     commonMain {
@@ -36,21 +26,20 @@ kotlin {
       }
     }
 
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-          implementation(libs.coroutines.test)
-        }
-      }
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
-        }
+    commonTest {
+      dependencies {
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
+        implementation(libs.coroutines.test)
       }
     }
+    jvmTest {
+      dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
+      }
+    }
+
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlib)

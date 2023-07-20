@@ -176,6 +176,11 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: kotlinUpgradeYarnLock
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: kotlinUpgradeYarnLock
+
       - name: jsTest
         uses: gradle/gradle-build-action@v2
         with:

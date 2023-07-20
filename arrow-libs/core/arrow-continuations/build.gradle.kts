@@ -17,16 +17,6 @@ spotless {
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
-  }
-}
 
 kotlin {
   sourceSets {
@@ -35,19 +25,17 @@ kotlin {
         implementation(libs.kotlin.stdlibCommon)
       }
     }
-    if(!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowCore)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-        }
+    commonTest {
+      dependencies {
+        implementation(projects.arrowCore)
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
       }
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
-        }
+    }
+    jvmTest {
+      dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
     jvmMain {

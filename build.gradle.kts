@@ -1,12 +1,9 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import kotlinx.knit.KnitPluginExtension
-import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 
 buildscript {
   repositories {
@@ -128,14 +125,4 @@ tasks {
 
 apiValidation {
   ignoredProjects.add("arrow-optics-ksp-plugin")
-}
-
-rootProject.plugins.withType<YarnPlugin> {
-  rootProject.configure<NodeJsRootExtension> {
-    versions.webpackDevServer.version = "4.15.1"
-    versions.webpack.version = "5.88.1"
-    versions.webpackCli.version = "4.10.0"
-    versions.karma.version = "6.4.2"
-    versions.mocha.version = "10.2.0"
-  }
 }
