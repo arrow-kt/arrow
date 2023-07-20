@@ -193,7 +193,9 @@ private fun resolveClassName(ele: ADT): Pair<String, String> = if (hasPackageCol
   val classNameAlias = ele.sourceClassName.replace(".", "")
   val aliasImport = "import ${ele.sourceClassName} as $classNameAlias"
   classNameAlias to aliasImport
-} else ele.sourceClassName to ""
+} else {
+  ele.sourceClassName to ""
+}
 
 private fun hasPackageCollisions(ele: ADT): Boolean =
   ele.declaration.getDeclaredProperties().let { properties ->
