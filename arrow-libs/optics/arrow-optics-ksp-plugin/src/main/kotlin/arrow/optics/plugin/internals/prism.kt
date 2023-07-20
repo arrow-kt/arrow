@@ -28,9 +28,11 @@ private fun OpticsProcessorOptions.processElement(ele: ADT, foci: List<Focus>): 
 
     val elseBranch = if (focus.onlyOneSealedSubclass) {
       ""
-    } else """
+    } else {
+      """
   |      else -> ${ele.sourceName}.left()
-    """.trimMargin()
+      """.trimMargin()
+    }
 
     """
   |$firstLine = $Prism(
