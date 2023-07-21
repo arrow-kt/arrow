@@ -12,10 +12,11 @@ kotest = "5.6.2"
 kotestGradle = "5.6.2"
 kover = "0.7.2"
 kotlin = "1.9.0"
+kotlinDev = "1.9.20-dev-6963"
 kotlinBinaryCompatibilityValidator = "0.13.2"
 kotlinCompileTesting = "1.5.0"
 knit = "0.4.0"
-kspVersion = "1.9.0-1.0.11"
+kspVersion = "1.9.0-1.0.12"
 kotlinxSerialization = "1.5.1"
 mockWebServer = "4.11.0"
 retrofit = "2.9.0"
@@ -62,8 +63,8 @@ arrowGradleConfig-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", ve
 arrowGradleConfig-versioning = { id = "io.arrow-kt.arrow-gradle-config-versioning", version.ref = "arrowGradleConfig" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinDev" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinDev" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

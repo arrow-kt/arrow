@@ -36,4 +36,12 @@ kotlin {
       }
     }
   }
+
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.core.serialization"
+      }
+    }
+  }
 }

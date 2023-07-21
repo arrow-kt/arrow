@@ -67,12 +67,13 @@ kotlin {
         runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
-
   }
-}
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.atomic"
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.atomic"
+      }
+    }
   }
 }

@@ -34,5 +34,10 @@ dependencies {
   testImplementation(libs.squareup.retrofitConverterMoshi)
   testImplementation(libs.kotlinx.serializationJson)
   testImplementation(libs.jakewharton.retrofitConverterKotlinxSerialization)
+}
 
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.core.retrofit"
+  }
 }
