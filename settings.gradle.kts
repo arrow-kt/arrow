@@ -22,6 +22,15 @@ dependencyResolutionManagement {
     gradlePluginPortal()
     mavenLocal()
   }
+  versionCatalogs {
+    create("libs") {
+      val kotlinOverride = System.getenv("KOTLIN_OVERRIDE")
+      if (!kotlinOverride.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlinOverride")
+        version("kotlin", kotlinOverride)
+      }
+    }
+  }
 }
 
 //CORE

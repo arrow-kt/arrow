@@ -165,6 +165,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
+    env:
+      KOTLIN_OVERRIDE: 1.9.20-dev-6963
+
     steps:
       - uses: actions/checkout@v3
         with:
