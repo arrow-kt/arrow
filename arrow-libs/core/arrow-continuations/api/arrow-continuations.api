@@ -26,6 +26,10 @@ public class arrow/continuations/generic/ControlThrowable : java/lang/Throwable 
 	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
+public final class arrow/continuations/generic/ControlThrowableKt {
+	public static final field deprecateArrowContinuation Ljava/lang/String;
+}
+
 public abstract interface class arrow/continuations/generic/DelimitedContinuation {
 	public abstract fun invoke (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
