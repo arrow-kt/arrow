@@ -1305,7 +1305,8 @@ public inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 public inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
 
-internal const val ValidatedDeprMsg = "Validated functionality is being merged into Either.\n"
+@PublishedApi internal const val ValidatedDeprMsg: String =
+  "Validated functionality is being merged into Either.\n"
 
-private const val DeprAndNicheMsg =
+@PublishedApi internal const val DeprAndNicheMsg: String =
   "Validated functionality is being merged into Either, but this API is niche and will be removed in the future. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"
