@@ -116,8 +116,7 @@ public sealed class Ior<out A, out B> {
   public fun isLeft(): Boolean {
     contract {
       returns(true) implies (this@Ior is Ior.Left<A>)
-      returns(false) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Both<A, B>)
+      returns(false) implies (this@Ior is Ior.Right<B> || this@Ior is Ior.Both<A, B>)
     }
     return this@Ior is Ior.Left<A>
   }
@@ -127,8 +126,7 @@ public sealed class Ior<out A, out B> {
   public fun isRight(): Boolean {
     contract {
       returns(true) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Left<A>)
-      returns(false) implies (this@Ior is Ior.Both<A, B>)
+      returns(false) implies (this@Ior is Ior.Left<A> || this@Ior is Ior.Both<A, B>)
     }
     return this@Ior is Ior.Right<B>
   }
@@ -137,8 +135,7 @@ public sealed class Ior<out A, out B> {
   @JvmName("_isBoth")
   public fun isBoth(): Boolean {
     contract {
-      returns(false) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Left<A>)
+      returns(false) implies (this@Ior is Ior.Right<B> || this@Ior is Ior.Left<A>)
       returns(true) implies (this@Ior is Ior.Both<A, B>)
     }
     return this@Ior is Ior.Both<A, B>
