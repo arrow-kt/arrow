@@ -2428,7 +2428,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *
  * fun test() {
  *   val error: Either<String, Int> = Either.Left("error")
- *   val listOfErrors: Either<List<Char>, Int> = error.recover { shift(it.toList()) }
+ *   val listOfErrors: Either<List<Char>, Int> = error.recover { raise(it.toList()) }
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
  * ```
@@ -2459,7 +2459,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  *   val left: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
  *
  *   val caught: Either<Nothing, Int> = left.catch { _: RuntimeException -> 1 }
- *   val failure: Either<String, Int> = left.catch { _: RuntimeException -> shift("failure") }
+ *   val failure: Either<String, Int> = left.catch { _: RuntimeException -> raise("failure") }
  *
  *   shouldThrowUnit<RuntimeException> {
  *     val caught2: Either<Nothing, Int> = left.catch { _: IllegalStateException -> 1 }
