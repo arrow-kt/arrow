@@ -2,7 +2,7 @@
 animalSniffer = "1.7.1"
 arrowGradleConfig = "0.12.0-rc.5"
 assertj = "3.24.2"
-coroutines = "1.7.2"
+coroutines = "1.7.3"
 classgraph = "4.8.161"
 dokka = "1.8.20"
 jUnit = "4.13.2"
