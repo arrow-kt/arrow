@@ -38,9 +38,7 @@ public suspend fun <A, B> Iterable<A>.parMapNotNull(
   concurrency: Int,
   transform: suspend CoroutineScope.(A) -> B?
 ): List<B> =
-  parMap(context, concurrency) {
-    transform(it)
-  }.filterNotNull()
+  parMap(context, concurrency, transform).filterNotNull()
 
 public suspend fun <A, B> Iterable<A>.parMapNotNull(
   context: CoroutineContext = EmptyCoroutineContext,
