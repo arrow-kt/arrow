@@ -44,9 +44,7 @@ public suspend fun <A, B> Iterable<A>.parMapNotNull(
   context: CoroutineContext = EmptyCoroutineContext,
   transform: suspend CoroutineScope.(A) -> B?
 ): List<B> =
-  parMap(context) {
-    transform(it)
-  }.filterNotNull()
+  parMap(context, transform).filterNotNull()
 
 /** Temporary intersection type, until we have context receivers */
 public class ScopedRaiseAccumulate<Error>(
