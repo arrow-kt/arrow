@@ -161,6 +161,8 @@ public final class arrow/fx/coroutines/FlowExtensions {
 	public static final fun metered-HG0u8IE (Lkotlinx/coroutines/flow/Flow;J)Lkotlinx/coroutines/flow/Flow;
 	public static final fun parMap (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/flow/Flow;
 	public static synthetic fun parMap$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun parMapNotNullUnordered (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun parMapNotNullUnordered$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun parMapUnordered (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
 	public static synthetic fun parMapUnordered$default (Lkotlinx/coroutines/flow/Flow;ILkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun repeat (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
