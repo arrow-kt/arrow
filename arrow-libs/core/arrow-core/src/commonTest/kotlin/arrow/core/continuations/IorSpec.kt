@@ -2,6 +2,8 @@ package arrow.core.continuations
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.toIorNel
+import arrow.core.raise.iorNel
 import arrow.core.test.nonEmptyList
 import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
@@ -56,5 +58,13 @@ class IorSpec :
         val two: Int = Either.Left(", World!").bind()
         one + two
       } shouldBe Ior.Left("Hello, World!")
+    }
+
+    "iorNel accumulates using Nel" {
+      iorNel {
+        val one = Ior.Both("ErrorOne", 1).toIorNel().bind()
+        val two = Ior.Both("ErrorTwo", 2).toIorNel().bind()
+        one + two
+      } shouldBe Ior.Both(listOf("ErrorOne", "ErrorTwo"), 3)
     }
   })
