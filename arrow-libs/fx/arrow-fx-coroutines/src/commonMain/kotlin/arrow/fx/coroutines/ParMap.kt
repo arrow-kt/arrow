@@ -33,6 +33,19 @@ public suspend fun <A, B> Iterable<A>.parMap(
   map { async(context) { transform.invoke(this, it) } }.awaitAll()
 }
 
+public suspend fun <A, B> Iterable<A>.parMapNotNull(
+  context: CoroutineContext = EmptyCoroutineContext,
+  concurrency: Int,
+  transform: suspend CoroutineScope.(A) -> B?
+): List<B> =
+  parMap(context, concurrency, transform).filterNotNull()
+
+public suspend fun <A, B> Iterable<A>.parMapNotNull(
+  context: CoroutineContext = EmptyCoroutineContext,
+  transform: suspend CoroutineScope.(A) -> B?
+): List<B> =
+  parMap(context, transform).filterNotNull()
+
 /** Temporary intersection type, until we have context receivers */
 public class ScopedRaiseAccumulate<Error>(
   raise: Raise<NonEmptyList<Error>>,
