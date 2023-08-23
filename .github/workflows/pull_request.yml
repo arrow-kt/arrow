@@ -166,7 +166,7 @@ jobs:
     timeout-minutes: 60
 
     env:
-      KOTLIN_OVERRIDE: 1.9.20-dev-9102
+      KOTLIN_OVERRIDE: 1.9.30-dev-1098
 
     steps:
       - uses: actions/checkout@v3
