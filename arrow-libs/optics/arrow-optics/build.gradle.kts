@@ -53,6 +53,14 @@ kotlin {
       }
     }
   }
+
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.optics"
+      }
+    }
+  }
 }
 
 //fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {
@@ -71,9 +79,3 @@ kotlin {
 //dependencies {
 //  kspTest(projects.arrowOpticsKspPlugin)
 //}
-
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.optics"
-  }
-}

@@ -4,7 +4,6 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  
   alias(libs.plugins.spotless)
 }
 
@@ -37,12 +36,14 @@ kotlin {
       }
     }
   }
+
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.annotations"
+      }
+    }
+  }
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))
-
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.annotations"
-  }
-}

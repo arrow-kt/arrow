@@ -12,6 +12,7 @@ kotest = "5.6.2"
 kotestGradle = "5.6.2"
 kover = "0.7.3"
 kotlin = "1.9.0"
+kotlinxSerializationPlugin = "1.9.0"
 kotlinBinaryCompatibilityValidator = "0.13.2"
 kotlinCompileTesting = "1.5.0"
 knit = "0.4.0"
@@ -23,7 +24,6 @@ retrofitKotlinxSerialization = "1.0.0"
 spotlessVersion = "6.20.0"
 
 [libraries]
-arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 jUnitJUnit = { module = "junit:junit", version.ref = "jUnit" }
@@ -67,6 +67,6 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerializationPlugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }

@@ -7,6 +7,7 @@ pluginManagement {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
   }
 }
 
@@ -20,6 +21,15 @@ dependencyResolutionManagement {
     mavenCentral()
     gradlePluginPortal()
     mavenLocal()
+  }
+  versionCatalogs {
+    create("libs") {
+      val kotlinOverride = System.getenv("KOTLIN_OVERRIDE")
+      if (!kotlinOverride.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlinOverride")
+        version("kotlin", kotlinOverride)
+      }
+    }
   }
 }
 

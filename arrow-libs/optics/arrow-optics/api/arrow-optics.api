@@ -173,12 +173,6 @@ public abstract interface class arrow/optics/PEvery : arrow/optics/Fold, arrow/o
 	public abstract fun compose (Larrow/optics/PEvery;)Larrow/optics/PEvery;
 	public static fun either ()Larrow/optics/PEvery;
 	public abstract fun foldMap (Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun getEvery (Larrow/optics/PIso;)Larrow/optics/PEvery;
-	public abstract fun getEvery (Larrow/optics/PLens;)Larrow/optics/PEvery;
-	public abstract fun getEvery (Larrow/optics/POptional;)Larrow/optics/PEvery;
-	public abstract fun getEvery (Larrow/optics/PPrism;)Larrow/optics/PEvery;
-	public abstract fun getEvery (Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public abstract fun getEvery (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun list ()Larrow/optics/PEvery;
 	public static fun map ()Larrow/optics/PEvery;
 	public abstract fun modify (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -236,13 +230,6 @@ public final class arrow/optics/PEvery$DefaultImpls {
 	public static fun fold (Larrow/optics/PEvery;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun foldMap (Larrow/optics/PEvery;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/PEvery;Ljava/lang/Object;)Ljava/util/List;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PIso;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PLens;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/POptional;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PPrism;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public static fun getEvery (Larrow/optics/PEvery;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun isEmpty (Larrow/optics/PEvery;Ljava/lang/Object;)Z
 	public static fun isNotEmpty (Larrow/optics/PEvery;Ljava/lang/Object;)Z
 	public static fun lastOrNull (Larrow/optics/PEvery;Ljava/lang/Object;)Ljava/lang/Object;
@@ -339,13 +326,6 @@ public final class arrow/optics/PIso$DefaultImpls {
 	public static fun foldMap (Larrow/optics/PIso;Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun foldMap (Larrow/optics/PIso;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/PIso;Ljava/lang/Object;)Ljava/util/List;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/PIso;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/PLens;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/POptional;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/PPrism;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public static fun getEvery (Larrow/optics/PIso;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun getOrModify (Larrow/optics/PIso;Ljava/lang/Object;)Larrow/core/Either;
 	public static fun getOrNull (Larrow/optics/PIso;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun isEmpty (Larrow/optics/PIso;Ljava/lang/Object;)Z
@@ -451,13 +431,6 @@ public final class arrow/optics/PLens$DefaultImpls {
 	public static fun foldMap (Larrow/optics/PLens;Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun foldMap (Larrow/optics/PLens;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/PLens;Ljava/lang/Object;)Ljava/util/List;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/PIso;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/PLens;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/POptional;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/PPrism;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public static fun getEvery (Larrow/optics/PLens;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun getOrModify (Larrow/optics/PLens;Ljava/lang/Object;)Larrow/core/Either;
 	public static fun getOrNull (Larrow/optics/PLens;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun isEmpty (Larrow/optics/PLens;Ljava/lang/Object;)Z
@@ -536,13 +509,6 @@ public final class arrow/optics/POptional$DefaultImpls {
 	public static fun foldMap (Larrow/optics/POptional;Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun foldMap (Larrow/optics/POptional;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/POptional;Ljava/lang/Object;)Ljava/util/List;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/PIso;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/PLens;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/PPrism;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public static fun getEvery (Larrow/optics/POptional;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun getOrNull (Larrow/optics/POptional;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun isEmpty (Larrow/optics/POptional;Ljava/lang/Object;)Z
 	public static fun isNotEmpty (Larrow/optics/POptional;Ljava/lang/Object;)Z
@@ -673,13 +639,6 @@ public final class arrow/optics/PPrism$DefaultImpls {
 	public static fun foldMap (Larrow/optics/PPrism;Larrow/typeclasses/Monoid;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun foldMap (Larrow/optics/PPrism;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun getAll (Larrow/optics/PPrism;Ljava/lang/Object;)Ljava/util/List;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/PIso;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/PLens;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/POptional;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/PPrism;)Larrow/optics/PEvery;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public static fun getEvery (Larrow/optics/PPrism;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun getOrNull (Larrow/optics/PPrism;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun isEmpty (Larrow/optics/PPrism;Ljava/lang/Object;)Z
 	public static fun isNotEmpty (Larrow/optics/PPrism;Ljava/lang/Object;)Z
@@ -731,13 +690,6 @@ public abstract interface class arrow/optics/PTraversal : arrow/optics/PSetter {
 	public abstract fun choice (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public abstract fun compose (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun either ()Larrow/optics/PTraversal;
-	public abstract fun getEvery (Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public abstract fun getEvery (Larrow/optics/PIso;)Larrow/optics/PTraversal;
-	public abstract fun getEvery (Larrow/optics/PLens;)Larrow/optics/PTraversal;
-	public abstract fun getEvery (Larrow/optics/POptional;)Larrow/optics/PTraversal;
-	public abstract fun getEvery (Larrow/optics/PPrism;)Larrow/optics/PTraversal;
-	public abstract fun getEvery (Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public abstract fun getEvery (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun list ()Larrow/optics/PTraversal;
 	public static fun map ()Larrow/optics/PTraversal;
 	public abstract fun modify (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -811,13 +763,6 @@ public final class arrow/optics/PTraversal$DefaultImpls {
 	public static fun choice (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun compose (Larrow/optics/PTraversal;Larrow/optics/PSetter;)Larrow/optics/PSetter;
 	public static fun compose (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/PEvery;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/PIso;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/PLens;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/POptional;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/PPrism;)Larrow/optics/PTraversal;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/PSetter;)Larrow/optics/PSetter;
-	public static fun getEvery (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun lift (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static fun plus (Larrow/optics/PTraversal;Larrow/optics/PSetter;)Larrow/optics/PSetter;
 	public static fun plus (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;

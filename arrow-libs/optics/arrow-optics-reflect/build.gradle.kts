@@ -31,3 +31,9 @@ dependencies {
   testImplementation(libs.kotest.property)
   testRuntimeOnly(libs.kotest.runnerJUnit5)
 }
+
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "arrow.optics.reflect"
+  }
+}
