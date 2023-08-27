@@ -445,4 +445,24 @@ class NonEmptyListTest : StringSpec({
         }
       }
     }
+
+    "lastOrNull" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.lastOrNull()
+        val expected = a.last()
+        result shouldBe expected
+      }
+    }
+
+    "extract" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.extract()
+        val expected = a.head
+        result shouldBe expected
+      }
+    }
 })
