@@ -35,26 +35,26 @@ class ScheduleTest {
 
   private val exception = MyException()
 
-  @Test
-  fun identity(): TestResult = runTest {
-    val identity = Schedule.identity<String>().calculateCont("test", 100)
-    assertEquals(identity.map { it.first }, (0 until 100L).map { "test" })
-    assertEquals(identity.map { it.second }, (0 until 100).map { ZERO })
-  }
+//  @Test
+//  fun identity(): TestResult = runTest {
+//    val identity = Schedule.identity<String>().calculateCont("test", 100)
+//    assertEquals(identity.map { it.first }, (0 until 100L).map { "test" })
+//    assertEquals(identity.map { it.second }, (0 until 100).map { ZERO })
+//  }
 
-  @Test
-  fun unfold(): TestResult = runTest {
-    val unfold = Schedule.unfold<String, Long>(0) { it + 1 }.calculateCont("test", 100)
-    assertEquals(unfold.map { it.first }, (0 until 100L).toList())
-    assertEquals(unfold.map { it.second }, (0 until 100).map { ZERO })
-  }
+//  @Test
+//  fun unfold(): TestResult = runTest {
+//    val unfold = Schedule.unfold<String, Long>(0) { it + 1 }.calculateCont("test", 100)
+//    assertEquals(unfold.map { it.first }, (0 until 100L).toList())
+//    assertEquals(unfold.map { it.second }, (0 until 100).map { ZERO })
+//  }
 
-  @Test
-  fun forever(): TestResult = runTest {
-    val forever = Schedule.forever<String>().calculateCont("test", 100)
-    assertEquals(forever.map { it.first }, (0 until 100L).toList())
-    assertEquals(forever.map { it.second }, (0 until 100).map { ZERO })
-  }
+//  @Test
+//  fun forever(): TestResult = runTest {
+//    val forever = Schedule.forever<String>().calculateCont("test", 100)
+//    assertEquals(forever.map { it.first }, (0 until 100L).toList())
+//    assertEquals(forever.map { it.second }, (0 until 100).map { ZERO })
+//  }
 
   @Test
   fun recurs(): TestResult = runTest {

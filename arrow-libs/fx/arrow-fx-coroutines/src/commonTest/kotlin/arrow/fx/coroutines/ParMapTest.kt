@@ -151,6 +151,75 @@ class ParMapTest : StringSpec({
       } shouldBe NonEmptyList(e, (1 until 100).map { e }).left()
     }
   }
+
+  "parMapNotNull is stack-safe" {
+    val count = 20_000
+    val ref = Atomic(0)
+    (0 until count).parMapNotNull { _: Int ->
+      ref.update { it + 1 }
+    }
+    ref.get() shouldBe count
+  }
+
+  "parMapNotNull runs in parallel" {
+    val promiseA = CompletableDeferred<Unit>()
+    val promiseB = CompletableDeferred<Unit>()
+    val promiseC = CompletableDeferred<Unit>()
+
+    listOf(
+      suspend {
+        promiseA.await()
+        promiseC.complete(Unit)
+      },
+      suspend {
+        promiseB.await()
+        promiseA.complete(Unit)
+      },
+      suspend {
+        promiseB.complete(Unit)
+        promiseC.await()
+      }
+    ).parMapNotNull { it.invoke() }
+  }
+
+  "parMapNotNull results in the correct error" {
+    checkAll(
+      Arb.int(min = 10, max = 20),
+      Arb.int(min = 1, max = 9),
+      Arb.throwable()
+    ) { n, killOn, e ->
+      Either.catch {
+        (0 until n).parMapNotNull { i ->
+          if (i == killOn) throw e else Unit
+        }
+      } should leftException(e)
+    }
+  }
+
+  "parMapNotNull(concurrency = 1) only runs one task at a time" {
+    val promiseA = CompletableDeferred<Unit>()
+
+    withTimeoutOrNull(100.milliseconds) {
+      listOf(
+        suspend { promiseA.await() },
+        suspend { promiseA.complete(Unit) }
+      ).parMapNotNull(concurrency = 1) { it.invoke() }
+    } shouldBe null
+  }
+
+  "parMapNotNull discards nulls" {
+    (0 until 100).parMapNotNull { _ ->
+      null
+    } shouldBe emptyList()
+  }
+
+  "parMapNotNull retains non-nulls" {
+    checkAll(Arb.int()) { i ->
+      (0 until 100).parMapNotNull { _ ->
+        i
+      } shouldBe List(100) { i }
+    }
+  }
 })
 
 private val emptyError: (Nothing, Nothing) -> Nothing =

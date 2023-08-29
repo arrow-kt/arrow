@@ -260,6 +260,7 @@ public final class arrow/resilience/common/Platform : java/lang/Enum {
 	public static final field JS Larrow/resilience/common/Platform;
 	public static final field JVM Larrow/resilience/common/Platform;
 	public static final field Native Larrow/resilience/common/Platform;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Larrow/resilience/common/Platform;
 	public static fun values ()[Larrow/resilience/common/Platform;
 }

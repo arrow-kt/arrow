@@ -4,7 +4,7 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
+  
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
@@ -18,16 +18,6 @@ spotless {
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
-  }
-}
-
 kotlin {
   sourceSets {
     commonMain {
@@ -36,20 +26,18 @@ kotlin {
       }
     }
 
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowFxCoroutines)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-        }
+    commonTest {
+      dependencies {
+        implementation(projects.arrowFxCoroutines)
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
       }
+    }
 
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
-        }
+    jvmTest {
+      dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
 
@@ -65,26 +53,27 @@ kotlin {
       }
     }
 
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowFxCoroutines)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-        }
+    commonTest {
+      dependencies {
+        implementation(projects.arrowFxCoroutines)
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
       }
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
-        }
+    }
+
+    jvmTest {
+      dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
   }
-}
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.atomic"
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.atomic"
+      }
+    }
   }
 }

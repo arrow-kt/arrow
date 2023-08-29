@@ -1,17 +1,15 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import kotlinx.knit.KnitPluginExtension
-import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 
 buildscript {
   repositories {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
   }
 
   dependencies {
@@ -23,6 +21,7 @@ allprojects {
   repositories {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
   }
 }
 
@@ -36,7 +35,6 @@ plugins {
   alias(libs.plugins.kotlinx.serialization) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
-  alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.spotless) apply false
 }
 
@@ -98,6 +96,10 @@ subprojects {
       }
     }
   }
+
+  tasks.withType<AbstractPublishToMaven> {
+    dependsOn(tasks.withType<Sign>())
+  }
 }
 
 tasks {
@@ -124,14 +126,4 @@ tasks {
 
 apiValidation {
   ignoredProjects.add("arrow-optics-ksp-plugin")
-}
-
-rootProject.plugins.withType<YarnPlugin> {
-  rootProject.configure<NodeJsRootExtension> {
-    versions.webpackDevServer.version = "4.15.1"
-    versions.webpack.version = "5.88.1"
-    versions.webpackCli.version = "4.10.0"
-    versions.karma.version = "6.4.2"
-    versions.mocha.version = "10.2.0"
-  }
 }

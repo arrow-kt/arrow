@@ -4,7 +4,6 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
 }
@@ -12,16 +11,6 @@ plugins {
 spotless {
   kotlin {
     ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
-  }
-}
-
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
   }
 }
 
@@ -35,20 +24,20 @@ kotlin {
         implementation("org.jetbrains.kotlin:kotlin-stdlib")
       }
     }
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowFxCoroutines)
-          implementation(libs.coroutines.test)
-          implementation(kotlin("test"))
-        }
+    commonTest {
+      dependencies {
+        implementation(projects.arrowFxCoroutines)
+        implementation(libs.coroutines.test)
+        implementation(kotlin("test"))
       }
     }
   }
-}
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.resilience"
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.resilience"
+      }
+    }
   }
 }

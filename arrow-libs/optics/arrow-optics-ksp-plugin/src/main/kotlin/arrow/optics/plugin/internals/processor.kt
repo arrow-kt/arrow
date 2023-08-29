@@ -10,6 +10,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Variance.INVARIANT
+import com.google.devtools.ksp.symbol.Variance.STAR
 import java.util.Locale
 
 internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
@@ -36,17 +37,25 @@ internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
   targetsFromOpticsAnnotation().let { targets ->
     when {
       isSealed ->
-        listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
-      isValue ->
-        listOf(OpticsTarget.ISO, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
+        if (targets.isEmpty()) {
+          listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
+        } else {
+          targets.filter { it == OpticsTarget.PRISM || it == OpticsTarget.DSL }
+        }
       isValue ->
         listOf(OpticsTarget.ISO, OpticsTarget.DSL)
           .filter { targets.isEmpty() || it in targets }
       else ->
-        listOf(OpticsTarget.LENS, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
+        if (targets.isEmpty()) {
+          listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
+        } else {
+          targets.filter {
+            when (it) {
+              OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
+              else -> false
+            }
+          }
+        }
     }
   }
 
@@ -183,7 +192,11 @@ internal fun KSType.qualifiedString(prefix: String = ""): String = when (declara
 
 internal fun KSTypeArgument.qualifiedString(): String = when (val ty = type?.resolve()) {
   null -> toString()
-  else -> ty.qualifiedString(prefix = "${variance.label} ".takeIf { variance != INVARIANT }.orEmpty())
+  else -> when (variance) {
+    STAR -> "*"
+    INVARIANT -> ty.qualifiedString()
+    else -> ty.qualifiedString(prefix = "${variance.label} ")
+  }
 }
 
 internal fun KSClassDeclaration.getConstructorParamNames(): List<String> =

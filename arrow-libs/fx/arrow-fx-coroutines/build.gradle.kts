@@ -4,7 +4,6 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
 }
@@ -17,16 +16,6 @@ spotless {
 
 apply(plugin = "io.kotest.multiplatform")
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
-  }
-}
-
 kotlin {
   sourceSets {
     commonMain {
@@ -37,10 +26,9 @@ kotlin {
       }
     }
 
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowCore)
+    commonTest {
+      dependencies {
+        implementation(projects.arrowCore)
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
@@ -50,9 +38,10 @@ kotlin {
       jvmTest {
         dependencies {
           runtimeOnly(libs.kotest.runnerJUnit5)
-        }
+
       }
     }
+
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlib)
@@ -64,10 +53,12 @@ kotlin {
       }
     }
   }
-}
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
+      }
+    }
   }
 }

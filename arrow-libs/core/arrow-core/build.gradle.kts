@@ -6,7 +6,6 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.spotless)
@@ -20,16 +19,6 @@ spotless {
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
-if (enableCompatibilityMetadataVariant) {
-  tasks.withType<Test>().configureEach {
-    exclude("**/*")
-  }
-}
-
 kotlin {
   sourceSets {
     commonMain {
@@ -39,21 +28,20 @@ kotlin {
         api(libs.kotlin.stdlibCommon)
       }
     }
-    if (!enableCompatibilityMetadataVariant) {
-      commonTest {
-        dependencies {
-          implementation(projects.arrowFxCoroutines)
-          implementation(projects.arrowFunctions)
+
+    commonTest {
+      dependencies {
+        implementation(projects.arrowFxCoroutines)
+        implementation(projects.arrowFunctions)
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
         }
       }
 
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
-        }
+    jvmTest {
+      dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
 
@@ -69,15 +57,17 @@ kotlin {
       }
     }
   }
+
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.core"
+      }
+    }
+  }
 }
 
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
-}
-
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.core"
-  }
 }

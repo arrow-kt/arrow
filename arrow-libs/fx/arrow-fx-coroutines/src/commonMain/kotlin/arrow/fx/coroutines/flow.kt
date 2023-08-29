@@ -134,6 +134,7 @@ public inline fun <A, B> Flow<A>.parMap(
  * <!--- KNIT example-flow-03.kt -->
  */
 @FlowPreview
+@ExperimentalCoroutinesApi
 public inline fun <A, B> Flow<A>.parMapUnordered(
   concurrency: Int = DEFAULT_CONCURRENCY,
   crossinline transform: suspend (a: A) -> B
@@ -141,6 +142,43 @@ public inline fun <A, B> Flow<A>.parMapUnordered(
   map { o ->
     flow {
       emit(transform(o))
+    }
+  }.flattenMerge(concurrency)
+
+/**
+ * Like [mapNotNull], but will evaluate effects in parallel, emitting the results downstream.
+ * The number of concurrent effects is limited by [concurrency].
+ *
+ * See [parMap] if retaining the original order of the stream is required.
+ *
+ * ```kotlin
+ * import kotlinx.coroutines.delay
+ * import kotlinx.coroutines.flow.flowOf
+ * import kotlinx.coroutines.flow.toList
+ * import kotlinx.coroutines.flow.collect
+ * import arrow.fx.coroutines.parMapNotNullUnordered
+ *
+ * //sampleStart
+ * suspend fun main(): Unit {
+ *   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+ *     .parMapNotNullUnordered { a ->
+ *       delay(100)
+ *       a.takeIf { a % 2 == 0 }
+ *     }.toList() // [4, 6, 2, 8, 10]
+ * }
+ * //sampleEnd
+ * ```
+ * <!--- KNIT example-flow-05.kt -->
+ */
+@FlowPreview
+@ExperimentalCoroutinesApi
+public inline fun <A, B> Flow<A>.parMapNotNullUnordered(
+  concurrency: Int = DEFAULT_CONCURRENCY,
+  crossinline transform: suspend (a: A) -> B?
+): Flow<B> =
+  map { o ->
+    flow {
+      transform(o)?.let { emit(it) }
     }
   }.flattenMerge(concurrency)
 

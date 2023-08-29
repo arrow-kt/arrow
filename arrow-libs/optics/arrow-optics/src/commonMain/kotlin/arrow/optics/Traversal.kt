@@ -625,43 +625,4 @@ public interface PTraversal<S, T, A, B> {
       pTuple9()
 
   }
-
-  /**
-   * DSL to compose [Traversal] with a [Lens] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [Lens] with a focus in [S]
-   * @return [Traversal] with a focus in [A]
-   */
-  public val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this@every.compose(this@PTraversal)
-
-  /**
-   * DSL to compose [Traversal] with a [Prism] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [Prism] with a focus in [S]
-   * @return [Traversal] with a focus in [A]
-   */
-  public val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() = this@every.compose(this@PTraversal)
-
-  /**
-   * DSL to compose [Traversal] with a [Optional] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [Optional] with a focus in [S]
-   * @return [Traversal] with a focus in [A]
-   */
-  public val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() =
-      this.compose(this@PTraversal)
-
-  /**
-   * DSL to compose [Traversal] with a [Traversal] for a structure [S] to see all its foci [A]
-   *
-   * @receiver [Traversal] with a focus in [S]
-   * @return [Traversal] with a focus in [A]
-   */
-  public val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B>
-    get() = this@every.compose(this@PTraversal)
-
 }

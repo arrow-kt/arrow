@@ -7,12 +7,13 @@ pluginManagement {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
   }
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.13.4"
-  id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
+  id("com.gradle.enterprise") version "3.14.1"
+  id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
 }
 
 dependencyResolutionManagement {
@@ -21,11 +22,16 @@ dependencyResolutionManagement {
     gradlePluginPortal()
     mavenLocal()
   }
+  versionCatalogs {
+    create("libs") {
+      val kotlinOverride = System.getenv("KOTLIN_OVERRIDE")
+      if (!kotlinOverride.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlinOverride")
+        version("kotlin", kotlinOverride)
+      }
+    }
+  }
 }
-
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
 
 //CORE
 include("arrow-annotations")

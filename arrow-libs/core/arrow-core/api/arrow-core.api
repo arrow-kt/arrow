@@ -303,6 +303,10 @@ public final class arrow/core/MapKt {
 	public static final fun zip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 }
 
+public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
+	public static final fun MemoizedDeepRecursiveFunction (Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
+}
+
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
 	public abstract fun distinct-1X0FA-Y ()Ljava/util/List;
 	public abstract fun distinctBy-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
@@ -849,6 +853,24 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
+public final class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function0;)V
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
+	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
+	public final fun ensure (Z)V
+	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+}
+
 public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun <init> (Lkotlin/jvm/functions/Function2;Ljava/util/concurrent/atomic/AtomicReference;Larrow/core/raise/Raise;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
@@ -886,6 +908,7 @@ public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
 	public final fun bindAllNullable (Ljava/util/Map;)Ljava/util/Map;
 	public final fun ensure (Z)V
 	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
@@ -909,6 +932,7 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 	public final fun bindAllOption (Ljava/util/Set;)Ljava/util/Set;
 	public final fun ensure (Z)V
 	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Larrow/core/None;)Ljava/lang/Void;
