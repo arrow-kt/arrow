@@ -21,7 +21,7 @@ kotlinxSerialization = "1.6.0"
 mockWebServer = "4.11.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
-spotlessVersion = "6.20.0"
+spotlessVersion = "6.21.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
