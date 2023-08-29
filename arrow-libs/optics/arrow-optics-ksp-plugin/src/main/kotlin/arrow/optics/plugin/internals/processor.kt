@@ -47,11 +47,11 @@ internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
           .filter { targets.isEmpty() || it in targets }
       else ->
         if (targets.isEmpty()) {
-          listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
+          listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.DSL)
         } else {
           targets.filter {
             when (it) {
-              OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
+              OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.DSL -> true
               else -> false
             }
           }

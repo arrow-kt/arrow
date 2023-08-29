@@ -168,7 +168,7 @@ public inline fun <A, B> Flow<A>.parMapUnordered(
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-flow-05.kt -->
+ * <!--- KNIT example-flow-04.kt -->
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
