@@ -183,6 +183,10 @@ public class NonEmptyList<out A>(
   public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
     NonEmptyList(transform(head), tail.map(transform))
 
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
+    NonEmptyList(transform(0, head), tail.mapIndexed { ix, e -> transform(ix + 1, e) })
+
   override fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
     transform(head).toNonEmptyList() + tail.flatMap(transform)
 
