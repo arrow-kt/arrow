@@ -196,8 +196,16 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
     NonEmptyList(all.flatMap(transform))
 
   @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> mapIndexed(transform: (index:Int, A) -> B): NonEmptyList<B> =
-    NonEmptyList(all.mapIndexed(transform))
+  public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
+    NonEmptyList(transform(0, head), tail.mapIndexed { ix, e -> transform(ix + 1, e) })
+
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+    transform(head).toNonEmptyList() + tail.flatMap(transform)
+
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
+    all.distinctBy(selector).toNonEmptyListOrNull()!!
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     this + l.all
