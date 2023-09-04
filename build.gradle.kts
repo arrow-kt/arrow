@@ -70,10 +70,6 @@ allprojects {
   group = property("projects.group").toString()
 }
 
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
-
 subprojects {
   this@subprojects.tasks.withType<DokkaTaskPartial>().configureEach {
     this@subprojects.extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
