@@ -1,0 +1,206 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Effect</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Arrow
+                    </a>            </div>
+            <div class="library-version">1.2.1
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core.raise/Effect///PointingToDeclaration//601698448">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core.raise</a><span class="delimiter">/</span><span class="current">Effect</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Effect</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="index.html">Effect</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Error</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html">A</a><span class="token operator">&gt;</span><span class="token operator"> = </span><span class="token keyword">suspend </span><span class="token keyword"></span><a href="../-raise/index.html">Raise</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="index.html">A</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-core/src/commonMain/kotlin/arrow/core/raise/Effect.kt#L665">source</a>)</span></span></div><p class="paragraph"><a href="index.html">Effect</a> represents a function of <code class="lang-kotlin">suspend Raise&lt;R&gt;.() -&gt; A</code>, that short-circuit with a value of <code class="lang-kotlin">R</code> or <code class="lang-kotlin">Throwable</code>, or completes with a value of <code class="lang-kotlin">A</code>.</p><p class="paragraph">So <a href="index.html">Effect</a> is defined by <code class="lang-kotlin">suspend fun &lt;B&gt; fold(recover: suspend (Throwable) -&gt; B, resolve: suspend (R) -&gt; B, transform: suspend (A) -&gt; B): B</code>, to map all values of <code class="lang-kotlin">R</code>, <code class="lang-kotlin">Throwable</code> and <code class="lang-kotlin">A</code> to a value of <code class="lang-kotlin">B</code>.</p><!-- TOC --><p class="paragraph">#writing-a-program-with-effect<r-a> #handling-errors #recover #catch #structured-concurrency #arrow-fx-coroutines #parzip #partraverse #racen #bracketcase--resource #kotlinx #withcontext #async #launch #strange-edge-cases</r-a></p><!-- END --><h2 class=""> Writing a program with Effect<r, a></r,></h2><p class="paragraph">Let's write a small program to read a file from disk, and instead of having the program work exception based we want to turn it into a polymorphic type-safe program.</p><p class="paragraph">We'll start by defining a small function that accepts a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a>, and does some simply validation to check that the path is not empty. If the path is empty, we want to program to result in <code class="lang-kotlin">EmptyPath</code>. So we're immediately going to see how we can raise an error of any arbitrary type <code class="lang-kotlin">R</code> by using the function <code class="lang-kotlin">raise</code>. The name <code class="lang-kotlin">raise</code> comes raising an intterupt, or changing, especially unexpectedly, away from the computation and finishing the <code class="lang-kotlin">Continuation</code> with <code class="lang-kotlin">R</code>.</p><!-- INCLUDE
+import arrow.core.raise.Effect
+import arrow.core.raise.effect
+import arrow.core.raise.ensureNotNull
+import arrow.core.raise.ensure
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">object EmptyPath<br><br>fun readFile(path: String): Effect&lt;EmptyPath, Unit&gt; = effect {<br>  if (path.isEmpty()) raise(EmptyPath) else Unit<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Here we see how we can define an <code class="lang-kotlin">Effect&lt;R, A&gt;</code> which has <code class="lang-kotlin">EmptyPath</code> for the raise type <code class="lang-kotlin">R</code>, and <code class="lang-kotlin">Unit</code> for the success type <code class="lang-kotlin">A</code>.</p><p class="paragraph">Patterns like validating a <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a> is very common, and the <a href="index.html">Effect</a> DSL offers utility functions like <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">kotlin.require</a> and <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html">kotlin.requireNotNull</a>. They're named <a href="../ensure.html">ensure</a> and <a href="../ensure-not-null.html">ensureNotNull</a> to avoid conflicts with the <code class="lang-kotlin">kotlin</code> namespace. So let's rewrite the function from above to use the DSL instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun readFile2(path: String?): Effect&lt;EmptyPath, Unit&gt; = effect {<br>  ensureNotNull(path) { EmptyPath }<br>  ensure(path.isNotEmpty()) { EmptyPath }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-01.kt --><p class="paragraph">Now that we have the path, we can read from the <code class="lang-kotlin">File</code> and return it as a domain model <code class="lang-kotlin">Content</code>. We also want to take a look at what exceptions reading from a file might occur <code class="lang-kotlin">FileNotFoundException</code>&amp;<code class="lang-kotlin">SecurityError</code>, so lets make some domain errors for those too. Grouping them as a sealed interface is useful since that way we can resolve <i>all</i> errors in a type safe manner.</p><!-- INCLUDE
+import arrow.core.Either
+import arrow.core.Ior
+import arrow.core.None
+import arrow.core.raise.Effect
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.core.raise.toEither
+import arrow.core.raise.toIor
+import arrow.core.raise.toOption
+import arrow.core.raise.ensureNotNull
+import arrow.core.raise.ensure
+import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import java.io.File
+import java.io.FileNotFoundException
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">@JvmInline<br>value class Content(val body: List&lt;String&gt;)<br><br>sealed interface FileError<br>@JvmInline value class SecurityError(val msg: String?) : FileError<br>@JvmInline value class FileNotFound(val path: String) : FileError<br>object EmptyPath : FileError {<br>  override fun toString() = "EmptyPath"<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can finish our function, but we need to refactor the return type from <code class="lang-kotlin">Unit</code> to <code class="lang-kotlin">Content</code> and the error type from <code class="lang-kotlin">EmptyPath</code> to <code class="lang-kotlin">FileError</code>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun readFile(path: String?): Effect&lt;FileError, Content&gt; = effect {<br>  ensureNotNull(path) { EmptyPath }<br>  ensure(path.isNotEmpty()) { EmptyPath }<br>  try {<br>    val lines = File(path).readLines()<br>    Content(lines)<br>  } catch (e: FileNotFoundException) {<br>    raise(FileNotFound(path))<br>  } catch (e: SecurityException) {<br>    raise(SecurityError(e.message))<br>  }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The <code class="lang-kotlin">readFile</code> function defines a <code class="lang-kotlin">suspend fun</code> that will return:</p><ul><li><p class="paragraph">the <code class="lang-kotlin">Content</code> of a given <code class="lang-kotlin">path</code></p></li><li><p class="paragraph">a <code class="lang-kotlin">FileError</code></p></li><li><p class="paragraph">An unexpected fatal error (<code class="lang-kotlin">OutOfMemoryException</code>)</p></li></ul><p class="paragraph">Since these are the properties of our <code class="lang-kotlin">Effect</code> function, we can turn it into a value.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main() {<br>   readFile("").toEither() shouldBe Either.Left(EmptyPath)<br>   readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))<br>   readFile("README.MD").toOption { None } shouldBe None<br><br>   readFile("build.gradle.kts").fold({ _: FileError -&gt; null }, { it })<br>     .shouldBeInstanceOf&lt;Content&gt;()<br>      .body.shouldNotBeEmpty()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-02.kt --><p class="paragraph">The functions above are available out of the box, but it's easy to define your own extension functions in terms of <code class="lang-kotlin">fold</code>. Implementing the <code class="lang-kotlin">toEither()</code> operator is as simple as:</p><!-- INCLUDE
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.raise.Effect
+import arrow.core.raise.fold
+import arrow.core.identity
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun &lt;R, A&gt; Effect&lt;R, A&gt;.toEither(): Either&lt;R, A&gt; =<br>  fold({ Either.Left(it) }) { Either.Right(it) }<br><br>suspend fun &lt;A&gt; Effect&lt;None, A&gt;.toOption(): Option&lt;A&gt; =<br>  fold(::identity) { Some(it) }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-03.kt --><p class="paragraph">Adding your own syntax to <code class="lang-kotlin">Raise&lt;R&gt;</code> is not advised, yet, but will be easy once "Multiple Receivers" become available.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">context(Raise&lt;R&gt;)<br>suspend fun &lt;R, A&gt; Either&lt;R, A&gt;.bind(): A =<br>  when (this) {<br>    is Either.Left -&gt; raise(value)<br>    is Either.Right -&gt; value<br>  }<br><br>context(Raise&lt;None&gt;)<br>fun &lt;A&gt; Option&lt;A&gt;.bind(): A =<br>  fold({ raise(it) }, ::identity)</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h2 class=""> Handling errors</h2><p class="paragraph">An Effect<r, a> has 2 error channels: <code class="lang-kotlin">Throwable</code> and <code class="lang-kotlin">R</code> There are two separate handlers to transform either of the error channels.</r,></p><ul><li><p class="paragraph"><code class="lang-kotlin">recover</code> to handle, and transform any error of type <code class="lang-kotlin">R</code>.</p></li><li><p class="paragraph"><code class="lang-kotlin">catch</code> to handle, and transform and error of type <code class="lang-kotlin">Throwable</code>.</p></li></ul><h3 class=""> recover</h3><p class="paragraph"><code class="lang-kotlin">recover</code> handles the error of type <code class="lang-kotlin">R</code>, by providing a new value of type <code class="lang-kotlin">A</code>, raising a different error of type <code class="lang-kotlin">E</code>, or throwing an exception.</p><p class="paragraph">Let's take a look at some examples:</p><p class="paragraph">We define a <code class="lang-kotlin">val failed</code> of type <code class="lang-kotlin">Effect&lt;String, Int&gt;</code>, that represents a failed effect with value "failed".</p><!-- INCLUDE
+import arrow.core.raise.Effect
+import arrow.core.raise.effect
+import arrow.core.raise.recover
+import arrow.core.raise.catch
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val failed: Effect&lt;String, Int&gt; =<br>  effect { raise("failed") }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can <code class="lang-kotlin">recover</code> the failure, and resolve it by providing a default value of <code class="lang-kotlin">-1</code> or the length of the <code class="lang-kotlin">error: String</code>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val default: Effect&lt;Nothing, Int&gt; =<br>  failed.recover { -1 }<br><br>val resolved: Effect&lt;Nothing, Int&gt; =<br>  failed.recover { it.length }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">As you can see the resulting <code class="lang-kotlin">error</code> is now of type <code class="lang-kotlin">Nothing</code>, since we did not raise any new errors. So our <code class="lang-kotlin">Effect</code> knows that no short-circuiting will occur during execution. Awesome! But it can also infer to any other error type that you might want instead, because it's never going to occur. So as you see below, we can even assign our <code class="lang-kotlin">Effect&lt;Nothing, A&gt;</code> to <code class="lang-kotlin">Effect&lt;E, A&gt;</code>, where <code class="lang-kotlin">E</code> can be any type.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val default2: Effect&lt;Double, Int&gt; = default<br>val resolved2: Effect&lt;Unit, Int&gt; = resolved</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph"><code class="lang-kotlin">recover</code> also allows us to <i>change</i> the error type when we resolve the error of type <code class="lang-kotlin">R</code>. Below we handle our error of <code class="lang-kotlin">String</code> and turn it into <code class="lang-kotlin">List&lt;Char&gt;</code> using <code class="lang-kotlin">reversed().toList()</code>. This is a powerful operation, since it allows us to transform our error types across boundaries or layers.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val newError: Effect&lt;List&lt;Char&gt;, Int&gt; =<br>  failed.recover { str -&gt;<br>    raise(str.reversed().toList())<br>  }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Finally, since <code class="lang-kotlin">recover</code> supports <code class="lang-kotlin">suspend</code> we can safely call other <code class="lang-kotlin">suspend</code> code and throw <code class="lang-kotlin">Throwable</code> into the <code class="lang-kotlin">suspend</code> system. This is typically undesired, since you should prefer lifting <code class="lang-kotlin">Throwable</code> into typed values of <code class="lang-kotlin">R</code> to make them compile-time tracked.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val newException: Effect&lt;Nothing, Int&gt; =<br>  failed.recover { str -&gt; throw RuntimeException(str) }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h3 class=""> catch</h3><p class="paragraph"><code class="lang-kotlin">catch</code> gives us the same powers as <code class="lang-kotlin">recover</code>, but instead of resolving <code class="lang-kotlin">R</code> we're recovering from any unexpected <code class="lang-kotlin">Throwable</code>. Unexpected, because the expectation is that all <code class="lang-kotlin">Throwable</code> get turned into <code class="lang-kotlin">R</code> unless it's a fatal/unexpected. This operator is useful when you need to work/wrap foreign code, especially Java SDKs or any code that is heavily based on exceptions.</p><p class="paragraph">Below we've defined a <code class="lang-kotlin">foreign</code> value that represents wrapping a foreign API which might throw <code class="lang-kotlin">RuntimeException</code>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val foreign = effect&lt;String, Int&gt; {<br>  throw RuntimeException("BOOM!")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can <code class="lang-kotlin">catch</code> to run the effect recovering from any exception, and recover it by providing a default value of <code class="lang-kotlin">-1</code> or the length of the <a href="../../arrow.core.continuations/-cancellation-exception-no-trace/index.html#1824300659%2FProperties%2F601698448">Throwable.message</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val default3: Effect&lt;String, Int&gt; =<br>  foreign.catch { -1 }<br><br>val resolved3: Effect&lt;String, Int&gt; =<br>  foreign.catch { it.message?.length ?: -1 }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">A big difference with <code class="lang-kotlin">recover</code> is that <code class="lang-kotlin">catch</code> <strong>cannot</strong> change the error type of <code class="lang-kotlin">R</code> because it doesn't resolve it, so it stays unchanged. You can however compose <code class="lang-kotlin">recover</code>, and <code class="lang-kotlin">v</code> to resolve the error type <strong>and</strong> recover the exception.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val default4: Effect&lt;Nothing, Int&gt; =<br>  foreign<br>    .recover&lt;String, Nothing, Int&gt; { -1 }<br>    .catch { -2 }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph"><code class="lang-kotlin">catch</code> however offers an overload that can <i>refine the exception</i>. Let's say you're wrapping some database interactions that might throw <code class="lang-kotlin">java.sql.SqlException</code>, or <code class="lang-kotlin">org.postgresql.util.PSQLException</code>, then you might only be interested in those exceptions and not <code class="lang-kotlin">Throwable</code>. <code class="lang-kotlin">catch</code> allows you to install multiple handlers for specific exceptions. If the desired exception is not matched, then it stays in the <code class="lang-kotlin">suspend</code> exception channel and will be thrown or recovered at a later point.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val default5: Effect&lt;String, Int&gt; =<br>  foreign<br>    .catch { ex: RuntimeException -&gt; -1 }<br>    .catch { ex: java.sql.SQLException -&gt; -2 }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">Finally, since <code class="lang-kotlin">catch</code> also supports <code class="lang-kotlin">suspend</code> we can safely call other <code class="lang-kotlin">suspend</code> code and throw <code class="lang-kotlin">Throwable</code> into the <code class="lang-kotlin">suspend</code> system. This can be useful if refinement of exceptions is not sufficient, for example in the case of <code class="lang-kotlin">org.postgresql.util.PSQLException</code> you might want to check the <code class="lang-kotlin">SQLState</code> to check for a <code class="lang-kotlin">foreign key violation</code> and rethrow the exception if not matched.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true<br><br>val rethrown: Effect&lt;String, Int&gt; =<br>  failed.catch { ex: java.sql.SQLException -&gt;<br>    if(ex.isForeignKeyViolation()) raise("foreign key violation")<br>    else throw ex<br>  }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-04.kt --><p class="paragraph">Note: Handling errors can also be done with <code class="lang-kotlin">try/catch</code> but this is <strong>not recommended</strong>, it uses <code class="lang-kotlin">CancellationException</code> which is used to cancel <code class="lang-kotlin">Coroutine</code>s and is advised not to capture in Kotlin. The <code class="lang-kotlin">CancellationException</code> from <code class="lang-kotlin">Effect</code> is <code class="lang-kotlin">RaiseCancellationException</code>, this a public type, thus can be distinguished from any other <code class="lang-kotlin">CancellationException</code> if necessary.</p><h2 class=""> Structured Concurrency</h2><p class="paragraph"><code class="lang-kotlin">Effect&lt;R, A&gt;</code> relies on <code class="lang-kotlin">kotlin.cancellation.CancellationException</code> to <code class="lang-kotlin">raise</code> error values of type <code class="lang-kotlin">R</code> inside the <code class="lang-kotlin">Continuation</code> since it effectively cancels/short-circuits it. For this reason <code class="lang-kotlin">raise</code> adheres to the same rules as <a href="https://kotlinlang.org/docs/coroutines-basics.html#structured-concurrency"><code class="lang-kotlin">Structured Concurrency</code></a></p><p class="paragraph">Let's overview below how <code class="lang-kotlin">raise</code> behaves with the different concurrency builders from Arrow Fx &amp; KotlinX Coroutines. In the examples below we're going to be using a utility to show how <i>sibling tasks</i> get cancelled. The utility function show below called <code class="lang-kotlin">awaitExitCase</code> will <code class="lang-kotlin">never</code> finish suspending, and completes a <code class="lang-kotlin">Deferred</code> with the <code class="lang-kotlin">ExitCase</code>. <code class="lang-kotlin">ExitCase</code> is a sealed class that can be a value of <code class="lang-kotlin">Failure(Throwable)</code>, <code class="lang-kotlin">Cancelled(CancellationException)</code>, or <code class="lang-kotlin">Completed</code>. Since <code class="lang-kotlin">awaitExitCase</code> suspends forever, it can only result in <code class="lang-kotlin">Cancelled(CancellationException)</code>.</p><!-- INCLUDE
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.parZip
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun &lt;A&gt; awaitExitCase(exit: CompletableDeferred&lt;ExitCase&gt;): A =<br>  guaranteeCase(::awaitCancellation) { exitCase -&gt; exit.complete(exitCase) }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h3 class=""> Arrow Fx Coroutines</h3><p class="paragraph">All operators in Arrow Fx Coroutines run in place, so they have no way of leaking <code class="lang-kotlin">raise</code>. It's there always safe to compose <code class="lang-kotlin">effect</code> with any Arrow Fx combinator. Let's see some small examples below.</p><h4 class=""> parZip</h4><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea"> suspend fun main() {<br>   val error = "Error"<br>   val exit = CompletableDeferred&lt;ExitCase&gt;()<br>  effect&lt;String, Int&gt; {<br>    parZip({ awaitExitCase&lt;Int&gt;(exit) }, { raise(error) }) { a: Int, b: Int -&gt; a + b }<br>  }.fold({ it shouldBe error }, { fail("Int can never be the result") })<br>  exit.await().shouldBeTypeOf&lt;ExitCase&gt;()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-05.kt --><h4 class=""> parTraverse</h4><!-- INCLUDE
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.parTraverse
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+
+suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
+guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+
+suspend fun <A> CompletableDeferred<A>.getOrNull(): A? =
+if (isCompleted) await() else null
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main() {<br>  val error = "Error"<br>  val exits = (0..3).map { CompletableDeferred&lt;ExitCase&gt;() }<br>  effect&lt;String, List&lt;Unit&gt;&gt; {<br>    (0..4).parTraverse { index -&gt;<br>      if (index == 4) raise(error)<br>      else awaitExitCase(exits[index])<br>    }<br>  }.fold({ msg -&gt; msg shouldBe error }, { fail("Int can never be the result") })<br>  // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran<br>  exits.forEach { exit -&gt; exit.getOrNull()?.shouldBeTypeOf&lt;ExitCase.Cancelled&gt;() }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-06.kt --><p class="paragraph"><code class="lang-kotlin">parTraverse</code> will launch 5 tasks, for every element in <code class="lang-kotlin">1..5</code>. The last task to get scheduled will <code class="lang-kotlin">raise</code> with "error", and it will cancel the other launched tasks before returning.</p><h4 class=""> raceN</h4><!-- INCLUDE
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.core.merge
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.raceN
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+
+suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
+guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+
+suspend fun <A> CompletableDeferred<A>.getOrNull(): A? =
+if (isCompleted) await() else null
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main() {<br>  val error = "Error"<br>  val exit = CompletableDeferred&lt;ExitCase&gt;()<br>  effect&lt;String, Int&gt; {<br>    raceN({ awaitExitCase&lt;Int&gt;(exit) }) { raise(error) }<br>      .merge() // Flatten Either&lt;Int, Int&gt; result from race into Int<br>  }.fold({ msg -&gt; msg shouldBe error }, { fail("Int can never be the result") })<br>  // It's possible not all parallel task got launched, and in those cases awaitCancellation never ran<br>  exit.getOrNull()?.shouldBeTypeOf&lt;ExitCase.Cancelled&gt;()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-07.kt --><p class="paragraph"><code class="lang-kotlin">raceN</code> races <code class="lang-kotlin">n</code> suspend functions in parallel, and cancels all participating functions when a winner is found. We can consider the function that <code class="lang-kotlin">raise</code>s the winner of the race, except with a raised value instead of a successful one. So when a function in the race <code class="lang-kotlin">raise</code>s, and thus short-circuiting the race, it will cancel all the participating functions.</p><h4 class=""> bracketCase / Resource</h4><!-- INCLUDE
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.bracketCase
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
+import kotlinx.coroutines.CompletableDeferred
+import java.io.BufferedReader
+import java.io.File
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main() {<br>  val error = "Error"<br>  val exit = CompletableDeferred&lt;ExitCase&gt;()<br>  effect&lt;String, Int&gt; {<br>    bracketCase(<br>      acquire = { File("build.gradle.kts").bufferedReader() },<br>      use = { reader: BufferedReader -&gt; raise(error) },<br>      release = { reader, exitCase -&gt;<br>        reader.close()<br>        exit.complete(exitCase)<br>      }<br>    )<br>  }.fold({ it shouldBe error }, { fail("Int can never be the result") })<br>  exit.await().shouldBeTypeOf&lt;ExitCase.Cancelled&gt;()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-08.kt --><!-- INCLUDE
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.autoCloseable
+import arrow.fx.coroutines.resourceScope
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
+import kotlinx.coroutines.CompletableDeferred
+import java.io.BufferedReader
+import java.io.File
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main() {<br>  val error = "Error"<br>  val exit = CompletableDeferred&lt;ExitCase&gt;()<br><br>  suspend fun ResourceScope.bufferedReader(path: String): BufferedReader =<br>    autoCloseable { File(path).bufferedReader() }.also {<br>      onRelease { exitCase -&gt; exit.complete(exitCase) }<br>    }<br><br>  resourceScope {<br>    effect&lt;String, Int&gt; {<br>      val reader = bufferedReader("build.gradle.kts")<br>      raise(error)<br>      reader.lineSequence().count()<br>    }.fold({ it shouldBe error }, { fail("Int can never be the result") })<br>  }<br>  exit.await().shouldBeTypeOf&lt;ExitCase.Cancelled&gt;()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-09.kt --><h3 class=""> KotlinX</h3><h4 class=""> withContext</h4><p class="paragraph">It's always safe to call <code class="lang-kotlin">raise</code> from <code class="lang-kotlin">withContext</code> since it runs in place, so it has no way of leaking <code class="lang-kotlin">raise</code>. When <code class="lang-kotlin">raise</code> is called from within <code class="lang-kotlin">withContext</code> it will cancel all <code class="lang-kotlin">Job</code>s running inside the <code class="lang-kotlin">CoroutineScope</code> of <code class="lang-kotlin">withContext</code>.</p><!-- INCLUDE
+import arrow.core.raise.Effect
+import arrow.core.raise.effect
+import arrow.core.raise.fold
+import arrow.core.raise.ensureNotNull
+import arrow.core.raise.ensure
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.guaranteeCase
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileNotFoundException
+
+</div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body"></div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+--></div></div></div></div></div></div></div></body></html>

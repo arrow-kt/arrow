@@ -1,9 +1,11 @@
 <!doctype html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Resource</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
@@ -16,12 +18,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
-<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
@@ -29,31 +32,37 @@
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-<a href="../../../index.html">
-<span>Arrow</span>            </a>    </div>
-    <div>1.2.0
-    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Arrow
+                    </a>            </div>
+            <div class="library-version">1.2.1
+            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">common</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/Resource///PointingToDeclaration//-245591949">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">Resource</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Resource</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/Resource.kt#L275">source</a>)</span></span></div><p class="paragraph"><a href="index.html">Resource</a> models resource allocation and releasing. It is especially useful when multiple resources that depend on each other need to be acquired and later released in reverse order. The capability of <i>installing</i> resources is called <a href="../index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a>, and <a href="index.html">Resource</a> defines the value associating the <code class="lang-kotlin">acquisition</code> step, and the <code class="lang-kotlin">finalizer</code>. <a href="index.html">Resource</a> allocates and releases resources in a safe way that co-operates with Structured Concurrency, and KotlinX Coroutines.</p><p class="paragraph">It is especially useful when multiple resources that depend on each other need to be acquired, and later released in reverse order. Or when you want to compose other <code class="lang-kotlin">suspend</code> functionality into resource safe programs, such as concurrency, parallelism or Arrow's Effect.</p><p class="paragraph">Creating a <a href="index.html">Resource</a> <i>value</i> can be done using the <a href="../resource.html">resource</a> function, and running a program using <a href="../index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a> can be done using <a href="../resource-scope.html">resourceScope</a>, or <a href="use.html">use</a>. Upon termination all finalizers are then guaranteed to run afterwards in reverse order of acquisition.</p><p class="paragraph">The following program is <strong>not-safe</strong> because it is prone to leak <code class="lang-kotlin">dataSource</code> and <code class="lang-kotlin">userProcessor</code> when an exception, or cancellation signal occurs whilst using the service.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">class UserProcessor {<br>  fun start(): Unit = println("Creating UserProcessor")<br>  fun shutdown(): Unit = println("Shutting down UserProcessor")<br>}<br><br>class DataSource {<br>  fun connect(): Unit = println("Connecting dataSource")<br>  fun close(): Unit = println("Closed dataSource")<br>}<br><br>class Service(val db: DataSource, val userProcessor: UserProcessor) {<br>  suspend fun processData(): List&lt;String&gt; = throw RuntimeException("I'm going to leak resources by not closing them")<br>}<br><br>suspend fun main(): Unit {<br>  val userProcessor = UserProcessor().also { it.start() }<br>  val dataSource = DataSource().also { it.connect() }<br>  val service = Service(dataSource, userProcessor)<br><br>  service.processData()<br><br>  dataSource.close()<br>  userProcessor.shutdown()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-01.kt --><p class="paragraph">If we were using Kotlin JVM, we might've relied on <code class="lang-kotlin">Closeable</code> or <code class="lang-kotlin">AutoCloseable</code> and rewritten our code to:</p><!-- INCLUDE
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/Resource.kt#L275">source</a>)</span></span></div><p class="paragraph"><a href="index.html">Resource</a> models resource allocation and releasing. It is especially useful when multiple resources that depend on each other need to be acquired and later released in reverse order. The capability of <i>installing</i> resources is called <a href="../-resource-scope/index.html">ResourceScope</a>, and <a href="index.html">Resource</a> defines the value associating the <code class="lang-kotlin">acquisition</code> step, and the <code class="lang-kotlin">finalizer</code>. <a href="index.html">Resource</a> allocates and releases resources in a safe way that co-operates with Structured Concurrency, and KotlinX Coroutines.</p><p class="paragraph">It is especially useful when multiple resources that depend on each other need to be acquired, and later released in reverse order. Or when you want to compose other <code class="lang-kotlin">suspend</code> functionality into resource safe programs, such as concurrency, parallelism or Arrow's Effect.</p><p class="paragraph">Creating a <a href="index.html">Resource</a> <i>value</i> can be done using the <a href="../resource.html">resource</a> function, and running a program using <a href="../-resource-scope/index.html">ResourceScope</a> can be done using <a href="../resource-scope.html">resourceScope</a>, or <a href="use.html">use</a>. Upon termination all finalizers are then guaranteed to run afterwards in reverse order of acquisition.</p><p class="paragraph">The following program is <strong>not-safe</strong> because it is prone to leak <code class="lang-kotlin">dataSource</code> and <code class="lang-kotlin">userProcessor</code> when an exception, or cancellation signal occurs whilst using the service.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">class UserProcessor {<br>  fun start(): Unit = println("Creating UserProcessor")<br>  fun shutdown(): Unit = println("Shutting down UserProcessor")<br>}<br><br>class DataSource {<br>  fun connect(): Unit = println("Connecting dataSource")<br>  fun close(): Unit = println("Closed dataSource")<br>}<br><br>class Service(val db: DataSource, val userProcessor: UserProcessor) {<br>  suspend fun processData(): List&lt;String&gt; = throw RuntimeException("I'm going to leak resources by not closing them")<br>}<br><br>suspend fun main(): Unit {<br>  val userProcessor = UserProcessor().also { it.start() }<br>  val dataSource = DataSource().also { it.connect() }<br>  val service = Service(dataSource, userProcessor)<br><br>  service.processData()<br><br>  dataSource.close()<br>  userProcessor.shutdown()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-01.kt --><p class="paragraph">If we were using Kotlin JVM, we might've relied on <code class="lang-kotlin">Closeable</code> or <code class="lang-kotlin">AutoCloseable</code> and rewritten our code to:</p><!-- INCLUDE
 import java.io.Closeable
 
 class UserProcessor : Closeable {
@@ -104,7 +113,7 @@ suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
     println("Shutting down UserProcessor")
 }
 }
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun ResourceScope.userProcessor(): UserProcessor =<br>  install({  UserProcessor().also { it.start() } }) { processor, _ -&gt;<br>    processor.shutdown()<br>  }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can of course also create <code class="lang-kotlin">lazy</code> representations of this by wrapping <code class="lang-kotlin">install</code> in <a href="../resource.html">resource</a> and returning the <code class="lang-kotlin">suspend lambda</code> value instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor: Resource&lt;UserProcessor&gt; = resource {<br>  val x: UserProcessor = install(<br>    {  UserProcessor().also { it.start() } },<br>    { processor, _ -&gt; processor.shutdown() }<br>  )<br>  x<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">There is also a convenience operator for this pattern, but you might have preferred <code class="lang-kotlin">ResourceScope::userProcessor</code> instead since it yields the same result.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor2: Resource&lt;UserProcessor&gt; = resource({<br>  UserProcessor().also { it.start() }<br>}) { processor, _ -&gt; processor.shutdown() }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-04.kt --><h2 class=""> Scope DSL</h2><p class="paragraph">The <a href="../index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a> DSL allows you to <i>install</i> resources, and interact with them in a safe way.</p><p class="paragraph">Arrow offers the same elegant <code class="lang-kotlin">bind</code> DSL for Resource composition as you might be familiar with from Arrow Core. Which we've already seen above, in our first example. What is more interesting, is that we can also compose it with any other existing pattern from Arrow! Let's compose our <code class="lang-kotlin">UserProcessor</code> and <code class="lang-kotlin">DataSource</code> in parallel, so that their <code class="lang-kotlin">start</code> and <code class="lang-kotlin">connect</code> methods can run in parallel.</p><!-- INCLUDE
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun ResourceScope.userProcessor(): UserProcessor =<br>  install({  UserProcessor().also { it.start() } }) { processor, _ -&gt;<br>    processor.shutdown()<br>  }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can of course also create <code class="lang-kotlin">lazy</code> representations of this by wrapping <code class="lang-kotlin">install</code> in <a href="../resource.html">resource</a> and returning the <code class="lang-kotlin">suspend lambda</code> value instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor: Resource&lt;UserProcessor&gt; = resource {<br>  val x: UserProcessor = install(<br>    {  UserProcessor().also { it.start() } },<br>    { processor, _ -&gt; processor.shutdown() }<br>  )<br>  x<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">There is also a convenience operator for this pattern, but you might have preferred <code class="lang-kotlin">ResourceScope::userProcessor</code> instead since it yields the same result.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor2: Resource&lt;UserProcessor&gt; = resource({<br>  UserProcessor().also { it.start() }<br>}) { processor, _ -&gt; processor.shutdown() }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-04.kt --><h2 class=""> Scope DSL</h2><p class="paragraph">The <a href="../-resource-scope/index.html">ResourceScope</a> DSL allows you to <i>install</i> resources, and interact with them in a safe way.</p><p class="paragraph">Arrow offers the same elegant <code class="lang-kotlin">bind</code> DSL for Resource composition as you might be familiar with from Arrow Core. Which we've already seen above, in our first example. What is more interesting, is that we can also compose it with any other existing pattern from Arrow! Let's compose our <code class="lang-kotlin">UserProcessor</code> and <code class="lang-kotlin">DataSource</code> in parallel, so that their <code class="lang-kotlin">start</code> and <code class="lang-kotlin">connect</code> methods can run in parallel.</p><!-- INCLUDE
 import arrow.fx.coroutines.ResourceScope
 import arrow.fx.coroutines.resourceScope
 import arrow.fx.coroutines.parZip
@@ -235,8 +244,9 @@ suspend fun processData(): List<String> = (0..10).map { "Processed : $it" }
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
 

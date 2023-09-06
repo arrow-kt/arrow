@@ -1,9 +1,11 @@
 <!doctype html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>arrow.optics.typeclasses</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
@@ -16,12 +18,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../styles/style.css" rel="Stylesheet">
-<link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
@@ -29,26 +32,32 @@
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
 <script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-<a href="../../index.html">
-<span>Arrow</span>            </a>    </div>
-    <div>1.2.0
-    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            Arrow
+                    </a>            </div>
+            <div class="library-version">1.2.1
+            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-optics:dokkaHtmlPartial/commonMain">common</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
 <div class="main-content" data-page-type="package" id="content" pageids="arrow-optics::arrow.optics.typeclasses////PointingToDeclaration//-682136119">
   <div class="breadcrumbs"><a href="../index.html">arrow-optics</a><span class="delimiter">/</span><span class="current">arrow.optics.typeclasses</span></div>
   <div class="cover ">
@@ -69,7 +78,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-at/index.html">At</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-at/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-at/index.html">I</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-at/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-at/index.html">At</a> provides a <a href="../arrow.optics/index.html#-141055921%2FClasslikes%2F-682136119">Lens</a> for a structure <a href="-at/index.html">S</a> to focus in <a href="-at/index.html">A</a> at a given index <a href="-at/index.html">I</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-at/index.html">At</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-at/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-at/index.html">I</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-at/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-at/index.html">At</a> provides a <a href="../arrow.optics/-lens/index.html">Lens</a> for a structure <a href="-at/index.html">S</a> to focus in <a href="-at/index.html">A</a> at a given index <a href="-at/index.html">I</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -78,13 +87,13 @@
           <div class="table-row" data-filterable-current=":arrow-optics:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-optics:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#1066020643%2FClasslikes%2F-682136119"><span><span>Conj</span></span></a></div>
+                  <div><a href="-conj/index.html"><span><span>Conj</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1066020643%2FClasslikes%2F-682136119"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="index.html#1066020643%2FClasslikes%2F-682136119">Conj</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1066020643%2FClasslikes%2F-682136119">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html#1066020643%2FClasslikes%2F-682136119">A</a><span class="token operator">&gt;</span><span class="token operator"> = </span><a href="-snoc/index.html">Snoc</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="index.html#1066020643%2FClasslikes%2F-682136119">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="index.html#1066020643%2FClasslikes%2F-682136119">A</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-conj/index.html">Conj</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-conj/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-conj/index.html">A</a><span class="token operator">&gt;</span><span class="token operator"> = </span><a href="-snoc/index.html">Snoc</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-conj/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-conj/index.html">A</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -99,7 +108,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-cons/index.html">Cons</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-cons/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-cons/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-cons/index.html">Cons</a> provides a <a href="../arrow.optics/index.html#1394331700%2FClasslikes%2F-682136119">Prism</a> between <a href="-cons/index.html">S</a> and its first element <a href="-cons/index.html">A</a> and tail <a href="-cons/index.html">S</a>. It provides a convenient way to attach or detach elements to the left side of a structure <a href="-cons/index.html">S</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-cons/index.html">Cons</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-cons/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-cons/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-cons/index.html">Cons</a> provides a <a href="../arrow.optics/-prism/index.html">Prism</a> between <a href="-cons/index.html">S</a> and its first element <a href="-cons/index.html">A</a> and tail <a href="-cons/index.html">S</a>. It provides a convenient way to attach or detach elements to the left side of a structure <a href="-cons/index.html">S</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -114,7 +123,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-filter-index/index.html">FilterIndex</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-filter-index/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-filter-index/index.html">I</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-filter-index/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-filter-index/index.html">FilterIndex</a> provides a <a href="../arrow.optics/index.html#176863642%2FClasslikes%2F-682136119">Every</a> for a structure <a href="-filter-index/index.html">S</a> with all its foci <a href="-filter-index/index.html">A</a> whose index <a href="-filter-index/index.html">I</a> satisfies a predicate.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-filter-index/index.html">FilterIndex</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-filter-index/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-filter-index/index.html">I</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-filter-index/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-filter-index/index.html">FilterIndex</a> provides a <a href="../arrow.optics/-every/index.html">Every</a> for a structure <a href="-filter-index/index.html">S</a> with all its foci <a href="-filter-index/index.html">A</a> whose index <a href="-filter-index/index.html">I</a> satisfies a predicate.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -129,7 +138,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-index/index.html">Index</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-index/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-index/index.html">I</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-index/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-index/index.html">Index</a> provides an <a href="../arrow.optics/index.html#-1955528147%2FClasslikes%2F-682136119">Optional</a> for a structure <a href="-index/index.html">S</a> to focus in an optional <a href="-index/index.html">A</a> at a given index <a href="-index/index.html">I</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-index/index.html">Index</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-index/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-index/index.html">I</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-index/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-index/index.html">Index</a> provides an <a href="../arrow.optics/-optional/index.html">Optional</a> for a structure <a href="-index/index.html">S</a> to focus in an optional <a href="-index/index.html">A</a> at a given index <a href="-index/index.html">I</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -144,7 +153,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-snoc/index.html">Snoc</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-snoc/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-snoc/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-snoc/index.html">Snoc</a> defines a <a href="../arrow.optics/index.html#1394331700%2FClasslikes%2F-682136119">Prism</a> between a <a href="-snoc/index.html">S</a> and its <a href="-snoc/index.html">init</a> and last element <a href="-snoc/index.html">A</a> and thus can be seen as the reverse of <a href="-cons/index.html">Cons</a>. It provides a way to attach or detach elements on the end side of a structure.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-optics:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-snoc/index.html">Snoc</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-snoc/index.html">S</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="-snoc/index.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="-snoc/index.html">Snoc</a> defines a <a href="../arrow.optics/-prism/index.html">Prism</a> between a <a href="-snoc/index.html">S</a> and its <a href="-snoc/index.html">init</a> and last element <a href="-snoc/index.html">A</a> and thus can be seen as the reverse of <a href="-cons/index.html">Cons</a>. It provides a way to attach or detach elements on the end side of a structure.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -176,8 +185,9 @@
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
 

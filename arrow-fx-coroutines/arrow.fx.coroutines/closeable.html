@@ -1,9 +1,11 @@
 <!doctype html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>closeable</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
@@ -16,12 +18,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../styles/style.css" rel="Stylesheet">
-<link href="../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
@@ -29,26 +32,32 @@
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
 <script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-<a href="../../index.html">
-<span>Arrow</span>            </a>    </div>
-    <div>1.2.0
-    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../index.html">
+                            Arrow
+                    </a>            </div>
+            <div class="library-version">1.2.1
+            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
 <div class="main-content" data-page-type="member" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines//closeable/arrow.fx.coroutines.continuations.ResourceScope#kotlinx.coroutines.CoroutineDispatcher#kotlin.coroutines.SuspendFunction0[TypeParam(bounds=[java.io.Closeable])]/PointingToDeclaration//-2049118941">
   <div class="breadcrumbs"><a href="../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">closeable</span></div>
   <div class="cover ">
@@ -56,13 +65,14 @@
   </div>
   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="closeable.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a><span class="token operator">&gt; </span><a href="index.html#145302728%2FClasslikes%2F-245591949">ResourceScope</a><span class="token punctuation">.</span><a href="closeable.html"><span class="token function">closeable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html">CoroutineDispatcher</a><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">closeable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="closeable.html">A</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/jvmMain/kotlin/arrow/fx/coroutines/ResourceExtensions.kt#L101">source</a>)</span></span></div><p class="paragraph">Creates a <a href="-resource/index.html">Resource</a> from an <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a>, which uses <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html#close--">Closeable.close</a> for releasing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.coroutines.resourceScope<br>import arrow.fx.coroutines.closeable<br>import java.io.FileInputStream<br><br>suspend fun copyFile(src: String, dest: String): Unit =<br>  resourceScope {<br>    val a: FileInputStream = closeable { FileInputStream(src) }<br>    val b: FileInputStream = closeable { FileInputStream(dest) }<br>    /** read from `a` and write to `b`. **/<br>} // Both resources will be closed accordingly to their #close methods</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resourceextensions-02.kt --><hr><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="closeable.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a><span class="token operator">&gt; </span><a href="closeable.html"><span class="token function">closeable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html">CoroutineDispatcher</a><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">closeable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-resource/index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="closeable.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/jvmMain/kotlin/arrow/fx/coroutines/ResourceExtensions.kt#L106">source</a>)</span></span></div></div>  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="closeable.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a><span class="token operator">&gt; </span><a href="-resource-scope/index.html">ResourceScope</a><span class="token punctuation">.</span><a href="closeable.html"><span class="token function">closeable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html">CoroutineDispatcher</a><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">closeable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="closeable.html">A</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/jvmMain/kotlin/arrow/fx/coroutines/ResourceExtensions.kt#L101">source</a>)</span></span></div><p class="paragraph">Creates a <a href="-resource/index.html">Resource</a> from an <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a>, which uses <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html#close--">Closeable.close</a> for releasing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.coroutines.resourceScope<br>import arrow.fx.coroutines.closeable<br>import java.io.FileInputStream<br><br>suspend fun copyFile(src: String, dest: String): Unit =<br>  resourceScope {<br>    val a: FileInputStream = closeable { FileInputStream(src) }<br>    val b: FileInputStream = closeable { FileInputStream(dest) }<br>    /** read from `a` and write to `b`. **/<br>} // Both resources will be closed accordingly to their #close methods</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resourceextensions-02.kt --><hr><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="closeable.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a><span class="token operator">&gt; </span><a href="closeable.html"><span class="token function">closeable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html">CoroutineDispatcher</a><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">closeable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-resource/index.html">Resource</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="closeable.html">A</a><span class="token operator">&gt;</span><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/jvmMain/kotlin/arrow/fx/coroutines/ResourceExtensions.kt#L106">source</a>)</span></span></div></div>  </div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
 
