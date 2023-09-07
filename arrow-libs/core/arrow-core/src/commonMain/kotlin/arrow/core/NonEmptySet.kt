@@ -62,3 +62,11 @@ public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
 
 public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()
+
+@Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
+public fun <A> Set<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
+  (this as Iterable<A>).toNonEmptySetOrNull()
+
+@Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
+public fun <A> Set<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
+  toNonEmptySetOrNull().toOption()
