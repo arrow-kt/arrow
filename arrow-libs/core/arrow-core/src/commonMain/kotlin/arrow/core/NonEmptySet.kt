@@ -54,14 +54,11 @@ public value class NonEmptySet<out A> private constructor(
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
   NonEmptySet(first, rest.toSet())
 
-public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
-  firstOrNull()?.let { NonEmptySet(it, minus(it).toSet()) }
+public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
+  val iter = iterator()
+  if (!iter.hasNext()) return null
+  return NonEmptySet(iter.next(), Iterable { iter }.toSet())
+}
 
 public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
-  toNonEmptySetOrNull().toOption()
-
-public fun <A> Set<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
-  firstOrNull()?.let { NonEmptySet(it, minus(it)) }
-
-public fun <A> Set<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()
