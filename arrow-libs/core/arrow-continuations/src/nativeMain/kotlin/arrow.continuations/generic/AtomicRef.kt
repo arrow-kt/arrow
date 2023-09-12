@@ -1,6 +1,6 @@
 package arrow.continuations.generic
 
-import kotlin.native.concurrent.AtomicReference
+import kotlin.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
@@ -18,7 +18,7 @@ public actual class AtomicRef<V> actual constructor(initialValue: V) {
     while (true) {
       val cur = atom.value
       if (cur === value) return cur
-      if (atom.compareAndSwap(cur, value) === cur) return cur
+      if (atom.compareAndSet(cur, value)) return cur
     }
   }
 
