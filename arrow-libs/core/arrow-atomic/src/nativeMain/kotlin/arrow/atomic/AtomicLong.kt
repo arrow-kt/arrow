@@ -1,6 +1,6 @@
 package arrow.atomic
 
-import kotlin.native.concurrent.AtomicLong
+import kotlin.concurrent.AtomicLong
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
@@ -14,10 +14,10 @@ public actual class AtomicLong actual constructor(initialValue: Long) {
   }
 
   public actual fun incrementAndGet(): Long =
-    inner.addAndGet(1)
+    inner.addAndGet(1L)
 
   public actual fun decrementAndGet(): Long =
-    inner.addAndGet(-1)
+    inner.addAndGet(-1L)
 
   public actual fun addAndGet(delta: Long): Long =
     inner.addAndGet(delta)
@@ -30,7 +30,7 @@ public actual class AtomicLong actual constructor(initialValue: Long) {
     while (true) {
       val cur = inner.value
       if (cur == value) return cur
-      if (inner.compareAndSwap(cur, value) == cur) return cur
+      if (inner.compareAndSet(cur, value)) return cur
     }
   }
 }

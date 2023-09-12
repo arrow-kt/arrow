@@ -1,7 +1,8 @@
 @file:OptIn(FreezingIsDeprecated::class)
+
 package arrow.atomic
 
-import kotlin.native.concurrent.AtomicReference
+import kotlin.concurrent.AtomicReference
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
@@ -22,7 +23,7 @@ public actual class Atomic<V> actual constructor(initialValue: V) {
     while (true) {
       val cur = inner.value
       if (cur === value) return cur
-      if (inner.compareAndSwap(cur, value) === cur) return cur
+      if (inner.compareAndSet(cur, value)) return cur
     }
   }
 }

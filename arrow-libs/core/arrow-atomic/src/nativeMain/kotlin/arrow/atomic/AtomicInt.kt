@@ -1,6 +1,6 @@
 package arrow.atomic
 
-import kotlin.native.concurrent.AtomicInt
+import kotlin.concurrent.AtomicInt
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.isFrozen
 
@@ -30,7 +30,7 @@ public actual class AtomicInt actual constructor(initialValue: Int) {
     while (true) {
       val cur = inner.value
       if (cur == value) return cur
-      if (inner.compareAndSwap(cur, value) == cur) return cur
+      if (inner.compareAndSet(cur, value)) return cur
     }
   }
 }
