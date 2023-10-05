@@ -473,4 +473,14 @@ class NonEmptyListTest : StringSpec({
         result shouldBe expected
       }
     }
+
+    "coflatMap should retain the same length as the original list" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.coflatMap { it.all }
+        val expected = a.all
+        result.size shouldBe expected.size
+      }
+    }
 })
