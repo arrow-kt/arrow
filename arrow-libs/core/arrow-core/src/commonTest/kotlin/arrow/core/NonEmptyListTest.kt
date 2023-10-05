@@ -12,10 +12,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.negativeInt
-import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.*
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
@@ -462,6 +459,17 @@ class NonEmptyListTest : StringSpec({
       ) { a ->
         val result = a.extract()
         val expected = a.head
+        result shouldBe expected
+      }
+    }
+
+    "plus" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int()),
+        Arb.int()
+      ) { a, b ->
+        val result = a + b
+        val expected = a.all + b
         result shouldBe expected
       }
     }
