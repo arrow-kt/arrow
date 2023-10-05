@@ -489,7 +489,9 @@ class NonEmptyListTest : StringSpec({
         Arb.nonEmptyList(Arb.int()),
         Arb.int()
       ) { list, initial ->
-        list.foldLeft(initial) { acc, i -> acc + i } shouldBe list.all.sum()
+        val result = list.foldLeft(initial) { acc, i -> acc + i }
+        val expected = initial + list.all.sum()
+        result shouldBe expected
       }
     }
 })
