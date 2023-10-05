@@ -483,4 +483,13 @@ class NonEmptyListTest : StringSpec({
         result.size shouldBe expected.size
       }
     }
+
+  "foldLeft should sum up correctly for addition" {
+    checkAll(
+      Arb.nonEmptyList(Arb.int()),
+      Arb.int()
+    ) { list, initial ->
+      list.foldLeft(initial) { acc, i -> acc + i } shouldBe list.all.sum()
+    }
+  }
 })
