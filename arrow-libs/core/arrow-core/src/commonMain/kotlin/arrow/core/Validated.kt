@@ -18,13 +18,13 @@ public typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 
 @Deprecated(
   ValidatedDeprMsg + "Use Right to construct Either values instead",
-  ReplaceWith("Either.Right(value)", "arrow.core.Either")
+  ReplaceWith("Either.Right<A>", "arrow.core.Either")
 )
 public typealias Valid<A> = Validated.Valid<A>
 
 @Deprecated(
   ValidatedDeprMsg + "Use Left to construct Either values instead",
-  ReplaceWith("Either.Left(value)", "arrow.core.Either")
+  ReplaceWith("Either.Left<E>", "arrow.core.Either")
 )
 public typealias Invalid<E> = Validated.Invalid<E>
 
@@ -318,7 +318,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use Right to construct Either values instead",
-    ReplaceWith("Either.Right(value)", "arrow.core.Either")
+    ReplaceWith("Either.Right<A>", "arrow.core.Either")
   )
   public data class Valid<out A>(val value: A) : Validated<Nothing, A>() {
     override fun toString(): String = "Validated.Valid($value)"
@@ -332,7 +332,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use Left to construct Either values instead",
-    ReplaceWith("Either.Left(value)", "arrow.core.Either")
+    ReplaceWith("Either.Left<E>", "arrow.core.Either")
   )
   public data class Invalid<out E>(val value: E) : Validated<E, Nothing>() {
     override fun toString(): String = "Validated.Invalid($value)"
