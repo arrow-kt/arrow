@@ -2,17 +2,18 @@ package arrow.core
 
 import arrow.core.test.functionAToB
 import arrow.core.test.stackSafeIteration
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class AndThenTests : StringSpec({
+class AndThenTests {
   val count = stackSafeIteration()
 
-  "AndThen0 - compose a chain of functions with andThen should be same with AndThen" {
+  @Test fun andThen0composeChain() = runTest {
     checkAll(Arb.int(), Arb.list(Arb.functionAToB<Int, Int>(Arb.int()))) { i, fs ->
       val result = fs.fold({ i }) { acc, f ->
         { f(acc()) }
@@ -26,7 +27,7 @@ class AndThenTests : StringSpec({
     }
   }
 
-  "AndThen0 - andThen is stack safe" {
+  @Test fun andThen0stackSafe() {
     val result = (0 until count).fold({ 0 }) { acc, _ ->
       acc.andThen { it + 1 }
     }.invoke()
@@ -34,7 +35,7 @@ class AndThenTests : StringSpec({
     result shouldBe count
   }
 
-  "AndThen1 - compose a chain of functions with andThen should be same with AndThen" {
+  @Test fun andThen1composeChain() = runTest {
     checkAll(Arb.int(), Arb.list(Arb.functionAToB<Int, Int>(Arb.int()))) { i, fs ->
       val result = fs.fold({ x: Int -> x }) { acc, f ->
         { x: Int -> f(acc(x)) }
@@ -48,7 +49,7 @@ class AndThenTests : StringSpec({
     }
   }
 
-  "AndThen1 - compose a chain of function with compose should be same with AndThen" {
+  @Test fun composeComposeChain() = runTest {
     checkAll(Arb.int(), Arb.list(Arb.functionAToB<Int, Int>(Arb.int()))) { i, fs ->
       val result = fs.fold({ x: Int -> x }) { acc, f ->
         { x: Int -> acc(f(x)) }
@@ -62,7 +63,7 @@ class AndThenTests : StringSpec({
     }
   }
 
-  "AndThen1 - andThen is stack safe" {
+  @Test fun andThen1stackSafe() {
     val result = (0 until count).fold({ x: Int -> x }) { acc, _ ->
       acc.andThen { it + 1 }
     }.invoke(0)
@@ -70,7 +71,7 @@ class AndThenTests : StringSpec({
     result shouldBe count
   }
 
-  "AndThen1 - compose is stack safe" {
+  @Test fun composeStackSafe() {
     val result = (0 until count).fold({ x: Int -> x }) { acc, _ ->
       acc.compose { it + 1 }
     }.invoke(0)
@@ -78,7 +79,7 @@ class AndThenTests : StringSpec({
     result shouldBe count
   }
 
-  "AndThen2 - compose a chain of functions with andThen should be same with AndThen" {
+  @Test fun andThen2composeChain() = runTest {
     checkAll(Arb.int(), Arb.int(), Arb.list(Arb.functionAToB<Int, Int>(Arb.int()))) { i, j, fs ->
       val result = fs.fold({ x: Int, y: Int -> x + y }) { acc, f ->
         { x: Int, y: Int -> f(acc(x, y)) }
@@ -92,11 +93,11 @@ class AndThenTests : StringSpec({
     }
   }
 
-  "AndThen2 - andThen is stack safe" {
+  @Test fun andThen2stackSafe() = runTest {
     val result = (0 until count).fold({ x: Int, y: Int -> x + y }) { acc, _ ->
       acc.andThen { it + 1 }
     }.invoke(0, 0)
 
     result shouldBe count
   }
-})
+}

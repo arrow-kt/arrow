@@ -7,7 +7,7 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.kotlinx.kover)
-  alias(libs.plugins.kotest.multiplatform)
+  // alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.spotless)
 }
 
@@ -33,6 +33,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
+        implementation(kotlin("test"))
         implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
@@ -40,9 +41,9 @@ kotlin {
     }
 
     jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
+      // dependencies {
+      //   runtimeOnly(libs.kotest.runnerJUnit5)
+      // }
     }
 
     jvmMain {
@@ -70,4 +71,8 @@ kotlin {
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+}
+
+tasks.test {
+  useJUnitPlatform()
 }
