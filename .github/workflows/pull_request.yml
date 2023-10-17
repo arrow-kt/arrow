@@ -165,9 +165,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
-    env:
-      KOTLIN_OVERRIDE: 1.9.30-dev-1098
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -182,7 +179,7 @@ jobs:
       - name: jvmTest (K2 enabled)
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jvmTest -Pkotlin.experimental.tryK2=true
+          arguments: "jvmTest -Pkotlin_version=1.9.30-dev-2548 -Pkotlin_repo_url=https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap -Pkotlin_language_version=2.0"
 
       - name: Upload reports
         if: failure()
@@ -271,7 +268,7 @@ jobs:
           arguments: apiDump
 
       - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update API files
           file_pattern: arrow-libs/**/api/*.api
@@ -297,7 +294,7 @@ jobs:
           arguments: spotlessApply
 
       - name: "Commit newly formatted files"
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Apply
           file_pattern: arrow-libs/**/*.kt
