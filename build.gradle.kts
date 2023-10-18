@@ -4,6 +4,7 @@ import kotlinx.knit.KnitPluginExtension
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
   repositories {
@@ -21,7 +22,16 @@ allprojects {
   repositories {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+    (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
+  }
+
+  tasks {
+    withType<KotlinCompile> {
+      kotlinOptions {
+        (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = it }
+        (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = it }
+      }
+    }
   }
 }
 
@@ -68,10 +78,6 @@ dependencies {
 allprojects {
   group = property("projects.group").toString()
 }
-
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
 
 subprojects {
   this@subprojects.tasks.withType<DokkaTaskPartial>().configureEach {

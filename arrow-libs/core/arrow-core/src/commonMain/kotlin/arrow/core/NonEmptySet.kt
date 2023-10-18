@@ -21,25 +21,6 @@ public value class NonEmptySet<out A> private constructor(
 
   override fun lastOrNull(): A = elements.last()
 
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
-    elements.map(transform).toNonEmptyListOrNull()!!
-
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
-    elements.mapIndexed(transform).toNonEmptyListOrNull()!!
-
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
-    elements.flatMap(transform).toNonEmptyListOrNull()!!
-
-  override fun distinct(): NonEmptyList<A> =
-    toNonEmptyList()
-
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
-    elements.distinctBy(selector).toNonEmptyListOrNull()!!
-
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")

@@ -29,7 +29,7 @@ jobs:
     timeout-minutes: 90
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -42,7 +42,7 @@ jobs:
       - name: assemble
         uses: gradle/gradle-build-action@v2
         with:
-          arguments:  assemble -Psemver.stage=snapshot -Psemver.scope=major
+          arguments: assemble -Pversion=${{ inputs.version }}
 
       - name: Upload reports
         if: failure()
@@ -54,4 +54,4 @@ jobs:
       - name: Publish next major SNAPSHOT version
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -Psemver.stage=snapshot -Psemver.scope=major publishToSonatype
+          arguments: -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository
