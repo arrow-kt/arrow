@@ -38,7 +38,7 @@ private data class DeepEval(val eval: Eval<Int>) {
   }
 
   companion object {
-    const val maxDepth = 10000
+    const val MAX_DEPTH = 10000
 
     fun build(leaf: () -> Eval<Int>, os: List<O>) = run {
       tailrec fun step(i: Int, leaf: () -> Eval<Int>, cbs: MutableList<(Eval<Int>) -> Eval<Int>>): Eval<Int> =
@@ -62,7 +62,7 @@ private data class DeepEval(val eval: Eval<Int>) {
 
     val gen = arbitrary { rs ->
       val leaf = { Eval.Now(0) }
-      val eval = build(leaf, O.gen.samples().map(Sample<O>::value).take(maxDepth).toList())
+      val eval = build(leaf, O.gen.samples().map(Sample<O>::value).take(MAX_DEPTH).toList())
       DeepEval(eval)
     }
   }
