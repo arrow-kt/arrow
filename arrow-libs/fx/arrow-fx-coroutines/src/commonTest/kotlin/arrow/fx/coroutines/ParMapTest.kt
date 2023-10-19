@@ -8,7 +8,6 @@ import arrow.core.NonEmptyList
 import arrow.core.raise.either
 import arrow.core.left
 import arrow.core.nonEmptyListOf
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -17,10 +16,12 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.test.Test
 
-class ParMapTest : StringSpec({
-  "parMap is stack-safe" {
+class ParMapTest {
+  @Test fun parMapIsStackSafe() = runTest {
     val count = 20_000
     val ref = Atomic(0)
     (0 until count).parMap { _: Int ->
@@ -29,7 +30,7 @@ class ParMapTest : StringSpec({
     ref.get() shouldBe count
   }
 
-  "parMap runs in parallel" {
+  @Test fun parMapRunsInParallel() = runTest {
     val promiseA = CompletableDeferred<Unit>()
     val promiseB = CompletableDeferred<Unit>()
     val promiseC = CompletableDeferred<Unit>()
@@ -50,7 +51,7 @@ class ParMapTest : StringSpec({
     ).parMap { it.invoke() }
   }
 
-  "parTraverse results in the correct error" {
+  @Test fun parTraverseResultsInTheCorrectError() = runTest {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -64,7 +65,7 @@ class ParMapTest : StringSpec({
     }
   }
 
-  "parMap(concurrency = 1) only runs one task at a time" {
+  @Test fun parMapConcurrency1OnlyRunsOneTaskAtATime() = runTest {
     val promiseA = CompletableDeferred<Unit>()
 
     withTimeoutOrNull(100.milliseconds) {
@@ -75,7 +76,7 @@ class ParMapTest : StringSpec({
     } shouldBe null
   }
 
-  "parMap with either results in the correct left" {
+  @Test fun parMapWithEitherResultsInTheCorrectLeft() = runTest {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -89,7 +90,7 @@ class ParMapTest : StringSpec({
     }
   }
 
-  "parMapOrAccumulate is stack-safe" {
+  @Test fun parMapOrAccumulateIsStackSafe() = runTest {
     val count = 20_000
     val ref = Atomic(0)
     (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
@@ -98,7 +99,7 @@ class ParMapTest : StringSpec({
     ref.get() shouldBe count
   }
 
-  "parMapOrAccumulate runs in parallel" {
+  @Test fun parMapOrAccumulateRunsInParallel() = runTest {
     val promiseA = CompletableDeferred<Unit>()
     val promiseB = CompletableDeferred<Unit>()
     val promiseC = CompletableDeferred<Unit>()
@@ -119,7 +120,7 @@ class ParMapTest : StringSpec({
     ).parMapOrAccumulate(combine = emptyError) { it.invoke() }
   }
 
-  "parMapOrAccumulate results in the correct error" {
+  @Test fun parMapOrAccumulateResultsInTheCorrectError() = runTest {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -133,7 +134,7 @@ class ParMapTest : StringSpec({
     }
   }
 
-  "parMapOrAccumulate(concurrency = 1) only runs one task at a time" {
+  @Test fun parMapOrAccumulateConcurrency1OnlyRunsOneTaskAtATime() = runTest {
     val promiseA = CompletableDeferred<Unit>()
 
     withTimeoutOrNull(100.milliseconds) {
@@ -144,7 +145,7 @@ class ParMapTest : StringSpec({
     } shouldBe null
   }
 
-  "parMapOrAccumulate accumulates shifts" {
+  @Test fun parMapOrAccumulateAccumulatesShifts() = runTest {
     checkAll(Arb.string()) { e ->
       (0 until 100).parMapOrAccumulate { _ ->
         raise(e)
@@ -152,7 +153,7 @@ class ParMapTest : StringSpec({
     }
   }
 
-  "parMapNotNull is stack-safe" {
+  @Test fun parMapNotNullIsStackSafe() = runTest {
     val count = 20_000
     val ref = Atomic(0)
     (0 until count).parMapNotNull { _: Int ->
@@ -161,7 +162,7 @@ class ParMapTest : StringSpec({
     ref.get() shouldBe count
   }
 
-  "parMapNotNull runs in parallel" {
+  @Test fun parMapNotNullRunsInParallel() = runTest {
     val promiseA = CompletableDeferred<Unit>()
     val promiseB = CompletableDeferred<Unit>()
     val promiseC = CompletableDeferred<Unit>()
@@ -182,7 +183,7 @@ class ParMapTest : StringSpec({
     ).parMapNotNull { it.invoke() }
   }
 
-  "parMapNotNull results in the correct error" {
+  @Test fun parMapNotNullResultsInTheCorrectError() = runTest {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -196,7 +197,7 @@ class ParMapTest : StringSpec({
     }
   }
 
-  "parMapNotNull(concurrency = 1) only runs one task at a time" {
+  @Test fun parMapNotNullConcurrency1OnlyRunsOneTaskAtATime() = runTest {
     val promiseA = CompletableDeferred<Unit>()
 
     withTimeoutOrNull(100.milliseconds) {
@@ -207,20 +208,20 @@ class ParMapTest : StringSpec({
     } shouldBe null
   }
 
-  "parMapNotNull discards nulls" {
+  @Test fun parMapNotNullDiscardsNulls() = runTest {
     (0 until 100).parMapNotNull { _ ->
       null
     } shouldBe emptyList()
   }
 
-  "parMapNotNull retains non-nulls" {
+  @Test fun parMapNotNullRetainsNonNulls() = runTest {
     checkAll(Arb.int()) { i ->
       (0 until 100).parMapNotNull { _ ->
         i
       } shouldBe List(100) { i }
     }
   }
-})
+}
 
 private val emptyError: (Nothing, Nothing) -> Nothing =
   { _, _ -> throw AssertionError("Should not be called") }
