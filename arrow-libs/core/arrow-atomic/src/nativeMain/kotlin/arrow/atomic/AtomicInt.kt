@@ -1,8 +1,6 @@
 package arrow.atomic
 
-import kotlin.native.concurrent.AtomicInt
-import kotlin.native.concurrent.freeze
-import kotlin.native.concurrent.isFrozen
+import kotlin.concurrent.AtomicInt
 
 public actual class AtomicInt actual constructor(initialValue: Int) {
   private val inner = AtomicInt(initialValue)
@@ -14,10 +12,10 @@ public actual class AtomicInt actual constructor(initialValue: Int) {
   }
 
   public actual fun incrementAndGet(): Int =
-    inner.addAndGet(1)
+    inner.incrementAndGet()
 
   public actual fun decrementAndGet(): Int =
-    inner.addAndGet(-1)
+    inner.decrementAndGet()
 
   public actual fun addAndGet(delta: Int): Int =
     inner.addAndGet(delta)
@@ -25,12 +23,6 @@ public actual class AtomicInt actual constructor(initialValue: Int) {
   public actual fun compareAndSet(expected: Int, new: Int): Boolean =
     inner.compareAndSet(expected, new)
 
-  public actual fun getAndSet(value: Int): Int {
-    if (inner.isFrozen) value.freeze()
-    while (true) {
-      val cur = inner.value
-      if (cur == value) return cur
-      if (inner.compareAndSwap(cur, value) == cur) return cur
-    }
-  }
+  public actual fun getAndSet(value: Int): Int =
+    inner.getAndSet(value)
 }
