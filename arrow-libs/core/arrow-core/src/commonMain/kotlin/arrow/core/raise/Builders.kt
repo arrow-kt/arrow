@@ -42,6 +42,9 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  *
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ *
+ * @see NullableRaise.ignoreErrors By default, `nullable` only allows raising `null`.
+ * Calling [ignoreErrors][NullableRaise.ignoreErrors] inside `nullable` allows to raise any error, which will be returned to the caller as if `null` was raised.
  */
 public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
   merge { block(NullableRaise(this)) }
