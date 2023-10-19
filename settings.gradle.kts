@@ -3,11 +3,12 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "arrow"
 
 pluginManagement {
+  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
   repositories {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+    kotlin_repo_url?.also { maven(it) }
   }
 }
 
@@ -17,17 +18,20 @@ plugins {
 }
 
 dependencyResolutionManagement {
+  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
+  @Suppress("LocalVariableName") val kotlin_version: String? by settings
+
   repositories {
     mavenCentral()
     gradlePluginPortal()
     mavenLocal()
+    kotlin_repo_url?.also { maven(it) }
   }
   versionCatalogs {
     create("libs") {
-      val kotlinOverride = System.getenv("KOTLIN_OVERRIDE")
-      if (!kotlinOverride.isNullOrBlank()) {
-        println("Overriding Kotlin version with $kotlinOverride")
-        version("kotlin", kotlinOverride)
+      if (!kotlin_version.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlin_version")
+        version("kotlin", kotlin_version!!)
       }
     }
   }
