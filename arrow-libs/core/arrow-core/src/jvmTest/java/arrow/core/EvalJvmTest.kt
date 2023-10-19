@@ -14,7 +14,7 @@ class EvalJvmTest : StringSpec({
       try {
         d.eval.value()
       } catch (e: StackOverflowError) {
-        fail("stack overflowed with eval-depth ${DeepEval.maxDepth}")
+        fail("stack overflowed with eval-depth ${DeepEval.MAX_DEPTH}")
       }
     }
   }
