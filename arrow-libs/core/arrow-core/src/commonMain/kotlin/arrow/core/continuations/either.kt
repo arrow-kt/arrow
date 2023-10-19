@@ -14,6 +14,6 @@ public object either {
     effect(f).toEither()
 }
 
-private const val eitherDSLDeprecation =
+@PublishedApi internal const val eitherDSLDeprecation: String =
   "The either DSL has been moved to arrow.core.raise.either.\n" +
     "Replace import arrow.core.computations.either with arrow.core.raise.either"

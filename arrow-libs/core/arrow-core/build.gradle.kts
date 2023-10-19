@@ -57,15 +57,17 @@ kotlin {
       }
     }
   }
+
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.core"
+      }
+    }
+  }
 }
 
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
-}
-
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.core"
-  }
 }

@@ -51,10 +51,12 @@ kotlin {
       }
     }
   }
-}
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
+      }
+    }
   }
 }

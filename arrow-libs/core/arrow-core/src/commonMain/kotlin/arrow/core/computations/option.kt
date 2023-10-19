@@ -111,6 +111,6 @@ public object option {
     Effect.suspended(eff = { OptionEffect { it } }, f = func, just = { Option.fromNullable(it) })
 }
 
-private const val optionDSLDeprecation =
+@PublishedApi internal const val optionDSLDeprecation: String =
   "The option DSL has been moved to arrow.core.raise.option.\n" +
     "Replace import arrow.core.computations.* with arrow.core.raise.*"

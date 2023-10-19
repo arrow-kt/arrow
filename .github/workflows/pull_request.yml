@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -42,7 +42,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -69,7 +69,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -96,7 +96,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -123,7 +123,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -161,12 +161,39 @@ jobs:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
 
+  jvmTestK2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: jvmTest (K2 enabled)
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: "jvmTest -Pkotlin_version=1.9.30-dev-2548 -Pkotlin_repo_url=https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap -Pkotlin_language_version=2.0"
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-jvmTest'
+          path: '**/build/reports/**'
+
   js:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -198,7 +225,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -225,7 +252,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -241,7 +268,7 @@ jobs:
           arguments: apiDump
 
       - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update API files
           file_pattern: arrow-libs/**/api/*.api
@@ -251,7 +278,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -267,7 +294,7 @@ jobs:
           arguments: spotlessApply
 
       - name: "Commit newly formatted files"
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Apply
           file_pattern: arrow-libs/**/*.kt

@@ -3,23 +3,37 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "arrow"
 
 pluginManagement {
+  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
   repositories {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
+    kotlin_repo_url?.also { maven(it) }
   }
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.14.1"
+  id("com.gradle.enterprise") version "3.15.1"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
 }
 
 dependencyResolutionManagement {
+  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
+  @Suppress("LocalVariableName") val kotlin_version: String? by settings
+
   repositories {
     mavenCentral()
     gradlePluginPortal()
     mavenLocal()
+    kotlin_repo_url?.also { maven(it) }
+  }
+  versionCatalogs {
+    create("libs") {
+      if (!kotlin_version.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlin_version")
+        version("kotlin", kotlin_version!!)
+      }
+    }
   }
 }
 

@@ -49,6 +49,6 @@ public object result {
     effect<Throwable, A> { f(ResultEffectScope(this)) }.toResult()
 }
 
-private const val resultDSLDeprecation =
+@PublishedApi internal const val resultDSLDeprecation: String =
   "The result DSL has been moved to arrow.core.raise.result.\n" +
     "Replace import arrow.core.computations.* with arrow.core.raise.*"

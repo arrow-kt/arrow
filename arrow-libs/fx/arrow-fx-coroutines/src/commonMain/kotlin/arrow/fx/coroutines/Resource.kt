@@ -1164,6 +1164,6 @@ private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   } ?: acc
 }
 
-private const val nextVersionRemoved: String =
+@PublishedApi internal const val nextVersionRemoved: String =
   "is redundant and will be removed in Arrow 2.x.x in favor of the DSL.\n" +
     "In case you think this method should stay, please provide feedback and your use-case on https://github.com/arrow-kt/arrow/issues"

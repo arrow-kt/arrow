@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 90
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -38,7 +38,7 @@ jobs:
       - name: assemble
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assemble -Pversion=${{ inputs.version }} -Pkotlin.mpp.enableCompatibilityMetadataVariant=true
+          arguments: assemble -Pversion=${{ inputs.version }}
 
       - name: Upload reports
         if: failure()
@@ -50,4 +50,4 @@ jobs:
       - name: Publish final version
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -Pkotlin.mpp.enableCompatibilityMetadataVariant=true -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository
+          arguments: -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository

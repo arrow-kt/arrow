@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -67,12 +70,19 @@ kotlin {
         runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
+  }
 
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.atomic"
+      }
+    }
   }
 }
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.atomic"
+tasks.withType<KotlinCompile>().configureEach {
+  kotlinOptions {
+    freeCompilerArgs = freeCompilerArgs + "-Xexpect-actual-classes"
   }
 }

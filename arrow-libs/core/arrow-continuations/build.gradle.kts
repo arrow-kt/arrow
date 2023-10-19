@@ -49,10 +49,12 @@ kotlin {
       }
     }
   }
-}
 
-tasks.jar {
-  manifest {
-    attributes["Automatic-Module-Name"] = "arrow.continuations"
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.continuations"
+      }
+    }
   }
 }
