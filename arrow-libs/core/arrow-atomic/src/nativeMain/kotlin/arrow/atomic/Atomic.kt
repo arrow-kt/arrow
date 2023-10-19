@@ -1,28 +1,19 @@
-@file:OptIn(FreezingIsDeprecated::class)
 package arrow.atomic
 
-import kotlin.native.concurrent.AtomicReference
-import kotlin.native.concurrent.freeze
-import kotlin.native.concurrent.isFrozen
+import kotlin.concurrent.AtomicReference
 
 public actual class Atomic<V> actual constructor(initialValue: V) {
-  private val inner = AtomicReference(initialValue.freeze())
+  private val inner = AtomicReference(initialValue)
 
   public actual fun get(): V = inner.value
 
   public actual fun set(value: V) {
-    inner.value = value.freeze()
+    inner.value = value
   }
 
   public actual fun compareAndSet(expected: V, new: V): Boolean =
-    inner.compareAndSet(expected, new.freeze())
+    inner.compareAndSet(expected, new)
 
-  public actual fun getAndSet(value: V): V {
-    if (inner.isFrozen) value.freeze()
-    while (true) {
-      val cur = inner.value
-      if (cur === value) return cur
-      if (inner.compareAndSwap(cur, value) === cur) return cur
-    }
-  }
+  public actual fun getAndSet(value: V): V =
+    inner.getAndSet(value)
 }

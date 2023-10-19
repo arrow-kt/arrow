@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.companionObject
@@ -28,6 +30,7 @@ data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val target
     copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")
 }
 
+@Suppress("RecursivePropertyAccessor")
 val KSClassDeclaration.nameWithParentClass: String
   get() = when (val parent = parentDeclaration) {
     is KSClassDeclaration -> parent.nameWithParentClass + "." + simpleName.asString()
