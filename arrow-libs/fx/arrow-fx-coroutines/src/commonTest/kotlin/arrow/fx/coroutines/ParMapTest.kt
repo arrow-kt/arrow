@@ -1,13 +1,11 @@
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
+import arrow.atomic.AtomicInt
 import arrow.atomic.update
 import arrow.core.Either
-import arrow.core.EitherNel
 import arrow.core.NonEmptyList
 import arrow.core.raise.either
 import arrow.core.left
-import arrow.core.nonEmptyListOf
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -23,7 +21,7 @@ import kotlin.test.Test
 class ParMapTest {
   @Test fun parMapIsStackSafe() = runTest {
     val count = 20_000
-    val ref = Atomic(0)
+    val ref = AtomicInt(0)
     (0 until count).parMap { _: Int ->
       ref.update { it + 1 }
     }
@@ -92,7 +90,7 @@ class ParMapTest {
 
   @Test fun parMapOrAccumulateIsStackSafe() = runTest {
     val count = 20_000
-    val ref = Atomic(0)
+    val ref = AtomicInt(0)
     (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
       ref.update { it + 1 }
     }
@@ -155,7 +153,7 @@ class ParMapTest {
 
   @Test fun parMapNotNullIsStackSafe() = runTest {
     val count = 20_000
-    val ref = Atomic(0)
+    val ref = AtomicInt(0)
     (0 until count).parMapNotNull { _: Int ->
       ref.update { it + 1 }
     }
