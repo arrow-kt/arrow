@@ -35,11 +35,6 @@ kotlin {
         implementation(libs.kotlin.test)
       }
     }
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
 
     jvmMain {
       dependencies {
@@ -60,4 +55,8 @@ kotlin {
       }
     }
   }
+}
+
+tasks.test {
+  useJUnitPlatform()
 }
