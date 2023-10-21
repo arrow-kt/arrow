@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.test.nonEmptySet
 import io.kotest.assertions.withClue
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -10,36 +9,38 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.next
 import io.kotest.property.checkAll
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class NonEmptySetTest : StringSpec({
+class NonEmptySetTest {
 
-  "iterable.toNonEmptySetOrNull should round trip" {
+  @Test fun iterableToNonEmptySetOrNullShouldRoundTrip() = runTest {
     checkAll(Arb.nonEmptySet(Arb.int())) { nonEmptySet ->
       nonEmptySet.toNonEmptySetOrNull().shouldNotBeNull() shouldBe nonEmptySet
     }
   }
 
-  "iterable.toNonEmptySetOrNone should round trip" {
+  @Test fun iterableToNonEmptySetOrNoneShouldRoundTrip() = runTest {
     checkAll(Arb.nonEmptySet(Arb.int())) { nonEmptySet ->
       nonEmptySet.toNonEmptySetOrNone() shouldBe nonEmptySet.some()
     }
   }
 
-  "emptyList.toNonEmptySetOrNull should be null" {
+  @Test fun emptyListToNonEmptySetOrNullShouldBeNull() = runTest {
     listOf<Int>().toNonEmptySetOrNull() shouldBe null
   }
 
-  "emptyList.toNonEmptySetOrNone should be none" {
+  @Test fun emptyListToNonEmptySetOrNoneShouldBeNone() = runTest {
     listOf<Int>().toNonEmptySetOrNone() shouldBe none()
   }
 
-  "adding an element already present doesn't change the set" {
+  @Test fun addingAnElementAlreadyPresentDoesNotChangeTheSet() = runTest {
     val element = Arb.int().next()
     val initialSet: NonEmptySet<Int> = nonEmptySetOf(element) + Arb.nonEmptySet(Arb.int()).next()
     initialSet.plus(element) shouldBe initialSet
   }
 
-  "NonEmptySet equals Set" {
+  @Test fun nonEmptySetEqualsSet() = runTest {
     checkAll(
       Arb.nonEmptySet(Arb.int())
     ) { nes ->
@@ -51,7 +52,7 @@ class NonEmptySetTest : StringSpec({
     }
   }
 
-  "NonEmptySet equals NonEmptySet" {
+  @Test fun nonEmptySetEqualsNonEmptySet() = runTest {
     checkAll(
       Arb.nonEmptySet(Arb.int())
     ) { nes ->
@@ -62,5 +63,5 @@ class NonEmptySetTest : StringSpec({
       }
     }
   }
-})
+}
 
