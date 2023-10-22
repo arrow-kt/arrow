@@ -36,7 +36,8 @@ kotlin {
           implementation(libs.kotest.frameworkEngine)
           implementation(libs.kotest.assertionsCore)
           implementation(libs.kotest.property)
-        }
+        implementation(libs.kotlin.test)
+      }
       }
 
     jvmTest {
