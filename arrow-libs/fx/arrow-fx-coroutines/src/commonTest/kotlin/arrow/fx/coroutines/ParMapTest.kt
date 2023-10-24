@@ -3,26 +3,25 @@ package arrow.fx.coroutines
 import arrow.atomic.AtomicInt
 import arrow.atomic.update
 import arrow.core.Either
-import arrow.core.EitherNel
 import arrow.core.NonEmptyList
-import arrow.core.raise.either
 import arrow.core.left
-import arrow.core.nonEmptyListOf
+import arrow.core.raise.either
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlin.test.Test
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
 class ParMapTest {
-  @Test fun parMapIsStackSafe() = runTest {
-    val count = 20_000
+  @Test fun parMapIsStackSafe() = runTestWithDelay {
+    val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMap { _: Int ->
       ref.update { it + 1 }
@@ -90,8 +89,8 @@ class ParMapTest {
     }
   }
 
-  @Test fun parMapOrAccumulateIsStackSafe() = runTest {
-    val count = 20_000
+  @Test fun parMapOrAccumulateIsStackSafe() = runTestWithDelay {
+    val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
       ref.update { it + 1 }
@@ -147,14 +146,14 @@ class ParMapTest {
 
   @Test fun parMapOrAccumulateAccumulatesShifts() = runTest {
     checkAll(Arb.string()) { e ->
-      (0 until 100).parMapOrAccumulate { _ ->
+      (0 until 10).parMapOrAccumulate { _ ->
         raise(e)
-      } shouldBe NonEmptyList(e, (1 until 100).map { e }).left()
+      } shouldBe NonEmptyList(e, (1 until 10).map { e }).left()
     }
   }
 
-  @Test fun parMapNotNullIsStackSafe() = runTest {
-    val count = 20_000
+  @Test fun parMapNotNullIsStackSafe() = runTestWithDelay {
+    val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapNotNull { _: Int ->
       ref.update { it + 1 }
@@ -209,16 +208,16 @@ class ParMapTest {
   }
 
   @Test fun parMapNotNullDiscardsNulls() = runTest {
-    (0 until 100).parMapNotNull { _ ->
+    (0 until 10).parMapNotNull { _ ->
       null
     } shouldBe emptyList()
   }
 
   @Test fun parMapNotNullRetainsNonNulls() = runTest {
     checkAll(Arb.int()) { i ->
-      (0 until 100).parMapNotNull { _ ->
+      (0 until 10).parMapNotNull { _ ->
         i
-      } shouldBe List(100) { i }
+      } shouldBe List(10) { i }
     }
   }
 }

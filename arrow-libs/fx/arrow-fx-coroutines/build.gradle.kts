@@ -42,6 +42,7 @@ kotlin {
         implementation(libs.kotlin.stdlib)
       }
     }
+
     jsMain {
       dependencies {
         implementation(libs.kotlin.stdlibJS)
