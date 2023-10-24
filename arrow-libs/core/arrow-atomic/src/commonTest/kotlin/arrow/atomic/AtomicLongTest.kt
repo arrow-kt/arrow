@@ -98,7 +98,7 @@ class AtomicLongTest {
 
   @Test
   fun concurrentModifications() = runTestWithDelay {
-    val finalValue = 50_000
+    val finalValue = stackSafeIteration()
     val r = AtomicLong(0)
     (0 until finalValue).parMap { r.update { it + 1 } }
     r.value shouldBe finalValue

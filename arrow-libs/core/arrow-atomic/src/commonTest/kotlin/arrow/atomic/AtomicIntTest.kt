@@ -98,7 +98,7 @@ class AtomicIntTest {
 
   @Test
   fun concurrentModifications() = runTestWithDelay {
-    val finalValue = 50_000
+    val finalValue = stackSafeIteration()
     val r = AtomicInt(0)
     (0 until finalValue).parMap { r.update { it + 1 } }
     r.value shouldBe finalValue

@@ -102,7 +102,7 @@ class AtomicTest {
 
   @Test
   fun concurrentModifications() = runTestWithDelay {
-    val finalValue = 50_000
+    val finalValue = stackSafeIteration()
     val r = Atomic("")
     (0 until finalValue).parMap { r.update { it + "a" } }
     r.value shouldBe "a".repeat(finalValue)

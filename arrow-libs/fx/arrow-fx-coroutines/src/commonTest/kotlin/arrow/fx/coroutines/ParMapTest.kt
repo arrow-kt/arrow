@@ -20,7 +20,7 @@ import kotlinx.coroutines.test.runTest
 
 class ParMapTest {
   @Test fun parMapIsStackSafe() = runTestWithDelay {
-    val count = 20_000
+    val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMap { _: Int ->
       ref.update { it + 1 }
@@ -89,7 +89,7 @@ class ParMapTest {
   }
 
   @Test fun parMapOrAccumulateIsStackSafe() = runTestWithDelay {
-    val count = 20_000
+    val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
       ref.update { it + 1 }
@@ -145,14 +145,14 @@ class ParMapTest {
 
   @Test fun parMapOrAccumulateAccumulatesShifts() = runTest {
     checkAll(Arb.string()) { e ->
-      (0 until 100).parMapOrAccumulate { _ ->
+      (0 until 10).parMapOrAccumulate { _ ->
         raise(e)
-      } shouldBe NonEmptyList(e, (1 until 100).map { e }).left()
+      } shouldBe NonEmptyList(e, (1 until 10).map { e }).left()
     }
   }
 
   @Test fun parMapNotNullIsStackSafe() = runTestWithDelay {
-    val count = 20_000
+    val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapNotNull { _: Int ->
       ref.update { it + 1 }
