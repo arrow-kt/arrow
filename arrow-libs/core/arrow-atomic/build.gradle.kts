@@ -63,3 +63,7 @@ tasks.withType<KotlinCompile>().configureEach {
     freeCompilerArgs = freeCompilerArgs + "-Xexpect-actual-classes"
   }
 }
+
+tasks.test {
+  useJUnitPlatform()
+}
