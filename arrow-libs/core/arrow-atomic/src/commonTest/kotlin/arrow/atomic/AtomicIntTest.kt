@@ -1,7 +1,6 @@
 package arrow.atomic
 
 import arrow.fx.coroutines.parMap
-import io.kotest.common.runBlocking
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import io.kotest.matchers.shouldBe
