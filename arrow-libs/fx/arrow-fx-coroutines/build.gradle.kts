@@ -37,12 +37,6 @@ kotlin {
       }
     }
 
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
     jvmMain {
       dependencies {
         implementation(libs.kotlin.stdlib)
