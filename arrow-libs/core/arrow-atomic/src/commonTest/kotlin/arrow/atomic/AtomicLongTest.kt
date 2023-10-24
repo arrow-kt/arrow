@@ -1,20 +1,17 @@
 package arrow.atomic
 
 import arrow.fx.coroutines.parMap
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
-class AtomicLongTest : StringSpec({
+class AtomicLongTest {
 
-  "set get - successful" {
+  @Test
+  fun setGetSuccessful() = runTest {
     checkAll(Arb.long(), Arb.long()) { x, y ->
       val r = AtomicLong(x)
       r.value = y
@@ -22,7 +19,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "update get - successful" {
+  @Test
+  fun updateGetSuccessful() = runTest {
     checkAll(Arb.long(), Arb.long()) { x, y ->
       val r = AtomicLong(x)
       r.update { y }
@@ -30,7 +28,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "getAndSet - successful" {
+  @Test
+  fun getAndSetSuccessful() = runTest {
     checkAll(Arb.long(), Arb.long()) { x, y ->
       val ref = AtomicLong(x)
       ref.getAndSet(y) shouldBe x
@@ -38,7 +37,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "getAndUpdate - successful" {
+  @Test
+  fun getAndUpdateSuccessful() = runTest {
     checkAll(Arb.long(), Arb.long()) { x, y ->
       val ref = AtomicLong(x)
       ref.getAndUpdate { y } shouldBe x
@@ -46,7 +46,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "updateAndGet - successful" {
+  @Test
+  fun updateAndGetSuccessful() = runTest {
     checkAll(Arb.long(), Arb.long()) { x, y ->
       val ref = AtomicLong(x)
       ref.updateAndGet {
@@ -56,7 +57,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "tryUpdate - modification occurs successfully" {
+  @Test
+  fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.long()) { x ->
       val ref = AtomicLong(x)
       ref.tryUpdate { it + 1 }
@@ -64,7 +66,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "tryUpdate - should fail to update if modification has occurred" {
+  @Test
+  fun tryUpdateShouldFailToUpdateIfModificationHasOccurred() = runTest {
     checkAll(Arb.long()) { x ->
       val ref = AtomicLong(x)
       ref.tryUpdate {
@@ -74,7 +77,8 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "consistent set update on strings" {
+  @Test
+  fun consistentSetUpdateOnStrings() = runTest {
     checkAll(Arb.long(), Arb.long()) { x, y ->
       val set = {
         val r = AtomicLong(x)
@@ -92,10 +96,11 @@ class AtomicLongTest : StringSpec({
     }
   }
 
-  "concurrent modifications" {
-    val finalValue = 50_000
+  @Test
+  fun concurrentModifications() = runTestWithDelay {
+    val finalValue = stackSafeIteration()
     val r = AtomicLong(0)
     (0 until finalValue).parMap { r.update { it + 1 } }
     r.value shouldBe finalValue
   }
-})
+}
