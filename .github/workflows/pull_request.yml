@@ -179,7 +179,7 @@ jobs:
       - name: jvmTest (K2 enabled)
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: "jvmTest -Pkotlin_version=1.9.30-dev-2548 -Pkotlin_repo_url=https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap -Pkotlin_language_version=2.0"
+          arguments: "jvmTest -Pkotlin_version=2.0.0-dev-5387 -Pkotlin_repo_url=https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap -Pkotlin_language_version=2.0"
 
       - name: Upload reports
         if: failure()
