@@ -29,16 +29,17 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowCore)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-          implementation(libs.coroutines.test)
-        }
+        implementation(libs.kotlin.test)
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
+        implementation(libs.coroutines.test)
       }
-      jvmTest {
-        dependencies {
-          runtimeOnly(libs.kotest.runnerJUnit5)
+    }
 
+    jvmTest {
+      dependencies {
+        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
 
@@ -47,6 +48,7 @@ kotlin {
         implementation(libs.kotlin.stdlib)
       }
     }
+
     jsMain {
       dependencies {
         implementation(libs.kotlin.stdlibJS)

@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package arrow.optics.plugin
 
 const val `package` = "package `if`.`this`.`object`.`is`.`finally`.`null`.`expect`.`annotation`"

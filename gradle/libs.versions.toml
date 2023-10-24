@@ -3,14 +3,14 @@ animalSniffer = "1.7.1"
 arrowGradleConfig = "0.12.0-rc.6"
 assertj = "3.24.2"
 coroutines = "1.7.3"
-classgraph = "4.8.162"
-dokka = "1.9.0"
+classgraph = "4.8.163"
+dokka = "1.9.10"
 jUnit = "4.13.2"
 jUnitJupiter = "5.10.0"
 jUnitVintage = "5.10.0"
 kotest = "5.7.2"
 kotestGradle = "5.7.2"
-kover = "0.7.3"
+kover = "0.7.4"
 kotlin = "1.9.10"
 kotlinxSerializationPlugin = "1.9.10"
 kotlinBinaryCompatibilityValidator = "0.13.2"
@@ -18,10 +18,10 @@ kotlinCompileTesting = "1.5.0"
 knit = "0.4.0"
 kspVersion = "1.9.10-1.0.13"
 kotlinxSerialization = "1.6.0"
-mockWebServer = "4.11.0"
+mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
-spotlessVersion = "6.21.0"
+spotlessVersion = "6.22.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -39,6 +39,7 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 kotlin-stdlibJS = { module = "org.jetbrains.kotlin:kotlin-stdlib-js" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }

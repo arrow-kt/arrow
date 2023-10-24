@@ -13,9 +13,9 @@ fun String.plusIfNotBlank(prefix: String = "", postfix: String = "") =
  * Sanitizes each delimited section if it matches with Kotlin reserved keywords.
  */
 fun KSName.asSanitizedString(delimiter: String = ".", prefix: String = "") =
-  asString().splitToSequence(delimiter).joinToString(delimiter, prefix) { if (it in kotlinKeywords) "`$it`" else it }
+  asString().splitToSequence(delimiter).joinToString(delimiter, prefix) { if (it in KOTLIN_KEYWORDS) "`$it`" else it }
 
-private val kotlinKeywords = setOf(
+private val KOTLIN_KEYWORDS = setOf(
   // Hard keywords
   "as",
   "break",
