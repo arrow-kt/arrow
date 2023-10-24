@@ -1,19 +1,28 @@
 public final class arrow/atomic/AtomicBoolean {
-	public fun <init> (Z)V
-	public final fun compareAndSet (ZZ)Z
-	public final fun get ()Z
-	public final fun getAndSet (Z)Z
-	public final fun getValue ()Z
-	public final fun set (Z)V
-	public final fun setValue (Z)V
+	public static final synthetic fun box-impl (Ljava/util/concurrent/atomic/AtomicInteger;)Larrow/atomic/AtomicBoolean;
+	public static final fun compareAndSet-impl (Ljava/util/concurrent/atomic/AtomicInteger;ZZ)Z
+	public static fun constructor-impl (Z)Ljava/util/concurrent/atomic/AtomicInteger;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/atomic/AtomicInteger;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/atomic/AtomicInteger;Ljava/util/concurrent/atomic/AtomicInteger;)Z
+	public static final fun get-impl (Ljava/util/concurrent/atomic/AtomicInteger;)Z
+	public static final fun getAndSet-impl (Ljava/util/concurrent/atomic/AtomicInteger;Z)Z
+	public static final fun getValue-impl (Ljava/util/concurrent/atomic/AtomicInteger;)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/atomic/AtomicInteger;)I
+	public static final fun set-impl (Ljava/util/concurrent/atomic/AtomicInteger;Z)V
+	public static final fun setValue-impl (Ljava/util/concurrent/atomic/AtomicInteger;Z)V
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/atomic/AtomicInteger;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/atomic/AtomicInteger;
 }
 
 public final class arrow/atomic/AtomicBooleanKt {
-	public static final fun getAndUpdate (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Z
-	public static final fun loop (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
-	public static final fun tryUpdate (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Z
-	public static final fun update (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)V
-	public static final fun updateAndGet (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun getAndUpdate-NCWaHEY (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun loop-NCWaHEY (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
+	public static final fun tryUpdate-NCWaHEY (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun update-NCWaHEY (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)V
+	public static final fun updateAndGet-NCWaHEY (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)Z
 }
 
 public final class arrow/atomic/AtomicIntKt {
