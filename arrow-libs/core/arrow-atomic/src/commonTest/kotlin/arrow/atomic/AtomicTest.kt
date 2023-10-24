@@ -102,11 +102,10 @@ class AtomicTest {
   }
 
   @Test
-  fun concurrentModifications() = runBlocking {
+  fun concurrentModifications() = runBlockingOnNative {
     val finalValue = 50_000
     val r = Atomic("")
     (0 until finalValue).parMap { r.update { it + "a" } }
     r.value shouldBe "a".repeat(finalValue)
-    Unit
   }
 }

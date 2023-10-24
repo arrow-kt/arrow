@@ -1,6 +1,7 @@
 package arrow.atomic
 
 import arrow.fx.coroutines.parMap
+import io.kotest.common.runBlocking
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import io.kotest.matchers.shouldBe
@@ -97,7 +98,7 @@ class AtomicIntTest {
   }
 
   @Test
-  fun concurrentModifications() = runTest {
+  fun concurrentModifications() = runBlockingOnNative {
     val finalValue = 50_000
     val r = AtomicInt(0)
     (0 until finalValue).parMap { r.update { it + 1 } }
