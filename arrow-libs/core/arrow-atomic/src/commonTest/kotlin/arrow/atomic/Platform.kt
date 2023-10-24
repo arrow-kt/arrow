@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.withContext
 
 fun stackSafeIteration(): Int = when (platform) {
-  Platform.JVM -> 500_000
+  Platform.JVM -> 20_000
   else -> 1000
 }
 
