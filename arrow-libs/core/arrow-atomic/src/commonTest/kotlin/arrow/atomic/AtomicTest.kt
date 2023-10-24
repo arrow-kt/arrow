@@ -101,7 +101,7 @@ class AtomicTest {
   }
 
   @Test
-  fun concurrentModifications() = runBlockingOnNative {
+  fun concurrentModifications() = runTestWithDelay {
     val finalValue = 50_000
     val r = Atomic("")
     (0 until finalValue).parMap { r.update { it + "a" } }
