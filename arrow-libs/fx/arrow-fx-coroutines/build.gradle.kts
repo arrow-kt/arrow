@@ -48,15 +48,6 @@ kotlin {
         implementation(libs.kotlin.stdlibJS)
       }
     }
-    js {
-      nodejs {
-        testTask {
-          useMocha {
-            timeout = "30000"
-          }
-        }
-      }
-    }
   }
 
   jvm {
