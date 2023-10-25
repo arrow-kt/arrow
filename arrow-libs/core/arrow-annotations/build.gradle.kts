@@ -13,26 +13,13 @@ spotless {
   }
 }
 
+apply(from = property("ANIMALSNIFFER_MPP"))
+
 kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        implementation(libs.kotlin.stdlibCommon)
-      }
-    }
-    jvmMain {
-      dependencies {
         implementation(libs.kotlin.stdlib)
-      }
-    }
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -45,5 +32,3 @@ kotlin {
     }
   }
 }
-
-apply(from = property("ANIMALSNIFFER_MPP"))

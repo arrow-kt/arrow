@@ -22,36 +22,32 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
 
     commonTest {
       dependencies {
+        implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
       }
     }
+
     jvmTest {
       dependencies {
         implementation(libs.kotlin.stdlib)
         implementation(libs.kotest.frameworkEngine)
-          implementation(libs.junitJupiterEngine)
-          implementation(libs.kotlin.reflect)
-
+        implementation(libs.junitJupiterEngine)
+        implementation(libs.kotlin.reflect)
       }
     }
 
     jvmMain {
       dependencies {
-        implementation(libs.kotlin.stdlib)
         api(libs.kotlin.reflect)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -65,19 +61,6 @@ kotlin {
   }
 }
 
-//fun DependencyHandlerScope.kspTest(dependencyNotation: Any): Unit {
-//  val exclude = setOf("commonTest", "nativeTest")
-//  add("kspMetadata", dependencyNotation)
-//  kotlin.sourceSets
-//    .filter { it.name !in exclude && it.name.contains("Test") }
-//    .forEach {
-//      val task = "ksp${it.name.capitalize()}"
-//      configurations.findByName(task)?.let {
-//        add(task, dependencyNotation)
-//      }
-//    }
-//}
-
-//dependencies {
-//  kspTest(projects.arrowOpticsKspPlugin)
-//}
+tasks.withType<Test> {
+  useJUnitPlatform()
+}

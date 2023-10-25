@@ -8,10 +8,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.negativeInt
-import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.*
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
 import kotlin.math.max
@@ -329,6 +326,63 @@ class NonEmptyListTest {
         // `shouldBe` doesn't use the `equals` methods on `Iterable`
         (a == a.all).shouldBeTrue()
       }
+    }
+  }
+
+  @Test
+  fun lastOrNull() = runTest {
+    checkAll(
+      Arb.nonEmptyList(Arb.int())
+    ) { a ->
+      val result = a.lastOrNull()
+      val expected = a.last()
+      result shouldBe expected
+    }
+  }
+
+  @Test
+  fun extract() = runTest {
+    checkAll(
+      Arb.nonEmptyList(Arb.int())
+    ) { a ->
+      val result = a.extract()
+      val expected = a.head
+      result shouldBe expected
+    }
+  }
+
+  @Test
+  fun plus() = runTest {
+    checkAll(
+      Arb.nonEmptyList(Arb.int()),
+      Arb.int()
+    ) { a, b ->
+      val result = a + b
+      val expected = a.all + b
+      result shouldBe expected
+    }
+  }
+
+  @Test
+  fun coflatMapKeepsLength() = runTest {
+    checkAll(
+      Arb.nonEmptyList(Arb.int())
+    ) { a ->
+      val result = a.coflatMap { it.all }
+      val expected = a.all
+      result.size shouldBe expected.size
+    }
+  }
+
+  @Test
+  fun foldLeftAddition() = runTest {
+    checkAll(
+      Arb.nonEmptyList(Arb.int()),
+      Arb.int()
+    ) { list, initial ->
+      val result = list.foldLeft(initial) { acc, i -> acc + i }
+      val expected = initial + list.all.sum()
+      result shouldBe expected
     }
   }
 }

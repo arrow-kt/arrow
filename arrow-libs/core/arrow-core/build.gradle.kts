@@ -25,7 +25,7 @@ kotlin {
       dependencies {
         api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
 
@@ -33,28 +33,17 @@ kotlin {
       dependencies {
         implementation(projects.arrowFxCoroutines)
         implementation(projects.arrowFunctions)
+        implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-        implementation(libs.kotlin.test)
       }
     }
 
     jvmTest {
       dependencies {
         runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -71,4 +60,8 @@ kotlin {
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }

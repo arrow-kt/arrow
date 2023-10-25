@@ -4,7 +4,6 @@ plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  
   alias(libs.plugins.kotlinx.serialization) // Needed for testing only
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
@@ -24,6 +23,8 @@ dependencies {
   compileOnly(libs.squareup.retrofit)
 
   testImplementation(projects.arrowCore)
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.coroutines.test)
   testImplementation(libs.kotest.frameworkEngine)
   testImplementation(libs.kotest.assertionsCore)
   testImplementation(libs.kotest.property)
@@ -40,4 +41,8 @@ tasks.jar {
   manifest {
     attributes["Automatic-Module-Name"] = "arrow.core.retrofit"
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }
