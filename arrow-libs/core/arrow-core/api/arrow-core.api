@@ -958,9 +958,9 @@ public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/
 public final class arrow/core/NonEmptySetKt {
 	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/Set;
 	public static final fun toNonEmptySetOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
-	public static final fun toNonEmptySetOrNone (Ljava/util/Set;)Larrow/core/Option;
+	public static final synthetic fun toNonEmptySetOrNone (Ljava/util/Set;)Larrow/core/Option;
 	public static final fun toNonEmptySetOrNull (Ljava/lang/Iterable;)Ljava/util/Set;
-	public static final fun toNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
+	public static final synthetic fun toNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
 }
 
 public final class arrow/core/NonFatalKt {
