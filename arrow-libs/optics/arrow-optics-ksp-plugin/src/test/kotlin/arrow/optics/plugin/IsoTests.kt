@@ -1,7 +1,7 @@
 package arrow.optics.plugin
 
 import arrow.optics.plugin.internals.noCompanion
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class IsoTests {
 
