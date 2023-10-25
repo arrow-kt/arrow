@@ -5,7 +5,6 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.kotlinx.kover)
-  alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.spotless)
 }
 
@@ -22,7 +21,6 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        compileOnly(libs.kotlin.stdlibCommon)
         implementation(libs.coroutines.core)
       }
     }
@@ -30,25 +28,10 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
-        implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-      }
-    }
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
+        implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
       }
     }
   }
@@ -60,4 +43,8 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }
