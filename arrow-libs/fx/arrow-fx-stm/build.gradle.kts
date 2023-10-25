@@ -21,7 +21,6 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        compileOnly(libs.kotlin.stdlibCommon)
         implementation(libs.coroutines.core)
       }
     }
@@ -29,21 +28,9 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
-        implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
         implementation(libs.kotlin.test)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -57,6 +44,6 @@ kotlin {
   }
 }
 
-tasks.test {
+tasks.withType<Test> {
   useJUnitPlatform()
 }
