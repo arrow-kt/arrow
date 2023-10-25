@@ -1,6 +1,6 @@
 package arrow.optics.plugin
 
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class OptionalTests {
 

@@ -26,33 +26,23 @@ kotlin {
       dependencies {
         api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-        }
+        implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
+        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
       }
+    }
 
     jvmTest {
       dependencies {
         runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -64,4 +54,8 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }

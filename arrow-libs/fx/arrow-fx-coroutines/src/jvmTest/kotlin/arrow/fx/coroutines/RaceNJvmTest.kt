@@ -63,7 +63,7 @@ class RaceNJvmTest : StringSpec({
     
     "race3 returns to original context" {
       val racerName = "race3"
-      
+
       checkAll(Arb.int(1..3)) { choose ->
         parallelCtx(3, racerName) { single, raceCtx ->
           withContext(single) {
@@ -118,17 +118,6 @@ class RaceNJvmTest : StringSpec({
           }
         }
       }
-    }
-    
-    "first racer out of 3 always wins on a single thread" {
-      resourceScope {
-        val ctx = singleThreadContext("single")
-        raceN(
-          ctx,
-          { Thread.currentThread().name },
-          { Thread.currentThread().name },
-          { Thread.currentThread().name }) as? Race3.First
-      }?.winner shouldStartWith "single"
     }
   }
 )

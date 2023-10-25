@@ -1,7 +1,8 @@
 package arrow.atomic
 
 import arrow.fx.coroutines.parMap
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.string
@@ -10,9 +11,10 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
-class AtomicTest : StringSpec({
+class AtomicTest {
 
-  "set get - successful" {
+  @Test
+  fun setGetSuccessful() = runTest {
     checkAll(Arb.string(), Arb.string()) { x, y ->
       val r = Atomic(x)
       r.value = y
@@ -20,7 +22,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "update get - successful" {
+  @Test
+  fun updateGetSuccessful() = runTest {
     checkAll(Arb.string(), Arb.string()) { x, y ->
       val r = Atomic(x)
       r.update { y }
@@ -28,7 +31,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "getAndSet - successful" {
+  @Test
+  fun getAndSetSuccessful() = runTest {
     checkAll(Arb.string(), Arb.string()) { x, y ->
       val ref = Atomic(x)
       ref.getAndSet(y) shouldBe x
@@ -36,7 +40,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "getAndUpdate - successful" {
+  @Test
+  fun getAndUpdateSuccessful() = runTest {
     checkAll(Arb.string(), Arb.string()) { x, y ->
       val ref = Atomic(x)
       ref.getAndUpdate { y } shouldBe x
@@ -44,7 +49,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "updateAndGet - successful" {
+  @Test
+  fun updateAndGetSuccessful() = runTest {
     checkAll(Arb.string(), Arb.string()) { x, y ->
       val ref = Atomic(x)
       ref.updateAndGet {
@@ -54,7 +60,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "tryUpdate - modification occurs successfully" {
+  @Test
+  fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.string()) { x ->
       val ref = Atomic(x)
       ref.tryUpdate { it + 1 }
@@ -62,7 +69,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "tryUpdate - should fail to update if modification has occurred" {
+  @Test
+  fun tryUpdateShouldFailToUpdateIfModificationHasOccurred() = runTest {
     checkAll(Arb.string()) { x ->
       val ref = Atomic(x)
       ref.tryUpdate {
@@ -73,7 +81,8 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "consistent set update on strings" {
+  @Test
+  fun consistentSetUpdateOnStrings() = runTest {
     checkAll(Arb.string(), Arb.string()) { x, y ->
       val set = suspend {
         val r = Atomic(x)
@@ -91,11 +100,11 @@ class AtomicTest : StringSpec({
     }
   }
 
-  "concurrent modifications" {
-    val finalValue = 50_000
+  @Test
+  fun concurrentModifications() = runTestWithDelay {
+    val finalValue = stackSafeIteration()
     val r = Atomic("")
     (0 until finalValue).parMap { r.update { it + "a" } }
     r.value shouldBe "a".repeat(finalValue)
   }
 }
-)
