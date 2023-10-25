@@ -23,17 +23,19 @@ dependencies {
   implementation(libs.kotlin.stdlib)
 
   testImplementation(libs.kotlin.stdlib)
-  testImplementation(libs.junitJupiterEngine)
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.coroutines.test)
   testImplementation(libs.kotlin.reflect)
-
-  testImplementation(libs.kotest.frameworkEngine)
   testImplementation(libs.kotest.assertionsCore)
   testImplementation(libs.kotest.property)
-  testRuntimeOnly(libs.kotest.runnerJUnit5)
 }
 
 tasks.jar {
   manifest {
     attributes["Automatic-Module-Name"] = "arrow.optics.reflect"
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }
