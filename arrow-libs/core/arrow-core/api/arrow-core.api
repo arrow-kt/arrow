@@ -611,6 +611,7 @@ public final class arrow/core/IorKt {
 	public static final fun sequenceNullable (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun sequenceOption (Larrow/core/Ior;)Larrow/core/Option;
 	public static final fun sequenceValidated (Larrow/core/Ior;)Larrow/core/Validated;
+	public static final fun toIorNel (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun widen (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function10;)Larrow/core/Ior;
@@ -3561,6 +3562,8 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ior (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static final fun iorNel (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static synthetic fun iorNel$default (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/core/Ior;
 	public static final fun mapError (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun mapError (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
