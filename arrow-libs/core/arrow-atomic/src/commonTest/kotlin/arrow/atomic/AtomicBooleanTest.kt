@@ -1,21 +1,16 @@
 package arrow.atomic
 
-import arrow.fx.coroutines.parMap
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 
-class AtomicBooleanTest : StringSpec({
+class AtomicBooleanTest {
 
-  "set get - successful" {
+  @Test
+  fun setGetSuccessful() = runTest {
     checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
       val r = AtomicBoolean(x)
       r.value = y
@@ -23,7 +18,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "update get - successful" {
+  @Test
+  fun updateGetSuccessful() = runTest {
     checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
       val r = AtomicBoolean(x)
       r.update { y }
@@ -31,7 +27,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "getAndSet - successful" {
+  @Test
+  fun getAndSetSuccessful() = runTest {
     checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
       val ref = AtomicBoolean(x)
       ref.getAndSet(y) shouldBe x
@@ -39,7 +36,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "getAndUpdate - successful" {
+  @Test
+  fun getAndUpdateSuccessful() = runTest {
     checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
       val ref = AtomicBoolean(x)
       ref.getAndUpdate { y } shouldBe x
@@ -47,7 +45,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "updateAndGet - successful" {
+  @Test
+  fun updateAndGetSuccessful() = runTest {
     checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
       val ref = AtomicBoolean(x)
       ref.updateAndGet {
@@ -57,7 +56,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "tryUpdate - modification occurs successfully" {
+  @Test
+  fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.boolean()) { x ->
       val ref = AtomicBoolean(x)
       ref.tryUpdate { !it }
@@ -65,7 +65,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "tryUpdate - should fail to update if modification has occurred" {
+  @Test
+  fun tryUpdateShouldFailToUpdateIfModificationHasOccurred() = runTest {
     checkAll(Arb.boolean()) { x ->
       val ref = AtomicBoolean(x)
       ref.tryUpdate {
@@ -75,7 +76,8 @@ class AtomicBooleanTest : StringSpec({
     }
   }
 
-  "consistent set update on strings" {
+  @Test
+  fun consistentSetUpdateOnStrings() = runTest {
     checkAll(Arb.boolean(), Arb.boolean()) { x, y ->
       val set = {
         val r = AtomicBoolean(x)
@@ -92,4 +94,4 @@ class AtomicBooleanTest : StringSpec({
       set() shouldBe update()
     }
   }
-})
+}
