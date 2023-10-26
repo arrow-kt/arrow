@@ -562,8 +562,11 @@ public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>>
 public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
   traverse(::identity)
 
-public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
-  firstOrNull()?.let { NonEmptyList(it, drop(1)) }
+public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? {
+  val iter = iterator()
+  if (!iter.hasNext()) return null
+  return NonEmptyList(iter.next(), Iterable { iter }.toList())
+}
 
 public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
   toNonEmptyListOrNull().toOption()
