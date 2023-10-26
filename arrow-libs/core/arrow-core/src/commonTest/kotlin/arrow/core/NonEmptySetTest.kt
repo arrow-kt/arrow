@@ -3,11 +3,13 @@ package arrow.core
 import arrow.core.test.nonEmptySet
 import io.kotest.assertions.withClue
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.next
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
@@ -16,6 +18,16 @@ class NonEmptySetTest {
 
   @Test fun iterableToNonEmptySetOrNullShouldRoundTrip() = runTest {
     checkAll(Arb.nonEmptySet(Arb.int())) { nonEmptySet ->
+      nonEmptySet.toNonEmptySetOrNull().shouldNotBeNull() shouldBe nonEmptySet
+    }
+  }
+
+  @Test fun iterableToNonEmptySetOrNullShouldReturnNullForEmptyIterable() = runTest {
+    listOf<String>().toNonEmptySetOrNull().shouldBeNull()
+  }
+
+  @Test fun iterableToNonEmptySetOrNullShouldReturnWorkWhenContainingNull() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.int().orNull())) { nonEmptySet ->
       nonEmptySet.toNonEmptySetOrNull().shouldNotBeNull() shouldBe nonEmptySet
     }
   }
