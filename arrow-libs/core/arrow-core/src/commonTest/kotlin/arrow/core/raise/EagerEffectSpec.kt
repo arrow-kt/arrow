@@ -18,11 +18,13 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlin.test.Test
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.test.runTest
 
 @Suppress("UNREACHABLE_CODE", "UNUSED_EXPRESSION")
-class EagerEffectSpec : StringSpec({
-  "try/catch - can recover from raise" {
+class EagerEffectSpec {
+  @Test fun tryCatchCanRecoverFromRaise() = runTest {
     checkAll(Arb.int(), Arb.string()) { i, s ->
       eagerEffect {
         try {
@@ -34,7 +36,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "try/catch - finally works" {
+  @Test fun tryCatchFinallyWorks() = runTest {
     checkAll(Arb.string(), Arb.int()) { s, i ->
       val promise = CompletableDeferred<Int>()
       eagerEffect {
@@ -49,7 +51,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "try/catch - First raise is ignored and second is returned" {
+  @Test fun tryCatchFirstRaiseIsIgnoredAndSecondIsReturned() = runTest {
     checkAll(Arb.int(), Arb.string(), Arb.string()) { i, s, s2 ->
       eagerEffect<String, Int> {
         try {
@@ -62,7 +64,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - catch" {
+  @Test fun recoverCatch() = runTest {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
@@ -75,7 +77,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - no catch" {
+  @Test fun recoverNoCatch() = runTest {
     checkAll(Arb.int(), Arb.long()) { i, l ->
       eagerEffect<String, Int> {
         eagerEffect<Long, Int> {
@@ -88,7 +90,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - raise from catch" {
+  @Test fun recoverRaiseFromCatch() = runTest {
     checkAll(Arb.long(), Arb.string()) { l, error ->
       eagerEffect {
         eagerEffect<Long, Int> {
@@ -101,18 +103,18 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "success" {
+  @Test fun success() = runTest {
     eagerEffect<Nothing, Int> { 1 }
       .fold({ unreachable() }, ::identity) shouldBe 1
   }
 
-  "short-circuit" {
+  @Test fun shortCircuit() = runTest {
     eagerEffect {
       raise("hello")
     }.fold(::identity) { unreachable() } shouldBe "hello"
   }
 
-  "Rethrows exceptions" {
+  @Test fun rethrowsExceptions() = runTest {
     val e = RuntimeException("test")
     Either.catch {
       eagerEffect<Nothing, Nothing> { throw e }
@@ -120,7 +122,7 @@ class EagerEffectSpec : StringSpec({
     } shouldBe Either.Left(e)
   }
 
-  "ensure null in eager either computation" {
+  @Test fun ensureNullInEagerEitherComputation() = runTest {
     checkAll(Arb.boolean(), Arb.int(), Arb.string()) { predicate, success, raise ->
       either {
         ensure(predicate) { raise }
@@ -129,7 +131,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "ensureNotNull in eager either computation" {
+  @Test fun ensureNotNullInEagerEitherComputation() = runTest {
     fun square(i: Int): Int = i * i
 
     checkAll(Arb.int().orNull(), Arb.string()) { i: Int?, raise: String ->
@@ -142,7 +144,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - happy path" {
+  @Test fun recoverHappyPath() = runTest {
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
@@ -151,7 +153,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - error path and recover" {
+  @Test fun recoverErrorPathAndRecover() = runTest {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, String> {
         raise(int)
@@ -161,7 +163,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - error path and re-raise" {
+  @Test fun recoverErrorPathAndReRaise() = runTest {
     checkAll(Arb.int(), Arb.string()) { int, fallback ->
       eagerEffect<Int, Unit> {
         raise(int)
@@ -171,7 +173,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "recover - error path and throw" {
+  @Test fun recoverErrorPathAndThrow() = runTest {
     checkAll(Arb.int(), Arb.string()) { int, msg ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
@@ -183,7 +185,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - happy path" {
+  @Test fun catchHappyPath() = runTest {
     checkAll(Arb.string()) { str ->
       eagerEffect<Int, String> {
         str
@@ -192,7 +194,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and recover" {
+  @Test fun catchErrorPathAndRecover() = runTest {
     checkAll(Arb.string(), Arb.string()) { msg, fallback ->
       eagerEffect<Int, String> {
         throw RuntimeException(msg)
@@ -201,7 +203,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and re-raise" {
+  @Test fun catchErrorPathAndReRaise() = runTest {
     checkAll(Arb.string(), Arb.int()) { msg, fallback ->
       eagerEffect<Int, Unit> {
         throw RuntimeException(msg)
@@ -210,7 +212,7 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and throw" {
+  @Test fun catchErrorPathAndThrow() = runTest {
     checkAll(Arb.string(), Arb.string()) { msg, msg2 ->
       shouldThrow<RuntimeException> {
         eagerEffect<Int, String> {
@@ -221,21 +223,21 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "catch - reified exception and recover" {
+  @Test fun catchReifiedExceptionAndRecover() = runTest {
     eagerEffect<Nothing, Int> {
       throw ArithmeticException()
     }.catch { _: ArithmeticException -> 1 }
       .fold({ unreachable() }, ::identity) shouldBe 1
   }
 
-  "catch - reified exception and raise" {
+  @Test fun catchReifiedExceptionAndRaise() = runTest {
     eagerEffect<String, Int> {
       throw ArithmeticException("Boom!")
     }.catch { e: ArithmeticException -> raise(e.message.shouldNotBeNull()) }
       .fold(::identity) { unreachable() } shouldBe "Boom!"
   }
 
-  "catch - reified exception and no match" {
+  @Test fun catchReifiedExceptionAndNoMatch() = runTest {
     shouldThrow<RuntimeException> {
       eagerEffect<Nothing, Int> {
         throw RuntimeException("Boom!")
@@ -244,7 +246,7 @@ class EagerEffectSpec : StringSpec({
     }.message shouldBe "Boom!"
   }
 
-  "shift leaked results in RaiseLeakException" {
+  @Test fun shiftLeakedResultsInRaiseLeakException() = runTest {
     eagerEffect {
       suspend { raise("failure") }
     }.fold(
@@ -254,7 +256,7 @@ class EagerEffectSpec : StringSpec({
       { unreachable() }) { f -> f() }
   }
 
-  "shift leaked results in RaiseLeakException with exception" {
+  @Test fun shiftLeakedResultsInRaiseLeakExceptionWithException() = runTest {
     shouldThrow<IllegalStateException> {
       val leak = CompletableDeferred<suspend () -> Unit>()
       eagerEffect {
@@ -270,7 +272,7 @@ class EagerEffectSpec : StringSpec({
     }.message shouldStartWith "raise or bind was called outside of its DSL scope"
   }
 
-  "shift leaked results in RaiseLeakException after raise" {
+  @Test fun shiftLeakedResultsInRaiseLeakExceptionAfterRaise() = runTest {
     shouldThrow<IllegalStateException> {
       val leak = CompletableDeferred<suspend () -> Unit>()
       eagerEffect {
@@ -285,7 +287,7 @@ class EagerEffectSpec : StringSpec({
     }.message shouldStartWith "raise or bind was called outside of its DSL scope"
   }
 
-  "mapError - raise and transform error" {
+  @Test fun mapErrorRaiseAndTransformError() = runTest {
     checkAll(Arb.long(), Arb.string()) { l, s ->
       (eagerEffect<Long, Int> {
         raise(l)
@@ -296,10 +298,10 @@ class EagerEffectSpec : StringSpec({
     }
   }
 
-  "mapError - success" {
+  @Test fun mapErrorSuccess() = runTest {
     checkAll(Arb.int()) { i ->
       (eagerEffect<Long, Int> { i } mapError { unreachable() })
         .get() shouldBe i
     }
   }
-})
+}

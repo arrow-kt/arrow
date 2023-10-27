@@ -5,6 +5,7 @@ import arrow.core.test.stackSafeIteration
 import io.kotest.assertions.withClue
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -39,6 +40,18 @@ class NonEmptyListTest {
   fun iterableToNonEmptyListOrNoneShouldRoundTrip() = runTest {
     checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
       nonEmptyList.all.toNonEmptyListOrNone() shouldBe nonEmptyList.some()
+    }
+  }
+
+  @Test
+  fun iterableToNonEmptyListOrNullShouldReturnNullForAnEmptyIterable() = runTest {
+    listOf<String>().toNonEmptyListOrNull().shouldBeNull()
+  }
+
+  @Test
+  fun iterableToNonEmptyListOrNullShouldWorkCorrectlyWhenTheIterableStartsWithOrContainsNull() = runTest {
+    checkAll(Arb.nonEmptyList(Arb.int().orNull())) { nonEmptyList ->
+      nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
     }
   }
 

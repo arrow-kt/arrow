@@ -384,8 +384,11 @@ public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 @JvmName("toNonEmptyListOrNull")
-public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? =
-  toList().let { if (it.isEmpty()) null else NonEmptyList(it) }
+public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? {
+  val iter = iterator()
+  if (!iter.hasNext()) return null
+  return NonEmptyList(iter.next(), Iterable { iter }.toList())
+}
 
 @JvmName("toNonEmptyListOrNone")
 public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
