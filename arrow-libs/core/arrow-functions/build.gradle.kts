@@ -1,13 +1,10 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.kotlinx.kover)
-  alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.spotless)
 }
 
@@ -26,33 +23,16 @@ kotlin {
       dependencies {
         api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
-          implementation(libs.kotest.frameworkEngine)
-          implementation(libs.kotest.assertionsCore)
-          implementation(libs.kotest.property)
-        }
-      }
-
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
+        implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.kotest.property)
       }
     }
   }
@@ -64,4 +44,8 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }

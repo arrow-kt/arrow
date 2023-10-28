@@ -2,17 +2,17 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Some
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-@Suppress("UNREACHABLE_CODE")
-class NullableSpec : StringSpec({
-  "ensure null in nullable computation" {
+class NullableSpec {
+  @Test fun ensureNullInNullableComputation() = runTest {
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
       nullable {
         ensure(predicate)
@@ -21,7 +21,7 @@ class NullableSpec : StringSpec({
     }
   }
 
-  "ensureNotNull in nullable computation" {
+  @Test fun ensureNotNullInNullableComputation() = runTest {
     fun square(i: Int): Int = i * i
     checkAll(Arb.int().orNull()) { i: Int? ->
       nullable {
@@ -31,7 +31,7 @@ class NullableSpec : StringSpec({
     }
   }
 
-  "short circuit null" {
+  @Test fun shortCircuitNull() = runTest {
     nullable {
       val number: Int = "s".length
       (number.takeIf { it > 1 }?.toString()).bind()
@@ -39,7 +39,7 @@ class NullableSpec : StringSpec({
     } shouldBe null
   }
 
-  "ensureNotNull short circuit" {
+  @Test fun ensureNotNullShortCircuit() = runTest {
     nullable {
       val number: Int = "s".length
       ensureNotNull(number.takeIf { it > 1 })
@@ -47,13 +47,13 @@ class NullableSpec : StringSpec({
     } shouldBe null
   }
 
-  "simple case" {
+  @Test fun simpleCase() = runTest {
     nullable {
       "s".length.bind()
     } shouldBe 1
   }
 
-  "multiple types" {
+  @Test fun multipleTypes() = runTest {
     nullable {
       val number = "s".length
       val string = number.toString().bind()
@@ -61,7 +61,7 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
-  "binding option in nullable" {
+  @Test fun bindingOptionInNullable() = runTest {
     nullable {
       val number = Some("s".length)
       val string = number.map(Int::toString).bind()
@@ -69,7 +69,7 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
-  "binding either in nullable" {
+  @Test fun bindingEitherInNullable() = runTest {
     nullable {
       val number = Either.Right("s".length)
       val string = number.map(Int::toString).bind()
@@ -77,7 +77,7 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
-  "binding either in nullable, ignore errors" {
+  @Test fun bindingEitherInNullableIgnoreErrors() = runTest {
     nullable {
       val number = Either.Right("s".length) as Either<Boolean, Int>
       val string = ignoreErrors { number.map(Int::toString).bind() }
@@ -85,7 +85,7 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
-  "short circuit option" {
+  @Test fun shortCircuitOption() = runTest {
     nullable {
       val number = Some("s".length)
       number.filter { it > 1 }.map(Int::toString).bind()
@@ -93,7 +93,7 @@ class NullableSpec : StringSpec({
     } shouldBe null
   }
 
-  "when expression" {
+  @Test fun whenExpression() = runTest {
     nullable {
       val number = "s".length.bind()
       val string = when (number) {
@@ -104,7 +104,7 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
-  "if expression" {
+  @Test fun ifExpression() = runTest {
     nullable {
       val number = "s".length.bind()
       val string = if (number == 1) {
@@ -116,7 +116,7 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
-  "if expression short circuit" {
+  @Test fun ifExpressionShortCircuit() = runTest {
     nullable {
       val number = "s".length.bind()
       val string = if (number != 1) {
@@ -128,18 +128,18 @@ class NullableSpec : StringSpec({
     } shouldBe null
   }
 
-  "Either<Nothing, A> can be bind" {
+  @Test fun eitherOfNothingAndSomethingCanBeBound() = runTest {
     nullable {
       val either: Either<Nothing, Int> = Either.Right(4)
       either.bind() + 3
     } shouldBe 7
   }
 
-  "Recover works as expected" {
+  @Test fun recoverWorksAsExpected() = runTest {
     nullable {
       val one: Int = recover({ null.bind<Int>() }) { 1 }
       val two = 2.bind()
       one + two
     } shouldBe 3
   }
-})
+}

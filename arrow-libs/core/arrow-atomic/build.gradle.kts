@@ -22,7 +22,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
 
@@ -30,21 +30,9 @@ kotlin {
       dependencies {
         implementation(projects.arrowFxCoroutines)
         implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-        implementation(libs.coroutines.test)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -64,6 +52,6 @@ tasks.withType<KotlinCompile>().configureEach {
   }
 }
 
-tasks.test {
+tasks.withType<Test> {
   useJUnitPlatform()
 }
