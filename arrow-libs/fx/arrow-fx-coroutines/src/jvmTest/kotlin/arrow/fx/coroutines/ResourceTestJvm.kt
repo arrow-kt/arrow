@@ -1,15 +1,16 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class ResourceTestJvm : StringSpec({
+class ResourceTestJvm {
 
   class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
@@ -20,8 +21,8 @@ class ResourceTestJvm : StringSpec({
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
-  
-  "AutoCloseable closes" {
+
+  @Test fun autoCloseableCloses() = runTest {
       val t = AutoCloseableTest()
       resourceScope {
         autoCloseable { t }
@@ -29,23 +30,23 @@ class ResourceTestJvm : StringSpec({
 
       t.didClose.get() shouldBe true
   }
-  
-  "AutoCloseable closes on error" {
+
+  @Test fun autoCloseableClosesOnError() = runTest {
     checkAll(Arb.throwable()) { throwable ->
       val t = AutoCloseableTest()
-      
+
       shouldThrow<Exception> {
         resourceScope {
           autoCloseable { t }
           throw throwable
         }
       } shouldBe throwable
-      
+
       t.didClose.get() shouldBe true
     }
   }
-  
-  "Closeable closes" {
+
+  @Test fun closeableCloses() = runTest {
       val t = CloseableTest()
 
       resourceScope {
@@ -54,8 +55,8 @@ class ResourceTestJvm : StringSpec({
 
       t.didClose.get() shouldBe true
   }
-  
-  "Closeable closes on error" {
+
+  @Test fun closeableClosesOnError() = runTest {
     checkAll(Arb.throwable()) { throwable ->
       val t = CloseableTest()
       
@@ -69,4 +70,4 @@ class ResourceTestJvm : StringSpec({
       t.didClose.get() shouldBe true
     }
   }
-})
+}
