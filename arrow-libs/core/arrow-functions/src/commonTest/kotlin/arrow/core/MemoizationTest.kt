@@ -1,14 +1,15 @@
 package arrow.core
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlin.random.Random
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class MemoizationTest : StringSpec({
-  "Memoize races" {
+class MemoizationTest {
+  @Test fun memoizeRaces() = runTest {
     checkAll<Int> {
       fun sum(): Int =
         Random.nextInt(Int.MAX_VALUE)
@@ -24,7 +25,7 @@ class MemoizationTest : StringSpec({
     }
   }
 
-  "Memoize P0 only first execution runs" {
+  @Test fun memoize0OnlyFirst() = runTest {
     var runs = 0
     fun sum(): Int {
       runs++
@@ -38,7 +39,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 1
   }
 
-  "Memoize P0 nullable" {
+  @Test fun memoize0Nullable() = runTest {
     var runs = 0
     fun sum(): Int? {
       runs++
@@ -52,7 +53,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 1
   }
 
-  "Memoize P1 only first execution runs" {
+  @Test fun memoize1OnlyFirst() = runTest {
     var runs = 0
     fun sum(n: Int): Int {
       runs++
@@ -70,7 +71,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 3
   }
 
-  "Memoize P1 nullable" {
+  @Test fun memoize1Nullable() = runTest {
     var runs = 0
     fun sum(n: Int): Int? {
       runs++
@@ -84,7 +85,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 1
   }
 
-  "Memoize P2 only first execution runs" {
+  @Test fun memoize2OnlyFirst() = runTest {
     var runs = 0
     fun sum(n1: Int, n2: Int): Int {
       runs++
@@ -103,7 +104,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 3
   }
 
-  "Memoize P2 nullable" {
+  @Test fun memoize2Nullable() = runTest {
     var runs = 0
     fun sum(n: Int, m: Int): Int? {
       runs++
@@ -117,7 +118,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 1
   }
 
-  "Memoize P3 only first execution runs" {
+  @Test fun memoize3OnlyFirst() = runTest {
     var runs = 0
     fun sum(n1: Int, n2: Int, n3: Int): Int {
       runs++
@@ -136,7 +137,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 3
   }
 
-  "Memoize P3 nullable" {
+  @Test fun memoize3Nullable() = runTest {
     var runs = 0
     fun sum(a: Int, b: Int, c: Int): Int? {
       runs++
@@ -150,7 +151,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 1
   }
 
-  "Memoize P4 only first execution runs" {
+  @Test fun memoize4OnlyFirst() = runTest {
     var runs = 0
     fun sum(n1: Int, n2: Int, n3: Int, n4: Int): Int {
       runs++
@@ -169,7 +170,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 3
   }
 
-  "Memoize P4 nullable" {
+  @Test fun memoize4Nullable() = runTest {
     var runs = 0
     fun sum(a: Int, b: Int, c: Int, d: Int): Int? {
       runs++
@@ -183,7 +184,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 1
   }
 
-  "Memoize P5 only first execution runs" {
+  @Test fun memoize5OnlyFirst() = runTest {
     var runs = 0
     fun sum(n1: Int, n2: Int, n3: Int, n4: Int, n5: Int): Int {
       runs++
@@ -202,7 +203,7 @@ class MemoizationTest : StringSpec({
     runs shouldBe 3
   }
 
-  "Memoize P5 nullable" {
+  @Test fun memoize5Nullable() = runTest {
     var runs = 0
     fun sum(a: Int, b: Int, c: Int, d: Int, e: Int): Int? {
       runs++
@@ -215,6 +216,6 @@ class MemoizationTest : StringSpec({
     memoized(1, 2, 3, 4, 5) shouldBe null
     runs shouldBe 1
   }
-})
+}
 
 private fun consecSumResult(n: Int): Int = (n * (n + 1)) / 2
