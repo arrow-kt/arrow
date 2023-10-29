@@ -3,7 +3,6 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.Tuple9
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.mpp.NamedThreadFactory
@@ -13,14 +12,16 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlin.test.Test
 import java.util.concurrent.Executors
 
-class ParZip9JvmTest : StringSpec({
+class ParZip9JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  "parZip 9 returns to original context" {
+  @Test fun parZip9ReturnsToOriginalContext() = runTest {
     val zipCtxName = "parZip9"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(9, NamedThreadFactory(zipCtxName)) }
@@ -57,7 +58,7 @@ class ParZip9JvmTest : StringSpec({
 
   }
 
-  "parZip 9 returns to original context on failure" {
+  @Test fun parZip9ReturnsToOriginalContextOnFailure() = runTest {
     val zipCtxName = "parZip9"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(9, NamedThreadFactory(zipCtxName)) }
@@ -192,7 +193,7 @@ class ParZip9JvmTest : StringSpec({
     }
   }
 
-  "parZip 9 finishes on single thread" {
+  @Test fun parZip9FinishesOnSingleThread() = runTest {
     checkAll(Arb.string()) {
       val res = resourceScope {
         parZip(
@@ -215,4 +216,4 @@ class ParZip9JvmTest : StringSpec({
       }
     }
   }
-})
+}
