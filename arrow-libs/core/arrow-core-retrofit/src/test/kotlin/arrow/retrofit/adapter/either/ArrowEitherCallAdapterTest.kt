@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 
-class ArrowEitherCallAdapterTest({
+class ArrowEitherCallAdapterTest {
 
   lateinit var server: MockWebServer
   lateinit var service: SuspendApiTestClient
@@ -94,5 +94,4 @@ class ArrowEitherCallAdapterTest({
 
     body.isFailure shouldBe true
   }
-})
-
+}
