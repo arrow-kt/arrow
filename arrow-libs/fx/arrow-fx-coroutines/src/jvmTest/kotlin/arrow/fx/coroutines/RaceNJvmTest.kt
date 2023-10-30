@@ -2,17 +2,18 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlin.test.Test
 
-class RaceNJvmTest : StringSpec({
-    "race2 returns to original context" {
+class RaceNJvmTest {
+    @Test fun race2ReturnsToOriginalContext() = runTest {
       val racerName = "race2"
       checkAll(Arb.int(1..2)) { choose ->
         resourceScope {
@@ -31,8 +32,8 @@ class RaceNJvmTest : StringSpec({
         }
       }
     }
-    
-    "race2 returns to original context on failure" {
+
+    @Test fun race2ReturnsToOriginalContextOnFailure() = runTest {
       val racerName = "race2"
       
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
@@ -54,14 +55,14 @@ class RaceNJvmTest : StringSpec({
       }
     }
     
-    "first racer out of 2 always wins on a single thread" {
+    @Test fun firstRacerOutOf2AlwaysWinsOnASingleThread() = runTest {
       resourceScope {
         val ctx = singleThreadContext("single")
         raceN(ctx, { Thread.currentThread().name }, { Thread.currentThread().name })
       }.swap().getOrNull() shouldStartWith "single"
     }
     
-    "race3 returns to original context" {
+    @Test fun race3ReturnsToOriginalContext() = runTest {
       val racerName = "race3"
 
       checkAll(Arb.int(1..3)) { choose ->
@@ -90,7 +91,7 @@ class RaceNJvmTest : StringSpec({
       }
     }
     
-    "race3 returns to original context on failure" {
+    @Test fun race3ReturnsToOriginalContextOnFailure() = runTest {
       val racerName = "race3"
       
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
@@ -120,4 +121,3 @@ class RaceNJvmTest : StringSpec({
       }
     }
   }
-)
