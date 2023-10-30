@@ -235,4 +235,3 @@ class ParZip9Test {
       }
     }
   }
-)
