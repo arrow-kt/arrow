@@ -16,21 +16,20 @@
 
 package arrow.core
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class CollectionsSyntaxTests : StringSpec({
-    "tail" {
+class CollectionsSyntaxTests {
+    @Test fun tail() = runTest {
       listOf(1, 2, 3).tail() shouldBe listOf(2, 3)
     }
 
-    "prependTo" {
+    @Test fun prependTo() = runTest {
       1 prependTo listOf(2, 3) shouldBe listOf(1, 2, 3)
     }
 
-    "destructured" {
+    @Test fun destructured() = runTest {
       val (head, tail) = listOf(1, 2, 3).let { it.first() to it.tail() }
       head shouldBe 1
       tail shouldBe listOf(2, 3)
     }
-})
+}
