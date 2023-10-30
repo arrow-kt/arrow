@@ -3,7 +3,6 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.Tuple8
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.mpp.NamedThreadFactory
@@ -14,13 +13,15 @@ import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlin.test.Test
 
-class ParZip8JvmTest : StringSpec({
+class ParZip8JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  "parZip 8 returns to original context" {
+  @Test fun parZip8ReturnsToOriginalContext() = runTest {
     val zipCtxName = "parZip8"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(8, NamedThreadFactory(zipCtxName)) }
@@ -47,7 +48,7 @@ class ParZip8JvmTest : StringSpec({
 
   }
 
-  "parZip 8 returns to original context on failure" {
+  @Test fun parZip8ReturnsToOriginalContextOnFailure() = runTest {
     val zipCtxName = "parZip8"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(8, NamedThreadFactory(zipCtxName)) }
@@ -159,7 +160,7 @@ class ParZip8JvmTest : StringSpec({
     }
   }
 
-  "parZip 8 finishes on single thread" {
+  @Test fun parZip8FinishesOnSingleThread() = runTest {
     checkAll(Arb.string()) {
       val res = resourceScope {
         val ctx = singleThreadContext("single")
@@ -182,4 +183,4 @@ class ParZip8JvmTest : StringSpec({
       }
     }
   }
-})
+}
