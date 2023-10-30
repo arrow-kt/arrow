@@ -5,15 +5,16 @@ import arrow.core.right
 import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
 import arrow.retrofit.adapter.retrofit.SuspendApiTestClient
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class ArrowResponseEAdapterTest : StringSpec({
+class ArrowResponseEAdapterTest {
 
   lateinit var server: MockWebServer
   lateinit var service: SuspendApiTestClient
@@ -30,8 +31,9 @@ class ArrowResponseEAdapterTest : StringSpec({
   }
 
   afterAny { server.shutdown() }
-
-  "should return ResponseMock for 200 with valid JSON" {
+  
+  @Test
+  fun shouldReturnResponseMockFor200WithValidJson() = runTest {
     server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
     val responseE = service.getResponseE()
@@ -42,7 +44,8 @@ class ArrowResponseEAdapterTest : StringSpec({
     }
   }
 
-  "should return Unit when service method returns Unit and null body received" {
+  @Test
+  fun shouldReturnUnitWhenServiceMethodReturnsUnitAndNullBodyReceived() = runTest {
     server.enqueue(MockResponse().setResponseCode(204))
 
     val responseE = service.postSomethingResponseE("Sample string")
@@ -52,8 +55,9 @@ class ArrowResponseEAdapterTest : StringSpec({
       body shouldBe Unit.right()
     }
   }
-
-  "should return Unit when service method returns Unit and JSON body received" {
+  
+  @Test
+  fun shouldReturnUnitWhenServiceMethodReturnsUnitAndJsonBodyReceived() = runTest {
     server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
     val responseE = service.postSomethingResponseE("Sample string")
@@ -64,7 +68,8 @@ class ArrowResponseEAdapterTest : StringSpec({
     }
   }
 
-  "should return ErrorMock for 400 with valid JSON" {
+  @Test
+  fun shouldReturnErrorMockFor400WithValidJson() = runTest {
     server.enqueue(MockResponse().setBody("""{"errorCode":42}""").setResponseCode(400))
 
     val responseE = service.getResponseE()
@@ -74,28 +79,31 @@ class ArrowResponseEAdapterTest : StringSpec({
       body shouldBe ErrorMock(42).left()
     }
   }
-
-  "should throw for 200 with invalid JSON" {
+  
+  @Test
+  fun shouldThrowFor200WithInvalidJson() = runTest {
     server.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
     val responseE = runCatching { service.getResponseE() }
 
     responseE.isFailure shouldBe true
   }
-
-  "should throw for 400 and invalid JSON" {
+  
+  @Test
+  fun shouldThrowFor400AndInvalidJson() = runTest {
     server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
 
     val responseE = runCatching { service.getResponseE() }
 
     responseE.isFailure shouldBe true
   }
-
-  "should throw when server disconnects" {
+  
+  @Test
+  fun shouldThrowWhenServerDisconnects() = runTest {
     server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })
 
     val responseE = runCatching { service.getResponseE() }
 
     responseE.isFailure shouldBe true
   }
-})
+}
