@@ -25,6 +25,7 @@ import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 
 class ParZip9Test {
+
     @Test
     fun parZip9RunsInParallel() = runTest {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g, h, i ->
@@ -89,7 +90,8 @@ class ParZip9Test {
         r.get() shouldBe "$i$h$g$f$e$d$c$b$a"
       }
     }
-
+    
+    @Test
     fun CancellingParZip9CancelsAllParticipants() = runTest {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -131,6 +133,7 @@ class ParZip9Test {
         ph.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pi.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
+    
     @Test
     fun parZip9CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTest {
       checkAll(
