@@ -8,7 +8,6 @@ import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -22,9 +21,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class ParZip8Test : StringSpec({
-    "parZip 8 runs in parallel" {
+class ParZip8Test {
+    @Test
+    fun parZip8RunsInParallel() = runTest {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g, h ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -81,8 +83,9 @@ class ParZip8Test : StringSpec({
         r.get() shouldBe "$h$g$f$e$d$c$b$a"
       }
     }
-
-    "Cancelling parZip 8 cancels all participants" {
+    
+    @Test
+    fun CancellingParZip8CancelsAllParticipants() = runTest {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -120,8 +123,9 @@ class ParZip8Test : StringSpec({
         pg.await().shouldBeTypeOf<ExitCase.Cancelled>()
         ph.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
-
-    "parZip 8 cancels losers if a failure occurs in one of the tasks" {
+    
+    @Test
+    fun parZip8CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTest {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4, 5, 6, 7, 8))
@@ -167,8 +171,9 @@ class ParZip8Test : StringSpec({
         r should leftException(e)
       }
     }
-
-    "parZip CancellationException on right can cancel rest" {
+    
+    @Test
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTest {
       checkAll(Arb.string(), Arb.int(1..8)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -212,4 +217,3 @@ class ParZip8Test : StringSpec({
       }
     }
   }
-)
