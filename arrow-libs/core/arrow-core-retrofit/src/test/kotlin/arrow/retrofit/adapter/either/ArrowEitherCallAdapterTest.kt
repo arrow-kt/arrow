@@ -19,7 +19,7 @@ class ArrowEitherCallAdapterTest {
   lateinit var server: MockWebServer
   lateinit var service: SuspendApiTestClient
 
-  beforeAny {
+  @Test fun beforeAny = runTime {
     server = MockWebServer()
     server.start()
     service = Retrofit.Builder()
@@ -30,7 +30,7 @@ class ArrowEitherCallAdapterTest {
       .create(SuspendApiTestClient::class.java)
   }
 
-  afterAny { server.shutdown() }
+  @Test fun afterAny = runTime { server.shutdown() }
 
   @Test fun shouldReturnResponseMockFor200WithValidJson() = runTest {
     server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
