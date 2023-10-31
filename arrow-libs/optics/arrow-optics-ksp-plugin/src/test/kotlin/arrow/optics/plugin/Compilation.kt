@@ -28,12 +28,16 @@ fun String.compilationFails() {
 
 fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
   val compilationResult = compile(this, allWarningsAsErrors = allWarningsAsErrors)
-  Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+  Assertions.assertThat(compilationResult.exitCode)
+    .withFailMessage(compilationResult.messages)
+    .isEqualTo(KotlinCompilation.ExitCode.OK)
 }
 
 fun String.evals(thing: Pair<String, Any?>) {
   val compilationResult = compile(this)
-  Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+  Assertions.assertThat(compilationResult.exitCode)
+    .withFailMessage(compilationResult.messages)
+    .isEqualTo(KotlinCompilation.ExitCode.OK)
   val classesDirectory = compilationResult.outputDirectory
   val (variable, output) = thing
   Assertions.assertThat(eval(variable, classesDirectory)).isEqualTo(output)

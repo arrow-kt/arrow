@@ -5,7 +5,6 @@ import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
 import arrow.core.test.unit
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -21,60 +20,6 @@ import kotlin.math.min
 class SequenceKTest : StringSpec({
 
     testLaws(MonoidLaws("Sequence", emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
-
-    "traverse for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        if (a > 20_000) {
-          Either.Left(Unit)
-        } else {
-          acc.add(a)
-          Either.Right(a)
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe Either.Left(Unit)
-    }
-
-    "traverse for Option stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = generateSequence(0) { it + 1 }.traverse { a ->
-        if ((a <= 20_000)) {
-          acc.add(a)
-          Some(a)
-        } else {
-          None
-        }
-      }
-      acc shouldBe (0..20_000).toList()
-      res shouldBe None
-    }
-
-    "mapOrAccumlate for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).asSequence().mapOrAccumulate(String::plus) {
-        acc.add(it)
-        Either.Right(it).bind()
-      }.map { it.toList() }
-      res shouldBe Either.Right(acc)
-      res shouldBe Either.Right((0..20_000).toList())
-    }
-
-    "traverse for Validated acummulates" {
-      checkAll(Arb.sequence(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, List<Int>> = ints.map { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-          .sequence(Semigroup.nonEmptyList())
-
-        val expected: ValidatedNel<Int, Sequence<Int>> =
-          ints.filterNot { it % 2 == 0 }.toList()
-            .toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.validNel()
-
-        res.map { it.toList() } shouldBe expected.map { it.toList() }
-      }
-    }
 
     "zip3" {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
@@ -210,34 +155,6 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip10" {
-      checkAll(
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int()),
-        Arb.sequence(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
-          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-          .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
-
-        result.toList() shouldBe expected.toList()
-      }
-    }
-
     "crosswalk the sequence to a List function" {
       checkAll(Arb.list(Arb.int())){ list ->
         val obtained = list.asSequence().crosswalk { listOf(it) }
@@ -330,16 +247,4 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "separateValidated" {
-      checkAll(Arb.sequence(Arb.int())) { ints ->
-        val sequence = ints.map {
-          if (it % 2 == 0) it.invalid()
-          else it.valid()
-        }
-
-        val (invalids, valids) = sequence.separateValidated()
-
-        invalids.toList() to valids.toList() shouldBe ints.partition { it % 2 == 0 }
-      }
-    }
 })

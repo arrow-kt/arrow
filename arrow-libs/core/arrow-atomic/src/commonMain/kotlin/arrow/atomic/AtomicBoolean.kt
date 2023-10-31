@@ -1,10 +1,13 @@
 package arrow.atomic
 
-public class AtomicBoolean(value: Boolean) {
-  private val inner = AtomicInt(value.toInt())
+import kotlin.jvm.JvmInline
+
+@JvmInline
+public value class AtomicBoolean private constructor(private val inner: AtomicInt) {
+  public constructor(value: Boolean): this(AtomicInt(value.toInt()))
 
   public var value: Boolean
-    get() = inner.value != 0
+    get() = inner.value.toBoolean()
     set(value) {
       inner.value = value.toInt()
     }
@@ -18,11 +21,14 @@ public class AtomicBoolean(value: Boolean) {
   }
 
   public fun getAndSet(value: Boolean): Boolean =
-    inner.getAndSet(value.toInt()) == 1
-
-  private fun Boolean.toInt(): Int =
-    if (this) 1 else 0
+    inner.getAndSet(value.toInt()).toBoolean()
 }
+
+private inline fun Boolean.toInt(): Int =
+  if (this) 1 else 0
+
+private inline fun Int.toBoolean(): Boolean =
+  this != 0
 
 
 /**

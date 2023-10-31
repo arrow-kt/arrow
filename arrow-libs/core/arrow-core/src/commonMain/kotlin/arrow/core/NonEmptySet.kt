@@ -21,25 +21,6 @@ public value class NonEmptySet<out A> private constructor(
 
   override fun lastOrNull(): A = elements.last()
 
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
-    elements.map(transform).toNonEmptyListOrNull()!!
-
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
-    elements.mapIndexed(transform).toNonEmptyListOrNull()!!
-
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
-    elements.flatMap(transform).toNonEmptyListOrNull()!!
-
-  override fun distinct(): NonEmptyList<A> =
-    toNonEmptyList()
-
-  @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
-    elements.distinctBy(selector).toNonEmptyListOrNull()!!
-
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
@@ -49,6 +30,24 @@ public value class NonEmptySet<out A> private constructor(
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =
     elements.hashCode()
+
+  public override fun distinct(): NonEmptyList<A> =
+    NonEmptyList(elements.distinct())
+
+  public override fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
+    NonEmptyList(elements.distinctBy(selector))
+
+  public override fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+    NonEmptyList(elements.map(transform))
+
+  public override fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+    NonEmptyList(elements.flatMap(transform))
+
+  public override fun <B> mapIndexed(transform: (index:Int, A) -> B): NonEmptyList<B> =
+    NonEmptyList(elements.mapIndexed(transform))
+
+  override fun <B> zip(other: NonEmptyCollection<B>): NonEmptyList<Pair<A, B>> =
+    NonEmptyList(elements.zip(other))
 }
 
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =

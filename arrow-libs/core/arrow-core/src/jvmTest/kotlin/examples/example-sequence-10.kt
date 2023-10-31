@@ -1,14 +1,13 @@
 // This file was automatically generated from Sequence.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleSequence10
 
-import arrow.core.rightPadZip
+import arrow.core.split
+import io.kotest.matchers.shouldBe
 
-val padRight = sequenceOf(1, 2).rightPadZip(sequenceOf("a"))        // Result: [Pair(1, "a"), Pair(2, null)]
-val padLeft = sequenceOf(1).rightPadZip(sequenceOf("a", "b"))       // Result: [Pair(1, "a")]
-val noPadding = sequenceOf(1, 2).rightPadZip(sequenceOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
-
-fun main() {
-  println("padRight = $padRight")
-  println("padLeft = $padLeft")
-  println("noPadding = $noPadding")
+fun test() {
+  sequenceOf("A", "B", "C").split()?.let { (tail, head) ->
+    head shouldBe "A"
+    tail.toList() shouldBe listOf("B", "C")
+  }
+  emptySequence<String>().split() shouldBe null
 }

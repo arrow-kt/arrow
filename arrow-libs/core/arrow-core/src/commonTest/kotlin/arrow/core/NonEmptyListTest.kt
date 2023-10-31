@@ -4,7 +4,6 @@ import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.nonEmptyList
 import arrow.core.test.stackSafeIteration
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.shouldForAll
@@ -41,130 +40,6 @@ class NonEmptyListTest : StringSpec({
     "iterable.toNonEmptyListOrNone should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
         nonEmptyList.all.toNonEmptyListOrNone() shouldBe nonEmptyList.some()
-      }
-    }
-
-    "flatten" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { nel ->
-        nonEmptyListOf(nel).flatten() shouldBe nel
-      }
-    }
-
-    "traverse for Either stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..stackSafeIteration()).toNonEmptyListOrNull()?.traverse { a ->
-        acc.add(a)
-        Either.Right(a)
-      }
-      res shouldBe Either.Right(acc.toNonEmptyListOrNull())
-      res shouldBe Either.Right((0..stackSafeIteration()).toNonEmptyListOrNull())
-    }
-
-    "traverse for Either short-circuit" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Either.Right(it)
-          } else Either.Left(it)
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        when (evens) {
-          is Either.Right -> evens.value shouldBe ints
-          is Either.Left -> evens.value shouldBe ints.first { it % 2 != 0 }
-        }
-      }
-    }
-
-    "sequence for Either should be consistent with traverseEither" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        fun onlyEven(i: Int) = if (i % 2 == 0) Either.Right(i) else Either.Left(i)
-        ints.map { onlyEven(it) }.sequence() shouldBe ints.traverse { onlyEven(it) }
-      }
-    }
-
-    "traverse for Option is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..stackSafeIteration()).toNonEmptyListOrNull()?.traverse { a ->
-        acc.add(a)
-        Some(a)
-      }
-      res shouldBe Some(acc.toNonEmptyListOrNull())
-      res shouldBe Some((0..stackSafeIteration()).toNonEmptyListOrNull())
-    }
-
-    "traverse for Option short-circuits" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse { a ->
-          if ((a % 2 == 0)) {
-            acc.add(a)
-            Some(a)
-          } else {
-            None
-          }
-        }
-        acc shouldBe ints.takeWhile { it % 2 == 0 }
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequence for Option yields some when all entries in the list are some" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val evens = ints.map { a ->
-          if ((a % 2 == 0)) {
-            Some(a)
-          } else {
-            None
-          }
-        }.sequence()
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "sequence for Option should be consistent with traverseOption" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        ints.map { a->
-          if ((a % 2 == 0)) {
-            Some(a)
-          } else {
-            None
-          }
-        }.sequence() shouldBe
-          ints.traverse { a->
-            if ((a % 2 == 0)) {
-              Some(a)
-            } else {
-              None
-            }
-          }
-      }
-    }
-
-    "traverse for Validated is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..stackSafeIteration())
-        .toNonEmptyListOrNull()?.traverse(Semigroup.string()) {
-          acc.add(it)
-          Validated.Valid(it)
-        }
-      res shouldBe Validated.Valid(acc)
-      res shouldBe Validated.Valid((0..stackSafeIteration()).toList())
-    }
-
-    "traverse for Validated accumulates" {
-      checkAll(Arb.nonEmptyList(Arb.int())) { ints ->
-        val res: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i: Int -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-
-        val expected: ValidatedNel<Int, NonEmptyList<Int>> =
-          ints.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.invalid() ?: ints.filter { it % 2 == 0 }.toNonEmptyListOrNull()!!.valid()
-
-        res shouldBe expected
       }
     }
 
@@ -378,26 +253,6 @@ class NonEmptyListTest : StringSpec({
       ) { a, b, c, d, e, f, g, h, i ->
         val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
         val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, ::Tuple9)
-          .toNonEmptyListOrNull()
-        result shouldBe expected
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int()),
-        Arb.nonEmptyList(Arb.int())
-      ) { a, b, c, d, e, f, g, h, i, j ->
-        val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
-        val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
           .toNonEmptyListOrNull()
         result shouldBe expected
       }

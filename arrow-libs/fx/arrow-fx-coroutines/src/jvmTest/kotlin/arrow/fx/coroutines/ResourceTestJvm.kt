@@ -1,15 +1,16 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class ResourceTestJvm : StringSpec({
+class ResourceTestJvm {
 
   class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
@@ -21,43 +22,52 @@ class ResourceTestJvm : StringSpec({
     override fun close() = didClose.set(true)
   }
 
-  "AutoCloseable closes" {
+  @Test fun autoCloseableCloses() = runTest {
       val t = AutoCloseableTest()
-
-      autoCloseable { t }.use {}
+      resourceScope {
+        autoCloseable { t }
+      }
 
       t.didClose.get() shouldBe true
   }
 
-  "AutoCloseable closes on error" {
+  @Test fun autoCloseableClosesOnError() = runTest {
     checkAll(Arb.throwable()) { throwable ->
       val t = AutoCloseableTest()
 
       shouldThrow<Exception> {
-        autoCloseable { t }.use<Nothing> { throw throwable }
+        resourceScope {
+          autoCloseable { t }
+          throw throwable
+        }
       } shouldBe throwable
 
       t.didClose.get() shouldBe true
     }
   }
 
-  "Closeable closes" {
+  @Test fun closeableCloses() = runTest {
       val t = CloseableTest()
 
-      closeable { t }.use {}
+      resourceScope {
+        closeable { t }
+      }
 
       t.didClose.get() shouldBe true
   }
 
-  "Closeable closes on error" {
+  @Test fun closeableClosesOnError() = runTest {
     checkAll(Arb.throwable()) { throwable ->
       val t = CloseableTest()
-
+      
       shouldThrow<Exception> {
-        closeable { t }.use<Nothing> { throw throwable }
+        resourceScope {
+          closeable { t }
+          throw throwable
+        }
       } shouldBe throwable
-
+      
       t.didClose.get() shouldBe true
     }
   }
-})
+}
