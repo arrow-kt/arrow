@@ -4,7 +4,6 @@ import arrow.optics.test.either
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import io.kotest.core.spec.style.StringSpec
@@ -22,13 +21,6 @@ class PrismTest : StringSpec({
       "Prism sum - ",
       PrismLaws(
         prism = Prism.sumType(),
-        aGen = Arb.sumType(),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
-      ),
-
-      SetterLaws(
-        setter = Prism.sumType(),
         aGen = Arb.sumType(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),

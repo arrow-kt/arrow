@@ -2,35 +2,17 @@
 package arrow.fx.coroutines.examples.exampleResource09
 
 import arrow.fx.coroutines.*
-import kotlinx.coroutines.delay
+import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 
-class UserProcessor {
-  suspend fun start(): Unit { delay(750); println("Creating UserProcessor") }
-  fun shutdown(): Unit = println("Shutting down UserProcessor")
-  fun process(ds: DataSource): List<String> =
-   ds.users().map { "Processed $it" }
-}
-
-class DataSource {
-  suspend fun connect(): Unit { delay(1000); println("Connecting dataSource") }
-  fun users(): List<String> = listOf("User-1", "User-2", "User-3")
-  fun close(): Unit = println("Closed dataSource")
-}
-
-class Service(val db: DataSource, val userProcessor: UserProcessor) {
-  suspend fun processData(): List<String> = userProcessor.process(db)
-}
-
-val userProcessor = resource {
-  UserProcessor().also { it.start() }
-} release UserProcessor::shutdown
-
-val dataSource = resource {
-  DataSource().also { it.connect() }
-} release DataSource::close
+val resource =
+  resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
 
 suspend fun main(): Unit {
-  userProcessor.parZip(dataSource) { userProcessor, ds ->
-      Service(ds, userProcessor)
-    }.use { service -> service.processData() }
+  val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
+  try {
+    /** Do something with A */
+    release(ExitCase.Completed)
+  } catch(e: Throwable) {
+     release(ExitCase(e))
+  }
 }

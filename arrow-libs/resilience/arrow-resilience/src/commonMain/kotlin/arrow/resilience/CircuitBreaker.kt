@@ -2,8 +2,8 @@
 
 package arrow.resilience
 
+import arrow.atomic.Atomic
 import arrow.core.Either
-import arrow.core.continuations.AtomicRef
 import arrow.core.identity
 import arrow.resilience.CircuitBreaker.State.Closed
 import arrow.resilience.CircuitBreaker.State.HalfOpen
@@ -134,7 +134,7 @@ import kotlin.time.TimeSource
 
 public class CircuitBreaker
 private constructor(
-  private val state: AtomicRef<State>,
+  private val state: Atomic<State>,
   private val resetTimeout: Duration,
   private val exponentialBackoffFactor: Double,
   private val maxResetTimeout: Duration,
@@ -522,7 +522,7 @@ private constructor(
       onOpen: suspend () -> Unit = suspend { }
     ): CircuitBreaker =
       CircuitBreaker(
-        state = AtomicRef(Closed(openingStrategy)),
+        state = Atomic(Closed(openingStrategy)),
         resetTimeout = resetTimeout
           .takeIf { it.isPositive() && it != Duration.ZERO }
           .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },

@@ -2,9 +2,9 @@
 package arrow.core.examples.exampleOption16
 
 import arrow.core.Some
+import arrow.core.none
 
- val value =
- Some(1).zip(Some("Hello"), Some(20.0), ::Triple)
 fun main() {
- println(value)
+  Some(12).onNone { println("flower") } // Result: Some(12)
+  none<Int>().onNone { println("flower") }  // Result: prints "flower" and returns: None
 }
