@@ -1,13 +1,17 @@
 name: "Publish all libs, Arrow-stack and Docs"
 
 on:
-  workflow_dispatch:
-    branches: [main]
-    inputs:
-      version:
-        description: 'Version'
-        required: true
-        type: string
+  push:
+    branch:
+      - 'arrow-2'
+#on:
+#  workflow_dispatch:
+#    branches: [main]
+#    inputs:
+#      version:
+#        description: 'Version'
+#        required: true
+#        type: string
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
@@ -47,7 +51,7 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Publish final version
+      - name: Publish next major SNAPSHOT version
         uses: gradle/gradle-build-action@v2
         with:
           arguments: -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository

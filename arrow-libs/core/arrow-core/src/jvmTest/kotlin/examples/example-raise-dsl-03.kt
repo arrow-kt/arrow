@@ -9,7 +9,6 @@ import arrow.core.raise.either
 import arrow.core.raise.effect
 import arrow.core.raise.ior
 import arrow.core.raise.toEither
-import arrow.typeclasses.Semigroup
 import io.kotest.matchers.shouldBe
 
 fun Raise<String>.failure(): Int = raise("failed")

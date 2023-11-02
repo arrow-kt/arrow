@@ -1,8 +1,8 @@
 package arrow.fx.coroutines
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.loop
-import arrow.core.continuations.update
+import arrow.atomic.Atomic
+import arrow.atomic.loop
+import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -46,7 +46,7 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     val unblock: CompletableDeferred<Unit>
   ) : State
 
-  private val state: AtomicRef<State> = AtomicRef(Awaiting(capacity, 0, CompletableDeferred()))
+  private val state: Atomic<State> = Atomic(Awaiting(capacity, 0, CompletableDeferred()))
 
   /**
    * When called, all waiting coroutines will be cancelled with [CancellationException].
@@ -78,7 +78,6 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
       throw cancellationException
     }
   }
-
   /**
    * When [await] is called the function will suspend until the required number of coroutines have called [await].
    * Once the [capacity] of the barrier has been reached, the coroutine will be released and continue execution.

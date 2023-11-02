@@ -1,6 +1,5 @@
 package arrow.fx.coroutines
 
-import arrow.fx.coroutines.continuations.ResourceDSL
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +11,6 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import java.io.Closeable
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -25,7 +23,7 @@ import kotlin.time.Duration
  * ```kotlin
  * import arrow.fx.coroutines.executor
  * import arrow.fx.coroutines.resourceScope
- * import arrow.fx.coroutines.parTraverse
+ * import arrow.fx.coroutines.parMap
  * import java.util.concurrent.Executors
  * import java.util.concurrent.atomic.AtomicInteger
  * import kotlin.math.max
@@ -41,7 +39,7 @@ import kotlin.time.Duration
  *       }
  *     }
  *
- *     listOf(1, 2, 3, 4, 5).parTraverse(pool) { i ->
+ *     listOf(1, 2, 3, 4, 5).parMap(pool) { i ->
  *       println("#$i running on ${Thread.currentThread().name}")
  *     }
  *   }
@@ -60,16 +58,6 @@ public suspend fun ResourceScope.executor(
     s.awaitTermination(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
   }
 }.asCoroutineDispatcher()
-
-@Deprecated(
-  "This API is being renamed in 2.x.x, use executor builder instead",
-  ReplaceWith(
-    "executor { f() }",
-    "import arrow.fx.coroutines.executor"
-  )
-)
-public fun Resource.Companion.fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
-  Resource(f) { s, _ -> s.shutdown() }.map(ExecutorService::asCoroutineDispatcher)
 
 public fun executor(
   timeout: Duration = Duration.INFINITE,
@@ -110,16 +98,6 @@ public fun <A : Closeable> closeable(
   closeable(closingDispatcher, closeable)
 }
 
-@Deprecated(
-  "This API is being renamed in 2.x.x, use closeable builder instead",
-  ReplaceWith(
-    "closeable { f() }",
-    "import arrow.fx.coroutines.closeable"
-  )
-)
-public fun <A : Closeable> Resource.Companion.fromCloseable(f: suspend () -> A): Resource<A> =
-  Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
-
 /**
  * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
  *
@@ -149,16 +127,6 @@ public fun <A : AutoCloseable> autoCloseable(
 ): Resource<A> = resource {
   autoCloseable(closingDispatcher, autoCloseable)
 }
-
-@Deprecated(
-  "This API is being renamed in 2.x.x, use closeable builder instead",
-  ReplaceWith(
-    "autoCloseable { f() }",
-    "import arrow.fx.coroutines.autoCloseable"
-  )
-)
-public fun <A : AutoCloseable> Resource.Companion.fromAutoCloseable(f: suspend () -> A): Resource<A> =
-  Resource(f) { s, _ -> withContext(Dispatchers.IO) { s.close() } }
 
 /**
  * Creates a single threaded [CoroutineContext] as a [Resource].
@@ -190,22 +158,6 @@ public suspend fun ResourceScope.singleThreadContext(name: String): ExecutorCoro
 
 public fun singleThreadContext(name: String): Resource<ExecutorCoroutineDispatcher> =
   resource { singleThreadContext(name) }
-
-@Deprecated(
-  "This API is being renamed in 2.x.x, use closeable builder instead",
-  ReplaceWith(
-    "singleThreadContext(name)",
-    "import arrow.fx.coroutines.singleThreadContext"
-  )
-)
-public fun Resource.Companion.singleThreadContext(name: String): Resource<CoroutineContext> =
-  fromExecutor {
-    Executors.newSingleThreadExecutor { r ->
-      Thread(r, name).apply {
-        isDaemon = true
-      }
-    }
-  }
 
 /**
  * Creates a single threaded [CoroutineContext] as a [Resource].

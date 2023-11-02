@@ -19,16 +19,15 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        compileOnly(libs.kotlin.stdlibCommon)
+        compileOnly(libs.kotlin.stdlib)
         implementation(libs.coroutines.core)
-        implementation("org.jetbrains.kotlin:kotlin-stdlib")
       }
     }
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
+        implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
-        implementation(kotlin("test"))
       }
     }
   }
@@ -40,4 +39,8 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }

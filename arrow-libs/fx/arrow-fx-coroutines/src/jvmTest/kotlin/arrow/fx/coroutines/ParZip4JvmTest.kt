@@ -3,28 +3,30 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.Tuple4
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
+import io.kotest.mpp.NamedThreadFactory
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import kotlin.test.Test
 
-class ParZip4JvmTest : StringSpec({
-    "parZip 4 returns to original context" {
+class ParZip4JvmTest {
+    @Test fun parZip4ReturnsToOriginalContext() = runTest {
       val zipCtxName = "parZip4"
-      val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { zipCtxName }) }
+      resourceScope {
+        val zipCtx = executor { Executors.newFixedThreadPool(4, NamedThreadFactory(zipCtxName)) }
 
-        single.zip(zipCtx).use { (_single, _zipCtx) ->
-          withContext(_single) {
-            threadName() shouldStartWith singleThreadName
+          withContext(single()) {
+            Thread.currentThread().name shouldStartWith "single"
 
             val (s1, s2, s3, s4) = parZip(
-              _zipCtx,
+              zipCtx,
               { Thread.currentThread().name },
               { Thread.currentThread().name },
               { Thread.currentThread().name },
@@ -35,46 +37,48 @@ class ParZip4JvmTest : StringSpec({
             s2 shouldStartWith zipCtxName
             s3 shouldStartWith zipCtxName
             s4 shouldStartWith zipCtxName
-            threadName() shouldStartWith singleThreadName
+            Thread.currentThread().name shouldStartWith "single"
           }
         }
-
     }
 
-    "parZip 4 returns to original context on failure" {
+    @Test fun parZip4ReturnsToOriginalContextOnFailure() = runTest {
       val zipCtxName = "parZip4"
-      val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { zipCtxName }) }
+      resourceScope {
+      val zipCtx = executor { Executors.newFixedThreadPool(4, NamedThreadFactory(zipCtxName)) }
 
       checkAll(Arb.int(1..4), Arb.throwable()) { choose, e ->
-        single.zip(zipCtx).use { (_single, _zipCtx) ->
-          withContext(_single) {
-            threadName() shouldStartWith singleThreadName
+          withContext(single()) {
+            Thread.currentThread().name shouldStartWith "single"
 
             Either.catch {
               when (choose) {
                 1 -> parZip(
-                  _zipCtx,
+                  zipCtx,
                   { e.suspend() },
                   { awaitCancellation() },
                   { awaitCancellation() },
                   { awaitCancellation() }
                 ) { _, _, _, _ -> Unit }
+
                 2 -> parZip(
-                  _zipCtx,
+                  zipCtx,
                   { awaitCancellation() },
                   { e.suspend() },
                   { awaitCancellation() },
                   { awaitCancellation() }
                 ) { _, _, _, _ -> Unit }
+
                 3 -> parZip(
-                  _zipCtx,
+                  zipCtx,
                   { awaitCancellation() },
                   { awaitCancellation() },
                   { e.suspend() },
                   { awaitCancellation() }
                 ) { _, _, _, _ -> Unit }
+
                 else -> parZip(
-                  _zipCtx,
+                  zipCtx,
                   { awaitCancellation() },
                   { awaitCancellation() },
                   { awaitCancellation() },
@@ -83,15 +87,16 @@ class ParZip4JvmTest : StringSpec({
               }
             } should leftException(e)
 
-            threadName() shouldStartWith singleThreadName
+            Thread.currentThread().name shouldStartWith "single"
           }
         }
       }
     }
 
-    "parZip 4 finishes on single thread" {
+    @Test fun parZip4FinishesOnSingleThread() = runTest {
       checkAll(Arb.string()) {
-        val res = single.use { ctx ->
+        val res = resourceScope {
+          val ctx = singleThreadContext("single")
           parZip(
             ctx,
             { Thread.currentThread().name },
@@ -105,4 +110,3 @@ class ParZip4JvmTest : StringSpec({
       }
     }
   }
-)

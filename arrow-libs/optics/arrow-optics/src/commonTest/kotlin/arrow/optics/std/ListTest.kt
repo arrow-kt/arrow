@@ -5,7 +5,6 @@ import arrow.optics.Optional
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.OptionalLaws
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.nonEmptyList
@@ -27,12 +26,6 @@ class ListTest : StringSpec({
       ),
       TraversalLaws(
         traversal = Optional.listHead(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
-      ),
-      SetterLaws(
-        setter = Optional.listHead(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),

@@ -4,9 +4,7 @@ import arrow.optics.test.functionAToB
 import arrow.optics.test.nonEmptyList
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.testLaws
-import arrow.optics.test.sequence
 import arrow.optics.typeclasses.Index
-import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
@@ -32,7 +30,7 @@ class IndexInstanceTest : StringSpec({
       "Index sequence - ",
       OptionalLaws(
         optionalGen = Arb.int().map { Index.sequence<Long>().index(it) },
-        aGen = Arb.sequence(Arb.long()),
+        aGen = Arb.list(Arb.long()).map { it.asSequence() },
         bGen = Arb.long(),
         funcGen = Arb.functionAToB(Arb.long()),
         eqa = { a, b -> a.toList() == b.toList() }

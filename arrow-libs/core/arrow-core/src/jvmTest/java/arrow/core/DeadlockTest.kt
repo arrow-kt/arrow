@@ -8,20 +8,6 @@ import kotlinx.coroutines.runBlocking
 
 class DeadlockTest : StringSpec({
 
-  "classloader should not deadlock Validated initialization" {
-    runBlocking {
-      (0..10).map { i ->
-        GlobalScope.launch {
-          if (i % 2 == 0) {
-            Validated.Invalid(Unit)
-          } else {
-            Validated.Valid(null)
-          }
-        }
-      }.joinAll()
-    }
-  }
-
   "classloader should not deadlock Either initialization" {
     runBlocking {
       (0..10).map { i ->
@@ -32,8 +18,8 @@ class DeadlockTest : StringSpec({
             Either.Right(null)
           }
         }
-      }.joinAll()
-    }
+      }
+    }.joinAll()
   }
 
   "classloader should not deadlock Option initialization" {
@@ -58,20 +44,6 @@ class DeadlockTest : StringSpec({
             Ior.Left(Unit)
           } else {
             Ior.Right(null)
-          }
-        }
-      }.joinAll()
-    }
-  }
-
-  "classloader should not deadlock Eval initialization" {
-    runBlocking {
-      (0..10).map { i ->
-        GlobalScope.launch {
-          if (i % 2 == 0) {
-            Eval.Now(Unit)
-          } else {
-            Eval.Later { null }
           }
         }
       }.joinAll()

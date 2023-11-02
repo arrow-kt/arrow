@@ -12,16 +12,16 @@ class SequenceKnitTest : StringSpec({
     arrow.core.examples.exampleSequence02.test()
   }
 
-  "ExampleSequence04" {
-    arrow.core.examples.exampleSequence04.test()
+  "ExampleSequence03" {
+    arrow.core.examples.exampleSequence03.test()
   }
 
-  "ExampleSequence11" {
-    arrow.core.examples.exampleSequence11.test()
+  "ExampleSequence10" {
+    arrow.core.examples.exampleSequence10.test()
   }
 
-  "ExampleSequence18" {
-    arrow.core.examples.exampleSequence18.test()
+  "ExampleSequence17" {
+    arrow.core.examples.exampleSequence17.test()
   }
 
 }) {

@@ -4,7 +4,6 @@ import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.nonEmptyList
-import arrow.optics.test.sequence
 import arrow.optics.typeclasses.FilterIndex
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
@@ -30,7 +29,7 @@ class FilterIndexInstanceTest : StringSpec({
       "FilterIndex sequence - ",
       TraversalLaws(
         traversal = FilterIndex.sequence<Int>().filter { true },
-        aGen = Arb.sequence(Arb.int()),
+        aGen = Arb.list(Arb.int()).map { it.asSequence() },
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       ) { a, b -> a.toList() == b.toList() }

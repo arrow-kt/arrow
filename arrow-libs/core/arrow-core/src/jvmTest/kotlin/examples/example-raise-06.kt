@@ -5,7 +5,7 @@ import arrow.core.raise.effect
 import arrow.core.raise.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
-import arrow.fx.coroutines.parTraverse
+import arrow.fx.coroutines.parMap
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -22,7 +22,7 @@ suspend fun main() {
   val error = "Error"
   val exits = (0..3).map { CompletableDeferred<ExitCase>() }
   effect<String, List<Unit>> {
-    (0..4).parTraverse { index ->
+    (0..4).parMap { index ->
       if (index == 4) raise(error)
       else awaitExitCase(exits[index])
     }
