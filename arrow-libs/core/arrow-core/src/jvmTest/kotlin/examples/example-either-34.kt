@@ -1,11 +1,13 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither34
 
- import arrow.core.*
+import arrow.core.*
 
- fun main(args: Array<String>) {
+fun main(args: Array<String>) {
   //sampleStart
-  Either.Left("foo").isNotEmpty()  // Result: false
-  Either.Right("foo").isNotEmpty() // Result: true
+  val string: Either<Int, String> = "Hello".right()
+  val chars: Either<Int, CharSequence> =
+    string.widen<Int, CharSequence, String>()
   //sampleEnd
+  println(chars)
 }

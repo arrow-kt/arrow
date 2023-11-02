@@ -1,7 +1,6 @@
 @file:UseSerializers(
   EitherSerializer::class,
   IorSerializer::class,
-  ValidatedSerializer::class,
   OptionSerializer::class,
   NonEmptyListSerializer::class,
   NonEmptySetSerializer::class
@@ -14,7 +13,6 @@ import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Option
-import arrow.core.Validated
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
@@ -38,9 +36,6 @@ data class EitherInside<A, B>(val thing: Either<A, B>)
 
 @Serializable
 data class IorInside<A, B>(val thing: Ior<A, B>)
-
-@Serializable
-data class ValidatedInside<A, B>(val thing: Validated<A, B>)
 
 @Serializable
 data class OptionInside<A>(val thing: Option<A>)
@@ -68,7 +63,6 @@ inline fun <reified T> StringSpec.backAgain(generator: Arb<T>) {
 class BackAgainTest : StringSpec({
   backAgain(Arb.either(Arb.string(), Arb.int()).map(::EitherInside))
   backAgain(Arb.ior(Arb.string(), Arb.int()).map(::IorInside))
-  backAgain(Arb.validated(Arb.string(), Arb.int()).map(::ValidatedInside))
   backAgain(Arb.option(Arb.string()).map(::OptionInside))
   backAgain(Arb.nonEmptyList(Arb.int()).map(::NonEmptyListInside))
   backAgain(Arb.nonEmptySet(Arb.int()).map(::NonEmptySetInside))

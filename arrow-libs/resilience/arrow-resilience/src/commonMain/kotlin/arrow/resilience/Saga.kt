@@ -1,7 +1,7 @@
 package arrow.resilience
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.updateAndGet
+import arrow.atomic.Atomic
+import arrow.atomic.updateAndGet
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -119,7 +119,7 @@ public object SagaActionStep
 // Internal implementation of the `saga { }` builder.
 @PublishedApi
 internal class SagaBuilder(
-  private val stack: AtomicRef<List<suspend () -> Unit>> = AtomicRef(emptyList())
+  private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
 ) : SagaScope {
 
   @SagaDSLMarker

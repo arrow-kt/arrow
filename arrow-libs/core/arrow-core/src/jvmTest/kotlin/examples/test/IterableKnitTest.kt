@@ -68,12 +68,12 @@ class IterableKnitTest : StringSpec({
     arrow.core.examples.exampleIterable16.test()
   }
 
-  "ExampleIterable19" {
-    arrow.core.examples.exampleIterable19.test()
+  "ExampleIterable18" {
+    arrow.core.examples.exampleIterable18.test()
   }
 
-  "ExampleIterable20" {
-    arrow.core.examples.exampleIterable20.test()
+  "ExampleIterable19" {
+    arrow.core.examples.exampleIterable19.test()
   }
 
 }) {
