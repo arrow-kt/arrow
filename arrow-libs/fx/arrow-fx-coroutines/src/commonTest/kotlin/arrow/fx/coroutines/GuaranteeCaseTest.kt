@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
@@ -10,55 +9,59 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class GuaranteeCaseTest : StringSpec({
+class GuaranteeCaseTest {
 
-    "release for success was invoked" {
-      checkAll(Arb.int()) { i ->
-        val p = CompletableDeferred<ExitCase>()
-
-        val res = guaranteeCase(
-          fa = { i },
-          finalizer = { ex -> require(p.complete(ex)) }
-        )
-
-        p.await() shouldBe ExitCase.Completed
-        res shouldBe i
-      }
-    }
-
-    "release for error was invoked" {
-      checkAll(Arb.throwable()) { e ->
-        val p = CompletableDeferred<ExitCase>()
-        val attempted = Either.catch {
-          guaranteeCase<Int>(
-            fa = { throw e },
-            finalizer = { ex -> require(p.complete(ex)) }
-          )
-        }
-
-        p.await() shouldBe ExitCase.Failure(e)
-        attempted shouldBe Either.Left(e)
-      }
-    }
-
-    "release for never was invoked" {
+  @Test
+  fun releaseForSuccessWasInvoked() = runTest {
+    checkAll(Arb.int()) { i ->
       val p = CompletableDeferred<ExitCase>()
-      val start = CompletableDeferred<Unit>()
 
-      val fiber = async {
-        guaranteeCase(
-          fa = {
-            start.complete(Unit)
-            awaitCancellation()
-          },
-          finalizer = { ex -> require(p.complete(ex)) }
-        )
-      }
+      val res = guaranteeCase(
+        fa = { i },
+        finalizer = { ex -> require(p.complete(ex)) }
+      )
 
-      start.await()
-      fiber.cancel()
-      p.await().shouldBeInstanceOf<ExitCase.Cancelled>()
+      p.await() shouldBe ExitCase.Completed
+      res shouldBe i
     }
   }
-)
+
+  @Test
+  fun releaseForErrorWasInvoked() = runTest {
+    checkAll(Arb.throwable()) { e ->
+      val p = CompletableDeferred<ExitCase>()
+      val attempted = Either.catch {
+        guaranteeCase<Int>(
+          fa = { throw e },
+          finalizer = { ex -> require(p.complete(ex)) }
+        )
+      }
+
+      p.await() shouldBe ExitCase.Failure(e)
+      attempted shouldBe Either.Left(e)
+    }
+  }
+
+  @Test
+  fun releaseForNeverWasInvoked() = runTest {
+    val p = CompletableDeferred<ExitCase>()
+    val start = CompletableDeferred<Unit>()
+
+    val fiber = async {
+      guaranteeCase(
+        fa = {
+          start.complete(Unit)
+          awaitCancellation()
+        },
+        finalizer = { ex -> require(p.complete(ex)) }
+      )
+    }
+
+    start.await()
+    fiber.cancel()
+    p.await().shouldBeInstanceOf<ExitCase.Cancelled>()
+  }
+}

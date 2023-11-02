@@ -1,10 +1,13 @@
 // This file was automatically generated from Ior.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleIor12
 
-import arrow.core.Ior
+import arrow.core.*
 
-fun main() {
-  Ior.Right(12).toValidated() // Result: Valid(12)
-  Ior.Left(12).toValidated()  // Result: Invalid(12)
-  Ior.Both(12, "power").toValidated()  // Result: Valid("power")
+fun main(args: Array<String>) {
+  //sampleStart
+  val string: Ior<Int, String> = Ior.Right("Hello")
+  val chars: Ior<Int, CharSequence> =
+    string.widen<Int, CharSequence, String>()
+  //sampleEnd
+  println(chars)
 }

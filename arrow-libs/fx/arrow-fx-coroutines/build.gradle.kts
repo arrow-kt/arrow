@@ -22,35 +22,18 @@ kotlin {
       dependencies {
         api(projects.arrowCore)
         api(libs.coroutines.core)
-        implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.kotlin.stdlib)
       }
     }
 
     commonTest {
       dependencies {
+        implementation(projects.arrowCore)
         implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-        implementation(libs.coroutines.test)
-      }
-    }
-
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
@@ -62,4 +45,8 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }

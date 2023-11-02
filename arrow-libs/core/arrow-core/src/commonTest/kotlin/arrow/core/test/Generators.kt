@@ -1,13 +1,10 @@
 package arrow.core.test
 
 import arrow.core.Either
-import arrow.core.Endo
-import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Option
-import arrow.core.Validated
 import arrow.core.left
 import arrow.core.memoize
 import arrow.core.right
@@ -41,7 +38,7 @@ import kotlin.coroutines.startCoroutine
 // copied from kotest-extensions-arrow
 
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
-  Arb.bind(arb, Arb.list(arb, range), ::NonEmptyList)
+  Arb.list(arb, max(range.first, 1) .. range.last).map { NonEmptyList(it) }
 
 fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
   Arb.set(arb, max(range.first, 1) .. range.last).map { it.toNonEmptySetOrNull()!! }
@@ -69,8 +66,6 @@ fun Arb.Companion.intSmall(factor: Int = 10000): Arb<Int> =
 fun Arb.Companion.longSmall(): Arb<Long> =
   Arb.long((Long.MIN_VALUE / 100000L)..(Long.MAX_VALUE / 100000L))
 
-fun <A> Arb.Companion.endo(arb: Arb<A>): Arb<Endo<A>> = arb.map { a: A -> Endo { a } }
-
 fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
   arb.orNull().map { it.toOption() }
 
@@ -80,20 +75,19 @@ fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
   return Arb.choice(arbLeft, arbRight)
 }
 
-fun <E, A> Arb.Companion.validated(arbE: Arb<E>, arbA: Arb<A>): Arb<Validated<E, A>> =
-  Arb.either(arbE, arbA).map { Validated.fromEither(it) }
-
 fun Arb.Companion.unit(): Arb<Unit> =
   Arb.constant(Unit)
 
 fun <A, B> Arb.Companion.ior(arbA: Arb<A>, arbB: Arb<B>): Arb<Ior<A, B>> =
   arbA.alignWith(arbB) { it }
 
-fun <A> Arb<A>.eval(): Arb<Eval<A>> =
-  map { Eval.now(it) }
-
 private fun <A, B, R> Arb<A>.alignWith(arbB: Arb<B>, transform: (Ior<A, B>) -> R): Arb<R> =
-  Arb.bind(this, arbB) { a, b -> transform(Ior.Both(a, b)) }
+  Arb.choice(
+    this.map { Ior.Left(it) },
+    Arb.bind(this, arbB) { a, b -> Ior.Both(a, b) },
+    arbB.map { Ior.Right(it) }
+  ).map(transform)
+
 
 fun Arb.Companion.suspendFunThatReturnsEitherAnyOrAnyOrThrows(): Arb<suspend () -> Either<Any, Any>> =
   choice(
