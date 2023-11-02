@@ -4,7 +4,7 @@ package arrow.core.examples.exampleIor01
 import arrow.core.Ior
 
 fun main() {
-  Ior.Left("tulip").isRight           // Result: false
-  Ior.Right("venus fly-trap").isRight // Result: true
-  Ior.Both("venus", "fly-trap").isRight // Result: false
+  Ior.Left("tulip").isLeft()           // Result: true
+  Ior.Right("venus fly-trap").isLeft() // Result: false
+  Ior.Both("venus", "fly-trap").isLeft() // Result: false
 }

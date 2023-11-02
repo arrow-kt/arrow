@@ -9,7 +9,6 @@ import arrow.core.test.map2
 import arrow.core.test.map3
 import arrow.core.test.option
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAllValues
@@ -42,97 +41,6 @@ class MapKTest : StringSpec({
         Arb.map(Arb.int(), Arb.intSmall(), maxSize = 10)
       )
     )
-
-    "traverseEither is stacksafe" {
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse { v ->
-        acc.add(v)
-        Either.Right(v)
-      }
-      res shouldBe acc.associateWith { it }.right()
-      res shouldBe (0..20_000).associateWith { it }.right()
-    }
-
-    "traverseEither short-circuit" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Either.Right(it)
-          } else Either.Left(it)
-        }
-        acc shouldBe ints.values.takeWhile { it % 2 == 0 }
-        when (evens) {
-          is Either.Right -> evens.value shouldBe ints
-          is Either.Left -> evens.value shouldBe ints.values.first { it % 2 != 0 }
-        }
-      }
-    }
-
-    "traverseOption is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse { a ->
-        acc.add(a)
-        Some(a)
-      }
-      res shouldBe Some(acc.associateWith { it })
-      res shouldBe Some((0..20_000).associateWith { it })
-    }
-
-    "traverseOption short-circuits" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        var shortCircuited = 0
-        val result = ints.traverse {
-          if (it % 2 == 0) {
-            Some(it)
-          } else {
-            shortCircuited++
-            None
-          }
-        }
-        shortCircuited.shouldBeIn(0, 1)
-
-        if (shortCircuited == 0) {
-          result.isSome().shouldBeTrue()
-        } else if (shortCircuited == 1) {
-          result.isNone().shouldBeTrue()
-        }
-      }
-    }
-
-    "sequenceOption yields some when all entries in the list are some" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "traverseValidated is stacksafe" {
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse(Semigroup.string()) { v ->
-        acc.add(v)
-        Validated.Valid(v)
-      }
-      res shouldBe acc.associateWith { it }.valid()
-      res shouldBe (0..20_000).associateWith { it }.valid()
-    }
-
-    "traverseValidated acummulates" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        val res: ValidatedNel<Int, Map<Int, Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-
-        val expected: ValidatedNel<Int, Map<Int, Int>> =
-          Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())
-            .fold(
-              { ints.entries.filter { (_, v) -> v % 2 == 0 }.associate { (k, v) -> k to v }.validNel() },
-              { it.invalid() })
-
-        res shouldBe expected
-      }
-    }
 
     "can align maps" {
       checkAll(
@@ -269,8 +177,8 @@ class MapKTest : StringSpec({
       ) {
           (a,b),f,g ->
 
-        val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
-        val r = a.align(b).mapValues { it.value.bimap(f,g)}
+        val l = a.mapValues{ f(it.value) }.align(b.mapValues{ g(it.value) })
+        val r = a.align(b).mapValues { it.value.map(g).mapLeft(f) }
 
         l shouldBe r
       }
@@ -499,26 +407,15 @@ class MapKTest : StringSpec({
       checkAll(
         Arb.map2(Arb.int(), Arb.intSmall(), Arb.intSmall())
       ) { (a, b) ->
-        a.salign(Semigroup.int(), b) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
+        a.salign(b, Int::plus) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
       }
     }
 
-    "void" {
-      checkAll(
-        Arb.map(Arb.intSmall(), Arb.intSmall())
-      ) { a ->
-        val result = a.void()
-
-        result.keys shouldBe a.keys
-        result.forAllValues { it shouldBe Unit }
-      }
-    }
-
-    "filterMap" {
+    "mapNotNull" {
       checkAll(
         Arb.map(Arb.int(), Arb.boolean())
       ) { xs ->
-        val rs = xs.filterMap { if(it) true else null }
+        val rs = xs.mapNotNull { (_, pred) -> if(pred) true else null }
 
         xs.forAll {
           if (it.value)
@@ -777,84 +674,6 @@ class MapKTest : StringSpec({
 
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, v) -> Pair(k, Tuple9(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "zip9 with nullables" {
-      checkAll(
-        Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
-      ) { (mapA, mapB) ->
-        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
-          Tuple9(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii
-          )
-        }
-        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple9(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.map2(Arb.int(), Arb.int(), Arb.int())
-      ) { (a, b) ->
-        val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
-          Tuple10(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii,
-            jj
-          )
-        }
-
-        val expected = a.filter { (k, _) -> b.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "zip10 with nullables" {
-      checkAll(
-        Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
-      ) { (mapA, mapB) ->
-        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
-          Tuple10(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii,
-            jj
-          )
-        }
-        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple10(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
           .toMap()
 
         result shouldBe expected

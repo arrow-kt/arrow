@@ -25,10 +25,6 @@ public inline fun <S : Any, reified A : S> instance(): Prism<S, A> =
     override fun reverseGet(focus: A): S = focus
   }
 
-/** Focuses on a given field */
-public val <S, A> ((S) -> A).ogetter: Getter<S, A>
-  get() = Getter { s -> this(s) }
-
 /**
  * [Lens] that focuses on a field in a data class
  *
@@ -45,15 +41,13 @@ public val <S, A> KProperty1<S, A>.lens: Lens<S, A>
 public val <S, A> KProperty1<S, A?>.optional: Optional<S, A>
   get() = lens compose Optional.nullable()
 
-public val <S, A> ((S) -> Iterable<A>).iter: Fold<S, A>
-  get() = ogetter compose Fold.iterable()
-
-public val <S, A> KProperty1<S, List<A>>.every: Every<S, A>
+public val <S, A> KProperty1<S, List<A>>.every: Traversal<S, A>
   get() = lens compose Every.list()
 
-public val <S, K, A> KProperty1<S, Map<K, A>>.values: Every<S, A>
+public val <S, K, A> KProperty1<S, Map<K, A>>.values: Traversal<S, A>
   get() = lens compose Every.map()
 
+@Suppress("UNCHECKED_CAST")
 private fun <S, A> clone(prop: KProperty1<S, A>, value: S, newField: A): S {
   // based on https://stackoverflow.com/questions/49511098/call-data-class-copy-via-reflection
   val klass = prop.instanceParameter?.type?.classifier as? KClass<*>

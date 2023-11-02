@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
-@file:Suppress("DEPRECATION")
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 
@@ -8,9 +7,6 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.Validated
-import arrow.core.ValidatedDeprMsg
-import arrow.core.continuations.EffectScope
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
@@ -95,7 +91,6 @@ public annotation class RaiseDSL
  * import arrow.core.raise.effect
  * import arrow.core.raise.ior
  * import arrow.core.raise.toEither
- * import arrow.typeclasses.Semigroup
  * import io.kotest.matchers.shouldBe
  *
  * fun Raise<String>.failure(): Int = raise("failed")
@@ -212,35 +207,6 @@ public interface Raise<in Error> {
   @RaiseDSL
   public fun raise(r: Error): Nothing
 
-  @Deprecated("Use raise instead", ReplaceWith("raise(r)"))
-  public fun <A> shift(r: Error): A = raise(r)
-
-  @RaiseDSL
-  public suspend fun <A> arrow.core.continuations.Effect<Error, A>.bind(): A =
-    fold({ raise(it) }, ::identity)
-
-  // Added for source compatibility with EffectScope / EagerScope
-  @RaiseDSL
-  public suspend fun <A> arrow.core.continuations.EagerEffect<Error, A>.bind(): A =
-    fold({ raise(it) }, ::identity)
-
-  @Deprecated(
-    "Use getOrElse on Raise, Effect or EagerEffect instead.",
-    ReplaceWith("effect { f() }")
-  )
-  public suspend fun <OtherError, A> attempt(
-    @BuilderInference
-    f: suspend EffectScope<OtherError>.() -> A,
-  ): arrow.core.continuations.Effect<OtherError, A> = arrow.core.continuations.effect(f)
-
-  @Deprecated(
-    "Use getOrElse on Raise, Effect or EagerEffect instead.",
-    ReplaceWith("fold({ recover(it) }, ::identity)")
-  )
-  public suspend infix fun <OtherError, A> arrow.core.continuations.Effect<OtherError, A>.catch(
-    recover: suspend Raise<Error>.(otherError: OtherError) -> A,
-  ): A = fold({ recover(it) }, ::identity)
-
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
    * Any _logical failure_ is raised in `this` [Raise] context,
@@ -320,18 +286,6 @@ public interface Raise<in Error> {
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     mapValues { (_, a) -> a.bind() }
 
-  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
-  @RaiseDSL
-  public fun <A> Validated<Error, A>.bind(): A = when (this) {
-    is Validated.Invalid -> raise(value)
-    is Validated.Valid -> value
-  }
-
-  /**
-   * Extracts all the values in the [Iterable], raising every [Either.Left]
-   * as a _logical failure_. In other words, executed [bind] over every
-   * value in this [Iterable].
-   */
   @RaiseDSL
   public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
     map { it.bind() }

@@ -1,43 +1,47 @@
 package arrow.fx.coroutines
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlin.test.Test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.test.runTest
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @ExperimentalTime
-class FlowJvmTest : StringSpec({
-  "parMap - single thread - identity" {
-    single.use { ctx ->
+class FlowJvmTest {
+  @Test fun parMapSingleThreadIdentity() = runTest {
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMap { it }.flowOn(ctx)
           .toList() shouldBe flow.toList()
       }
     }
   }
-  
-  "parMap - flowOn" {
-    single.use { ctx ->
+
+  @Test fun parMapflowOn() = runTest {
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMap { Thread.currentThread().name }.flowOn(ctx)
           .toList().forEach {
-            it shouldContain singleThreadName
+            it shouldContain "single"
           }
       }
     }
   }
   
-  "parMapUnordered - single thread - identity" {
-    single.use { ctx ->
+  @Test fun parMapUnorderedSingleThreadIdentity() = runTest {
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMapUnordered { it }.flowOn(ctx)
           .toSet() shouldBe flow.toSet()
@@ -45,14 +49,15 @@ class FlowJvmTest : StringSpec({
     }
   }
   
-  "parMapUnordered - flowOn" {
-    single.use { ctx ->
+  @Test fun parMapUnorderedFlowOn() = runTest {
+    resourceScope {
+      val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
         flow.parMap { Thread.currentThread().name }.flowOn(ctx)
           .toList().forEach {
-            it shouldContain singleThreadName
+            it shouldContain "single"
           }
       }
     }
   }
-})
+}

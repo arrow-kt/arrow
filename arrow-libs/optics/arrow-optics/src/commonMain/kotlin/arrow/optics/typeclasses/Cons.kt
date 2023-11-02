@@ -2,7 +2,6 @@ package arrow.optics.typeclasses
 
 import arrow.core.left
 import arrow.core.right
-import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.PPrism
@@ -52,12 +51,6 @@ public fun interface Cons<S, A> {
     cons().getOrNull(this)
 
   public companion object {
-
-    /**
-     * Lift an instance of [Cons] using an [Iso].
-     */
-    public fun <S, A, B> fromIso(C: Cons<A, B>, iso: Iso<S, A>): Cons<S, B> =
-      Cons { iso compose C.cons() compose iso.reverse().second() }
 
     public operator fun <S, A> invoke(prism: Prism<S, Pair<A, S>>): Cons<S, A> =
       Cons { prism }

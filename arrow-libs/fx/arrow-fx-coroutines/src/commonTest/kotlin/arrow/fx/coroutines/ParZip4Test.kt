@@ -1,8 +1,10 @@
 package arrow.fx.coroutines.parZip
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
+import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple4
-import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
@@ -47,14 +49,14 @@ class ParZip4Test : StringSpec({
             modifyGate3.complete(Unit)
           },
           {
-            r.set("$d")
+            r.value = "$d"
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d ->
           Tuple4(_a, _b, _c, _d)
         }
 
-        r.get() shouldBe "$d$c$b$a"
+        r.value shouldBe "$d$c$b$a"
       }
     }
 

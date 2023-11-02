@@ -2,11 +2,9 @@ package arrow.optics
 
 import arrow.optics.test.functionAToB
 import arrow.optics.test.option
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.nonEmptyList
-import arrow.optics.test.sequence
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
@@ -22,13 +20,6 @@ class TraversalTest : StringSpec({
       "Traversal list - ",
       TraversalLaws(
         traversal = Traversal.list(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
-      ),
-
-      SetterLaws(
-        setter = Traversal.list(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
@@ -49,7 +40,7 @@ class TraversalTest : StringSpec({
       "Traversal sequence - ",
       TraversalLaws(
         traversal = Traversal.sequence(),
-        aGen = Arb.sequence(Arb.int()),
+        aGen = Arb.list(Arb.int()).map { it.asSequence() },
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
         eq = { a, b -> a.toList() == b.toList() }
