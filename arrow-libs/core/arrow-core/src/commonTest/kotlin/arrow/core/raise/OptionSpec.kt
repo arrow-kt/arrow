@@ -4,17 +4,18 @@ import arrow.core.None
 import arrow.core.Some
 import arrow.core.some
 import arrow.core.toOption
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class OptionSpec : StringSpec({
+class OptionSpec {
 
-  "ensure" {
+  @Test fun ensure() = runTest {
     checkAll(Arb.boolean(), Arb.int()) { b, i ->
       option {
         ensure(b)
@@ -23,7 +24,7 @@ class OptionSpec : StringSpec({
     }
   }
 
-  "ensureNotNull in option computation" {
+  @Test fun ensureNotNullInOptionComputation() = runTest {
     fun square(i: Int): Int = i * i
     checkAll(Arb.int().orNull()) { i: Int? ->
       option {
@@ -33,7 +34,7 @@ class OptionSpec : StringSpec({
     }
   }
 
-  "short circuit option" {
+  @Test fun shortCircuitOption() = runTest {
     @Suppress("UNREACHABLE_CODE")
     option {
       ensureNotNull<Int>(null)
@@ -41,11 +42,11 @@ class OptionSpec : StringSpec({
     } shouldBe None
   }
 
-  "Recover works as expected" {
+  @Test fun RecoverWorksAsExpected() = runTest {
     option {
       val one: Int = recover({ None.bind<Int>() }) { 1 }
       val two = Some(2).bind()
       one + two
     } shouldBe Some(3)
   }
-})
+}
