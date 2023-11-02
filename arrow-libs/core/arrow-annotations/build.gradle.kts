@@ -19,17 +19,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        implementation(libs.kotlin.stdlibCommon)
-      }
-    }
-    jvmMain {
-      dependencies {
         implementation(libs.kotlin.stdlib)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

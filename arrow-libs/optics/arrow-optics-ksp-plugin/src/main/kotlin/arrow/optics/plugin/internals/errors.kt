@@ -8,29 +8,12 @@ val String.otherClassTypeErrorMessage
       |Only data, sealed, and value classes can be annotated with @optics
     """.trimMargin()
 
-val String.typeParametersErrorMessage
-  get() =
-    """
-      |$this cannot be annotated with @optics
-      | ^
-      |Only classes with no type parameters can be annotated with @optics
-    """.trimMargin()
-
 val String.lensErrorMessage
   get() =
     """
       |Cannot generate arrow.optics.Lens for $this
       |                                       ^
       |arrow.optics.OpticsTarget.LENS is an invalid @optics argument for $this.
-      |It is only valid for data classes.
-    """.trimMargin()
-
-val String.optionalErrorMessage
-  get() =
-    """
-      |Cannot generate arrow.optics.Optional for $this
-      |                                           ^
-      |arrow.optics.OpticsTarget.OPTIONAL is an invalid @optics argument for $this.
       |It is only valid for data classes.
     """.trimMargin()
 

@@ -2,9 +2,11 @@
 package arrow.core.examples.exampleEither36
 
 import arrow.core.Either
-import arrow.core.getOrElse
+import arrow.core.recover
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Left(12) getOrElse { it + 5 } shouldBe 17
+  val error: Either<String, Int> = Either.Left("error")
+  val listOfErrors: Either<List<Char>, Int> = error.recover { raise(it.toList()) }
+  listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
 }

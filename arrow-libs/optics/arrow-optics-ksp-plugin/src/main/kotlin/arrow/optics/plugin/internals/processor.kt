@@ -22,15 +22,15 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
         OpticsTarget.LENS ->
           evalAnnotatedDataClass(c, c.qualifiedNameOrSimpleName.lensErrorMessage, logger)
             .let(::LensTarget)
-        OpticsTarget.OPTIONAL ->
-          evalAnnotatedDataClass(c, c.qualifiedNameOrSimpleName.optionalErrorMessage, logger)
-            .let(::OptionalTarget)
+
         OpticsTarget.ISO ->
-          evalAnnotatedIsoElement(c, c.qualifiedNameOrSimpleName.isoErrorMessage, logger)
+          evalAnnotatedValueClass(c, c.qualifiedNameOrSimpleName.isoErrorMessage, logger)
             .let(::IsoTarget)
+
         OpticsTarget.PRISM ->
           evalAnnotatedPrismElement(c, c.qualifiedNameOrSimpleName.prismErrorMessage, logger)
             .let(::PrismTarget)
+
         OpticsTarget.DSL -> evalAnnotatedDslElement(c, logger)
       }
     },
@@ -40,25 +40,16 @@ internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
   targetsFromOpticsAnnotation().let { targets ->
     when {
       isSealed ->
-        if (targets.isEmpty()) {
-          listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
-        } else {
-          targets.filter { it == OpticsTarget.PRISM || it == OpticsTarget.DSL }
-        }
+        listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
+          .filter { targets.isEmpty() || it in targets }
+
       isValue ->
         listOf(OpticsTarget.ISO, OpticsTarget.DSL)
           .filter { targets.isEmpty() || it in targets }
+
       else ->
-        if (targets.isEmpty()) {
-          listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
-        } else {
-          targets.filter {
-            when (it) {
-              OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
-              else -> false
-            }
-          }
-        }
+        listOf(OpticsTarget.LENS, OpticsTarget.DSL)
+          .filter { targets.isEmpty() || it in targets }
     }
   }
 
@@ -66,13 +57,12 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget
   annotations
     .find { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
     ?.arguments
-    ?.flatMap { (it.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
+    ?.flatMap { arg -> (arg.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
     ?.mapNotNull {
       when (it.qualifiedString()) {
         "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
         "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
         "arrow.optics.OpticsTarget.PRISM" -> OpticsTarget.PRISM
-        "arrow.optics.OpticsTarget.OPTIONAL" -> OpticsTarget.OPTIONAL
         "arrow.optics.OpticsTarget.DSL" -> OpticsTarget.DSL
         else -> null
       }
@@ -104,9 +94,6 @@ internal fun evalAnnotatedPrismElement(
 internal val KSDeclaration.qualifiedNameOrSimpleName: String
   get() = (qualifiedName ?: simpleName).asSanitizedString()
 
-internal fun KSClassDeclaration.sealedSubclassFqNameList(): List<String> =
-  getSealedSubclasses().mapNotNull { it.qualifiedName?.asString() }.toList()
-
 internal fun evalAnnotatedDataClass(
   element: KSClassDeclaration,
   errorMessage: String,
@@ -117,6 +104,20 @@ internal fun evalAnnotatedDataClass(
       element
         .getConstructorTypesNames()
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
+    else -> {
+      logger.error(errorMessage, element)
+      emptyList()
+    }
+  }
+
+internal fun evalAnnotatedValueClass(
+  element: KSClassDeclaration,
+  errorMessage: String,
+  logger: KSPLogger,
+): List<Focus> =
+  when {
+    element.isValue ->
+      listOf(Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()))
     else -> {
       logger.error(errorMessage, element)
       emptyList()

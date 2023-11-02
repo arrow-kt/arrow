@@ -2,13 +2,9 @@
 package arrow.core.examples.exampleIterable18
 
 import arrow.core.*
+import io.kotest.matchers.shouldBe
 
-fun main(args: Array<String>) {
-  //sampleStart
-  val result =
-   listOf(1,2,3).ifThen(listOf("empty")) { i ->
-     listOf("$i, ${i + 1}")
-   }
-  //sampleEnd
-  println(result)
+fun test() {
+  listOf("A".left(), 2.right(), "C".left(), 4.right())
+    .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))
 }

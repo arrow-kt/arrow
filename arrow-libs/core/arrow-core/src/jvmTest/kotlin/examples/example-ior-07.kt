@@ -4,7 +4,7 @@ package arrow.core.examples.exampleIor07
 import arrow.core.Ior
 
 fun main() {
-  Ior.Left("left").swap()   // Result: Right("left")
-  Ior.Right("right").swap() // Result: Left("right")
-  Ior.Both("left", "right").swap() // Result: Both("right", "left")
+  Ior.Right(12).toEither() // Result: Either.Right(12)
+  Ior.Left(12).toEither()  // Result: Either.Left(12)
+  Ior.Both("power", 12).toEither()  // Result: Either.Right(12)
 }

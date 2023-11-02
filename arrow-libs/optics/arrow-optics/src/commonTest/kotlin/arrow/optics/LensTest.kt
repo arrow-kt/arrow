@@ -5,7 +5,6 @@ import arrow.core.Either.Right
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import io.kotest.core.spec.style.StringSpec
@@ -36,13 +35,6 @@ class LensTest : StringSpec({
 
       OptionalLaws(
         optional = Lens.token(),
-        aGen = Arb.token(),
-        bGen = Arb.string(),
-        funcGen = Arb.functionAToB(Arb.string()),
-      ),
-
-      SetterLaws(
-        setter = Lens.token(),
         aGen = Arb.token(),
         bGen = Arb.string(),
         funcGen = Arb.functionAToB(Arb.string()),
@@ -98,24 +90,6 @@ class LensTest : StringSpec({
     "asFold should behave as valid Fold: lastOption" {
       checkAll(Arb.token()) { token ->
         Lens.token().lastOrNull(token) shouldBe token.value
-      }
-    }
-
-    "asGetter should behave as valid Getter: get" {
-      checkAll(Arb.token()) { token ->
-        Lens.token().get(token) shouldBe Getter.token().get(token)
-      }
-    }
-
-    "asGetter should behave as valid Getter: find" {
-      checkAll(Arb.token(), Arb.functionAToB<String, Boolean>(Arb.boolean())) { token, p ->
-        Lens.token().findOrNull(token, p) shouldBe Getter.token().findOrNull(token, p)
-      }
-    }
-
-    "asGetter should behave as valid Getter: exist" {
-      checkAll(Arb.token(), Arb.functionAToB<String, Boolean>(Arb.boolean())) { token, p ->
-        Lens.token().any(token, p) shouldBe Getter.token().any(token, p)
       }
     }
 
