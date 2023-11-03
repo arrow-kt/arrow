@@ -1,0 +1,74 @@
+public final class arrow/collectors/Characteristics : java/lang/Enum {
+	public static final field CONCURRENT Larrow/collectors/Characteristics;
+	public static final field Companion Larrow/collectors/Characteristics$Companion;
+	public static final field IDENTITY_FINISH Larrow/collectors/Characteristics;
+	public static final field UNORDERED Larrow/collectors/Characteristics;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Larrow/collectors/Characteristics;
+	public static fun values ()[Larrow/collectors/Characteristics;
+}
+
+public final class arrow/collectors/Characteristics$Companion {
+	public final fun getCONCURRENT_UNORDERED ()Ljava/util/Set;
+	public final fun getIDENTITY_CONCURRENT ()Ljava/util/Set;
+	public final fun getIDENTITY_CONCURRENT_UNORDERED ()Ljava/util/Set;
+}
+
+public abstract interface class arrow/collectors/CollectorI {
+	public abstract fun accumulate (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public abstract fun finish (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getCharacteristics ()Ljava/util/Set;
+	public abstract fun map (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public abstract fun supply (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun zip (Larrow/collectors/CollectorI;)Larrow/collectors/CollectorI;
+	public abstract fun zip (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+}
+
+public final class arrow/collectors/CollectorI$DefaultImpls {
+	public static fun contramap (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public static fun map (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public static fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;)Larrow/collectors/CollectorI;
+	public static fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+}
+
+public final class arrow/collectors/Collectors {
+	public static final field INSTANCE Larrow/collectors/Collectors;
+	public final fun bestBy (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public final fun constant (Ljava/lang/Object;)Larrow/collectors/CollectorI;
+	public final fun getLength ()Larrow/collectors/CollectorI;
+	public final fun getSum ()Larrow/collectors/CollectorI;
+	public final fun intReducer (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public final fun list ()Larrow/collectors/CollectorI;
+	public final fun map ()Larrow/collectors/CollectorI;
+	public final fun mapFromEntries ()Larrow/collectors/CollectorI;
+	public final fun reducer (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Z)Larrow/collectors/CollectorI;
+	public static synthetic fun reducer$default (Larrow/collectors/Collectors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;ZILjava/lang/Object;)Larrow/collectors/CollectorI;
+	public final fun set ()Larrow/collectors/CollectorI;
+}
+
+public final class arrow/collectors/CollectorsKt {
+	public static final fun concurrentMap (Larrow/collectors/Collectors;)Larrow/collectors/CollectorI;
+	public static final fun concurrentMapFromEntries (Larrow/collectors/Collectors;)Larrow/collectors/CollectorI;
+	public static final fun concurrentSet (Larrow/collectors/Collectors;)Larrow/collectors/CollectorI;
+}
+
+public final class arrow/collectors/FlowKt {
+	public static final fun collect (Ljava/lang/Iterable;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun collect (Lkotlinx/coroutines/flow/Flow;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun collect$default (Ljava/lang/Iterable;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun collect$default (Lkotlinx/coroutines/flow/Flow;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun collectBlocking (Ljava/lang/Iterable;Larrow/collectors/CollectorI;)Ljava/lang/Object;
+	public static final fun collectBlocking (Lkotlinx/coroutines/flow/Flow;Larrow/collectors/CollectorI;)Ljava/lang/Object;
+}
+
+public final class arrow/collectors/JvmCollectorKt {
+	public static final fun asCollector (Ljava/util/stream/Collector;)Larrow/collectors/CollectorI;
+	public static final fun jvm (Larrow/collectors/Collectors;Ljava/util/stream/Collector;)Larrow/collectors/CollectorI;
+}
+
+public final class arrow/collectors/ZipKt {
+	public static final fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function3;)Larrow/collectors/CollectorI;
+	public static final fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+}
+
