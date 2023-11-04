@@ -66,8 +66,6 @@ public final class arrow/collectors/FlowKt {
 	public static final fun collect (Lkotlinx/coroutines/flow/Flow;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun collect$default (Ljava/lang/Iterable;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun collect$default (Lkotlinx/coroutines/flow/Flow;Larrow/collectors/CollectorI;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun collectBlocking (Ljava/lang/Iterable;Larrow/collectors/CollectorI;)Ljava/lang/Object;
-	public static final fun collectBlocking (Lkotlinx/coroutines/flow/Flow;Larrow/collectors/CollectorI;)Ljava/lang/Object;
 }
 
 public final class arrow/collectors/JvmCollectorKt {
