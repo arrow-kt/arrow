@@ -128,7 +128,7 @@ class CyclicBarrierSpec : StringSpec({
 
       val jobs = (0 until n - 1).map { i ->
         launch(start = CoroutineStart.UNDISPATCHED) {
-          guaranteeCase(barrier::await, exits[i]::complete)
+          guaranteeCase({ barrier.await() }, exits[i]::complete)
         }
       }
 

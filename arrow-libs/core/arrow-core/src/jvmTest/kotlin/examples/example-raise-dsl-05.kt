@@ -13,7 +13,7 @@ fun test() {
 
   either {
     val x = one.bind()
-    val y = recover({ left.bind() }) { failure : String -> 1 }
+    val y = recover({ left.bind() }) { _ : String -> 1 }
     x + y
   } shouldBe Either.Right(2)
 }

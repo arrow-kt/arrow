@@ -8,7 +8,6 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.either
 import arrow.core.raise.fold
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -574,7 +573,7 @@ public fun <A> Sequence<A>.salign(
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
 public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
-  fold(listOf<A>() to listOf<B>()) { (lefts, rights), either ->
+  fold(listOf<A>() to listOf()) { (lefts, rights), either ->
     when (either) {
       is Left -> lefts + either.value to rights
       is Right -> lefts to rights + either.value
@@ -637,7 +636,7 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
  * import arrow.core.leftIor
  * import arrow.core.unalign
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   //sampleStart
  *   val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalign()
  *   //sampleEnd
@@ -662,7 +661,7 @@ public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> 
  * import arrow.core.leftIor
  * import arrow.core.unalign
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   //sampleStart
  *   val result = sequenceOf(1, 2, 3).unalign { it.leftIor() }
  *   //sampleEnd
@@ -680,7 +679,7 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
  * ```kotlin
  * import arrow.core.unweave
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   //sampleStart
  *   val result = sequenceOf(1,2,3).unweave { i -> sequenceOf("$i, ${i + 1}") }
  *   //sampleEnd
@@ -700,7 +699,7 @@ public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
  * ```kotlin
  * import arrow.core.unzip
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   //sampleStart
  *   val result = sequenceOf("A" to 1, "B" to 2).unzip()
  *   //sampleEnd
@@ -720,7 +719,7 @@ public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
  * ```kotlin
  * import arrow.core.unzip
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   //sampleStart
  *   val result =
  *    sequenceOf("A:1", "B:2", "C:3").unzip { e ->
@@ -743,7 +742,7 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
  * ```kotlin
  * import arrow.core.widen
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   val original: Sequence<String> = sequenceOf("Hello World")
  *   val result: Sequence<CharSequence> = original.widen()
  * }

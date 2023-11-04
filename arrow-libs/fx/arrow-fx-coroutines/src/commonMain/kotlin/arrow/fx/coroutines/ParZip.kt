@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineScope

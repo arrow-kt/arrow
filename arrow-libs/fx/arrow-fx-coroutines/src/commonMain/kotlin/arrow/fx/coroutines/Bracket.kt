@@ -32,7 +32,7 @@ public sealed class ExitCase {
  * @see guaranteeCase for registering a handler that executes for any [ExitCase].
  */
 public suspend inline fun <A> onCancel(
-  fa: suspend () -> A,
+  fa: () -> A,
   crossinline onCancel: suspend () -> Unit
 ): A = guaranteeCase(fa) { case ->
   when (case) {
@@ -55,7 +55,7 @@ public suspend inline fun <A> onCancel(
  * @see guaranteeCase for registering a handler that tracks the [ExitCase] of [fa].
  */
 public suspend inline fun <A> guarantee(
-  fa: suspend () -> A,
+  fa: () -> A,
   crossinline finalizer: suspend () -> Unit
 ): A {
   val res = try {
@@ -84,7 +84,7 @@ public suspend inline fun <A> guarantee(
  * @see guarantee for registering a handler that ignores the [ExitCase] of [fa].
  */
 public suspend inline fun <A> guaranteeCase(
-  fa: suspend () -> A,
+  fa: () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
 ): A {
   val res = try {
@@ -115,10 +115,10 @@ public suspend inline fun <A> guaranteeCase(
  * ```kotlin
  * import arrow.fx.coroutines.*
  *
- * class File(url: String) {
+ * class File(val url: String) {
  *   fun open(): File = this
  *   fun close(): Unit {}
- *   override fun toString(): String = "This file contains some interesting content!"
+ *   override fun toString(): String = "This file contains some interesting content from $url!"
  * }
  *
  * suspend fun openFile(uri: String): File = File(uri).open()
@@ -140,7 +140,7 @@ public suspend inline fun <A> guaranteeCase(
  */
 public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
-  use: suspend (A) -> B,
+  use: (A) -> B,
   crossinline release: suspend (A) -> Unit
 ): B {
   val acquired = withContext(NonCancellable) {
@@ -191,13 +191,13 @@ public suspend inline fun <A, B> bracket(
  * ```kotlin
  * import arrow.fx.coroutines.*
  *
- * class File(url: String) {
+ * class File(val url: String) {
  *   fun open(): File = this
  *   fun close(): Unit {}
  * }
  *
  * suspend fun File.content(): String =
- *     "This file contains some interesting content!"
+ *     "This file contains some interesting content from $url!"
  * suspend fun openFile(uri: String): File = File(uri).open()
  * suspend fun closeFile(file: File): Unit = file.close()
  *
@@ -223,7 +223,7 @@ public suspend inline fun <A, B> bracket(
  */
 public suspend inline fun <A, B> bracketCase(
   crossinline acquire: suspend () -> A,
-  use: suspend (A) -> B,
+  use: (A) -> B,
   crossinline release: suspend (A, ExitCase) -> Unit
 ): B {
   val acquired = withContext(NonCancellable) {

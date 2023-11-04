@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package arrow.core
 
 import io.kotest.property.checkAll

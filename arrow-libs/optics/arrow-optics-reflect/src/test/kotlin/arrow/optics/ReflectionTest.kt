@@ -11,8 +11,8 @@ import kotlin.test.Test
 data class Person(val name: String, val friends: List<String>)
 
 sealed interface Cutlery
-object Fork : Cutlery
-object Spoon : Cutlery
+data object Fork : Cutlery
+data object Spoon : Cutlery
 
 class ReflectionTest {
   @Test fun lensesForFieldGet() = runTest {
@@ -25,16 +25,16 @@ class ReflectionTest {
   @Test fun lensesForFieldSet() = runTest {
     checkAll(Arb.string(), Arb.list(Arb.string())) { nm, fs ->
       val p = Person(nm, fs.toMutableList())
-      val m = Person::name.lens.modify(p) { it.capitalize() }
-      m shouldBe Person(nm.capitalize(), fs)
+      val m = Person::name.lens.modify(p) { it.uppercase() }
+      m shouldBe Person(nm.uppercase(), fs)
     }
   }
 
   @Test fun traversalForListSet() = runTest {
     checkAll(Arb.string(), Arb.list(Arb.string())) { nm, fs ->
       val p = Person(nm, fs)
-      val m = Person::friends.every.modify(p) { it.capitalize() }
-      m shouldBe Person(nm, fs.map { it.capitalize() })
+      val m = Person::friends.every.modify(p) { it.uppercase() }
+      m shouldBe Person(nm, fs.map { it.uppercase() })
     }
   }
 

@@ -166,6 +166,7 @@ public class TVar<A> internal constructor(a: A) {
    * Internal unsafe (non-suspend) version of read. Used by various other internals and [unsafeRead] to
    *  read the current value respecting its state.
    */
+  @Suppress("UNCHECKED_CAST")
   internal fun readI(): A {
     while (true) {
       ref.value.let { a ->

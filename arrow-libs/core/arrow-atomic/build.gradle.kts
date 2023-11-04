@@ -46,10 +46,8 @@ kotlin {
   }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + "-Xexpect-actual-classes"
-  }
+tasks.withType<KotlinCompile> {
+  kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
 tasks.withType<Test> {

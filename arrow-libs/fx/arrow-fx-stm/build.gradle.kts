@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -43,6 +46,10 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<KotlinCompile> {
+  kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
 tasks.withType<Test> {

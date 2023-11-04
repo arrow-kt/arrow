@@ -5,7 +5,7 @@ import arrow.core.bothIor
 import arrow.core.leftIor
 import arrow.core.unalign
 
-fun main(args: Array<String>) {
+fun main() {
   //sampleStart
   val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalign()
   //sampleEnd

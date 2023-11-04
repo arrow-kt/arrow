@@ -3,7 +3,7 @@ package arrow.core.examples.exampleSequence16
 
 import arrow.core.widen
 
-fun main(args: Array<String>) {
+fun main() {
   val original: Sequence<String> = sequenceOf("Hello World")
   val result: Sequence<CharSequence> = original.widen()
 }

@@ -264,7 +264,7 @@ public interface Raise<in Error> {
    *
    *   either {
    *     val x = one.bind()
-   *     val y = recover({ left.bind() }) { failure : String -> 1 }
+   *     val y = recover({ left.bind() }) { _ : String -> 1 }
    *     x + y
    *   } shouldBe Either.Right(2)
    * }
@@ -325,7 +325,7 @@ public interface Raise<in Error> {
  *   recover({ raise("failed") }) { str -> str.length } shouldBe 6
  *
  *   either<Int, String> {
- *     recover({ raise("failed") }) { str -> raise(-1) }
+ *     recover({ raise("failed") }) { _ -> raise(-1) }
  *   } shouldBe Either.Left(-1)
  * }
  * ```
@@ -421,7 +421,7 @@ public inline fun <reified T : Throwable, Error, A> recover(
  * -->
  * ```kotlin
  * fun test() {
- *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *   catch({ throw RuntimeException("BOOM") }) { _ ->
  *     "fallback"
  *   } shouldBe "fallback"
  *
@@ -460,7 +460,7 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
  * -->
  * ```kotlin
  * fun test() {
- *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *   catch({ throw RuntimeException("BOOM") }) { _ ->
  *     "fallback"
  *   } shouldBe "fallback"
  *

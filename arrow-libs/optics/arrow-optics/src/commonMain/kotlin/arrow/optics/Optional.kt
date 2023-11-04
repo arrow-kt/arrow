@@ -38,10 +38,10 @@ public fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S,
  *   }
  * }
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   val original = User("arrow-user", None)
  *   val set = User.email.set(original, "arRoW-UsEr@arrow-Kt.IO")
- *   val modified = User.email.modify(set, String::toLowerCase)
+ *   val modified = User.email.modify(set, String::lowercase)
  *   println("original: $original, set: $set, modified: $modified")
  * }
  * ```

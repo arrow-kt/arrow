@@ -3,7 +3,7 @@ package arrow.core.examples.exampleSequence13
 
 import arrow.core.unweave
 
-fun main(args: Array<String>) {
+fun main() {
   //sampleStart
   val result = sequenceOf(1,2,3).unweave { i -> sequenceOf("$i, ${i + 1}") }
   //sampleEnd

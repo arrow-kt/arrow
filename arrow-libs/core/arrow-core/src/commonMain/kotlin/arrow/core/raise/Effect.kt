@@ -289,8 +289,8 @@ import kotlin.jvm.JvmName
  * ```kotlin
  * val default5: Effect<String, Int> =
  *   foreign
- *     .catch { ex: RuntimeException -> -1 }
- *     .catch { ex: java.sql.SQLException -> -2 }
+ *     .catch { _: RuntimeException -> -1 }
+ *     .catch { _: java.sql.SQLException -> -2 }
  * ```
  *
  * Finally, since `catch` also supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
@@ -338,7 +338,7 @@ import kotlin.jvm.JvmName
  * -->
  * ```kotlin
  * suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
- *   guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+ *   guaranteeCase({ awaitCancellation() }) { exitCase -> exit.complete(exitCase) }
  *
  * ```
  *
@@ -374,7 +374,7 @@ import kotlin.jvm.JvmName
  * import kotlinx.coroutines.awaitCancellation
  *
  * suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
- *  guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+ *  guaranteeCase({ awaitCancellation() }) { exitCase -> exit.complete(exitCase) }
  *
  * suspend fun <A> CompletableDeferred<A>.getOrNull(): A? =
  *  if (isCompleted) await() else null
@@ -413,7 +413,7 @@ import kotlin.jvm.JvmName
  * import kotlinx.coroutines.awaitCancellation
  *
  * suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
- *   guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+ *   guaranteeCase({ awaitCancellation() }) { exitCase -> exit.complete(exitCase) }
  *
  * suspend fun <A> CompletableDeferred<A>.getOrNull(): A? =
  *   if (isCompleted) await() else null
@@ -456,7 +456,7 @@ import kotlin.jvm.JvmName
  *   effect<String, Int> {
  *     bracketCase(
  *       acquire = { File("build.gradle.kts").bufferedReader() },
- *       use = { reader: BufferedReader -> raise(error) },
+ *       use = { _: BufferedReader -> raise(error) },
  *       release = { reader, exitCase ->
  *         reader.close()
  *         exit.complete(exitCase)
@@ -552,7 +552,7 @@ import kotlin.jvm.JvmName
  * }
  *
  * suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
- *   guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
+ *   guaranteeCase({ awaitCancellation() }) { exitCase -> exit.complete(exitCase) }
  * -->
  * ```kotlin
  * suspend fun main() {
@@ -664,11 +664,13 @@ import kotlin.jvm.JvmName
  */
 public typealias Effect<Error, A> = suspend Raise<Error>.() -> A
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <Error, A> effect(@BuilderInference noinline block: suspend Raise<Error>.() -> A): Effect<Error, A> = block
 
 /** The same behavior and API as [Effect] except without requiring _suspend_. */
 public typealias EagerEffect<Error, A> = Raise<Error>.() -> A
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <Error, A> eagerEffect(@BuilderInference noinline block: Raise<Error>.() -> A): EagerEffect<Error, A> = block
 
 public suspend fun <A> Effect<A, A>.merge(): A = merge { invoke() }
