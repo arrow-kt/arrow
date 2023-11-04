@@ -3,7 +3,7 @@ package arrow.collectors
 /**
  * Wraps a [java.util.stream.Collector] to use with [collect].
  */
-public fun <T, R> java.util.stream.Collector<T, *, R>.asCollector(): Collector<T, R> =
+public fun <T, R> java.util.stream.Collector<T, *, R>.asCollector(): NonSuspendCollector<T, R> =
   Collectors.jvm(this)
 
 /**
@@ -12,14 +12,14 @@ public fun <T, R> java.util.stream.Collector<T, *, R>.asCollector(): Collector<T
 @Suppress("UnusedReceiverParameter")
 public fun <T, R> Collectors.jvm(
   collector: java.util.stream.Collector<T, *, R>,
-): Collector<T, R> = Collectors.jvmI(collector)
+): NonSuspendCollector<T, R> = Collectors.jvmI(collector)
 
 private typealias JavaCharacteristics = java.util.stream.Collector.Characteristics
 
 @Suppress("UnusedReceiverParameter")
 private fun <T, A, R> Collectors.jvmI(
   collector: java.util.stream.Collector<T, A, R>,
-): Collector<T, R> = Collector.of(
+): NonSuspendCollector<T, R> = Collector.nonSuspendOf(
   supply = { collector.supplier().get() },
   accumulate = { current, value -> collector.accumulator().accept(current, value) },
   finish = { collector.finisher().apply(it) },

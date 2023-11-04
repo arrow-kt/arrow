@@ -29,8 +29,8 @@ public enum class Characteristics {
   }
 }
 
-
 public typealias Collector<Value, Result> = CollectorI<*, Value, Result>
+public typealias NonSuspendCollector<Value, Result> = NonSuspendCollectorI<*, Value, Result>
 
 /**
  * A [Collector] accumulates information from elements
@@ -68,6 +68,24 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
       }
 
       override suspend fun finish(current: InternalAccumulator): Result = finish(current)
+    }
+
+    /**
+     * Constructs a new [Collector] from its components
+     */
+    public fun <InternalAccumulator, Value, Result> nonSuspendOf(
+      supply: () -> InternalAccumulator,
+      accumulate: (current: InternalAccumulator, value: Value) -> Unit,
+      finish: (current: InternalAccumulator) -> Result,
+      characteristics: Set<Characteristics> = setOf(),
+    ): NonSuspendCollector<Value, Result> = object : NonSuspendCollectorI<InternalAccumulator, Value, Result> {
+      override val characteristics: Set<Characteristics> = characteristics
+      override fun supplyNonSuspend(): InternalAccumulator = supply()
+      override fun accumulateNonSuspend(current: InternalAccumulator, value: Value) {
+        accumulate(current, value)
+      }
+
+      override fun finishNonSuspend(current: InternalAccumulator): Result = finish(current)
     }
   }
 
@@ -125,7 +143,7 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
    */
   public fun <B, S, V> zip(
     other: CollectorI<B, @UnsafeVariance Value, S>,
-    combine: (Result, S) -> V,
+    combine: suspend (Result, S) -> V,
   ): Collector<Value, V> = of(
     supply = { Pair(this.supply(), other.supply()) },
     accumulate = { (currentThis, currentOther), value ->
@@ -134,6 +152,85 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
     },
     finish = { (currentThis, currentOther) ->
       combine(this.finish(currentThis), other.finish(currentOther))
+    },
+    characteristics = this.characteristics,
+  )
+}
+
+public interface NonSuspendCollectorI<InternalAccumulator, in Value, out Result>
+  : CollectorI<InternalAccumulator, Value, Result> {
+  public fun supplyNonSuspend(): InternalAccumulator
+  override suspend fun supply(): InternalAccumulator = supplyNonSuspend()
+  public fun accumulateNonSuspend(current: InternalAccumulator, value: Value)
+  override suspend fun accumulate(current: InternalAccumulator, value: Value) {
+    accumulateNonSuspend(current, value)
+  }
+  public fun finishNonSuspend(current: InternalAccumulator): Result
+  override suspend fun finish(current: InternalAccumulator): Result = finishNonSuspend(current)
+
+  /**
+   * Performs additional work during the finalization phase,
+   * by applying a function to the end result.
+   *
+   * @param transform Additional function to apply to the end result.
+   */
+  // functor over R
+  public fun <S> mapNonSuspend(
+    transform: (Result) -> S,
+  ): NonSuspendCollector<Value, S> = CollectorI.nonSuspendOf(
+    supply = this::supplyNonSuspend,
+    accumulate = this::accumulateNonSuspend,
+    finish = { current -> transform(this.finishNonSuspend(current)) },
+    characteristics = this.characteristics,
+  )
+
+  /**
+   * Applies a function over each element in the data source,
+   * before giving it to the collector.
+   *
+   * @param transform Function to apply to each value
+   */
+  // contravariant functor over T
+  public fun <P> contramapNonSuspend(
+    transform: (P) -> Value,
+  ): NonSuspendCollector<P, Result> = CollectorI.nonSuspendOf(
+    supply = this::supplyNonSuspend,
+    accumulate = { current, value -> this.accumulateNonSuspend(current, transform(value)) },
+    finish = this::finishNonSuspend,
+    characteristics = this.characteristics,
+  )
+
+  /**
+   * Combines two [Collector]s by performing the phases
+   * of each of them in parallel.
+   *
+   * @param other [Collector] to combine with [this]
+   */
+  // applicative
+  public fun <B, S> zip(
+    other: NonSuspendCollectorI<B, @UnsafeVariance Value, S>,
+  ): NonSuspendCollector<Value, Pair<Result, S>> =
+    this.zipNonSuspend(other, ::Pair)
+
+  /**
+   * Combines two [Collector]s by performing the phases
+   * of each of them in parallel, and then combining
+   * the end result in a final step.
+   *
+   * @param other [Collector] to combine with [this]
+   * @param combine Function that combines the end results
+   */
+  public fun <B, S, V> zipNonSuspend(
+    other: NonSuspendCollectorI<B, @UnsafeVariance Value, S>,
+    combine: (Result, S) -> V,
+  ): NonSuspendCollector<Value, V> = CollectorI.nonSuspendOf(
+    supply = { Pair(this.supplyNonSuspend(), other.supplyNonSuspend()) },
+    accumulate = { (currentThis, currentOther), value ->
+      this.accumulateNonSuspend(currentThis, value)
+      other.accumulateNonSuspend(currentOther, value)
+    },
+    finish = { (currentThis, currentOther) ->
+      combine(this.finishNonSuspend(currentThis), other.finishNonSuspend(currentOther))
     },
     characteristics = this.characteristics,
   )
