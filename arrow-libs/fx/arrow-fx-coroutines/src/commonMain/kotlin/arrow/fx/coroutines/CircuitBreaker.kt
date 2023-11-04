@@ -621,26 +621,31 @@ private constructor(
       onClosed: suspend () -> Unit = { },
       onHalfOpen: suspend () -> Unit = { },
       onOpen: suspend () -> Unit = { },
-    ): CircuitBreaker =
-      CircuitBreaker(
+    ): CircuitBreaker {
+      require(maxFailures >= 0) {
+        "maxFailures expected to be greater than or equal to 0, but was $maxFailures"
+      }
+      require(resetTimeoutNanos > 0) {
+        "resetTimeout expected to be greater than 0, but was $resetTimeoutNanos"
+      }
+      require(exponentialBackoffFactor > 0) {
+        "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor"
+      }
+      require(maxResetTimeoutNanos > 0) {
+        "maxResetTimeout expected to be greater than 0, but was $maxResetTimeoutNanos"
+      }
+      return CircuitBreaker(
         state = AtomicRef(Closed(0)),
-        maxFailures = maxFailures
-          .takeIf { it >= 0 }
-          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
-        resetTimeoutNanos = resetTimeoutNanos
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "resetTimeout expected to be greater than 0, but was $resetTimeoutNanos" } },
-        exponentialBackoffFactor = exponentialBackoffFactor
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
-        maxResetTimeoutNanos = maxResetTimeoutNanos
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than 0, but was $maxResetTimeoutNanos" } },
+        maxFailures = maxFailures,
+        resetTimeoutNanos = resetTimeoutNanos,
+        exponentialBackoffFactor = exponentialBackoffFactor,
+        maxResetTimeoutNanos = maxResetTimeoutNanos,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
         onOpen = onOpen
       )
+    }
 
     /**
      * Attempts to create a [CircuitBreaker].
@@ -682,20 +687,10 @@ private constructor(
       onOpen: suspend () -> Unit = suspend { },
     ): CircuitBreaker =
       of(
-        maxFailures = maxFailures
-          .takeIf { it >= 0 }
-          .let { requireNotNull(it) { "maxFailures expected to be greater than or equal to 0, but was $maxFailures" } },
-        resetTimeoutNanos = resetTimeout
-          .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } }
-          .toDouble(DurationUnit.NANOSECONDS),
-        exponentialBackoffFactor = exponentialBackoffFactor
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
-        maxResetTimeoutNanos = maxResetTimeout
-          .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } }
-          .toDouble(DurationUnit.NANOSECONDS),
+        maxFailures = maxFailures,
+        resetTimeoutNanos = resetTimeout.toDouble(DurationUnit.NANOSECONDS),
+        exponentialBackoffFactor = exponentialBackoffFactor,
+        maxResetTimeoutNanos = maxResetTimeout.toDouble(DurationUnit.NANOSECONDS),
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
