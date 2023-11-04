@@ -38,10 +38,6 @@ public suspend fun <T, R> Iterable<T>.collect(
   concurrency: Int = DEFAULT_CONCURRENCY,
 ): R = asFlow().collect(collector, concurrency)
 
-public fun <T, R> Iterable<T>.collectBlocking(
-  collector: Collector<T, R>,
-): R = asFlow().collectBlocking(collector)
-
 /**
  * Performs collection over the elements of [this].
  * The amount of concurrency depends on the
@@ -89,16 +85,4 @@ internal suspend fun <A, T, R> Flow<T>.collectI(
     }
   }.collect { }
   return completed
-}
-
-@Suppress("UNINITIALIZED_VARIABLE")
-public fun <T, R> Flow<T>.collectBlocking(collector: Collector<T, R>): R {
-  var final: R
-  suspend { collect(collector) }.startCoroutine(object : Continuation<R> {
-    override val context: CoroutineContext = EmptyCoroutineContext
-    override fun resumeWith(result: Result<R>) {
-      final = result.getOrThrow()
-    }
-  })
-  return final
 }

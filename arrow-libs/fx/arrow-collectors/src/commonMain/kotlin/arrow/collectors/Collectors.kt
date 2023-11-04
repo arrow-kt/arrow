@@ -54,45 +54,48 @@ public object Collectors {
     characteristics = if (unordered) Characteristics.CONCURRENT_UNORDERED else emptySet()
   )
 
+  private data object BestByNotInitialized
+
   /**
    * Returns the "best" value from the value.
    *
    * @param selectNew Decides whether the new value is "better" than the previous best.
    */
+  @Suppress("UNCHECKED_CAST")
   public fun <M> bestBy(
     selectNew: (old: M, new: M) -> Boolean,
-  ): Collector<M, M?> = Collector.of(
-    supply = { Atomic(null) },
+  ): Collector<M, M?> = Collector.of<Atomic<Any?>, M, M?>(
+    supply = { Atomic(BestByNotInitialized) },
     accumulate = { current, value ->
       current.update { old ->
-        if (old == null) value
-        else if (selectNew(old, value)) value
-        else old
+        if (old == BestByNotInitialized) {
+          value
+        } else {
+          old as M
+          if (selectNew(old, value)) value else old
+        }
       }
     },
-    finish = Atomic<M?>::get,
+    finish = { current ->
+      when (val result = current.get()) {
+        BestByNotInitialized -> null
+        else -> result as M
+      }
+    },
     characteristics = Characteristics.CONCURRENT_UNORDERED
   )
 
   /**
    * Collects all the values in a list, in the order in which they are emitted.
    */
-  public fun <T> list(): Collector<T, List<T>> = Collector.of(
-    supply = ::mutableListOf,
-    accumulate = MutableList<T>::add,
-    finish = { it },
-    characteristics = Characteristics.IDENTITY
-  )
+  @Suppress("UNCHECKED_CAST")
+  public fun <T> list(): Collector<T, List<T>> = _list as Collector<T, List<T>>
 
   /**
    * Collects all the values in a set.
    */
-  public fun <T> set(): Collector<T, Set<T>> = Collector.of(
-    supply = ::mutableSetOf,
-    accumulate = MutableSet<T>::add,
-    finish = { it },
-    characteristics = Characteristics.IDENTITY_UNORDERED
-  )
+  @Suppress("UNCHECKED_CAST")
+  public fun <T> set(): Collector<T, Set<T>> = _set as Collector<T, Set<T>>
 
   /**
    * Collects all the values in a map.
@@ -103,8 +106,27 @@ public object Collectors {
   /**
    * Collects all the values in a map.
    */
-  public fun <K, V> map(): Collector<Pair<K, V>, Map<K, V>> = Collector.of(
-    supply = { mutableMapOf<K, V>() },
+  @Suppress("UNCHECKED_CAST")
+  public fun <K, V> map(): Collector<Pair<K, V>, Map<K, V>> = _map as Collector<Pair<K, V>, Map<K, V>>
+
+  /* These Collectors can be cached and casted accordingly */
+
+  private val _list: Collector<Any?, List<Any?>> = Collector.of(
+    supply = { mutableListOf() },
+    accumulate = MutableList<Any?>::add,
+    finish = { it },
+    characteristics = Characteristics.IDENTITY
+  )
+
+  private val _set: Collector<Any?, Set<Any?>> = Collector.of(
+    supply = ::mutableSetOf,
+    accumulate = MutableSet<Any?>::add,
+    finish = { it },
+    characteristics = Characteristics.IDENTITY_UNORDERED
+  )
+
+  private val _map: Collector<Pair<Any?, Any?>, Map<Any?, Any?>> = Collector.of(
+    supply = { mutableMapOf<Any?, Any?>() },
     accumulate = { current, (k, v) -> current[k] = v },
     finish = { it },
     characteristics = Characteristics.IDENTITY_UNORDERED
