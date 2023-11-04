@@ -132,7 +132,7 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
       this.accumulate(currentThis, value)
       other.accumulate(currentOther, value)
     },
-    finish = {(currentThis, currentOther) ->
+    finish = { (currentThis, currentOther) ->
       combine(this.finish(currentThis), other.finish(currentOther))
     },
     characteristics = this.characteristics,

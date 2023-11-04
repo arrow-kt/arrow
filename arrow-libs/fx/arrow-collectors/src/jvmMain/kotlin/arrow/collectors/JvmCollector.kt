@@ -14,6 +14,8 @@ public fun <T, R> Collectors.jvm(
   collector: java.util.stream.Collector<T, *, R>,
 ): Collector<T, R> = Collectors.jvmI(collector)
 
+private typealias JavaCharacteristics = java.util.stream.Collector.Characteristics
+
 @Suppress("UnusedReceiverParameter")
 private fun <T, A, R> Collectors.jvmI(
   collector: java.util.stream.Collector<T, A, R>,
@@ -22,11 +24,11 @@ private fun <T, A, R> Collectors.jvmI(
   accumulate = { current, value -> collector.accumulator().accept(current, value) },
   finish = { collector.finisher().apply(it) },
   characteristics =
-    collector.characteristics().let { original ->
-      setOfNotNull(
-        Characteristics.CONCURRENT.takeIf { java.util.stream.Collector.Characteristics.CONCURRENT in original },
-        Characteristics.IDENTITY_FINISH.takeIf { java.util.stream.Collector.Characteristics.IDENTITY_FINISH in original },
-        Characteristics.UNORDERED.takeIf { java.util.stream.Collector.Characteristics.UNORDERED in original },
-      )
-    }
+  collector.characteristics().let { original ->
+    setOfNotNull(
+      Characteristics.CONCURRENT.takeIf { JavaCharacteristics.CONCURRENT in original },
+      Characteristics.IDENTITY_FINISH.takeIf { JavaCharacteristics.IDENTITY_FINISH in original },
+      Characteristics.UNORDERED.takeIf { JavaCharacteristics.UNORDERED in original },
+    )
+  }
 )
