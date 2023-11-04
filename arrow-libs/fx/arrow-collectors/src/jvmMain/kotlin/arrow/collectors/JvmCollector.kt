@@ -12,26 +12,21 @@ public fun <T, R> java.util.stream.Collector<T, *, R>.asCollector(): Collector<T
 @Suppress("UnusedReceiverParameter")
 public fun <T, R> Collectors.jvm(
   collector: java.util.stream.Collector<T, *, R>,
-): Collector<T, R> = JvmCollector(collector)
+): Collector<T, R> = Collectors.jvmI(collector)
 
-@JvmInline
-private value class JvmCollector<A, T, R>(
-  private val collector: java.util.stream.Collector<T, A, R>,
-) : CollectorI<A, T, R> {
-  override val characteristics: Set<Characteristics>
-    get() {
-      val original = collector.characteristics()
-      return setOfNotNull(
+@Suppress("UnusedReceiverParameter")
+private fun <T, A, R> Collectors.jvmI(
+  collector: java.util.stream.Collector<T, A, R>,
+): Collector<T, R> = Collector.of(
+  supply = { collector.supplier().get() },
+  accumulate = { current, value -> collector.accumulator().accept(current, value) },
+  finish = { collector.finisher().apply(it) },
+  characteristics =
+    collector.characteristics().let { original ->
+      setOfNotNull(
         Characteristics.CONCURRENT.takeIf { java.util.stream.Collector.Characteristics.CONCURRENT in original },
         Characteristics.IDENTITY_FINISH.takeIf { java.util.stream.Collector.Characteristics.IDENTITY_FINISH in original },
         Characteristics.UNORDERED.takeIf { java.util.stream.Collector.Characteristics.UNORDERED in original },
       )
     }
-
-  override suspend fun supply(): A = collector.supplier().get()
-  override suspend fun accumulate(current: A, value: T) {
-    collector.accumulator().accept(current, value)
-  }
-
-  override suspend fun finish(current: A): R = collector.finisher().apply(current)
-}
+)
