@@ -130,6 +130,8 @@ tasks {
     from(layout.projectDirectory.dir("static").file("CNAME"))
     into(layout.projectDirectory.dir("docs"))
   }
+
+  getByName("koverXmlReport").doNotTrackState("weird problem with null bytes")
 }
 
 apiValidation {
