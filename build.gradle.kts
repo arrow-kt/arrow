@@ -64,6 +64,7 @@ configure<KnitPluginExtension> {
 }
 
 dependencies {
+  // commented out projects cause issues in GitHub Actions
   kover(projects.arrowAtomic)
   kover(projects.arrowContinuations)
   kover(projects.arrowCore)
