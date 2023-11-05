@@ -134,6 +134,7 @@ tasks {
   named("koverGenerateArtifact") {
     outputs.cacheIf { false }
   }
+  getByName("koverXmlReport").doNotTrackState("weird problem with null bytes")
 }
 
 apiValidation {
