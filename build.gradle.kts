@@ -131,7 +131,9 @@ tasks {
     into(layout.projectDirectory.dir("docs"))
   }
 
-  getByName("koverXmlReport").doNotTrackState("weird problem with null bytes")
+  named("koverGenerateArtifact") {
+    outputs.cacheIf { false }
+  }
 }
 
 apiValidation {
