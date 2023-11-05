@@ -58,11 +58,11 @@ kotlin {
 }
 
 // enables context receivers for Jvm Tests
-tasks.withType<KotlinCompile> {
+tasks.withType<KotlinCompile>.configureEach {
   kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
-tasks.named<KotlinCompile>("compileTestKotlinJvm") {
+tasks.named<KotlinCompile>("compileTestKotlinJvm").configureEach {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
 
