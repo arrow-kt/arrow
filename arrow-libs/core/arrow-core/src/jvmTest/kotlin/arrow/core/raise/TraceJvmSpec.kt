@@ -1,11 +1,12 @@
 package arrow.core.raise
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
+  
 @OptIn(ExperimentalTraceApi::class)
-class TraceJvmSpec : StringSpec({
-  "Can trace a typed error" {
+class TraceJvmSpec {
+  @Test fun canTraceATypedError() = runTest {
     either<RuntimeException, Nothing> {
       traced({ raise(RuntimeException("")) }) { traced, raised ->
         // Remove first 2 lines:
@@ -21,4 +22,4 @@ class TraceJvmSpec : StringSpec({
       }
     }
   }
-})
+}

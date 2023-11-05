@@ -10,7 +10,6 @@ import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -24,9 +23,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class ParZip6Test : StringSpec({
-    "parZip 6 runs in parallel" {
+class ParZip6Test {
+    @Test
+    fun parZip6RunsInParallel() = runTest {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -72,7 +74,8 @@ class ParZip6Test : StringSpec({
       }
     }
 
-    "Cancelling parZip 6 cancels all participants" {
+    @Test
+    fun CancellingParZip6CancelsAllParticipants() = runTest {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -104,8 +107,9 @@ class ParZip6Test : StringSpec({
         pe.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
-
-    "parZip 6 cancels losers if a failure occurs in one of the tasks" {
+    
+    @Test
+    fun parZip6CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTest {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4, 5, 6))
@@ -143,8 +147,9 @@ class ParZip6Test : StringSpec({
         r should leftException(e)
       }
     }
-
-    "parZip CancellationException on right can cancel rest" {
+    
+    @Test
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTest {
       checkAll(Arb.string(), Arb.int(1..6)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -180,4 +185,3 @@ class ParZip6Test : StringSpec({
       }
     }
   }
-)

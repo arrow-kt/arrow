@@ -1,7 +1,6 @@
 package arrow.core
 
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
@@ -12,6 +11,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.short
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
 data class Person(val age: Int, val name: String) : Comparable<Person> {
   companion object {
@@ -29,8 +30,8 @@ data class Person(val age: Int, val name: String) : Comparable<Person> {
 fun Arb.Companion.person(): Arb<Person> =
   Arb.bind(Arb.int(), Arb.string(), ::Person)
 
-class ComparisonKtTest : StringSpec({
-    "Arberic - sort2" {
+class ComparisonKtTest {
+    @Test fun arbericSort2() = runTest {
       checkAll(Arb.person(), Arb.person()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
@@ -42,7 +43,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Arberic - sort3" {
+    @Test fun arbericSort3() = runTest {
       checkAll(Arb.person(), Arb.person(), Arb.person()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
@@ -55,7 +56,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Arberic - sortAll" {
+    @Test fun arbericSortAll() = runTest {
       checkAll(Arb.person(), Arb.list(Arb.person(), 0..50)) { a, lst ->
         val aas = lst.toTypedArray()
         val res = sort(a, *aas)
@@ -65,7 +66,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Arberic - comparator - sort2" {
+    @Test fun arbericComparatorSort2() = runTest {
       checkAll(Arb.person(), Arb.person()) { a, b ->
         val (first, second) = sort(a, b, Person.comparator)
         val (aa, bb) = listOf(a, b).sorted()
@@ -77,7 +78,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Arberic - comparator - sort3" {
+    @Test fun arbericComparatorSort3() = runTest {
       checkAll(Arb.person(), Arb.person(), Arb.person()) { a, b, c ->
         val (first, second, third) = sort(a, b, c, Person.comparator)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
@@ -90,7 +91,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Byte - sort2" {
+    @Test fun byteSort2() = runTest {
       checkAll(Arb.byte(), Arb.byte()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
@@ -102,7 +103,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Byte - sort3" {
+    @Test fun byteSort3() = runTest {
       checkAll(Arb.byte(), Arb.byte(), Arb.byte()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
@@ -115,7 +116,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Byte - sortAll" {
+    @Test fun byteSortAll() = runTest {
       checkAll(Arb.byte(), Arb.byte(), Arb.byte(), Arb.byte()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
@@ -124,7 +125,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Short - sort2" {
+    @Test fun shortSort2() = runTest {
       checkAll(Arb.short(), Arb.short()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
@@ -136,7 +137,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Short - sort3" {
+    @Test fun shortSort3() = runTest {
       checkAll(Arb.short(), Arb.short(), Arb.short()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
@@ -149,7 +150,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Short - sortAll" {
+    @Test fun shortSortAll() = runTest {
       checkAll(Arb.short(), Arb.short(), Arb.short(), Arb.short()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
@@ -157,8 +158,8 @@ class ComparisonKtTest : StringSpec({
         res shouldBe expected
       }
     }
-
-    "Int - sort2" {
+    
+    @Test fun intSort2() = runTest {
       checkAll(Arb.int(), Arb.int()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
@@ -168,7 +169,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Int - sort3" {
+    @Test fun intSort3() = runTest {
       checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
@@ -181,7 +182,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Int - sortAll" {
+    @Test fun intSortAll() = runTest {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
@@ -190,7 +191,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Long - sort2" {
+    @Test fun longSort2() = runTest {
       checkAll(Arb.long(), Arb.long()) { a, b ->
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
@@ -202,7 +203,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Long - sort3" {
+    @Test fun longSort3() = runTest {
       checkAll(Arb.long(), Arb.long(), Arb.long()) { a, b, c ->
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
@@ -215,7 +216,7 @@ class ComparisonKtTest : StringSpec({
       }
     }
 
-    "Long - sortAll" {
+    @Test fun longSortAll() = runTest {
       checkAll(Arb.long(), Arb.long(), Arb.long(), Arb.long()) { a, b, c, d ->
         val res = sort(a, b, c, d)
         val expected = listOf(a, b, c, d).sorted()
@@ -223,4 +224,4 @@ class ComparisonKtTest : StringSpec({
         res shouldBe expected
       }
     }
-})
+}

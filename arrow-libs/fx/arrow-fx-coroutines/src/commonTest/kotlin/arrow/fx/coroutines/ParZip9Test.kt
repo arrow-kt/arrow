@@ -9,7 +9,6 @@ import arrow.fx.coroutines.awaitExitCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.parZip
 import arrow.fx.coroutines.throwable
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -23,9 +22,13 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class ParZip9Test : StringSpec({
-    "parZip 9 runs in parallel" {
+class ParZip9Test {
+
+    @Test
+    fun parZip9RunsInParallel() = runTest {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g, h, i ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -88,8 +91,9 @@ class ParZip9Test : StringSpec({
         r.get() shouldBe "$i$h$g$f$e$d$c$b$a"
       }
     }
-
-    "Cancelling parZip 9 cancels all participants" {
+    
+    @Test
+    fun CancellingParZip9CancelsAllParticipants() = runTest {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -130,8 +134,9 @@ class ParZip9Test : StringSpec({
         ph.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pi.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
-
-    "parZip 9 cancels losers if a failure occurs in one of the tasks" {
+    
+    @Test
+    fun parZip9CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTest {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
@@ -181,8 +186,9 @@ class ParZip9Test : StringSpec({
         r should leftException(e)
       }
     }
-
-    "parZip CancellationException on right can cancel rest" {
+    
+    @Test
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTest {
       checkAll(Arb.string(), Arb.int(1..9)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -230,4 +236,3 @@ class ParZip9Test : StringSpec({
       }
     }
   }
-)

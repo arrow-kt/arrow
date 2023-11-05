@@ -520,24 +520,28 @@ private constructor(
       onClosed: suspend () -> Unit = suspend { },
       onHalfOpen: suspend () -> Unit = suspend { },
       onOpen: suspend () -> Unit = suspend { }
-    ): CircuitBreaker =
-      CircuitBreaker(
+    ): CircuitBreaker {
+      require(resetTimeout > Duration.ZERO) {
+        "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout"
+      }
+      require(exponentialBackoffFactor > 0) {
+        "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor"
+      }
+      require(maxResetTimeout > Duration.ZERO) {
+        "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout"
+      }
+      return CircuitBreaker(
         state = Atomic(Closed(openingStrategy)),
-        resetTimeout = resetTimeout
-          .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "resetTimeout expected to be greater than ${Duration.ZERO}, but was $resetTimeout" } },
-        exponentialBackoffFactor = exponentialBackoffFactor
-          .takeIf { it > 0 }
-          .let { requireNotNull(it) { "exponentialBackoffFactor expected to be greater than 0, but was $exponentialBackoffFactor" } },
-        maxResetTimeout = maxResetTimeout
-          .takeIf { it.isPositive() && it != Duration.ZERO }
-          .let { requireNotNull(it) { "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout" } },
+        resetTimeout = resetTimeout,
+        exponentialBackoffFactor = exponentialBackoffFactor,
+        maxResetTimeout = maxResetTimeout,
         timeSource = timeSource,
         onRejected = onRejected,
         onClosed = onClosed,
         onHalfOpen = onHalfOpen,
         onOpen = onOpen
       )
+    }
   }
 
   public sealed class OpeningStrategy {

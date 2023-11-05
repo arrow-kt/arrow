@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.mpp.NamedThreadFactory
@@ -12,11 +11,13 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import kotlin.test.Test
 
-class ParZip2JvmTest : StringSpec({
-  "parZip 2 returns to original context" {
+class ParZip2JvmTest {
+  @Test fun parZip2ReturnsToOriginalContext() = runTest {
     val zipCtxName = "parZip2"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
@@ -35,7 +36,7 @@ class ParZip2JvmTest : StringSpec({
     }
   }
 
-  "parZip 2 returns to original context on failure" {
+  @Test fun parZip2ReturnsToOriginalContextOnFailure() = runTest {
     val zipCtxName = "parZip2"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
@@ -56,7 +57,7 @@ class ParZip2JvmTest : StringSpec({
     }
   }
 
-  "parZip 2 finishes on single thread" {
+  @Test fun parZip2FinishesOnSingleThread() = runTest {
     checkAll(Arb.string()) {
       val res = resourceScope {
         val ctx = singleThreadContext("single")
@@ -68,7 +69,6 @@ class ParZip2JvmTest : StringSpec({
     }
   }
 }
-)
 
 suspend fun parallelCtx(
   nThreads: Int,
