@@ -193,9 +193,8 @@ public inline fun <Error, A> Raise<Error>.traced(
   @BuilderInference block: Raise<Error>.() -> A,
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
-  val self = this
-  val isOuterTraced = self is DefaultRaise && self.isTraced
-  val nested: DefaultRaise = if (isOuterTraced) self else DefaultRaise(true)
+  val isOuterTraced = this is DefaultRaise && isTraced
+  val nested: DefaultRaise = if (isOuterTraced) this as DefaultRaise else DefaultRaise(true)
   return try {
     block.invoke(nested)
   } catch (e: RaiseCancellationException) {
