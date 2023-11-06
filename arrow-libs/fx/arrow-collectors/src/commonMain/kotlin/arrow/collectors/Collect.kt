@@ -127,14 +127,12 @@ internal suspend fun <A, T, R> Flow<T>.collectI(
 
     else -> started.map { collector.accumulate(accumulator, it) }
   }
-  var completed: R
-  continued.onCompletion {
-    completed = when {
-      Characteristics.IDENTITY_FINISH in collector.characteristics -> accumulator as R
-      else -> collector.finish(accumulator)
-    }
-  }.collect { }
-  return completed
+  continued.collect()
+
+  return when {
+    Characteristics.IDENTITY_FINISH in collector.characteristics -> accumulator as R
+    else -> collector.finish(accumulator)
+  }
 }
 
 @Suppress("UNCHECKED_CAST")
