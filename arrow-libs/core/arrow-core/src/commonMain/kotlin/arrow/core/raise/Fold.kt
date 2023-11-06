@@ -194,8 +194,8 @@ public inline fun <Error, A> Raise<Error>.traced(
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
   val self = this
-  val isOuterTraced = self is DefaultRaise && isTraced
-  val nested = if (isOuterTraced) self else DefaultRaise(true)
+  val isOuterTraced = self is DefaultRaise && self.isTraced
+  val nested: DefaultRaise = if (isOuterTraced) self else DefaultRaise(true)
   return try {
     block.invoke(nested)
   } catch (e: RaiseCancellationException) {
