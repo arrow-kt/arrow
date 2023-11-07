@@ -64,16 +64,15 @@ configure<KnitPluginExtension> {
 }
 
 dependencies {
-  // commented out projects cause issues in GitHub Actions
   kover(projects.arrowAtomic)
   kover(projects.arrowContinuations)
   kover(projects.arrowCore)
   kover(projects.arrowCoreRetrofit)
-  // kover(projects.arrowCoreSerialization)
+  kover(projects.arrowCoreSerialization)
   kover(projects.arrowFxCoroutines)
   kover(projects.arrowFxStm)
   kover(projects.arrowOptics)
-  // kover(projects.arrowOpticsKspPlugin)
+  kover(projects.arrowOpticsKspPlugin)
   kover(projects.arrowOpticsReflect)
   kover(projects.arrowResilience)
   kover(projects.arrowCollectors)
