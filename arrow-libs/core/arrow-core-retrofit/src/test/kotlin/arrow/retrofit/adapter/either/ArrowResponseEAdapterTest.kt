@@ -11,15 +11,18 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
 class ArrowResponseEAdapterTest {
 
   lateinit var server: MockWebServer
   lateinit var service: SuspendApiTestClient
 
-  beforeAny {
+  @BeforeTest
+  fun initialize() {
     server = MockWebServer()
     server.start()
     service = Retrofit.Builder()
@@ -30,7 +33,10 @@ class ArrowResponseEAdapterTest {
       .create(SuspendApiTestClient::class.java)
   }
 
-  afterAny { server.shutdown() }
+  @AfterTest
+  fun shutdown() {
+    server.shutdown()
+  }
   
   @Test
   fun shouldReturnResponseMockFor200WithValidJson() = runTest {
