@@ -67,6 +67,7 @@ dependencies {
   kover(projects.arrowAtomic)
   kover(projects.arrowCore)
   kover(projects.arrowCoreRetrofit)
+  kover(projects.arrowCoreSerialization)
   kover(projects.arrowFxCoroutines)
   kover(projects.arrowFxStm)
   kover(projects.arrowOptics)
