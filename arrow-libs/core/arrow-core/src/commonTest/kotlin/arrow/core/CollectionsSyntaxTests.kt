@@ -17,6 +17,8 @@
 package arrow.core
 
 import io.kotest.matchers.shouldBe
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
 class CollectionsSyntaxTests {
     @Test fun tail() = runTest {
