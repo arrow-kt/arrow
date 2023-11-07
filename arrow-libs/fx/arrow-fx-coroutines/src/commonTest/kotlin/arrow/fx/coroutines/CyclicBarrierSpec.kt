@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
@@ -13,30 +12,36 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class CyclicBarrierSpec : StringSpec({
-  "should raise an exception when constructed with a negative or zero capacity" {
+class CyclicBarrierSpec {
+  @Test
+  fun shouldRaiseAnExceptionWhenConstructedWithNegativeOrZeroCapacity() = runTest {
     checkAll(Arb.int(Int.MIN_VALUE, 0)) { i ->
       shouldThrow<IllegalArgumentException> { CyclicBarrier(i) }.message shouldBe
         "Cyclic barrier must be constructed with positive non-zero capacity $i but was $i > 0"
     }
   }
 
-  "barrier of capacity 1 is a no op" {
+  @Test
+  fun barrierOfCapacity1IsANoOp() = runTest {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(1)
       barrier.await()
     }
   }
 
-  "awaiting all in parallel resumes all coroutines" {
+  @Test
+  fun awaitingAllInParallelResumesAllCoroutines() = runTest {
     checkAll(Arb.int(1, 100)) { i ->
       val barrier = CyclicBarrier(i)
       (0 until i).parMap { barrier.await() }
     }
   }
 
-  "should reset once full" {
+  @Test
+  fun shouldResetOnceFull() = runTest {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
@@ -44,7 +49,8 @@ class CyclicBarrierSpec : StringSpec({
     }
   }
 
-  "executes runnable once full" {
+  @Test
+  fun executesRunnableOnceFull() = runTest {
     var barrierRunnableInvoked = false
     val barrier = CyclicBarrier(2) { barrierRunnableInvoked = true }
     parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
@@ -52,7 +58,8 @@ class CyclicBarrierSpec : StringSpec({
     barrierRunnableInvoked shouldBe true
   }
 
-  "await is cancelable" {
+  @Test
+  fun awaitIsCancelable() = runTest {
     checkAll(Arb.int(2, Int.MAX_VALUE)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
@@ -68,14 +75,16 @@ class CyclicBarrierSpec : StringSpec({
     }
   }
 
-  "should clean up upon cancellation of await" {
+  @Test
+  fun shouldCleanUpUponCancellationOfAwait() = runTest {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }.cancelAndJoin()
     }
   }
 
-  "reset cancels all awaiting" {
+  @Test
+  fun resetCancelsAllAwaiting() = runTest {
     checkAll(Arb.int(2, 100)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
@@ -92,7 +101,8 @@ class CyclicBarrierSpec : StringSpec({
     }
   }
 
-  "should clean up upon reset" {
+  @Test
+  fun shouldCleanUpUponReset() = runTest {
     checkAll(Arb.int(2, 100)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
@@ -107,7 +117,8 @@ class CyclicBarrierSpec : StringSpec({
     }
   }
 
-  "race fiber cancel and barrier full" {
+  @Test
+  fun raceFiberCancelAndBarrierFull() = runTest {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       val job = launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }
@@ -120,7 +131,8 @@ class CyclicBarrierSpec : StringSpec({
     }
   }
 
-  "reset" {
+  @Test
+  fun reset() = runTest {
     checkAll(Arb.int(2..10)) { n ->
       val barrier = CyclicBarrier(n)
 
@@ -140,4 +152,4 @@ class CyclicBarrierSpec : StringSpec({
       }
     }
   }
-})
+}
