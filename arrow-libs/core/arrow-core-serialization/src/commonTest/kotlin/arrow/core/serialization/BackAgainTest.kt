@@ -13,17 +13,18 @@ import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Option
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.string
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import io.kotest.matchers.shouldBe
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.string
 import kotlinx.serialization.Serializable
 
 /*
@@ -46,24 +47,28 @@ data class NonEmptyListInside<A>(val thing: NonEmptyList<A>)
 @Serializable
 data class NonEmptySetInside<A>(val thing: NonEmptySet<A>)
 
-inline fun <reified T> StringSpec.backAgain(generator: Arb<T>) {
-  "there and back again, ${T::class.simpleName}" {
+inline fun <reified T> backAgain(generator: Arb<T>) =
+  runTest {
     checkAll(generator) { e ->
       val result = Json.encodeToJsonElement<T>(e)
       val back = Json.decodeFromJsonElement<T>(result)
       back shouldBe e
     }
   }
-}
 
 /**
  * Checks that the result of serializing a value into JSON,
  * and then deserializing it, gives back the original.
  */
-class BackAgainTest : StringSpec({
-  backAgain(Arb.either(Arb.string(), Arb.int()).map(::EitherInside))
-  backAgain(Arb.ior(Arb.string(), Arb.int()).map(::IorInside))
-  backAgain(Arb.option(Arb.string()).map(::OptionInside))
-  backAgain(Arb.nonEmptyList(Arb.int()).map(::NonEmptyListInside))
-  backAgain(Arb.nonEmptySet(Arb.int()).map(::NonEmptySetInside))
-})
+class BackAgainTest {
+  @Test fun backAgainEither() =
+    backAgain(Arb.either(Arb.string(), Arb.int()).map(::EitherInside))
+  @Test fun backAgainIor() =
+    backAgain(Arb.ior(Arb.string(), Arb.int()).map(::IorInside))
+  @Test fun backAgainOption() =
+    backAgain(Arb.option(Arb.string()).map(::OptionInside))
+  @Test fun backAgainNonEmptyList() =
+    backAgain(Arb.nonEmptyList(Arb.int()).map(::NonEmptyListInside))
+  @Test fun backAgainNonEmptySet() =
+    backAgain(Arb.nonEmptySet(Arb.int()).map(::NonEmptySetInside))
+}

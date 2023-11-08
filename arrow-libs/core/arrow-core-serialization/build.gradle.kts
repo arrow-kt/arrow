@@ -4,7 +4,8 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.kotest.multiplatform)
+  alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.spotless)
   id(libs.plugins.kotlinx.serialization.get().pluginId)
 }
 
@@ -25,15 +26,8 @@ kotlin {
         implementation(libs.kotlinx.serializationJson)
         implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
-        implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-      }
-    }
-
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
   }

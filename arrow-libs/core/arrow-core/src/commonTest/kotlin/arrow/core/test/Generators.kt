@@ -1,15 +1,6 @@
 package arrow.core.test
 
-import arrow.core.Either
-import arrow.core.Ior
-import arrow.core.NonEmptyList
-import arrow.core.NonEmptySet
-import arrow.core.Option
-import arrow.core.left
-import arrow.core.memoize
-import arrow.core.right
-import arrow.core.toNonEmptySetOrNull
-import arrow.core.toOption
+import arrow.core.*
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.bind
@@ -47,11 +38,13 @@ fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Seq
   Arb.list(arb, range).map { it.asSequence() }
 
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> = arbitrary { random ->
-  { _: A -> arb.next(random) }.memoize()
+  val memoized = MemoizedDeepRecursiveFunction<A, B> { _ -> arb.next(random) }
+  fun (x: A): B = memoized(x)
 }
 
 fun <A, B, C, D> Arb.Companion.functionABCToD(arb: Arb<D>): Arb<(A, B, C) -> D> = arbitrary { random ->
-  { _: A, _:B, _:C -> arb.next(random)}.memoize()
+  val memoized = MemoizedDeepRecursiveFunction<Triple<A, B, C>, D> { _ -> arb.next(random) }
+  fun (x: A, y: B, z: C): D = memoized(Triple(x, y, z))
 }
 
 fun Arb.Companion.throwable(): Arb<Throwable> =

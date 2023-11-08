@@ -32,13 +32,15 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  * all becomes even more unwieldy when we try to compose exception-throwing procedures.
  *
  * ```kotlin
- * import arrow.core.andThen
- *
  * //sampleStart
  * val throwsSomeStuff: (Int) -> Double = {x -> x.toDouble()}
  * val throwsOtherThings: (Double) -> String = {x -> x.toString()}
  * val moreThrowing: (String) -> List<String> = {x -> listOf(x)}
- * val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
+ * val magic: (Int) -> List<String> = { x ->
+ *   val y = throwsSomeStuff(x)
+ *   val z = throwsOtherThings(y)
+ *   moreThrowing(z)
+ * }
  * //sampleEnd
  * fun main() {
  *  println ("magic = $magic")
