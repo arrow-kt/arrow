@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.newSingleThreadContext
@@ -151,7 +152,7 @@ public fun <A : AutoCloseable> autoCloseable(
  * ```
  * <!--- KNIT example-resourceextensions-04.kt -->
  */
-@OptIn(DelicateCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @ResourceDSL
 public suspend fun ResourceScope.singleThreadContext(name: String): ExecutorCoroutineDispatcher =
   closeable { newSingleThreadContext(name) }

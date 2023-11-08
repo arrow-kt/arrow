@@ -11,4 +11,5 @@ suspend fun main() {
     tarr.transform { it + 1 }
   }
   //sampleEnd
+  println("Result $result")
 }

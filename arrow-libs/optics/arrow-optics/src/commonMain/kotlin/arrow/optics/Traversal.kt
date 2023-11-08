@@ -195,11 +195,11 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
-          combine(f(get1(s)), f(get2(s)))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+          combine(map(get1(source)), map(get2(source)))
 
-        override fun modify(s: S, transform: (focus: A) -> B): T =
-          set(transform(get1(s)), transform(get2(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -209,11 +209,11 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
-          combine(combine(f(get1(s)), f(get2(s))), f(get3(s)))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+          combine(combine(map(get1(source)), map(get2(source))), map(get3(source)))
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), map(get3(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -224,11 +224,11 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
-          combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get4(s)))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+          combine(combine(combine(map(get1(source)), map(get2(source))), map(get3(source))), map(get4(source)))
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), map(get3(source)), map(get4(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -240,11 +240,11 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
-          combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s)))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+          combine(combine(combine(map(get1(source)), map(get2(source))), map(get3(source))), map(get5(source)))
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), map(get3(source)), map(get4(source)), map(get5(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -257,11 +257,11 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
-          combine(combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))), f(get6(s)))
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+          combine(combine(combine(combine(map(get1(source)), map(get2(source))), map(get3(source))), map(get5(source))), map(get6(source)))
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), map(get3(source)), map(get4(source)), map(get5(source)), map(get6(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -275,14 +275,14 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
           combine(
-            combine(combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))), f(get6(s))),
-            f(get7(s))
+            combine(combine(combine(combine(map(get1(source)), map(get2(source))), map(get3(source))), map(get5(source))), map(get6(source))),
+            map(get7(source))
           )
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), map(get3(source)), map(get4(source)), map(get5(source)), map(get6(source)), map(get7(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -297,18 +297,18 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
           combine(
             combine(
               combine(
-                combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))),
-                f(get6(s))
-              ), f(get7(s))
-            ), f(get8(s))
+                combine(combine(combine(map(get1(source)), map(get2(source))), map(get3(source))), map(get5(source))),
+                map(get6(source))
+              ), map(get7(source))
+            ), map(get8(source))
           )
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
-          set(f(get1(s)), f(get2(s)), f(get3(s)), f(get4(s)), f(get5(s)), f(get6(s)), f(get7(s)), f(get8(s)), s)
+        override fun modify(source: S, map: (focus: A) -> B): T =
+          set(map(get1(source)), map(get2(source)), map(get3(source)), map(get4(source)), map(get5(source)), map(get6(source)), map(get7(source)), map(get8(source)), source)
       }
 
     public operator fun <S, T, A, B> invoke(
@@ -324,30 +324,30 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
           combine(
             combine(
               combine(
                 combine(
-                  combine(combine(combine(f(get1(s)), f(get2(s))), f(get3(s))), f(get5(s))),
-                  f(get6(s))
-                ), f(get7(s))
-              ), f(get8(s))
-            ), f(get9(s))
+                  combine(combine(combine(map(get1(source)), map(get2(source))), map(get3(source))), map(get5(source))),
+                  map(get6(source))
+                ), map(get7(source))
+              ), map(get8(source))
+            ), map(get9(source))
           )
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
+        override fun modify(source: S, map: (focus: A) -> B): T =
           set(
-            f(get1(s)),
-            f(get2(s)),
-            f(get3(s)),
-            f(get4(s)),
-            f(get5(s)),
-            f(get6(s)),
-            f(get7(s)),
-            f(get8(s)),
-            f(get9(s)),
-            s
+            map(get1(source)),
+            map(get2(source)),
+            map(get3(source)),
+            map(get4(source)),
+            map(get5(source)),
+            map(get6(source)),
+            map(get7(source)),
+            map(get8(source)),
+            map(get9(source)),
+            source
           )
       }
 
@@ -365,35 +365,35 @@ public interface PTraversal<S, T, A, B> {
       set: (B, B, B, B, B, B, B, B, B, B, S) -> T
     ): PTraversal<S, T, A, B> =
       object : PTraversal<S, T, A, B> {
-        override fun <R> foldMap(initial: R, combine: (R, R) -> R, s: S, f: (focus: A) -> R): R =
+        override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
           combine(
             combine(
               combine(
                 combine(
                   combine(
                     combine(
-                      combine(combine(f(get1(s)), f(get2(s))), f(get3(s))),
-                      f(get5(s))
-                    ), f(get6(s))
-                  ), f(get7(s))
-                ), f(get8(s))
-              ), f(get9(s))
-            ), f(get10(s))
+                      combine(combine(map(get1(source)), map(get2(source))), map(get3(source))),
+                      map(get5(source))
+                    ), map(get6(source))
+                  ), map(get7(source))
+                ), map(get8(source))
+              ), map(get9(source))
+            ), map(get10(source))
           )
 
-        override fun modify(s: S, f: (focus: A) -> B): T =
+        override fun modify(source: S, map: (focus: A) -> B): T =
           set(
-            f(get1(s)),
-            f(get2(s)),
-            f(get3(s)),
-            f(get4(s)),
-            f(get5(s)),
-            f(get6(s)),
-            f(get7(s)),
-            f(get8(s)),
-            f(get9(s)),
-            f(get10(s)),
-            s
+            map(get1(source)),
+            map(get2(source)),
+            map(get3(source)),
+            map(get4(source)),
+            map(get5(source)),
+            map(get6(source)),
+            map(get7(source)),
+            map(get8(source)),
+            map(get9(source)),
+            map(get10(source)),
+            source
           )
       }
 

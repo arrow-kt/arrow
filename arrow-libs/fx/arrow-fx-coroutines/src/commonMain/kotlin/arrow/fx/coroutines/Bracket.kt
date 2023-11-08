@@ -31,6 +31,7 @@ public sealed class ExitCase {
  * @see guarantee for registering a handler that is guaranteed to always run.
  * @see guaranteeCase for registering a handler that executes for any [ExitCase].
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> onCancel(
   fa: suspend () -> A,
   crossinline onCancel: suspend () -> Unit
@@ -54,6 +55,7 @@ public suspend inline fun <A> onCancel(
  * @param finalizer handler to run after [fa].
  * @see guaranteeCase for registering a handler that tracks the [ExitCase] of [fa].
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> guarantee(
   fa: suspend () -> A,
   crossinline finalizer: suspend () -> Unit
@@ -83,6 +85,7 @@ public suspend inline fun <A> guarantee(
  * @param finalizer handler to run after [fa].
  * @see guarantee for registering a handler that ignores the [ExitCase] of [fa].
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> guaranteeCase(
   fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
@@ -115,10 +118,10 @@ public suspend inline fun <A> guaranteeCase(
  * ```kotlin
  * import arrow.fx.coroutines.*
  *
- * class File(url: String) {
+ * class File(val url: String) {
  *   fun open(): File = this
  *   fun close(): Unit {}
- *   override fun toString(): String = "This file contains some interesting content!"
+ *   override fun toString(): String = "This file contains some interesting content from $url!"
  * }
  *
  * suspend fun openFile(uri: String): File = File(uri).open()
@@ -138,6 +141,7 @@ public suspend inline fun <A> guaranteeCase(
  * ```
  * <!--- KNIT example-bracket-01.kt -->
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
   use: suspend (A) -> B,
@@ -191,13 +195,13 @@ public suspend inline fun <A, B> bracket(
  * ```kotlin
  * import arrow.fx.coroutines.*
  *
- * class File(url: String) {
+ * class File(val url: String) {
  *   fun open(): File = this
  *   fun close(): Unit {}
  * }
  *
  * suspend fun File.content(): String =
- *     "This file contains some interesting content!"
+ *     "This file contains some interesting content from $url!"
  * suspend fun openFile(uri: String): File = File(uri).open()
  * suspend fun closeFile(file: File): Unit = file.close()
  *
@@ -221,6 +225,7 @@ public suspend inline fun <A, B> bracket(
  * ```
  * <!--- KNIT example-bracket-02.kt -->
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A, B> bracketCase(
   crossinline acquire: suspend () -> A,
   use: suspend (A) -> B,

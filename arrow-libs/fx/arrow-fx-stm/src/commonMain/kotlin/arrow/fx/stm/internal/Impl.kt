@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package arrow.fx.stm.internal
 
 import arrow.atomic.Atomic
@@ -11,17 +13,17 @@ import kotlin.coroutines.Continuation
  * A STMFrame keeps the reads and writes performed by a transaction.
  * It may have a parent which is only used for read lookups.
  */
-internal class STMFrame(val parent: STMFrame? = null) : STM {
+internal class STMFrame(private val parent: STMFrame? = null) : STM {
 
   class Entry(var initialVal: Any?, var newVal: Any?) {
-    object NO_CHANGE
-    object NOT_PRESENT
+    object NoChange
+    object NotPresent
 
     fun isWrite(): Boolean =
-      newVal !== NO_CHANGE
+      newVal !== NoChange
 
-    fun update(v: Any?): Unit {
-      newVal = if (initialVal === v) NO_CHANGE else v
+    fun update(v: Any?) {
+      newVal = if (initialVal === v) NoChange else v
     }
 
     fun getValue(): Any? = if (isWrite()) newVal else initialVal
@@ -32,8 +34,8 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
   /**
    * Helper to search the entire hierarchy for stored previous reads
    */
-  private fun readVar(v: TVar<Any?>): Any? =
-    accessMap[v]?.getValue() ?: parent?.readVar(v) ?: Entry.NOT_PRESENT
+  private fun readVar(v: TVar<Any?>): Any =
+    accessMap[v]?.getValue() ?: parent?.readVar(v) ?: Entry.NotPresent
 
   override fun retry(): Nothing = throw RetryException
 
@@ -57,18 +59,18 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
         //  If we are already invalid here there is no point in continuing.
         if (frame.validate()) {
           this@STMFrame.merge(frame)
-          return@runLocal res as A
+          return res
         }
       } catch (ignored: RetryException) {
         if (frame.validate()) {
           this@STMFrame.mergeReads(frame)
-          return@runLocal onRetry()
+          return onRetry()
         }
       } catch (e: Throwable) {
         // An invalid frame retries even if it throws, so our sub-frame also needs to handle this correctly
         if (frame.validate()) {
           this@STMFrame.mergeReads(frame)
-          return@runLocal onError(e)
+          return onError(e)
         }
       }
     }
@@ -79,7 +81,7 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
    */
   override fun <A> TVar<A>.read(): A =
     when (val r = readVar(this as TVar<Any?>)) {
-      Entry.NOT_PRESENT -> readI().also { accessMap[this] = Entry(it, Entry.NO_CHANGE) }
+      Entry.NotPresent -> readI().also { accessMap[this] = Entry(it, Entry.NoChange) }
       else -> r as A
     }
 
@@ -140,11 +142,11 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
     return true
   }
 
-  private fun mergeReads(other: STMFrame): Unit {
+  private fun mergeReads(other: STMFrame) {
     accessMap.putAll(other.accessMap.filter { (_, e) -> e.isWrite().not() })
   }
 
-  private fun merge(other: STMFrame): Unit {
+  private fun merge(other: STMFrame) {
     accessMap.putAll(other.accessMap)
   }
 }
@@ -184,12 +186,12 @@ internal class STMTransaction<A>(val f: STM.() -> A) {
       try {
         val res = frame.f()
 
-        if (frame.validateAndCommit()) return@commit res
+        if (frame.validateAndCommit()) return res
       } catch (ignored: RetryException) {
         if (frame.accessMap.isEmpty()) throw BlockedIndefinitely()
 
         val registered = mutableListOf<TVar<Any?>>()
-        suspendCancellableCoroutine<Unit> susp@{ k ->
+        suspendCancellableCoroutine susp@{ k ->
           cont.value = k
 
           frame.accessMap

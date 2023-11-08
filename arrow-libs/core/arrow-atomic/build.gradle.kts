@@ -47,11 +47,9 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + "-Xexpect-actual-classes"
-  }
+  kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
-tasks.withType<Test> {
+tasks.withType<Test>().configureEach {
   useJUnitPlatform()
 }

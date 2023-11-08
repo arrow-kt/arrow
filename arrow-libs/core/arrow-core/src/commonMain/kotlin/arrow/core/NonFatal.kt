@@ -24,7 +24,7 @@ import kotlin.coroutines.cancellation.CancellationException
  *         else -> "Hello"
  *    }
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   val nonFatal: Either<Throwable, String> =
  *   //sampleStart
  *   try {

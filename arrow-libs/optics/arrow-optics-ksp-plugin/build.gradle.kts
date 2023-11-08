@@ -44,7 +44,7 @@ dependencies {
   testRuntimeOnly(projects.arrowOptics)
 }
 
-tasks.withType<Test> {
+tasks.withType<Test>().configureEach {
   maxParallelForks = 1
   useJUnitPlatform()
 }

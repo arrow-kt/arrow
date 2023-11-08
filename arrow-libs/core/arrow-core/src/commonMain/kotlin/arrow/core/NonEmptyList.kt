@@ -179,7 +179,7 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
     else -> head
   }
 
-  @Suppress("OVERRIDE_BY_INLINE")
+  @Suppress("OVERRIDE_BY_INLINE", "NOTHING_TO_INLINE")
   public override inline fun distinct(): NonEmptyList<A> =
     NonEmptyList(all.distinct())
 
@@ -340,6 +340,7 @@ public fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
   NonEmptyList(listOf(head) + t)
 
 @JvmName("nel")
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <A> A.nel(): NonEmptyList<A> =
   NonEmptyList(listOf(this))
 
@@ -355,9 +356,11 @@ public inline fun <A, B : Comparable<B>> NonEmptyList<A>.minBy(selector: (A) -> 
 public inline fun <A, B : Comparable<B>> NonEmptyList<A>.maxBy(selector: (A) -> B): A =
   maxByOrNull(selector)!!
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <T : Comparable<T>> NonEmptyList<T>.min(): T =
   minOrNull()!!
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <T : Comparable<T>> NonEmptyList<T>.max(): T =
   maxOrNull()!!
 

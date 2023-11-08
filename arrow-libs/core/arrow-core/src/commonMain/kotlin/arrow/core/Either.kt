@@ -1332,6 +1332,7 @@ public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  * <!--- KNIT example-either-33.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
 

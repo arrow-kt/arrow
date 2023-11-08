@@ -3,7 +3,7 @@ package arrow.core.examples.exampleSequence15
 
 import arrow.core.unzip
 
-fun main(args: Array<String>) {
+fun main() {
   //sampleStart
   val result =
    sequenceOf("A:1", "B:2", "C:3").unzip { e ->

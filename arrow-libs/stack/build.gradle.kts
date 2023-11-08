@@ -15,6 +15,7 @@ dependencies {
     api("io.arrow-kt:arrow-core:$version")
     api("io.arrow-kt:arrow-functions:$version")
     api("io.arrow-kt:arrow-core-retrofit:$version")
+    api("io.arrow-kt:arrow-core-serialization:$version")
     api("io.arrow-kt:arrow-fx-coroutines:$version")
     api("io.arrow-kt:arrow-fx-stm:$version")
     api("io.arrow-kt:arrow-resilience:$version")

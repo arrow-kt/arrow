@@ -84,6 +84,7 @@ public interface SagaScope {
  * By doing so we can guarantee that any transactional like operations made by the [Saga] will
  * guarantee that it results in the correct state.
  */
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <A> saga(noinline block: suspend SagaScope.() -> A): Saga<A> = block
 
 /** Create a lazy [Saga] that will only run when the [Saga] is invoked. */

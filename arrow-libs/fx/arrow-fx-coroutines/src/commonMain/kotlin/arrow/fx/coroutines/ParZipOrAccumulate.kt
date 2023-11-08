@@ -14,44 +14,44 @@ public suspend inline fun <E, A, B, C> Raise<E>.parZipOrAccumulate(
   crossinline combine: (E, E) -> E,
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
-  crossinline f: suspend CoroutineScope.(A, B) -> C
+  crossinline transform: suspend CoroutineScope.(A, B) -> C
 ): C =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, transform)
 
 public suspend inline fun <E, A, B, C> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
   crossinline combine: (E, E) -> E,
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
-  crossinline f: suspend CoroutineScope.(A, B) -> C
+  crossinline transform: suspend CoroutineScope.(A, B) -> C
 ): C =
   parZip(
     context,
     { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b ->
-    Either.zipOrAccumulate(a, b) { aa, bb -> f(aa, bb) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b) { aa, bb -> transform(aa, bb) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
-  crossinline f: suspend CoroutineScope.(A, B) -> C
+  crossinline transform: suspend CoroutineScope.(A, B) -> C
 ): C =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, transform)
 
 public suspend inline fun <E, A, B, C> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
-  crossinline f: suspend CoroutineScope.(A, B) -> C
+  crossinline transform: suspend CoroutineScope.(A, B) -> C
 ): C =
   parZip(
     context,
     { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b ->
-    Either.zipOrAccumulate(a, b) { aa, bb -> f(aa, bb) }.bind()
+    Either.zipOrAccumulate(a, b) { aa, bb -> transform(aa, bb) }.bind()
   }
 //endregion
 
@@ -61,9 +61,9 @@ public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
-  crossinline f: suspend CoroutineScope.(A, B, C) -> D
+  crossinline transform: suspend CoroutineScope.(A, B, C) -> D
 ): D =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, transform)
 
 public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -71,7 +71,7 @@ public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
-  crossinline f: suspend CoroutineScope.(A, B, C) -> D
+  crossinline transform: suspend CoroutineScope.(A, B, C) -> D
 ): D =
   parZip(
     context,
@@ -79,23 +79,23 @@ public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
     { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c ->
-    Either.zipOrAccumulate(a, b, c) { aa, bb, cc -> f(aa, bb, cc) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c) { aa, bb, cc -> transform(aa, bb, cc) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
-  crossinline f: suspend CoroutineScope.(A, B, C) -> D
+  crossinline transform: suspend CoroutineScope.(A, B, C) -> D
 ): D =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, transform)
 
 public suspend inline fun <E, A, B, C, D> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
   crossinline fa: suspend ScopedRaiseAccumulate<E>.() -> A,
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
-  crossinline f: suspend CoroutineScope.(A, B, C) -> D
+  crossinline transform: suspend CoroutineScope.(A, B, C) -> D
 ): D =
   parZip(
     context,
@@ -103,7 +103,7 @@ public suspend inline fun <E, A, B, C, D> Raise<NonEmptyList<E>>.parZipOrAccumul
     { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c ->
-    Either.zipOrAccumulate(a, b, c) { aa, bb, cc -> f(aa, bb, cc) }.bind()
+    Either.zipOrAccumulate(a, b, c) { aa, bb, cc -> transform(aa, bb, cc) }.bind()
   }
 //endregion
 
@@ -114,9 +114,9 @@ public suspend inline fun <E, A, B, C, D, F> Raise<E>.parZipOrAccumulate(
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
-  crossinline f: suspend CoroutineScope.(A, B, C, D) -> F
+  crossinline transform: suspend CoroutineScope.(A, B, C, D) -> F
 ): F =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, transform)
 
 public suspend inline fun <E, A, B, C, D, F> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -125,7 +125,7 @@ public suspend inline fun <E, A, B, C, D, F> Raise<E>.parZipOrAccumulate(
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
-  crossinline f: suspend CoroutineScope.(A, B, C, D) -> F
+  crossinline transform: suspend CoroutineScope.(A, B, C, D) -> F
 ): F =
   parZip(
     context,
@@ -134,7 +134,7 @@ public suspend inline fun <E, A, B, C, D, F> Raise<E>.parZipOrAccumulate(
     { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d ->
-    Either.zipOrAccumulate(a, b, c, d) { aa, bb, cc, dd -> f(aa, bb, cc, dd) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c, d) { aa, bb, cc, dd -> transform(aa, bb, cc, dd) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -142,9 +142,9 @@ public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccu
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
-  crossinline f: suspend CoroutineScope.(A, B, C, D) -> F
+  crossinline transform: suspend CoroutineScope.(A, B, C, D) -> F
 ): F =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, transform)
 
 public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -152,7 +152,7 @@ public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccu
   crossinline fb: suspend ScopedRaiseAccumulate<E>.() -> B,
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
-  crossinline f: suspend CoroutineScope.(A, B, C, D) -> F
+  crossinline transform: suspend CoroutineScope.(A, B, C, D) -> F
 ): F =
   parZip(
     context,
@@ -161,7 +161,7 @@ public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccu
     { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d ->
-    Either.zipOrAccumulate(a, b, c, d) { aa, bb, cc, dd -> f(aa, bb, cc, dd) }.bind()
+    Either.zipOrAccumulate(a, b, c, d) { aa, bb, cc, dd -> transform(aa, bb, cc, dd) }.bind()
   }
 //endregion
 
@@ -173,9 +173,9 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<E>.parZipOrAccumulate(
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F) -> G
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F) -> G
 ): G =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -185,7 +185,7 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<E>.parZipOrAccumulate(
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F) -> G
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F) -> G
 ): G =
   parZip(
     context,
@@ -195,7 +195,7 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<E>.parZipOrAccumulate(
     { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f ->
-    Either.zipOrAccumulate(a, b, c, d, f) { aa, bb, cc, dd, ff -> f(aa, bb, cc, dd, ff) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c, d, f) { aa, bb, cc, dd, ff -> transform(aa, bb, cc, dd, ff) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -204,9 +204,9 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrA
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F) -> G
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F) -> G
 ): G =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -215,7 +215,7 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrA
   crossinline fc: suspend ScopedRaiseAccumulate<E>.() -> C,
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F) -> G
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F) -> G
 ): G =
   parZip(
     context,
@@ -225,7 +225,7 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrA
     { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f ->
-    Either.zipOrAccumulate(a, b, c, d, f) { aa, bb, cc, dd, ff -> f(aa, bb, cc, dd, ff) }.bind()
+    Either.zipOrAccumulate(a, b, c, d, f) { aa, bb, cc, dd, ff -> transform(aa, bb, cc, dd, ff) }.bind()
   }
 //endregion
 
@@ -238,9 +238,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<E>.parZipOrAccumulate(
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G) -> H
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G) -> H
 ): H =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -251,7 +251,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<E>.parZipOrAccumulate(
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G) -> H
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G) -> H
 ): H =
   parZip(
     context,
@@ -262,7 +262,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<E>.parZipOrAccumulate(
     { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g ->
-    Either.zipOrAccumulate(a, b, c, d, f, g) { aa, bb, cc, dd, ff, gg -> f(aa, bb, cc, dd, ff, gg) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c, d, f, g) { aa, bb, cc, dd, ff, gg -> transform(aa, bb, cc, dd, ff, gg) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -272,9 +272,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZip
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G) -> H
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G) -> H
 ): H =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -284,7 +284,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZip
   crossinline fd: suspend ScopedRaiseAccumulate<E>.() -> D,
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G) -> H
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G) -> H
 ): H =
   parZip(
     context,
@@ -295,7 +295,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZip
     { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g ->
-    Either.zipOrAccumulate(a, b, c, d, f, g) { aa, bb, cc, dd, ff, gg -> f(aa, bb, cc, dd, ff, gg) }.bind()
+    Either.zipOrAccumulate(a, b, c, d, f, g) { aa, bb, cc, dd, ff, gg -> transform(aa, bb, cc, dd, ff, gg) }.bind()
   }
 //endregion
 
@@ -309,9 +309,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<E>.parZipOrAccumulat
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
 ): I =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, fh, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, fh, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -323,7 +323,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<E>.parZipOrAccumulat
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
 ): I =
   parZip(
     context,
@@ -335,7 +335,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<E>.parZipOrAccumulat
     { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h) { aa, bb, cc, dd, ff, gg, hh -> f(aa, bb, cc, dd, ff, gg, hh) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c, d, f, g, h) { aa, bb, cc, dd, ff, gg, hh -> transform(aa, bb, cc, dd, ff, gg, hh) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -346,9 +346,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.par
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
 ): I =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, fh, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, fh, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -359,7 +359,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.par
   crossinline ff: suspend ScopedRaiseAccumulate<E>.() -> F,
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H) -> I
 ): I =
   parZip(
     context,
@@ -371,7 +371,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.par
     { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h) { aa, bb, cc, dd, ff, gg, hh -> f(aa, bb, cc, dd, ff, gg, hh) }.bind()
+    Either.zipOrAccumulate(a, b, c, d, f, g, h) { aa, bb, cc, dd, ff, gg, hh -> transform(aa, bb, cc, dd, ff, gg, hh) }.bind()
   }
 //endregion
 
@@ -386,9 +386,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<E>.parZipOrAccumu
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
 ): J =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, fh, fi, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, fh, fi, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -401,7 +401,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<E>.parZipOrAccumu
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
 ): J =
   parZip(
     context,
@@ -414,7 +414,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<E>.parZipOrAccumu
     { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h, i ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i) { aa, bb, cc, dd, ff, gg, hh, ii -> f(aa, bb, cc, dd, ff, gg, hh, ii) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c, d, f, g, h, i) { aa, bb, cc, dd, ff, gg, hh, ii -> transform(aa, bb, cc, dd, ff, gg, hh, ii) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -426,9 +426,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
 ): J =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, fh, fi, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, fh, fi, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -440,7 +440,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.
   crossinline fg: suspend ScopedRaiseAccumulate<E>.() -> G,
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I) -> J
 ): J =
   parZip(
     context,
@@ -453,7 +453,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.
     { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
   ) { a, b, c, d, f, g, h, i ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i) { aa, bb, cc, dd, ff, gg, hh, ii -> f(aa, bb, cc, dd, ff, gg, hh, ii) }.bind()
+    Either.zipOrAccumulate(a, b, c, d, f, g, h, i) { aa, bb, cc, dd, ff, gg, hh, ii -> transform(aa, bb, cc, dd, ff, gg, hh, ii) }.bind()
   }
 //endregion
 
@@ -469,9 +469,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<E>.parZipOrAcc
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
   crossinline fj: suspend ScopedRaiseAccumulate<E>.() -> J,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
 ): K =
-  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, fh, fi, fj, f)
+  parZipOrAccumulate(EmptyCoroutineContext, combine, fa, fb, fc, fd, ff, fg, fh, fi, fj, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<E>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -485,7 +485,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<E>.parZipOrAcc
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
   crossinline fj: suspend ScopedRaiseAccumulate<E>.() -> J,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
 ): K =
   parZip(
     context,
@@ -499,7 +499,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<E>.parZipOrAcc
     { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fj(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h, i, j ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i, j) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> f(aa, bb, cc, dd, ff, gg, hh, ii, jj) }.getOrElse { raise(it.reduce(combine)) }
+    Either.zipOrAccumulate(a, b, c, d, f, g, h, i, j) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> transform(aa, bb, cc, dd, ff, gg, hh, ii, jj) }.getOrElse { raise(it.reduce(combine)) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -512,9 +512,9 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
   crossinline fj: suspend ScopedRaiseAccumulate<E>.() -> J,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
 ): K =
-  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, fh, fi, fj, f)
+  parZipOrAccumulate(EmptyCoroutineContext, fa, fb, fc, fd, ff, fg, fh, fi, fj, transform)
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E>>.parZipOrAccumulate(
   context: CoroutineContext,
@@ -527,7 +527,7 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E
   crossinline fh: suspend ScopedRaiseAccumulate<E>.() -> H,
   crossinline fi: suspend ScopedRaiseAccumulate<E>.() -> I,
   crossinline fj: suspend ScopedRaiseAccumulate<E>.() -> J,
-  crossinline f: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
+  crossinline transform: suspend CoroutineScope.(A, B, C, D, F, G, H, I, J) -> K
 ): K =
   parZip(
     context,
@@ -541,6 +541,6 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E
     { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
     { either { fj(ScopedRaiseAccumulate(this, this@parZip)) } },
   ) { a, b, c, d, f, g, h, i, j ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i, j) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> f(aa, bb, cc, dd, ff, gg, hh, ii, jj) }.bind()
+    Either.zipOrAccumulate(a, b, c, d, f, g, h, i, j) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> transform(aa, bb, cc, dd, ff, gg, hh, ii, jj) }.bind()
   }
 //endregion
