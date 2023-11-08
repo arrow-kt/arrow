@@ -13,7 +13,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 
 suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
- guaranteeCase({ awaitCancellation() }) { exitCase -> exit.complete(exitCase) }
+ guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
 
 suspend fun <A> CompletableDeferred<A>.getOrNull(): A? =
  if (isCompleted) await() else null

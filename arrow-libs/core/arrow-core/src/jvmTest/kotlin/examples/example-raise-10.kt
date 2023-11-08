@@ -43,7 +43,7 @@ fun readFile(path: String?): Effect<FileError, Content> = effect {
 }
 
 suspend fun <A> awaitExitCase(exit: CompletableDeferred<ExitCase>): A =
-  guaranteeCase({ awaitCancellation() }) { exitCase -> exit.complete(exitCase) }
+  guaranteeCase(::awaitCancellation) { exitCase -> exit.complete(exitCase) }
 
 suspend fun main() {
   val exit = CompletableDeferred<ExitCase>()

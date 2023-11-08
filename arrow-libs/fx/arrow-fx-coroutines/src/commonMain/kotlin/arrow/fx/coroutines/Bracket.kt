@@ -31,8 +31,9 @@ public sealed class ExitCase {
  * @see guarantee for registering a handler that is guaranteed to always run.
  * @see guaranteeCase for registering a handler that executes for any [ExitCase].
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> onCancel(
-  fa: () -> A,
+  fa: suspend () -> A,
   crossinline onCancel: suspend () -> Unit
 ): A = guaranteeCase(fa) { case ->
   when (case) {
@@ -54,8 +55,9 @@ public suspend inline fun <A> onCancel(
  * @param finalizer handler to run after [fa].
  * @see guaranteeCase for registering a handler that tracks the [ExitCase] of [fa].
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> guarantee(
-  fa: () -> A,
+  fa: suspend () -> A,
   crossinline finalizer: suspend () -> Unit
 ): A {
   val res = try {
@@ -83,8 +85,9 @@ public suspend inline fun <A> guarantee(
  * @param finalizer handler to run after [fa].
  * @see guarantee for registering a handler that ignores the [ExitCase] of [fa].
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> guaranteeCase(
-  fa: () -> A,
+  fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
 ): A {
   val res = try {
@@ -138,9 +141,10 @@ public suspend inline fun <A> guaranteeCase(
  * ```
  * <!--- KNIT example-bracket-01.kt -->
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
-  use: (A) -> B,
+  use: suspend (A) -> B,
   crossinline release: suspend (A) -> Unit
 ): B {
   val acquired = withContext(NonCancellable) {
@@ -221,9 +225,10 @@ public suspend inline fun <A, B> bracket(
  * ```
  * <!--- KNIT example-bracket-02.kt -->
  */
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A, B> bracketCase(
   crossinline acquire: suspend () -> A,
-  use: (A) -> B,
+  use: suspend (A) -> B,
   crossinline release: suspend (A, ExitCase) -> Unit
 ): B {
   val acquired = withContext(NonCancellable) {
