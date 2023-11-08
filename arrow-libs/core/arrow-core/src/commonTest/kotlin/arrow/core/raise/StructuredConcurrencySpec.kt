@@ -5,7 +5,6 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -15,6 +14,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -27,11 +27,12 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 
 @Suppress("DeferredResultUnused")
-class StructuredConcurrencySpec : StringSpec({
-  "async - suspendCancellableCoroutine.invokeOnCancellation is called with Raised Continuation" {
+class StructuredConcurrencySpec {
+  @Test fun asyncSuspendCancellableCoroutineInvokeOnCancellationIsCalledWithRaisedContinuation() = runTest {
     val started = CompletableDeferred<Unit>()
     val cancelled = CompletableDeferred<Throwable?>()
 
@@ -58,13 +59,13 @@ class StructuredConcurrencySpec : StringSpec({
     }
   }
 
-  "Computation blocks run on parent context" {
+  @Test fun computationBlocksRunOnParentContext() = runTest {
     val parentCtx = currentCoroutineContext()
     effect<Nothing, Unit> { currentCoroutineContext() shouldBe parentCtx }
       .fold({ fail("Should never be here") }, ::identity)
   }
 
-  "Concurrent raise - async await" {
+  @Test fun concurrentRaiseAsyncAwait() = runTest {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       effect {
         coroutineScope {
@@ -77,7 +78,7 @@ class StructuredConcurrencySpec : StringSpec({
     }
   }
 
-  "Concurrent raise - async await exit results" {
+  @Test fun concurrentRaiseAsyncAwaitExitResults() = runTest {
     checkAll(Arb.int()) { a ->
       val scopeExit = CompletableDeferred<ExitCase>()
       val fbExit = CompletableDeferred<ExitCase>()
@@ -121,7 +122,7 @@ class StructuredConcurrencySpec : StringSpec({
     }
   }
 
-  "Concurrent raise - async" {
+  @Test fun concurrentRaiseAsync() = runTest {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       effect {
         coroutineScope {
@@ -135,7 +136,7 @@ class StructuredConcurrencySpec : StringSpec({
     }
   }
 
-  "Concurrent raise - async exit results" {
+  @Test fun concurrentRaiseAsyncExitResults() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, str ->
       val exitScope = CompletableDeferred<ExitCase>()
       val startLatches = (0..10).map { CompletableDeferred<Unit>() }
@@ -171,7 +172,7 @@ class StructuredConcurrencySpec : StringSpec({
     }
   }
 
-  "Concurrent raise - launch" {
+  @Test fun concurrentRaiseLaunch() = runTest {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       effect {
         coroutineScope {
@@ -184,7 +185,7 @@ class StructuredConcurrencySpec : StringSpec({
     }
   }
 
-  "Concurrent raise - launch exit results" {
+  @Test fun concurrentRaiseLaunchExitResults() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, str ->
       val scopeExit = CompletableDeferred<ExitCase>()
       val startLatches = (0..10).map { CompletableDeferred<Unit>() }
@@ -222,7 +223,7 @@ class StructuredConcurrencySpec : StringSpec({
 
   // `raise` escapes `cont` block, and gets rethrown inside `coroutineScope`.
   // Effectively awaiting/executing DSL code, outside of the DSL...
-  "async funky scenario #1 - Extract `raise` from `effect` through `async`" {
+  @Test fun asyncFunkyScenario1ExtractRaiseFromEffectThroughAsync() = runTest {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       shouldThrow<IllegalStateException> {
         coroutineScope {
@@ -237,4 +238,4 @@ class StructuredConcurrencySpec : StringSpec({
       }.message shouldStartWith "raise or bind was called outside of its DSL scope"
     }
   }
-})
+}
