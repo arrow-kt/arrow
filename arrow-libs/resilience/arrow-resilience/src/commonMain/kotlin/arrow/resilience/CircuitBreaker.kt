@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package arrow.resilience
 
 import arrow.atomic.Atomic
@@ -14,7 +12,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -50,9 +47,7 @@ import kotlin.time.TimeSource
  * import arrow.resilience.CircuitBreaker
  * import kotlinx.coroutines.delay
  * import kotlin.time.Duration.Companion.seconds
- * import kotlin.time.ExperimentalTime
  *
- * @ExperimentalTime
  * suspend fun main(): Unit {
  * //sampleStart
  *   val circuitBreaker = CircuitBreaker(
@@ -92,9 +87,7 @@ import kotlin.time.TimeSource
  * import arrow.resilience.retry
  * import kotlinx.coroutines.delay
  * import kotlin.time.Duration.Companion.seconds
- * import kotlin.time.ExperimentalTime
  *
- * @ExperimentalTime
  * suspend fun main(): Unit {
  *   suspend fun apiCall(): Unit {
  *     println("apiCall . . .")

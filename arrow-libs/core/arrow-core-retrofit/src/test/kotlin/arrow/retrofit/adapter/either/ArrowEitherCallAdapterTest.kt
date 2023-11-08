@@ -6,20 +6,22 @@ import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
 import arrow.retrofit.adapter.retrofit.SuspendApiTestClient
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlinx.coroutines.test.runTest
 
 class ArrowEitherCallAdapterTest {
 
   lateinit var server: MockWebServer
   lateinit var service: SuspendApiTestClient
 
-  @Test fun beforeAny = runTime {
+  @BeforeTest fun initialize() {
     server = MockWebServer()
     server.start()
     service = Retrofit.Builder()
@@ -30,7 +32,9 @@ class ArrowEitherCallAdapterTest {
       .create(SuspendApiTestClient::class.java)
   }
 
-  @Test fun afterAny = runTime { server.shutdown() }
+  @AfterTest fun shutdown() {
+    server.shutdown()
+  }
 
   @Test fun shouldReturnResponseMockFor200WithValidJson() = runTest {
     server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
