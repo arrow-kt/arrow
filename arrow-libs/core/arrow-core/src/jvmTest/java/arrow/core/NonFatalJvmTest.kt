@@ -2,8 +2,8 @@ package arrow.core
 
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.matchers.shouldBe
-import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
 class NonFatalJvmTest {
   val fatals: List<Throwable> =
@@ -21,7 +21,7 @@ class NonFatalJvmTest {
       NonFatal(it) shouldBe false
     }
   }
-  
+
   @Test fun testFatalsUsingThrowableNonFatalOrThrow() = runTest {
     fatals.forEach {
       shouldThrowAny {

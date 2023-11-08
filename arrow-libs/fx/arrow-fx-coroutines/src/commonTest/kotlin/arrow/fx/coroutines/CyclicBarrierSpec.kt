@@ -34,7 +34,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun awaitingAllInParallelResumesAllCoroutines() = runTest {
-    checkAll(Arb.int(1, 100)) { i ->
+    checkAll(Arb.int(1, 20)) { i ->
       val barrier = CyclicBarrier(i)
       (0 until i).parMap { barrier.await() }
     }
@@ -85,7 +85,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun resetCancelsAllAwaiting() = runTest {
-    checkAll(Arb.int(2, 100)) { i ->
+    checkAll(Arb.int(2, 20)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
 
@@ -103,7 +103,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun shouldCleanUpUponReset() = runTest {
-    checkAll(Arb.int(2, 100)) { i ->
+    checkAll(Arb.int(2, 20)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
 

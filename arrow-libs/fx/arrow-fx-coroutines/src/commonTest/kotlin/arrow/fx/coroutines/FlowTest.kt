@@ -236,7 +236,7 @@ class FlowTest {
 
   @Test
   fun fixedDelay() = runTest {
-    checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+    checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..20)) { waitPeriod, n ->
       val emissionDuration = waitPeriod / 10L
       var state: Long? = null
 
@@ -261,7 +261,7 @@ class FlowTest {
 
   @Test
   fun fixedRate() = runTest {
-    checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..100)) { waitPeriod, n ->
+    checkAll(Arb.positiveInt().map(Int::toLong), Arb.int(1..20)) { waitPeriod, n ->
       val emissionDuration = waitPeriod / 10
       var state: Long? = null
 

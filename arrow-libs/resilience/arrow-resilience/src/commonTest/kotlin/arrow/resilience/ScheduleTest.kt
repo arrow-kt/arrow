@@ -5,7 +5,6 @@ import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
@@ -19,7 +18,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 internal data class SideEffect(var counter: Int = 0) {
   fun increment() {
@@ -27,9 +25,6 @@ internal data class SideEffect(var counter: Int = 0) {
   }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-@ExperimentalTime
-@Suppress("UNREACHABLE_CODE", "UNUSED_VARIABLE")
 class ScheduleTest {
   class MyException : Exception()
 
@@ -287,19 +282,16 @@ fun <A, B> Schedule.Decision<A, B>.delay(): Duration? = when (this) {
   is Done -> null
 }
 
-@ExperimentalTime
 private fun fibs(one: Duration): Sequence<Duration> =
   generateSequence(Pair(one, one)) { (a, b) ->
     Pair(b, (a + b))
   }.map { it.first }
 
-@ExperimentalTime
 private fun exp(base: Duration): Sequence<Duration> =
   generateSequence(Pair(base, 1.0)) { (_, n) ->
     Pair(base * 2.0.pow(n), n + 1)
   }.map { it.first }
 
-@ExperimentalTime
 private fun linear(base: Duration): Sequence<Duration> =
   generateSequence(Pair(base, 1.0)) { (_, n) ->
     Pair((base * n), (n + 1))

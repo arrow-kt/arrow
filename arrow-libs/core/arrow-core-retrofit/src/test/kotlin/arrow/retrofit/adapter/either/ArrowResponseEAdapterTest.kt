@@ -6,6 +6,7 @@ import arrow.retrofit.adapter.mock.ErrorMock
 import arrow.retrofit.adapter.mock.ResponseMock
 import arrow.retrofit.adapter.retrofit.SuspendApiTestClient
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
@@ -14,7 +15,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlinx.coroutines.test.runTest
 
 class ArrowResponseEAdapterTest {
 
@@ -37,7 +37,7 @@ class ArrowResponseEAdapterTest {
   fun shutdown() {
     server.shutdown()
   }
-  
+
   @Test
   fun shouldReturnResponseMockFor200WithValidJson() = runTest {
     server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
@@ -61,7 +61,7 @@ class ArrowResponseEAdapterTest {
       body shouldBe Unit.right()
     }
   }
-  
+
   @Test
   fun shouldReturnUnitWhenServiceMethodReturnsUnitAndJsonBodyReceived() = runTest {
     server.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
@@ -85,7 +85,7 @@ class ArrowResponseEAdapterTest {
       body shouldBe ErrorMock(42).left()
     }
   }
-  
+
   @Test
   fun shouldThrowFor200WithInvalidJson() = runTest {
     server.enqueue(MockResponse().setBody("""not a valid JSON"""))
@@ -94,7 +94,7 @@ class ArrowResponseEAdapterTest {
 
     responseE.isFailure shouldBe true
   }
-  
+
   @Test
   fun shouldThrowFor400AndInvalidJson() = runTest {
     server.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
@@ -103,7 +103,7 @@ class ArrowResponseEAdapterTest {
 
     responseE.isFailure shouldBe true
   }
-  
+
   @Test
   fun shouldThrowWhenServerDisconnects() = runTest {
     server.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AFTER_REQUEST })

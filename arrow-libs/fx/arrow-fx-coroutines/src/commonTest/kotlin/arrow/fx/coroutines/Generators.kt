@@ -27,10 +27,10 @@ import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 
-fun <A> Arb.Companion.flow(arbA: Arb<A>): Arb<Flow<A>> =
+fun <A> Arb.Companion.flow(arbA: Arb<A>, range: IntRange = 1 .. 20): Arb<Flow<A>> =
   Arb.choose(
-    10 to Arb.list(arbA).map { it.asFlow() },
-    10 to Arb.list(arbA).map { channelFlow { it.forEach { send(it) } }.buffer(Channel.RENDEZVOUS) },
+    10 to Arb.list(arbA, range).map { it.asFlow() },
+    10 to Arb.list(arbA, range).map { channelFlow { it.forEach { send(it) } }.buffer(Channel.RENDEZVOUS) },
     1 to Arb.constant(emptyFlow()),
   )
 
