@@ -27,10 +27,8 @@ import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
-import kotlin.time.ExperimentalTime
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-@ExperimentalTime
 class FlowTest {
 
   @Test

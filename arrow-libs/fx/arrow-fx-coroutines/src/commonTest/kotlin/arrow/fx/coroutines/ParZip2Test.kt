@@ -1,15 +1,9 @@
-package arrow.fx.coroutines.parZip
+package arrow.fx.coroutines
 
 import arrow.atomic.AtomicInt
 import arrow.atomic.update
 import arrow.atomic.value
 import arrow.core.Either
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.awaitExitCase
-import arrow.fx.coroutines.guaranteeCase
-import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.throwable
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf

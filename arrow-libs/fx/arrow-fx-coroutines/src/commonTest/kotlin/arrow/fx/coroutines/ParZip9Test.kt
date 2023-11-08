@@ -1,4 +1,4 @@
-package arrow.fx.coroutines.parZip
+package arrow.fx.coroutines
 
 import arrow.atomic.Atomic
 import arrow.atomic.update

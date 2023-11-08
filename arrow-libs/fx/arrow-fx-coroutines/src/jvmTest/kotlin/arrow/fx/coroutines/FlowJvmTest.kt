@@ -10,12 +10,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.test.runTest
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-@ExperimentalTime
 class FlowJvmTest {
   @Test fun parMapSingleThreadIdentity() = runTest {
     resourceScope {

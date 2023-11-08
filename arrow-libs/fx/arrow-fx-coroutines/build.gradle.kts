@@ -14,8 +14,6 @@ spotless {
   }
 }
 
-apply(plugin = "io.kotest.multiplatform")
-
 kotlin {
   sourceSets {
     commonMain {
@@ -31,7 +29,6 @@ kotlin {
         implementation(projects.arrowCore)
         implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
-        implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
       }
