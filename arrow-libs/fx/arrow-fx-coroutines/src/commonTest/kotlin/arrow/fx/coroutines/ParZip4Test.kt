@@ -1,15 +1,10 @@
-package arrow.fx.coroutines.parZip
+package arrow.fx.coroutines
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple4
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.awaitExitCase
-import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.throwable
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -23,12 +18,11 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
     
 class ParZip4Test {
     @Test
-    fun parZip4RunsInParallel() = runTest {
+    fun parZip4RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -63,7 +57,7 @@ class ParZip4Test {
     }
     
     @Test
-    fun CancellingParZip4CancelsAllParticipants() = runTest {
+    fun CancellingParZip4CancelsAllParticipants() = runTestUsingDefaultDispatcher {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -87,7 +81,7 @@ class ParZip4Test {
     }
     
     @Test
-    fun parZip4CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTest {
+    fun parZip4CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTestUsingDefaultDispatcher {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4)),
@@ -119,7 +113,7 @@ class ParZip4Test {
     }
     
     @Test
-    fun parZipCancellationExceptionOnRightCanCancelRest() = runTest {
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
       checkAll(Arb.string(), Arb.int(1..4)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()

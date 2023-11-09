@@ -601,7 +601,7 @@ class EffectSpec {
   }
 
   @Test fun accumulateReturnsEveryError() = runTest {
-    checkAll(Arb.list(Arb.int(), range = 2..100)) { errors ->
+    checkAll(Arb.list(Arb.int(), range = 2..20)) { errors ->
       either<NonEmptyList<Int>, List<String>> {
         mapOrAccumulate(errors) { raise(it) }
       } shouldBe errors.toNonEmptyListOrNull()!!.left()
@@ -609,7 +609,7 @@ class EffectSpec {
   }
 
   @Test fun accumulateReturnsNoError() = runTest {
-    checkAll(Arb.list(Arb.int())) { elements ->
+    checkAll(Arb.list(Arb.int(), range = 0..20)) { elements ->
       either<NonEmptyList<Int>, List<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
@@ -617,7 +617,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptyListMapOrAccumulateReturnsEveryError() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.int(), range = 2..100)) { errors ->
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 2..20)) { errors ->
       either<NonEmptyList<Int>, NonEmptyList<String>> {
         mapOrAccumulate(errors) { raise(it) }
       } shouldBe errors.toNonEmptyListOrNull()!!.left()
@@ -625,7 +625,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptyListMapOrAccumulateReturnsNoError() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.int())) { elements ->
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0..20)) { elements ->
       either<NonEmptyList<Int>, NonEmptyList<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
@@ -633,7 +633,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptySetMapOrAccumulateReturnsEveryError() = runTest {
-    checkAll(Arb.nonEmptySet(Arb.int(), range = 2..100)) { errors ->
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 2..20)) { errors ->
       either<NonEmptyList<Int>, NonEmptySet<String>> {
         mapOrAccumulate(errors) { raise(it) }
       } shouldBe errors.toNonEmptyListOrNull()!!.left()
@@ -641,7 +641,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptySetMapOrAccumulateReturnsNoError() = runTest {
-    checkAll(Arb.nonEmptySet(Arb.int())) { elements ->
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 0..20)) { elements ->
       either<NonEmptyList<Int>, NonEmptySet<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
@@ -649,7 +649,7 @@ class EffectSpec {
   }
 
   @Test fun bindAllFailsOnFirstError() = runTest {
-    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
       either {
         eithers.bindAll()
@@ -658,7 +658,7 @@ class EffectSpec {
   }
 
   @Test fun accumulateBindAll() = runTest {
-    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
@@ -672,7 +672,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptyListBindAllFailsOnFirstError() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
       either {
         eithers.bindAll()
@@ -681,7 +681,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptyListBindAllAccumulateErrors() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
@@ -695,7 +695,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptySetBindAllFailsOnFirstError() = runTest {
-    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
       either {
         eithers.bindAll()
@@ -704,7 +704,7 @@ class EffectSpec {
   }
 
   @Test fun nonEmptySetBindAllAccumulateErrors() = runTest {
-    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
 

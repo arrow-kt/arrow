@@ -13,7 +13,6 @@ import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
 
@@ -21,7 +20,7 @@ class ParZip7JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  @Test fun parZip7ReturnsToOriginalContext() = runTest {
+  @Test fun parZip7ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip7"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(7, NamedThreadFactory(zipCtxName)) }
@@ -47,7 +46,7 @@ class ParZip7JvmTest {
     }
   }
 
-  @Test fun parZip7ReturnsToOriginalContextOnFailure() = runTest {
+  @Test fun parZip7ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip7"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(7, NamedThreadFactory(zipCtxName)) }
@@ -60,7 +59,7 @@ class ParZip7JvmTest {
             when (choose) {
               1 -> parZip(
                 zipCtx,
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -72,7 +71,7 @@ class ParZip7JvmTest {
               2 -> parZip(
                 zipCtx,
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -84,7 +83,7 @@ class ParZip7JvmTest {
                 zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -96,7 +95,7 @@ class ParZip7JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
@@ -108,7 +107,7 @@ class ParZip7JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _ -> Unit }
@@ -120,7 +119,7 @@ class ParZip7JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _ -> Unit }
 
@@ -132,7 +131,7 @@ class ParZip7JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() }
+                { throw e }
               ) { _, _, _, _, _, _, _ -> Unit }
             }
           } should leftException(e)
@@ -142,7 +141,7 @@ class ParZip7JvmTest {
     }
   }
 
-  @Test fun parZip7FinishesOnSingleThread() = runTest {
+  @Test fun parZip7FinishesOnSingleThread() = runTestUsingDefaultDispatcher {
     checkAll(Arb.string()) {
       val res = resourceScope {
         val ctx = singleThreadContext("single")

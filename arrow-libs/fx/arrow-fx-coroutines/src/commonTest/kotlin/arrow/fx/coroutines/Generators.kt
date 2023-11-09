@@ -38,7 +38,7 @@ fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
   arb.map { b: B -> { _: A -> b } }
 
 fun Arb.Companion.throwable(): Arb<Throwable> =
-  Arb.of(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
+  Arb.of(listOf(IndexOutOfBoundsException(), NoSuchElementException(), IllegalArgumentException()))
 
 fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
   val arbLeft = arbE.map { Either.Left(it) }

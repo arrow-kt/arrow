@@ -1,15 +1,9 @@
-package arrow.fx.coroutines.parZip
+package arrow.fx.coroutines
 
 import arrow.atomic.AtomicInt
 import arrow.atomic.update
 import arrow.atomic.value
 import arrow.core.Either
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.awaitExitCase
-import arrow.fx.coroutines.guaranteeCase
-import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.throwable
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -24,11 +18,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class ParZip2Test {
-  @Test fun parZip2RunsInParallel() = runTest {
+  @Test fun parZip2RunsInParallel() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       val r = AtomicInt(0)
       val modifyGate = CompletableDeferred<Int>()
@@ -50,7 +43,7 @@ class ParZip2Test {
     }
   }
 
-  @Test fun cancellingParZip2CancelsAllParticipants() = runTest {
+  @Test fun cancellingParZip2CancelsAllParticipants() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       val s = Channel<Unit>()
       val pa = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -78,7 +71,7 @@ class ParZip2Test {
     }
   }
 
-  @Test fun parZip2CancelsLosersIfAFailtureOccursInOneOfTheTasts() = runTest {
+  @Test fun parZip2CancelsLosersIfAFailtureOccursInOneOfTheTasts() = runTestUsingDefaultDispatcher {
     checkAll(Arb.throwable(), Arb.boolean()) { e, leftWinner ->
       val s = Channel<Unit>()
       val pa = CompletableDeferred<ExitCase>()
@@ -97,7 +90,7 @@ class ParZip2Test {
     }
   }
 
-  @Test fun parZipCancellationExceptionOnRightCanCancelRest() = runTest {
+  @Test fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
     checkAll(Arb.string()) { msg ->
       val exit = CompletableDeferred<ExitCase>()
       val start = CompletableDeferred<Unit>()

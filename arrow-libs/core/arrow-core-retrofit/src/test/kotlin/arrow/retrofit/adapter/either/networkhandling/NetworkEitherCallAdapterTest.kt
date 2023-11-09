@@ -6,11 +6,9 @@ import arrow.core.right
 import arrow.retrofit.adapter.either.EitherCallAdapterFactory
 import arrow.retrofit.adapter.mock.ResponseMock
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.core.spec.style.stringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -24,21 +22,17 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
-@ExperimentalSerializationApi
-class NetworkEitherCallAdapterTestSuite : StringSpec({
-  include(networkEitherCallAdapterTests(GsonConverterFactory.create()))
-  include(networkEitherCallAdapterTests(MoshiConverterFactory.create()))
-  include(networkEitherCallAdapterTests(Json.asConverterFactory("application/json".toMediaType())))
-})
+abstract class NetworkEitherCallAdapterTest(
+  private val jsonConverterFactory: Converter.Factory,
+) {
+  private var server: MockWebServer? = null
+  private var service: CallErrorTestClient? = null
 
-private fun networkEitherCallAdapterTests(
-  jsonConverterFactory: Converter.Factory,
-) = stringSpec {
-  var server: MockWebServer? = null
-  var service: CallErrorTestClient? = null
-
-  beforeAny {
+  open fun initialize() {
     server = MockWebServer()
     server!!.start()
     val client = OkHttpClient.Builder()
@@ -52,9 +46,12 @@ private fun networkEitherCallAdapterTests(
       .build()
       .create(CallErrorTestClient::class.java)
   }
-  afterAny { server!!.shutdown() }
 
-  "should return ResponseMock for 200 with valid JSON" {
+  open fun shutdown() {
+    server!!.shutdown()
+  }
+
+  open fun shouldReturn200ForValidJson() = runTest {
     server!!.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
     val body = service!!.getEither()
@@ -62,7 +59,7 @@ private fun networkEitherCallAdapterTests(
     body shouldBe ResponseMock("Arrow rocks").right()
   }
 
-  "should return HttpError for 400" {
+  open fun shouldReturnHttpErrorFor404() = runTest {
     server!!.enqueue(MockResponse().setBody("""{"errorCode":666}""").setResponseCode(400))
 
     val body = service!!.getEither()
@@ -74,7 +71,7 @@ private fun networkEitherCallAdapterTests(
     ).left()
   }
 
-  "should return CallError for 200 with invalid JSON" {
+  open fun shouldReturnCallErrorFor200InvalidJson() = runTest {
     server!!.enqueue(MockResponse().setBody("""not a valid JSON"""))
 
     val body = service!!.getEither()
@@ -83,7 +80,7 @@ private fun networkEitherCallAdapterTests(
       .value.shouldBeInstanceOf<CallError>()
   }
 
-  "should return HttpError for 400 and invalid JSON" {
+  open fun shouldReturnHttpErrorFor404InvalidJson() = runTest {
     server!!.enqueue(MockResponse().setBody("""not a valid JSON""").setResponseCode(400))
 
     val body = service!!.getEither()
@@ -95,7 +92,7 @@ private fun networkEitherCallAdapterTests(
     ).left()
   }
 
-  "should return IOError when server disconnects" {
+  open fun shouldReturnIOErrorDisconnect() = runTest {
     server!!.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.DISCONNECT_AT_START })
 
     val body = service!!.getEither()
@@ -105,7 +102,7 @@ private fun networkEitherCallAdapterTests(
       .cause.shouldBeInstanceOf<SocketException>()
   }
 
-  "should return IOError when no response" {
+  open fun shouldReturnIOErrorNoResponse() = runTest {
     server!!.enqueue(MockResponse().apply { socketPolicy = SocketPolicy.NO_RESPONSE })
 
     val body = service!!.getEither()
@@ -115,7 +112,7 @@ private fun networkEitherCallAdapterTests(
       .cause.shouldBeInstanceOf<SocketTimeoutException>()
   }
 
-  "should return Unit when service method returns Unit and null body received" {
+  open fun shouldReturnUnitForNullBody() = runTest {
     server!!.enqueue(MockResponse().setResponseCode(204))
 
     val body = service!!.postSomething("Sample string")
@@ -123,7 +120,7 @@ private fun networkEitherCallAdapterTests(
     body shouldBe Unit.right()
   }
 
-  "should return Unit when service method returns Unit and JSON body received" {
+  open fun shouldReturnUnitForUnitBody() = runTest {
     server!!.enqueue(MockResponse().setBody("""{"response":"Arrow rocks"}"""))
 
     val body = service!!.postSomething("Sample string")
@@ -131,7 +128,7 @@ private fun networkEitherCallAdapterTests(
     body shouldBe Unit.right()
   }
 
-  "should return CallError when service method returns type other than Unit but null body received" {
+  open fun shouldReturnCallErrorWithUnitForNonNullBody() = runTest {
     server!!.enqueue(MockResponse())
 
     val body = service!!.getEither()
@@ -139,4 +136,88 @@ private fun networkEitherCallAdapterTests(
     body.shouldBeInstanceOf<Left<*>>()
       .value.shouldBeInstanceOf<CallError>()
   }
+}
+
+class NetworkEitherCallAdapterTestGson : NetworkEitherCallAdapterTest(GsonConverterFactory.create()) {
+  @BeforeTest override fun initialize() {
+    super.initialize()
+  }
+
+  @AfterTest override fun shutdown() {
+    super.shutdown()
+  }
+
+  @Test override fun shouldReturn200ForValidJson() = super.shouldReturn200ForValidJson()
+
+  @Test override fun shouldReturnHttpErrorFor404() = super.shouldReturnHttpErrorFor404()
+
+  @Test override fun shouldReturnCallErrorFor200InvalidJson() = super.shouldReturnCallErrorFor200InvalidJson()
+
+  @Test override fun shouldReturnHttpErrorFor404InvalidJson() = super.shouldReturnHttpErrorFor404InvalidJson()
+
+  @Test override fun shouldReturnIOErrorDisconnect() = super.shouldReturnIOErrorDisconnect()
+
+  @Test override fun shouldReturnIOErrorNoResponse() = super.shouldReturnIOErrorNoResponse()
+
+  @Test override fun shouldReturnUnitForNullBody() = super.shouldReturnUnitForNullBody()
+
+  @Test override fun shouldReturnUnitForUnitBody() = super.shouldReturnUnitForUnitBody()
+
+  @Test override fun shouldReturnCallErrorWithUnitForNonNullBody() = super.shouldReturnCallErrorWithUnitForNonNullBody()
+}
+
+class NetworkEitherCallAdapterTestMoshi : NetworkEitherCallAdapterTest(MoshiConverterFactory.create()) {
+  @BeforeTest override fun initialize() {
+    super.initialize()
+  }
+
+  @AfterTest override fun shutdown() {
+    super.shutdown()
+  }
+
+  @Test override fun shouldReturn200ForValidJson() = super.shouldReturn200ForValidJson()
+
+  @Test override fun shouldReturnHttpErrorFor404() = super.shouldReturnHttpErrorFor404()
+
+  @Test override fun shouldReturnCallErrorFor200InvalidJson() = super.shouldReturnCallErrorFor200InvalidJson()
+
+  @Test override fun shouldReturnHttpErrorFor404InvalidJson() = super.shouldReturnHttpErrorFor404InvalidJson()
+
+  @Test override fun shouldReturnIOErrorDisconnect() = super.shouldReturnIOErrorDisconnect()
+
+  @Test override fun shouldReturnIOErrorNoResponse() = super.shouldReturnIOErrorNoResponse()
+
+  @Test override fun shouldReturnUnitForNullBody() = super.shouldReturnUnitForNullBody()
+
+  @Test override fun shouldReturnUnitForUnitBody() = super.shouldReturnUnitForUnitBody()
+
+  @Test override fun shouldReturnCallErrorWithUnitForNonNullBody() = super.shouldReturnCallErrorWithUnitForNonNullBody()
+}
+
+class NetworkEitherCallAdapterTestKotlinxSerialization : NetworkEitherCallAdapterTest(Json.asConverterFactory("application/json".toMediaType())) {
+  @BeforeTest override fun initialize() {
+    super.initialize()
+  }
+
+  @AfterTest override fun shutdown() {
+    super.shutdown()
+  }
+
+  @Test override fun shouldReturn200ForValidJson() = super.shouldReturn200ForValidJson()
+
+  @Test override fun shouldReturnHttpErrorFor404() = super.shouldReturnHttpErrorFor404()
+
+  @Test override fun shouldReturnCallErrorFor200InvalidJson() = super.shouldReturnCallErrorFor200InvalidJson()
+
+  @Test override fun shouldReturnHttpErrorFor404InvalidJson() = super.shouldReturnHttpErrorFor404InvalidJson()
+
+  @Test override fun shouldReturnIOErrorDisconnect() = super.shouldReturnIOErrorDisconnect()
+
+  @Test override fun shouldReturnIOErrorNoResponse() = super.shouldReturnIOErrorNoResponse()
+
+  @Test override fun shouldReturnUnitForNullBody() = super.shouldReturnUnitForNullBody()
+
+  @Test override fun shouldReturnUnitForUnitBody() = super.shouldReturnUnitForUnitBody()
+
+  @Test override fun shouldReturnCallErrorWithUnitForNonNullBody() = super.shouldReturnCallErrorWithUnitForNonNullBody()
 }

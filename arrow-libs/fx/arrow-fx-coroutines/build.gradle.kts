@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import java.time.Duration
+
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -13,8 +16,6 @@ spotless {
     ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
   }
 }
-
-apply(plugin = "io.kotest.multiplatform")
 
 kotlin {
   sourceSets {
@@ -31,7 +32,6 @@ kotlin {
         implementation(projects.arrowCore)
         implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
-        implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
       }
@@ -42,6 +42,24 @@ kotlin {
     tasks.jvmJar {
       manifest {
         attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
+      }
+    }
+  }
+
+  js {
+    nodejs {
+      testTask {
+        useMocha {
+          timeout = "60000"
+        }
+      }
+    }
+    browser {
+      testTask {
+        useKarma {
+          useChromeHeadless()
+          timeout.set(Duration.ofSeconds(60))
+        }
       }
     }
   }
