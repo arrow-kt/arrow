@@ -11,11 +11,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.test.runTest
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class FlowJvmTest {
-  @Test fun parMapSingleThreadIdentity() = runTest {
+  @Test fun parMapSingleThreadIdentity() = runTestUsingDefaultDispatcher {
     resourceScope {
       val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
@@ -25,7 +24,7 @@ class FlowJvmTest {
     }
   }
 
-  @Test fun parMapflowOn() = runTest {
+  @Test fun parMapflowOn() = runTestUsingDefaultDispatcher {
     resourceScope {
       val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
@@ -37,7 +36,7 @@ class FlowJvmTest {
     }
   }
   
-  @Test fun parMapUnorderedSingleThreadIdentity() = runTest {
+  @Test fun parMapUnorderedSingleThreadIdentity() = runTestUsingDefaultDispatcher {
     resourceScope {
       val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->
@@ -47,7 +46,7 @@ class FlowJvmTest {
     }
   }
   
-  @Test fun parMapUnorderedFlowOn() = runTest {
+  @Test fun parMapUnorderedFlowOn() = runTestUsingDefaultDispatcher {
     resourceScope {
       val ctx = singleThreadContext("single")
       checkAll(Arb.flow(Arb.int())) { flow ->

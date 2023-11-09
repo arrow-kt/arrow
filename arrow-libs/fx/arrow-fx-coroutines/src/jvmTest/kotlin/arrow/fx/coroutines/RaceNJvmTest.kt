@@ -8,12 +8,11 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
 
 class RaceNJvmTest {
-    @Test fun race2ReturnsToOriginalContext() = runTest {
+    @Test fun race2ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
       val racerName = "race2"
       checkAll(Arb.int(1..2)) { choose ->
         resourceScope {
@@ -33,7 +32,7 @@ class RaceNJvmTest {
       }
     }
 
-    @Test fun race2ReturnsToOriginalContextOnFailure() = runTest {
+    @Test fun race2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race2"
       
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
@@ -55,14 +54,14 @@ class RaceNJvmTest {
       }
     }
     
-    @Test fun firstRacerOutOf2AlwaysWinsOnASingleThread() = runTest {
+    @Test fun firstRacerOutOf2AlwaysWinsOnASingleThread() = runTestUsingDefaultDispatcher {
       resourceScope {
         val ctx = singleThreadContext("single")
         raceN(ctx, { Thread.currentThread().name }, { Thread.currentThread().name })
       }.swap().getOrNull() shouldStartWith "single"
     }
     
-    @Test fun race3ReturnsToOriginalContext() = runTest {
+    @Test fun race3ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
 
       checkAll(Arb.int(1..3)) { choose ->
@@ -91,7 +90,7 @@ class RaceNJvmTest {
       }
     }
     
-    @Test fun race3ReturnsToOriginalContextOnFailure() = runTest {
+    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
       
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
@@ -103,15 +102,15 @@ class RaceNJvmTest {
               when (choose) {
                 1 ->
                   raceN(raceCtx, { e.suspend() }, { awaitCancellation() }, { awaitCancellation() })
-                    .fold(::identity, { null }, { null })
+                    .fold({ x: String? -> x }, { null }, { null })
                 
                 2 ->
                   raceN(raceCtx, { awaitCancellation() }, { e.suspend() }, { awaitCancellation() })
-                    .fold({ null }, ::identity, { null })
+                    .fold({ null }, { x: String? -> x }, { null })
                 
                 else ->
                   raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { e.suspend() })
-                    .fold({ null }, { null }, ::identity)
+                    .fold({ null }, { null }, { x: String? -> x })
               }
             } should leftException(e)
             

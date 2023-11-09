@@ -11,13 +11,12 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.test.Test
 
 class ParZip2JvmTest {
-  @Test fun parZip2ReturnsToOriginalContext() = runTest {
+  @Test fun parZip2ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip2"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
@@ -36,7 +35,7 @@ class ParZip2JvmTest {
     }
   }
 
-  @Test fun parZip2ReturnsToOriginalContextOnFailure() = runTest {
+  @Test fun parZip2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip2"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
@@ -57,7 +56,7 @@ class ParZip2JvmTest {
     }
   }
 
-  @Test fun parZip2FinishesOnSingleThread() = runTest {
+  @Test fun parZip2FinishesOnSingleThread() = runTestUsingDefaultDispatcher {
     checkAll(Arb.string()) {
       val res = resourceScope {
         val ctx = singleThreadContext("single")

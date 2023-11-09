@@ -13,7 +13,6 @@ import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
 
@@ -21,7 +20,7 @@ class ParZip5JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  @Test fun parZip5ReturnsToOriginalContext() = runTest {
+  @Test fun parZip5ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip5"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(5, NamedThreadFactory(zipCtxName)) }
@@ -43,7 +42,7 @@ class ParZip5JvmTest {
     }
   }
 
-  @Test fun parZip5ReturnsToOriginalContextOnFailure() = runTest {
+  @Test fun parZip5ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip5"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(5, NamedThreadFactory(zipCtxName)) }
@@ -107,7 +106,7 @@ class ParZip5JvmTest {
     }
   }
 
-  @Test fun parZip5FinishesOnSingleThread() = runTest {
+  @Test fun parZip5FinishesOnSingleThread() = runTestUsingDefaultDispatcher {
     checkAll(Arb.string()) {
       val res = resourceScope {
         val ctx = singleThreadContext("single")
