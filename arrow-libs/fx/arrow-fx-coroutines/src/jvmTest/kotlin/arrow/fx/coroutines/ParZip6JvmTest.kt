@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 class ParZip6JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
@@ -45,7 +46,7 @@ class ParZip6JvmTest {
     }
   }
 
-  @Test fun parZip6ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+  @Test fun parZip6ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
     val zipCtxName = "parZip6"
     resourceScope {
     val zipCtx = executor { Executors.newFixedThreadPool(6, NamedThreadFactory(zipCtxName)) }

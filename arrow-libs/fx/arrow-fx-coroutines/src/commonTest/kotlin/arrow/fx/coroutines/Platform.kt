@@ -7,6 +7,8 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 fun stackSafeIteration(): Int = when (platform) {
   Platform.JVM -> 20_000
@@ -15,7 +17,10 @@ fun stackSafeIteration(): Int = when (platform) {
 
 // The normal dispatcher with 'runTest' does some magic
 // which doesn't go well with 'parZip', 'parMap', and 'raceN'
-fun runTestUsingDefaultDispatcher(testBody: suspend TestScope.() -> Unit): TestResult = runTest {
+fun runTestUsingDefaultDispatcher(
+  timeout: Duration = 10.seconds,
+  testBody: suspend TestScope.() -> Unit
+): TestResult = runTest(timeout = timeout) {
   withContext(Dispatchers.Default) {
     testBody()
   }
