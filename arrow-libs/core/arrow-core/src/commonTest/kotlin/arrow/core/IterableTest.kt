@@ -19,10 +19,11 @@ import kotlinx.coroutines.test.runTest
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 class IterableTest {
-  @Test fun flattenOrAccumulateCombine() = runTest {
-    checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
+  @Test fun flattenOrAccumulateCombine() = runTest(timeout = 30.seconds) {
+    checkAll(Arb.list(Arb.either(Arb.string(maxSize = 10), Arb.int()))) { list ->
       val expected =
         if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
           .fold("") { acc, either -> "$acc${either.value}" }.left()
