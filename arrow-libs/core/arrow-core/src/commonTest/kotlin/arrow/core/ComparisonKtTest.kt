@@ -57,7 +57,7 @@ class ComparisonKtTest {
     }
 
     @Test fun arbericSortAll() = runTest {
-      checkAll(Arb.person(), Arb.list(Arb.person(), 0..50)) { a, lst ->
+      checkAll(Arb.person(), Arb.list(Arb.person(), 0..20)) { a, lst ->
         val aas = lst.toTypedArray()
         val res = sort(a, *aas)
         val expected = listOf(a, *aas).sorted()

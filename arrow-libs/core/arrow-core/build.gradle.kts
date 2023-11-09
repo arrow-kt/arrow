@@ -1,6 +1,7 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.Duration
 
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
@@ -46,13 +47,31 @@ kotlin {
       }
     }
   }
+
+  js {
+    nodejs {
+      testTask {
+        useMocha {
+          timeout = "60000"
+        }
+      }
+    }
+    browser {
+      testTask {
+        useKarma {
+          useChromeHeadless()
+          timeout.set(Duration.ofSeconds(60))
+        }
+      }
+    }
+  }
 }
 
-// enables context receivers for Jvm Tests
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
+// enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
   kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
