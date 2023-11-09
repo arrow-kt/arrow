@@ -9,6 +9,7 @@ import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -23,6 +24,16 @@ class NonEmptyListTest : StringSpec({
 
     "iterable.toNonEmptyListOrNull should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
+        nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
+      }
+    }
+
+    "iterable.toNonEmptyListOrNull should return null for an empty iterable" {
+      listOf<String>().toNonEmptyListOrNull().shouldBeNull()
+    }
+
+    "iterable.toNonEmptyListOrNull should work correctly when the iterable starts with or contains null" {
+      checkAll(Arb.nonEmptyList(Arb.int().orNull())) { nonEmptyList ->
         nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
       }
     }
