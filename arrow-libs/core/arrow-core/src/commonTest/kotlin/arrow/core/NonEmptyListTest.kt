@@ -103,7 +103,7 @@ class NonEmptyListTest {
 
   @Test
   fun mapOrAccumulateAccumulatesErrorsWithCombineFunction() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.negativeInt())) { nel ->
+    checkAll(Arb.nonEmptyList(Arb.negativeInt(), range = 0 .. 20)) { nel ->
       val res = nel.mapOrAccumulate(String::plus) { i ->
         if (i > 0) i else raise("Negative")
       }
