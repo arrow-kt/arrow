@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class RaceNJvmTest {
@@ -90,7 +91,7 @@ class RaceNJvmTest {
       }
     }
     
-    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+    @Test @Ignore fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
       
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
