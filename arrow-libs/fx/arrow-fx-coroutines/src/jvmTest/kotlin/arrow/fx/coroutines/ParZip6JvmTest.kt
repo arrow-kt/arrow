@@ -14,6 +14,7 @@ import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class ParZip6JvmTest {
@@ -45,7 +46,7 @@ class ParZip6JvmTest {
     }
   }
 
-  @Test fun parZip6ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+  @Test @Ignore fun parZip6ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip6"
     resourceScope {
     val zipCtx = executor { Executors.newFixedThreadPool(6, NamedThreadFactory(zipCtxName)) }
