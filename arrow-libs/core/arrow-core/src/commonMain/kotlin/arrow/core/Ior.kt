@@ -196,6 +196,7 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-05.kt -->
    */
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> {
     contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
     return fold(

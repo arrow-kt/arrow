@@ -14,6 +14,7 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -336,7 +337,13 @@ public interface Raise<in Error> {
 public inline fun <Error, A> recover(
   @BuilderInference block: Raise<Error>.() -> A,
   @BuilderInference recover: (error: Error) -> A,
-): A = fold(block, { throw it }, recover, ::identity)
+): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+  }
+  return fold(block, { throw it }, recover, ::identity)
+}
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
@@ -371,7 +378,14 @@ public inline fun <Error, A> recover(
   @BuilderInference block: Raise<Error>.() -> A,
   @BuilderInference recover: (error: Error) -> A,
   @BuilderInference catch: (throwable: Throwable) -> A,
-): A = fold(block, catch, recover, ::identity)
+): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return fold(block, catch, recover, ::identity)
+}
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
@@ -407,7 +421,14 @@ public inline fun <reified T : Throwable, Error, A> recover(
   @BuilderInference block: Raise<Error>.() -> A,
   @BuilderInference recover: (error: Error) -> A,
   @BuilderInference catch: (t: T) -> A,
-): A = fold(block, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
+): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return fold(block, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
+}
 
 /**
  * Allows safely catching exceptions without capturing [CancellationException],
@@ -441,12 +462,18 @@ public inline fun <reified T : Throwable, Error, A> recover(
  * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
  */
 @RaiseDSL
-public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A): A =
-  try {
+@Suppress("WRONG_INVOCATION_KIND")
+public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return try {
     block()
   } catch (t: Throwable) {
     catch(t.nonFatalOrThrow())
   }
+}
 
 /**
  * Allows safely catching exceptions of type `T` without capturing [CancellationException],
@@ -481,8 +508,13 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
  */
 @RaiseDSL
 @JvmName("catchReified")
-public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A =
-  catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
+public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
+}
 
 /**
  * Ensures that the [condition] is met;
@@ -656,4 +688,9 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
 @JvmName("_merge")
 public inline fun <A> merge(
   @BuilderInference block: Raise<A>.() -> A,
-): A = recover(block, ::identity)
+): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return recover(block, ::identity)
+}

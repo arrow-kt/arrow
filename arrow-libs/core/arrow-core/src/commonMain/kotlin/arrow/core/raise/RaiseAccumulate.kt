@@ -17,6 +17,7 @@ import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -654,6 +655,10 @@ public open class RaiseAccumulate<Error>(
   }
 
   @RaiseDSL
-  public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A =
-    block(raise)
+  public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A {
+    contract {
+      callsInPlace(block, EXACTLY_ONCE)
+    }
+    return block(raise)
+  }
 }

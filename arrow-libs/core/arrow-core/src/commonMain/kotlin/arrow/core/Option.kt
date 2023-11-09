@@ -310,13 +310,14 @@ public sealed class Option<out A> {
      * Ignores exceptions and returns None if one is thrown
      */
     public inline fun <A> catch(f: () -> A): Option<A> {
-      contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
       val recover: (Throwable) -> Option<A> = { None }
       return catch(recover, f)
     }
 
     @JvmStatic
     @JvmName("tryCatch")
+    @Suppress("WRONG_INVOCATION_KIND")
     public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
       contract {
         callsInPlace(f, InvocationKind.EXACTLY_ONCE)
@@ -429,7 +430,7 @@ public sealed class Option<out A> {
    */
   public inline fun isSome(predicate: (A) -> Boolean): Boolean {
     contract {
-      callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
       returns(true) implies (this@Option is Some<A>)
     }
     return this@Option is Some<A> && predicate(value)
@@ -553,6 +554,7 @@ public data class Some<out T>(val value: T) : Option<T>() {
  *
  * @param default the default expression.
  */
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
   return fold({ default() }, ::identity)
