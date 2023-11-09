@@ -5,7 +5,6 @@ package arrow.core
 import arrow.core.test.either
 import arrow.core.test.ior
 import arrow.core.test.option
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.property.Arb
@@ -13,15 +12,16 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.test.Test
 
-class IterableTest : StringSpec({
-  "flattenOrAccumulate(combine)" {
+class IterableTest {
+  @Test fun flattenOrAccumulateCombine() = runTest {
     checkAll(Arb.list(Arb.either(Arb.string(), Arb.int()))) { list ->
       val expected =
         if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
@@ -32,7 +32,7 @@ class IterableTest : StringSpec({
     }
   }
 
-  "flattenOrAccumulate" {
+  @Test fun flattenOrAccumulateOk() = runTest {
     checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { list ->
       val expected =
         if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<Int>>()
@@ -43,7 +43,7 @@ class IterableTest : StringSpec({
     }
   }
 
-    "mapAccumulating stack-safe, and runs in original order" {
+  @Test fun mapOrAccumulateOrder() = runTest {
       val acc = mutableListOf<Int>()
       val res = (0..20_000).mapOrAccumulate(String::plus) {
         acc.add(it)
@@ -53,7 +53,7 @@ class IterableTest : StringSpec({
       res shouldBe (0..20_000).toList().right()
     }
 
-    "mapAccumulating accumulates" {
+  @Test fun mapOrAccumulateAccumulates() = runTest {
       checkAll(Arb.list(Arb.int())) { ints ->
         val res=
           ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
@@ -65,13 +65,13 @@ class IterableTest : StringSpec({
       }
     }
 
-    "mapAccumulating with String::plus" {
+  @Test fun mapOrAccumulateString() = runTest {
       listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
         raise("fail")
       } shouldBe Either.Left("failfailfail")
     }
 
-    "zip3" {
+  @Test fun zip3Ok() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
         val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
@@ -79,7 +79,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "zip4" {
+  @Test fun zip4Ok() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int()), Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b, c, d ->
         val result = a.zip(b, c, d, ::Tuple4)
         val expected = a.zip(b, ::Pair)
@@ -90,7 +90,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "zip5" {
+  @Test fun zip5Ok() = runTest {
       checkAll(
         Arb.list(Arb.int()),
         Arb.list(Arb.int()),
@@ -108,7 +108,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "zip6" {
+  @Test fun zip6Ok() = runTest {
       checkAll(
         Arb.list(Arb.int()),
         Arb.list(Arb.int()),
@@ -128,7 +128,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "zip7" {
+  @Test fun zip7Ok() = runTest {
       checkAll(
         Arb.list(Arb.int()),
         Arb.list(Arb.int()),
@@ -150,7 +150,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "zip8" {
+  @Test fun zip8Ok() = runTest {
       checkAll(
         Arb.list(Arb.int()),
         Arb.list(Arb.int()),
@@ -174,7 +174,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "zip9" {
+  @Test fun zip9Ok() = runTest {
       checkAll(
         Arb.list(Arb.int()),
         Arb.list(Arb.int()),
@@ -200,7 +200,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "can align lists with different lengths" {
+  @Test fun alignDifferentLength() = runTest {
       checkAll(Arb.list(Arb.boolean()), Arb.list(Arb.boolean())) { a, b ->
         a.align(b).size shouldBe max(a.size, b.size)
       }
@@ -222,7 +222,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "leftPadZip (with map)" {
+  @Test fun leftPadZipMap() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
@@ -233,7 +233,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "leftPadZip (without map)" {
+  @Test fun leftPadZipNoMap() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
@@ -244,7 +244,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "rightPadZip (without map)" {
+  @Test fun rightPadZipNoMap() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
@@ -256,7 +256,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "rightPadZip (with map)" {
+  @Test fun rightPadZipMap() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
@@ -268,7 +268,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "padZip" {
+  @Test fun padZipOk() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
@@ -276,7 +276,7 @@ class IterableTest : StringSpec({
       }
     }
 
-    "padZipWithNull" {
+  @Test fun padZipNull() = runTest {
       checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
@@ -285,19 +285,19 @@ class IterableTest : StringSpec({
       }
     }
 
-    "filterOption" {
+  @Test fun filterOptionOk() = runTest {
       checkAll(Arb.list(Arb.option(Arb.int()))) { listOfOption ->
         listOfOption.filterOption() shouldBe listOfOption.mapNotNull { it.getOrNull() }
       }
     }
 
-    "flattenOption" {
+  @Test fun flattenOptionOk() = runTest {
       checkAll(Arb.list(Arb.option(Arb.int()))) { listOfOption ->
         listOfOption.flattenOption() shouldBe listOfOption.mapNotNull { it.getOrNull() }
       }
     }
 
-    "separateEither" {
+  @Test fun separateEitherOk() = runTest {
       checkAll(Arb.list(Arb.int())) { ints ->
         val list = ints.separateEither {
           if (it % 2 == 0) it.left()
@@ -307,7 +307,7 @@ class IterableTest : StringSpec({
       }
     }
 
-  "unzip is the inverse of zip" {
+  @Test fun unzipInverseOfZip() = runTest {
     checkAll(Arb.list(Arb.int())) { xs ->
 
       val zipped = xs.zip(xs)
@@ -318,13 +318,13 @@ class IterableTest : StringSpec({
     }
   }
 
-  "unzip(fn)" {
+  @Test fun unzipOk() = runTest {
     checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { xs ->
       xs.unzip { it } shouldBe xs.unzip()
     }
   }
 
-  "unalign is the inverse of align" {
+  @Test fun unalignInverseOfAlign() = runTest {
     fun <A, B> Pair<List<A?>, List<B?>>.fix(): Pair<List<A>, List<B>> =
       first.mapNotNull { it } to second.mapNotNull { it }
 
@@ -333,7 +333,7 @@ class IterableTest : StringSpec({
     }
   }
 
-  "align is the inverse of unalign" {
+  @Test fun alignInverseOfUnalign() = runTest {
     fun <A, B> Ior<A?, B?>.fix(): Ior<A, B> =
       fold({ Ior.Left(it!!) }, { Ior.Right(it!!) }, { a, b ->
         when {
@@ -351,13 +351,13 @@ class IterableTest : StringSpec({
     }
   }
 
-  "unalign(fn)" {
+  @Test fun unalignOk() = runTest {
     checkAll(Arb.list(Arb.ior(Arb.int(), Arb.int()))) { xs ->
       xs.unalign { it } shouldBe xs.unalign()
     }
   }
 
-  "reduceOrNull is compatible with reduce from stdlib" {
+  @Test fun reduceOrNullCompatibleWithReduce() = runTest {
     checkAll(Arb.list(Arb.int())) { xs ->
 
       val rs = xs.reduceOrNull({ it }) { a, b ->
@@ -374,7 +374,7 @@ class IterableTest : StringSpec({
     }
   }
 
-  "reduceRightNull is compatible with reduce from stdlib" {
+  @Test fun reduceRightNullCompatibleWithReduce() = runTest {
     checkAll(Arb.list(Arb.int())) { xs ->
 
       val rs = xs.reduceRightNull({ it }) { a, b ->
@@ -390,4 +390,4 @@ class IterableTest : StringSpec({
       }
     }
   }
-})
+}
