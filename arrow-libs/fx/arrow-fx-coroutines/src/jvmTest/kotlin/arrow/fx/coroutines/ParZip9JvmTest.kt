@@ -15,7 +15,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import java.util.concurrent.Executors
-import kotlin.test.Ignore
 
 class ParZip9JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
@@ -58,7 +57,7 @@ class ParZip9JvmTest {
 
   }
 
-  @Test @Ignore fun parZip9ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+  @Test fun parZip9ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip9"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(9, NamedThreadFactory(zipCtxName)) }
@@ -71,7 +70,7 @@ class ParZip9JvmTest {
             when (choose) {
               1 -> parZip(
                 zipCtx,
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -85,7 +84,7 @@ class ParZip9JvmTest {
               2 -> parZip(
                 zipCtx,
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -99,7 +98,7 @@ class ParZip9JvmTest {
                 zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -113,7 +112,7 @@ class ParZip9JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -127,7 +126,7 @@ class ParZip9JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
@@ -141,7 +140,7 @@ class ParZip9JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() }
@@ -155,7 +154,7 @@ class ParZip9JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
@@ -169,7 +168,7 @@ class ParZip9JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
 
@@ -183,7 +182,7 @@ class ParZip9JvmTest {
                 { awaitCancellation() },
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() }
+                { throw e }
               ) { _, _, _, _, _, _, _, _, _ -> Unit }
             }
           } should leftException(e)

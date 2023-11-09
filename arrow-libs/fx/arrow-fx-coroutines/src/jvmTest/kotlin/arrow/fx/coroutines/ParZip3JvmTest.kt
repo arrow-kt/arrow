@@ -12,7 +12,6 @@ import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class ParZip3JvmTest {
@@ -36,7 +35,7 @@ class ParZip3JvmTest {
     }
   }
 
-  @Test @Ignore fun parZip3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+  @Test fun parZip3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip3"
     resourceScope {
     val zipCtx = executor { Executors.newFixedThreadPool(3, NamedThreadFactory(zipCtxName)) }
@@ -49,7 +48,7 @@ class ParZip3JvmTest {
             when (choose) {
               1 -> parZip(
                 zipCtx,
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() },
                 { awaitCancellation() }
               ) { _, _, _ -> Unit }
@@ -57,7 +56,7 @@ class ParZip3JvmTest {
               2 -> parZip(
                 zipCtx,
                 { awaitCancellation() },
-                { e.suspend() },
+                { throw e },
                 { awaitCancellation() }
               ) { _, _, _ -> Unit }
 
@@ -65,7 +64,7 @@ class ParZip3JvmTest {
                 zipCtx,
                 { awaitCancellation() },
                 { awaitCancellation() },
-                { e.suspend() }
+                { throw e }
               ) { _, _, _ -> Unit }
             }
           } should leftException(e)

@@ -9,7 +9,6 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class RaceNJvmTest {
@@ -44,8 +43,8 @@ class RaceNJvmTest {
             
             Either.catch {
               when (choose) {
-                1 -> raceN(pool, { e.suspend() }, { awaitCancellation() }).swap().getOrNull()
-                else -> raceN(pool, { awaitCancellation() }, { e.suspend() }).getOrNull()
+                1 -> raceN(pool, { throw e }, { awaitCancellation() }).swap().getOrNull()
+                else -> raceN(pool, { awaitCancellation() }, { throw e }).getOrNull()
               }
             } should leftException(e)
             
@@ -91,7 +90,7 @@ class RaceNJvmTest {
       }
     }
     
-    @Test @Ignore fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
       
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
@@ -102,15 +101,15 @@ class RaceNJvmTest {
             Either.catch {
               when (choose) {
                 1 ->
-                  raceN(raceCtx, { e.suspend() }, { awaitCancellation() }, { awaitCancellation() })
+                  raceN(raceCtx, { throw e }, { awaitCancellation() }, { awaitCancellation() })
                     .fold({ x: String? -> x }, { null }, { null })
                 
                 2 ->
-                  raceN(raceCtx, { awaitCancellation() }, { e.suspend() }, { awaitCancellation() })
+                  raceN(raceCtx, { awaitCancellation() }, { throw e }, { awaitCancellation() })
                     .fold({ null }, { x: String? -> x }, { null })
                 
                 else ->
-                  raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { e.suspend() })
+                  raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { throw e })
                     .fold({ null }, { null }, { x: String? -> x })
               }
             } should leftException(e)
