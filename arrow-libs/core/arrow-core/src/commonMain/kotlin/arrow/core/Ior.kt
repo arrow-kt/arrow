@@ -448,6 +448,14 @@ public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A,
   flatMap(combine, ::identity)
 
 /**
+ * Given an [Ior] with an error type [A], returns an [IorNel] with the same
+ * error type. Wraps the original error in a [NonEmptyList] so that it can be
+ * combined with an [IorNel] in a Raise DSL which operates on one.
+ */
+public fun <A, B> Ior<A, B>.toIorNel(): IorNel<A, B> =
+  mapLeft { it.nel() }
+
+/**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
  *
  * ```kotlin

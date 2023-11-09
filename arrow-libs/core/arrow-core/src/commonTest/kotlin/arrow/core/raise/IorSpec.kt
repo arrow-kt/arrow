@@ -3,6 +3,7 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.test.nonEmptyList
+import arrow.core.toIorNel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -84,5 +85,13 @@ class IorSpec {
       val three = Ior.Both(", World", 3).bind()
       one + two + three
     } shouldBe Ior.Both(", World", 6)
+  }
+
+  @Test fun iorNelAccumulates() = runTest {
+    iorNel {
+      val one = Ior.Both("ErrorOne", 1).toIorNel().bind()
+      val two = Ior.Both("ErrorTwo", 2).toIorNel().bind()
+      one + two
+    } shouldBe Ior.Both(listOf("ErrorOne", "ErrorTwo"), 3)
   }
 }

@@ -8,6 +8,7 @@ import arrow.atomic.Atomic
 import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.IorNel
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.None
@@ -90,6 +91,32 @@ public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
 public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
   val state: Atomic<Option<Error>> = Atomic(None)
   return fold<Error, A, Ior<Error, A>>(
+    { block(IorRaise(combineError, state, this)) },
+    { e -> throw e },
+    { e -> Ior.Left(state.get().getOrElse { e }) },
+    { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
+  )
+}
+
+/**
+ * Run a computation [block] using [Raise]. and return its outcome as [IorNel].
+ * - [Ior.Right] represents success,
+ * - [Ior.Left] represents logical failure which made it impossible to continue,
+ * - [Ior.Both] represents that some logical failures were raised,
+ *   but it was possible to continue until producing a final value.
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ *
+ * In both [Ior.Left] and [Ior.Both] cases, if more than one logical failure
+ * has been raised, they are combined using [combineError]. This defaults to
+ * combining [NonEmptyList]s by concatenating them.
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
+public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, @BuilderInference block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> {
+  val state: Atomic<Option<NonEmptyList<Error>>> = Atomic(None)
+  return fold<NonEmptyList<Error>, A, Ior<NonEmptyList<Error>, A>>(
     { block(IorRaise(combineError, state, this)) },
     { e -> throw e },
     { e -> Ior.Left(state.get().getOrElse { e }) },
