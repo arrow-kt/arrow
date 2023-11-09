@@ -223,7 +223,7 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
   public inline fun <A> ignoreErrors(
     @BuilderInference block: IgnoreErrorsRaise<Null>.() -> A,
   ): A {
-    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     return block(IgnoreErrorsRaise(this) { null })
   }
 }
