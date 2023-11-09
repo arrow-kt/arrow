@@ -1442,6 +1442,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
+  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
   return when (this) {
     is Left -> either { recover(this, value) }
     is Right -> this@recover
@@ -1477,5 +1478,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
-public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(T) -> A): Either<E, A> =
-  recover { e -> if (e is T) catch(e) else throw e }
+public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(T) -> A): Either<E, A> {
+  contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
+  return recover { e -> if (e is T) catch(e) else throw e }
+}
