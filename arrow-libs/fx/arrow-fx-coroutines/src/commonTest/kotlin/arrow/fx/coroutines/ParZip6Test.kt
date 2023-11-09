@@ -5,11 +5,6 @@ import arrow.atomic.update
 import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple6
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.awaitExitCase
-import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.throwable
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -23,12 +18,11 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class ParZip6Test {
     @Test
-    fun parZip6RunsInParallel() = runTest {
+    fun parZip6RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -75,7 +69,7 @@ class ParZip6Test {
     }
 
     @Test
-    fun CancellingParZip6CancelsAllParticipants() = runTest {
+    fun CancellingParZip6CancelsAllParticipants() = runTestUsingDefaultDispatcher {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -109,7 +103,7 @@ class ParZip6Test {
     }
     
     @Test
-    fun parZip6CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTest {
+    fun parZip6CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTestUsingDefaultDispatcher {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4, 5, 6))
@@ -149,7 +143,7 @@ class ParZip6Test {
     }
     
     @Test
-    fun parZipCancellationExceptionOnRightCanCancelRest() = runTest {
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
       checkAll(Arb.string(), Arb.int(1..6)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()

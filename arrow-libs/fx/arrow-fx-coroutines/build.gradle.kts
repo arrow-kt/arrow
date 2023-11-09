@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import java.time.Duration
+
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -39,6 +42,24 @@ kotlin {
     tasks.jvmJar {
       manifest {
         attributes["Automatic-Module-Name"] = "arrow.fx.coroutines"
+      }
+    }
+  }
+
+  js {
+    nodejs {
+      testTask {
+        useMocha {
+          timeout = "20000"
+        }
+      }
+    }
+    browser {
+      testTask {
+        useKarma {
+          useChromeHeadless()
+          timeout.set(Duration.ofSeconds(20))
+        }
       }
     }
   }

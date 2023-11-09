@@ -24,19 +24,19 @@ fun <A> Either<Throwable, A>.rethrow(): A =
   fold({ throw it }, ::identity)
 
 class RaceNTest {
-  @Test fun race2JoinFirst() = runTestWithDelay {
+  @Test fun race2JoinFirst() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       raceN({ i }, { awaitCancellation() }) shouldBe Either.Left(i)
     }
   }
 
-  @Test fun race2JoinSecond() = runTestWithDelay {
+  @Test fun race2JoinSecond() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       raceN({ awaitCancellation() }, { i }) shouldBe Either.Right(i)
     }
   }
 
-  @Test fun race2CancelsAll() = runTestWithDelay {
+  @Test fun race2CancelsAll() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       val s = Channel<Unit>()
       val pa = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -63,7 +63,7 @@ class RaceNTest {
     }
   }
 
-  @Test fun race2CancelsWithFirstSuccess() = runTestWithDelay {
+  @Test fun race2CancelsWithFirstSuccess() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.either(Arb.throwable(), Arb.int()),
       Arb.boolean(),
@@ -88,25 +88,25 @@ class RaceNTest {
     }
   }
 
-  @Test fun race3JoinFirst() = runTestWithDelay {
+  @Test fun race3JoinFirst() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       raceN({ i }, { awaitCancellation() }, { awaitCancellation() }) shouldBe Race3.First(i)
     }
   }
 
-  @Test fun race3JoinSecond() = runTestWithDelay {
+  @Test fun race3JoinSecond() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       raceN({ awaitCancellation() }, { i }, { awaitCancellation() }) shouldBe Race3.Second(i)
     }
   }
 
-  @Test fun race3JoinThird() = runTestWithDelay {
+  @Test fun race3JoinThird() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       raceN({ awaitCancellation() }, { awaitCancellation() }, { i }) shouldBe Race3.Third(i)
     }
   }
 
-  @Test fun race3CancelsAll() = runTestWithDelay {
+  @Test fun race3CancelsAll() = runTestUsingDefaultDispatcher {
     retry(10, 1.seconds) {
       checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
         val s = Channel<Unit>()
@@ -144,7 +144,7 @@ class RaceNTest {
     }
   }
 
-  @Test fun race3CancelsWithFirstSuccess() = runTestWithDelay {
+  @Test fun race3CancelsWithFirstSuccess() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.either(Arb.throwable(), Arb.int()),
       Arb.element(listOf(1, 2, 3)),

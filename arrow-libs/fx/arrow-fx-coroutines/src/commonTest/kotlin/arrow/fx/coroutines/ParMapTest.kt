@@ -13,13 +13,13 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.test.Test
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.test.runTest
+import kotlin.time.Duration.Companion.milliseconds
 
 class ParMapTest {
-  @Test fun parMapIsStackSafe() = runTestWithDelay {
+  @Test fun parMapIsStackSafe() = runTestUsingDefaultDispatcher {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMap { _: Int ->
@@ -28,7 +28,7 @@ class ParMapTest {
     ref.get() shouldBe count
   }
 
-  @Test fun parMapRunsInParallel() = runTest {
+  @Test fun parMapRunsInParallel() = runTestUsingDefaultDispatcher {
     val promiseA = CompletableDeferred<Unit>()
     val promiseB = CompletableDeferred<Unit>()
     val promiseC = CompletableDeferred<Unit>()
@@ -49,7 +49,7 @@ class ParMapTest {
     ).parMap { it.invoke() }
   }
 
-  @Test fun parTraverseResultsInTheCorrectError() = runTest {
+  @Test fun parTraverseResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -74,7 +74,7 @@ class ParMapTest {
     } shouldBe null
   }
 
-  @Test fun parMapWithEitherResultsInTheCorrectLeft() = runTest {
+  @Test fun parMapWithEitherResultsInTheCorrectLeft() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -88,7 +88,7 @@ class ParMapTest {
     }
   }
 
-  @Test fun parMapOrAccumulateIsStackSafe() = runTestWithDelay {
+  @Test fun parMapOrAccumulateIsStackSafe() = runTestUsingDefaultDispatcher {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
@@ -118,7 +118,7 @@ class ParMapTest {
     ).parMapOrAccumulate(combine = emptyError) { it.invoke() }
   }
 
-  @Test fun parMapOrAccumulateResultsInTheCorrectError() = runTest {
+  @Test fun parMapOrAccumulateResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -143,7 +143,7 @@ class ParMapTest {
     } shouldBe null
   }
 
-  @Test fun parMapOrAccumulateAccumulatesShifts() = runTest {
+  @Test fun parMapOrAccumulateAccumulatesShifts() = runTestUsingDefaultDispatcher {
     checkAll(Arb.string()) { e ->
       (0 until 10).parMapOrAccumulate { _ ->
         raise(e)
@@ -151,7 +151,7 @@ class ParMapTest {
     }
   }
 
-  @Test fun parMapNotNullIsStackSafe() = runTestWithDelay {
+  @Test fun parMapNotNullIsStackSafe() = runTestUsingDefaultDispatcher {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapNotNull { _: Int ->
@@ -160,7 +160,7 @@ class ParMapTest {
     ref.get() shouldBe count
   }
 
-  @Test fun parMapNotNullRunsInParallel() = runTest {
+  @Test fun parMapNotNullRunsInParallel() = runTestUsingDefaultDispatcher {
     val promiseA = CompletableDeferred<Unit>()
     val promiseB = CompletableDeferred<Unit>()
     val promiseC = CompletableDeferred<Unit>()
@@ -181,7 +181,7 @@ class ParMapTest {
     ).parMapNotNull { it.invoke() }
   }
 
-  @Test fun parMapNotNullResultsInTheCorrectError() = runTest {
+  @Test fun parMapNotNullResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -206,13 +206,13 @@ class ParMapTest {
     } shouldBe null
   }
 
-  @Test fun parMapNotNullDiscardsNulls() = runTest {
+  @Test fun parMapNotNullDiscardsNulls() = runTestUsingDefaultDispatcher {
     (0 until 10).parMapNotNull { _ ->
       null
     } shouldBe emptyList()
   }
 
-  @Test fun parMapNotNullRetainsNonNulls() = runTest {
+  @Test fun parMapNotNullRetainsNonNulls() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       (0 until 10).parMapNotNull { _ ->
         i

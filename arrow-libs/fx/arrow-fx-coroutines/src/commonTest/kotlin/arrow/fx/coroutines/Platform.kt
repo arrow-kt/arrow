@@ -13,7 +13,9 @@ fun stackSafeIteration(): Int = when (platform) {
   else -> 1000
 }
 
-fun runTestWithDelay(testBody: suspend TestScope.() -> Unit): TestResult = runTest {
+// The normal dispatcher with 'runTest' does some magic
+// which doesn't go well with 'parZip', 'parMap', and 'raceN'
+fun runTestUsingDefaultDispatcher(testBody: suspend TestScope.() -> Unit): TestResult = runTest {
   withContext(Dispatchers.Default) {
     testBody()
   }

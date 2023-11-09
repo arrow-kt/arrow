@@ -7,6 +7,7 @@ import arrow.core.identity
 import arrow.core.prependTo
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -465,6 +466,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  * instead the caller is responsible for correctly invoking the `release` handler at the appropriate time.
  * This API is useful for building inter-op APIs between [Resource] and non-suspending code, such as Java libraries.
  */
+@DelicateCoroutinesApi
 public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Unit> {
   val effect = ResourceScopeImpl()
   val allocated: A = invoke(effect)
