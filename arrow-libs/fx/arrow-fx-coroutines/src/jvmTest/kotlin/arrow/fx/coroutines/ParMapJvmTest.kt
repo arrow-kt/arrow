@@ -5,11 +5,10 @@ import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class ParMapJvmTest {
-  @Test fun parMapRunsOnProvidedContext() = runTest { // 100 is same default length as Arb.list
+  @Test fun parMapRunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         (0 until i).parMap(single()) { Thread.currentThread().name }
@@ -18,7 +17,7 @@ class ParMapJvmTest {
     }
   }
 
-  @Test fun parMapConcurrency3RunsOnProvidedContext() = runTest {
+  @Test fun parMapConcurrency3RunsOnProvidedContext() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         (0 until i).parMap(single(), concurrency = 3) {
@@ -29,7 +28,7 @@ class ParMapJvmTest {
     }
   }
 
-  @Test fun parMapOrAccumulateCombineEmptyErrorRunsOnProvidedContext() = runTest { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateCombineEmptyErrorRunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         (0 until i).parMapOrAccumulate<Nothing, Int, String>(single(), combine = emptyError) { Thread.currentThread().name }
@@ -41,7 +40,7 @@ class ParMapJvmTest {
     }
   }
 
-  @Test fun parMapOrAccumulateCombineEmptyErrorConcurrency3RunsOnProvidedContext() = runTest { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateCombineEmptyErrorConcurrency3RunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         (0 until i).parMapOrAccumulate<Nothing, Int, String>(
@@ -57,7 +56,7 @@ class ParMapJvmTest {
     }
   }
 
-  @Test fun parMapOrAccumulateRunsOnProvidedContext() = runTest { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateRunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
       val res = resourceScope {
         (0 until i).parMapOrAccumulate<Nothing, Int, String>(single()) {
@@ -71,7 +70,7 @@ class ParMapJvmTest {
     }
   }
 
-  @Test fun parMapOrAccumulateConcurrency3RunsOnProvidedContext() = runTest { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateConcurrency3RunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
 
       val res = resourceScope {

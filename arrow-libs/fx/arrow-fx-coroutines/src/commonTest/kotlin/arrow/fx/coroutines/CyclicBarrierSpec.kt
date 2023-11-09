@@ -33,7 +33,7 @@ class CyclicBarrierSpec {
   }
 
   @Test
-  fun awaitingAllInParallelResumesAllCoroutines() = runTest {
+  fun awaitingAllInParallelResumesAllCoroutines() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(1, 20)) { i ->
       val barrier = CyclicBarrier(i)
       (0 until i).parMap { barrier.await() }
@@ -41,7 +41,7 @@ class CyclicBarrierSpec {
   }
 
   @Test
-  fun shouldResetOnceFull() = runTest {
+  fun shouldResetOnceFull() = runTestUsingDefaultDispatcher {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
@@ -50,7 +50,7 @@ class CyclicBarrierSpec {
   }
 
   @Test
-  fun executesRunnableOnceFull() = runTest {
+  fun executesRunnableOnceFull() = runTestUsingDefaultDispatcher {
     var barrierRunnableInvoked = false
     val barrier = CyclicBarrier(2) { barrierRunnableInvoked = true }
     parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
@@ -102,7 +102,7 @@ class CyclicBarrierSpec {
   }
 
   @Test
-  fun shouldCleanUpUponReset() = runTest {
+  fun shouldCleanUpUponReset() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(2, 20)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
@@ -118,7 +118,7 @@ class CyclicBarrierSpec {
   }
 
   @Test
-  fun raceFiberCancelAndBarrierFull() = runTest {
+  fun raceFiberCancelAndBarrierFull() = runTestUsingDefaultDispatcher {
     checkAll(Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       val job = launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }

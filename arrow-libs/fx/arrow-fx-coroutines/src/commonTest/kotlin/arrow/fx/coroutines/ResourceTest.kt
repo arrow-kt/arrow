@@ -6,7 +6,6 @@ import arrow.core.raise.either
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.should
@@ -24,14 +23,18 @@ import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class ResourceTest : StringSpec({
+class ResourceTest {
 
-  "acquire - success - identity" {
+  @Test
+  fun acquireSuccessIdentity() = runTest {
     checkAll(Arb.int()) { n ->
       resourceScope {
         install({ n }) { _, _ -> } shouldBe n
@@ -39,7 +42,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "respect FIFO order installed release functions" {
+  @Test
+  fun respectFIFOOrderInstalledFunction() = runTest {
     checkAll(Arb.positiveInt(), Arb.negativeInt()) { a, b ->
       val order = mutableListOf<Int>()
 
@@ -56,7 +60,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "value resource is released with Complete" {
+  @Test
+  fun resourceReleasedWithComplete() = runTest {
     checkAll(Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
       resourceScope {
@@ -66,7 +71,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "error resource finishes with error" {
+  @Test
+  fun errorFinishesWithError() = runTest {
     checkAll(Arb.throwable()) { e ->
       val p = CompletableDeferred<ExitCase>()
       suspend fun ResourceScope.failingScope(): Nothing =
@@ -78,7 +84,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "never use can be cancelled with ExitCase.Completed" {
+  @Test
+  fun neverCancelled() = runTest {
     checkAll(Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
       val start = CompletableDeferred<Unit>()
@@ -98,7 +105,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "Map + bind (traverse)" {
+  @Test
+  fun mapBind() = runTest {
     checkAll(
       Arb.list(Arb.int()),
       Arb.functionAToB<Int, String>(Arb.string())
@@ -111,7 +119,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "Resource can close from either" {
+  @Test
+  fun resourceCloseFromEither() = runTest {
     val exit = CompletableDeferred<ExitCase>()
     either<String, Int> {
       resourceScope {
@@ -124,7 +133,7 @@ class ResourceTest : StringSpec({
     exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
   }
 
-  val depth = 10
+  private val depth = 10
 
   class CheckableAutoClose {
     var started = true
@@ -133,7 +142,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - success" {
+  @Test
+  fun parZipSuccess() = runTestUsingDefaultDispatcher {
     suspend fun ResourceScope.closeable(): CheckableAutoClose =
       install({ CheckableAutoClose() }) { a: CheckableAutoClose, _: ExitCase -> a.close() }
 
@@ -146,7 +156,7 @@ class ResourceTest : StringSpec({
     }
   }
 
-  fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
+  private fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
     val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
     val res = promises.fold(resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
       resource {
@@ -159,7 +169,8 @@ class ResourceTest : StringSpec({
     return Pair(promises.map { it.second }, res)
   }
 
-  "parZip - deep finalizers are called when final one blows" {
+  @Test
+  fun parZipFinalizersBlow() = runTestUsingDefaultDispatcher {
     checkAll(3, Arb.int(10..100)) {
       val (promises, resource) = generate()
       shouldThrow<RuntimeException> {
@@ -178,7 +189,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - deep finalizers are called when final one cancels" {
+  @Test
+  fun parZipFinalizersCancel() = runTestUsingDefaultDispatcher {
     checkAll(3, Arb.int(10..100)) {
       val cancel = CancellationException(null, null)
       val (promises, resource) = generate()
@@ -199,7 +211,8 @@ class ResourceTest : StringSpec({
   }
 
   // Test multiple release triggers on acquire fail.
-  "parZip - Deep finalizers get called on left or right cancellation" {
+  @Test
+  fun parZipFinalizersLeftOrRightCancellation() = runTestUsingDefaultDispatcher {
     checkAll(Arb.boolean()) { isLeft ->
       val cancel = CancellationException(null, null)
       val (promises, resource) = generate()
@@ -233,7 +246,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Right CancellationException on acquire" {
+  @Test
+  fun parZipRightCancellationExceptionOnAcquire() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -261,7 +275,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Left CancellationException on acquire" {
+  @Test
+  fun parZipLeftCancellationExceptionOnAcquire() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -290,7 +305,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Right error on acquire" {
+  @Test
+  fun parZipRightErrorOnAcquire() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
       val started = CompletableDeferred<Unit>()
@@ -317,7 +333,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Left error on acquire" {
+  @Test
+  fun parZipLeftErrorOnAcquire() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
       val started = CompletableDeferred<Unit>()
@@ -343,7 +360,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Right CancellationException on release" {
+  @Test
+  fun parZipRightCancellationExceptionOnRelease() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -364,7 +382,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Left CancellationException on release" {
+  @Test
+  fun parZipLeftCancellationExceptionOnRelease() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -385,7 +404,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Right error on release" {
+  @Test
+  fun parZipRightErrorOnRelease() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -405,7 +425,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - Left error on release" {
+  @Test
+  fun parZipLeftErrorOnRelease() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -425,7 +446,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - error in use" {
+  @Test
+  fun parZipErrorInUse() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.int(), Arb.throwable()) { a, b, throwable ->
       val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
       val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -451,7 +473,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "parZip - cancellation in use" {
+  @Test
+  fun parZipCancellationInUse() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
       val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -477,7 +500,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "resource.asFlow()" {
+  @Test
+  fun resourceAsFlow() = runTest {
     checkAll(Arb.int()) { n ->
       val released = CompletableDeferred<ExitCase>()
       val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
@@ -488,7 +512,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "resource.asFlow() - failed" {
+  @Test
+  fun resourceAsFlowFail() = runTest {
     checkAll(Arb.int(), Arb.throwable()) { n, throwable ->
       val released = CompletableDeferred<ExitCase>()
       val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
@@ -501,7 +526,8 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "resource.asFlow() - cancelled" {
+  @Test
+  fun resourceAsFlowCancel() = runTest {
     checkAll(Arb.int()) { n ->
       val released = CompletableDeferred<ExitCase>()
       val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
@@ -514,7 +540,9 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "allocated" {
+  @OptIn(DelicateCoroutinesApi::class)
+  @Test
+  fun allocatedWorks() = runTest {
     checkAll(Arb.int()) { seed ->
       val released = CompletableDeferred<ExitCase>()
       val (allocate, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
@@ -526,7 +554,9 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "allocated - suppressed exception" {
+  @OptIn(DelicateCoroutinesApi::class)
+  @Test
+  fun allocatedSupressedException() = runTest {
     checkAll(
       Arb.int(),
       Arb.string().map(::RuntimeException),
@@ -554,7 +584,9 @@ class ResourceTest : StringSpec({
     }
   }
 
-  "allocated - cancellation exception" {
+  @OptIn(DelicateCoroutinesApi::class)
+  @Test
+  fun allocatedCancellationException() = runTest {
     checkAll(
       Arb.int(),
       Arb.string().map { CancellationException(it, null) },
@@ -581,4 +613,4 @@ class ResourceTest : StringSpec({
       released.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
-})
+}
