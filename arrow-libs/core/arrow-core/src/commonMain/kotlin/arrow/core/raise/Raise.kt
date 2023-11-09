@@ -339,7 +339,7 @@ public inline fun <Error, A> recover(
   @BuilderInference recover: (error: Error) -> A,
 ): A {
   contract {
-    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
   }
   return fold(block, { throw it }, recover, ::identity)
@@ -380,7 +380,7 @@ public inline fun <Error, A> recover(
   @BuilderInference catch: (throwable: Throwable) -> A,
 ): A {
   contract {
-    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
   }
@@ -423,7 +423,7 @@ public inline fun <reified T : Throwable, Error, A> recover(
   @BuilderInference catch: (t: T) -> A,
 ): A {
   contract {
-    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
   }
@@ -462,10 +462,9 @@ public inline fun <reified T : Throwable, Error, A> recover(
  * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
  */
 @RaiseDSL
-@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A): A {
   contract {
-    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
   }
   return try {
@@ -510,7 +509,7 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
 @JvmName("catchReified")
 public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A {
   contract {
-    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
   }
   return catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
@@ -690,7 +689,7 @@ public inline fun <A> merge(
   @BuilderInference block: Raise<A>.() -> A,
 ): A {
   contract {
-    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
   }
   return recover(block, ::identity)
 }

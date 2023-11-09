@@ -310,17 +310,15 @@ public sealed class Option<out A> {
      * Ignores exceptions and returns None if one is thrown
      */
     public inline fun <A> catch(f: () -> A): Option<A> {
-      contract { callsInPlace(f, InvocationKind.EXACTLY_ONCE) }
-      val recover: (Throwable) -> Option<A> = { None }
-      return catch(recover, f)
+      contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+      return catch({ None }, f)
     }
 
     @JvmStatic
     @JvmName("tryCatch")
-    @Suppress("WRONG_INVOCATION_KIND")
     public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
       contract {
-        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(f, InvocationKind.AT_MOST_ONCE)
         callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
       }
       return try {
@@ -554,10 +552,12 @@ public data class Some<out T>(val value: T) : Option<T>() {
  *
  * @param default the default expression.
  */
-@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return fold({ default() }, ::identity)
+  return when (this) {
+    is Some -> value
+    else -> default()
+  }
 }
 
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None

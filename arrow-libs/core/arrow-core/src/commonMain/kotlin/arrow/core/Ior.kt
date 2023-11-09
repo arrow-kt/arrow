@@ -175,7 +175,7 @@ public sealed class Ior<out A, out B> {
   public inline fun <D> map(f: (B) -> D): Ior<A, D> {
     contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
     return when (this) {
-      is Left -> Left(value)
+      is Left -> this
       is Right -> Right(f(value))
       is Both -> Both(leftValue, f(rightValue))
     }
@@ -196,14 +196,13 @@ public sealed class Ior<out A, out B> {
    * ```
    * <!--- KNIT example-ior-05.kt -->
    */
-  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> {
     contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
-    return fold(
-      { Left(fa(it)) },
-      ::Right,
-      { a, b -> Both(fa(a), b) }
-    )
+    return when (this) {
+      is Left -> Left(fa(value))
+      is Right -> this
+      is Both -> Both(fa(leftValue), rightValue)
+    }
   }
 
   /**
