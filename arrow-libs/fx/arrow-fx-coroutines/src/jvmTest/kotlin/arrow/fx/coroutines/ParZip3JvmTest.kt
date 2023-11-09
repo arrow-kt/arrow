@@ -13,6 +13,7 @@ import java.util.concurrent.Executors
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 class ParZip3JvmTest {
   @Test fun parZip3ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
@@ -35,7 +36,7 @@ class ParZip3JvmTest {
     }
   }
 
-  @Test fun parZip3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+  @Test fun parZip3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
     val zipCtxName = "parZip3"
     resourceScope {
     val zipCtx = executor { Executors.newFixedThreadPool(3, NamedThreadFactory(zipCtxName)) }

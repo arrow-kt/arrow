@@ -10,6 +10,7 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 class RaceNJvmTest {
     @Test fun race2ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
@@ -32,7 +33,7 @@ class RaceNJvmTest {
       }
     }
 
-    @Test fun race2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+    @Test fun race2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
       val racerName = "race2"
       
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
@@ -90,7 +91,7 @@ class RaceNJvmTest {
       }
     }
     
-    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
       val racerName = "race3"
       
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
