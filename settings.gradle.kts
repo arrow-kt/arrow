@@ -56,6 +56,9 @@ project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-re
 include("arrow-core-serialization")
 project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-core-serialization")
 
+include("arrow-cache4k")
+project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
+
 // FX
 include("arrow-fx-coroutines")
 project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-coroutines")
