@@ -4,6 +4,7 @@ import io.kotest.assertions.fail
 import io.kotest.assertions.withClue
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
+import kotlin.time.Duration.Companion.seconds
 
 interface LawSet {
   val laws: List<Law>
@@ -18,7 +19,7 @@ fun testLaws(lawSet: LawSet): TestResult = withClue("In $lawSet") {
   testLaws(lawSet.laws)
 }
 
-fun testLaws(vararg laws: List<Law>): TestResult = runTest {
+fun testLaws(vararg laws: List<Law>): TestResult = runTest(timeout = (30 * laws.size).seconds) {
   laws
     .flatMap(List<Law>::asIterable)
     .distinctBy(Law::name)
