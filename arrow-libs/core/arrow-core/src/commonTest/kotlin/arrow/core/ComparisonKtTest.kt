@@ -28,7 +28,7 @@ data class Person(val age: Int, val name: String) : Comparable<Person> {
 }
 
 fun Arb.Companion.person(): Arb<Person> =
-  Arb.bind(Arb.int(), Arb.string(), ::Person)
+  Arb.bind(Arb.int(0, 100), Arb.string(0 .. 10), ::Person)
 
 class ComparisonKtTest {
     @Test fun arbericSort2() = runTest {
