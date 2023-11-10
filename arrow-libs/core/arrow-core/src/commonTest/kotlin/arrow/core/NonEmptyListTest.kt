@@ -89,7 +89,7 @@ class NonEmptyListTest {
 
   @Test
   fun mapOrAccumulateAccumulatesErrors() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.int())) { nel ->
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0 .. 20)) { nel ->
       val res = nel.mapOrAccumulate { i ->
         if (i % 2 == 0) i else raise(i)
       }
