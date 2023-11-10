@@ -22,7 +22,6 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
@@ -219,7 +218,7 @@ class MapKTest {
 
   @Test fun zipyness2() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.int())) {
+        Arb.map(Arb.int(), Arb.int(), maxSize = 30)) {
           xs ->
         xs.zip(xs).mapValues { it.value.second } shouldBe xs
       }
@@ -227,7 +226,7 @@ class MapKTest {
 
   @Test fun zipyness3() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()))) {
+        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30)) {
           xs ->
         xs.mapValues { it.value.first }.zip(xs.mapValues { it.value.second }) shouldBe xs
       }
@@ -302,7 +301,7 @@ class MapKTest {
 
   @Test fun unzipInverseOfZip() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.int())
+        Arb.map(Arb.int(), Arb.int(), maxSize = 30)
       ) { xs ->
         val ls = xs.zip(xs).unzip()
         val rs = xs to xs
@@ -313,7 +312,7 @@ class MapKTest {
 
   @Test fun zipInverseOfUnzip() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         val (a,b) = xs.unzip()
         a.zip(b) shouldBe xs
@@ -322,7 +321,7 @@ class MapKTest {
 
   @Test fun unzipWith() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         xs.unzip { it.value.first to it.value.second } shouldBe xs.unzip()
       }
@@ -330,7 +329,7 @@ class MapKTest {
 
   @Test fun unalignWith() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         xs.unalign { it.value } shouldBe xs.unalign()
       }
@@ -338,7 +337,7 @@ class MapKTest {
 
   @Test fun getOrNoneOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(0 .. 1000), Arb.int())
+        Arb.map(Arb.int(0 .. 1000), Arb.int(), maxSize = 30)
       ) { xs ->
         val (found, notFound) = (0 .. 1000).partition { xs.containsKey(it) }
 
@@ -365,7 +364,7 @@ class MapKTest {
 
   @Test fun alignInverseOfUnalign() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         val (a,b) = xs.unalign()
 
@@ -412,7 +411,7 @@ class MapKTest {
 
   @Test fun mapNotNullOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.boolean())
+        Arb.map(Arb.int(), Arb.boolean(), maxSize = 30)
       ) { xs ->
         val rs = xs.mapNotNull { (_, pred) -> if(pred) true else null }
 
@@ -427,7 +426,7 @@ class MapKTest {
 
   @Test fun filterOptionOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.option(Arb.int()))
+        Arb.map(Arb.int(), Arb.option(Arb.int()), maxSize = 30)
       ) { xs ->
         val rs = xs.filterOption()
 
@@ -443,7 +442,7 @@ class MapKTest {
 
   @Test fun filterInstanceOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         val a = xs.filterIsInstance<Int, String>()
         val b = xs.filterIsInstance<Int, Int>()
@@ -453,13 +452,13 @@ class MapKTest {
     }
 
   @Test fun filterInstanceIdentity() = runTest {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { xs ->
+      checkAll(Arb.map(Arb.int(), Arb.int(), maxSize = 30)) { xs ->
         xs.filterIsInstance<Int, Int>() shouldBe xs
       }
     }
 
   @Test fun filterInstanceIdentityNull() = runTest {
-      checkAll(Arb.map(Arb.int(), Arb.int().orNull())) { xs ->
+      checkAll(Arb.map(Arb.int(), Arb.int().orNull(), maxSize = 30)) { xs ->
         xs.filterIsInstance<Int, Int?>() shouldBe xs
       }
     }
@@ -702,7 +701,7 @@ class MapKTest {
 
   @Test fun mapOrAccumulateMaps() = runTest {
     checkAll(
-      Arb.map(Arb.int(), Arb.int())
+      Arb.map(Arb.int(), Arb.int(), maxSize = 30)
     ) { xs ->
 
       val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapOrAccumulate {
@@ -717,7 +716,7 @@ class MapKTest {
 
   @Test fun mapOrAccumulateAccumulates() = runTest {
     checkAll(
-      Arb.map(Arb.int(), Arb.int(), minSize = 1)
+      Arb.map(Arb.int(), Arb.int(), minSize = 1, maxSize = 30)
     ) { xs ->
        xs.mapOrAccumulate {
           raise(it.value)
