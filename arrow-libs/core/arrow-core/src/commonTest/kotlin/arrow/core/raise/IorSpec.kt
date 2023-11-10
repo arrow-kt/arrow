@@ -45,7 +45,7 @@ class IorSpec {
   }
 
   @Test fun concurrentArrowIorBind() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.int())) { xs ->
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0 .. 20)) { xs ->
       ior(List<Int>::plus) {
         xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
       }

@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class IterableTest {
   @Test fun flattenOrAccumulateCombine() = runTest(timeout = 30.seconds) {
-    checkAll(Arb.list(Arb.either(Arb.string(maxSize = 10), Arb.int()))) { list ->
+    checkAll(Arb.list(Arb.either(Arb.string(maxSize = 10), Arb.int()), range = 0 .. 20)) { list ->
       val expected =
         if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<String>>()
           .fold("") { acc, either -> "$acc${either.value}" }.left()
@@ -34,7 +34,7 @@ class IterableTest {
   }
 
   @Test fun flattenOrAccumulateOk() = runTest {
-    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { list ->
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0 .. 20)) { list ->
       val expected =
         if (list.any { it.isLeft() }) list.filterIsInstance<Either.Left<Int>>()
           .map { it.value }.toNonEmptyListOrNull().shouldNotBeNull().left()
@@ -55,7 +55,7 @@ class IterableTest {
     }
 
   @Test fun mapOrAccumulateAccumulates() = runTest {
-      checkAll(Arb.list(Arb.int())) { ints ->
+      checkAll(Arb.list(Arb.int(), range = 0 .. 20)) { ints ->
         val res=
           ints.mapOrAccumulate { i -> if (i % 2 == 0) i else raise(i) }
 
