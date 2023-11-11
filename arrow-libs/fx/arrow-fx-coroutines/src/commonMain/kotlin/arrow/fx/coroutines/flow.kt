@@ -19,15 +19,17 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.produceIn
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.zip
+import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.TimeSource
 
 /**
  * Like [map], but will evaluate [transform] in parallel, emitting the results
@@ -209,16 +211,17 @@ public fun <A> Flow<A>.repeat(): Flow<A> =
 public fun <A> Flow<A>.metered(period: Duration): Flow<A> =
   fixedRate(period).zip(this) { _, a -> a }
 
+@ExperimentalTime
 public fun <A> Flow<A>.metered(period: Long): Flow<A> =
   fixedRate(period).zip(this) { _, a -> a }
 
 @ExperimentalTime
 public fun fixedRate(
-  period: Duration,
+  periodInMillis: Long,
   dampen: Boolean = true,
-  timeStampInMillis: () -> Long = { timeInMillis() }
+  timeStamp: () -> ComparableTimeMark = { TimeSource.Monotonic.markNow() }
 ): Flow<Unit> =
-  fixedRate(period.inWholeMilliseconds, dampen, timeStampInMillis)
+  fixedRate(periodInMillis.milliseconds, dampen, timeStamp)
 
 /**
  * Flow that emits [Unit] every [period] while taking into account how much time it takes downstream to consume the emission.
@@ -234,19 +237,19 @@ public fun fixedRate(
  *
  * @param period period between [Unit] emits of the resulting [Flow].
  * @param dampen if you set [dampen] to false it will send `n` times [period] time it took downstream to process the emission.
- * @param timeStampInMillis allows for supplying a different timestamp function, useful to override with `runBlockingTest`
+ * @param timeStamp allows for supplying a different timestamp function, useful to override with `runBlockingTest`
  */
 public fun fixedRate(
-  period: Long,
+  period: Duration,
   dampen: Boolean = true,
-  timeStampInMillis: () -> Long = { timeInMillis() }
+  timeStamp: () -> ComparableTimeMark = { TimeSource.Monotonic.markNow() }
 ): Flow<Unit> =
-  if (period == 0L) flowOf(Unit).repeat()
+  if (period == Duration.ZERO) flowOf(Unit).repeat()
   else flow {
-    var lastAwakeAt = timeStampInMillis()
+    var lastAwakeAt = timeStamp()
 
     while (true) {
-      val now = timeStampInMillis()
+      val now = timeStamp()
       val next = lastAwakeAt + period
 
       if (next > now) {
@@ -254,13 +257,13 @@ public fun fixedRate(
         emit(Unit)
         lastAwakeAt = next
       } else {
-        val ticks: Long = (now - lastAwakeAt - 1) / period
+        val ticks: Long = ((now - lastAwakeAt).inWholeMilliseconds - 1) / period.inWholeMilliseconds
         when {
           ticks < 0L -> Unit
           ticks == 0L || dampen -> emit(Unit)
           else -> repeat(ticks.toInt()) { emit(Unit) }
         }
-        lastAwakeAt += (period * ticks)
+        lastAwakeAt += (period * ticks.toDouble())
       }
     }
   }
