@@ -8,125 +8,136 @@ import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class IsoTest : StringSpec({
+class IsoTest {
 
-  val aIso: Iso<SumType.A, String> = Iso(
+  private val aIso: Iso<SumType.A, String> = Iso(
     get = { a: SumType.A -> a.string },
     reverseGet = SumType::A
   )
 
-  testLaws(
-    "Iso token - ",
-    LensLaws(
-      lens = Iso.token(),
-      aGen = Arb.token(),
-      bGen = Arb.string(),
-      funcGen = Arb.functionAToB(Arb.string())
-    ),
+  @Test
+  fun isoTokenLaws() =
+    testLaws(
+      LensLaws(
+        lens = Iso.token(),
+        aGen = Arb.token(),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
+      ),
 
-    PrismLaws(
-      prism = aIso,
-      aGen = Arb.sumTypeA(),
-      bGen = Arb.string(),
-      funcGen = Arb.functionAToB(Arb.string())
-    ),
+      PrismLaws(
+        prism = aIso,
+        aGen = Arb.sumTypeA(),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
+      ),
 
-    TraversalLaws(
-      traversal = Iso.token(),
-      aGen = Arb.token(),
-      bGen = Arb.string(),
-      funcGen = Arb.functionAToB(Arb.string())
-    ),
+      TraversalLaws(
+        traversal = Iso.token(),
+        aGen = Arb.token(),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
+      ),
 
-    OptionalLaws(
-      optional = Iso.token(),
-      aGen = Arb.token(),
-      bGen = Arb.string(),
-      funcGen = Arb.functionAToB(Arb.string())
-    ),
+      OptionalLaws(
+        optional = Iso.token(),
+        aGen = Arb.token(),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
+      ),
 
-    IsoLaws(
-      iso = Iso.token(),
-      aGen = Arb.token(),
-      bGen = Arb.string(),
-      funcGen = Arb.functionAToB(Arb.string())
+      IsoLaws(
+        iso = Iso.token(),
+        aGen = Arb.token(),
+        bGen = Arb.string(),
+        funcGen = Arb.functionAToB(Arb.string())
+      )
     )
-  )
 
-  with(Iso.token()) {
 
-    "asFold should behave as valid Fold: size" {
-      checkAll(Arb.token()) { token ->
-        size(token) shouldBe 1
-      }
-    }
-
-    "asFold should behave as valid Fold: nonEmpty" {
-      checkAll(Arb.token()) { token ->
-        isNotEmpty(token) shouldBe true
-      }
-    }
-
-    "asFold should behave as valid Fold: isEmpty" {
-      checkAll(Arb.token()) { token ->
-        !isEmpty(token) shouldBe true
-      }
-    }
-
-    "asFold should behave as valid Fold: getAll" {
-      checkAll(Arb.token()) { token ->
-        getAll(token) shouldBe listOf(token.value)
-      }
-    }
-
-    "asFold should behave as valid Fold: fold" {
-      checkAll(Arb.token()) { token ->
-        fold("", { x, y -> x + y }, token) shouldBe token.value
-      }
-    }
-
-    "asFold should behave as valid Fold: headOption" {
-      checkAll(Arb.token()) { token ->
-        firstOrNull(token) shouldBe token.value
-      }
-    }
-
-    "asFold should behave as valid Fold: lastOption" {
-      checkAll(Arb.token()) { token ->
-        lastOrNull(token) shouldBe token.value
-      }
+  @Test
+  fun sizeOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      Iso.token().size(token) shouldBe 1
     }
   }
 
-  "Lifting a function should yield the same result as not yielding" {
+  @Test
+  fun isNotEmptyOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      Iso.token().isNotEmpty(token) shouldBe true
+    }
+  }
+
+  @Test
+  fun isEmptyOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      !Iso.token().isEmpty(token) shouldBe true
+    }
+  }
+
+  @Test
+  fun getAllOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      Iso.token().getAll(token) shouldBe listOf(token.value)
+    }
+  }
+
+  @Test
+  fun foldOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      Iso.token().fold("", { x, y -> x + y }, token) shouldBe token.value
+    }
+  }
+
+  @Test
+  fun firstOrNullOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      Iso.token().firstOrNull(token) shouldBe token.value
+    }
+  }
+
+  @Test
+  fun lastOrNullOk() = runTest {
+    checkAll(Arb.token()) { token ->
+      Iso.token().lastOrNull(token) shouldBe token.value
+    }
+  }
+
+  @Test
+  fun modifyOk() = runTest {
     checkAll(Arb.token(), Arb.string()) { token, value ->
       Iso.token().modify(token) { value } shouldBe Iso.token().lift { value }(token)
     }
   }
 
-  "Creating a first pair with a type should result in the target to value" {
+  @Test
+  fun firstOk() = runTest {
     val first = Iso.token().first<Int>()
     checkAll(Arb.token(), Arb.int()) { token: Token, int: Int ->
       first.get(token to int) shouldBe (token.value to int)
     }
   }
 
-  "Creating a second pair with a type should result in the value to target" {
+  @Test
+  fun secondOk() = runTest {
     val second = Iso.token().second<Int>()
     checkAll(Arb.int(), Arb.token()) { int: Int, token: Token ->
       second.get(int to token) shouldBe (int to token.value)
     }
   }
 
-  "Creating a left with a type should result in a sum target to value" {
+  @Test
+  fun leftOk() = runTest {
     val left = Iso.token().left<Int>()
     checkAll(Arb.token(), Arb.int()) { token: Token, int: Int ->
       left.get(Either.Left(token)) shouldBe Either.Left(token.value)
@@ -134,7 +145,8 @@ class IsoTest : StringSpec({
     }
   }
 
-  "Creating a right with a type should result in a sum value to target" {
+  @Test
+  fun rightOk() = runTest {
     val left = Iso.token().right<Int>()
     checkAll(Arb.token(), Arb.int()) { token: Token, int: Int ->
       left.get(Either.Left(int)) shouldBe Either.Left(int)
@@ -142,19 +154,22 @@ class IsoTest : StringSpec({
     }
   }
 
-  "Finding a target using a predicate within a Iso should be wrapped in the correct option result" {
+  @Test
+  fun firstOrNullPredicateOk() = runTest {
     checkAll(Arb.boolean()) { predicate: Boolean ->
       (Iso.token().findOrNull(Token("any value")) { predicate }?.let { true } ?: false) shouldBe predicate
     }
   }
 
-  "Checking existence predicate over the target should result in same result as predicate" {
+  @Test
+  fun anyOk() = runTest {
     checkAll(Arb.boolean()) { predicate: Boolean ->
       Iso.token().any(Token("any value")) { predicate } shouldBe predicate
     }
   }
 
-  "Pairing two disjoint isos together" {
+  @Test
+  fun splitOk() = runTest {
     val joinedIso = Iso.token() split Iso.user()
 
     checkAll(Arb.string()) { tokenValue: String ->
@@ -164,7 +179,8 @@ class IsoTest : StringSpec({
     }
   }
 
-  "Composing isos should result in an iso of the first iso's value with the second iso's target" {
+  @Test
+  fun composeOk() = runTest {
     val composedIso = Iso.user() compose Iso.token()
 
     checkAll(Arb.string()) { tokenValue: String ->
@@ -174,4 +190,4 @@ class IsoTest : StringSpec({
     }
   }
 
-})
+}
