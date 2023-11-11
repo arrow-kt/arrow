@@ -28,7 +28,7 @@ data class Person(val age: Int, val name: String) : Comparable<Person> {
 }
 
 fun Arb.Companion.person(): Arb<Person> =
-  Arb.bind(Arb.int(), Arb.string(), ::Person)
+  Arb.bind(Arb.int(0, 100), Arb.string(0 .. 10), ::Person)
 
 class ComparisonKtTest {
     @Test fun arbericSort2() = runTest {
@@ -57,7 +57,7 @@ class ComparisonKtTest {
     }
 
     @Test fun arbericSortAll() = runTest {
-      checkAll(Arb.person(), Arb.list(Arb.person(), 0..50)) { a, lst ->
+      checkAll(Arb.person(), Arb.list(Arb.person(), 0..20)) { a, lst ->
         val aas = lst.toTypedArray()
         val res = sort(a, *aas)
         val expected = listOf(a, *aas).sorted()

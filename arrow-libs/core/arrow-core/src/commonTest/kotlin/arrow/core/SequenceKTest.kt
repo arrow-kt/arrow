@@ -7,23 +7,24 @@ import arrow.core.test.option
 import arrow.core.test.sequence
 import arrow.core.test.testLaws
 import arrow.core.test.unit
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.sequences.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.positiveInt
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.test.Test
 
-class SequenceKTest : StringSpec({
+class SequenceKTest {
 
+  @Test fun monoidLaws() =
     testLaws(MonoidLaws("Sequence", emptySequence(), { a, b -> sequenceOf(a, b).flatten()} , Arb.sequence(Arb.int())) { s1, s2 -> s1.toList() == s2.toList() })
 
-    "zip3" {
+  @Test fun zip3Ok() = runTest {
       checkAll(Arb.sequence(Arb.int()), Arb.sequence(Arb.int()), Arb.sequence(Arb.int())) { a, b, c ->
         val result = a.zip(b, c, ::Triple)
         val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
@@ -31,7 +32,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip4" {
+  @Test fun zip4Ok() = runTest {
       checkAll(
         Arb.sequence(Arb.int()),
         Arb.sequence(Arb.int()),
@@ -47,7 +48,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip5" {
+  @Test fun zip5Ok() = runTest {
       checkAll(
         Arb.sequence(Arb.int()),
         Arb.sequence(Arb.int()),
@@ -65,7 +66,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip6" {
+  @Test fun zip6Ok() = runTest {
       checkAll(
         Arb.sequence(Arb.int()),
         Arb.sequence(Arb.int()),
@@ -85,7 +86,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip7" {
+  @Test fun zip7Ok() = runTest {
       checkAll(
         Arb.sequence(Arb.int()),
         Arb.sequence(Arb.int()),
@@ -107,7 +108,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip8" {
+  @Test fun zip8Ok() = runTest {
       checkAll(
         Arb.sequence(Arb.int()),
         Arb.sequence(Arb.int()),
@@ -131,7 +132,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "zip9" {
+  @Test fun zip9Ok() = runTest {
       checkAll(
         Arb.sequence(Arb.int()),
         Arb.sequence(Arb.int()),
@@ -157,7 +158,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "crosswalk the sequence to a List function" {
+  @Test fun crosswalkOk() = runTest {
       checkAll(Arb.list(Arb.int())){ list ->
         val obtained = list.asSequence().crosswalk { listOf(it) }
         val expected = if (list.isEmpty()) emptyList()
@@ -166,13 +167,13 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "can align sequences - 1" {
+  @Test fun align1() = runTest {
       checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).toList().size shouldBe max(a.toList().size, b.toList().size)
       }
     }
 
-    "can align sequences - 2" {
+  @Test fun align2() = runTest {
       checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         a.align(b).take(min(a.toList().size, b.toList().size)).forEach {
           it.isBoth() shouldBe true
@@ -180,7 +181,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "can align sequences - 3" {
+  @Test fun align3() = runTest {
       checkAll(Arb.sequence(Arb.unit()), Arb.sequence(Arb.unit())) { a, b ->
         val ls = a.toList()
         val rs = b.toList()
@@ -191,12 +192,12 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "align empty sequences" {
+  @Test fun alignEmpty() = runTest {
       val a = emptyList<String>().asSequence()
       a.align(a).shouldBeEmpty()
     }
 
-    "align infinite sequences" {
+  @Test fun alignInfinite() = runTest {
       val seq1 = generateSequence("A") { it }
 
       val seq2 = generateSequence(0) { it + 1 }
@@ -208,7 +209,7 @@ class SequenceKTest : StringSpec({
       }
     }
 
-    "mapNotNull" {
+  @Test fun mapNotNullOk() = runTest {
       checkAll(Arb.sequence(Arb.int())) { a ->
         val result = a.mapNotNull {
           when (it % 2 == 0) {
@@ -230,13 +231,13 @@ class SequenceKTest : StringSpec({
       }
     }
 
-  "filterOption should filter None" {
+  @Test fun filterOptionOk() = runTest {
       checkAll(Arb.list(Arb.option(Arb.int()))) { ints ->
         ints.asSequence().filterOption().toList() shouldBe ints.filterOption()
       }
     }
 
-    "separateEither" {
+  @Test fun separateEitherOk() = runTest {
       checkAll(Arb.sequence(Arb.int())) { ints ->
         val sequence = ints.map {
           if (it % 2 == 0) it.left()
@@ -249,4 +250,4 @@ class SequenceKTest : StringSpec({
       }
     }
 
-})
+}

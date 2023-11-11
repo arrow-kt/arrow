@@ -1,81 +1,80 @@
 // This file was automatically generated from Iterable.kt by Knit tool. Do not edit.
 package arrow.core.examples.test
 
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class IterableKnitTest : StringSpec({
-  "ExampleIterable01" {
+class IterableKnitTest {
+  @Test fun exampleIterable01() = runTest {
     arrow.core.examples.exampleIterable01.test()
   }
 
-  "ExampleIterable02" {
+  @Test fun exampleIterable02() = runTest {
     arrow.core.examples.exampleIterable02.test()
   }
 
-  "ExampleIterable03" {
+  @Test fun exampleIterable03() = runTest {
     arrow.core.examples.exampleIterable03.test()
   }
 
-  "ExampleIterable04" {
+  @Test fun exampleIterable04() = runTest {
     arrow.core.examples.exampleIterable04.test()
   }
 
-  "ExampleIterable05" {
+  @Test fun exampleIterable05() = runTest {
     arrow.core.examples.exampleIterable05.test()
   }
 
-  "ExampleIterable06" {
+  @Test fun exampleIterable06() = runTest {
     arrow.core.examples.exampleIterable06.test()
   }
 
-  "ExampleIterable07" {
+  @Test fun exampleIterable07() = runTest {
     arrow.core.examples.exampleIterable07.test()
   }
 
-  "ExampleIterable08" {
+  @Test fun exampleIterable08() = runTest {
     arrow.core.examples.exampleIterable08.test()
   }
 
-  "ExampleIterable09" {
+  @Test fun exampleIterable09() = runTest {
     arrow.core.examples.exampleIterable09.test()
   }
 
-  "ExampleIterable10" {
+  @Test fun exampleIterable10() = runTest {
     arrow.core.examples.exampleIterable10.test()
   }
 
-  "ExampleIterable11" {
+  @Test fun exampleIterable11() = runTest {
     arrow.core.examples.exampleIterable11.test()
   }
 
-  "ExampleIterable12" {
+  @Test fun exampleIterable12() = runTest {
     arrow.core.examples.exampleIterable12.test()
   }
 
-  "ExampleIterable13" {
+  @Test fun exampleIterable13() = runTest {
     arrow.core.examples.exampleIterable13.test()
   }
 
-  "ExampleIterable14" {
+  @Test fun exampleIterable14() = runTest {
     arrow.core.examples.exampleIterable14.test()
   }
 
-  "ExampleIterable15" {
+  @Test fun exampleIterable15() = runTest {
     arrow.core.examples.exampleIterable15.test()
   }
 
-  "ExampleIterable16" {
+  @Test fun exampleIterable16() = runTest {
     arrow.core.examples.exampleIterable16.test()
   }
 
-  "ExampleIterable18" {
+  @Test fun exampleIterable18() = runTest {
     arrow.core.examples.exampleIterable18.test()
   }
 
-  "ExampleIterable19" {
+  @Test fun exampleIterable19() = runTest {
     arrow.core.examples.exampleIterable19.test()
   }
 
-}) {
-  override fun timeout(): Long = 1000
 }

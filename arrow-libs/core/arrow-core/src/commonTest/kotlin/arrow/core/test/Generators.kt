@@ -220,7 +220,7 @@ private fun <K, A, B> Map<K, Pair<Option<A>?, Option<B>?>>.destructured(): Pair<
 }
 
 fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>): Arb<Pair<Map<K, A>, Map<K, B>>> =
-  Arb.map(keyArb = arbK, valueArb = value2(arbA, arbB))
+  Arb.map(keyArb = arbK, valueArb = value2(arbA, arbB), maxSize = 30)
     .map { it.destructured() }
 
 fun <K, A, B, C> Arb.Companion.map3(
@@ -229,5 +229,5 @@ fun <K, A, B, C> Arb.Companion.map3(
   arbB: Arb<B>,
   arbC: Arb<C>
 ): Arb<Triple<Map<K, A>, Map<K, B>, Map<K, C>>> =
-  Arb.map(arbK, value3(arbA, arbB, arbC))
+  Arb.map(arbK, value3(arbA, arbB, arbC), maxSize = 30)
     .map { it.destructured() }

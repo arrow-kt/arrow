@@ -6,7 +6,6 @@ import arrow.core.left
 import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith

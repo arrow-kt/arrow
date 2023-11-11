@@ -1,53 +1,52 @@
 // This file was automatically generated from Raise.kt by Knit tool. Do not edit.
 package arrow.core.examples.test
 
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class RaiseKnitTest : StringSpec({
-  "ExampleRaiseDsl02" {
+class RaiseKnitTest {
+  @Test fun exampleRaiseDsl02() = runTest {
     arrow.core.examples.exampleRaiseDsl02.test()
   }
 
-  "ExampleRaiseDsl03" {
+  @Test fun exampleRaiseDsl03() = runTest {
     arrow.core.examples.exampleRaiseDsl03.test()
   }
 
-  "ExampleRaiseDsl04" {
+  @Test fun exampleRaiseDsl04() = runTest {
     arrow.core.examples.exampleRaiseDsl04.test()
   }
 
-  "ExampleRaiseDsl05" {
+  @Test fun exampleRaiseDsl05() = runTest {
     arrow.core.examples.exampleRaiseDsl05.test()
   }
 
-  "ExampleRaiseDsl06" {
+  @Test fun exampleRaiseDsl06() = runTest {
     arrow.core.examples.exampleRaiseDsl06.test()
   }
 
-  "ExampleRaiseDsl07" {
+  @Test fun exampleRaiseDsl07() = runTest {
     arrow.core.examples.exampleRaiseDsl07.test()
   }
 
-  "ExampleRaiseDsl08" {
+  @Test fun exampleRaiseDsl08() = runTest {
     arrow.core.examples.exampleRaiseDsl08.test()
   }
 
-  "ExampleRaiseDsl09" {
+  @Test fun exampleRaiseDsl09() = runTest {
     arrow.core.examples.exampleRaiseDsl09.test()
   }
 
-  "ExampleRaiseDsl10" {
+  @Test fun exampleRaiseDsl10() = runTest {
     arrow.core.examples.exampleRaiseDsl10.test()
   }
 
-  "ExampleRaiseDsl11" {
+  @Test fun exampleRaiseDsl11() = runTest {
     arrow.core.examples.exampleRaiseDsl11.test()
   }
 
-  "ExampleRaiseDsl12" {
+  @Test fun exampleRaiseDsl12() = runTest {
     arrow.core.examples.exampleRaiseDsl12.test()
   }
 
-}) {
-  override fun timeout(): Long = 1000
 }
