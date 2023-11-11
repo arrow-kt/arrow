@@ -17,9 +17,9 @@ class MapTest {
   fun mapToSetLaws() = testLaws(
     IsoLaws(
       iso = Iso.mapToSet(),
-      aGen = Arb.map(Arb.string(), Arb.constant(Unit)),
-      bGen = Arb.set(Arb.string()),
-      funcGen = Arb.functionAToB(Arb.set(Arb.string())),
+      aGen = Arb.map(Arb.string(), Arb.constant(Unit), maxSize = 20),
+      bGen = Arb.set(Arb.string(), range = 0 .. 20),
+      funcGen = Arb.functionAToB(Arb.set(Arb.string(), range = 0 .. 20)),
     )
   )
 
