@@ -5,18 +5,31 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.testTimeSource
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
+import kotlin.time.ComparableTimeMark
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class FlowTest {
@@ -240,18 +253,17 @@ class FlowTest {
     )
   }
 
-  /* These tests do not run properly in the coroutines-test environment
-
-  @Test
-  fun fixedDelay() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.long(10L .. 50L), Arb.int(3..20)) { waitPeriod, n ->
-      val emissionDuration = waitPeriod / 10L
-      var state: Long? = null
+  @Test @ExperimentalTime
+  fun fixedDelay() = runTest {
+    checkAll(Arb.long(10L .. 50L), Arb.int(3..20)) { waitPeriodInMillis, n ->
+      val waitPeriod = waitPeriodInMillis.milliseconds
+      val emissionDuration = (waitPeriodInMillis / 10L).milliseconds
+      var state: ComparableTimeMark? = null
 
       val rate = flow { emit(delay(waitPeriod)) }.repeat()
         .map {
-          val now = state ?: currentTime
-          val nextNow = currentTime
+          val now = state ?: testTimeSource.markNow()
+          val nextNow = testTimeSource.markNow()
           val lapsed = nextNow - now
           state = nextNow
           delay(emissionDuration)
@@ -260,23 +272,24 @@ class FlowTest {
         .take(n)
         .toList()
 
-      rate.first() shouldBe 0 // First element is immediately
+      rate.first() shouldBe Duration.ZERO // First element is immediately
       rate.drop(1).forEach { act ->
         act shouldBe (waitPeriod + emissionDuration) // Remaining elements all take delay + emission duration
       }
     }
   }
 
-  @Test
-  fun fixedRate() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.long(10L..50L), Arb.int(3..20)) { waitPeriod, n ->
-      val emissionDuration = waitPeriod / 10
-      var state: Long? = null
+  @Test @ExperimentalTime
+  fun fixedRate() = runTest {
+    checkAll(Arb.long(10L..50L), Arb.int(3..20)) { waitPeriodInMillis, n ->
+      val waitPeriod = waitPeriodInMillis.milliseconds
+      val emissionDuration = (waitPeriodInMillis / 10L).milliseconds
+      var state: ComparableTimeMark? = null
 
-      val rate = fixedRate(waitPeriod) { currentTime }
+      val rate = fixedRate(waitPeriod) { testTimeSource.markNow() }
         .map {
-          val now = state ?: currentTime
-          val nextNow = currentTime
+          val now = state ?: testTimeSource.markNow()
+          val nextNow = testTimeSource.markNow()
           val lapsed = nextNow - now
           state = nextNow
           delay(emissionDuration)
@@ -285,7 +298,7 @@ class FlowTest {
         .take(n)
         .toList()
 
-      rate.first() shouldBe 0 // First element is immediately
+      rate.first() shouldBe Duration.ZERO // First element is immediately
       rate.drop(1).forEach { act ->
         // Remaining elements all take total of waitPeriod, emissionDuration is correctly taken into account.
         act shouldBe waitPeriod
@@ -294,11 +307,11 @@ class FlowTest {
   }
 
 
-  @Test
-  fun fixedRateWithDampenTrue() = runTestUsingDefaultDispatcher {
+  @Test @ExperimentalTime
+  fun fixedRateWithDampenTrue() = runTest {
     val buffer = mutableListOf<Unit>()
     withTimeoutOrNull(4500) {
-      fixedRate(1000, true) { currentTime }
+      fixedRate(1000, true) { testTimeSource.markNow() }
         .mapIndexed { index, _ ->
           if (index == 0) delay(3000) else Unit
           advanceTimeBy(1)
@@ -307,11 +320,11 @@ class FlowTest {
     buffer.size shouldBe 2
   }
 
-  @Test
-  fun fixedRateWithDampenFalse() = runTestUsingDefaultDispatcher {
+  @Test @ExperimentalTime
+  fun fixedRateWithDampenFalse() = runTest {
     val buffer = mutableListOf<Unit>()
     withTimeoutOrNull(4500) {
-      fixedRate(1000, false) { currentTime }
+      fixedRate(1000, false) { testTimeSource.markNow() }
         .mapIndexed { index, _ ->
           if (index == 0) delay(3000) else Unit
           advanceTimeBy(1)
@@ -319,5 +332,4 @@ class FlowTest {
     }
     buffer.size shouldBe 4
   }
-  */
 }
