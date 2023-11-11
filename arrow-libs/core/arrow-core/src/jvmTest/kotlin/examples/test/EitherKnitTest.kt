@@ -1,69 +1,68 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.test
 
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class EitherKnitTest : StringSpec({
-  "ExampleEither21" {
+class EitherKnitTest {
+  @Test fun exampleEither21() = runTest {
     arrow.core.examples.exampleEither21.test()
   }
 
-  "ExampleEither22" {
+  @Test fun exampleEither22() = runTest {
     arrow.core.examples.exampleEither22.test()
   }
 
-  "ExampleEither23" {
+  @Test fun exampleEither23() = runTest {
     arrow.core.examples.exampleEither23.test()
   }
 
-  "ExampleEither25" {
+  @Test fun exampleEither25() = runTest {
     arrow.core.examples.exampleEither25.test()
   }
 
-  "ExampleEither26" {
+  @Test fun exampleEither26() = runTest {
     arrow.core.examples.exampleEither26.test()
   }
 
-  "ExampleEither27" {
+  @Test fun exampleEither27() = runTest {
     arrow.core.examples.exampleEither27.test()
   }
 
-  "ExampleEither28" {
+  @Test fun exampleEither28() = runTest {
     arrow.core.examples.exampleEither28.test()
   }
 
-  "ExampleEither29" {
+  @Test fun exampleEither29() = runTest {
     arrow.core.examples.exampleEither29.test()
   }
 
-  "ExampleEither30" {
+  @Test fun exampleEither30() = runTest {
     arrow.core.examples.exampleEither30.test()
   }
 
-  "ExampleEither31" {
+  @Test fun exampleEither31() = runTest {
     arrow.core.examples.exampleEither31.test()
   }
 
-  "ExampleEither32" {
+  @Test fun exampleEither32() = runTest {
     arrow.core.examples.exampleEither32.test()
   }
 
-  "ExampleEither33" {
+  @Test fun exampleEither33() = runTest {
     arrow.core.examples.exampleEither33.test()
   }
 
-  "ExampleEither35" {
+  @Test fun exampleEither35() = runTest {
     arrow.core.examples.exampleEither35.test()
   }
 
-  "ExampleEither36" {
+  @Test fun exampleEither36() = runTest {
     arrow.core.examples.exampleEither36.test()
   }
 
-  "ExampleEither37" {
+  @Test fun exampleEither37() = runTest {
     arrow.core.examples.exampleEither37.test()
   }
 
-}) {
-  override fun timeout(): Long = 1000
 }

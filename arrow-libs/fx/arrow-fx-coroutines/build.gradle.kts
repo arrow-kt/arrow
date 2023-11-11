@@ -50,7 +50,7 @@ kotlin {
     nodejs {
       testTask {
         useMocha {
-          timeout = "60000"
+          timeout = "60s"
         }
       }
     }
@@ -58,7 +58,7 @@ kotlin {
       testTask {
         useKarma {
           useChromeHeadless()
-          timeout.set(Duration.ofSeconds(60))
+          timeout.set(Duration.ofMinutes(1))
         }
       }
     }

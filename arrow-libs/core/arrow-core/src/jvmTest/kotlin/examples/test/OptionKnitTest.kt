@@ -1,17 +1,16 @@
 // This file was automatically generated from Option.kt by Knit tool. Do not edit.
 package arrow.core.examples.test
 
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class OptionKnitTest : StringSpec({
-  "ExampleOption21" {
+class OptionKnitTest {
+  @Test fun exampleOption21() = runTest {
     arrow.core.examples.exampleOption21.test()
   }
 
-  "ExampleOption22" {
+  @Test fun exampleOption22() = runTest {
     arrow.core.examples.exampleOption22.test()
   }
 
-}) {
-  override fun timeout(): Long = 1000
 }

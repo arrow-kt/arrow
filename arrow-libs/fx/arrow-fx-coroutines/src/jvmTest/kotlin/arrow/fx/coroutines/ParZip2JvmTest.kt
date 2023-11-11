@@ -36,7 +36,7 @@ class ParZip2JvmTest {
     }
   }
 
-  @Test fun parZip2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
+  @Test fun parZip2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
     val zipCtxName = "parZip2"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
