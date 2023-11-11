@@ -25,7 +25,7 @@ class IsoTest {
   )
 
   @Test
-  fun laws() =
+  fun isoTokenLaws() =
     testLaws(
       LensLaws(
         lens = Iso.token(),

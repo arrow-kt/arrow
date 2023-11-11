@@ -5,7 +5,6 @@ import arrow.optics.test.nonEmptyList
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.typeclasses.Index
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
@@ -13,11 +12,13 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class IndexInstanceTest : StringSpec({
+class IndexInstanceTest {
 
+  @Test
+  fun indexListLaws() =
     testLaws(
-      "Index list - ",
       OptionalLaws(
         optionalGen = Arb.int().map { Index.list<Long>().index(it) },
         aGen = Arb.list(Arb.long()),
@@ -26,8 +27,9 @@ class IndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun indexSequenceLaws() =
     testLaws(
-      "Index sequence - ",
       OptionalLaws(
         optionalGen = Arb.int().map { Index.sequence<Long>().index(it) },
         aGen = Arb.list(Arb.long()).map { it.asSequence() },
@@ -37,8 +39,9 @@ class IndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun indexMapLaws() =
     testLaws(
-      "Index map - ",
       OptionalLaws(
         optionalGen = Arb.int().map { Index.list<Long>().index(it) },
         aGen = Arb.list(Arb.long()),
@@ -47,8 +50,9 @@ class IndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun indexNonEmptyListLaws() =
     testLaws(
-      "Index Nel - ",
       OptionalLaws(
         optionalGen = Arb.int().map { Index.nonEmptyList<Long>().index(it) },
         aGen = Arb.nonEmptyList(Arb.long()),
@@ -57,8 +61,9 @@ class IndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun indexStringLaws() =
     testLaws(
-      "Index string - ",
       OptionalLaws(
         optionalGen = Arb.int().map { Index.string().index(it) },
         aGen = Arb.string(),
@@ -67,4 +72,4 @@ class IndexInstanceTest : StringSpec({
       )
     )
 
-})
+}

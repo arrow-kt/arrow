@@ -19,7 +19,7 @@ import kotlin.test.Test
 class LensTest {
 
   @Test
-  fun laws() =
+  fun lensTokenLaws() =
     testLaws(
       LensLaws(
         lens = Lens.token(),
