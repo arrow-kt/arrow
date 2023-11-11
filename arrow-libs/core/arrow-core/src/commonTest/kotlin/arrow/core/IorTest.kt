@@ -3,29 +3,28 @@ package arrow.core
 import arrow.core.test.ior
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.testLaws
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class IorTest : StringSpec({
+class IorTest {
 
   val ARB = Arb.ior(Arb.string(), Arb.int())
 
-  testLaws(
+  @Test fun semigroupLaws() = testLaws(
     SemigroupLaws("Ior", { a, b ->
       a.combine(b, String::plus, Int::plus)
     }, ARB)
   )
 
-  "map() should just right side of an Ior" {
+  @Test fun mapRightOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Left(a).map { l: String -> l.length } shouldBe Ior.Left(a)
       Ior.Right(b).map { it.length } shouldBe Ior.Right(b.length)
@@ -33,7 +32,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "mapLeft() should modify only left value" {
+  @Test fun mapLeftOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Right(b).mapLeft { a * 2 } shouldBe Ior.Right(b)
       Ior.Left(a).mapLeft { b } shouldBe Ior.Left(b)
@@ -41,20 +40,20 @@ class IorTest : StringSpec({
     }
   }
 
-  "swap() should interchange value" {
+  @Test fun swapBoth() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Both(a, b).swap() shouldBe Ior.Both(b, a)
     }
   }
 
-  "swap() should interchange entity" {
+  @Test fun swapLeftRight() = runTest {
     checkAll(Arb.int()) { a: Int ->
       Ior.Left(a).swap() shouldBe Ior.Right(a)
       Ior.Right(a).swap() shouldBe Ior.Left(a)
     }
   }
 
-  "unwrap() should return the isomorphic either" {
+  @Test fun unwrapOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Left(a).unwrap() shouldBe Either.Left(Either.Left(a))
       Ior.Right(b).unwrap() shouldBe Either.Left(Either.Right(b))
@@ -62,7 +61,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "toEither() should convert values into a valid Either" {
+  @Test fun toEitherOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Left(a).toEither() shouldBe Either.Left(a)
       Ior.Right(b).toEither() shouldBe Either.Right(b)
@@ -70,7 +69,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "getOrNull() should convert right values into a nullable, or return null if left" {
+  @Test fun getOrNullOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Left(a).getOrNull() shouldBe null
       Ior.Right(b).getOrNull() shouldBe b
@@ -79,7 +78,7 @@ class IorTest : StringSpec({
   }
 
 
-  "leftOrNull() should convert left values into a nullable" {
+  @Test fun leftOrNullOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.Left(a).leftOrNull() shouldBe a
       Ior.Right(b).leftOrNull() shouldBe null
@@ -87,7 +86,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "fromNullables() should build a correct Ior" {
+  @Test fun fromNullablesOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.fromNullables(a, null) shouldBe Ior.Left(a)
       Ior.fromNullables(a, b) shouldBe Ior.Both(a, b)
@@ -96,19 +95,19 @@ class IorTest : StringSpec({
     }
   }
 
-  "leftNel() should build a correct Ior" {
+  @Test fun leftNelOk() = runTest {
     checkAll(Arb.int()) { a: Int ->
       Ior.leftNel<Int, Nothing>(a) shouldBe Ior.Left(nonEmptyListOf(a))
     }
   }
 
-  "bothNel() should build a correct Ior" {
+  @Test fun bothNelOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
       Ior.bothNel(a, b) shouldBe Ior.Both(nonEmptyListOf(a), b)
     }
   }
 
-  "getOrElse() should return value" {
+  @Test fun getOrElseOk() = runTest {
     checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
       Ior.Right(a).getOrElse { b } shouldBe a
       Ior.Left(a).getOrElse { b } shouldBe b
@@ -116,13 +115,13 @@ class IorTest : StringSpec({
     }
   }
 
-  "Ior.monad.flatMap should combine left values" {
+  @Test fun flatMapCombinesLeft() = runTest {
     val ior1 = Ior.Both(3, "Hello, world!")
     val iorResult = ior1.flatMap(Int::plus) { Ior.Left(7) }
     iorResult shouldBe Ior.Left(10)
   }
 
-  "Ior.monad.flatMap should combine Both values" {
+  @Test fun flatMapCombinesBoth() = runTest {
     val ior1 = Ior.Both(3, "Hello, world!")
     val iorResult1 = ior1.flatMap(Int::plus) { Ior.Both(7, "Again!") }
     iorResult1 shouldBe Ior.Both(10, "Again!")
@@ -131,7 +130,7 @@ class IorTest : StringSpec({
     iorResult2 shouldBe Ior.Both(3, "Again!")
   }
 
-  "combine cases for Semigroup" {
+  @Test fun combineSemigroup() = runTest {
     forAll(
       row("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
       row(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
@@ -147,7 +146,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "isLeft() should return true with Left and false otherwise"{
+  @Test fun isLeftOk() = runTest {
     checkAll(Arb.int(), Arb.string()){ a, b ->
       Ior.Left(a).isLeft() shouldBe true
       Ior.Right(b).isLeft() shouldBe false
@@ -155,7 +154,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "isRight() should return true with Right and false otherwise" {
+  @Test fun isRightOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       Ior.Left(a).isRight() shouldBe false
       Ior.Right(b).isRight() shouldBe true
@@ -163,7 +162,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "isBoth() should return true with Both and false otherwise" {
+  @Test fun isBothOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       Ior.Left(a).isBoth() shouldBe false
       Ior.Right(b).isBoth() shouldBe false
@@ -171,7 +170,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "isLeft(predicate) should return true with Left, if satisfies the predicate, and false otherwise" {
+  @Test fun isLeftPredicateOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val predicate = { i: Int -> i % 2 == 0 }
 
@@ -183,7 +182,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "isRight(predicate) should return true with Right, if satisfies the predicate, and false otherwise" {
+  @Test fun isRightPredicateOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val predicate = { s: String -> s.length % 2 == 0 }
 
@@ -195,7 +194,7 @@ class IorTest : StringSpec({
     }
   }
 
-  "isBoth(predicate) should return true with Both, if satisfies the predicate, and false otherwise" {
+  @Test fun isBothPredicateOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val leftPredicate = { i: Int -> i % 2 == 0 }
       val rightPredicate = { s: String -> s.length % 2 == 0 }
@@ -207,14 +206,14 @@ class IorTest : StringSpec({
     }
   }
 
-  "widen should retype Right" {
+  @Test fun widenOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val ior = Ior.Both(a, b)
       ior.widen<Int, CharSequence, String>().shouldBeInstanceOf<Ior.Both<Int, CharSequence>>()
     }
   }
 
-  "compareTo should compare 2 Ior" {
+  @Test fun compareToOk() = runTest {
     val left1 = Ior.Left(1)
     val left2 = Ior.Left(2)
     val right1 = Ior.Right(1)
@@ -237,4 +236,4 @@ class IorTest : StringSpec({
     both11.compareTo(left1) shouldBe 1
     both11.compareTo(right1) shouldBe 1
   }
-})
+}

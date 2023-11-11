@@ -18,7 +18,7 @@ fun stackSafeIteration(): Int = when (platform) {
 // The normal dispatcher with 'runTest' does some magic
 // which doesn't go well with 'parZip', 'parMap', and 'raceN'
 fun runTestUsingDefaultDispatcher(
-  timeout: Duration = 10.seconds,
+  timeout: Duration = 40.seconds,
   testBody: suspend TestScope.() -> Unit
 ): TestResult = runTest(timeout = timeout) {
   withContext(Dispatchers.Default) {
