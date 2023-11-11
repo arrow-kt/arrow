@@ -25,7 +25,7 @@ dependencies {
 
   testImplementation(libs.kotlin.stdlib)
   testImplementation(libs.kotlin.test)
-  testImplementation(libs.assertj)
+  testImplementation(libs.kotest.assertionsCore)
   testImplementation(libs.classgraph)
   testImplementation(libs.kotlinCompileTesting) {
     exclude(

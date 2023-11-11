@@ -5,7 +5,6 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.kotlinx.kover)
-  alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.spotless)
 }
 
@@ -30,24 +29,8 @@ kotlin {
       dependencies {
         implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
-        implementation(libs.kotest.frameworkEngine)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-      }
-    }
-
-    jvmTest {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-        implementation(libs.kotest.frameworkEngine)
-        implementation(libs.junitJupiterEngine)
-        implementation(libs.kotlin.reflect)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        api(libs.kotlin.reflect)
       }
     }
   }
