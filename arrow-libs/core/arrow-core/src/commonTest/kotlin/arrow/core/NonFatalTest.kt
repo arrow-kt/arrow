@@ -1,9 +1,9 @@
 package arrow.core
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlin.test.Test
 
-class NonFatalTest : StringSpec({
+class NonFatalTest {
     val nonFatals: List<Throwable> =
       listOf(
         RuntimeException(),
@@ -12,14 +12,16 @@ class NonFatalTest : StringSpec({
         NotImplementedError()
       )
 
-    "Test nonfatals using #invoke()" {
+  @Test
+  fun usingInvoke() {
       nonFatals.forEach {
         NonFatal(it) shouldBe true
       }
     }
-    "Test nonfatals using Throwable#nonFatalOrThrow" {
+
+  @Test fun usingNotFatalOrThrow() {
       nonFatals.forEach {
         it.nonFatalOrThrow() shouldBe it
       }
     }
-})
+}

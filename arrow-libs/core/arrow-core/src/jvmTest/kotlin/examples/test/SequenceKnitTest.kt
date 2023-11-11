@@ -1,29 +1,28 @@
 // This file was automatically generated from Sequence.kt by Knit tool. Do not edit.
 package arrow.core.examples.test
 
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class SequenceKnitTest : StringSpec({
-  "ExampleSequence01" {
+class SequenceKnitTest {
+  @Test fun exampleSequence01() = runTest {
     arrow.core.examples.exampleSequence01.test()
   }
 
-  "ExampleSequence02" {
+  @Test fun exampleSequence02() = runTest {
     arrow.core.examples.exampleSequence02.test()
   }
 
-  "ExampleSequence03" {
+  @Test fun exampleSequence03() = runTest {
     arrow.core.examples.exampleSequence03.test()
   }
 
-  "ExampleSequence10" {
+  @Test fun exampleSequence10() = runTest {
     arrow.core.examples.exampleSequence10.test()
   }
 
-  "ExampleSequence17" {
+  @Test fun exampleSequence17() = runTest {
     arrow.core.examples.exampleSequence17.test()
   }
 
-}) {
-  override fun timeout(): Long = 1000
 }

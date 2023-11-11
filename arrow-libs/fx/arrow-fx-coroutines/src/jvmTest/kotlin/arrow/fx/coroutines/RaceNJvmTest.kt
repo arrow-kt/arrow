@@ -33,7 +33,7 @@ class RaceNJvmTest {
       }
     }
 
-    @Test fun race2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
+    @Test fun race2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race2"
       
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
@@ -91,7 +91,7 @@ class RaceNJvmTest {
       }
     }
     
-    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher(20.seconds) {
+    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
       
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
