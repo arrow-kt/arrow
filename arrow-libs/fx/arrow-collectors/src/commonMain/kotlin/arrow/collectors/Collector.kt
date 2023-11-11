@@ -102,7 +102,7 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
     supply = this::supply,
     accumulate = this::accumulate,
     finish = { current -> transform(this.finish(current)) },
-    characteristics = this.characteristics,
+    characteristics = this.characteristics - Characteristics.IDENTITY_FINISH,
   )
 
   /**
@@ -153,7 +153,7 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
     finish = { (currentThis, currentOther) ->
       combine(this.finish(currentThis), other.finish(currentOther))
     },
-    characteristics = this.characteristics,
+    characteristics = this.characteristics intersect other.characteristics,
   )
 }
 
@@ -181,7 +181,7 @@ public interface NonSuspendCollectorI<InternalAccumulator, in Value, out Result>
     supply = this::supplyNonSuspend,
     accumulate = this::accumulateNonSuspend,
     finish = { current -> transform(this.finishNonSuspend(current)) },
-    characteristics = this.characteristics,
+    characteristics = this.characteristics - Characteristics.IDENTITY_FINISH,
   )
 
   /**
@@ -232,6 +232,6 @@ public interface NonSuspendCollectorI<InternalAccumulator, in Value, out Result>
     finish = { (currentThis, currentOther) ->
       combine(this.finishNonSuspend(currentThis), other.finishNonSuspend(currentOther))
     },
-    characteristics = this.characteristics,
+    characteristics = this.characteristics intersect other.characteristics,
   )
 }
