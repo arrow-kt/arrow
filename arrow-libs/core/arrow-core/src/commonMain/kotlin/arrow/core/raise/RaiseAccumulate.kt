@@ -272,6 +272,534 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<Error>.zipOrAccumu
 }
 
 /**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], and [action10] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    block: (A, B, C, D, E, F, G, H, I, J) -> K
+): K {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], and [action11] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    block: (A, B, C, D, E, F, G, H, I, J, K) -> L
+): L {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], and [action12] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L) -> M
+): M {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], and [action13] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M) -> N
+): N {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], and [action14] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N) -> O
+): O {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], [action14], and [action15] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    @BuilderInference action15: RaiseAccumulate<Error>.() -> O,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) -> P
+): P {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val o = recover({ action15(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n), unbox(o))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], [action14], [action15], and [action16] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    @BuilderInference action15: RaiseAccumulate<Error>.() -> O,
+    @BuilderInference action16: RaiseAccumulate<Error>.() -> P,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) -> Q
+): Q {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val o = recover({ action15(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val p = recover({ action16(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n), unbox(o), unbox(p))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], [action14], [action15], and [action16] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    @BuilderInference action15: RaiseAccumulate<Error>.() -> O,
+    @BuilderInference action16: RaiseAccumulate<Error>.() -> P,
+    @BuilderInference action17: RaiseAccumulate<Error>.() -> Q,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) -> R
+): R {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val o = recover({ action15(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val p = recover({ action16(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val q = recover({ action17(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n), unbox(o), unbox(p), unbox(q))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], [action14], [action15], [action16], [action17], and [action18] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    @BuilderInference action15: RaiseAccumulate<Error>.() -> O,
+    @BuilderInference action16: RaiseAccumulate<Error>.() -> P,
+    @BuilderInference action17: RaiseAccumulate<Error>.() -> Q,
+    @BuilderInference action18: RaiseAccumulate<Error>.() -> R,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) -> S
+): S {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val o = recover({ action15(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val p = recover({ action16(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val q = recover({ action17(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val r = recover({ action18(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n), unbox(o), unbox(p), unbox(q), unbox(r))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], [action14], [action15], [action16], [action17], [action18], and [action19] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    @BuilderInference action15: RaiseAccumulate<Error>.() -> O,
+    @BuilderInference action16: RaiseAccumulate<Error>.() -> P,
+    @BuilderInference action17: RaiseAccumulate<Error>.() -> Q,
+    @BuilderInference action18: RaiseAccumulate<Error>.() -> R,
+    @BuilderInference action19: RaiseAccumulate<Error>.() -> S,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) -> T
+): T {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val o = recover({ action15(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val p = recover({ action16(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val q = recover({ action17(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val r = recover({ action18(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val s = recover({ action19(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n), unbox(o), unbox(p), unbox(q), unbox(r), unbox(s))
+}
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], [action9], [action10], [action11], [action12], [action13], [action14], [action15], [action16], [action17], [action18], [action19], and [action20] using the given [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> Raise<Error>.zipOrAccumulate(
+    combine: (Error, Error) -> Error,
+    @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
+    @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
+    @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
+    @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
+    @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
+    @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
+    @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
+    @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
+    @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
+    @BuilderInference action10: RaiseAccumulate<Error>.() -> J,
+    @BuilderInference action11: RaiseAccumulate<Error>.() -> K,
+    @BuilderInference action12: RaiseAccumulate<Error>.() -> L,
+    @BuilderInference action13: RaiseAccumulate<Error>.() -> M,
+    @BuilderInference action14: RaiseAccumulate<Error>.() -> N,
+    @BuilderInference action15: RaiseAccumulate<Error>.() -> O,
+    @BuilderInference action16: RaiseAccumulate<Error>.() -> P,
+    @BuilderInference action17: RaiseAccumulate<Error>.() -> Q,
+    @BuilderInference action18: RaiseAccumulate<Error>.() -> R,
+    @BuilderInference action19: RaiseAccumulate<Error>.() -> S,
+    @BuilderInference action20: RaiseAccumulate<Error>.() -> T,
+    block: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) -> U
+): U {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    var error: Any? = EmptyValue
+    val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val j = recover({ action10(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val k = recover({ action11(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val l = recover({ action12(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val m = recover({ action13(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val n = recover({ action14(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val o = recover({ action15(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val p = recover({ action16(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val q = recover({ action17(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val r = recover({ action18(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val s = recover({ action19(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    val t = recover({ action20(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
+    return if (error !== EmptyValue) raise(unbox<Error>(error))
+    else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i), unbox(j), unbox(k), unbox(l), unbox(m), unbox(n), unbox(o), unbox(p), unbox(q), unbox(r), unbox(s), unbox(t))
+}
+
+/**
  * Accumulate the errors from running both [action1] and [action2].
  *
  * See the Arrow docs for more information over
