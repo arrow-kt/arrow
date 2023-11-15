@@ -11,7 +11,7 @@ on:
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
   OSS_USER: '${{ secrets.OSS_USER }}'
   OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
   OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
