@@ -17,6 +17,7 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.identity
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -32,8 +33,10 @@ import kotlin.jvm.JvmName
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> =
-  fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
+public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+  return fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
+}
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as nullable type,
@@ -47,8 +50,10 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  * @see NullableRaise.ignoreErrors By default, `nullable` only allows raising `null`.
  * Calling [ignoreErrors][NullableRaise.ignoreErrors] inside `nullable` allows to raise any error, which will be returned to the caller as if `null` was raised.
  */
-public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
-  merge { block(NullableRaise(this)) }
+public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+  return merge { block(NullableRaise(this)) }
+}
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Result].
@@ -57,8 +62,10 @@ public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
-  fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
+public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
+}
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Option].
@@ -70,8 +77,10 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
-  fold({ block(OptionRaise(this)) }, ::identity, ::Some)
+public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+  return fold({ block(OptionRaise(this)) }, ::identity, ::Some)
+}
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Ior].
@@ -89,6 +98,7 @@ public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
 public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   val state: Atomic<Option<Error>> = Atomic(None)
   return fold<Error, A, Ior<Error, A>>(
     { block(IorRaise(combineError, state, this)) },
@@ -115,6 +125,7 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
 public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, @BuilderInference block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   val state: Atomic<Option<NonEmptyList<Error>>> = Atomic(None)
   return fold<NonEmptyList<Error>, A, Ior<NonEmptyList<Error>, A>>(
     { block(IorRaise(combineError, state, this)) },
@@ -193,9 +204,15 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
   public inline fun <A> recover(
     @BuilderInference block: NullableRaise.() -> A,
     recover: () -> A,
-  ): A = when (val nullable = nullable(block)) {
-    null -> recover()
-    else -> nullable
+  ): A {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (val nullable = nullable(block)) {
+      null -> recover()
+      else -> nullable
+    }
   }
 
   /**
@@ -205,7 +222,10 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
   @RaiseDSL
   public inline fun <A> ignoreErrors(
     @BuilderInference block: IgnoreErrorsRaise<Null>.() -> A,
-  ): A = block(IgnoreErrorsRaise(this) { null })
+  ): A {
+    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+    return block(IgnoreErrorsRaise(this) { null })
+  }
 }
 
 /**
@@ -285,9 +305,15 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   public inline fun <A> recover(
     @BuilderInference block: OptionRaise.() -> A,
     recover: () -> A,
-  ): A = when (val option = option(block)) {
-    is None -> recover()
-    is Some<A> -> option.value
+  ): A {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (val option = option(block)) {
+      is None -> recover()
+      is Some<A> -> option.value
+    }
   }
 
   /**
@@ -297,7 +323,12 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
   @RaiseDSL
   public inline fun <A> ignoreErrors(
     @BuilderInference block: IgnoreErrorsRaise<None>.() -> A,
-  ): A = block(IgnoreErrorsRaise(this) { None })
+  ): A {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    return block(IgnoreErrorsRaise(this) { None })
+  }
 }
 
 /**
@@ -353,13 +384,19 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   public inline fun <A> recover(
     @BuilderInference block: IorRaise<Error>.() -> A,
     recover: (error: Error) -> A,
-  ): A = when (val ior = ior(combineError, block)) {
-    is Ior.Both -> {
-      combine(ior.leftValue)
-      ior.rightValue
+  ): A {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
     }
+    return when (val ior = ior(combineError, block)) {
+      is Ior.Both -> {
+        combine(ior.leftValue)
+        ior.rightValue
+      }
 
-    is Ior.Left -> recover(ior.value)
-    is Ior.Right -> ior.value
+      is Ior.Left -> recover(ior.value)
+      is Ior.Right -> ior.value
+    }
   }
 }

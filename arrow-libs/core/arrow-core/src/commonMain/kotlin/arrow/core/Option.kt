@@ -311,15 +311,14 @@ public sealed class Option<out A> {
      */
     public inline fun <A> catch(f: () -> A): Option<A> {
       contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-      val recover: (Throwable) -> Option<A> = { None }
-      return catch(recover, f)
+      return catch({ None }, f)
     }
 
     @JvmStatic
     @JvmName("tryCatch")
     public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
       contract {
-        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(f, InvocationKind.AT_MOST_ONCE)
         callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
       }
       return try {
@@ -429,7 +428,7 @@ public sealed class Option<out A> {
    */
   public inline fun isSome(predicate: (A) -> Boolean): Boolean {
     contract {
-      callsInPlace(predicate, InvocationKind.EXACTLY_ONCE)
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
       returns(true) implies (this@Option is Some<A>)
     }
     return this@Option is Some<A> && predicate(value)
@@ -555,7 +554,10 @@ public data class Some<out T>(val value: T) : Option<T>() {
  */
 public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return fold({ default() }, ::identity)
+  return when (this) {
+    is Some -> value
+    else -> default()
+  }
 }
 
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
