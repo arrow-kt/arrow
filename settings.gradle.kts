@@ -22,6 +22,7 @@ plugins {
 dependencyResolutionManagement {
   @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
   @Suppress("LocalVariableName") val kotlin_version: String? by settings
+  @Suppress("LocalVariableName") val compose_version: String? by settings
 
   repositories {
     mavenCentral()
@@ -34,6 +35,10 @@ dependencyResolutionManagement {
       if (!kotlin_version.isNullOrBlank()) {
         println("Overriding Kotlin version with $kotlin_version")
         version("kotlin", kotlin_version!!)
+      }
+      if (!compose_version.isNullOrBlank()) {
+        println("Overriding Compose version with $compose_version")
+        version("composePlugin", compose_version!!)
       }
     }
   }

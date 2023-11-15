@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+
 repositories {
   google()
   mavenCentral()
@@ -67,8 +70,17 @@ kotlin {
   }
 }
 
-tasks.withType<Test> {
+tasks.withType<Test>().configureEach {
   useJUnitPlatform()
+}
+
+compose {
+  // override the choice of Compose if we use a Kotlin -dev version
+  val kotlinVersion = project.rootProject.properties["kotlin_version"] as? String
+  if (kotlinVersion != null && kotlinVersion.contains("-dev-")) {
+    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.9.20"))
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.9.20")
+  }
 }
 
 android {
