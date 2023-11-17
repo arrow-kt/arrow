@@ -1,6 +1,7 @@
 package arrow.optics
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -9,7 +10,9 @@ import kotlinx.coroutines.flow.update
  * by applying the function [block] to the current value.
  */
 public inline fun <T> MutableState<T>.update(block: (T) -> T) {
-  value = block(value)
+  Snapshot.withMutableSnapshot {
+    value = block(value)
+  }
 }
 
 /**
