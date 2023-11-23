@@ -53,8 +53,9 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        api(libs.coroutines.core)
         api(compose.runtime)
+        implementation(projects.arrowCore)
+        implementation(libs.coroutines.core)
         implementation(libs.kotlin.stdlibCommon)
       }
     }
@@ -62,8 +63,10 @@ kotlin {
     commonTest {
       dependencies {
         implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
+        implementation(projects.arrowFxCoroutines)
       }
     }
   }
