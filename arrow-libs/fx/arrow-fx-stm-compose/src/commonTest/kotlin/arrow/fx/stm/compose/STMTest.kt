@@ -243,7 +243,7 @@ class STMTest {
         delay(20.milliseconds)
         atomically { acc1.modify { it + 60 } }
       },
-      { _, _ -> Unit }
+      { _, _ -> }
     )
     acc1.unsafeRead() shouldBeExactly 50
     acc2.unsafeRead() shouldBeExactly 250

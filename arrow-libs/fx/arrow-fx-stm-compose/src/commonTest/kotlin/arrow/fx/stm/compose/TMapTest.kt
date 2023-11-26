@@ -14,7 +14,7 @@ class TMapTest {
     checkAll(Arb.int(), Arb.int()) { k, v ->
       val map = TMap.new<Int, Int>()
       atomically { map.insert(k, v) }
-      atomically { map.lookup(k) } shouldBe v
+      atomically { map[k] } shouldBe v
     }
   }
 
@@ -25,7 +25,7 @@ class TMapTest {
         for ((k, v) in pairs) map.insert(k, v)
       }
       atomically {
-        for ((k, v) in pairs) map.lookup(k) shouldBe v
+        for ((k, v) in pairs) map[k] shouldBe v
       }
     }
   }
@@ -37,7 +37,7 @@ class TMapTest {
         for ((k, v) in pairs) map.insert(k, v)
       }
       atomically {
-        for ((k, v) in pairs) map.lookup(k) shouldBe v
+        for ((k, v) in pairs) map[k] shouldBe v
       }
     }
   }
@@ -46,9 +46,9 @@ class TMapTest {
     checkAll(Arb.int(), Arb.int()) { k, v ->
       val map = TMap.new<Int, Int>()
       atomically { map.insert(k, v) }
-      atomically { map.lookup(k) } shouldBe v
+      atomically { map[k] } shouldBe v
       atomically { map.remove(k) }
-      atomically { map.lookup(k) } shouldBe null
+      atomically { map[k] } shouldBe null
     }
   }
 
@@ -56,9 +56,9 @@ class TMapTest {
     checkAll(Arb.int(), Arb.int(), Arb.int()) { k, v, g ->
       val map = TMap.new<Int, Int>()
       atomically { map.insert(k, v) }
-      atomically { map.lookup(k) } shouldBe v
+      atomically { map[k] } shouldBe v
       atomically { map.update(k) { v + g } }
-      atomically { map.lookup(k) } shouldBe v + g
+      atomically { map[k] } shouldBe v + g
     }
   }
 }
