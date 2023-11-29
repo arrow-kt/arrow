@@ -425,7 +425,7 @@ public sealed class Option<out A> {
     map: (A, B) -> C
   ): Option<C> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind()) }
+    return option { map(this@Option.bind(), b.bind()) }
   }
 
   @Deprecated(
@@ -441,7 +441,7 @@ public sealed class Option<out A> {
     map: (A, B, C) -> D
   ): Option<D> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind()) }
   }
 
   /**
@@ -562,7 +562,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D) -> E
   ): Option<E> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind()) }
   }
 
   @Deprecated(
@@ -580,7 +580,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E) -> F
   ): Option<F> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind(), e.bind()) }
   }
 
   @Deprecated(
@@ -599,7 +599,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F) -> G
   ): Option<G> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
   }
 
   @Deprecated(
@@ -619,7 +619,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G) -> H
   ): Option<H> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
   }
 
   @Deprecated(
@@ -640,7 +640,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H) -> I
   ): Option<I> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
   }
 
   @Deprecated(
@@ -662,7 +662,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H, I) -> J
   ): Option<J> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
   }
 
   @Deprecated(
@@ -685,7 +685,7 @@ public sealed class Option<out A> {
     map: (A, B, C, D, E, F, G, H, I, J) -> K
   ): Option<K> {
     contract { callsInPlace(map, InvocationKind.AT_MOST_ONCE) }
-    return option { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
+    return option { map(this@Option.bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
   }
 
   /**
