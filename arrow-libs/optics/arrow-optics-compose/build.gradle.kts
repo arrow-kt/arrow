@@ -78,7 +78,7 @@ compose {
   // override the choice of Compose if we use a Kotlin -dev version
   val kotlinVersion = project.rootProject.properties["kotlin_version"] as? String
   if (kotlinVersion != null && kotlinVersion.contains("-dev-")) {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.9.20"))
+    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("2.0.0-Beta1"))
     kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
   }
 }
