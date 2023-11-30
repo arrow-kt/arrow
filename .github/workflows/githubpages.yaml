@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 jobs:
   githubpages:
@@ -17,9 +17,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Dokka
-        id: Dokka
-        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: assemble
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
