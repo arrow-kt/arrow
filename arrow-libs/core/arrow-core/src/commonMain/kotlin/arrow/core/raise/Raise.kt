@@ -14,7 +14,6 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -342,7 +341,7 @@ public inline fun <Error, A> recover(
     callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
   }
-  return fold(block, { throw it }, recover, ::identity)
+  return recover(block, recover) { throw it }
 }
 
 /**
@@ -384,7 +383,16 @@ public inline fun <Error, A> recover(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
   }
-  return fold(block, catch, recover, ::identity)
+  val raise = DefaultRaise(false)
+  return try {
+    block(raise).also { raise.complete() }
+  } catch (e: CancellationException) {
+    raise.complete()
+    recover(e.raisedOrRethrow(raise))
+  } catch (e: Throwable) {
+    raise.complete()
+    catch(e.nonFatalOrThrow())
+  }
 }
 
 /**
@@ -427,7 +435,7 @@ public inline fun <reified T : Throwable, Error, A> recover(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
   }
-  return fold(block, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
+  return recover(block, recover) { t -> if (t is T) catch(t) else throw t }
 }
 
 /**

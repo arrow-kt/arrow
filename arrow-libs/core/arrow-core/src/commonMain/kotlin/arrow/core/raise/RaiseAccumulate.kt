@@ -516,10 +516,9 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   var error: Any? = EmptyValue
   val results = ArrayList<B>(iterable.collectionSizeOrDefault(10))
   for (item in iterable) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error = combine(error, errors.reduce(combine), combine) },
-      { results.add(it) }
+    recover(
+      { results.add(transform(RaiseAccumulate(this), item)) },
+      { errors -> error = combine(error, errors.reduce(combine), combine) }
     )
   }
   return if (error === EmptyValue) results else raise(unbox<Error>(error))
@@ -540,10 +539,9 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   val error = mutableListOf<Error>()
   val results = ArrayList<B>(iterable.collectionSizeOrDefault(10))
   for (item in iterable) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error.addAll(errors) },
-      { results.add(it) }
+    recover(
+      { results.add(transform(RaiseAccumulate(this), item)) },
+      error::addAll
     )
   }
   return error.toNonEmptyListOrNull()?.let { raise(it) } ?: results
@@ -577,10 +575,9 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   val error = mutableListOf<Error>()
   val results = HashSet<B>(nonEmptySet.collectionSizeOrDefault(10))
   for (item in nonEmptySet) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error.addAll(errors) },
-      { results.add(it) }
+    recover(
+      { results.add(transform(RaiseAccumulate(this), item)) },
+      error::addAll
     )
   }
   return error.toNonEmptyListOrNull()?.let { raise(it) } ?: requireNotNull(results.toNonEmptySetOrNull())

@@ -8,7 +8,7 @@ package arrow.core
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.fold
+import arrow.core.raise.recover
 import kotlin.experimental.ExperimentalTypeInference
 
 /** Adds [kotlin.sequences.zip] support for 3 parameters */
@@ -614,7 +614,10 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   var left: Any? = EmptyValue
   val right = mutableListOf<B>()
   for (item in this)
-    fold({ transform(RaiseAccumulate(this), item) }, { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) }, { b -> right.add(b) })
+    recover (
+      { right.add(transform(RaiseAccumulate(this), item)) },
+      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) }
+    )
   return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
 }
 
@@ -624,7 +627,10 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   val left = mutableListOf<Error>()
   val right = mutableListOf<B>()
   for (item in this)
-    fold({ transform(RaiseAccumulate(this), item) }, { errors -> left.addAll(errors) }, { b -> right.add(b) })
+    recover(
+      { right.add(transform(RaiseAccumulate(this), item)) },
+      left::addAll
+    )
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 

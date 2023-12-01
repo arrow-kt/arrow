@@ -6,16 +6,7 @@ package arrow.core.raise
 
 import arrow.atomic.Atomic
 import arrow.atomic.updateAndGet
-import arrow.core.Either
-import arrow.core.Ior
-import arrow.core.IorNel
-import arrow.core.NonEmptyList
-import arrow.core.NonEmptySet
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.getOrElse
-import arrow.core.identity
+import arrow.core.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -35,7 +26,7 @@ import kotlin.jvm.JvmName
  */
 public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
+  return recover({ block(this).right() }, { it.left() })
 }
 
 /**
@@ -64,7 +55,7 @@ public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
  */
 public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
+  return recover({ Result.success(block(ResultRaise(this))) }, Result.Companion::failure, Result.Companion::failure)
 }
 
 /**
@@ -79,7 +70,7 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
  */
 public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return fold({ block(OptionRaise(this)) }, ::identity, ::Some)
+  return merge { block(OptionRaise(this)).some() }
 }
 
 /**
@@ -100,11 +91,12 @@ public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
 public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   val state: Atomic<Option<Error>> = Atomic(None)
-  return fold<Error, A, Ior<Error, A>>(
-    { block(IorRaise(combineError, state, this)) },
-    { e -> throw e },
-    { e -> Ior.Left(state.get().getOrElse { e }) },
-    { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
+  return recover(
+    {
+      val a = block(IorRaise(combineError, state, this))
+      state.get().fold({ a.rightIor() }) { e -> Ior.Both(e, a) }
+    },
+    { e -> Ior.Left(state.get().getOrElse { e }) }
   )
 }
 
@@ -126,13 +118,7 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
  */
 public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, @BuilderInference block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  val state: Atomic<Option<NonEmptyList<Error>>> = Atomic(None)
-  return fold<NonEmptyList<Error>, A, Ior<NonEmptyList<Error>, A>>(
-    { block(IorRaise(combineError, state, this)) },
-    { e -> throw e },
-    { e -> Ior.Left(state.get().getOrElse { e }) },
-    { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
-  )
+  return ior(combineError, block)
 }
 
 /**

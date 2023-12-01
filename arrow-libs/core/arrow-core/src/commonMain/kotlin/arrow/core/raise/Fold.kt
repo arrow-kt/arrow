@@ -5,7 +5,6 @@
 package arrow.core.raise
 
 import arrow.atomic.AtomicBoolean
-import arrow.core.nonFatalOrThrow
 import arrow.core.Either
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -34,7 +33,8 @@ public suspend fun <Error, A, B> Effect<Error, A>.fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold({ invoke() }, { catch(it) }, { recover(it) }, { transform(it) })
+  val a = recover<Error, A>({ invoke(this) }, { return recover(it) }, { return catch(it) })
+  return catch({ transform(a) }) { catch(it) }
 }
 
 /**
@@ -74,7 +74,8 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold({ invoke(this) }, catch, recover, transform)
+  val a = recover<Error, A>({ invoke(this) }, { return recover(it) }, { return catch(it) })
+  return catch({ transform(a) }) { catch(it) }
 }
 
 /**
@@ -90,65 +91,6 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Erro
     callsInPlace(transform, AT_MOST_ONCE)
   }
   return fold({ throw it }, recover, transform)
-}
-
-/**
- * The most general way to execute a computation using [Raise].
- * Depending on the outcome of the block, one of the two continuations is run:
- * - _success_ [transform] result of [A] to a value of [B].
- * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
- *
- * This function re-throws any exceptions thrown within the [Raise] block.
- */
-@JvmName("_foldOrThrow")
-public inline fun <Error, A, B> fold(
-  @BuilderInference block: Raise<Error>.() -> A,
-  recover: (error: Error) -> B,
-  transform: (value: A) -> B,
-): B {
-  contract {
-    callsInPlace(block, AT_MOST_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-    callsInPlace(transform, AT_MOST_ONCE)
-  }
-  return fold(block, { throw it }, recover, transform)
-}
-
-/**
- * The most general way to execute a computation using [Raise].
- * Depending on the outcome of the block, one of the three continuations is run:
- * - _success_ [transform] result of [A] to a value of [B].
- * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
- * - _exception_ [catch] from [Throwable] by transforming value into [B].
- *
- * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
- * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
- */
-@JvmName("_fold")
-public inline fun <Error, A, B> fold(
-  @BuilderInference block: Raise<Error>.() -> A,
-  catch: (throwable: Throwable) -> B,
-  recover: (error: Error) -> B,
-  transform: (value: A) -> B,
-): B {
-  contract {
-    callsInPlace(block, AT_MOST_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-    callsInPlace(transform, AT_MOST_ONCE)
-  }
-  val raise = DefaultRaise(false)
-  return try {
-    val res = block(raise)
-    raise.complete()
-    transform(res)
-  } catch (e: CancellationException) {
-    raise.complete()
-    recover(e.raisedOrRethrow(raise))
-  } catch (e: Throwable) {
-    raise.complete()
-    catch(e.nonFatalOrThrow())
-  }
 }
 
 /**

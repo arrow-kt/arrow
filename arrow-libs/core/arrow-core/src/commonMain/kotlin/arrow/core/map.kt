@@ -3,7 +3,7 @@
 package arrow.core
 
 import arrow.core.raise.RaiseAccumulate
-import arrow.core.raise.fold
+import arrow.core.raise.recover
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
@@ -260,10 +260,9 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   var left: Any? = EmptyValue
   val right = mutableMapOf<K, B>()
   for (element in this)
-    fold(
-      { transform(RaiseAccumulate(this), element) },
-      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
-      { right[element.key] = it }
+    recover(
+      { right[element.key] = transform(RaiseAccumulate(this), element) },
+      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) }
     )
   return if (left !== EmptyValue) EmptyValue.unbox<E>(left).left() else right.right()
 }
@@ -274,7 +273,7 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   val left = mutableListOf<E>()
   val right = mutableMapOf<K, B>()
   for (element in this)
-    fold({ transform(RaiseAccumulate(this), element) }, { error -> left.addAll(error) }, { right[element.key] = it })
+    recover({ right[element.key] = transform(RaiseAccumulate(this), element) }, { error -> left.addAll(error) })
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
