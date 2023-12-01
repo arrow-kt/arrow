@@ -14,7 +14,6 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -665,6 +664,13 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   return recover(block) { raise(transform(it)) }
 }
 
+@RaiseDSL
+public inline fun <Error, A> Raise<Error>.ignoreErrors(value: Error, @BuilderInference block: SingletonRaise<Any?>.() -> A): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+  }
+  return block(IgnoreErrorsRaise(this, value))
+}
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [A].
  * Does not distinguish between normal results and errors, thus you can consider
