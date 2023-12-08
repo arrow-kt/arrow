@@ -41,7 +41,7 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  * @see SingletonRaise.ignoreErrors By default, `nullable` only allows raising `null`.
  * Calling [ignoreErrors][SingletonRaise.ignoreErrors] inside `nullable` allows to raise any error, which will be returned to the caller as if `null` was raised.
  */
-public inline fun <A> nullable(block: NullableRaise.() -> A): A? {
+public inline fun <A> nullable(block: SingletonRaise.() -> A): A? {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return merge { ignoreErrors(null, block) }
 }
@@ -68,7 +68,7 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <A> option(block: OptionRaise.() -> A): Option<A> {
+public inline fun <A> option(block: SingletonRaise.() -> A): Option<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return merge { ignoreErrors(None, block).some() }
 }
@@ -134,7 +134,7 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun impure(block: UnitRaise.() -> Unit) {
+public inline fun impure(block: SingletonRaise.() -> Unit) {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return merge { ignoreErrors(Unit, block) }
 }
@@ -146,21 +146,44 @@ public inline fun impure(block: UnitRaise.() -> Unit) {
 public class IgnoreErrorsRaise<N>(
   private val raise: Raise<N>,
   private val error: N
-) : SingletonRaise<Any?>() {
+) : SingletonRaise(), Raise<Any?> {
   @RaiseDSL
-  override fun raise(): Nothing =
-    raise.raise(error)
+  override fun raise(): Nothing = raise.raise(error)
+
+  @RaiseDSL
+  override fun raise(r: Any?): Nothing = raise()
+
+  @JvmName("recoverIgnoreErrors")
+  @RaiseDSL
+  public inline fun <A> recover(
+    @BuilderInference block: IgnoreErrorsRaise<*>.() -> A,
+    recover: () -> A,
+  ): A {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+    }
+    impure {
+      return ignoreErrors(block)
+    }
+    return recover()
+  }
 }
 
-public sealed class SingletonRaise<in Error> : Raise<Error> {
+public sealed class SingletonRaise {
   public abstract fun raise(): Nothing
-  override fun raise(r: Error): Nothing = raise()
 
   @RaiseDSL
-  public fun ensure(value: Boolean): Unit = ensure(value) { raise() }
+  public fun ensure(condition: Boolean) {
+    contract { returns() implies condition }
+    return if (condition) Unit else raise()
+  }
 
   @RaiseDSL
-  public fun <A> Option<A>.bind(): A = getOrElse { raise() }
+  public fun <A> Option<A>.bind(): A {
+    contract { returns() implies (this@bind is Some<A>) }
+    return getOrElse { raise() }
+  }
 
   @RaiseDSL
   public fun <A> A?.bind(): A {
@@ -171,7 +194,7 @@ public sealed class SingletonRaise<in Error> : Raise<Error> {
   @RaiseDSL
   public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
-    return ensureNotNull(value) { raise() }
+    return value ?: raise()
   }
 
   @RaiseDSL
@@ -215,7 +238,7 @@ public sealed class SingletonRaise<in Error> : Raise<Error> {
 
   @RaiseDSL
   public inline fun <A> recover(
-    @BuilderInference block: SingletonRaise<Error>.() -> A,
+    @BuilderInference block: SingletonRaise.() -> A,
     recover: () -> A,
   ): A {
     contract {
@@ -223,7 +246,7 @@ public sealed class SingletonRaise<in Error> : Raise<Error> {
       callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
     }
     impure {
-      return ignoreErrors(block)
+      return block()
     }
     return recover()
   }
@@ -234,7 +257,7 @@ public sealed class SingletonRaise<in Error> : Raise<Error> {
    */
   @RaiseDSL
   public inline fun <A> ignoreErrors(
-    @BuilderInference block: SingletonRaise<Any?>.() -> A,
+    @BuilderInference block: IgnoreErrorsRaise<*>.() -> A,
   ): A {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     return when (this) {
@@ -244,12 +267,6 @@ public sealed class SingletonRaise<in Error> : Raise<Error> {
 }
 
 public typealias Null = Nothing?
-
-public typealias NullableRaise = SingletonRaise<Null>
-
-public typealias OptionRaise = SingletonRaise<None>
-
-public typealias UnitRaise = SingletonRaise<Unit>
 
 /**
  * Implementation of [Raise] used by [result].

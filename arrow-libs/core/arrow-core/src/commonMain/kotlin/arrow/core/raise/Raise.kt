@@ -665,7 +665,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
 }
 
 @RaiseDSL
-public inline fun <Error, A> Raise<Error>.ignoreErrors(value: Error, @BuilderInference block: SingletonRaise<Any?>.() -> A): A {
+public inline fun <Error, A> Raise<Error>.ignoreErrors(value: Error, @BuilderInference block: IgnoreErrorsRaise<*>.() -> A): A {
   contract {
     callsInPlace(block, AT_MOST_ONCE)
   }

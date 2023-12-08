@@ -69,14 +69,6 @@ class NullableSpec {
     } shouldBe "1"
   }
 
-  @Test fun bindingEitherInNullable() = runTest {
-    nullable {
-      val number = Either.Right("s".length)
-      val string = number.map(Int::toString).bind()
-      string
-    } shouldBe "1"
-  }
-
   @Test fun bindingEitherInNullableIgnoreErrors() = runTest {
     nullable {
       val number = Either.Right("s".length) as Either<Boolean, Int>
@@ -126,13 +118,6 @@ class NullableSpec {
       }.bind()
       string
     } shouldBe null
-  }
-
-  @Test fun eitherOfNothingAndSomethingCanBeBound() = runTest {
-    nullable {
-      val either: Either<Nothing, Int> = Either.Right(4)
-      either.bind() + 3
-    } shouldBe 7
   }
 
   @Test fun recoverWorksAsExpected() = runTest {

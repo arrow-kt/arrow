@@ -3,7 +3,7 @@ package arrow.core
 
 import arrow.core.raise.EagerEffect
 import arrow.core.raise.Effect
-import arrow.core.raise.OptionRaise
+import arrow.core.raise.SingletonRaise
 import arrow.core.raise.option
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -563,10 +563,10 @@ public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
 /** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
-public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
+public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { ignoreErrors { invoke() } }
 
 /** Run the [EagerEffect] by returning [Option] of [A], or [None] if raised with [None]. */
-public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
+public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { ignoreErrors { invoke() } }
 
 public fun <A> A.some(): Option<A> = Some(this)
 
@@ -671,8 +671,8 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- KNIT example-option-22.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
+public inline fun <A> Option<A>.recover(recover: SingletonRaise.() -> A): Option<A> =
   when (this@recover) {
-    is None -> option { recover(this, None) }
+    is None -> option { recover() }
     is Some -> this@recover
   }
