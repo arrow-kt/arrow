@@ -17,11 +17,11 @@ kotlinBinaryCompatibilityValidator = "0.13.2"
 kotlinCompileTesting = "1.5.0"
 knit = "0.4.0"
 kspVersion = "1.9.21-1.0.15"
-kotlinxSerialization = "1.6.1"
+kotlinxSerialization = "1.6.2"
 mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
-spotlessVersion = "6.23.2"
+spotlessVersion = "6.23.3"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
