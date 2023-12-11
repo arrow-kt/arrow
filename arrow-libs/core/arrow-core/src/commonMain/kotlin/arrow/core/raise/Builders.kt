@@ -136,7 +136,7 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
  */
 public inline fun impure(block: SingletonRaise.() -> Unit) {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors({}, block) }
+  return merge { ignoreErrors({ Unit }, block) }
 }
 
 /**
