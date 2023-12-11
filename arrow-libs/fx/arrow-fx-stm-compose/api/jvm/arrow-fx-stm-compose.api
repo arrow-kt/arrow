@@ -1,0 +1,126 @@
+public final class arrow/fx/stm/compose/AtomicallyKt {
+	public static final fun atomically (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/compose/BlockedIndefinitely : java/lang/Throwable {
+	public static final field $stable I
+	public fun <init> ()V
+}
+
+public abstract interface class arrow/fx/stm/compose/STM {
+	public abstract fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun check (Z)V
+	public abstract fun orElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public abstract fun peek-_Eq8ja4 (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/Object;
+	public abstract fun read-_Eq8ja4 (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/Object;
+	public abstract fun retry ()Ljava/lang/Void;
+}
+
+public final class arrow/fx/stm/compose/STM$DefaultImpls {
+	public static fun check (Larrow/fx/stm/compose/STM;Z)V
+	public static fun peek-_Eq8ja4 (Larrow/fx/stm/compose/STM;Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/Object;
+	public static fun read-_Eq8ja4 (Larrow/fx/stm/compose/STM;Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/compose/STMKt {
+	public static final fun stm (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/fx/stm/compose/StructuresKt {
+	public static final fun insert (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public static final fun modify (Landroidx/compose/runtime/MutableState;Lkotlin/jvm/functions/Function1;)V
+	public static final fun read (Landroidx/compose/runtime/MutableState;)Ljava/lang/Object;
+	public static final fun unsafeRead (Landroidx/compose/runtime/MutableState;)Ljava/lang/Object;
+	public static final fun update (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
+	public static final fun write (Landroidx/compose/runtime/MutableState;Ljava/lang/Object;)V
+}
+
+public final class arrow/fx/stm/compose/TList {
+	public static final field $stable I
+	public static final field INSTANCE Larrow/fx/stm/compose/TList;
+	public final fun new ()Landroidx/compose/runtime/snapshots/SnapshotStateList;
+}
+
+public final class arrow/fx/stm/compose/TMap {
+	public static final field $stable I
+	public static final field INSTANCE Larrow/fx/stm/compose/TMap;
+	public final fun new ()Landroidx/compose/runtime/snapshots/SnapshotStateMap;
+}
+
+public final class arrow/fx/stm/compose/TQueue {
+	public static final field Companion Larrow/fx/stm/compose/TQueue$Companion;
+	public static final synthetic fun box-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Larrow/fx/stm/compose/TQueue;
+	public static fun constructor-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Landroidx/compose/runtime/snapshots/SnapshotStateList;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Landroidx/compose/runtime/snapshots/SnapshotStateList;Landroidx/compose/runtime/snapshots/SnapshotStateList;)Z
+	public static final fun flush-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/util/List;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)I
+	public static final fun isEmpty-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Z
+	public static final fun isNotEmpty-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Z
+	public static final fun plusAssign-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;Ljava/lang/Object;)V
+	public static final fun removeAll-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;Lkotlin/jvm/functions/Function1;)V
+	public static final fun size-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/String;
+	public static final fun tryPeek-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/Object;
+	public static final fun tryRead-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;)Ljava/lang/Object;
+	public final synthetic fun unbox-impl ()Landroidx/compose/runtime/snapshots/SnapshotStateList;
+	public static final fun write-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;Ljava/lang/Object;)V
+	public static final fun writeFront-impl (Landroidx/compose/runtime/snapshots/SnapshotStateList;Ljava/lang/Object;)V
+}
+
+public final class arrow/fx/stm/compose/TQueue$Companion {
+	public final fun new-9nEOTck ()Landroidx/compose/runtime/snapshots/SnapshotStateList;
+}
+
+public final class arrow/fx/stm/compose/TSet : java/util/Set, kotlin/jvm/internal/markers/KMutableSet {
+	public static final field Companion Larrow/fx/stm/compose/TSet$Companion;
+	public fun add (Ljava/lang/Object;)Z
+	public static fun add-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/lang/Object;)Z
+	public fun addAll (Ljava/util/Collection;)Z
+	public static fun addAll-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/util/Collection;)Z
+	public static final synthetic fun box-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)Larrow/fx/stm/compose/TSet;
+	public fun clear ()V
+	public static fun clear-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)V
+	public static fun constructor-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)Landroidx/compose/runtime/snapshots/SnapshotStateMap;
+	public fun contains (Ljava/lang/Object;)Z
+	public static fun contains-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/lang/Object;)Z
+	public fun containsAll (Ljava/util/Collection;)Z
+	public static fun containsAll-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/util/Collection;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Landroidx/compose/runtime/snapshots/SnapshotStateMap;)Z
+	public fun getSize ()I
+	public static fun getSize-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)I
+	public fun hashCode ()I
+	public static fun hashCode-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)I
+	public fun isEmpty ()Z
+	public static fun isEmpty-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)Z
+	public fun iterator ()Ljava/util/Iterator;
+	public static fun iterator-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)Ljava/util/Iterator;
+	public fun remove (Ljava/lang/Object;)Z
+	public static fun remove-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/lang/Object;)Z
+	public fun removeAll (Ljava/util/Collection;)Z
+	public static fun removeAll-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/util/Collection;)Z
+	public fun retainAll (Ljava/util/Collection;)Z
+	public static fun retainAll-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;Ljava/util/Collection;)Z
+	public synthetic fun size ()I
+	public fun toArray ()[Ljava/lang/Object;
+	public fun toArray ([Ljava/lang/Object;)[Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Landroidx/compose/runtime/snapshots/SnapshotStateMap;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Landroidx/compose/runtime/snapshots/SnapshotStateMap;
+}
+
+public final class arrow/fx/stm/compose/TSet$Companion {
+	public final fun new-BPBqEAU ()Landroidx/compose/runtime/snapshots/SnapshotStateMap;
+}
+
+public final class arrow/fx/stm/compose/TVar {
+	public static final field $stable I
+	public static final field INSTANCE Larrow/fx/stm/compose/TVar;
+	public final fun new (Ljava/lang/Object;)Landroidx/compose/runtime/MutableState;
+}
+
