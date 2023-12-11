@@ -854,8 +854,8 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
-public final class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/SingletonRaise, arrow/core/raise/Raise {
-	public fun <init> (Larrow/core/raise/Raise;Ljava/lang/Object;)V
+public abstract class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/SingletonRaise, arrow/core/raise/Raise {
+	public fun <init> ()V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -865,7 +865,6 @@ public final class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/Singlet
 	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun raise ()Ljava/lang/Void;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun recoverIgnoreErrors (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 }
@@ -966,7 +965,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun getOrElse (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun ignoreErrors (Larrow/core/raise/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun ignoreErrors (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun impure (Lkotlin/jvm/functions/Function1;)V
 	public static final fun ior (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static final fun iorNel (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;

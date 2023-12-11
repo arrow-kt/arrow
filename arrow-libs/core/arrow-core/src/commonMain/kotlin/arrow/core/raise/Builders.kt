@@ -43,7 +43,7 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  */
 public inline fun <A> nullable(block: SingletonRaise.() -> A): A? {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors(null, block) }
+  return merge { ignoreErrors({ null }, block) }
 }
 
 /**
@@ -70,7 +70,7 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
  */
 public inline fun <A> option(block: SingletonRaise.() -> A): Option<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors(None, block).some() }
+  return merge { ignoreErrors({ None }, block).some() }
 }
 
 /**
@@ -136,27 +136,21 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
  */
 public inline fun impure(block: SingletonRaise.() -> Unit) {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors(Unit, block) }
+  return merge { ignoreErrors({}, block) }
 }
 
 /**
  * Implementation of [Raise] used by `ignoreErrors`.
  * You should never use this directly.
  */
-public class IgnoreErrorsRaise<N>(
-  private val raise: Raise<N>,
-  private val error: N
-) : SingletonRaise(), Raise<Any?> {
-  @RaiseDSL
-  override fun raise(): Nothing = raise.raise(error)
-
+public abstract class IgnoreErrorsRaise : SingletonRaise(), Raise<Any?> {
   @RaiseDSL
   override fun raise(r: Any?): Nothing = raise()
 
   @JvmName("recoverIgnoreErrors")
   @RaiseDSL
   public inline fun <A> recover(
-    @BuilderInference block: IgnoreErrorsRaise<*>.() -> A,
+    block: IgnoreErrorsRaise.() -> A,
     recover: () -> A,
   ): A {
     contract {
@@ -238,7 +232,7 @@ public sealed class SingletonRaise {
 
   @RaiseDSL
   public inline fun <A> recover(
-    @BuilderInference block: SingletonRaise.() -> A,
+    block: SingletonRaise.() -> A,
     recover: () -> A,
   ): A {
     contract {
@@ -257,16 +251,14 @@ public sealed class SingletonRaise {
    */
   @RaiseDSL
   public inline fun <A> ignoreErrors(
-    @BuilderInference block: IgnoreErrorsRaise<*>.() -> A,
+    block: IgnoreErrorsRaise.() -> A,
   ): A {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
     return when (this) {
-      is IgnoreErrorsRaise<*> -> block(this)
+      is IgnoreErrorsRaise -> block(this)
     }
   }
 }
-
-public typealias Null = Nothing?
 
 /**
  * Implementation of [Raise] used by [result].
