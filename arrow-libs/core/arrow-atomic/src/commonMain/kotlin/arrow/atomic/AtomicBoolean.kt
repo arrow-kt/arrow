@@ -14,7 +14,7 @@ public class AtomicBoolean(value: Boolean) {
 
   public fun get(): Boolean = value
   public fun set(value: Boolean) {
-    inner.value = value.toInt()
+     this.value = value
   }
 
   public fun getAndSet(value: Boolean): Boolean =
@@ -28,45 +28,30 @@ public class AtomicBoolean(value: Boolean) {
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun AtomicBoolean.loop(action: (Boolean) -> Unit): Nothing {
-  while (true) {
-    action(value)
-  }
-}
+public inline fun AtomicBoolean.loop(action: (Boolean) -> Unit): Nothing = forever { action(value) }
 
-public fun AtomicBoolean.tryUpdate(function: (Boolean) -> Boolean): Boolean {
-  val cur = value
-  val upd = function(cur)
-  return compareAndSet(cur, upd)
-}
+public inline fun AtomicBoolean.tryUpdate(function: (Boolean) -> Boolean): Boolean = tryUpdate(function) { _, _ -> }
 
-public inline fun AtomicBoolean.update(function: (Boolean) -> Boolean) {
-  while (true) {
-    val cur = value
-    val upd = function(cur)
-    if (compareAndSet(cur, upd)) return
-  }
-}
+public inline fun AtomicBoolean.update(function: (Boolean) -> Boolean): Unit = update(function) { _, _ -> }
 
 /**
  * Updates variable atomically using the specified [function] of its value and returns its old value.
  */
-public inline fun AtomicBoolean.getAndUpdate(function: (Boolean) -> Boolean): Boolean {
-  while (true) {
-    val cur = value
-    val upd = function(cur)
-    if (compareAndSet(cur, upd)) return cur
-  }
-}
+public inline fun AtomicBoolean.getAndUpdate(function: (Boolean) -> Boolean): Boolean = update(function) { old, _ -> old }
 
 /**
  * Updates variable atomically using the specified [function] of its value and returns its new value.
  */
-public inline fun AtomicBoolean.updateAndGet(function: (Boolean) -> Boolean): Boolean {
-  while (true) {
-    val cur = value
-    val upd = function(cur)
-    if (compareAndSet(cur, upd)) return upd
-  }
+public inline fun AtomicBoolean.updateAndGet(function: (Boolean) -> Boolean): Boolean = update(function) { _, new -> new }
+
+@PublishedApi
+internal inline fun <R> AtomicBoolean.update(function: (Boolean) -> Boolean, transform: (old: Boolean, new: Boolean) -> R): R = forever {
+  tryUpdate(function) { old, new -> return transform(old, new) }
 }
 
+@PublishedApi
+internal inline fun AtomicBoolean.tryUpdate(function: (Boolean) -> Boolean, onUpdated: (old: Boolean, new: Boolean) -> Unit): Boolean {
+  val cur = value
+  val upd = function(cur)
+  return compareAndSet(cur, upd).also { if (it) onUpdated(cur, upd) }
+}

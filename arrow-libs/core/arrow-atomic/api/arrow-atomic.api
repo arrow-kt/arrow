@@ -12,7 +12,9 @@ public final class arrow/atomic/AtomicBooleanKt {
 	public static final fun getAndUpdate (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Z
 	public static final fun loop (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
 	public static final fun tryUpdate (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun tryUpdate (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Z
 	public static final fun update (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)V
+	public static final fun update (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun updateAndGet (Larrow/atomic/AtomicBoolean;Lkotlin/jvm/functions/Function1;)Z
 }
 
@@ -22,17 +24,22 @@ public final class arrow/atomic/AtomicIntKt {
 	public static final fun loop (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
 	public static final fun setValue (Ljava/util/concurrent/atomic/AtomicInteger;I)V
 	public static final fun tryUpdate (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun tryUpdate (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Z
 	public static final fun update (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)V
+	public static final fun update (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicInteger;Lkotlin/jvm/functions/Function1;)I
 }
 
 public final class arrow/atomic/AtomicKt {
+	public static final fun forever (Lkotlin/jvm/functions/Function0;)Ljava/lang/Void;
 	public static final fun getAndUpdate (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getValue (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/Object;
 	public static final fun loop (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
 	public static final fun setValue (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;)V
 	public static final fun tryUpdate (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun tryUpdate (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Z
 	public static final fun update (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)V
+	public static final fun update (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
@@ -42,7 +49,9 @@ public final class arrow/atomic/AtomicLongKt {
 	public static final fun loop (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;
 	public static final fun setValue (Ljava/util/concurrent/atomic/AtomicLong;J)V
 	public static final fun tryUpdate (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;)Z
+	public static final fun tryUpdate (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Z
 	public static final fun update (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;)V
+	public static final fun update (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun updateAndGet (Ljava/util/concurrent/atomic/AtomicLong;Lkotlin/jvm/functions/Function1;)J
 }
 

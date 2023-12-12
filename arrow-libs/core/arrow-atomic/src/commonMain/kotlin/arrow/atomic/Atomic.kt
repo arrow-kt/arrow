@@ -1,7 +1,7 @@
 package arrow.atomic
 
 /**
- * [Atomic] value of [A].
+ * [Atomic] value of [V].
  *
  * ```kotlin
  * import arrow.atomic.AtomicInt
@@ -44,44 +44,38 @@ public var <T> Atomic<T>.value: T
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun <V> Atomic<V>.loop(action: (V) -> Unit): Nothing {
-  while (true) {
-    action(value)
-  }
-}
+public inline fun <V> Atomic<V>.loop(action: (V) -> Unit): Nothing = forever { action(value) }
 
-public fun <V> Atomic<V>.tryUpdate(function: (V) -> V): Boolean {
-  val cur = value
-  val upd = function(cur)
-  return compareAndSet(cur, upd)
-}
+public inline fun <V> Atomic<V>.tryUpdate(function: (V) -> V): Boolean = tryUpdate(function) { _, _ -> }
 
-public inline fun <V> Atomic<V>.update(function: (V) -> V) {
-  while (true) {
-    val cur = value
-    val upd = function(cur)
-    if (compareAndSet(cur, upd)) return
-  }
-}
+public inline fun <V> Atomic<V>.update(function: (V) -> V): Unit = update(function) { _, _ -> }
 
 /**
  * Updates variable atomically using the specified [function] of its value and returns its old value.
  */
-public inline fun <V> Atomic<V>.getAndUpdate(function: (V) -> V): V {
-  while (true) {
-    val cur = value
-    val upd = function(cur)
-    if (compareAndSet(cur, upd)) return cur
-  }
-}
+public inline fun <V> Atomic<V>.getAndUpdate(function: (V) -> V): V = update(function) { old, _ -> old }
 
 /**
  * Updates variable atomically using the specified [function] of its value and returns its new value.
  */
-public inline fun <V> Atomic<V>.updateAndGet(function: (V) -> V): V {
-  while (true) {
-    val cur = value
-    val upd = function(cur)
-    if (compareAndSet(cur, upd)) return upd
-  }
+public inline fun <V> Atomic<V>.updateAndGet(function: (V) -> V): V = update(function) { _, new -> new }
+
+@PublishedApi
+internal inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform: (old: V, new: U) -> R): R = forever {
+  tryUpdate(function) { old, new -> return transform(old, new) }
+}
+
+@PublishedApi
+internal inline fun <V, U: V> Atomic<V>.tryUpdate(function: (V) -> U, onUpdated: (old: V, new: U) -> Unit): Boolean {
+  val cur = value
+  val upd = function(cur)
+  return compareAndSet(cur, upd).also { if (it) onUpdated(cur, upd) }
+}
+
+/**
+ * while (true) as an expression.
+ */
+@PublishedApi
+internal inline fun forever(block: () -> Unit): Nothing {
+  while (true) block()
 }

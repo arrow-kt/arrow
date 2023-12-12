@@ -1,7 +1,8 @@
 package arrow.core
 
 import arrow.atomic.Atomic
-import arrow.atomic.loop
+import arrow.atomic.update
+import arrow.atomic.value
 
 /**
  * Defines a recursive **pure** function that:
@@ -18,21 +19,17 @@ public fun <T, R> MemoizedDeepRecursiveFunction(
 ): DeepRecursiveFunction<T, R> {
   val cache = Atomic(emptyMap<T, R>())
   return DeepRecursiveFunction { x ->
-    when (val v = cache.get()[x]) {
-      null -> {
-        val result = block(x)
-        cache.loop { old ->
-          when (x) {
-            in old ->
-              return@DeepRecursiveFunction old.getValue(x)
-            else -> {
-              if (cache.compareAndSet(old, old + Pair(x, result)))
-                return@DeepRecursiveFunction result
-            }
-          }
-        }
-      }
-      else -> v
+    cache.value.onAvailable(x) { return@DeepRecursiveFunction it }
+
+    val result = block(x)
+    cache.update { old ->
+      old.onAvailable(x) { return@DeepRecursiveFunction it }
+      old + (x to result)
     }
+    result
   }
+}
+
+private inline fun <K, V> Map<K, V>.onAvailable(key: K, action: (V) -> Unit) {
+  if (key in this) action(getValue(key))
 }
