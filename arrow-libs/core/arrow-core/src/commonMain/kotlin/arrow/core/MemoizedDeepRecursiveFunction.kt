@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.atomic.Atomic
-import arrow.atomic.loop
+import arrow.atomic.updateAndGet
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmOverloads
 
@@ -15,16 +15,9 @@ public value class AtomicMemoizationCache<K, V>(
   private val cache: Atomic<Map<K, V>> = Atomic(emptyMap())
 ): MemoizationCache<K, V> {
   override fun get(key: K): V? = cache.get()[key]
-  override fun set(key: K, value: V): V = cache.loop { old ->
-    when (key) {
-      in old ->
-        return@set old.getValue(key)
-      else -> {
-        if (cache.compareAndSet(old, old + Pair(key, value)))
-          return@set value
-      }
-    }
-  }
+  override fun set(key: K, value: V): V = cache.updateAndGet { old ->
+    if (key in old) old else old + (key to value)
+  }.getValue(key)
 }
 
 /**
@@ -41,11 +34,9 @@ public value class AtomicMemoizationCache<K, V>(
 public fun <T, R> MemoizedDeepRecursiveFunction(
   cache: MemoizationCache<T, R> = AtomicMemoizationCache(),
   block: suspend DeepRecursiveScope<T, R>.(T) -> R
-): DeepRecursiveFunction<T, R> {
-  return DeepRecursiveFunction { x ->
-    when (val v = cache.get(x)) {
-      null -> cache.set(x, block(x))
-      else -> v
-    }
+): DeepRecursiveFunction<T, R> = DeepRecursiveFunction { x ->
+  when (val v = cache.get(x)) {
+    null -> cache.set(x, block(x))
+    else -> v
   }
 }
