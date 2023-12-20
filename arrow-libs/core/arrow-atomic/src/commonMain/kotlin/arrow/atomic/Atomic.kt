@@ -71,11 +71,3 @@ internal inline fun <V, U: V> Atomic<V>.tryUpdate(function: (V) -> U, onUpdated:
   val upd = function(cur)
   return compareAndSet(cur, upd).also { if (it) onUpdated(cur, upd) }
 }
-
-/**
- * while (true) as an expression.
- */
-@PublishedApi
-internal inline fun forever(block: () -> Unit): Nothing {
-  while (true) block()
-}
