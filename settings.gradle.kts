@@ -20,6 +20,7 @@ plugins {
 dependencyResolutionManagement {
   @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
   @Suppress("LocalVariableName") val kotlin_version: String? by settings
+  @Suppress("LocalVariableName") val ksp_version: String? by settings
 
   repositories {
     mavenCentral()
@@ -32,6 +33,10 @@ dependencyResolutionManagement {
       if (!kotlin_version.isNullOrBlank()) {
         println("Overriding Kotlin version with $kotlin_version")
         version("kotlin", kotlin_version!!)
+      }
+      if (!ksp_version.isNullOrBlank()) {
+        println("Overriding KSP version with $ksp_version")
+        version("kspVersion", ksp_version!!)
       }
     }
   }
