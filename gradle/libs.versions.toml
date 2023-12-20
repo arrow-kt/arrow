@@ -16,7 +16,7 @@ kotlinxSerializationPlugin = "1.9.21"
 kotlinBinaryCompatibilityValidator = "0.13.2"
 kotlinCompileTesting = "1.5.0"
 knit = "0.5.0"
-kspVersion = "1.9.21-1.0.15"
+kspVersion = "1.9.21-1.0.16"
 kotlinxSerialization = "1.6.2"
 mockWebServer = "4.12.0"
 retrofit = "2.9.0"
@@ -26,6 +26,7 @@ compose = "1.5.4"
 composePlugin = "1.5.11"
 agp = "8.2.0"
 android-compileSdk = "34"
+cache4k = "0.12.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -58,6 +59,7 @@ classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classg
 kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
