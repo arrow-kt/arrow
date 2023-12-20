@@ -69,18 +69,18 @@ class NullableSpec {
     } shouldBe "1"
   }
 
-  @Test fun bindingEitherInNullableIgnoreErrors() = runTest {
-    nullable {
-      val number = Either.Right("s".length) as Either<Boolean, Int>
-      val string = ignoreErrors { number.map(Int::toString).bind() }
-      string
-    } shouldBe "1"
-  }
-
   @Test fun bindingEitherInNullable() = runTest {
     nullable {
       val number = Either.Right("s".length)
       val string = number.map(Int::toString).bind()
+      string
+    } shouldBe "1"
+  }
+
+  @Test fun bindingEitherInNullableIgnoreErrors() = runTest {
+    nullable {
+      val number = Either.Right("s".length) as Either<Boolean, Int>
+      val string = ignoreErrors { number.map(Int::toString).bind() }
       string
     } shouldBe "1"
   }
