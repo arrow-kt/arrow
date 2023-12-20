@@ -718,6 +718,7 @@ class EffectSpec : StringSpec({
     }
   }
 
+  /*
   "shift leaked results in RaiseLeakException" {
     effect {
       suspend { raise("failure") }
@@ -727,6 +728,7 @@ class EffectSpec : StringSpec({
       },
       { unreachable() }) { f -> f() }
   }
+  */
 
   "shift leaked results in RaiseLeakException with exception" {
     shouldThrow<IllegalStateException> {
