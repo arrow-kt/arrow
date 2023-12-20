@@ -1,7 +1,24 @@
 package arrow.core
 
 import arrow.atomic.Atomic
-import arrow.atomic.loop
+import arrow.atomic.updateAndGet
+import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmOverloads
+
+public interface MemoizationCache<K, V> {
+  public fun get(key: K): V?
+  public fun set(key: K, value: V): V
+}
+
+@JvmInline
+public value class AtomicMemoizationCache<K, V>(
+  private val cache: Atomic<Map<K, V>> = Atomic(emptyMap())
+): MemoizationCache<K, V> {
+  override fun get(key: K): V? = cache.get()[key]
+  override fun set(key: K, value: V): V = cache.updateAndGet { old ->
+    if (key in old) old else old + (key to value)
+  }.getValue(key)
+}
 
 /**
  * Defines a recursive **pure** function that:
@@ -13,26 +30,13 @@ import arrow.atomic.loop
  * [callRecursive][DeepRecursiveScope.callRecursive] function can be used to make a recursive call
  * to the declared function.
  */
+@JvmOverloads
 public fun <T, R> MemoizedDeepRecursiveFunction(
+  cache: MemoizationCache<T, R> = AtomicMemoizationCache(),
   block: suspend DeepRecursiveScope<T, R>.(T) -> R
-): DeepRecursiveFunction<T, R> {
-  val cache = Atomic(emptyMap<T, R>())
-  return DeepRecursiveFunction { x ->
-    when (val v = cache.get()[x]) {
-      null -> {
-        val result = block(x)
-        cache.loop { old ->
-          when (x) {
-            in old ->
-              return@DeepRecursiveFunction old.getValue(x)
-            else -> {
-              if (cache.compareAndSet(old, old + Pair(x, result)))
-                return@DeepRecursiveFunction result
-            }
-          }
-        }
-      }
-      else -> v
-    }
+): DeepRecursiveFunction<T, R> = DeepRecursiveFunction { x ->
+  when (val v = cache.get(x)) {
+    null -> cache.set(x, block(x))
+    else -> v
   }
 }

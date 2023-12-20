@@ -32,7 +32,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-ios_watchos'
           path: '**/build/reports/**'
@@ -59,7 +59,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-macos_tvos'
           path: '**/build/reports/**'
@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-windows'
           path: '**/build/reports/**'
@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-check'
           path: '**/build/reports/**'
@@ -156,7 +156,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
@@ -179,11 +179,11 @@ jobs:
       - name: jvmTest (K2 enabled)
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: "jvmTest -Pkotlin_version=2.0.0-dev-7674 -Pkotlin_repo_url=https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0"
+          arguments: "jvmTest -Pkotlin_version=2.0.0-Beta2 -Pksp_version=2.0.0-Beta2-1.0.16 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0"
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
@@ -215,7 +215,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-js'
           path: '**/build/reports/**'
@@ -242,7 +242,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-linux'
           path: '**/build/reports/**'

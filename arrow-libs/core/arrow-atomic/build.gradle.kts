@@ -19,6 +19,12 @@ spotless {
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {
+  targets.all {
+    compilations.all {
+      kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+    }
+  }
+
   sourceSets {
     commonMain {
       dependencies {
