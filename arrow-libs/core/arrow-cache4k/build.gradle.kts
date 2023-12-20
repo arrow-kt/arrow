@@ -3,7 +3,6 @@
 plugins {
   `java-library`
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
-  // alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
   alias(libs.plugins.spotless)
 }
