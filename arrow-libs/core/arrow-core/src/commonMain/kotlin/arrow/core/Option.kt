@@ -563,10 +563,10 @@ public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
 public fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
 /** Run the [Effect] by returning [Option] of [A], or [None] if raised with [None]. */
-public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { ignoreErrors { invoke() } }
+public suspend fun <A> Effect<None, A>.toOption(): Option<A> = option { invoke() }
 
 /** Run the [EagerEffect] by returning [Option] of [A], or [None] if raised with [None]. */
-public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { ignoreErrors { invoke() } }
+public fun <A> EagerEffect<None, A>.toOption(): Option<A> = option { invoke() }
 
 public fun <A> A.some(): Option<A> = Some(this)
 

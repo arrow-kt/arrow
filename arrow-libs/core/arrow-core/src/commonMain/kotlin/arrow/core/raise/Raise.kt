@@ -664,17 +664,6 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   return recover(block) { raise(transform(it)) }
 }
 
-@RaiseDSL
-public inline fun <Error, A> Raise<Error>.ignoreErrors(crossinline raise: () -> Error, block: IgnoreErrorsRaise.() -> A): A {
-  contract {
-    callsInPlace(raise, AT_MOST_ONCE)
-    callsInPlace(block, AT_MOST_ONCE)
-  }
-  return block(object : IgnoreErrorsRaise() {
-    override fun raise(): Nothing = this@ignoreErrors.raise(raise())
-  })
-}
-
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [A].
  * Does not distinguish between normal results and errors, thus you can consider

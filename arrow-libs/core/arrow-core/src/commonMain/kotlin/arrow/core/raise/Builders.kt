@@ -11,8 +11,21 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.js.JsName
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
+
+@RaiseDSL
+@JvmName("singleton")
+public inline fun <A> singleton(
+  crossinline raise: () -> A,
+  @BuilderInference block: SingletonRaise.() -> A,
+): A {
+  contract {
+    callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+  }
+  return fold({ block(SingletonRaise(this)) }, { raise() }, { it })
+}
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Either].
@@ -26,7 +39,7 @@ import kotlin.jvm.JvmName
  */
 public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
+  return fold(block, { Either.Left(it) }, { Either.Right(it) })
 }
 
 /**
@@ -43,7 +56,7 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  */
 public inline fun <A> nullable(block: SingletonRaise.() -> A): A? {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors({ null }, block) }
+  return singleton({ null }, block)
 }
 
 /**
@@ -70,7 +83,7 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
  */
 public inline fun <A> option(block: SingletonRaise.() -> A): Option<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors({ None }, block).some() }
+  return singleton({ None }, { block().some() })
 }
 
 /**
@@ -136,36 +149,12 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
  */
 public inline fun impure(block: SingletonRaise.() -> Unit) {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return merge { ignoreErrors({ Unit }, block) }
+  return singleton({ }, block)
 }
 
-/**
- * Implementation of [Raise] used by `ignoreErrors`.
- * You should never use this directly.
- */
-public abstract class IgnoreErrorsRaise : SingletonRaise(), Raise<Any?> {
-  @RaiseDSL
-  override fun raise(r: Any?): Nothing = raise()
-
-  @JvmName("recoverIgnoreErrors")
-  @RaiseDSL
-  public inline fun <A> recover(
-    block: IgnoreErrorsRaise.() -> A,
-    recover: () -> A,
-  ): A {
-    contract {
-      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
-    }
-    impure {
-      return ignoreErrors(block)
-    }
-    return recover()
-  }
-}
-
-public sealed class SingletonRaise {
-  public abstract fun raise(): Nothing
+public class SingletonRaise(private val raise: Raise<Any?>): Raise<Any?> by raise {
+  @JsName("raiseNull")
+  public fun raise(): Nothing = raise(null)
 
   @RaiseDSL
   public fun ensure(condition: Boolean) {
@@ -233,16 +222,13 @@ public sealed class SingletonRaise {
   @RaiseDSL
   public inline fun <A> recover(
     block: SingletonRaise.() -> A,
-    recover: () -> A,
+    crossinline recover: () -> A,
   ): A {
     contract {
       callsInPlace(block, InvocationKind.AT_MOST_ONCE)
       callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
     }
-    impure {
-      return block()
-    }
-    return recover()
+    return singleton(recover, block)
   }
 
   /**
@@ -251,12 +237,10 @@ public sealed class SingletonRaise {
    */
   @RaiseDSL
   public inline fun <A> ignoreErrors(
-    block: IgnoreErrorsRaise.() -> A,
+    block: Raise<Any?>.() -> A,
   ): A {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-    return when (this) {
-      is IgnoreErrorsRaise -> block(this)
-    }
+    return block(this)
   }
 }
 
