@@ -11,20 +11,19 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.js.JsName
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 @RaiseDSL
 @JvmName("singleton")
 public inline fun <A> singleton(
-  crossinline raise: () -> A,
-  @BuilderInference block: SingletonRaise.() -> A,
+  noinline raise: () -> A,
+  @BuilderInference block: SingletonRaise<A>.() -> A,
 ): A {
   contract {
     callsInPlace(block, InvocationKind.AT_MOST_ONCE)
   }
-  return fold({ block(SingletonRaise(this)) }, { raise() }, { it })
+  return merge { block(SingletonRaise(raise, this as Raise<Any?>)) }
 }
 
 /**
@@ -54,7 +53,7 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  * @see SingletonRaise.ignoreErrors By default, `nullable` only allows raising `null`.
  * Calling [ignoreErrors][SingletonRaise.ignoreErrors] inside `nullable` allows to raise any error, which will be returned to the caller as if `null` was raised.
  */
-public inline fun <A> nullable(block: SingletonRaise.() -> A): A? {
+public inline fun <A> nullable(block: SingletonRaise<Nothing?>.() -> A): A? {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return singleton({ null }, block)
 }
@@ -81,9 +80,9 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <A> option(block: SingletonRaise.() -> A): Option<A> {
+public inline fun <A> option(block: SingletonRaise<None>.() -> A): Option<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return singleton({ None }, { block().some() })
+  return singleton<Option<A>>({ None }, { block().some() })
 }
 
 /**
@@ -147,14 +146,16 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun impure(block: SingletonRaise.() -> Unit) {
+public inline fun impure(block: SingletonRaise<Unit>.() -> Unit) {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return singleton({ }, block)
 }
 
-public class SingletonRaise(private val raise: Raise<Any?>): Raise<Any?> by raise {
-  @JsName("raiseNull")
-  public fun raise(): Nothing = raise(null)
+public class SingletonRaise<in E>(
+  private val error: () -> E,
+  private val raise: Raise<Any?>
+): Raise<E> by raise {
+  public fun raise(): Nothing = raise(error())
 
   @RaiseDSL
   public fun ensure(condition: Boolean) {
@@ -220,15 +221,15 @@ public class SingletonRaise(private val raise: Raise<Any?>): Raise<Any?> by rais
     map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
-  public inline fun <A> recover(
-    block: SingletonRaise.() -> A,
-    crossinline recover: () -> A,
+  public fun <A> recover(
+    block: SingletonRaise<E>.() -> A,
+    recover: () -> A,
   ): A {
     contract {
       callsInPlace(block, InvocationKind.AT_MOST_ONCE)
       callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
     }
-    return singleton(recover, block)
+    return recover<E, A>({ block(SingletonRaise(error, this as Raise<Any?>)) }, { _ -> recover() })
   }
 
   /**
@@ -236,11 +237,11 @@ public class SingletonRaise(private val raise: Raise<Any?>): Raise<Any?> by rais
    * but no information is saved in the [raise] case.
    */
   @RaiseDSL
-  public inline fun <A> ignoreErrors(
+  public fun <A> ignoreErrors(
     block: Raise<Any?>.() -> A,
   ): A {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-    return block(this)
+    return block(SingletonRaise({ null }, raise))
   }
 }
 

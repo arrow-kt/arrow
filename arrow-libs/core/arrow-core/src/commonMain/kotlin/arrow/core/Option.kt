@@ -671,7 +671,7 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- KNIT example-option-22.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A> Option<A>.recover(recover: SingletonRaise.() -> A): Option<A> =
+public inline fun <A> Option<A>.recover(recover: SingletonRaise<None>.() -> A): Option<A> =
   when (this@recover) {
     is None -> option { recover() }
     is Some -> this@recover
