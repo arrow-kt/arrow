@@ -28,7 +28,7 @@ public class AtomicBoolean(value: Boolean) {
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun AtomicBoolean.loop(action: (Boolean) -> Unit): Nothing = forever { action(value) }
+public inline fun AtomicBoolean.loop(action: (Boolean) -> Unit): Nothing { while(true) { action(value) } }
 
 public inline fun AtomicBoolean.tryUpdate(function: (Boolean) -> Boolean): Boolean = tryUpdate(function) { _, _ -> }
 
@@ -45,8 +45,10 @@ public inline fun AtomicBoolean.getAndUpdate(function: (Boolean) -> Boolean): Bo
 public inline fun AtomicBoolean.updateAndGet(function: (Boolean) -> Boolean): Boolean = update(function) { _, new -> new }
 
 @PublishedApi
-internal inline fun <R> AtomicBoolean.update(function: (Boolean) -> Boolean, transform: (old: Boolean, new: Boolean) -> R): R = forever {
-  tryUpdate(function) { old, new -> return transform(old, new) }
+internal inline fun <R> AtomicBoolean.update(function: (Boolean) -> Boolean, transform: (old: Boolean, new: Boolean) -> R): R {
+  while (true) {
+    tryUpdate(function) { old, new -> return transform(old, new) }
+  }
 }
 
 @PublishedApi

@@ -23,7 +23,7 @@ public var AtomicInt.value: Int
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun AtomicInt.loop(action: (Int) -> Unit): Nothing = forever { action(value) }
+public inline fun AtomicInt.loop(action: (Int) -> Unit): Nothing { while(true) { action(value) } }
 
 public inline fun AtomicInt.tryUpdate(function: (Int) -> Int): Boolean = tryUpdate(function) { _, _ -> }
 
@@ -40,8 +40,10 @@ public inline fun AtomicInt.getAndUpdate(function: (Int) -> Int): Int = update(f
 public inline fun AtomicInt.updateAndGet(function: (Int) -> Int): Int = update(function) { _, new -> new }
 
 @PublishedApi
-internal inline fun <R> AtomicInt.update(function: (Int) -> Int, transform: (old: Int, new: Int) -> R): R = forever {
-  tryUpdate(function) { old, new -> return transform(old, new) }
+internal inline fun <R> AtomicInt.update(function: (Int) -> Int, transform: (old: Int, new: Int) -> R): R {
+  while (true) {
+    tryUpdate(function) { old, new -> return transform(old, new) }
+  }
 }
 
 @PublishedApi

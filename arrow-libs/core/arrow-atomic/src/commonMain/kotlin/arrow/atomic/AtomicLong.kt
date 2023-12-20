@@ -23,7 +23,7 @@ public var AtomicLong.value: Long
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun AtomicLong.loop(action: (Long) -> Unit): Nothing = forever { action(value) }
+public inline fun AtomicLong.loop(action: (Long) -> Unit): Nothing { while(true) { action(value) } }
 
 public inline fun AtomicLong.tryUpdate(function: (Long) -> Long): Boolean = tryUpdate(function) { _, _ -> }
 
@@ -40,8 +40,10 @@ public inline fun AtomicLong.getAndUpdate(function: (Long) -> Long): Long = upda
 public inline fun AtomicLong.updateAndGet(function: (Long) -> Long): Long = update(function) { _, new -> new }
 
 @PublishedApi
-internal inline fun <R> AtomicLong.update(function: (Long) -> Long, transform: (old: Long, new: Long) -> R): R = forever {
-  tryUpdate(function) { old, new -> return transform(old, new) }
+internal inline fun <R> AtomicLong.update(function: (Long) -> Long, transform: (old: Long, new: Long) -> R): R {
+  while (true) {
+    tryUpdate(function) { old, new -> return transform(old, new) }
+  }
 }
 
 @PublishedApi

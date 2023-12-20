@@ -31,7 +31,6 @@ public final class arrow/atomic/AtomicIntKt {
 }
 
 public final class arrow/atomic/AtomicKt {
-	public static final fun forever (Lkotlin/jvm/functions/Function0;)Ljava/lang/Void;
 	public static final fun getAndUpdate (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getValue (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/Object;
 	public static final fun loop (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)Ljava/lang/Void;

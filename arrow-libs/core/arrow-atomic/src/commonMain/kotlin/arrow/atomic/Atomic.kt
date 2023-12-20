@@ -44,7 +44,7 @@ public var <T> Atomic<T>.value: T
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun <V> Atomic<V>.loop(action: (V) -> Unit): Nothing = forever { action(value) }
+public inline fun <V> Atomic<V>.loop(action: (V) -> Unit): Nothing { while(true) { action(value) } }
 
 public inline fun <V> Atomic<V>.tryUpdate(function: (V) -> V): Boolean = tryUpdate(function) { _, _ -> }
 
@@ -61,8 +61,10 @@ public inline fun <V> Atomic<V>.getAndUpdate(function: (V) -> V): V = update(fun
 public inline fun <V> Atomic<V>.updateAndGet(function: (V) -> V): V = update(function) { _, new -> new }
 
 @PublishedApi
-internal inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform: (old: V, new: U) -> R): R = forever {
-  tryUpdate(function) { old, new -> return transform(old, new) }
+internal inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform: (old: V, new: U) -> R): R {
+  while (true) {
+    tryUpdate(function) { old, new -> return transform(old, new) }
+  }
 }
 
 @PublishedApi
