@@ -190,7 +190,7 @@ private fun processIsoSyntax(ele: ADT, dsl: ValueClassDsl, className: String): S
   }
 
 private fun resolveClassName(ele: ADT): Pair<String, String> = if (hasPackageCollisions(ele)) {
-  val classNameAlias = ele.sourceClassName.replace(".", "")
+  val classNameAlias = ele.sourceClassName.replace(".", "").replace("`", "").sanitize()
   val aliasImport = "import ${ele.sourceClassName} as $classNameAlias"
   classNameAlias to aliasImport
 } else {
