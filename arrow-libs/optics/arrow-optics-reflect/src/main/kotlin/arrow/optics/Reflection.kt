@@ -4,7 +4,9 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
+import kotlin.reflect.cast
 import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.safeCast
@@ -30,11 +32,12 @@ public inline fun <S : Any, reified A : S> instance(): Prism<S, A> =
  *
  * WARNING: this should only be called on data classes,
  *          but that is checked only at runtime!
+ *          The check happens when the lens is created.
  */
 public val <S, A> KProperty1<S, A>.lens: Lens<S, A>
   get() = PLens(
     get = this,
-    set = { s, a -> clone(this, s, a) },
+    set = reflectiveCopy,
   )
 
 /** [Optional] that focuses on a nullable field */
@@ -47,14 +50,23 @@ public val <S, A> KProperty1<S, List<A>>.every: Traversal<S, A>
 public val <S, K, A> KProperty1<S, Map<K, A>>.values: Traversal<S, A>
   get() = lens compose Every.map()
 
-@Suppress("UNCHECKED_CAST")
-private fun <S, A> clone(prop: KProperty1<S, A>, value: S, newField: A): S {
+private val <S, A> KProperty1<S, A>.reflectiveCopy: (S, A) -> S get() {
   // based on https://stackoverflow.com/questions/49511098/call-data-class-copy-via-reflection
-  val klass = prop.instanceParameter?.type?.classifier as? KClass<*>
-  val copy = klass?.memberFunctions?.firstOrNull { it.name == "copy" }
-  if (klass == null || !klass.isData || copy == null) {
+  val klass = kClass
+  val copy = klass.copyMethod
+  val fieldParam = copy.parameters.first { it.name == name }
+  val instanceParam = copy.instanceParameter!!
+  return { value, newField -> klass.cast(copy.callBy(mapOf(instanceParam to value, fieldParam to newField))) }
+}
+
+@Suppress("UNCHECKED_CAST")
+private val <S> KProperty1<S, *>.kClass: KClass<S & Any>
+  get() = instanceParameter?.type?.classifier as? KClass<S & Any> ?: throw IllegalArgumentException("may only be used with instance properties")
+
+private val KClass<*>.copyMethod: KFunction<*> get() {
+  val copy = memberFunctions.firstOrNull { it.name == "copy" }
+  if (!isData || copy == null) {
     throw IllegalArgumentException("may only be used with data classes")
   }
-  val fieldParam = copy.parameters.first { it.name == prop.name }
-  return copy.callBy(mapOf(copy.instanceParameter!! to value, fieldParam to newField)) as S
+  return copy
 }

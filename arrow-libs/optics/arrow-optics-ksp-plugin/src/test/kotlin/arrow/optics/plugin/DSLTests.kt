@@ -77,6 +77,42 @@ class DSLTests {
   }
 
   @Test
+  fun `DSL for a class in a package including keywords, issue #3134, part 1`() {
+    """
+      |package com.sats.core.data.workouts.models
+      |
+      |$imports
+      |
+      |@optics
+      |data class Source(val program: String) {
+      |  companion object
+      |}
+      |
+      """.compilationSucceeds()
+  }
+
+  /*
+   This test is for a very specific corner case, in which:
+   - The package name includes a Kotlin keyword, so we need to escape them,
+   - There's at least one property which shares name with part of the package,
+     so we need to include an explicit import
+   */
+  @Test
+  fun `DSL for a class in a package including keywords and conflicting fields, issue #3134, part 2`() {
+    """
+      |package com.sats.core.data.workouts.models
+      |
+      |$imports
+      |
+      |@optics
+      |data class Source(val models: String) {
+      |  companion object
+      |}
+      |
+      """.compilationSucceeds()
+  }
+
+  @Test
   fun `DSL works with variance, issue #3057`() {
     """
       |$`package`
