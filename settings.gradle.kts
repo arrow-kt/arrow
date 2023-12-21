@@ -55,6 +55,9 @@ project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 include("arrow-continuations")
 project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
+include("arrow-eval")
+project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")
+
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 

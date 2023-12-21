@@ -1,6 +1,11 @@
-package arrow.core
+package arrow.eval
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.getOrElse
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidDeprecation
 import kotlin.js.JsName
 import kotlin.jvm.JvmStatic
 
@@ -33,7 +38,7 @@ import kotlin.jvm.JvmStatic
  * Example of stack safety:
  *
  * ```kotlin
- * import arrow.core.Eval
+ * import arrow.eval.Eval
  *
  * //sampleStart
  * fun even(n: Int): Eval<Boolean> =
@@ -57,10 +62,6 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-eval-01.kt -->
  *
  */
-@Deprecated(
-  "This is now part of the arrow-eval module, and will be removed from arrow-core in version 2.0. Please update your project dependencies.",
-  ReplaceWith("Eval", "arrow.eval.Eval")
-)
 public sealed class Eval<out A> {
 
   public companion object {
@@ -71,7 +72,7 @@ public sealed class Eval<out A> {
      * @param a is an already computed value of type [A]
      *
      * ```kotlin
-     * import arrow.core.*
+     * import arrow.eval.*
      *
      * fun main() {
      * //sampleStart
@@ -94,7 +95,7 @@ public sealed class Eval<out A> {
      * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
      *
      * ```kotlin
-     * import arrow.core.*
+     * import arrow.eval.*
      *
      * fun main() {
      * //sampleStart
@@ -117,7 +118,7 @@ public sealed class Eval<out A> {
      * @param f is a function or computation that will be called every time `.value()` is invoked.
      *
      * ```kotlin
-     * import arrow.core.*
+     * import arrow.eval.*
      *
      * fun main() {
      * //sampleStart
@@ -229,7 +230,10 @@ public sealed class Eval<out A> {
     }
   }
 
+  @JsName("evalValue")
   public abstract fun value(): A
+
+  public operator fun invoke(): A = value()
 
   public abstract fun memoize(): Eval<A>
 
@@ -268,9 +272,10 @@ public sealed class Eval<out A> {
    * This type should be used when an A value is already in hand, or when the computation to produce an A value is
    * pure and very fast.
    */
-  public data class Now<out A>(@JsName("_value") val value: A) : Eval<A>() {
+  public data class Now<out A>(override val value: A) : Eval<A>(), Lazy<A> {
     override fun value(): A = value
     override fun memoize(): Eval<A> = this
+    override fun isInitialized(): Boolean = true
 
     override fun toString(): String =
       "Eval.Now($value)"
@@ -292,9 +297,11 @@ public sealed class Eval<out A> {
    * Once Later has been evaluated, the closure (and any values captured by the closure) will not be retained, and
    * will be available for garbage collection.
    */
-  public data class Later<out A>(private val f: () -> A) : Eval<A>() {
-    @JsName("_name")
-    val value: A by lazy(f)
+  public data class Later<out A>(private val f: () -> A) : Eval<A>(), Lazy<A> {
+    private val underlying: Lazy<A> = lazy(f)
+
+    override val value: A by underlying
+    override fun isInitialized(): Boolean = underlying.isInitialized()
 
     override fun value(): A = value
     override fun memoize(): Eval<A> = this
@@ -560,11 +567,13 @@ public fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
-  if (n <= 0) Eval.now(emptyList())
-  else this.zip(replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
+public fun <A, B> Eval<A>.replicate(n: Int, initial: () -> B, combine: (A, B) -> B): Eval<B> =
+  if (n <= 0) Eval.now(initial())
+  else this.zip(replicate(n - 1, initial, combine), combine)
 
-public fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
-  if (n <= 0) Eval.now(MA.empty())
-  else this@replicate.zip(replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
-}
+public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
+  replicate(n, { emptyList() }) { x, xs -> listOf(x) + xs }
+
+@Deprecated(MonoidDeprecation, ReplaceWith("replicate(n, MA::empty) { x, xs -> MA.run { x + xs } }", "arrow.eval.replicate"))
+public fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> =
+  replicate(n, MA::empty) { x, xs -> MA.run { x + xs } }
