@@ -2,6 +2,7 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Some
+import arrow.core.test.any
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -13,6 +14,7 @@ import io.kotest.property.checkAll
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 
+@Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
 class NullableSpec {
   @Test fun ensureNullInNullableComputation() = runTest {
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
@@ -85,6 +87,14 @@ class NullableSpec {
       val string = ignoreErrors { number.map(Int::toString).bind() }
       string
     } shouldBe "1"
+  }
+
+  @Test fun raisingInIgnoreErrorsReturnsNone() = runTest {
+    checkAll(Arb.any()) { a ->
+      nullable {
+        ignoreErrors { raise(a) }
+      } shouldBe null
+    }
   }
 
   @Test fun shortCircuitOption() = runTest {

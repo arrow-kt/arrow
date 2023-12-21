@@ -1,9 +1,7 @@
 package arrow.core.raise
 
-import arrow.core.None
-import arrow.core.Some
-import arrow.core.some
-import arrow.core.toOption
+import arrow.core.*
+import arrow.core.test.any
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -13,6 +11,7 @@ import io.kotest.property.checkAll
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 
+@Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
 class OptionSpec {
 
   @Test fun ensure() = runTest {
@@ -35,11 +34,18 @@ class OptionSpec {
   }
 
   @Test fun shortCircuitOption() = runTest {
-    @Suppress("UNREACHABLE_CODE")
     option {
       ensureNotNull<Int>(null)
       throw IllegalStateException("This should not be executed")
     } shouldBe None
+  }
+
+  @Test fun raisingInIgnoreErrorsReturnsNone() = runTest {
+    checkAll(Arb.any()) { a ->
+      option {
+        ignoreErrors { raise(a) }
+      } shouldBe None
+    }
   }
 
   @Test fun RecoverWorksAsExpected() = runTest {

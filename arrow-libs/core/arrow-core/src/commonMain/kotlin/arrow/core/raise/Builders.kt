@@ -15,15 +15,15 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 @RaiseDSL
-@JvmName("singleton")
 public inline fun <A> singleton(
-  noinline raise: () -> A,
+  raise: () -> A,
   @BuilderInference block: SingletonRaise<A>.() -> A,
 ): A {
   contract {
+    callsInPlace(raise, InvocationKind.AT_MOST_ONCE)
     callsInPlace(block, InvocationKind.AT_MOST_ONCE)
   }
-  return merge { block(SingletonRaise(raise, this as Raise<Any?>)) }
+  return recover({ block(SingletonRaise(this)) }) { raise() }
 }
 
 /**
@@ -82,7 +82,7 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
  */
 public inline fun <A> option(block: SingletonRaise<None>.() -> A): Option<A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return singleton<Option<A>>({ None }, { block().some() })
+  return singleton(::none) { block().some() }
 }
 
 /**
@@ -151,11 +151,12 @@ public inline fun impure(block: SingletonRaise<Unit>.() -> Unit) {
   return singleton({ }, block)
 }
 
-public class SingletonRaise<in E>(
-  private val error: () -> E,
-  private val raise: Raise<Any?>
-): Raise<E> by raise {
-  public fun raise(): Nothing = raise(error())
+public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
+  @RaiseDSL
+  public fun raise(): Nothing = raise.raise(Unit)
+
+  @RaiseDSL
+  override fun raise(r: E): Nothing = raise()
 
   @RaiseDSL
   public fun ensure(condition: Boolean) {
@@ -221,7 +222,7 @@ public class SingletonRaise<in E>(
     map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
-  public fun <A> recover(
+  public inline fun <A> recover(
     block: SingletonRaise<E>.() -> A,
     recover: () -> A,
   ): A {
@@ -229,7 +230,7 @@ public class SingletonRaise<in E>(
       callsInPlace(block, InvocationKind.AT_MOST_ONCE)
       callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
     }
-    return recover<E, A>({ block(SingletonRaise(error, this as Raise<Any?>)) }, { _ -> recover() })
+    return singleton(recover) { ignoreErrors(block) }
   }
 
   /**
@@ -237,11 +238,14 @@ public class SingletonRaise<in E>(
    * but no information is saved in the [raise] case.
    */
   @RaiseDSL
-  public fun <A> ignoreErrors(
-    block: Raise<Any?>.() -> A,
+  public inline fun <A> ignoreErrors(
+    block: SingletonRaise<Any?>.() -> A,
   ): A {
     contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-    return block(SingletonRaise({ null }, raise))
+    // This is safe because SingletonRaise never leaks the e from `raise(e: E)`, instead always calling `raise()`.
+    // and hence the type parameter of SingletonRaise merely states what errors it accepts and ignores.
+    @Suppress("UNCHECKED_CAST")
+    return block(this as SingletonRaise<Any?>)
   }
 }
 
