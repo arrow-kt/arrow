@@ -2,6 +2,8 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Some
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -141,5 +143,20 @@ class NullableSpec {
       val two = 2.bind()
       one + two
     } shouldBe 3
+  }
+
+  @Test fun detectsPotentialLeaks() {
+    shouldThrow<IllegalStateException> {
+      nullable { lazy { raise(null) } }
+    }
+  }
+
+  @Test fun unsafeLeak() {
+    val l: Lazy<Int> = foldUnsafe<String, Lazy<Int>, Lazy<Int>?>(
+      { lazy { raise("problem") } }, { throw it }, { null }, { it }
+    ).shouldNotBeNull()
+    shouldThrow<IllegalStateException> {
+      l.value
+    }
   }
 }

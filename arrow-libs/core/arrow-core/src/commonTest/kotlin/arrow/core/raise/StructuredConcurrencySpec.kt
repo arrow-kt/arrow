@@ -235,7 +235,7 @@ class StructuredConcurrencySpec {
               .fold({ fail("shift was never awaited, so it never took effect") }, ::identity)
           shiftedAsync.await()
         }
-      }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+      }.message shouldStartWith "'raise' or 'bind' was leaked"
     }
   }
 }
