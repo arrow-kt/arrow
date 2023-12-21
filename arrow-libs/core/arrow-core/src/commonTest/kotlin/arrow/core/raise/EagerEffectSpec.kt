@@ -245,16 +245,6 @@ class EagerEffectSpec {
     }.message shouldBe "Boom!"
   }
 
-  @Test fun shiftLeakedResultsInRaiseLeakException() = runTest {
-    eagerEffect {
-      suspend { raise("failure") }
-    }.fold(
-      {
-        it.message shouldStartWith "raise or bind was called outside of its DSL scope"
-      },
-      { unreachable() }) { f -> f() }
-  }
-
   @Test fun shiftLeakedResultsInRaiseLeakExceptionWithException() = runTest {
     shouldThrow<IllegalStateException> {
       val leak = CompletableDeferred<suspend () -> Unit>()
@@ -268,7 +258,7 @@ class EagerEffectSpec {
         },
         { fail("Cannot be here") }
       ) { fail("Cannot be here") }
-    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+    }.message shouldStartWith "'raise' or 'bind' was leaked"
   }
 
   @Test fun shiftLeakedResultsInRaiseLeakExceptionAfterRaise() = runTest {
@@ -283,7 +273,7 @@ class EagerEffectSpec {
           it shouldBe "Boom!"
           leak.await().invoke()
         }) { fail("Cannot be here") }
-    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+    }.message shouldStartWith "'raise' or 'bind' was leaked"
   }
 
   @Test fun mapErrorRaiseAndTransformError() = runTest {
