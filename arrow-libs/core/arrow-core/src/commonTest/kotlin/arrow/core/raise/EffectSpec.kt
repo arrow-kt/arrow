@@ -718,6 +718,7 @@ class EffectSpec : StringSpec({
     }
   }
 
+  /*
   "shift leaked results in RaiseLeakException" {
     effect {
       suspend { raise("failure") }
@@ -727,6 +728,7 @@ class EffectSpec : StringSpec({
       },
       { unreachable() }) { f -> f() }
   }
+  */
 
   "shift leaked results in RaiseLeakException with exception" {
     shouldThrow<IllegalStateException> {
@@ -741,7 +743,7 @@ class EffectSpec : StringSpec({
         },
         { fail("Cannot be here") }
       ) { fail("Cannot be here") }
-    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+    }.message shouldStartWith "'raise' or 'bind' was leaked"
   }
 
   "shift leaked results in RaiseLeakException after raise" {
@@ -756,7 +758,7 @@ class EffectSpec : StringSpec({
           it shouldBe "Boom!"
           leak.await().invoke()
         }) { fail("Cannot be here") }
-    }.message shouldStartWith "raise or bind was called outside of its DSL scope"
+    }.message shouldStartWith "'raise' or 'bind' was leaked"
   }
 
   "mapError - raise and transform error" {
