@@ -692,15 +692,3 @@ public inline fun <A> merge(
   }
   return recover(block, ::identity)
 }
-
-@RaiseDSL
-public inline fun <A, Error> Raise<Error>.withSingletonError(
-  raise: () -> Error,
-  @BuilderInference block: SingletonRaise<Error>.() -> A,
-): A {
-  contract {
-    callsInPlace(raise, AT_MOST_ONCE)
-    callsInPlace(block, AT_MOST_ONCE)
-  }
-  return withError({ raise() }) { block(SingletonRaise(this)) }
-}
