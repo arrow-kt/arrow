@@ -1067,7 +1067,7 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 }
 
 public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Raise {
-	public fun <init> (Lkotlin/jvm/functions/Function0;Larrow/core/raise/Raise;)V
+	public fun <init> (Larrow/core/raise/Raise;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
