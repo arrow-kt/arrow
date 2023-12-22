@@ -97,6 +97,17 @@ class NullableSpec {
     }
   }
 
+  @Test fun ignoreErrorsAcceptsCallableReferences() = runTest {
+    fun Raise<Any?>.foo(): Int = raise(42)
+    val bar: Raise<String>.() -> Unit = { raise("s") }
+    nullable {
+      ignoreErrors(Raise<Any?>::foo)
+    } shouldBe null
+    nullable {
+      ignoreErrors(bar)
+    } shouldBe null
+  }
+
   @Test fun shortCircuitOption() = runTest {
     nullable {
       val number = Some("s".length)
