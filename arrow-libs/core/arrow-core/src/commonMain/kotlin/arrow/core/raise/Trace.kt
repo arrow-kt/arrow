@@ -20,7 +20,7 @@ public value class Trace(private val exception: CancellationException) {
    * Note, the first line in the stacktrace will be the `RaiseCancellationException`.
    * The users call to `raise` can found in the_second line of the stacktrace.
    */
-  public fun stackTraceToString(): String = exception.stackTraceToString()
+  public fun stackTraceToString(): String = (exception.cause ?: exception).stackTraceToString()
 
   /**
    * Prints the stacktrace.
@@ -29,7 +29,7 @@ public value class Trace(private val exception: CancellationException) {
    * The users call to `raise` can found in the_second line of the stacktrace.
    */
   public fun printStackTrace(): Unit =
-    exception.printStackTrace()
+    (exception.cause ?: exception).printStackTrace()
 
   /**
    * Returns the suppressed exceptions that occurred during cancellation of the surrounding coroutines,
@@ -39,5 +39,5 @@ public value class Trace(private val exception: CancellationException) {
    * if the finalizer then results in a `Throwable` it will be added as a `suppressedException` to the [CancellationException].
    */
   public fun suppressedExceptions(): List<Throwable> =
-    exception.suppressedExceptions
+    exception.cause?.suppressedExceptions.orEmpty() + exception.suppressedExceptions
 }

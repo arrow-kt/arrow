@@ -224,15 +224,27 @@ public inline fun <Error, A> Raise<Error>.traced(
   @BuilderInference block: Raise<Error>.() -> A,
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
-  val isOuterTraced = this is DefaultRaise && isTraced
-  val nested: DefaultRaise = if (isOuterTraced) this as DefaultRaise else DefaultRaise(true)
+  val nested = DefaultRaise(true)
   return try {
-    block.invoke(nested)
+    block(nested).also { nested.complete() }
   } catch (e: CancellationException) {
+    nested.complete()
     val r: Error = e.raisedOrRethrow(nested)
     trace(Trace(e), r)
-    if (isOuterTraced) throw e else raise(r)
+    // If our outer Raise happens to be traced
+    // Then we want the stack trace to match the inner one
+    try {
+      raise(r)
+    } catch (rethrown: CancellationException) {
+      throw rethrown.withCause(e)
+    }
   }
+}
+
+@PublishedApi
+internal fun CancellationException.withCause(cause: CancellationException): CancellationException = when (this) {
+  is RaiseCancellationException -> RaiseCancellationException(raised, raise, cause.cause ?: cause)
+  else -> this
 }
 
 /** Returns the raised value, rethrows the CancellationException if not our scope */
@@ -262,7 +274,7 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
   CancellationExceptionNoTrace()
 
-private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
+private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>, override val cause: Throwable? = null) : CancellationException()
 
 internal expect open class CancellationExceptionNoTrace() : CancellationException
 
