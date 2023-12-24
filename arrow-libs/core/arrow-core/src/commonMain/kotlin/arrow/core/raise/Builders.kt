@@ -5,17 +5,8 @@
 package arrow.core.raise
 
 import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
-import arrow.core.Either
-import arrow.core.Ior
-import arrow.core.IorNel
-import arrow.core.NonEmptyList
-import arrow.core.NonEmptySet
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.getOrElse
-import arrow.core.identity
+import arrow.atomic.update
+import arrow.core.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
@@ -88,15 +79,19 @@ public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
-  val state: Atomic<Option<Error>> = Atomic(None)
-  return fold<Error, A, Ior<Error, A>>(
-    { block(IorRaise(combineError, state, this)) },
-    { e -> throw e },
-    { e -> Ior.Left(state.get().getOrElse { e }) },
-    { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
+public inline fun <Error, A> ior(crossinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
+  val state: Atomic<Any?> = Atomic(EmptyValue)
+  return fold(
+    { block(IorRaise { e -> state.update { EmptyValue.combine(it, e, combineError) } }) },
+    { e -> Ior.Left(EmptyValue.combine(state.get(), e, combineError)) },
+    { a -> EmptyValue.fold(state.get(), { Ior.Right(a) }, { e: Error -> Ior.Both(e, a) }) }
   )
 }
+
+@PublishedApi internal inline fun <Error> Raise<Error>.IorRaise(crossinline addError: (Error) -> Unit): IorRaise<Error> =
+  object: IorRaise<Error>(this) {
+    override fun addError(e: Error) = addError(e)
+  }
 
 /**
  * Run a computation [block] using [Raise]. and return its outcome as [IorNel].
@@ -114,15 +109,8 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, @BuilderInference block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> {
-  val state: Atomic<Option<NonEmptyList<Error>>> = Atomic(None)
-  return fold<NonEmptyList<Error>, A, Ior<NonEmptyList<Error>, A>>(
-    { block(IorRaise(combineError, state, this)) },
-    { e -> throw e },
-    { e -> Ior.Left(state.get().getOrElse { e }) },
-    { a -> state.get().fold({ Ior.Right(a) }, { Ior.Both(it, a) }) }
-  )
-}
+public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, @BuilderInference block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> =
+  ior(combineError, block)
 
 /**
  * Implementation of [Raise] used by `ignoreErrors`.
@@ -304,14 +292,11 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
  * Implementation of [Raise] used by [ior].
  * You should never use this directly.
  */
-public class IorRaise<Error> @PublishedApi internal constructor(
-  @PublishedApi internal val combineError: (Error, Error) -> Error,
-  private val state: Atomic<Option<Error>>,
+public abstract class IorRaise<Error> @PublishedApi internal constructor(
   private val raise: Raise<Error>,
-) : Raise<Error> {
-
-  @RaiseDSL
-  override fun raise(r: Error): Nothing = raise.raise(combine(r))
+) : Raise<Error> by raise {
+  @PublishedApi
+  internal abstract fun addError(e: Error)
 
   @RaiseDSL
   @JvmName("bindAllIor")
@@ -334,7 +319,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
       is Ior.Left -> raise(value)
       is Ior.Right -> value
       is Ior.Both -> {
-        combine(leftValue)
+        addError(leftValue)
         rightValue
       }
     }
@@ -343,23 +328,9 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
     mapValues { (_, v) -> v.bind() }
 
-  @PublishedApi
-  internal fun combine(other: Error): Error =
-    state.updateAndGet { prev ->
-      Some(prev.map { combineError(it, other) }.getOrElse { other })
-    }.getOrElse { other }
-
   @RaiseDSL
   public inline fun <A> recover(
     @BuilderInference block: IorRaise<Error>.() -> A,
     recover: (error: Error) -> A,
-  ): A = when (val ior = ior(combineError, block)) {
-    is Ior.Both -> {
-      combine(ior.leftValue)
-      ior.rightValue
-    }
-
-    is Ior.Left -> recover(ior.value)
-    is Ior.Right -> ior.value
-  }
+  ): A = recover<Error, A>({ block(IorRaise(::addError)) }, recover)
 }

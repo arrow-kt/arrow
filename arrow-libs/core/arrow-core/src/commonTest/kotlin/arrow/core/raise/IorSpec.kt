@@ -78,10 +78,27 @@ class IorSpec : StringSpec({
 
   "Recover works as expected" {
     ior(String::plus) {
-      val one = recover({ Ior.Left("Hello").bind() }) { 1 }
+      val one = recover({
+        Ior.Both("Hi", Unit).bind()
+        Ior.Left("Hello").bind()
+      }) { 1 }
       val two = Ior.Right(2).bind()
       val three = Ior.Both(", World", 3).bind()
       one + two + three
-    } shouldBe Ior.Both(", World", 6)
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
+  "try catch can recover from raise" {
+    ior(String::plus) {
+      val one = try {
+        Ior.Both("Hi", Unit).bind()
+        Ior.Left("Hello").bind()
+      } catch (e: Throwable) {
+        1
+      }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Both("Hi, World", 6)
   }
 })

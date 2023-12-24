@@ -374,6 +374,7 @@ public final class arrow/core/EitherKt {
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
 	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -3422,8 +3423,9 @@ public final class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/Raise {
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
-	public fun <init> (Lkotlin/jvm/functions/Function2;Ljava/util/concurrent/atomic/AtomicReference;Larrow/core/raise/Raise;)V
+public abstract class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;)V
+	public abstract fun addError (Ljava/lang/Object;)V
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
@@ -3441,8 +3443,6 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public final fun bindAllIor (Ljava/util/Map;)Ljava/util/Map;
 	public final fun bindAllIor (Ljava/util/Set;)Ljava/util/Set;
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun combine (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun getCombineError ()Lkotlin/jvm/functions/Function2;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
@@ -3582,6 +3582,7 @@ public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang
 }
 
 public final class arrow/core/raise/RaiseKt {
+	public static final fun IorRaise (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Larrow/core/raise/IorRaise;
 	public static final fun _fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun _foldOrThrow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun _foldUnsafe (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
