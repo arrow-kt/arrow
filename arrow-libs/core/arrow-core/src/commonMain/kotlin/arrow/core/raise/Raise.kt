@@ -14,7 +14,6 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -662,7 +661,8 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   contract {
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return recover(block) { raise(transform(it)) }
+  val error = attempt { return block(this) }
+  raise(transform(error))
 }
 
 /**
@@ -692,4 +692,42 @@ public inline fun <A> merge(
     callsInPlace(block, AT_MOST_ONCE)
   }
   return recover(block, ::identity)
+}
+
+/**
+ * Execute the [Raise] context function resulting in an early-return to an outer scope,
+ * or any _logical error_ of type [Error].
+ * This function behaves like an imperative version of recover.
+ * <!--- INCLUDE
+ * import arrow.core.getOrElse
+ * import arrow.core.raise.attempt
+ * import arrow.core.raise.either
+ * import io.kotest.matchers.shouldBe
+ * import kotlin.random.Random
+ * -->
+ * ```kotlin
+ * val foo = either { if (Random.nextBoolean()) raise("failed") else 42 }
+ *
+ * fun test() {
+ *   either {
+ *     val msg = attempt { return@either foo.bind() }
+ *     raise(msg.toList())
+ *   } shouldBe foo.mapLeft(String::toList)
+ *
+ *   run {
+ *     attempt { return@run foo.bind() }
+ *     1
+ *   } shouldBe foo.getOrElse { 1 }
+ * }
+ *
+ * ```
+ * <!--- KNIT example-raise-dsl-13.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+public inline fun <Error> attempt(block: Raise<Error>.() -> Nothing): Error {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+  }
+  return merge(block)
 }
