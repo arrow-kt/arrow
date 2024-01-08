@@ -81,7 +81,10 @@ class IorSpec : StringSpec({
       val one = recover({
         Ior.Both("Hi", Unit).bind()
         Ior.Left("Hello").bind()
-      }) { 1 }
+      }) {
+        it shouldBe "Hello"
+        1
+      }
       val two = Ior.Right(2).bind()
       val three = Ior.Both(", World", 3).bind()
       one + two + three

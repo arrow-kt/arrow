@@ -5,7 +5,7 @@
 package arrow.core.raise
 
 import arrow.atomic.Atomic
-import arrow.atomic.update
+import arrow.atomic.updateAndGet
 import arrow.core.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -79,19 +79,14 @@ public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> ior(crossinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
+public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
   val state: Atomic<Any?> = Atomic(EmptyValue)
   return fold(
-    { block(IorRaise { e -> state.update { EmptyValue.combine(it, e, combineError) } }) },
+    { block(IorRaise(combineError, state, this)) },
     { e -> Ior.Left(EmptyValue.combine(state.get(), e, combineError)) },
     { a -> EmptyValue.fold(state.get(), { Ior.Right(a) }, { e: Error -> Ior.Both(e, a) }) }
   )
 }
-
-@PublishedApi internal inline fun <Error> Raise<Error>.IorRaise(crossinline addError: (Error) -> Unit): IorRaise<Error> =
-  object: IorRaise<Error>(this) {
-    override fun addError(e: Error) = addError(e)
-  }
 
 /**
  * Run a computation [block] using [Raise]. and return its outcome as [IorNel].
@@ -292,11 +287,14 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
  * Implementation of [Raise] used by [ior].
  * You should never use this directly.
  */
-public abstract class IorRaise<Error> @PublishedApi internal constructor(
+public class IorRaise<Error> @PublishedApi internal constructor(
+  @PublishedApi internal val combineError: (Error, Error) -> Error,
+  @PublishedApi internal val state: Atomic<Any?>,
   private val raise: Raise<Error>,
 ) : Raise<Error> by raise {
+  @Suppress("UNCHECKED_CAST")
   @PublishedApi
-  internal abstract fun addError(e: Error)
+  internal fun combine(e: Error): Error = state.updateAndGet { EmptyValue.combine(it, e, combineError) } as Error
 
   @RaiseDSL
   @JvmName("bindAllIor")
@@ -319,7 +317,7 @@ public abstract class IorRaise<Error> @PublishedApi internal constructor(
       is Ior.Left -> raise(value)
       is Ior.Right -> value
       is Ior.Both -> {
-        addError(leftValue)
+        combine(leftValue)
         rightValue
       }
     }
@@ -332,5 +330,5 @@ public abstract class IorRaise<Error> @PublishedApi internal constructor(
   public inline fun <A> recover(
     @BuilderInference block: IorRaise<Error>.() -> A,
     recover: (error: Error) -> A,
-  ): A = recover<Error, A>({ block(IorRaise(::addError)) }, recover)
+  ): A = recover<Error, A>({ block(IorRaise(combineError, state, this)) }, recover)
 }
