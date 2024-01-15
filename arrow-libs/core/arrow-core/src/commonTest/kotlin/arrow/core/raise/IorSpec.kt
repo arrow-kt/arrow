@@ -91,6 +91,39 @@ class IorSpec : StringSpec({
     } shouldBe Ior.Both("Hi, World", 6)
   }
 
+  "recover with throw" {
+    ior(String::plus) {
+      val one = try {
+        recover({
+          Ior.Both("Hi", Unit).bind()
+          throw RuntimeException("Hello")
+        }) {
+          unreachable()
+        }
+      } catch (e: RuntimeException) {
+        1
+      }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
+  "recover with raise is a no-op" {
+    ior(String::plus) {
+      val one: Int =
+        recover({
+          Ior.Both("Hi", Unit).bind()
+          Ior.Left(", Hello").bind()
+        }) {
+          raise(it)
+        }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Left("Hi, Hello")
+  }
+
   "try catch can recover from raise" {
     ior(String::plus) {
       val one = try {

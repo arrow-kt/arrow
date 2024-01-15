@@ -3444,7 +3444,6 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun combine (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun getCombineError ()Lkotlin/jvm/functions/Function2;
-	public final fun getState ()Ljava/util/concurrent/atomic/AtomicReference;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;

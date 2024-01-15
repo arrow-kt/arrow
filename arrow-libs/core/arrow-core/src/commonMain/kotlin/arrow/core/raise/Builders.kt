@@ -289,7 +289,7 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
  */
 public class IorRaise<Error> @PublishedApi internal constructor(
   @PublishedApi internal val combineError: (Error, Error) -> Error,
-  @PublishedApi internal val state: Atomic<Any?>,
+  private val state: Atomic<Any?>,
   private val raise: Raise<Error>,
 ) : Raise<Error> by raise {
   @Suppress("UNCHECKED_CAST")
@@ -330,5 +330,18 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   public inline fun <A> recover(
     @BuilderInference block: IorRaise<Error>.() -> A,
     recover: (error: Error) -> A,
-  ): A = recover<Error, A>({ block(IorRaise(combineError, state, this)) }, recover)
+  ): A {
+    val state: Atomic<Any?> = Atomic(EmptyValue)
+    return recover<Error, A>({
+      try {
+        block(IorRaise(combineError, state, this))
+      } finally {
+        val accumulated = state.get()
+        if (accumulated != EmptyValue) {
+          @Suppress("UNCHECKED_CAST")
+          combine(accumulated as Error)
+        }
+      }
+    }, recover)
+  }
 }
