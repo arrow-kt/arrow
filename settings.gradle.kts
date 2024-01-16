@@ -16,7 +16,7 @@ pluginManagement {
 
 plugins {
   id("com.gradle.enterprise") version "3.16.1"
-  id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
+  id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
 dependencyResolutionManagement {
@@ -77,6 +77,9 @@ project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-corout
 
 include("arrow-fx-stm")
 project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
+
+include("arrow-collectors")
+project(":arrow-collectors").projectDir = file("arrow-libs/fx/arrow-collectors")
 
 include("arrow-resilience")
 project(":arrow-resilience").projectDir = file("arrow-libs/resilience/arrow-resilience")
