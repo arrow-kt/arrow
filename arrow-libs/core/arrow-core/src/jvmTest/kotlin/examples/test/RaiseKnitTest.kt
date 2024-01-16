@@ -49,4 +49,8 @@ class RaiseKnitTest {
     arrow.core.examples.exampleRaiseDsl12.test()
   }
 
+  @Test fun exampleRaiseDsl13() = runTest {
+    arrow.core.examples.exampleRaiseDsl13.test()
+  }
+
 }

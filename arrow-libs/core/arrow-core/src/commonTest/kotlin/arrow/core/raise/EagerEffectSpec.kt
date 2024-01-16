@@ -293,4 +293,25 @@ class EagerEffectSpec {
         .get() shouldBe i
     }
   }
+
+  @Test fun attemptSuccess() = runTest {
+    checkAll(Arb.int()) { i ->
+      run { attempt<Nothing> { return@run i } } shouldBe i
+    }
+  }
+
+  @Test fun attemptRaise() = runTest {
+    checkAll(Arb.int(), Arb.string()) { i, s ->
+      run {
+        attempt { raise(i) } shouldBe i
+        s
+      } shouldBe s
+    }
+  }
+
+  @Test fun attemptNested() = runTest {
+    checkAll(Arb.int()) { i ->
+      attempt { attempt<Nothing> { raise(i) } } shouldBe i
+    }
+  }
 }

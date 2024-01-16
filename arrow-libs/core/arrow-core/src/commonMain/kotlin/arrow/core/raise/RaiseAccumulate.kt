@@ -256,17 +256,17 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<Error>.zipOrAccumu
 ): J {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   var error: Any? = EmptyValue
-  val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  return if (error !== EmptyValue) raise(unbox<Error>(error))
-  else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i))
+  val a = valueOrEmpty(action1) { error = combine(error, it.reduce(combine), combine) }
+  val b = valueOrEmpty(action2) { error = combine(error, it.reduce(combine), combine) }
+  val c = valueOrEmpty(action3) { error = combine(error, it.reduce(combine), combine) }
+  val d = valueOrEmpty(action4) { error = combine(error, it.reduce(combine), combine) }
+  val e = valueOrEmpty(action5) { error = combine(error, it.reduce(combine), combine) }
+  val f = valueOrEmpty(action6) { error = combine(error, it.reduce(combine), combine) }
+  val g = valueOrEmpty(action7) { error = combine(error, it.reduce(combine), combine) }
+  val h = valueOrEmpty(action8) { error = combine(error, it.reduce(combine), combine) }
+  val i = valueOrEmpty(action9) { error = combine(error, it.reduce(combine), combine) }
+  if (error !== EmptyValue) raise(unbox(error))
+  return block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i))
 }
 
 /**
@@ -487,17 +487,31 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
 ): J {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   val error: MutableList<Error> = mutableListOf()
-  val a = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val b = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val c = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val d = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val e = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val f = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val g = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val h = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val i = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
+  val a = valueOrEmpty(action1, error::addAll)
+  val b = valueOrEmpty(action2, error::addAll)
+  val c = valueOrEmpty(action3, error::addAll)
+  val d = valueOrEmpty(action4, error::addAll)
+  val e = valueOrEmpty(action5, error::addAll)
+  val f = valueOrEmpty(action6, error::addAll)
+  val g = valueOrEmpty(action7, error::addAll)
+  val h = valueOrEmpty(action8, error::addAll)
+  val i = valueOrEmpty(action9, error::addAll)
   error.toNonEmptyListOrNull()?.let { raise(it) }
   return block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i))
+}
+
+@PublishedApi
+internal inline fun <A, Error> valueOrEmpty(
+  block: RaiseAccumulate<Error>.() -> A,
+  addErrors: (NonEmptyList<Error>) -> Unit
+): Any? {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(addErrors, AT_MOST_ONCE)
+  }
+  val errorList = attempt { return block(RaiseAccumulate(this)) }
+  addErrors(errorList)
+  return EmptyValue
 }
 
 /**
