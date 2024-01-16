@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalCompilerApi::class)
+
 package arrow.optics.plugin
 
+import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspSourcesDir
@@ -10,6 +13,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -50,7 +54,7 @@ fun String.evals(thing: Pair<String, Any?>) {
 // UTILITY FUNCTIONS COPIED FROM META-TEST
 // =======================================
 
-internal fun compile(text: String, allWarningsAsErrors: Boolean = false): KotlinCompilation.Result {
+internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult {
   val compilation = buildCompilation(text, allWarningsAsErrors = allWarningsAsErrors)
   // fix problems with double compilation and KSP
   // as stated in https://github.com/tschuchortdev/kotlin-compile-testing/issues/72
