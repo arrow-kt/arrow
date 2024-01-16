@@ -67,6 +67,13 @@ class IorSpec : StringSpec({
     } shouldBe Ior.Left("Hello, World!")
   }
 
+  "Accumulates and short-circuits with raise" {
+    ior(String::plus) {
+      Ior.Both("Hello", Unit).bind()
+      raise(" World")
+    } shouldBe Ior.Left("Hello World")
+  }
+
   "Ior rethrows exception" {
     val boom = RuntimeException("Boom!")
     shouldThrow<RuntimeException> {
