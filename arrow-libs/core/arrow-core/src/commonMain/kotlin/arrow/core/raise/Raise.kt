@@ -312,6 +312,12 @@ public interface Raise<in Error> {
     is Either.Right -> value
   }
 
+  @RaiseDSL
+  public fun  Error.raise(): Nothing = raise(this)
+
+  @RaiseDSL
+  public fun  Either.Left<Error>.raise(): Nothing = this.value.raise()
+
   /**
    * Extracts all the values in the [Map], raising every [Either.Left]
    * as a _logical failure_. In other words, executed [bind] over every
