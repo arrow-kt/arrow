@@ -14,14 +14,14 @@ kover = "0.7.5"
 kotlin = "1.9.22"
 kotlinxSerializationPlugin = "1.9.22"
 kotlinBinaryCompatibilityValidator = "0.13.2"
-kotlinCompileTesting = "1.5.0"
+kotlinCompileTesting = "0.4.0"
 knit = "0.5.0"
 kspVersion = "1.9.22-1.0.16"
 kotlinxSerialization = "1.6.2"
 mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
-spotlessVersion = "6.23.3"
+spotlessVersion = "6.24.0"
 cache4k = "0.12.0"
 
 [libraries]
@@ -52,8 +52,8 @@ ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = 
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
-kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
-kotlinCompileTestingKsp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
+kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
+kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
 
 [plugins]
