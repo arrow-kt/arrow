@@ -240,7 +240,6 @@ public inline fun <Error, A> Raise<Error>.traced(
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
-    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
     this is RaiseCancellationException && this.raise === raise -> raised as R
     else -> throw this
   }
@@ -253,18 +252,19 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
   override fun raise(r: Any?): Nothing = when {
-    isActive.value -> throw if (isTraced) RaiseCancellationException(r, this) else RaiseCancellationExceptionNoTrace(r, this)
+    isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
 }
 
-/** CancellationException is required to cancel coroutines when raising from within them. */
-private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
-  CancellationExceptionNoTrace()
+public sealed class RaiseCancellationException(
+  internal val raised: Any?,
+  internal val raise: Raise<Any?>
+) : CancellationException(RaiseCancellationExceptionCaptured)
 
-private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
-
-internal expect open class CancellationExceptionNoTrace() : CancellationException
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+internal class Traced(raised: Any?, raise: Raise<Any?>): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """
