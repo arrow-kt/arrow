@@ -374,6 +374,7 @@ public final class arrow/core/EitherKt {
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
 	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
