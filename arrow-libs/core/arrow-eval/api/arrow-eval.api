@@ -1,0 +1,106 @@
+public abstract class arrow/eval/Eval {
+	public static final field Companion Larrow/eval/Eval$Companion;
+	public static final fun always (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Always;
+	public final fun coflatMap (Lkotlin/jvm/functions/Function1;)Larrow/eval/Eval;
+	public static final fun defer (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval;
+	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/eval/Eval;
+	public final fun invoke ()Ljava/lang/Object;
+	public static final fun later (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
+	public final fun map (Lkotlin/jvm/functions/Function1;)Larrow/eval/Eval;
+	public abstract fun memoize ()Larrow/eval/Eval;
+	public static final fun now (Ljava/lang/Object;)Larrow/eval/Eval;
+	public static final fun raise (Ljava/lang/Throwable;)Larrow/eval/Eval;
+	public fun toString ()Ljava/lang/String;
+	public abstract fun value ()Ljava/lang/Object;
+}
+
+public final class arrow/eval/Eval$Always : arrow/eval/Eval {
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Always;
+	public static synthetic fun copy$default (Larrow/eval/Eval$Always;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Always;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun memoize ()Larrow/eval/Eval;
+	public fun toString ()Ljava/lang/String;
+	public fun value ()Ljava/lang/Object;
+}
+
+public final class arrow/eval/Eval$Companion {
+	public final fun always (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Always;
+	public final fun defer (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval;
+	public final fun later (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
+	public final fun now (Ljava/lang/Object;)Larrow/eval/Eval;
+	public final fun raise (Ljava/lang/Throwable;)Larrow/eval/Eval;
+}
+
+public final class arrow/eval/Eval$Defer : arrow/eval/Eval {
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function0;
+	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Defer;
+	public static synthetic fun copy$default (Larrow/eval/Eval$Defer;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Defer;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getThunk ()Lkotlin/jvm/functions/Function0;
+	public fun hashCode ()I
+	public fun memoize ()Larrow/eval/Eval;
+	public fun toString ()Ljava/lang/String;
+	public fun value ()Ljava/lang/Object;
+}
+
+public abstract class arrow/eval/Eval$FlatMap : arrow/eval/Eval {
+	public fun <init> ()V
+	public fun memoize ()Larrow/eval/Eval;
+	public abstract fun run (Ljava/lang/Object;)Larrow/eval/Eval;
+	public abstract fun start ()Larrow/eval/Eval;
+	public fun toString ()Ljava/lang/String;
+	public fun value ()Ljava/lang/Object;
+}
+
+public final class arrow/eval/Eval$Later : arrow/eval/Eval, kotlin/Lazy {
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
+	public static synthetic fun copy$default (Larrow/eval/Eval$Later;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Later;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun isInitialized ()Z
+	public fun memoize ()Larrow/eval/Eval;
+	public fun toString ()Ljava/lang/String;
+	public fun value ()Ljava/lang/Object;
+}
+
+public final class arrow/eval/Eval$Now : arrow/eval/Eval, kotlin/Lazy {
+	public static final field Companion Larrow/eval/Eval$Now$Companion;
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Larrow/eval/Eval$Now;
+	public static synthetic fun copy$default (Larrow/eval/Eval$Now;Ljava/lang/Object;ILjava/lang/Object;)Larrow/eval/Eval$Now;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun isInitialized ()Z
+	public fun memoize ()Larrow/eval/Eval;
+	public fun toString ()Ljava/lang/String;
+	public fun value ()Ljava/lang/Object;
+}
+
+public final class arrow/eval/Eval$Now$Companion {
+	public final fun getUnit ()Larrow/eval/Eval;
+}
+
+public final class arrow/eval/EvalKt {
+	public static final fun iterateRight (Ljava/util/Iterator;Larrow/eval/Eval;Lkotlin/jvm/functions/Function2;)Larrow/eval/Eval;
+	public static final fun replicate (Larrow/eval/Eval;I)Larrow/eval/Eval;
+	public static final fun replicate (Larrow/eval/Eval;ILarrow/typeclasses/Monoid;)Larrow/eval/Eval;
+	public static final fun replicate (Larrow/eval/Eval;ILkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function10;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function9;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function8;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function7;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function6;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function5;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function4;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function3;)Larrow/eval/Eval;
+	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function2;)Larrow/eval/Eval;
+}
+
