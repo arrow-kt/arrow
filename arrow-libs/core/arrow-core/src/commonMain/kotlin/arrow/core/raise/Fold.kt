@@ -257,13 +257,26 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
   }
 }
 
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@RequiresOptIn(RaiseCancellationExceptionCaptured, RequiresOptIn.Level.WARNING)
+public annotation class DelicateArrowApi
+
+/**
+ * [RaiseCancellationException] is an _delicate_ api, and should be used with care.
+ * It drives the short-circuiting behavior of [Raise].
+ */
+@DelicateArrowApi
 public sealed class RaiseCancellationException(
   internal val raised: Any?,
   internal val raise: Raise<Any?>
 ) : CancellationException(RaiseCancellationExceptionCaptured)
 
+@DelicateArrowApi
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+
+@DelicateArrowApi
 internal class Traced(raised: Any?, raise: Raise<Any?>): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
@@ -276,6 +289,6 @@ private class RaiseLeakedException : IllegalStateException(
 )
 
 internal const val RaiseCancellationExceptionCaptured: String =
-  "kotlin.coroutines.cancellation.CancellationException should never get cancelled. Always re-throw it if captured." +
+  "kotlin.coroutines.cancellation.CancellationException should never get swallowed. Always re-throw it if captured." +
     "This swallows the exception of Arrow's Raise, and leads to unexpected behavior." +
     "When working with Arrow prefer Either.catch or arrow.core.raise.catch to automatically rethrow CancellationException."
