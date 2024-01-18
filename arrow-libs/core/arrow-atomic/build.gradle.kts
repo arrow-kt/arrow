@@ -1,7 +1,5 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -19,6 +17,12 @@ spotless {
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {
+  targets.all {
+    compilations.all {
+      kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+    }
+  }
+
   sourceSets {
     commonMain {
       dependencies {
@@ -55,11 +59,5 @@ kotlin {
         attributes["Automatic-Module-Name"] = "arrow.atomic"
       }
     }
-  }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + "-Xexpect-actual-classes"
   }
 }

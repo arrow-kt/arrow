@@ -15,14 +15,15 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.16"
-  id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
+  id("com.gradle.enterprise") version "3.16.1"
+  id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
 dependencyResolutionManagement {
   @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
   @Suppress("LocalVariableName") val kotlin_version: String? by settings
   @Suppress("LocalVariableName") val compose_version: String? by settings
+  @Suppress("LocalVariableName") val ksp_version: String? by settings
 
   repositories {
     mavenCentral()
@@ -39,6 +40,10 @@ dependencyResolutionManagement {
       if (!compose_version.isNullOrBlank()) {
         println("Overriding Compose version with $compose_version")
         version("composePlugin", compose_version!!)
+      }
+      if (!ksp_version.isNullOrBlank()) {
+        println("Overriding KSP version with $ksp_version")
+        version("kspVersion", ksp_version!!)
       }
     }
   }
@@ -57,11 +62,17 @@ project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 include("arrow-continuations")
 project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
+include("arrow-eval")
+project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")
+
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 
 include("arrow-core-serialization")
 project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-core-serialization")
+
+include("arrow-cache4k")
+project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
 
 // FX
 include("arrow-fx-coroutines")
@@ -72,6 +83,9 @@ project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
 
 include("arrow-fx-stm-compose")
 project(":arrow-fx-stm-compose").projectDir = file("arrow-libs/fx/arrow-fx-stm-compose")
+
+include("arrow-collectors")
+project(":arrow-collectors").projectDir = file("arrow-libs/fx/arrow-collectors")
 
 include("arrow-resilience")
 project(":arrow-resilience").projectDir = file("arrow-libs/resilience/arrow-resilience")

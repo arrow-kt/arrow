@@ -3,6 +3,24 @@ public final class arrow/core/ArrowCoreInternalException : java/lang/RuntimeExce
 	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
+public final class arrow/core/AtomicMemoizationCache : arrow/core/MemoizationCache {
+	public static final synthetic fun box-impl (Ljava/util/concurrent/atomic/AtomicReference;)Larrow/core/AtomicMemoizationCache;
+	public static fun constructor-impl (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/util/concurrent/atomic/AtomicReference;
+	public static synthetic fun constructor-impl$default (Ljava/util/concurrent/atomic/AtomicReference;ILkotlin/jvm/internal/DefaultConstructorMarker;)Ljava/util/concurrent/atomic/AtomicReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/atomic/AtomicReference;Ljava/util/concurrent/atomic/AtomicReference;)Z
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun get-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/atomic/AtomicReference;)I
+	public fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun set-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/atomic/AtomicReference;
+}
+
 public final class arrow/core/ComparisonKt {
 	public static final fun sort (BB)Lkotlin/Pair;
 	public static final fun sort (BBB)Lkotlin/Triple;
@@ -29,6 +47,24 @@ public final class arrow/core/Composition {
 	public static final fun andThen (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static final fun compose (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/core/ConcurrentMapMemoizationCache : arrow/core/MemoizationCache {
+	public static final synthetic fun box-impl (Ljava/util/concurrent/ConcurrentMap;)Larrow/core/ConcurrentMapMemoizationCache;
+	public static fun constructor-impl (Ljava/util/concurrent/ConcurrentMap;)Ljava/util/concurrent/ConcurrentMap;
+	public static synthetic fun constructor-impl$default (Ljava/util/concurrent/ConcurrentMap;ILkotlin/jvm/internal/DefaultConstructorMarker;)Ljava/util/concurrent/ConcurrentMap;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/ConcurrentMap;Ljava/util/concurrent/ConcurrentMap;)Z
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun get-impl (Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/ConcurrentMap;)I
+	public fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun set-impl (Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/ConcurrentMap;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/ConcurrentMap;
 }
 
 public final class arrow/core/Const {
@@ -338,6 +374,7 @@ public final class arrow/core/EitherKt {
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
 	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -777,8 +814,15 @@ public final class arrow/core/Memoization {
 	public static final fun memoize (Lkotlin/jvm/functions/Function5;)Lkotlin/jvm/functions/Function5;
 }
 
+public abstract interface class arrow/core/MemoizationCache {
+	public abstract fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
+	public static final fun MemoizedDeepRecursiveFunction (Larrow/core/MemoizationCache;Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
 	public static final fun MemoizedDeepRecursiveFunction (Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
+	public static synthetic fun MemoizedDeepRecursiveFunction$default (Larrow/core/MemoizationCache;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlin/DeepRecursiveFunction;
 }
 
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
@@ -3541,6 +3585,7 @@ public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang
 public final class arrow/core/raise/RaiseKt {
 	public static final fun _fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun _foldOrThrow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun _foldUnsafe (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun _merge (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun catch (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
