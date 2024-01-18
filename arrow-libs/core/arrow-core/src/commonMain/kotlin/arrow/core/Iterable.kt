@@ -21,6 +21,7 @@ import arrow.typeclasses.SemigroupDeprecation
 import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
+import kotlin.collections.unzip as stdlibUnzip
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -849,9 +850,7 @@ public fun <A> Iterable<A>.salign(
   ReplaceWith("unzip()", "kotlin.collections.unzip")
 )
 public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
-    l + x.first to r + x.second
-  }
+   stdlibUnzip()
 
 /**
  * after applying the given function unzip the resulting structure into its elements.
@@ -876,7 +875,7 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
   ReplaceWith("map(fc).unzip()", "kotlin.collections.unzip")
 )
 public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
-  map(fc).unzip()
+  map(fc).stdlibUnzip()
 
 /**
  * splits a union into its component parts.
