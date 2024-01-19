@@ -263,7 +263,7 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 public annotation class DelicateArrowApi
 
 /**
- * [RaiseCancellationException] is an _delicate_ api, and should be used with care.
+ * [RaiseCancellationException] is a _delicate_ api, and should be used with care.
  * It drives the short-circuiting behavior of [Raise].
  */
 @DelicateArrowApi
