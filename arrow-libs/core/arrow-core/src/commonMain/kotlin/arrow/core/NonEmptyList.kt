@@ -10,6 +10,7 @@ import arrow.typeclasses.SemigroupDeprecation
 import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
+import kotlin.collections.unzip as stdlibUnzip
 
 public typealias Nel<A> = NonEmptyList<A>
 
@@ -424,11 +425,8 @@ public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmp
   this.unzip(::identity)
 
 public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> =
-  this.map(f).let { nel ->
-    nel.tail.unzip().let {
-      NonEmptyList(nel.head.first, it.first) to
-        NonEmptyList(nel.head.second, it.second)
-    }
+  map(f).stdlibUnzip().let { (l1, l2) ->
+    l1.toNonEmptyListOrNull()!! to l2.toNonEmptyListOrNull()!!
   }
 
 @Deprecated(
