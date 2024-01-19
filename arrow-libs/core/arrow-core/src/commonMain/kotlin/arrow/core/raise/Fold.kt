@@ -260,23 +260,23 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
 @RequiresOptIn(RaiseCancellationExceptionCaptured, RequiresOptIn.Level.WARNING)
-public annotation class DelicateArrowApi
+public annotation class DelicateRaiseApi
 
 /**
  * [RaiseCancellationException] is a _delicate_ api, and should be used with care.
  * It drives the short-circuiting behavior of [Raise].
  */
-@DelicateArrowApi
+@DelicateRaiseApi
 public sealed class RaiseCancellationException(
   internal val raised: Any?,
   internal val raise: Raise<Any?>
 ) : CancellationException(RaiseCancellationExceptionCaptured)
 
-@DelicateArrowApi
+@DelicateRaiseApi
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
-@DelicateArrowApi
+@DelicateRaiseApi
 internal class Traced(raised: Any?, raise: Raise<Any?>): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(

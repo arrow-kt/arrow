@@ -3396,7 +3396,7 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
-public abstract interface annotation class arrow/core/raise/DelicateArrowApi : java/lang/annotation/Annotation {
+public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : java/lang/annotation/Annotation {
 }
 
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
