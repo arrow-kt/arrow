@@ -7,7 +7,9 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+@MustBeDocumented
 @RequiresOptIn("This API is experimental, and may change in the future.")
+@Retention(AnnotationRetention.BINARY)
 public annotation class ExperimentalTraceApi
 
 /** Tracing result. Allows to inspect the traces from where raise was called. */

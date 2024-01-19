@@ -3396,6 +3396,9 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
@@ -3577,6 +3580,10 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
