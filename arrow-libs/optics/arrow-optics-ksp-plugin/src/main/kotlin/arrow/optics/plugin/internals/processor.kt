@@ -36,38 +36,21 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
     },
   )
 
-internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
+internal fun KSClassDeclaration.targets(): Set<OpticsTarget> =
   targetsFromOpticsAnnotation().let { targets ->
     when {
-      isSealed ->
-        if (targets.isEmpty()) {
-          listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
-        } else {
-          targets.filter { it == OpticsTarget.PRISM || it == OpticsTarget.DSL }
-        }
-      isValue ->
-        listOf(OpticsTarget.ISO, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
-      else ->
-        if (targets.isEmpty()) {
-          listOf(OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL)
-        } else {
-          targets.filter {
-            when (it) {
-              OpticsTarget.ISO, OpticsTarget.LENS, OpticsTarget.OPTIONAL, OpticsTarget.DSL -> true
-              else -> false
-            }
-          }
-        }
+      isSealed -> targets intersect SEALED_TARGETS
+      isValue -> targets intersect VALUE_TARGETS
+      else -> targets intersect OTHER_TARGETS
     }
   }
 
-internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget> =
+internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): Set<OpticsTarget> =
   annotations
-    .find { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
-    ?.arguments
-    ?.flatMap { (it.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
-    ?.mapNotNull {
+    .single { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
+    .arguments
+    .flatMap { (it.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
+    .mapNotNull {
       when (it.qualifiedString()) {
         "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
         "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
@@ -76,7 +59,7 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget
         "arrow.optics.OpticsTarget.DSL" -> OpticsTarget.DSL
         else -> null
       }
-    }.orEmpty().distinct()
+    }.ifEmpty { ALL_TARGETS }.toSet()
 
 internal fun evalAnnotatedPrismElement(
   element: KSClassDeclaration,
