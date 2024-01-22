@@ -1,3 +1,5 @@
+@file:Suppress("LocalVariableName")
+
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "arrow"
@@ -19,12 +21,12 @@ plugins {
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
-dependencyResolutionManagement {
-  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
-  @Suppress("LocalVariableName") val kotlin_version: String? by settings
-  @Suppress("LocalVariableName") val ksp_version: String? by settings
-  @Suppress("LocalVariableName") val compose_version: String? by settings
+val kotlin_repo_url: String? by settings
+val kotlin_version: String? by settings
+val ksp_version: String? by settings
+val compose_version: String? by settings
 
+dependencyResolutionManagement {
   repositories {
     mavenCentral()
     gradlePluginPortal()
@@ -94,8 +96,10 @@ project(":arrow-optics").projectDir = file("arrow-libs/optics/arrow-optics")
 include("arrow-optics-reflect")
 project(":arrow-optics-reflect").projectDir = file("arrow-libs/optics/arrow-optics-reflect")
 
-include("arrow-optics-compose")
-project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-optics-compose")
+if (kotlin_version.isNullOrBlank() || "2.0" !in kotlin_version!!) {
+  include("arrow-optics-compose")
+  project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-optics-compose")
+}
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
