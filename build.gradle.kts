@@ -75,6 +75,8 @@ dependencies {
   kover(projects.arrowOpticsKspPlugin)
   kover(projects.arrowOpticsReflect)
   kover(projects.arrowResilience)
+  kover(projects.arrowCollectors)
+  kover(projects.arrowEval)
 }
 
 allprojects {
