@@ -3,29 +3,44 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "arrow"
 
 pluginManagement {
+  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
   repositories {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
+    kotlin_repo_url?.also { maven(it) }
   }
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.13.4"
-  id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
+  id("com.gradle.enterprise") version "3.16.1"
+  id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
 dependencyResolutionManagement {
+  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
+  @Suppress("LocalVariableName") val kotlin_version: String? by settings
+  @Suppress("LocalVariableName") val ksp_version: String? by settings
+
   repositories {
     mavenCentral()
     gradlePluginPortal()
     mavenLocal()
+    kotlin_repo_url?.also { maven(it) }
+  }
+  versionCatalogs {
+    create("libs") {
+      if (!kotlin_version.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlin_version")
+        version("kotlin", kotlin_version!!)
+      }
+      if (!ksp_version.isNullOrBlank()) {
+        println("Overriding KSP version with $ksp_version")
+        version("kspVersion", ksp_version!!)
+      }
+    }
   }
 }
-
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
 
 //CORE
 include("arrow-annotations")
@@ -40,8 +55,17 @@ project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 include("arrow-continuations")
 project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
+include("arrow-eval")
+project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")
+
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
+
+include("arrow-core-serialization")
+project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-core-serialization")
+
+include("arrow-cache4k")
+project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
 
 // FX
 include("arrow-fx-coroutines")
@@ -49,6 +73,9 @@ project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-corout
 
 include("arrow-fx-stm")
 project(":arrow-fx-stm").projectDir = file("arrow-libs/fx/arrow-fx-stm")
+
+include("arrow-collectors")
+project(":arrow-collectors").projectDir = file("arrow-libs/fx/arrow-collectors")
 
 include("arrow-resilience")
 project(":arrow-resilience").projectDir = file("arrow-libs/resilience/arrow-resilience")

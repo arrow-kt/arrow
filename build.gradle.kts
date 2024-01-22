@@ -1,17 +1,16 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import kotlinx.knit.KnitPluginExtension
-import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
   repositories {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
   }
 
   dependencies {
@@ -23,6 +22,16 @@ allprojects {
   repositories {
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
+  }
+
+  tasks {
+    withType<KotlinCompile> {
+      kotlinOptions {
+        (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = it }
+        (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = it }
+      }
+    }
   }
 }
 
@@ -33,8 +42,10 @@ plugins {
   alias(libs.plugins.kotest.multiplatform) apply false
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.kotlin.multiplatform) apply false
+  alias(libs.plugins.kotlinx.serialization) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
+  alias(libs.plugins.spotless) apply false
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
@@ -57,21 +68,20 @@ dependencies {
   kover(projects.arrowContinuations)
   kover(projects.arrowCore)
   kover(projects.arrowCoreRetrofit)
+  kover(projects.arrowCoreSerialization)
   kover(projects.arrowFxCoroutines)
   kover(projects.arrowFxStm)
   kover(projects.arrowOptics)
   kover(projects.arrowOpticsKspPlugin)
   kover(projects.arrowOpticsReflect)
   kover(projects.arrowResilience)
+  kover(projects.arrowCollectors)
+  kover(projects.arrowEval)
 }
 
 allprojects {
   group = property("projects.group").toString()
 }
-
-val enableCompatibilityMetadataVariant =
-  providers.gradleProperty("kotlin.mpp.enableCompatibilityMetadataVariant")
-    .orNull?.toBoolean() == true
 
 subprojects {
   this@subprojects.tasks.withType<DokkaTaskPartial>().configureEach {
@@ -95,6 +105,10 @@ subprojects {
         }
       }
     }
+  }
+
+  tasks.withType<AbstractPublishToMaven> {
+    dependsOn(tasks.withType<Sign>())
   }
 }
 
@@ -122,14 +136,4 @@ tasks {
 
 apiValidation {
   ignoredProjects.add("arrow-optics-ksp-plugin")
-}
-
-rootProject.plugins.withType<YarnPlugin> {
-  rootProject.configure<NodeJsRootExtension> {
-    versions.webpackDevServer.version = "4.11.1"
-    versions.webpack.version = "5.75.0"
-    versions.webpackCli.version = "4.10.0"
-    versions.karma.version = "6.4.1"
-    versions.mocha.version = "10.2.0"
-  }
 }

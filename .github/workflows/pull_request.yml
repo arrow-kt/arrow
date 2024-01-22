@@ -3,7 +3,7 @@ name: "pull_request"
 on: pull_request
 
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
 concurrency:
   group: pull_request-${{ github.ref }}
@@ -15,24 +15,24 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: ios and watchos tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel --scan
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-ios_watchos'
           path: '**/build/reports/**'
@@ -42,15 +42,15 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: macos and tvos tests
         uses: gradle/gradle-build-action@v2
@@ -59,7 +59,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-macos_tvos'
           path: '**/build/reports/**'
@@ -69,15 +69,15 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: mingwX64Test
         uses: gradle/gradle-build-action@v2
@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-windows'
           path: '**/build/reports/**'
@@ -96,15 +96,15 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: check
         uses: gradle/gradle-build-action@v2
@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-check'
           path: '**/build/reports/**'
@@ -123,15 +123,15 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: jvmTest
         uses: gradle/gradle-build-action@v2
@@ -156,7 +156,34 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'reports-jvmTest'
+          path: '**/build/reports/**'
+
+  jvmTestK2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: jvmTest (K2 enabled)
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: "jvmTest -Pkotlin_version=2.0.0-Beta2 -Pksp_version=2.0.0-Beta2-1.0.16 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0"
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
@@ -166,15 +193,20 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: kotlinUpgradeYarnLock
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: kotlinUpgradeYarnLock
 
       - name: jsTest
         uses: gradle/gradle-build-action@v2
@@ -183,7 +215,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-js'
           path: '**/build/reports/**'
@@ -193,15 +225,15 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: linuxX64Test
         uses: gradle/gradle-build-action@v2
@@ -210,7 +242,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'reports-linux'
           path: '**/build/reports/**'
@@ -220,15 +252,15 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
 
       - name: apiDump
         uses: gradle/gradle-build-action@v2
@@ -236,7 +268,34 @@ jobs:
           arguments: apiDump
 
       - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Update API files
           file_pattern: arrow-libs/**/api/*.api
+
+  spotless:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: spotlessApply
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotlessApply
+
+      - name: "Commit newly formatted files"
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply
+          file_pattern: arrow-libs/**/*.kt
+

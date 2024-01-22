@@ -125,6 +125,6 @@ public object either {
     Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
 }
 
-private const val eitherDSLDeprecation =
+@PublishedApi internal const val eitherDSLDeprecation: String =
   "The either DSL has been moved to arrow.core.raise.either.\n" +
     "Replace import arrow.core.computations.* with arrow.core.raise.*"

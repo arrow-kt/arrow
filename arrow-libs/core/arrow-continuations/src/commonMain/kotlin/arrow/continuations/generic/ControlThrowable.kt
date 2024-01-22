@@ -9,5 +9,5 @@ package arrow.continuations.generic
 @Deprecated(deprecateArrowContinuation)
 public expect open class ControlThrowable() : Throwable
 
-internal const val deprecateArrowContinuation: String =
+@PublishedApi internal const val deprecateArrowContinuation: String =
   "arrow.continuation is being discontinued and will be removed in the next version in favor of the Effect/ EagerEffect Runtime. If you depend on low-level APIs as in arrow.continuation, feel free to write us in the Kotlin Slack channel for guidance."

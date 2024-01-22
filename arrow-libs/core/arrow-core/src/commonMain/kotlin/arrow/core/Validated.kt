@@ -18,13 +18,13 @@ public typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 
 @Deprecated(
   ValidatedDeprMsg + "Use Right to construct Either values instead",
-  ReplaceWith("Either.Right(value)", "arrow.core.Either")
+  ReplaceWith("Either.Right<A>", "arrow.core.Either")
 )
 public typealias Valid<A> = Validated.Valid<A>
 
 @Deprecated(
   ValidatedDeprMsg + "Use Left to construct Either values instead",
-  ReplaceWith("Either.Left(value)", "arrow.core.Either")
+  ReplaceWith("Either.Left<E>", "arrow.core.Either")
 )
 public typealias Invalid<E> = Validated.Invalid<E>
 
@@ -318,7 +318,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use Right to construct Either values instead",
-    ReplaceWith("Either.Right(value)", "arrow.core.Either")
+    ReplaceWith("Either.Right<A>", "arrow.core.Either")
   )
   public data class Valid<out A>(val value: A) : Validated<Nothing, A>() {
     override fun toString(): String = "Validated.Valid($value)"
@@ -332,7 +332,7 @@ public sealed class Validated<out E, out A> {
 
   @Deprecated(
     ValidatedDeprMsg + "Use Left to construct Either values instead",
-    ReplaceWith("Either.Left(value)", "arrow.core.Either")
+    ReplaceWith("Either.Left<E>", "arrow.core.Either")
   )
   public data class Invalid<out E>(val value: E) : Validated<E, Nothing>() {
     override fun toString(): String = "Validated.Invalid($value)"
@@ -1305,7 +1305,8 @@ public inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 public inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
 
-internal const val ValidatedDeprMsg = "Validated functionality is being merged into Either.\n"
+@PublishedApi internal const val ValidatedDeprMsg: String =
+  "Validated functionality is being merged into Either.\n"
 
-private const val DeprAndNicheMsg =
+@PublishedApi internal const val DeprAndNicheMsg: String =
   "Validated functionality is being merged into Either, but this API is niche and will be removed in the future. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"

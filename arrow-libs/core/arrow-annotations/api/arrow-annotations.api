@@ -4,6 +4,7 @@ public final class arrow/optics/OpticsTarget : java/lang/Enum {
 	public static final field LENS Larrow/optics/OpticsTarget;
 	public static final field OPTIONAL Larrow/optics/OpticsTarget;
 	public static final field PRISM Larrow/optics/OpticsTarget;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Larrow/optics/OpticsTarget;
 	public static fun values ()[Larrow/optics/OpticsTarget;
 }

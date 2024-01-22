@@ -75,6 +75,6 @@ public object option {
     effect<None, A> { f(OptionEffectScope(this)) }.toOption()
 }
 
-private const val optionDSLDeprecation =
+@PublishedApi internal const val optionDSLDeprecation: String =
   "The option DSL has been moved to arrow.core.raise.option.\n" +
     "Replace import arrow.core.computations.option with arrow.core.raise.option"

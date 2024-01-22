@@ -8,7 +8,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-internal const val deprecateZip: String =
+@PublishedApi internal const val deprecateZip: String =
   "Prefer using the inline result DSL + bind(). Please, be aware that all the errors are no longer accumulated, just the first error found is considered." +
     "In case you think this behaviour should stay, please provide feedback and your use-case on https://github.com/arrow-kt/arrow/issues"
 

@@ -1,3 +1,5 @@
+@file:Suppress("DUPLICATE_PARAMETER_NAME_IN_FUNCTION_TYPE")
+
 package arrow.core
 
 import arrow.core.test.either

@@ -3,6 +3,24 @@ public final class arrow/core/ArrowCoreInternalException : java/lang/RuntimeExce
 	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
+public final class arrow/core/AtomicMemoizationCache : arrow/core/MemoizationCache {
+	public static final synthetic fun box-impl (Ljava/util/concurrent/atomic/AtomicReference;)Larrow/core/AtomicMemoizationCache;
+	public static fun constructor-impl (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/util/concurrent/atomic/AtomicReference;
+	public static synthetic fun constructor-impl$default (Ljava/util/concurrent/atomic/AtomicReference;ILkotlin/jvm/internal/DefaultConstructorMarker;)Ljava/util/concurrent/atomic/AtomicReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/atomic/AtomicReference;Ljava/util/concurrent/atomic/AtomicReference;)Z
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun get-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/atomic/AtomicReference;)I
+	public fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun set-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/atomic/AtomicReference;
+}
+
 public final class arrow/core/ComparisonKt {
 	public static final fun sort (BB)Lkotlin/Pair;
 	public static final fun sort (BBB)Lkotlin/Triple;
@@ -29,6 +47,24 @@ public final class arrow/core/Composition {
 	public static final fun andThen (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static final fun compose (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/core/ConcurrentMapMemoizationCache : arrow/core/MemoizationCache {
+	public static final synthetic fun box-impl (Ljava/util/concurrent/ConcurrentMap;)Larrow/core/ConcurrentMapMemoizationCache;
+	public static fun constructor-impl (Ljava/util/concurrent/ConcurrentMap;)Ljava/util/concurrent/ConcurrentMap;
+	public static synthetic fun constructor-impl$default (Ljava/util/concurrent/ConcurrentMap;ILkotlin/jvm/internal/DefaultConstructorMarker;)Ljava/util/concurrent/ConcurrentMap;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/ConcurrentMap;Ljava/util/concurrent/ConcurrentMap;)Z
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun get-impl (Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/ConcurrentMap;)I
+	public fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun set-impl (Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/ConcurrentMap;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/ConcurrentMap;
 }
 
 public final class arrow/core/Const {
@@ -338,6 +374,7 @@ public final class arrow/core/EitherKt {
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
 	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -611,6 +648,7 @@ public final class arrow/core/IorKt {
 	public static final fun sequenceNullable (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun sequenceOption (Larrow/core/Ior;)Larrow/core/Option;
 	public static final fun sequenceValidated (Larrow/core/Ior;)Larrow/core/Validated;
+	public static final fun toIorNel (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun widen (Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;)Larrow/core/Ior;
 	public static final fun zip (Larrow/core/Ior;Larrow/typeclasses/Semigroup;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Larrow/core/Ior;Lkotlin/jvm/functions/Function10;)Larrow/core/Ior;
@@ -774,6 +812,17 @@ public final class arrow/core/Memoization {
 	public static final fun memoize (Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function3;
 	public static final fun memoize (Lkotlin/jvm/functions/Function4;)Lkotlin/jvm/functions/Function4;
 	public static final fun memoize (Lkotlin/jvm/functions/Function5;)Lkotlin/jvm/functions/Function5;
+}
+
+public abstract interface class arrow/core/MemoizationCache {
+	public abstract fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
+	public static final fun MemoizedDeepRecursiveFunction (Larrow/core/MemoizationCache;Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
+	public static final fun MemoizedDeepRecursiveFunction (Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
+	public static synthetic fun MemoizedDeepRecursiveFunction$default (Larrow/core/MemoizationCache;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlin/DeepRecursiveFunction;
 }
 
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
@@ -954,9 +1003,9 @@ public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/
 public final class arrow/core/NonEmptySetKt {
 	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/Set;
 	public static final fun toNonEmptySetOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
-	public static final fun toNonEmptySetOrNone (Ljava/util/Set;)Larrow/core/Option;
+	public static final synthetic fun toNonEmptySetOrNone (Ljava/util/Set;)Larrow/core/Option;
 	public static final fun toNonEmptySetOrNull (Ljava/lang/Iterable;)Ljava/util/Set;
-	public static final fun toNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
+	public static final synthetic fun toNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
 }
 
 public final class arrow/core/NonFatalKt {
@@ -1618,6 +1667,7 @@ public final class arrow/core/PredefKt {
 }
 
 public final class arrow/core/ResultKt {
+	public static final field deprecateZip Ljava/lang/String;
 	public static final fun composeErrors ([Ljava/lang/Throwable;)Ljava/lang/Throwable;
 	public static final fun flatMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getUnitResult ()Ljava/lang/Object;
@@ -2594,6 +2644,8 @@ public final class arrow/core/Validated$Valid$Companion {
 }
 
 public final class arrow/core/ValidatedKt {
+	public static final field DeprAndNicheMsg Ljava/lang/String;
+	public static final field ValidatedDeprMsg Ljava/lang/String;
 	public static final fun andThen (Larrow/core/Validated;Lkotlin/jvm/functions/Function1;)Larrow/core/Validated;
 	public static final fun attempt (Larrow/core/Validated;)Larrow/core/Validated;
 	public static final fun bisequence (Larrow/core/Validated;)Ljava/util/List;
@@ -2667,6 +2719,7 @@ public final class arrow/core/computations/EitherEffect$DefaultImpls {
 }
 
 public final class arrow/core/computations/EitherKt {
+	public static final field eitherDSLDeprecation Ljava/lang/String;
 	public static final fun ensureNotNull (Larrow/core/computations/EitherEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2691,6 +2744,7 @@ public final class arrow/core/computations/NullableEffect$DefaultImpls {
 }
 
 public final class arrow/core/computations/NullableKt {
+	public static final field nullableDSLDeprecation Ljava/lang/String;
 	public static final fun ensureNotNull (Larrow/core/computations/NullableEffect;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2705,6 +2759,7 @@ public final class arrow/core/computations/OptionEffect$DefaultImpls {
 }
 
 public final class arrow/core/computations/OptionKt {
+	public static final field optionDSLDeprecation Ljava/lang/String;
 	public static final fun ensureNotNull (Larrow/core/computations/OptionEffect;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -2747,6 +2802,10 @@ public final class arrow/core/computations/ResultEffect {
 	public final fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Validated;)Ljava/lang/Object;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class arrow/core/computations/ResultKt {
+	public static final field resultDSLDeprecation Ljava/lang/String;
 }
 
 public final class arrow/core/computations/either {
@@ -2934,6 +2993,10 @@ public final class arrow/core/continuations/EffectScopeKt {
 	public static final fun ensureNotNull (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class arrow/core/continuations/EitherKt {
+	public static final field eitherDSLDeprecation Ljava/lang/String;
+}
+
 public final class arrow/core/continuations/FoldContinuation : arrow/core/continuations/Token, arrow/core/continuations/EffectScope, kotlin/coroutines/Continuation {
 	public field recover Lkotlin/jvm/functions/Function2;
 	public fun <init> (Larrow/core/continuations/Token;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)V
@@ -3001,6 +3064,10 @@ public final class arrow/core/continuations/IorEffectScope : arrow/core/continua
 	public fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setLeftState (Ljava/util/concurrent/atomic/AtomicReference;)V
 	public fun shift (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/core/continuations/IorKt {
+	public static final field iorDSLDeprecation Ljava/lang/String;
 }
 
 public final class arrow/core/continuations/NullableEagerEffectScope : arrow/core/continuations/EagerEffectScope {
@@ -3084,6 +3151,7 @@ public final class arrow/core/continuations/NullableEffectScope : arrow/core/con
 }
 
 public final class arrow/core/continuations/NullableKt {
+	public static final field nullableDSLDeprecation Ljava/lang/String;
 	public static final fun ensureNotNull-0Rsnnio (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ensureNotNull-7s8y1X8 (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -3167,6 +3235,7 @@ public final class arrow/core/continuations/OptionEffectScope : arrow/core/conti
 }
 
 public final class arrow/core/continuations/OptionKt {
+	public static final field optionDSLDeprecation Ljava/lang/String;
 	public static final fun ensureNotNull-09sQPHg (Larrow/core/continuations/EffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ensureNotNull-dxZa7OQ (Larrow/core/continuations/EagerEffectScope;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toOption (Larrow/core/continuations/EagerEffect;)Larrow/core/Option;
@@ -3250,6 +3319,7 @@ public final class arrow/core/continuations/ResultEffectScope : arrow/core/conti
 }
 
 public final class arrow/core/continuations/ResultKt {
+	public static final field resultDSLDeprecation Ljava/lang/String;
 	public static final fun toResult (Larrow/core/continuations/EagerEffect;)Ljava/lang/Object;
 	public static final fun toResult (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -3326,7 +3396,34 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
+}
+
+public final class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/Raise {
+	public fun <init> (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function0;)V
+	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/EagerEffect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/continuations/Effect;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Larrow/core/NonEmptyList;)Larrow/core/NonEmptyList;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
+	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun ensure (Z)V
+	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public fun shift (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
@@ -3377,6 +3474,7 @@ public final class arrow/core/raise/NullableRaise : arrow/core/raise/Raise {
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun ensure (Z)V
 	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
@@ -3407,6 +3505,7 @@ public final class arrow/core/raise/OptionRaise : arrow/core/raise/Raise {
 	public fun catch (Larrow/core/continuations/Effect;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun ensure (Z)V
 	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Larrow/core/None;)Ljava/lang/Void;
@@ -3455,6 +3554,9 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 
 public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
+	public final fun _mapOrAccumulate (Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
+	public final fun _mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public final fun _mapOrAccumulate (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
 	public fun attempt (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Larrow/core/Validated;)Ljava/lang/Object;
@@ -3480,12 +3582,17 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
+public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
 }
 
 public final class arrow/core/raise/RaiseKt {
 	public static final fun _fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun _foldOrThrow (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun _foldUnsafe (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun _merge (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun catch (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
@@ -3507,6 +3614,8 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun ior (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static final fun iorNel (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static synthetic fun iorNel$default (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/core/Ior;
 	public static final fun mapError (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public static final fun mapError (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;

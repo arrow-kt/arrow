@@ -2,7 +2,9 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Some
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -69,6 +71,22 @@ class NullableSpec : StringSpec({
     } shouldBe "1"
   }
 
+  "binding either in nullable" {
+    nullable {
+      val number = Either.Right("s".length)
+      val string = number.map(Int::toString).bind()
+      string
+    } shouldBe "1"
+  }
+
+  "binding either in nullable, ignore errors" {
+    nullable {
+      val number = Either.Right("s".length) as Either<Boolean, Int>
+      val string = ignoreErrors { number.map(Int::toString).bind() }
+      string
+    } shouldBe "1"
+  }
+
   "short circuit option" {
     nullable<Int> {
       val number = Some("s".length)
@@ -125,5 +143,20 @@ class NullableSpec : StringSpec({
       val two = 2.bind()
       one + two
     } shouldBe 3
+  }
+
+  "Detects potential leaked exceptions" {
+    shouldThrow<IllegalStateException> {
+      nullable { lazy { raise(null) } }
+    }
+  }
+
+  "Unsafe leakage of exceptions" {
+    val l: Lazy<Int> = foldUnsafe<String, Lazy<Int>, Lazy<Int>?>(
+      { lazy { raise("problem") } }, { throw it }, { null }, { it }
+    ).shouldNotBeNull()
+    shouldThrow<IllegalStateException> {
+      l.value
+    }
   }
 })

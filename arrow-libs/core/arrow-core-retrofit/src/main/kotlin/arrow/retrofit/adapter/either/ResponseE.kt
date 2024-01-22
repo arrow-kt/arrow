@@ -6,7 +6,7 @@ import okhttp3.Response
 
 public data class ResponseE<E, A>(
   val raw: Response,
-  val body: Either<E, A>
+  val body: Either<E, A>,
 ) {
 
   val code: Int = raw.code()

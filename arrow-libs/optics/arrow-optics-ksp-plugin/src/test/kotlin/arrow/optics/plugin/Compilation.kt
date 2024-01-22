@@ -1,11 +1,15 @@
+@file:OptIn(ExperimentalCompilerApi::class)
+
 package arrow.optics.plugin
 
+import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
 import org.assertj.core.api.Assertions
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -42,7 +46,7 @@ fun String.evals(thing: Pair<String, Any?>) {
 // UTILITY FUNCTIONS COPIED FROM META-TEST
 // =======================================
 
-internal fun compile(text: String, allWarningsAsErrors: Boolean = false): KotlinCompilation.Result {
+internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult {
   val compilation = buildCompilation(text, allWarningsAsErrors = allWarningsAsErrors)
   // fix problems with double compilation and KSP
   // as stated in https://github.com/tschuchortdev/kotlin-compile-testing/issues/72
@@ -62,7 +66,7 @@ fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = Kotli
   classpaths = listOf(
     "arrow-annotations:$arrowVersion",
     "arrow-core:$arrowVersion",
-    "arrow-optics:$arrowVersion"
+    "arrow-optics:$arrowVersion",
   ).map { classpathOf(it) }
   symbolProcessorProviders = listOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))

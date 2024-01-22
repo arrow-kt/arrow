@@ -37,6 +37,13 @@ public suspend fun <Error, A, B> Effect<Error, A>.fold(
   return fold({ invoke() }, { catch(it) }, { recover(it) }, { transform(it) })
 }
 
+/**
+ * `invoke` the [Effect] and [fold] the result:
+ *  - _success_ [transform] result of [A] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *
+ * This function re-throws any exceptions thrown within the [Effect].
+ */
 public suspend fun <Error, A, B> Effect<Error, A>.fold(
   recover: suspend (error: Error) -> B,
   transform: suspend (value: A) -> B,
@@ -48,6 +55,15 @@ public suspend fun <Error, A, B> Effect<Error, A>.fold(
   return fold({ throw it }, recover, transform)
 }
 
+/**
+ * `invoke` the [EagerEffect] and [fold] the result:
+ *  - _success_ [transform] result of [A] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *  - _exception_ [catch] from [Throwable] by transforming value into [B].
+ *
+ * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+ * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
+ */
 public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
   catch: (throwable: Throwable) -> B,
   recover: (error: Error) -> B,
@@ -61,6 +77,13 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
   return fold({ invoke(this) }, catch, recover, transform)
 }
 
+/**
+ * `invoke` the [EagerEffect] and [fold] the result:
+ *  - _success_ [transform] result of [A] to a value of [B].
+ *  - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *
+ * This function re-throws any exceptions thrown within the [Effect].
+ */
 public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Error) -> B, transform: (value: A) -> B): B {
   contract {
     callsInPlace(recover, AT_MOST_ONCE)
@@ -69,6 +92,14 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Erro
   return fold({ throw it }, recover, transform)
 }
 
+/**
+ * The most general way to execute a computation using [Raise].
+ * Depending on the outcome of the block, one of the two continuations is run:
+ * - _success_ [transform] result of [A] to a value of [B].
+ * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ */
 @JvmName("_foldOrThrow")
 public inline fun <Error, A, B> fold(
   @BuilderInference block: Raise<Error>.() -> A,
@@ -82,8 +113,49 @@ public inline fun <Error, A, B> fold(
   return fold(block, { throw it }, recover, transform)
 }
 
+/**
+ * The most general way to execute a computation using [Raise].
+ * Depending on the outcome of the block, one of the three continuations is run:
+ * - _success_ [transform] result of [A] to a value of [B].
+ * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
+ * - _exception_ [catch] from [Throwable] by transforming value into [B].
+ *
+ * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
+ * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
+ */
 @JvmName("_fold")
 public inline fun <Error, A, B> fold(
+  @BuilderInference block: Raise<Error>.() -> A,
+  catch: (throwable: Throwable) -> B,
+  recover: (error: Error) -> B,
+  transform: (value: A) -> B,
+): B {
+  contract {
+    callsInPlace(catch, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return foldUnsafe(block, catch, recover) {
+    if (it is Function<*> || it is Lazy<*> || it is Sequence<*>)
+      throw IllegalStateException(
+        """
+  Returning a lazy computation or closure from 'fold' breaks the context scope, and may lead to leaked exceptions on later execution.
+  Make sure all calls to 'raise' and 'bind' occur within the lifecycle of nullable { }, either { } or similar builders.
+ 
+  See Arrow documentation on 'Typed errors' for further information.
+  """.trimIndent()
+      )
+    transform(it)
+  }
+}
+
+/**
+ * Similar to [fold], but does *not* check for
+ * potential lazy return types which break the
+ * [Raise] context barrier.
+ */
+@JvmName("_foldUnsafe")
+public inline fun <Error, A, B> foldUnsafe(
   @BuilderInference block: Raise<Error>.() -> A,
   catch: (throwable: Throwable) -> B,
   recover: (error: Error) -> B,
@@ -153,10 +225,10 @@ public inline fun <Error, A> Raise<Error>.traced(
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
   val isOuterTraced = this is DefaultRaise && isTraced
-  val nested = if (this is DefaultRaise && isTraced) this else DefaultRaise(true)
+  val nested: DefaultRaise = if (isOuterTraced) this as DefaultRaise else DefaultRaise(true)
   return try {
     block.invoke(nested)
-  } catch (e: RaiseCancellationException) {
+  } catch (e: CancellationException) {
     val r: Error = e.raisedOrRethrow(nested)
     trace(Trace(e), r)
     if (isOuterTraced) throw e else raise(r)
@@ -168,7 +240,6 @@ public inline fun <Error, A> Raise<Error>.traced(
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
-    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
     this is RaiseCancellationException && this.raise === raise -> raised as R
     else -> throw this
   }
@@ -181,29 +252,43 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
   override fun raise(r: Any?): Nothing = when {
-    isActive.value -> throw if (isTraced) RaiseCancellationException(r, this) else RaiseCancellationExceptionNoTrace(r, this)
+    isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
 }
 
-/** CancellationException is required to cancel coroutines when raising from within them. */
-private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
-  CancellationExceptionNoTrace()
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@RequiresOptIn(RaiseCancellationExceptionCaptured, RequiresOptIn.Level.WARNING)
+public annotation class DelicateRaiseApi
 
-private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
+/**
+ * [RaiseCancellationException] is a _delicate_ api, and should be used with care.
+ * It drives the short-circuiting behavior of [Raise].
+ */
+@DelicateRaiseApi
+public sealed class RaiseCancellationException(
+  internal val raised: Any?,
+  internal val raise: Raise<Any?>
+) : CancellationException(RaiseCancellationExceptionCaptured)
 
-internal expect open class CancellationExceptionNoTrace() : CancellationException
+@DelicateRaiseApi
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+
+@DelicateRaiseApi
+internal class Traced(raised: Any?, raise: Raise<Any?>): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """
-  raise or bind was called outside of its DSL scope, and the DSL Scoped operator was leaked
-  This is kind of usage is incorrect, make sure all calls to raise or bind occur within the lifecycle of effect { }, either { } or similar builders.
+  'raise' or 'bind' was leaked outside of its context scope.
+  Make sure all calls to 'raise' and 'bind' occur within the lifecycle of nullable { }, either { } or similar builders.
  
-  See: Effect documentation for additional information.
+  See Arrow documentation on 'Typed errors' for further information.
   """.trimIndent()
 )
 
 internal const val RaiseCancellationExceptionCaptured: String =
-  "kotlin.coroutines.cancellation.CancellationException should never get cancelled. Always re-throw it if captured." +
+  "kotlin.coroutines.cancellation.CancellationException should never get swallowed. Always re-throw it if captured." +
     "This swallows the exception of Arrow's Raise, and leads to unexpected behavior." +
     "When working with Arrow prefer Either.catch or arrow.core.raise.catch to automatically rethrow CancellationException."

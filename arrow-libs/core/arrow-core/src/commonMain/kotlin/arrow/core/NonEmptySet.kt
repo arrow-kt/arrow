@@ -4,7 +4,7 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 public value class NonEmptySet<out A> private constructor(
-  private val elements: Set<A>
+  @PublishedApi internal val elements: Set<A>
 ) : Set<A> by elements, NonEmptyCollection<A> {
 
   public constructor(first: A, rest: Set<A>) : this(setOf(first) + rest)
@@ -21,13 +21,30 @@ public value class NonEmptySet<out A> private constructor(
 
   override fun lastOrNull(): A = elements.last()
 
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+    elements.map(transform).toNonEmptyListOrNull()!!
+
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
+    elements.mapIndexed(transform).toNonEmptyListOrNull()!!
+
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+    elements.flatMap(transform).toNonEmptyListOrNull()!!
+
+  override fun distinct(): NonEmptyList<A> =
+    toNonEmptyList()
+
+  @Suppress("OVERRIDE_BY_INLINE")
+  public override inline fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
+    elements.distinctBy(selector).toNonEmptyListOrNull()!!
+
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
-  override fun equals(other: Any?): Boolean = when (other) {
-    is NonEmptySet<*> -> elements == other.elements
-    else -> elements == other
-  }
+  override fun equals(other: Any?): Boolean =
+    elements == other
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =
@@ -37,14 +54,19 @@ public value class NonEmptySet<out A> private constructor(
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
   NonEmptySet(first, rest.toSet())
 
-public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
-  firstOrNull()?.let { NonEmptySet(it, minus(it).toSet()) }
+public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
+  val iter = iterator()
+  if (!iter.hasNext()) return null
+  return NonEmptySet(iter.next(), Iterable { iter }.toSet())
+}
 
 public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()
 
+@Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
 public fun <A> Set<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
-  firstOrNull()?.let { NonEmptySet(it, minus(it)) }
+  (this as Iterable<A>).toNonEmptySetOrNull()
 
+@Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
 public fun <A> Set<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
   toNonEmptySetOrNull().toOption()

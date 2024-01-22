@@ -1,28 +1,30 @@
 [versions]
-animalSniffer = "1.7.0"
-arrowGradleConfig = "0.12.0-rc.3"
-assertj = "3.24.2"
-coroutines = "1.7.2"
-classgraph = "4.8.160"
-dokka = "1.8.20"
+animalSniffer = "1.7.1"
+arrowGradleConfig = "0.12.0-rc.6"
+assertj = "3.25.1"
+coroutines = "1.7.3"
+classgraph = "4.8.165"
+dokka = "1.9.10"
 jUnit = "4.13.2"
-jUnitJupiter = "5.9.3"
-jUnitVintage = "5.9.3"
-kotest = "5.6.2"
-kotestGradle = "5.6.2"
-kover = "0.7.2"
-kotlin = "1.8.22"
+jUnitJupiter = "5.10.1"
+jUnitVintage = "5.10.1"
+kotest = "5.8.0"
+kotestGradle = "5.8.0"
+kover = "0.7.5"
+kotlin = "1.9.22"
+kotlinxSerializationPlugin = "1.9.22"
 kotlinBinaryCompatibilityValidator = "0.13.2"
-kotlinCompileTesting = "1.5.0"
-knit = "0.4.0"
-kspVersion = "1.8.22-1.0.11"
-kotlinxSerialization = "1.5.1"
-mockWebServer = "4.11.0"
+kotlinCompileTesting = "0.4.0"
+knit = "0.5.0"
+kspVersion = "1.9.22-1.0.17"
+kotlinxSerialization = "1.6.2"
+mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
+spotlessVersion = "6.24.0"
+cache4k = "0.12.0"
 
 [libraries]
-arrow-kotlinMetadata = { module = "io.arrow-kt:kotlin-metadata", version.ref = "kotlin" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 jUnitJUnit = { module = "junit:junit", version.ref = "jUnit" }
@@ -37,7 +39,9 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 kotlin-stdlibJS = { module = "org.jetbrains.kotlin:kotlin-stdlib-js" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
+kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
@@ -48,8 +52,9 @@ ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = 
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
-kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
-kotlinCompileTestingKsp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
+kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
+kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
+cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
@@ -65,5 +70,6 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerializationPlugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }

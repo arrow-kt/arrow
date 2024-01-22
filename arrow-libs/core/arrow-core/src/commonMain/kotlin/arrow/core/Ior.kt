@@ -116,8 +116,7 @@ public sealed class Ior<out A, out B> {
   public fun isLeft(): Boolean {
     contract {
       returns(true) implies (this@Ior is Ior.Left<A>)
-      returns(false) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Both<A, B>)
+      returns(false) implies (this@Ior is Ior.Right<B> || this@Ior is Ior.Both<A, B>)
     }
     return this@Ior is Ior.Left<A>
   }
@@ -127,8 +126,7 @@ public sealed class Ior<out A, out B> {
   public fun isRight(): Boolean {
     contract {
       returns(true) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Left<A>)
-      returns(false) implies (this@Ior is Ior.Both<A, B>)
+      returns(false) implies (this@Ior is Ior.Left<A> || this@Ior is Ior.Both<A, B>)
     }
     return this@Ior is Ior.Right<B>
   }
@@ -137,8 +135,7 @@ public sealed class Ior<out A, out B> {
   @JvmName("_isBoth")
   public fun isBoth(): Boolean {
     contract {
-      returns(false) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Left<A>)
+      returns(false) implies (this@Ior is Ior.Right<B> || this@Ior is Ior.Left<A>)
       returns(true) implies (this@Ior is Ior.Both<A, B>)
     }
     return this@Ior is Ior.Both<A, B>
@@ -1164,6 +1161,14 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>>
     { a -> Valid(Left(a)) },
     { b -> b.map { Right(it) } },
     { a, b -> b.map { Both(a, it) } })
+
+/**
+ * Given an [Ior] with an error type [A], returns an [IorNel] with the same
+ * error type. Wraps the original error in a [NonEmptyList] so that it can be
+ * combined with an [IorNel] in a Raise DSL which operates on one.
+ */
+public fun <A, B> Ior<A, B>.toIorNel(): IorNel<A, B> =
+  mapLeft { it.nel() }
 
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>

@@ -10,7 +10,7 @@ fun test() {
   val left: Either<Throwable, Int> = Either.catch { throw RuntimeException("Boom!") }
 
   val caught: Either<Nothing, Int> = left.catch { _: RuntimeException -> 1 }
-  val failure: Either<String, Int> = left.catch { _: RuntimeException -> shift("failure") }
+  val failure: Either<String, Int> = left.catch { _: RuntimeException -> raise("failure") }
 
   shouldThrowUnit<RuntimeException> {
     val caught2: Either<Nothing, Int> = left.catch { _: IllegalStateException -> 1 }

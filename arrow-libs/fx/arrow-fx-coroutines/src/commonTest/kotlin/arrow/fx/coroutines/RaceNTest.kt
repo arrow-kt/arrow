@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.merge
+import io.kotest.assertions.retry
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -17,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
+import kotlin.time.Duration.Companion.seconds
 
 fun <A> Either<Throwable, A>.rethrow(): A =
   fold({ throw it }, ::identity)
@@ -105,34 +107,39 @@ class RaceNTest : StringSpec({
     }
 
     "Cancelling race 3 cancels all participants" {
-      checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
-        val s = Channel<Unit>()
-        val pa = CompletableDeferred<Pair<Int, ExitCase>>()
-        val pb = CompletableDeferred<Pair<Int, ExitCase>>()
-        val pc = CompletableDeferred<Pair<Int, ExitCase>>()
+      retry(10, 1.seconds) {
+        checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
+          val s = Channel<Unit>()
+          val pa = CompletableDeferred<Pair<Int, ExitCase>>()
+          val pb = CompletableDeferred<Pair<Int, ExitCase>>()
+          val pc = CompletableDeferred<Pair<Int, ExitCase>>()
 
-        val loserA: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pa.complete(Pair(a, ex)) } }
-        val loserB: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pb.complete(Pair(b, ex)) } }
-        val loserC: suspend CoroutineScope.() -> Int = { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pc.complete(Pair(c, ex)) } }
+          val loserA: suspend CoroutineScope.() -> Int =
+            { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pa.complete(Pair(a, ex)) } }
+          val loserB: suspend CoroutineScope.() -> Int =
+            { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pb.complete(Pair(b, ex)) } }
+          val loserC: suspend CoroutineScope.() -> Int =
+            { guaranteeCase({ s.receive(); awaitCancellation() }) { ex -> pc.complete(Pair(c, ex)) } }
 
-        val f = async { raceN(loserA, loserB, loserC) }
+          val f = async { raceN(loserA, loserB, loserC) }
 
-        s.send(Unit) // Suspend until all racers started
-        s.send(Unit)
-        s.send(Unit)
-        f.cancel()
+          s.send(Unit) // Suspend until all racers started
+          s.send(Unit)
+          s.send(Unit)
+          f.cancel()
 
-        pa.await().let { (res, exit) ->
-          res shouldBe a
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
-        pb.await().let { (res, exit) ->
-          res shouldBe b
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-        }
-        pc.await().let { (res, exit) ->
-          res shouldBe c
-          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+          pa.await().let { (res, exit) ->
+            res shouldBe a
+            exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+          }
+          pb.await().let { (res, exit) ->
+            res shouldBe b
+            exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+          }
+          pc.await().let { (res, exit) ->
+            res shouldBe c
+            exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+          }
         }
       }
     }

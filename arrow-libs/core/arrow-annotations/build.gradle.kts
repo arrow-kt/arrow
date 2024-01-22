@@ -4,8 +4,16 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.arrowGradleConfig.publish)
-  alias(libs.plugins.arrowGradleConfig.versioning)
+  alias(libs.plugins.spotless)
 }
+
+spotless {
+  kotlin {
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+  }
+}
+
+apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {
   sourceSets {
@@ -19,17 +27,18 @@ kotlin {
         implementation(libs.kotlin.stdlib)
       }
     }
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
     jsMain {
       dependencies {
         implementation(libs.kotlin.stdlibJS)
       }
     }
   }
-}
 
-apply(from = property("ANIMALSNIFFER_MPP"))
+  jvm {
+    tasks.jvmJar {
+      manifest {
+        attributes["Automatic-Module-Name"] = "arrow.annotations"
+      }
+    }
+  }
+}

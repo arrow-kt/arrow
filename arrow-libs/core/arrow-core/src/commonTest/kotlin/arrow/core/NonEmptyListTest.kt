@@ -9,13 +9,11 @@ import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.negativeInt
-import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.*
 import io.kotest.property.checkAll
 import kotlin.math.max
 import kotlin.math.min
@@ -26,6 +24,16 @@ class NonEmptyListTest : StringSpec({
 
     "iterable.toNonEmptyListOrNull should round trip" {
       checkAll(Arb.nonEmptyList(Arb.int())) { nonEmptyList ->
+        nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
+      }
+    }
+
+    "iterable.toNonEmptyListOrNull should return null for an empty iterable" {
+      listOf<String>().toNonEmptyListOrNull().shouldBeNull()
+    }
+
+    "iterable.toNonEmptyListOrNull should work correctly when the iterable starts with or contains null" {
+      checkAll(Arb.nonEmptyList(Arb.int().orNull())) { nonEmptyList ->
         nonEmptyList.all.toNonEmptyListOrNull().shouldNotBeNull() shouldBe nonEmptyList
       }
     }
@@ -443,6 +451,58 @@ class NonEmptyListTest : StringSpec({
           // `shouldBe` doesn't use the `equals` methods on `Iterable`
           (a == a.all).shouldBeTrue()
         }
+      }
+    }
+
+    "lastOrNull" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.lastOrNull()
+        val expected = a.last()
+        result shouldBe expected
+      }
+    }
+
+    "extract" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.extract()
+        val expected = a.head
+        result shouldBe expected
+      }
+    }
+
+    "plus" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int()),
+        Arb.int()
+      ) { a, b ->
+        val result = a + b
+        val expected = a.all + b
+        result shouldBe expected
+      }
+    }
+
+    "coflatMap should retain the same length as the original list" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int())
+      ) { a ->
+        val result = a.coflatMap { it.all }
+        val expected = a.all
+        result.size shouldBe expected.size
+      }
+    }
+
+    "foldLeft should sum up correctly for addition" {
+      checkAll(
+        Arb.nonEmptyList(Arb.int()),
+        Arb.int()
+      ) { list, initial ->
+        val result = list.foldLeft(initial) { acc, i -> acc + i }
+        val expected = initial + list.all.sum()
+        result shouldBe expected
       }
     }
 })

@@ -93,6 +93,6 @@ public class IorEagerEffectScope<E>(semigroup: Semigroup<E>, private val effect:
   override suspend fun <B> shift(r: E): B = effect.shift(combine(r))
 }
 
-private const val iorDSLDeprecation =
+@PublishedApi internal const val iorDSLDeprecation: String =
   "The ior DSL has been moved to arrow.core.raise.ior.\n" +
     "Replace import arrow.core.computations.ior with arrow.core.raise.ior"

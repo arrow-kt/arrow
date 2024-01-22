@@ -106,6 +106,6 @@ public object nullable {
     Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }
 
-private const val nullableDSLDeprecation =
+@PublishedApi internal const val nullableDSLDeprecation: String =
   "The nullable DSL has been moved to arrow.core.raise.nullable.\n" +
     "Replace import arrow.core.computations.* with arrow.core.raise.*"

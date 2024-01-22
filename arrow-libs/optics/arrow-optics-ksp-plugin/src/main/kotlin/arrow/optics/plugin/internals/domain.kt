@@ -1,8 +1,14 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.companionObject
 import com.google.devtools.ksp.getVisibility
-import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSName
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeParameter
+import com.google.devtools.ksp.symbol.Visibility
 import java.util.Locale
 
 data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
@@ -24,6 +30,7 @@ data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val target
     copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")
 }
 
+@Suppress("RecursivePropertyAccessor")
 val KSClassDeclaration.nameWithParentClass: String
   get() = when (val parent = parentDeclaration) {
     is KSClassDeclaration -> parent.nameWithParentClass + "." + simpleName.asString()
@@ -35,7 +42,7 @@ enum class OpticsTarget {
   LENS,
   PRISM,
   OPTIONAL,
-  DSL
+  DSL,
 }
 
 typealias IsoTarget = Target.Iso
@@ -105,6 +112,7 @@ sealed class Focus {
 
   abstract val className: String
   abstract val paramName: String
+
   // only used for type-refining prisms
   abstract val refinedType: KSType?
   abstract val onlyOneSealedSubclass: Boolean
@@ -158,7 +166,7 @@ data class Snippet(
   val `package`: String,
   val name: String,
   val imports: Set<String> = emptySet(),
-  val content: String
+  val content: String,
 ) {
   val fqName = "$`package`.$name"
 }
@@ -168,4 +176,4 @@ fun Snippet.asFileText(): String =
             |${if (`package`.isNotBlank() && `package` != "`unnamed package`") "package $`package`" else ""}
             |${imports.joinToString(prefix = "\n", separator = "\n", postfix = "\n")}
             |$content
-            """.trimMargin()
+  """.trimMargin()
