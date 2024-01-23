@@ -90,7 +90,6 @@ public final class arrow/eval/Eval$Now$Companion {
 public final class arrow/eval/EvalKt {
 	public static final fun iterateRight (Ljava/util/Iterator;Larrow/eval/Eval;Lkotlin/jvm/functions/Function2;)Larrow/eval/Eval;
 	public static final fun replicate (Larrow/eval/Eval;I)Larrow/eval/Eval;
-	public static final fun replicate (Larrow/eval/Eval;ILarrow/typeclasses/Monoid;)Larrow/eval/Eval;
 	public static final fun replicate (Larrow/eval/Eval;ILkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Larrow/eval/Eval;
 	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;)Larrow/eval/Eval;
 	public static final fun zip (Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Larrow/eval/Eval;Lkotlin/jvm/functions/Function10;)Larrow/eval/Eval;
