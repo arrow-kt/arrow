@@ -3,7 +3,7 @@ package arrow.core
 
 import arrow.core.raise.EagerEffect
 import arrow.core.raise.Effect
-import arrow.core.raise.OptionRaise
+import arrow.core.raise.SingletonRaise
 import arrow.core.raise.option
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -671,8 +671,8 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- KNIT example-option-22.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A> Option<A>.recover(recover: OptionRaise.(None) -> A): Option<A> =
+public inline fun <A> Option<A>.recover(recover: SingletonRaise<None>.() -> A): Option<A> =
   when (this@recover) {
-    is None -> option { recover(this, None) }
+    is None -> option { recover() }
     is Some -> this@recover
   }

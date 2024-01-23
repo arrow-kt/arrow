@@ -620,7 +620,7 @@ public final class arrow/core/OptionKt {
 	public static final fun flatten (Larrow/core/Option;)Larrow/core/Option;
 	public static final fun getOrElse (Larrow/core/Option;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun none ()Larrow/core/Option;
-	public static final fun recover (Larrow/core/Option;Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
+	public static final fun recover (Larrow/core/Option;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun some (Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun toMap (Larrow/core/Option;)Ljava/util/Map;
 	public static final fun toOption (Ljava/lang/Object;)Larrow/core/Option;
@@ -901,14 +901,6 @@ public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : j
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
-public final class arrow/core/raise/IgnoreErrorsRaise : arrow/core/raise/TransformingRaise {
-	public fun <init> (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function0;)V
-	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
-	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun ensure (Z)V
-	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class arrow/core/raise/IorRaise : arrow/core/raise/RaiseWrapper {
 	public fun <init> (Lkotlin/jvm/functions/Function2;Ljava/util/concurrent/atomic/AtomicReference;Larrow/core/raise/Raise;)V
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
@@ -919,31 +911,6 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/RaiseWrapper {
 	public final fun combine (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun getCombineError ()Lkotlin/jvm/functions/Function2;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-}
-
-public final class arrow/core/raise/NullableRaise : arrow/core/raise/RaiseWrapper {
-	public fun <init> (Larrow/core/raise/Raise;)V
-	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
-	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun bindAllNullable (Ljava/lang/Iterable;)Ljava/util/List;
-	public final fun bindAllNullable (Ljava/util/Map;)Ljava/util/Map;
-	public final fun ensure (Z)V
-	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
-}
-
-public final class arrow/core/raise/OptionRaise : arrow/core/raise/RaiseWrapper {
-	public fun <init> (Larrow/core/raise/Raise;)V
-	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
-	public final fun bindAllOption (Ljava/lang/Iterable;)Ljava/util/List;
-	public final fun bindAllOption (Ljava/util/List;)Ljava/util/List;
-	public final fun bindAllOption (Ljava/util/Map;)Ljava/util/Map;
-	public final fun bindAllOption (Ljava/util/Set;)Ljava/util/Set;
-	public final fun ensure (Z)V
-	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
-	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/core/raise/Raise {
@@ -1020,6 +987,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun getOrElse (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun getOrNull (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun impure (Lkotlin/jvm/functions/Function1;)V
 	public static final fun ior (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static final fun iorNel (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
 	public static synthetic fun iorNel$default (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/core/Ior;
@@ -1042,6 +1010,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun recoverTraced (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun singleton (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toIor (Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
@@ -1085,6 +1054,26 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/RaiseWrapper 
 	public final fun bindAllResult (Ljava/util/Map;)Ljava/util/Map;
 	public final fun bindAllResult (Ljava/util/Set;)Ljava/util/Set;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class arrow/core/raise/SingletonRaise : arrow/core/raise/TransformingRaise {
+	public fun <init> (Larrow/core/raise/Raise;)V
+	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
+	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun bindAllNullable (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllNullable (Ljava/util/List;)Ljava/util/List;
+	public final fun bindAllNullable (Ljava/util/Map;)Ljava/util/Map;
+	public final fun bindAllNullable (Ljava/util/Set;)Ljava/util/Set;
+	public final fun bindAllOption (Ljava/lang/Iterable;)Ljava/util/List;
+	public final fun bindAllOption (Ljava/util/List;)Ljava/util/List;
+	public final fun bindAllOption (Ljava/util/Map;)Ljava/util/Map;
+	public final fun bindAllOption (Ljava/util/Set;)Ljava/util/Set;
+	public final fun ensure (Z)V
+	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun raise ()Ljava/lang/Void;
+	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public synthetic fun transform (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/Trace {
