@@ -155,6 +155,7 @@ public inline fun <Error, A, B> fold(
  * [Raise] context barrier.
  */
 @JvmName("_foldUnsafe")
+@OptIn(DelicateRaiseApi::class)
 public inline fun <Error, A, B> foldUnsafe(
   @BuilderInference block: Raise<Error>.() -> A,
   catch: (throwable: Throwable) -> B,
@@ -171,7 +172,7 @@ public inline fun <Error, A, B> foldUnsafe(
     val res = block(raise)
     raise.complete()
     transform(res)
-  } catch (e: CancellationException) {
+  } catch (e: RaiseCancellationException) {
     raise.complete()
     recover(e.raisedOrRethrow(raise))
   } catch (e: Throwable) {
@@ -219,6 +220,7 @@ public inline fun <Error, A, B> foldUnsafe(
  * but **this only occurs** when composing `traced`.
  * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
  */
+@OptIn(DelicateRaiseApi::class)
 @ExperimentalTraceApi
 public inline fun <Error, A> Raise<Error>.traced(
   @BuilderInference block: Raise<Error>.() -> A,
@@ -227,7 +229,7 @@ public inline fun <Error, A> Raise<Error>.traced(
   val nested = DefaultRaise(true)
   return try {
     block(nested).also { nested.complete() }
-  } catch (e: CancellationException) {
+  } catch (e: Traced) {
     nested.complete()
     val r: Error = e.raisedOrRethrow(nested)
     trace(Trace(e), r)
@@ -235,20 +237,20 @@ public inline fun <Error, A> Raise<Error>.traced(
     // Then we want the stack trace to match the inner one
     try {
       raise(r)
-    } catch (rethrown: CancellationException) {
+    } catch (rethrown: Traced) {
       throw rethrown.withCause(e)
     }
   }
 }
 
 @PublishedApi
-internal fun CancellationException.withCause(cause: CancellationException): CancellationException = when (this) {
-  is RaiseCancellationException -> RaiseCancellationException(raised, raise, cause.cause ?: cause)
-  else -> this
-}
+@DelicateRaiseApi
+internal fun Traced.withCause(cause: Traced): Traced =
+  Traced(raised, raise, cause)
 
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
+@DelicateRaiseApi
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
@@ -263,6 +265,7 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
+  @OptIn(DelicateRaiseApi::class)
   override fun raise(r: Any?): Nothing = when {
     isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
@@ -289,7 +292,7 @@ public sealed class RaiseCancellationException(
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
 @DelicateRaiseApi
-internal class Traced(raised: Any?, raise: Raise<Any?>): RaiseCancellationException(raised, raise)
+internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """
