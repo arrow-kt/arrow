@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
  * Modifies the value in this [MutableState]
  * by applying the function [block] to the current value.
  */
-public inline fun <T> MutableState<T>.update(block: (T) -> T) {
+public inline fun <T> MutableState<T>.update(crossinline block: (T) -> T) {
   Snapshot.withMutableSnapshot {
     value = block(value)
   }
