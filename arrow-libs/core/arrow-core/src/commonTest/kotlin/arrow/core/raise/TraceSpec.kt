@@ -44,4 +44,14 @@ class TraceSpec {
       }
     }
   }
+
+  @Test fun nestedTracingDifferentTypes() = runTest {
+    either {
+      traced<Any?, _>({
+        traced<String, _> ({
+          raise(Unit)
+        }) { _, _ -> unreachable() }
+      }) { _, unit -> unit shouldBe Unit }
+    }
+  }
 }

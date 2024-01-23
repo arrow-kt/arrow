@@ -3,6 +3,7 @@
 package arrow.core
 
 import arrow.core.raise.RaiseAccumulate
+import kotlin.collections.unzip as stdlibUnzip
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
@@ -368,11 +369,8 @@ public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmp
   this.unzip(::identity)
 
 public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> =
-  this.map(f).let { nel ->
-    nel.tail.unzip().let {
-      NonEmptyList(nel.head.first, it.first) to
-        NonEmptyList(nel.head.second, it.second)
-    }
+  map(f).stdlibUnzip().let { (l1, l2) ->
+    l1.toNonEmptyListOrNull()!! to l2.toNonEmptyListOrNull()!!
   }
 
 public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(

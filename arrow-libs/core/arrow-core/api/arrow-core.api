@@ -163,6 +163,7 @@ public final class arrow/core/EitherKt {
 public final class arrow/core/EmptyValue {
 	public static final field INSTANCE Larrow/core/EmptyValue;
 	public final fun combine (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public final fun unbox (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -894,6 +895,9 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 }
 
+public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
@@ -1032,6 +1036,10 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
+public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
 }
 
@@ -1089,6 +1097,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun traced (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static final fun withCause (Larrow/core/raise/Traced;Larrow/core/raise/Traced;)Larrow/core/raise/Traced;
 	public static final fun withError (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function9;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function8;)Ljava/lang/Object;
