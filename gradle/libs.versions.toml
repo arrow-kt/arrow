@@ -22,6 +22,10 @@ mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
 spotlessVersion = "6.25.0"
+compose = "1.6.0-rc01"
+composePlugin = "1.6.0-dev1369"
+agp = "8.2.0"
+android-compileSdk = "34"
 cache4k = "0.12.0"
 
 [libraries]
@@ -52,6 +56,7 @@ ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = 
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
@@ -73,3 +78,5 @@ kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerializationPlugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
