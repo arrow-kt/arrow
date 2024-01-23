@@ -14,13 +14,6 @@ public sealed class ExitCase {
   public data class Cancelled(val exception: CancellationException) : ExitCase()
   public data class Failure(val failure: Throwable) : ExitCase()
 
-  public fun exceptionOrNull(): Throwable? =
-    when(this) {
-      Completed -> null
-      is Cancelled -> exception
-      is Failure -> failure
-    }
-
   public companion object {
     public fun ExitCase(error: Throwable): ExitCase =
       if (error is CancellationException) Cancelled(error) else Failure(error)

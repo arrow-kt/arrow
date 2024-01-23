@@ -158,7 +158,7 @@ class ResourceTest : StringSpec({
     val depth: Int = 100
 
     class CheckableAutoClose {
-      var started: AtomicRef<Boolean> = AtomicRef(true)
+      val started: AtomicRef<Boolean> = AtomicRef(true)
       fun close() {
         started.update { _ -> false }
       }
@@ -180,7 +180,7 @@ class ResourceTest : StringSpec({
       val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
       val res = promises.fold(resource({ 0 }) { _, _ -> }) { acc, (i, p) ->
         resource {
-          acc.bind() + autoClose({ i }) { ii, _ -> p.complete(ii) }
+          acc.bind() + install({ i }) { ii, _ -> p.complete(ii) }
         }
       }
       return Pair(promises.map { it.second }, res)

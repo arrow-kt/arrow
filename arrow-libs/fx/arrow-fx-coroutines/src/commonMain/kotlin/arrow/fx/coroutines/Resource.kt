@@ -5,7 +5,10 @@ import arrow.atomic.Atomic
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.core.zip
+import arrow.fx.coroutines.ExitCase.Cancelled
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
+import arrow.fx.coroutines.ExitCase.Completed
+import arrow.fx.coroutines.ExitCase.Failure
 import arrow.fx.coroutines.continuations.AcquireStep
 import arrow.fx.coroutines.continuations.ScopeDSL
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -1156,7 +1159,14 @@ private class ResourceScopeImpl : ResourceScope {
   override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
     try {
       acquire().also { a ->
-        val finalizer: suspend (ExitCase) -> Unit = { exitCase -> release(a, exitCase.exceptionOrNull()) }
+        val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
+          val errorOrNull = when (exitCase) {
+            Completed -> null
+            is Cancelled -> exitCase.exception
+            is Failure -> exitCase.failure
+          }
+          release(a, errorOrNull)
+        }
         finalizers.update { prev -> prev + finalizer }
       }
     } catch (e: Throwable) {
@@ -1174,7 +1184,6 @@ private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   } ?: acc
 }
 
-@PublishedApi
-internal const val nextVersionRemoved: String =
+@PublishedApi internal const val nextVersionRemoved: String =
   "is redundant and will be removed in Arrow 2.x.x in favor of the DSL.\n" +
     "In case you think this method should stay, please provide feedback and your use-case on https://github.com/arrow-kt/arrow/issues"

@@ -108,7 +108,7 @@ class AutoCloseTest {
     val res = Resource()
 
     autoCloseScope {
-      val r = autoClose(res)
+      val r = install(res)
       wasActive.complete(r.isActive())
     }
 
