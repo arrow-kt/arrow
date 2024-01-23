@@ -134,12 +134,10 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
  * You should never use this directly.
  */
 public class IgnoreErrorsRaise<N>(
-  private val raise: Raise<N>,
+  raise: Raise<N>,
   private val error: () -> N
-) : Raise<Any?> {
-  @RaiseDSL
-  override fun raise(r: Any?): Nothing =
-    raise.raise(error())
+) : TransformingRaise<Any?, N>(raise) {
+  override fun transform(r: Any?): N = error()
 
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
@@ -166,7 +164,7 @@ public typealias Null = Nothing?
  * Implementation of [Raise] used by [nullable].
  * You should never use this directly.
  */
-public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by raise {
+public class NullableRaise(raise: Raise<Null>) : RaiseWrapper<Null>(raise) {
   @RaiseDSL
   public fun ensure(value: Boolean): Unit = ensure(value) { null }
 
@@ -226,7 +224,7 @@ public class NullableRaise(private val raise: Raise<Null>) : Raise<Null> by rais
  * Implementation of [Raise] used by [result].
  * You should never use this directly.
  */
-public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
+public class ResultRaise(raise: Raise<Throwable>) : RaiseWrapper<Throwable>(raise){
   @RaiseDSL
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
 
@@ -263,7 +261,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
  * Implementation of [Raise] used by [option].
  * You should never use this directly.
  */
-public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise {
+public class OptionRaise(raise: Raise<None>) : RaiseWrapper<None>(raise) {
   @RaiseDSL
   public fun <A> Option<A>.bind(): A = getOrElse { raise(None) }
 
@@ -332,8 +330,8 @@ public class OptionRaise(private val raise: Raise<None>) : Raise<None> by raise 
 public class IorRaise<Error> @PublishedApi internal constructor(
   @PublishedApi internal val combineError: (Error, Error) -> Error,
   private val state: Atomic<Any?>,
-  private val raise: Raise<Error>,
-) : Raise<Error> by raise {
+  raise: Raise<Error>,
+) : RaiseWrapper<Error>(raise) {
   @Suppress("UNCHECKED_CAST")
   @PublishedApi
   internal fun combine(e: Error): Error = state.updateAndGet { EmptyValue.combine(it, e, combineError) } as Error

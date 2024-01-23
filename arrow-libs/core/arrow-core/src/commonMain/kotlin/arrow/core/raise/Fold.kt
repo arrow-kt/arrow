@@ -183,6 +183,27 @@ public inline fun <Error, A, B> foldUnsafe(
   }
 }
 
+@OptIn(DelicateRaiseApi::class)
+@ExperimentalTraceApi
+@RaiseDSL
+public inline fun <Error, A> recoverTraced(
+  @BuilderInference block: Raise<Error>.() -> A,
+  recover: (trace: Trace, error: Error) -> A
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+  }
+  val nested = DefaultRaise(true)
+  return try {
+    block(nested).also { nested.complete() }
+  } catch (e: Traced) {
+    nested.complete()
+    val r: Error = e.raisedOrRethrow(nested)
+    recover(Trace(e), r)
+  }
+}
+
 /**
  * Inspect a [Trace] value of [Error].
  *
@@ -232,27 +253,21 @@ public inline fun <Error, A> Raise<Error>.traced(
     callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(trace, AT_MOST_ONCE)
   }
-  val nested = DefaultRaise(true)
-  return try {
-    block(nested).also { nested.complete() }
-  } catch (e: Traced) {
-    nested.complete()
-    val r: Error = e.raisedOrRethrow(nested)
-    trace(Trace(e), r)
-    // If our outer Raise happens to be traced
-    // Then we want the stack trace to match the inner one
-    try {
-      raise(r)
-    } catch (rethrown: Traced) {
-      throw rethrown.withCause(e)
-    }
+  return recoverTraced(block) { t, r ->
+    trace(t, r)
+    raiseWithTrace(t, r)
   }
 }
 
-@PublishedApi
 @DelicateRaiseApi
-internal fun Traced.withCause(cause: Traced): Traced =
-  Traced(raised, raise, cause)
+@ExperimentalTraceApi
+@RaiseDSL
+public fun <Error> Raise<Error>.raiseWithTrace(trace: Trace, r: Error): Nothing =
+  try {
+    raise(r)
+  } catch (rethrown: Traced) {
+    throw Traced(rethrown.raised, rethrown.raise, trace)
+  }
 
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
@@ -271,12 +286,20 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
-  @OptIn(DelicateRaiseApi::class)
+  @OptIn(DelicateRaiseApi::class, ExperimentalTraceApi::class)
   override fun raise(r: Any?): Nothing = when {
     isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
 }
+
+@DelicateRaiseApi
+@PublishedApi
+internal tailrec fun Raise<*>.realUnderlying(): DefaultRaise =
+  when (this) {
+    is TransformingRaise<*, *> -> raise.realUnderlying()
+    is DefaultRaise -> this
+  }
 
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -298,7 +321,8 @@ public sealed class RaiseCancellationException(
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
 @DelicateRaiseApi
-internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
+@ExperimentalTraceApi
+internal class Traced(raised: Any?, raise: Raise<Any?>, val originalTrace: Trace? = null): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """

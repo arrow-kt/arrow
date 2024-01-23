@@ -11,7 +11,7 @@ import kotlin.test.Test
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 
-@OptIn(ExperimentalTraceApi::class)
+@OptIn(ExperimentalTraceApi::class, DelicateRaiseApi::class)
 class TraceSpec {
   @Test fun traceIsEmptyWhenNoErrors() = runTest {
     checkAll(Arb.int()) { i ->
@@ -53,5 +53,23 @@ class TraceSpec {
         }) { _, _ -> unreachable() }
       }) { _, unit -> unit shouldBe Unit }
     }
+  }
+
+  @Test
+  fun withErrorMaintainsTrace() = runTest {
+    val inner = CompletableDeferred<String>()
+    merge {
+      traced({
+        withError({ str: String -> str.length }) {
+          val e = shouldThrow<Traced> {
+            raise("")
+          }
+          inner.complete(e.stackTraceToString())
+          throw e
+        }
+      }) { traced, _ ->
+        inner.await() shouldBe traced.stackTraceToString()
+      }
+    } shouldBe 0
   }
 }
