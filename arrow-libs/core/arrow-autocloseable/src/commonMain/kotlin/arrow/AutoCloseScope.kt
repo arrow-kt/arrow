@@ -20,7 +20,7 @@ import arrow.atomic.update
  * }
  * ```
  */
-public inline fun <A> autoClose(block: AutoCloseScope.() -> A): A {
+public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   val scope = DefaultAutoCloseScope()
   return try {
     block(scope).also {
@@ -32,7 +32,7 @@ public inline fun <A> autoClose(block: AutoCloseScope.() -> A): A {
 }
 
 /**
- * The AutoCloseScope interface exposes all functionality for the [autoClose],
+ * The AutoCloseScope interface exposes all functionality for the [autoCloseScope],
  * and can conveniently be combined with context parameters, or extension functions.
  *
  * ```kotlin
@@ -47,33 +47,28 @@ public inline fun <A> autoClose(block: AutoCloseScope.() -> A): A {
  * ```
  */
 public interface AutoCloseScope {
-  public fun <A> install(
+  public fun <A> autoClose(
     acquire: () -> A,
     release: (A, Throwable?) -> Unit
   ): A
 
   @ExperimentalStdlibApi
-  public fun <A : AutoCloseable> install(autoCloseable: A): A =
-    install({ autoCloseable }) { a, errorOrNull ->
-      a.close()
-      errorOrNull?.let { throw it }
-    }
+  public fun <A : AutoCloseable> autoClose(autoCloseable: A): A =
+    autoClose({ autoCloseable }) { a, _ -> a.close() }
 }
 
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {
   private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())
 
-  override fun <A> install(acquire: () -> A, release: (A, Throwable?) -> Unit): A {
-    val a = try {
-      acquire()
+  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
+    try {
+      acquire().also { a ->
+        finalizers.update { it + { e -> release(a, e) } }
+      }
     } catch (e: Throwable) {
-      // finalizers ??
       throw e
     }
-    finalizers.update { it + { e -> release(a, e) } }
-    return a
-  }
 
   fun close(error: Throwable?): Nothing? {
     return finalizers.get().fold(error) { acc, function ->

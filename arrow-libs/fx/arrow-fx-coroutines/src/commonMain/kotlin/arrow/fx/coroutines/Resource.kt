@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
+import arrow.atomic.update
+import arrow.atomic.Atomic
 import arrow.core.identity
 import arrow.core.prependTo
 import arrow.core.zip
@@ -273,7 +273,7 @@ public typealias ResourceScope = arrow.fx.coroutines.continuations.ResourceScope
  * and automatic [NonCancellable] `acquire` and `release` steps use [bracketCase] or [bracket].
  **/
 public sealed class Resource<out A> {
-  
+
   /**
    * Use the created resource
    * When done will run all finalizers
@@ -318,17 +318,17 @@ public sealed class Resource<out A> {
         }
         b
       }
-      
+
       is Allocate -> bracketCase(acquire, f, release)
       is Bind<*, *> -> Dsl {
         val any = source.bind()
         val ff = this@Resource.f as (Any?) -> Resource<A>
         ff(any).bind()
       }.use(f)
-      
+
       is Defer -> resource().use(f)
     }
-  
+
   @Deprecated(
     "map $nextVersionRemoved",
     ReplaceWith(
@@ -338,7 +338,7 @@ public sealed class Resource<out A> {
   )
   public fun <B> map(f: suspend (A) -> B): Resource<B> =
     resource { f(bind()) }
-  
+
   /** Useful for setting up/configuring an acquired resource */
   @Deprecated(
     "tap $nextVersionRemoved",
@@ -349,7 +349,7 @@ public sealed class Resource<out A> {
   )
   public fun tap(f: suspend (A) -> Unit): Resource<A> =
     resource { bind().also { f(it) } }
-  
+
   @Deprecated(
     "ap $nextVersionRemoved",
     ReplaceWith(
@@ -359,7 +359,7 @@ public sealed class Resource<out A> {
   )
   public fun <B> ap(ff: Resource<(A) -> B>): Resource<B> =
     resource { bind().let { a -> ff.bind().invoke(a) } }
-  
+
   /**
    * Create a resource value of [B] from a resource [A] by mapping [f].
    *
@@ -400,7 +400,7 @@ public sealed class Resource<out A> {
    * @see zip to combine independent resources together
    * @see parZip for combining independent resources in parallel
    */
-  
+
   @Deprecated(
     "flatMap $nextVersionRemoved",
     ReplaceWith(
@@ -410,7 +410,7 @@ public sealed class Resource<out A> {
   )
   public fun <B> flatMap(f: (A) -> Resource<B>): Resource<B> =
     resource { f(bind()).bind() }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -420,7 +420,7 @@ public sealed class Resource<out A> {
   )
   public inline fun <B, C> zip(other: Resource<B>, crossinline combine: (A, B) -> C): Resource<C> =
     resource { combine(bind(), other.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -430,7 +430,7 @@ public sealed class Resource<out A> {
   )
   public fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
     zip(other, ::Pair)
-  
+
   /**
    * Combines two independent resource values with the provided [map] function,
    * returning the resulting immutable [Resource] value.
@@ -492,7 +492,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C) -> D,
   ): Resource<D> =
     resource { map(bind(), b.bind(), c.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -507,7 +507,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D) -> E,
   ): Resource<E> =
     resource { map(bind(), b.bind(), c.bind(), d.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -523,7 +523,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D, E) -> G,
   ): Resource<G> =
     resource { map(bind(), b.bind(), c.bind(), d.bind(), e.bind()) }
-  
+
   @Deprecated(
     "This method will be removed in Arrow 2.x.x in favor of the DSL",
     ReplaceWith(
@@ -540,7 +540,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D, E, F) -> G,
   ): Resource<G> =
     resource { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -558,7 +558,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D, E, F, G) -> H,
   ): Resource<H> =
     resource { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -577,7 +577,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D, E, F, G, H) -> I,
   ): Resource<I> =
     resource { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -597,7 +597,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D, E, F, G, H, I) -> J,
   ): Resource<J> =
     resource { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind()) }
-  
+
   @Deprecated(
     "zip $nextVersionRemoved",
     ReplaceWith(
@@ -618,7 +618,7 @@ public sealed class Resource<out A> {
     crossinline map: (A, B, C, D, E, F, G, H, I, J) -> K,
   ): Resource<K> =
     resource { map(bind(), b.bind(), c.bind(), d.bind(), e.bind(), f.bind(), g.bind(), h.bind(), i.bind(), j.bind()) }
-  
+
   @Deprecated(
     "parZip $nextVersionRemoved",
     ReplaceWith(
@@ -628,7 +628,7 @@ public sealed class Resource<out A> {
   )
   public fun <B, C> parZip(fb: Resource<B>, f: suspend (A, B) -> C): Resource<C> =
     resource { parZip({ bind() }, { fb.bind() }) { a, b -> f(a, b) } }
-  
+
   /**
    * Composes two [Resource]s together by zipping them in parallel,
    * by running both their `acquire` handlers in parallel, and both `release` handlers in parallel.
@@ -687,7 +687,7 @@ public sealed class Resource<out A> {
     resource {
       parZip(ctx, { this@Resource.bind() }, { fb.bind() }) { a, b -> f(a, b) }
     }
-  
+
   @Deprecated("Use the safer version allocate instead.")
   @DelicateCoroutinesApi
   public suspend fun allocated(): Pair<suspend () -> A, suspend (@UnsafeVariance A, ExitCase) -> Unit> =
@@ -698,7 +698,7 @@ public sealed class Resource<out A> {
           val ff = f as (Any?) -> Resource<A>
           ff(any).bind()
         }.allocated()
-      
+
       is Allocate -> acquire to release
       is Defer -> resource().allocated()
       is Dsl -> {
@@ -718,7 +718,7 @@ public sealed class Resource<out A> {
         allocated
       }
     }
-  
+
   /**
    * Deconstruct [Resource] into an [A] and a `release` handler.
    * The `release` action **must** always be called, if  never called, then the resource [A] will leak.
@@ -758,12 +758,12 @@ public sealed class Resource<out A> {
           val ff = f as (Any?) -> Resource<A>
           ff(any).bind()
         }.allocate()
-      
+
       is Allocate -> {
         val a = acquire()
         Pair(a) { exitCase -> release(a, exitCase) }
       }
-      
+
       is Defer -> resource().allocate()
       is Dsl -> {
         val effect = ResourceScopeImpl()
@@ -780,7 +780,7 @@ public sealed class Resource<out A> {
         Pair(allocated, release)
       }
     }
-  
+
   @Deprecated(
     "Bind $nextVersionRemoved",
     ReplaceWith(
@@ -789,7 +789,7 @@ public sealed class Resource<out A> {
     )
   )
   public class Bind<A, B>(public val source: Resource<A>, public val f: (A) -> Resource<B>) : Resource<B>()
-  
+
   @Deprecated(
     "Allocate $nextVersionRemoved",
     ReplaceWith(
@@ -801,7 +801,7 @@ public sealed class Resource<out A> {
     public val acquire: suspend () -> A,
     public val release: suspend (A, ExitCase) -> Unit,
   ) : Resource<A>()
-  
+
   @Deprecated(
     "Defer $nextVersionRemoved",
     ReplaceWith(
@@ -810,7 +810,7 @@ public sealed class Resource<out A> {
     )
   )
   public class Defer<A>(public val resource: suspend () -> Resource<A>) : Resource<A>()
-  
+
   @Deprecated(
     "Dsl $nextVersionRemoved",
     ReplaceWith(
@@ -819,13 +819,13 @@ public sealed class Resource<out A> {
     )
   )
   public data class Dsl<A>(public val dsl: suspend ResourceScope.() -> A) : Resource<A>()
-  
+
   public companion object {
-    
+
     @PublishedApi
     @Deprecated("This will be removed from the binary in Arrow 2.0", level = DeprecationLevel.ERROR)
     internal val unit: Resource<Unit> = just(Unit)
-    
+
     /**
      * Construct a [Resource] from an allocating function [acquire] and a release function [release].
      *
@@ -855,7 +855,7 @@ public sealed class Resource<out A> {
       acquire: suspend () -> A,
       release: suspend (A, ExitCase) -> Unit,
     ): Resource<A> = Allocate(acquire, release)
-    
+
     /**
      * Create a [Resource] from a pure value [A].
      */
@@ -868,7 +868,7 @@ public sealed class Resource<out A> {
     )
     public fun <A> just(r: A): Resource<A> =
       Resource({ r }, { _, _ -> Unit })
-    
+
     @Deprecated(
       "defer is being deprecated. Use resource DSL instead",
       ReplaceWith(
@@ -1106,7 +1106,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
   }
 
 private class ResourceScopeImpl : ResourceScope {
-  val finalizers: AtomicRef<List<suspend (ExitCase) -> Unit>> = AtomicRef(emptyList())
+  val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList())
   override suspend fun <A> Resource<A>.bind(): A =
     when (this) {
       is Resource.Dsl -> dsl.invoke(this@ResourceScopeImpl)
@@ -1124,7 +1124,7 @@ private class ResourceScopeImpl : ResourceScope {
           (e?.apply { e2?.let(::addSuppressed) } ?: e2)?.let { throw it }
         }
       })
-      
+
       is Resource.Bind<*, *> -> {
         val dsl: suspend ResourceScope.() -> A = {
           val any = source.bind()
@@ -1133,10 +1133,10 @@ private class ResourceScopeImpl : ResourceScope {
         }
         dsl(this@ResourceScopeImpl)
       }
-      
+
       is Resource.Defer -> resource().bind()
     }
-  
+
   override suspend fun <A> install(acquire: suspend AcquireStep.() -> A, release: suspend (A, ExitCase) -> Unit): A =
     bracketCase({
       val a = acquire(AcquireStep)
@@ -1152,6 +1152,16 @@ private class ResourceScopeImpl : ResourceScope {
         Platform.composeErrors(e, e2)?.let { throw it }
       }
     })
+
+  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
+    try {
+      acquire().also { a ->
+        val finalizer: suspend (ExitCase) -> Unit = { exitCase -> release(a, exitCase.exceptionOrNull()) }
+        finalizers.update { prev -> prev + finalizer }
+      }
+    } catch (e: Throwable) {
+      throw e
+    }
 }
 
 private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
@@ -1164,6 +1174,7 @@ private suspend fun List<suspend (ExitCase) -> Unit>.cancelAll(
   } ?: acc
 }
 
-@PublishedApi internal const val nextVersionRemoved: String =
+@PublishedApi
+internal const val nextVersionRemoved: String =
   "is redundant and will be removed in Arrow 2.x.x in favor of the DSL.\n" +
     "In case you think this method should stay, please provide feedback and your use-case on https://github.com/arrow-kt/arrow/issues"

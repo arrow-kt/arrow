@@ -15,8 +15,8 @@ class AutoCloseTest {
     val wasActive = CompletableDeferred<Boolean>()
     val res = Resource()
 
-    autoClose {
-      val r = install({ res }) { r, e ->
+    autoCloseScope {
+      val r = autoClose({ res }) { r, e ->
         promise.complete(e)
         r.shutdown()
       }
@@ -36,8 +36,8 @@ class AutoCloseTest {
     val res = Resource()
 
     shouldThrow<RuntimeException> {
-      autoClose {
-        val r = install({ res }) { r, e ->
+      autoCloseScope {
+        val r = autoClose({ res }) { r, e ->
           promise.complete(e)
           r.shutdown()
         }
@@ -61,13 +61,13 @@ class AutoCloseTest {
     val res = Resource()
 
     shouldThrow<RuntimeException> {
-      autoClose {
-        val r = install({ res }) { r, e ->
+      autoCloseScope {
+        val r = autoClose({ res }) { r, e ->
           promise.complete(e)
           r.shutdown()
           throw error2
         }
-        install({ Resource() }) { _, _ -> throw error3 }
+        autoClose({ Resource() }) { _, _ -> throw error3 }
         wasActive.complete(r.isActive())
         throw error
       }
@@ -88,13 +88,13 @@ class AutoCloseTest {
     val error2 = RuntimeException("BOOM 2!")
 
     shouldThrow<RuntimeException> {
-      autoClose {
-        install({ Resource() }) { r, e ->
+      autoCloseScope {
+        autoClose({ Resource() }) { r, e ->
           promise.complete(e)
           r.shutdown()
           throw error2
         }
-        install<Int>({ throw error }) { _, _ -> }
+        autoClose<Int>({ throw error }) { _, _ -> }
       }
     } shouldBe error.apply { addSuppressed(error2) }
 
@@ -107,8 +107,8 @@ class AutoCloseTest {
     val wasActive = CompletableDeferred<Boolean>()
     val res = Resource()
 
-    autoClose {
-      val r = install(res)
+    autoCloseScope {
+      val r = autoClose(res)
       wasActive.complete(r.isActive())
     }
 

@@ -1,5 +1,6 @@
 package arrow.fx.coroutines.continuations
 
+import arrow.AutoCloseScope
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import arrow.fx.coroutines.Resource
@@ -66,11 +67,11 @@ public object AcquireStep
  * <!--- KNIT example-resource-computations-01.kt -->
  */
 @ResourceDSL
-public interface ResourceScope {
-  
+public interface ResourceScope : AutoCloseScope {
+
   @ResourceDSL
   public suspend fun <A> Resource<A>.bind(): A
-  
+
   /**
    * Install [A] into the [ResourceScope].
    * It's [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
@@ -81,21 +82,21 @@ public interface ResourceScope {
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
   ): A
-  
+
   /** Composes a [release] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A {
     val a = bind()
     return install({ a }) { a, _ -> release(a) }
   }
-  
+
   /** Composes a [releaseCase] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): A {
     val a = bind()
     return install({ a }, release)
   }
-  
+
   public suspend infix fun onRelease(release: suspend (ExitCase) -> Unit): Unit =
     install({ }) { _, exitCase -> release(exitCase) }
 }
