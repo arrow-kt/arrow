@@ -43,4 +43,14 @@ class TraceSpec : StringSpec({
       }
     }
   }
+
+  "nested tracing - different types" {
+    either {
+      traced<Any?, _>({
+        traced<String, _> ({
+          raise(Unit)
+        }) { _, _ -> unreachable() }
+      }) { _, unit -> unit shouldBe Unit }
+    }
+  }
 })
