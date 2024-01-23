@@ -13,6 +13,7 @@ import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapOrAccumulate
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
+import kotlin.collections.unzip as stdlibUnzip
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -604,10 +605,12 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
  * <!--- KNIT example-iterable-11.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
+@Deprecated(
+  "Unzip is being deprecated in favor of the standard library version.\n$NicheAPI",
+  ReplaceWith("unzip()", "kotlin.collections.unzip")
+)
 public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
-    l + x.first to r + x.second
-  }
+   stdlibUnzip()
 
 /**
  * after applying the given function unzip the resulting structure into its elements.
@@ -627,8 +630,12 @@ public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
  * <!--- KNIT example-iterable-12.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
+@Deprecated(
+  "Unzip is being deprecated in favor of the standard library version.\n$NicheAPI",
+  ReplaceWith("map(fc).unzip()", "kotlin.collections.unzip")
+)
 public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
-  map(fc).unzip()
+  map(fc).stdlibUnzip()
 
 /**
  * splits a union into its component parts.

@@ -55,6 +55,9 @@ project(":arrow-functions").projectDir = file("arrow-libs/core/arrow-functions")
 include("arrow-atomic")
 project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 
+include("arrow-eval")
+project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")
+
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
 

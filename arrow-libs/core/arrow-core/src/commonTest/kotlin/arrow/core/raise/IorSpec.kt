@@ -69,6 +69,13 @@ class IorSpec {
     } shouldBe Ior.Left("Hello, World!")
   }
 
+  @Test fun accumulatesAndShortCircuits() = runTest {
+    ior(String::plus) {
+      Ior.Both("Hello", Unit).bind()
+      raise(" World")
+    } shouldBe Ior.Left("Hello World")
+  }
+
   @Test fun iorRethrowsException() = runTest {
     val boom = RuntimeException("Boom!")
     shouldThrow<RuntimeException> {
@@ -80,11 +87,64 @@ class IorSpec {
 
   @Test fun recoverWorksAsExpected() = runTest {
     ior(String::plus) {
-      val one = recover({ Ior.Left("Hello").bind() }) { 1 }
+      val one = recover({
+        Ior.Both("Hi", Unit).bind()
+        Ior.Left("Hello").bind()
+      }) {
+        it shouldBe "Hello"
+        1
+      }
       val two = Ior.Right(2).bind()
       val three = Ior.Both(", World", 3).bind()
       one + two + three
-    } shouldBe Ior.Both(", World", 6)
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
+  @Test fun recoverWithThrow() = runTest {
+    ior(String::plus) {
+      val one = try {
+        recover({
+          Ior.Both("Hi", Unit).bind()
+          throw RuntimeException("Hello")
+        }) {
+          unreachable()
+        }
+      } catch (e: RuntimeException) {
+        1
+      }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
+  @Test fun recoverWithRaiseIsNoOp() = runTest {
+    ior(String::plus) {
+      val one: Int =
+        recover({
+          Ior.Both("Hi", Unit).bind()
+          Ior.Left(", Hello").bind()
+        }) {
+          raise(it)
+        }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Left("Hi, Hello")
+  }
+
+  @Test fun tryCatchRecoverRaise() = runTest {
+    ior(String::plus) {
+      val one = try {
+        Ior.Both("Hi", Unit).bind()
+        Ior.Left("Hello").bind()
+      } catch (e: Throwable) {
+        1
+      }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Both("Hi, World", 6)
   }
 
   @Test fun iorNelAccumulates() = runTest {

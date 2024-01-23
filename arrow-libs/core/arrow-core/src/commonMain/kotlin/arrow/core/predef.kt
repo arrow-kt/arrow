@@ -17,5 +17,9 @@ internal object EmptyValue {
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   public inline fun <T> combine(first: Any?, second: T, combine: (T, T) -> T): T =
-    if (first === EmptyValue) second else combine(first as T, second)
+    if (first === this) second else combine(first as T, second)
+
+  @Suppress("UNCHECKED_CAST")
+  inline fun <T, R> fold(value: Any?, ifEmpty: () -> R, ifNotEmpty: (T) -> R): R =
+    if (value === this) ifEmpty() else ifNotEmpty(value as T)
 }

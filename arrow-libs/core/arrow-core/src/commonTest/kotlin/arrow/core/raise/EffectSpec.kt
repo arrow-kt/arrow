@@ -44,7 +44,7 @@ class EffectSpec {
       effect {
         try {
           raise(s())
-        } catch (e: Throwable) {
+        } catch (e: RaiseCancellationException) {
           i()
         }
       }.getOrElse { unreachable() } shouldBe i()
@@ -70,7 +70,7 @@ class EffectSpec {
       effect<String, Int> {
         try {
           raise(s())
-        } catch (e: Throwable) {
+        } catch (e: RaiseCancellationException) {
           i()
         }
         raise(s2())
