@@ -130,4 +130,23 @@ class LensTests {
       |}
       """.compilationSucceeds()
   }
+  @Test
+  fun `Lens for sealed class property`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |  
+      |   data class dataChild(override val property1: String) : LensSealed()
+      |   
+      |   companion object 
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.evals("r" to true)
+  }
 }
+
