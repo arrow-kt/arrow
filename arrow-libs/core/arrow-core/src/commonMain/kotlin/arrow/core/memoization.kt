@@ -76,8 +76,8 @@ public fun <P1, P2, P3, P4, P5, R> ((P1, P2, P3, P4, P5) -> R).memoize(): (P1, P
   return { p1: P1, p2: P2, p3: P3, p4: P4, p5: P5 -> m(MemoizeKey5(p1, p2, p3, p4, p5)) }
 }
 
-private interface MemoizedCall<in F, out R> {
-  operator fun invoke(f: F): R
+public interface MemoizedCall<in F, out R> {
+  public operator fun invoke(f: F): R
 }
 
 private data class MemoizeKey0<R>(val p1: Byte) : MemoizedCall<() -> R, R> {
@@ -112,10 +112,10 @@ private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(
   override fun invoke(f: (P1, P2, P3, P4, P5) -> R) = f(p1, p2, p3, p4, p5)
 }
 
-private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
+public class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(public val f: F) {
   private val cache = AtomicRef(emptyMap<K, R>())
 
-  operator fun invoke(k: K): R = when (k) {
+  public operator fun invoke(k: K): R = when (k) {
     in cache.get() -> cache.get().getValue(k)
     else -> {
       val b = k(f)

@@ -11,8 +11,7 @@ public inline fun <A> identity(a: A): A = a
  * This is only used as an optimisation technique in low-level code,
  * always prefer to use `Option` in actual business code when needed in generic code.
  */
-@PublishedApi
-internal object EmptyValue {
+public object EmptyValue {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   public inline fun <A> unbox(value: Any?): A =
     if (value === this) null as A else value as A

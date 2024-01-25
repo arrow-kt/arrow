@@ -818,10 +818,20 @@ public abstract interface class arrow/core/MemoizationCache {
 	public abstract fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
+public abstract interface class arrow/core/MemoizedCall {
+	public abstract fun invoke (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
 	public static final fun MemoizedDeepRecursiveFunction (Larrow/core/MemoizationCache;Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
 	public static final fun MemoizedDeepRecursiveFunction (Lkotlin/jvm/functions/Function3;)Lkotlin/DeepRecursiveFunction;
 	public static synthetic fun MemoizedDeepRecursiveFunction$default (Larrow/core/MemoizationCache;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlin/DeepRecursiveFunction;
+}
+
+public final class arrow/core/MemoizedHandler {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun getF ()Ljava/lang/Object;
+	public final fun invoke (Larrow/core/MemoizedCall;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
