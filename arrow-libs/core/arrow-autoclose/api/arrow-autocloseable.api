@@ -22,3 +22,7 @@ public final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope {
 	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
 }
 
+public final class arrow/ThrowIfFatalKt {
+	public static final fun throwIfFatal (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+}
+
