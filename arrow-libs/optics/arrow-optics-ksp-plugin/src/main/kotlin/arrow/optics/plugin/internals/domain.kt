@@ -109,7 +109,7 @@ sealed class Focus {
           paramName = paramName,
           refinedType = refinedType,
           onlyOneSealedSubclass = onlyOneSealedSubclass,
-          subclasses = subclasses
+          subclasses = subclasses,
         )
       }
   }

@@ -130,6 +130,7 @@ class LensTests {
       |}
       """.compilationSucceeds()
   }
+
   @Test
   fun `Lens for sealed class property`() {
     """
@@ -149,4 +150,3 @@ class LensTests {
       """.evals("r" to true)
   }
 }
-

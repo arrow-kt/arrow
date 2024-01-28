@@ -36,11 +36,11 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
         """when(${adt.sourceName}) {
         |${focus.subclasses.joinToString(separator = "\n") { "is $sourceClassNameWithParams.$it -> $setBodyCopy" }}
         |}
-        |""".trimMargin()
+        |
+        """.trimMargin()
       }
 
       else -> setBodyCopy
-
     }
   }
   return foci.joinToString(separator = "\n") { focus ->
@@ -63,7 +63,7 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
       |}
       |)
       |
-      """.trimMargin()
+    """.trimMargin()
   }
 }
 

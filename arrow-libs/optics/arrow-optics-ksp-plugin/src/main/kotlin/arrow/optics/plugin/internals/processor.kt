@@ -96,7 +96,7 @@ internal fun evalAnnotatedClass(
   element: KSClassDeclaration,
   errorMessage: String,
   logger: KSPLogger,
-  ): List<Focus>? {
+): List<Focus>? {
   return when {
     element.isDataClass ->
       element
