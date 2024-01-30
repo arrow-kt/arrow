@@ -18,9 +18,9 @@ public class Printer(private val path: String) : AutoCloseable {
 }
 
 context(AutoCloseScope)
-fun copyFiles() {
-  val scanner = install(Scanner("testRead.txt"))
-  val printer = install(Printer("testWrite.txt"))
+fun copyFiles(input: String, output: String) {
+  val scanner = install(Scanner(input))
+  val printer = install(Printer(output))
   for(line in scanner) {
     printer.print(line)
   }

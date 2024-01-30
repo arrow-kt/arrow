@@ -43,7 +43,9 @@ import kotlin.coroutines.cancellation.CancellationException
  * In the snippet above, `Scanner`, and `File` just like the nested [use] blocks
  *
  * This also works with `suspend`, since [autoCloseScope] is `inline` however if
- * you need to take into account cancellation then you need to use `ResourceScope` from Arrow Fx Coroutines.
+ * you need to take into _inspect_ cancellation then you need to use `ResourceScope` from Arrow Fx Coroutines.
+ * So both [AutoCloseScope], and `ResourceScope` behave correctly when encountering cancellation, by closing the source,
+ * but `ResourceScope` allows inspecting _complete_, _failure_, **and** _cancellation_ in the finalizer.
  *
  * This DSL works very well with Kotlin's experimental feature context receivers, soon called context parameters.
  * We can write the same code from above as a function:

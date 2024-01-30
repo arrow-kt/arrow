@@ -184,7 +184,7 @@ class ResourceTest : StringSpec({
       exit.await()
         .shouldBeTypeOf<ExitCase.Cancelled>()
         .exception
-        .message shouldBe "Boom!"
+        .message shouldBe "BOOM!"
     }
 
     "parZip - success" {
