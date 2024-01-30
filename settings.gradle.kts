@@ -1,3 +1,5 @@
+@file:Suppress("LocalVariableName")
+
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "arrow"
@@ -9,19 +11,22 @@ pluginManagement {
     mavenCentral()
     mavenLocal()
     kotlin_repo_url?.also { maven(it) }
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.16.1"
+  id("com.gradle.enterprise") version "3.16.2"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
-dependencyResolutionManagement {
-  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
-  @Suppress("LocalVariableName") val kotlin_version: String? by settings
-  @Suppress("LocalVariableName") val ksp_version: String? by settings
+val kotlin_repo_url: String? by settings
+val kotlin_version: String? by settings
+val ksp_version: String? by settings
+val compose_version: String? by settings
 
+dependencyResolutionManagement {
   repositories {
     mavenCentral()
     gradlePluginPortal()
@@ -37,6 +42,10 @@ dependencyResolutionManagement {
       if (!ksp_version.isNullOrBlank()) {
         println("Overriding KSP version with $ksp_version")
         version("kspVersion", ksp_version!!)
+      }
+      if (!compose_version.isNullOrBlank()) {
+        println("Overriding Compose version with $compose_version")
+        version("composePlugin", compose_version!!)
       }
     }
   }
@@ -89,6 +98,11 @@ project(":arrow-optics").projectDir = file("arrow-libs/optics/arrow-optics")
 
 include("arrow-optics-reflect")
 project(":arrow-optics-reflect").projectDir = file("arrow-libs/optics/arrow-optics-reflect")
+
+if (kotlin_version.isNullOrBlank() || "2.0" !in kotlin_version!!) {
+  include("arrow-optics-compose")
+  project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-optics-compose")
+}
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
