@@ -1,11 +1,13 @@
 package arrow.fx.coroutines
 
+import arrow.autoCloseScope
 import arrow.core.Either
 import arrow.core.continuations.AtomicRef
 import arrow.core.continuations.update
 import arrow.core.identity
 import arrow.core.left
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainExactly
@@ -29,7 +31,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import kotlin.random.Random
+import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ResourceTest : StringSpec({
@@ -158,7 +162,7 @@ class ResourceTest : StringSpec({
     val depth: Int = 100
 
     class CheckableAutoClose {
-      var started: AtomicRef<Boolean> = AtomicRef(true)
+      val started: AtomicRef<Boolean> = AtomicRef(true)
       fun close() {
         started.update { _ -> false }
       }
@@ -166,6 +170,22 @@ class ResourceTest : StringSpec({
 
     fun closeable(): Resource<CheckableAutoClose> =
       resource({ CheckableAutoClose() }) { a, _ -> a.close() }
+
+    "close the scope on cancellation" {
+      val exit = CompletableDeferred<ExitCase>()
+
+      shouldThrow<CancellationException> {
+        resourceScope {
+          install({  }) { _, ex -> require(exit.complete(ex)) }
+          throw CancellationException("BOOM!")
+        }
+      }.message shouldBe "BOOM!"
+
+      exit.await()
+        .shouldBeTypeOf<ExitCase.Cancelled>()
+        .exception
+        .message shouldBe "BOOM!"
+    }
 
     "parZip - success" {
       val all = (1..depth).traverse { closeable() }.parZip(
