@@ -36,7 +36,7 @@ jobs:
           java-version: 17
 
       - name: assemble
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: assemble -Pversion=${{ inputs.version }}
 
@@ -48,6 +48,6 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Publish final version
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository

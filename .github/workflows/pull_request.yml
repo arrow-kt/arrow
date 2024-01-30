@@ -26,7 +26,7 @@ jobs:
           java-version: 17
 
       - name: ios and watchos tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
 
@@ -53,7 +53,7 @@ jobs:
           java-version: 17
 
       - name: macos and tvos tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
 
@@ -80,7 +80,7 @@ jobs:
           java-version: 17
 
       - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: mingwX64Test  --scan
 
@@ -107,7 +107,7 @@ jobs:
           java-version: 17
 
       - name: check
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: knitCheck apiCheck --scan
 
@@ -134,13 +134,13 @@ jobs:
           java-version: 17
 
       - name: jvmTest
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: jvmTest --scan
 
       - name: Create code coverage report
         if: "! github.event.pull_request.head.repo.fork "
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: koverXmlReport
 
@@ -177,7 +177,7 @@ jobs:
           java-version: 17
 
       - name: jvmTest (K2 enabled)
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: "jvmTest -Pkotlin_version=2.0.0-Beta2 -Pksp_version=2.0.0-Beta2-1.0.16 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0"
 
@@ -204,12 +204,12 @@ jobs:
           java-version: 17
 
       - name: kotlinUpgradeYarnLock
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: kotlinUpgradeYarnLock
 
       - name: jsTest
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: jsTest  --scan
 
@@ -236,7 +236,7 @@ jobs:
           java-version: 17
 
       - name: linuxX64Test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: linuxX64Test  --scan
 
@@ -263,7 +263,7 @@ jobs:
           java-version: 17
 
       - name: apiDump
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: apiDump
 
@@ -289,7 +289,7 @@ jobs:
           java-version: 17
 
       - name: spotlessApply
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: spotlessApply
 
