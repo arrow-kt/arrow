@@ -76,6 +76,9 @@ project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-co
 include("arrow-cache4k")
 project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
 
+include("arrow-autoclose")
+project(":arrow-autoclose").projectDir = file("arrow-libs/core/arrow-autoclose")
+
 // FX
 include("arrow-fx-coroutines")
 project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-coroutines")
