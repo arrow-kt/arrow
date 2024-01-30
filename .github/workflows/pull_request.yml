@@ -10,6 +10,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: Knit and API checks
+        run: ./gradlew knitCheck apiCheck --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'reports-check'
+          path: '**/build/reports/**'
+
   ios_watchos:
     runs-on: macos-latest
     timeout-minutes: 60
@@ -25,10 +56,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: ios and watchos tests
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: iOS and watchOS tests
+        run: ./gradlew iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
 
       - name: Upload reports
         if: failure()
@@ -36,6 +70,64 @@ jobs:
         with:
           name: 'reports-ios_watchos'
           path: '**/build/reports/**'
+
+  update_api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: Update API files
+        run: ./gradlew apiDump
+
+      - name: Commit updated API files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Auto-update API files
+          file_pattern: arrow-libs/**/api/*.api
+
+  spotless:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: Apply Spotless rules
+        run: ./gradlew spotlessApply
+
+      - name: Commit newly formatted files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Auto-apply Spotless rules
+          file_pattern: arrow-libs/**/*.kt
 
   macos_tvos:
     runs-on: macos-latest
@@ -52,10 +144,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: macos and tvos tests
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: macOS and tvOS tests
+        run: ./gradlew macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
 
       - name: Upload reports
         if: failure()
@@ -79,10 +174,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: mingwX64Test
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: mingwX64Test  --scan
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: Windows (MinGW-w64) tests
+        run: ./gradlew mingwX64Test --scan
 
       - name: Upload reports
         if: failure()
@@ -91,7 +189,7 @@ jobs:
           name: 'reports-windows'
           path: '**/build/reports/**'
 
-  check:
+  jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -106,45 +204,19 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: check
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: knitCheck apiCheck --scan
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'reports-check'
-          path: '**/build/reports/**'
+      - name: JVM tests
+        run: ./gradlew jvmTest --scan
 
-  jvmTest:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: jvmTest
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: jvmTest --scan
-
-      - name: Create code coverage report
+      - name: Code coverage
         if: "! github.event.pull_request.head.repo.fork "
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: koverXmlReport
+        run: ./gradlew koverXmlReport
 
-      - name: Add coverage report to PR
+      - name: Add code coverage report
         if: "! github.event.pull_request.head.repo.fork "
         id: kover
         uses: mi-kas/kover-report@v1
@@ -161,7 +233,7 @@ jobs:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
 
-  jvmTestK2:
+  jvmK2:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -176,10 +248,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: jvmTest (K2 enabled)
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: "jvmTest -Pkotlin_version=2.0.0-Beta2 -Pksp_version=2.0.0-Beta2-1.0.16 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0"
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: JVM (Kotlin 2.0) tests
+        run: ./gradlew jvmTest -Pkotlin_version=2.0.0-Beta3 -Pksp_version=2.0.0-Beta3-1.0.17 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0
 
       - name: Upload reports
         if: failure()
@@ -190,7 +265,7 @@ jobs:
 
   js:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -203,15 +278,16 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: kotlinUpgradeYarnLock
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: kotlinUpgradeYarnLock
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
-      - name: jsTest
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: jsTest  --scan
+      - name: Upgrade yarn.lock
+        run: ./gradlew kotlinUpgradeYarnLock
+
+      - name: JS tests
+        run: ./gradlew jsTest  --scan
 
       - name: Upload reports
         if: failure()
@@ -235,10 +311,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: linuxX64Test
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: linuxX64Test  --scan
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: Linux (x64) tests
+        run: ./gradlew linuxX64Test  --scan
 
       - name: Upload reports
         if: failure()
@@ -246,56 +325,3 @@ jobs:
         with:
           name: 'reports-linux'
           path: '**/build/reports/**'
-
-  update_api:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: apiDump
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: apiDump
-
-      - name: "Commit new API files"
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Update API files
-          file_pattern: arrow-libs/**/api/*.api
-
-  spotless:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: spotlessApply
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: spotlessApply
-
-      - name: "Commit newly formatted files"
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Apply
-          file_pattern: arrow-libs/**/*.kt
-

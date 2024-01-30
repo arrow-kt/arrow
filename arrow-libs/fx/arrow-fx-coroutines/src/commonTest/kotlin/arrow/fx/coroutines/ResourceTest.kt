@@ -1,10 +1,12 @@
 package arrow.fx.coroutines
 
+import arrow.autoCloseScope
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -29,6 +31,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import kotlin.random.Random
 import kotlin.test.Test
 
 class ResourceTest {
@@ -140,6 +143,23 @@ class ResourceTest {
     fun close() {
       started = false
     }
+  }
+
+  @Test
+  fun closeTheScopeOnCancellation() = runTest {
+    val exit = CompletableDeferred<ExitCase>()
+
+    shouldThrow<CancellationException> {
+      resourceScope {
+        install({  }) { _, ex -> require(exit.complete(ex)) }
+        throw CancellationException("BOOM!")
+      }
+    }.message shouldBe "BOOM!"
+
+    exit.await()
+      .shouldBeTypeOf<ExitCase.Cancelled>()
+      .exception
+      .message shouldBe "BOOM!"
   }
 
   @Test

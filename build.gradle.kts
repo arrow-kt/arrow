@@ -37,6 +37,7 @@ allprojects {
 
 plugins {
   base
+  alias(libs.plugins.android.library) apply false
   alias(libs.plugins.dokka)
   alias(libs.plugins.animalSniffer) apply false
   alias(libs.plugins.kotlinx.kover)
@@ -45,6 +46,7 @@ plugins {
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.arrowGradleConfig.nexus)
   alias(libs.plugins.spotless) apply false
+  alias(libs.plugins.jetbrainsCompose) apply false
 }
 
 apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)

@@ -23,10 +23,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: assemble
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: assemble
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3

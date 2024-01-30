@@ -1,11 +1,15 @@
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
+import arrow.AutoCloseScope
 import arrow.atomic.update
+import arrow.atomic.Atomic
 import arrow.atomic.value
 import arrow.core.identity
 import arrow.core.prependTo
+import arrow.fx.coroutines.ExitCase.Cancelled
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
+import arrow.fx.coroutines.ExitCase.Completed
+import arrow.fx.coroutines.ExitCase.Failure
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
@@ -285,15 +289,14 @@ public typealias Resource<A> = suspend ResourceScope.() -> A
 public object AcquireStep
 
 @ResourceDSL
-public interface ResourceScope {
-  
+public interface ResourceScope : AutoCloseScope {
+
   /**
    * Compose another [Resource] program into this [ResourceScope].
    * All [release] functions [install]ed into the [Resource] lambda will be installed in this [ResourceScope] while respecting the FIFO order.
    */
   @ResourceDSL
   public suspend fun <A> Resource<A>.bind(): A
-  
   /**
    * Install [A] into the [ResourceScope].
    * It's [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
@@ -304,21 +307,21 @@ public interface ResourceScope {
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
   ): A
-  
+
   /** Composes a [release] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A {
     val a = bind()
     return install({ a }) { aa, _ -> release(aa) }
   }
-  
+
   /** Composes a [releaseCase] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): A {
     val a = bind()
     return install({ a }, release)
   }
-  
+
   public suspend infix fun onRelease(release: suspend (ExitCase) -> Unit): Unit =
     install({ }) { _, exitCase -> release(exitCase) }
 }
@@ -507,7 +510,24 @@ private value class ResourceScopeImpl(
         }?.let { throw it }
       }
     })
-  
+
+  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
+    try {
+      acquire().also { a ->
+        val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
+          val errorOrNull = when (exitCase) {
+            Completed -> null
+            is Cancelled -> exitCase.exception
+            is Failure -> exitCase.failure
+          }
+          release(a, errorOrNull)
+        }
+        finalizers.update { prev -> prev + finalizer }
+      }
+    } catch (e: Throwable) {
+      throw e
+    }
+
   suspend fun cancelAll(
     exitCase: ExitCase,
     first: Throwable? = null,

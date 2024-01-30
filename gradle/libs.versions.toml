@@ -8,7 +8,7 @@ kotest = "5.8.0"
 kover = "0.7.5"
 kotlin = "1.9.22"
 kotlinxSerializationPlugin = "1.9.22"
-kotlinBinaryCompatibilityValidator = "0.13.2"
+kotlinBinaryCompatibilityValidator = "0.14.0"
 kotlinCompileTesting = "0.4.0"
 knit = "0.5.0"
 kspVersion = "1.9.22-1.0.17"
@@ -17,6 +17,10 @@ mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
 spotlessVersion = "6.25.0"
+compose = "1.6.0"
+composePlugin = "1.6.0-beta01"
+agp = "8.2.2"
+android-compileSdk = "34"
 cache4k = "0.12.0"
 
 [libraries]
@@ -38,6 +42,7 @@ squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = 
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
@@ -58,3 +63,5 @@ kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerializationPlugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
