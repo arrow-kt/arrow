@@ -2,11 +2,14 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
+import kotlin.test.DefaultAsserter.fail
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -59,15 +62,25 @@ class ResourceTestJvm {
   @Test fun closeableClosesOnError() = runTest {
     checkAll(Arb.throwable()) { throwable ->
       val t = CloseableTest()
-      
+
       shouldThrow<Exception> {
         resourceScope {
           closeable { t }
           throw throwable
         }
       } shouldBe throwable
-      
+
       t.didClose.get() shouldBe true
     }
+  }
+
+  @Test
+  fun blowTheScopeOnFatal() = runTest {
+    shouldThrow<LinkageError> {
+      resourceScope {
+        install({  }) { _, _ -> fail("Should never come here") }
+        throw LinkageError("BOOM!")
+      }
+    }.message shouldBe "BOOM!"
   }
 }
