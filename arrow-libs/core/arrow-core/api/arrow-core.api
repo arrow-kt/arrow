@@ -889,6 +889,7 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
 	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public final fun complete ()Z
+	public fun getUnderlyingRaise ()Larrow/core/raise/Raise;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun isTraced ()Z
@@ -901,15 +902,26 @@ public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : j
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
-public final class arrow/core/raise/IorRaise : arrow/core/raise/RaiseWrapper {
+public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun <init> (Lkotlin/jvm/functions/Function2;Ljava/util/concurrent/atomic/AtomicReference;Larrow/core/raise/Raise;)V
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
+	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public final fun bindAllIor (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindAllIor (Ljava/util/List;)Ljava/util/List;
 	public final fun bindAllIor (Ljava/util/Map;)Ljava/util/Map;
 	public final fun bindAllIor (Ljava/util/Set;)Ljava/util/Set;
 	public final fun combine (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun getCombineError ()Lkotlin/jvm/functions/Function2;
+	public fun getUnderlyingRaise ()Larrow/core/raise/Raise;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
@@ -921,6 +933,7 @@ public abstract interface class arrow/core/raise/Raise {
 	public abstract fun bindAll (Ljava/util/Map;)Ljava/util/Map;
 	public abstract fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
 	public abstract fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
+	public abstract fun getUnderlyingRaise ()Larrow/core/raise/Raise;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun raise (Ljava/lang/Object;)Ljava/lang/Void;
@@ -934,25 +947,32 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun bindAll (Larrow/core/raise/Raise;Ljava/util/Map;)Ljava/util/Map;
 	public static fun bindAll-1TN0_VU (Larrow/core/raise/Raise;Ljava/util/Set;)Ljava/util/Set;
 	public static fun bindAll-vcjLgH4 (Larrow/core/raise/Raise;Ljava/util/List;)Ljava/util/List;
+	public static fun getUnderlyingRaise (Larrow/core/raise/Raise;)Larrow/core/raise/Raise;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/TransformingRaise {
+public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
 	public final fun _mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun _mapOrAccumulate (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun _mapOrAccumulate (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
 	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
 	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public final fun bindNel (Larrow/core/Either;)Ljava/lang/Object;
+	public final fun getRaise ()Larrow/core/raise/Raise;
+	public fun getUnderlyingRaise ()Larrow/core/raise/Raise;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-FrVv2gs (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-nfMsDo0 (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
-	public synthetic fun transform (Ljava/lang/Object;)Ljava/lang/Object;
-	protected fun transform-0-xjo5U (Ljava/lang/Object;)Ljava/util/List;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
@@ -1041,25 +1061,39 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 }
 
-public abstract class arrow/core/raise/RaiseWrapper : arrow/core/raise/TransformingRaise {
+public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
-	protected final fun transform (Ljava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class arrow/core/raise/ResultRaise : arrow/core/raise/RaiseWrapper {
-	public fun <init> (Larrow/core/raise/Raise;)V
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
+	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public final fun bindAllResult (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindAllResult (Ljava/util/List;)Ljava/util/List;
 	public final fun bindAllResult (Ljava/util/Map;)Ljava/util/Map;
 	public final fun bindAllResult (Ljava/util/Set;)Ljava/util/Set;
+	public fun getUnderlyingRaise ()Larrow/core/raise/Raise;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
-public final class arrow/core/raise/SingletonRaise : arrow/core/raise/TransformingRaise {
+public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Option;)Ljava/lang/Object;
 	public final fun bind (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
+	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public final fun bindAllNullable (Ljava/lang/Iterable;)Ljava/util/List;
 	public final fun bindAllNullable (Ljava/util/List;)Ljava/util/List;
 	public final fun bindAllNullable (Ljava/util/Map;)Ljava/util/Map;
@@ -1070,10 +1104,13 @@ public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Transformi
 	public final fun bindAllOption (Ljava/util/Set;)Ljava/util/Set;
 	public final fun ensure (Z)V
 	public final fun ensureNotNull (Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getUnderlyingRaise ()Larrow/core/raise/Raise;
 	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun raise ()Ljava/lang/Void;
+	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
-	public synthetic fun transform (Ljava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/Trace {
@@ -1090,21 +1127,5 @@ public final class arrow/core/raise/Trace {
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Larrow/core/raise/Traced;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Larrow/core/raise/Traced;
-}
-
-public abstract class arrow/core/raise/TransformingRaise : arrow/core/raise/Raise {
-	public fun <init> (Larrow/core/raise/Raise;)V
-	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
-	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
-	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
-	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
-	public final fun getRaise ()Larrow/core/raise/Raise;
-	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun raise (Ljava/lang/Object;)Ljava/lang/Void;
-	protected abstract fun transform (Ljava/lang/Object;)Ljava/lang/Object;
 }
 

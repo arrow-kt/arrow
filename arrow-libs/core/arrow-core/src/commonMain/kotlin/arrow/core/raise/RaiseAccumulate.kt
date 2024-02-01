@@ -592,9 +592,12 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * It extends [Raise] of [Error], and allows working over [Raise] of [NonEmptyList] of [Error] as well.
  */
 public open class RaiseAccumulate<Error>(
-  raise: Raise<NonEmptyList<Error>>
-) : TransformingRaise<Error, NonEmptyList<Error>>(raise) {
-  override fun transform(r: Error): NonEmptyList<Error> = nonEmptyListOf(r)
+  public val raise: Raise<NonEmptyList<Error>>
+) : Raise<Error> {
+
+  @RaiseDSL
+  public override fun raise(r: Error): Nothing =
+    raise.raise(nonEmptyListOf(r))
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     mapOrAccumulate { (_, a) -> a.bind() }.bindNel()

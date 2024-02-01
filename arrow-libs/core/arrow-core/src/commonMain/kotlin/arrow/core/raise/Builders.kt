@@ -23,7 +23,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.js.JsName
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -157,12 +156,12 @@ public inline fun impure(block: SingletonRaise<Unit>.() -> Unit) {
   return singleton({ }, block)
 }
 
-public class SingletonRaise<in E>(raise: Raise<Unit>): TransformingRaise<E, Unit>(raise) {
-  override fun transform(r: E) { }
+public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
+  @RaiseDSL
+  public fun raise(): Nothing = raise.raise(Unit)
 
   @RaiseDSL
-  @JsName("raiseUnit")
-  public fun raise(): Nothing = raise.raise(Unit)
+  override fun raise(r: E): Nothing = raise()
 
   @RaiseDSL
   public fun ensure(condition: Boolean) {
@@ -259,7 +258,7 @@ public class SingletonRaise<in E>(raise: Raise<Unit>): TransformingRaise<E, Unit
  * Implementation of [Raise] used by [result].
  * You should never use this directly.
  */
-public class ResultRaise(raise: Raise<Throwable>) : RaiseWrapper<Throwable>(raise) {
+public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable> by raise {
   @RaiseDSL
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
 
@@ -299,8 +298,8 @@ public class ResultRaise(raise: Raise<Throwable>) : RaiseWrapper<Throwable>(rais
 public class IorRaise<Error> @PublishedApi internal constructor(
   @PublishedApi internal val combineError: (Error, Error) -> Error,
   private val state: Atomic<Any?>,
-  raise: Raise<Error>,
-) : RaiseWrapper<Error>(raise) {
+  private val raise: Raise<Error>,
+) : Raise<Error> by raise {
   @Suppress("UNCHECKED_CAST")
   @PublishedApi
   internal fun combine(e: Error): Error = state.updateAndGet { EmptyValue.combine(it, e, combineError) } as Error

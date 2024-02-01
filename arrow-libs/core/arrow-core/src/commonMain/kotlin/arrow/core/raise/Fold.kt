@@ -295,10 +295,11 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 
 @DelicateRaiseApi
 @PublishedApi
-internal tailrec fun Raise<*>.realUnderlying(): DefaultRaise =
-  when (this) {
-    is TransformingRaise<*, *> -> raise.realUnderlying()
-    is DefaultRaise -> this
+internal tailrec fun Raise<*>.realUnderlying(): DefaultRaise? =
+  when (val underlying = underlyingRaise) {
+    is DefaultRaise -> underlying
+    this -> null
+    else -> underlying.realUnderlying()
   }
 
 @MustBeDocumented

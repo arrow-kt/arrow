@@ -143,7 +143,8 @@ public annotation class RaiseDSL
  * <!--- KNIT example-raise-dsl-04.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public sealed interface Raise<in Error> {
+public interface Raise<in Error> {
+  public val underlyingRaise: Raise<*> get() = this
 
   /**
    * Raises a _logical failure_ of type [Error].
@@ -663,7 +664,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
     callsInPlace(transform, AT_MOST_ONCE)
   }
   val outer = realUnderlying()
-  return if (outer.isTraced) recoverTraced(block) { t, r -> raiseWithTrace(t, transform(r)) }
+  return if (outer?.isTraced == true) recoverTraced(block) { t, r -> raiseWithTrace(t, transform(r)) }
   else recover(block) { raise(transform(it)) }
 }
 
