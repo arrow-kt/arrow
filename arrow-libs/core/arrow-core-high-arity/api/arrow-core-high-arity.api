@@ -27,25 +27,6 @@ public final class arrow/core/MapKt {
 	public static final fun zip (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function12;)Ljava/util/Map;
 }
 
-public final class arrow/core/Memoization {
-	public static final fun memoize (Lkotlin/jvm/functions/Function10;)Lkotlin/jvm/functions/Function10;
-	public static final fun memoize (Lkotlin/jvm/functions/Function11;)Lkotlin/jvm/functions/Function11;
-	public static final fun memoize (Lkotlin/jvm/functions/Function12;)Lkotlin/jvm/functions/Function12;
-	public static final fun memoize (Lkotlin/jvm/functions/Function13;)Lkotlin/jvm/functions/Function13;
-	public static final fun memoize (Lkotlin/jvm/functions/Function14;)Lkotlin/jvm/functions/Function14;
-	public static final fun memoize (Lkotlin/jvm/functions/Function15;)Lkotlin/jvm/functions/Function15;
-	public static final fun memoize (Lkotlin/jvm/functions/Function16;)Lkotlin/jvm/functions/Function16;
-	public static final fun memoize (Lkotlin/jvm/functions/Function17;)Lkotlin/jvm/functions/Function17;
-	public static final fun memoize (Lkotlin/jvm/functions/Function18;)Lkotlin/jvm/functions/Function18;
-	public static final fun memoize (Lkotlin/jvm/functions/Function19;)Lkotlin/jvm/functions/Function19;
-	public static final fun memoize (Lkotlin/jvm/functions/Function20;)Lkotlin/jvm/functions/Function20;
-	public static final fun memoize (Lkotlin/jvm/functions/Function21;)Lkotlin/jvm/functions/Function21;
-	public static final fun memoize (Lkotlin/jvm/functions/Function6;)Lkotlin/jvm/functions/Function6;
-	public static final fun memoize (Lkotlin/jvm/functions/Function7;)Lkotlin/jvm/functions/Function7;
-	public static final fun memoize (Lkotlin/jvm/functions/Function8;)Lkotlin/jvm/functions/Function8;
-	public static final fun memoize (Lkotlin/jvm/functions/Function9;)Lkotlin/jvm/functions/Function9;
-}
-
 public final class arrow/core/NonEmptyListKt {
 	public static final fun zip (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function21;)Larrow/core/NonEmptyList;
 	public static final fun zip (Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function20;)Larrow/core/NonEmptyList;
