@@ -35,10 +35,13 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: assemble
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: assemble -Pversion=${{ inputs.version }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+
+      - name: Assemble
+        run: ./gradlew assemble -Pversion=${{ inputs.version }}
 
       - name: Upload reports
         if: failure()
@@ -48,6 +51,4 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Publish final version
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository
+        run: ./gradlew -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository

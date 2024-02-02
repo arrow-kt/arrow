@@ -155,6 +155,7 @@ public inline fun <Error, A, B> fold(
  * [Raise] context barrier.
  */
 @JvmName("_foldUnsafe")
+@OptIn(DelicateRaiseApi::class)
 public inline fun <Error, A, B> foldUnsafe(
   @BuilderInference block: Raise<Error>.() -> A,
   catch: (throwable: Throwable) -> B,
@@ -171,7 +172,7 @@ public inline fun <Error, A, B> foldUnsafe(
     val res = block(raise)
     raise.complete()
     transform(res)
-  } catch (e: CancellationException) {
+  } catch (e: RaiseCancellationException) {
     raise.complete()
     recover(e.raisedOrRethrow(raise))
   } catch (e: Throwable) {
@@ -219,28 +220,40 @@ public inline fun <Error, A, B> foldUnsafe(
  * but **this only occurs** when composing `traced`.
  * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
  */
+@OptIn(DelicateRaiseApi::class)
 @ExperimentalTraceApi
 public inline fun <Error, A> Raise<Error>.traced(
   @BuilderInference block: Raise<Error>.() -> A,
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
-  val isOuterTraced = this is DefaultRaise && isTraced
-  val nested: DefaultRaise = if (isOuterTraced) this as DefaultRaise else DefaultRaise(true)
+  val nested = DefaultRaise(true)
   return try {
-    block.invoke(nested)
-  } catch (e: CancellationException) {
+    block(nested).also { nested.complete() }
+  } catch (e: Traced) {
+    nested.complete()
     val r: Error = e.raisedOrRethrow(nested)
     trace(Trace(e), r)
-    if (isOuterTraced) throw e else raise(r)
+    // If our outer Raise happens to be traced
+    // Then we want the stack trace to match the inner one
+    try {
+      raise(r)
+    } catch (rethrown: Traced) {
+      throw rethrown.withCause(e)
+    }
   }
 }
 
+@PublishedApi
+@DelicateRaiseApi
+internal fun Traced.withCause(cause: Traced): Traced =
+  Traced(raised, raise, cause)
+
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
+@DelicateRaiseApi
 @Suppress("UNCHECKED_CAST")
 internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
   when {
-    this is RaiseCancellationExceptionNoTrace && this.raise === raise -> raised as R
     this is RaiseCancellationException && this.raise === raise -> raised as R
     else -> throw this
   }
@@ -252,19 +265,34 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
+  @OptIn(DelicateRaiseApi::class)
   override fun raise(r: Any?): Nothing = when {
-    isActive.value -> throw if (isTraced) RaiseCancellationException(r, this) else RaiseCancellationExceptionNoTrace(r, this)
+    isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
 }
 
-/** CancellationException is required to cancel coroutines when raising from within them. */
-private class RaiseCancellationExceptionNoTrace(val raised: Any?, val raise: Raise<Any?>) :
-  CancellationExceptionNoTrace()
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@RequiresOptIn(RaiseCancellationExceptionCaptured, RequiresOptIn.Level.WARNING)
+public annotation class DelicateRaiseApi
 
-private class RaiseCancellationException(val raised: Any?, val raise: Raise<Any?>) : CancellationException()
+/**
+ * [RaiseCancellationException] is a _delicate_ api, and should be used with care.
+ * It drives the short-circuiting behavior of [Raise].
+ */
+@DelicateRaiseApi
+public sealed class RaiseCancellationException(
+  internal val raised: Any?,
+  internal val raise: Raise<Any?>
+) : CancellationException(RaiseCancellationExceptionCaptured)
 
-internal expect open class CancellationExceptionNoTrace() : CancellationException
+@DelicateRaiseApi
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+
+@DelicateRaiseApi
+internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """
@@ -276,6 +304,6 @@ private class RaiseLeakedException : IllegalStateException(
 )
 
 internal const val RaiseCancellationExceptionCaptured: String =
-  "kotlin.coroutines.cancellation.CancellationException should never get cancelled. Always re-throw it if captured." +
+  "kotlin.coroutines.cancellation.CancellationException should never get swallowed. Always re-throw it if captured." +
     "This swallows the exception of Arrow's Raise, and leads to unexpected behavior." +
     "When working with Arrow prefer Either.catch or arrow.core.raise.catch to automatically rethrow CancellationException."
