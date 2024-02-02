@@ -561,7 +561,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
   buildList {
     addAll(firstError)
     for (item in iterator) {
-      recover({ block(RaiseAccumulate(this), item) }, ::addAll)
+      recover({ block(RaiseAccumulate(this), item) }) { addAll(it) }
     }
   }.toNonEmptyListOrNull()!!.let(::raise)
 }
