@@ -521,20 +521,14 @@ public inline fun <Error, A> Raise<Error>.forEachAccumulating(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
-): Unit = recover({
+) {
+  var error: Any? = EmptyValue
   for (item in iterator) {
-    block(RaiseAccumulate(this), item)
-  }
-}) { firstErrors ->
-  var error = firstErrors.reduce(combine)
-  for (item in iterator) {
-    recover({
-      block(RaiseAccumulate(this), item)
-    }) {
-      error = combine(error, it.reduce(combine))
+    recover({ block(RaiseAccumulate(this), item) }) { errors ->
+      error = combine(error, errors.reduce(combine), combine)
     }
   }
-  raise(error)
+  return if (error === EmptyValue) Unit else raise(unbox<Error>(error))
 }
 
 @RaiseDSL
@@ -553,17 +547,14 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
 public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
-): Unit = recover({
+) {
+  val error: MutableList<Error> = mutableListOf()
   for (item in iterator) {
-    block(RaiseAccumulate(this), item)
-  }
-}) { firstError ->
-  buildList {
-    addAll(firstError)
-    for (item in iterator) {
-      recover({ block(RaiseAccumulate(this), item) }) { addAll(it) }
+    recover({ block(RaiseAccumulate(this), item) }) {
+      error.addAll(it)
     }
-  }.toNonEmptyListOrNull()!!.let(::raise)
+  }
+  error.toNonEmptyListOrNull()?.let(::raise)
 }
 
 /**
