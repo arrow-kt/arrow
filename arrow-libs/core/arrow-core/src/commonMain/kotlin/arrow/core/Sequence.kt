@@ -1006,6 +1006,7 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
 public fun <A> Sequence<A>.void(): Sequence<Unit> =
   map { Unit }
 
+@Deprecated(DeprecatedWiden, ReplaceWith("(this as Sequence<B>)"))
 /**
  * Given [A] is a subtype of [B], re-type this value from Sequence<A> to Sequence<B>
  *

@@ -421,6 +421,7 @@ public fun <K, V> Map<K, Option<V>>.sequence(): Option<Map<K, V>> =
 public fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { }
 
+@Deprecated(DeprecatedWiden, ReplaceWith("(this as Map<K, B>)"))
 public fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
 
