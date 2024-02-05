@@ -2550,6 +2550,7 @@ public final class arrow/core/TupleNKt {
 public final class arrow/core/UtilsKt {
 	public static final field DeprecatedAmbiguity Ljava/lang/String;
 	public static final field DeprecatedUnsafeAccess Ljava/lang/String;
+	public static final field DeprecatedWiden Ljava/lang/String;
 	public static final fun constant (Ljava/lang/Object;)Lkotlin/jvm/functions/Function1;
 	public static final fun mapNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 }
