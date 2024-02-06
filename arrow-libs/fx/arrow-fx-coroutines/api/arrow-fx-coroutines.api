@@ -151,6 +151,17 @@ public final class arrow/fx/coroutines/ExitCase$Failure : arrow/fx/coroutines/Ex
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class arrow/fx/coroutines/FailureValue {
+	public static final field Companion Larrow/fx/coroutines/FailureValue$Companion;
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun getError ()Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/FailureValue$Companion {
+	public final fun bindNel (Larrow/core/raise/RaiseAccumulate;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun mightFail (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
 public final class arrow/fx/coroutines/FlowExtensions {
 	public static final fun fixedRate (JZLkotlin/jvm/functions/Function0;)Lkotlinx/coroutines/flow/Flow;
 	public static synthetic fun fixedRate$default (JZLkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;

@@ -3,9 +3,10 @@ package arrow.fx.coroutines
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.flattenOrAccumulate
+import arrow.core.mapOrAccumulate
 import arrow.core.raise.Raise
-import arrow.core.raise.either
+import arrow.fx.coroutines.FailureValue.Companion.bindNel
+import arrow.fx.coroutines.FailureValue.Companion.mightFail
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -59,16 +60,13 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<Error, List<B>> =
   coroutineScope {
-    val semaphore = Semaphore(concurrency)
-    map {
-      async(context) {
-        either {
-          semaphore.withPermit {
-            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
-          }
-        }
+    parMap(context, concurrency) {
+      mightFail {
+        transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
       }
-    }.awaitAll().flattenOrAccumulate(combine)
+    }.mapOrAccumulate(combine) { maybeFailure ->
+      bindNel<Error, B>(maybeFailure)
+    }
   }
 
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
@@ -77,13 +75,13 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<Error, List<B>> =
   coroutineScope {
-    map {
-      async(context) {
-        either {
-          transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
-        }
+    parMap(context) {
+      mightFail {
+        transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
       }
-    }.awaitAll().flattenOrAccumulate(combine)
+    }.mapOrAccumulate(combine) { maybeFailure ->
+      bindNel<Error, B>(maybeFailure)
+    }
   }
 
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
@@ -92,16 +90,13 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<NonEmptyList<Error>, List<B>> =
   coroutineScope {
-    val semaphore = Semaphore(concurrency)
-    map {
-      async(context) {
-        either {
-          semaphore.withPermit {
-            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
-          }
-        }
+    parMap(context, concurrency) {
+      mightFail {
+        transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
       }
-    }.awaitAll().flattenOrAccumulate()
+    }.mapOrAccumulate { maybeFailure ->
+      bindNel<Error, B>(maybeFailure)
+    }
   }
 
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
@@ -109,11 +104,11 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<NonEmptyList<Error>, List<B>> =
   coroutineScope {
-    map {
-      async(context) {
-        either {
-          transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
-        }
+    parMap(context) {
+      mightFail {
+        transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
       }
-    }.awaitAll().flattenOrAccumulate()
+    }.mapOrAccumulate { maybeFailure ->
+      bindNel<Error, B>(maybeFailure)
+    }
   }

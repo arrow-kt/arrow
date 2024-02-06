@@ -1,10 +1,10 @@
 package arrow.fx.coroutines
 
-import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.getOrElse
 import arrow.core.raise.Raise
-import arrow.core.raise.either
+import arrow.core.raise.zipOrAccumulate
+import arrow.fx.coroutines.FailureValue.Companion.bindNel
+import arrow.fx.coroutines.FailureValue.Companion.mightFail
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -27,10 +27,10 @@ public suspend inline fun <E, A, B, C> Raise<E>.parZipOrAccumulate(
 ): C =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b ->
-    Either.zipOrAccumulate(a, b) { aa, bb -> f(aa, bb) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(combine, { bindNel<E, A>(a) }, { bindNel<E, B>(b) }) { aa, bb -> f(aa, bb) }
   }
 
 public suspend inline fun <E, A, B, C> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -48,10 +48,10 @@ public suspend inline fun <E, A, B, C> Raise<NonEmptyList<E>>.parZipOrAccumulate
 ): C =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b ->
-    Either.zipOrAccumulate(a, b) { aa, bb -> f(aa, bb) }.bind()
+    zipOrAccumulate({ bindNel<E, A>(a) }, { bindNel<E, B>(b) }) { aa, bb -> f(aa, bb) }
   }
 //endregion
 
@@ -75,11 +75,11 @@ public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
 ): D =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c ->
-    Either.zipOrAccumulate(a, b, c) { aa, bb, cc -> f(aa, bb, cc) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(combine, { bindNel<E, A>(a) }, { bindNel<E, B>(b) }, { bindNel<E, C>(c) }) { aa, bb, cc -> f(aa, bb, cc) }
   }
 
 public suspend inline fun <E, A, B, C, D> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -99,11 +99,15 @@ public suspend inline fun <E, A, B, C, D> Raise<NonEmptyList<E>>.parZipOrAccumul
 ): D =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c ->
-    Either.zipOrAccumulate(a, b, c) { aa, bb, cc -> f(aa, bb, cc) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) }
+    ) { aa, bb, cc -> f(aa, bb, cc) }
   }
 //endregion
 
@@ -129,12 +133,18 @@ public suspend inline fun <E, A, B, C, D, F> Raise<E>.parZipOrAccumulate(
 ): F =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d ->
-    Either.zipOrAccumulate(a, b, c, d) { aa, bb, cc, dd -> f(aa, bb, cc, dd) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(
+      combine,
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) }
+    ) { aa, bb, cc, dd -> f(aa, bb, cc, dd) }
   }
 
 public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -156,12 +166,17 @@ public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccu
 ): F =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d ->
-    Either.zipOrAccumulate(a, b, c, d) { aa, bb, cc, dd -> f(aa, bb, cc, dd) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) }
+    ) { aa, bb, cc, dd -> f(aa, bb, cc, dd) }
   }
 //endregion
 
@@ -189,13 +204,20 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<E>.parZipOrAccumulate(
 ): G =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f ->
-    Either.zipOrAccumulate(a, b, c, d, f) { aa, bb, cc, dd, ff -> f(aa, bb, cc, dd, ff) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(
+      combine,
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) }
+    ) { aa, bb, cc, dd, ff -> f(aa, bb, cc, dd, ff) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -219,13 +241,19 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrA
 ): G =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f ->
-    Either.zipOrAccumulate(a, b, c, d, f) { aa, bb, cc, dd, ff -> f(aa, bb, cc, dd, ff) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) }
+    ) { aa, bb, cc, dd, ff -> f(aa, bb, cc, dd, ff) }
   }
 //endregion
 
@@ -255,14 +283,22 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<E>.parZipOrAccumulate(
 ): H =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g ->
-    Either.zipOrAccumulate(a, b, c, d, f, g) { aa, bb, cc, dd, ff, gg -> f(aa, bb, cc, dd, ff, gg) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(
+      combine,
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) }
+    ) { aa, bb, cc, dd, ff, gg -> f(aa, bb, cc, dd, ff, gg) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -288,14 +324,21 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZip
 ): H =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g ->
-    Either.zipOrAccumulate(a, b, c, d, f, g) { aa, bb, cc, dd, ff, gg -> f(aa, bb, cc, dd, ff, gg) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) }
+    ) { aa, bb, cc, dd, ff, gg -> f(aa, bb, cc, dd, ff, gg) }
   }
 //endregion
 
@@ -327,15 +370,24 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<E>.parZipOrAccumulat
 ): I =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h) { aa, bb, cc, dd, ff, gg, hh -> f(aa, bb, cc, dd, ff, gg, hh) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(
+      combine,
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) },
+      { bindNel<E, H>(h) }
+    ) { aa, bb, cc, dd, ff, gg, hh -> f(aa, bb, cc, dd, ff, gg, hh) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -363,15 +415,23 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.par
 ): I =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h) { aa, bb, cc, dd, ff, gg, hh -> f(aa, bb, cc, dd, ff, gg, hh) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) },
+      { bindNel<E, H>(h) }
+    ) { aa, bb, cc, dd, ff, gg, hh -> f(aa, bb, cc, dd, ff, gg, hh) }
   }
 //endregion
 
@@ -405,16 +465,26 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<E>.parZipOrAccumu
 ): J =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fi(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h, i ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i) { aa, bb, cc, dd, ff, gg, hh, ii -> f(aa, bb, cc, dd, ff, gg, hh, ii) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(
+      combine,
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) },
+      { bindNel<E, H>(h) },
+      { bindNel<E, I>(i) }
+    ) { aa, bb, cc, dd, ff, gg, hh, ii -> f(aa, bb, cc, dd, ff, gg, hh, ii) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -444,16 +514,25 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.
 ): J =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
   ) { a, b, c, d, f, g, h, i ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i) { aa, bb, cc, dd, ff, gg, hh, ii -> f(aa, bb, cc, dd, ff, gg, hh, ii) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) },
+      { bindNel<E, H>(h) },
+      { bindNel<E, I>(i) }
+    ) { aa, bb, cc, dd, ff, gg, hh, ii -> f(aa, bb, cc, dd, ff, gg, hh, ii) }
   }
 //endregion
 
@@ -489,17 +568,28 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<E>.parZipOrAcc
 ): K =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fj(ScopedRaiseAccumulate(this, this@parZip)) } }
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fj(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h, i, j ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i, j) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> f(aa, bb, cc, dd, ff, gg, hh, ii, jj) }.getOrElse { raise(it.reduce(combine)) }
+    zipOrAccumulate(
+      combine,
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) },
+      { bindNel<E, H>(h) },
+      { bindNel<E, I>(i) },
+      { bindNel<E, J>(j) }
+    ) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> f(aa, bb, cc, dd, ff, gg, hh, ii, jj) }
   }
 
 public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E>>.parZipOrAccumulate(
@@ -531,16 +621,26 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E
 ): K =
   parZip(
     context,
-    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
-    { either { fj(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { mightFail { fj(ScopedRaiseAccumulate(this, this@parZip)) } },
   ) { a, b, c, d, f, g, h, i, j ->
-    Either.zipOrAccumulate(a, b, c, d, f, g, h, i, j) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> f(aa, bb, cc, dd, ff, gg, hh, ii, jj) }.bind()
+    zipOrAccumulate(
+      { bindNel<E, A>(a) },
+      { bindNel<E, B>(b) },
+      { bindNel<E, C>(c) },
+      { bindNel<E, D>(d) },
+      { bindNel<E, F>(f) },
+      { bindNel<E, G>(g) },
+      { bindNel<E, H>(h) },
+      { bindNel<E, I>(i) },
+      { bindNel<E, J>(j) }
+    ) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> f(aa, bb, cc, dd, ff, gg, hh, ii, jj) }
   }
 //endregion
