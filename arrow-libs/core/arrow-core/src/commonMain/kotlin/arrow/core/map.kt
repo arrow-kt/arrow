@@ -278,9 +278,6 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   return left.toNonEmptyListOrNull()?.left() ?: right.right()
 }
 
-public fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
-  this
-
 public fun <K, A, B> Map<K, A>.mapNotNull(transform: (Map.Entry<K, A>) -> B?): Map<K, B> =
   buildMap {
     this@mapNotNull.forEach { entry ->

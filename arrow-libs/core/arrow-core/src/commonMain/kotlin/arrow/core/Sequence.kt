@@ -737,22 +737,6 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
   map(fc).unzip()
 
 /**
- * Given [A] is a subtype of [B], re-type this value from Sequence<A> to Sequence<B>
- *
- * ```kotlin
- * import arrow.core.widen
- *
- * fun main() {
- *   val original: Sequence<String> = sequenceOf("Hello World")
- *   val result: Sequence<CharSequence> = original.widen()
- * }
- * ```
- * <!--- KNIT example-sequence-16.kt -->
- */
-public fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
-  this
-
-/**
  * Filters out all elements that are [None],
  * and unwraps the remaining elements [Some] values.
  *
