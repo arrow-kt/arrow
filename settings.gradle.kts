@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.16.1"
+  id("com.gradle.enterprise") version "3.16.2"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
@@ -58,6 +58,9 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
+include("arrow-core-high-arity")
+project(":arrow-core-high-arity").projectDir = file("arrow-libs/core/arrow-core-high-arity")
+
 include("arrow-atomic")
 project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 
@@ -75,6 +78,9 @@ project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-co
 
 include("arrow-cache4k")
 project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
+
+include("arrow-autoclose")
+project(":arrow-autoclose").projectDir = file("arrow-libs/core/arrow-autoclose")
 
 // FX
 include("arrow-fx-coroutines")

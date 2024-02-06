@@ -3,11 +3,14 @@ package arrow.fx.coroutines
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
+import kotlin.test.DefaultAsserter.fail
 
 class ResourceTestJvm : StringSpec({
 
@@ -59,5 +62,14 @@ class ResourceTestJvm : StringSpec({
 
       t.didClose.get() shouldBe true
     }
+  }
+
+  "blow the scope on fatal" {
+    shouldThrow<LinkageError> {
+      resourceScope {
+        install({  }) { _, _ -> fail("Should never come here") }
+        throw LinkageError("BOOM!")
+      }
+    }.message shouldBe "BOOM!"
   }
 })
