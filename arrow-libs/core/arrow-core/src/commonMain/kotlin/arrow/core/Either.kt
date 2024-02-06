@@ -1364,29 +1364,6 @@ public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) 
     }
   }
 
-/**
- * Given [B] is a subtype of [C], re-type this value from Either<A, B> to Either<A, C>
- *
- * ```kotlin
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val string: Either<Int, String> = "Hello".right()
- *   val chars: Either<Int, CharSequence> =
- *     string.widen<Int, CharSequence, String>()
- *   //sampleEnd
- *   println(chars)
- * }
- * ```
- * <!--- KNIT example-either-34.kt -->
- */
-public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
-  this
-
-public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
-  this
-
 public const val NicheAPI: String =
   "This API is niche and will be removed in the future. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"
 

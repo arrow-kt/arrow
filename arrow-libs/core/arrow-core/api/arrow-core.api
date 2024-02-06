@@ -152,12 +152,10 @@ public final class arrow/core/EitherKt {
 	public static final fun getOrElse (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun left (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun leftNel (Ljava/lang/Object;)Larrow/core/Either;
-	public static final fun leftWiden (Larrow/core/Either;)Larrow/core/Either;
 	public static final fun merge (Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun recover (Larrow/core/Either;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun right (Ljava/lang/Object;)Larrow/core/Either;
 	public static final fun toEitherNel (Larrow/core/Either;)Larrow/core/Either;
-	public static final fun widen (Larrow/core/Either;)Larrow/core/Either;
 }
 
 public final class arrow/core/EmptyValue {
@@ -249,7 +247,6 @@ public final class arrow/core/IorKt {
 	public static final fun leftIor (Ljava/lang/Object;)Larrow/core/Ior;
 	public static final fun rightIor (Ljava/lang/Object;)Larrow/core/Ior;
 	public static final fun toIorNel (Larrow/core/Ior;)Larrow/core/Ior;
-	public static final fun widen (Larrow/core/Ior;)Larrow/core/Ior;
 }
 
 public final class arrow/core/IterableKt {
@@ -297,8 +294,6 @@ public final class arrow/core/IterableKt {
 	public static final fun unweave (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun unzip (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun unzip (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
-	public static final fun widen (Ljava/lang/Iterable;)Ljava/lang/Iterable;
-	public static final fun widen (Ljava/util/List;)Ljava/util/List;
 	public static final fun zip (Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function10;)Ljava/util/List;
 	public static final fun zip (Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function9;)Ljava/util/List;
 	public static final fun zip (Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function8;)Ljava/util/List;
@@ -328,7 +323,6 @@ public final class arrow/core/MapKt {
 	public static final fun unalign (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun unzip (Ljava/util/Map;)Lkotlin/Pair;
 	public static final fun unzip (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
-	public static final fun widen (Ljava/util/Map;)Ljava/util/Map;
 	public static final fun zip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun zip (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function11;)Ljava/util/Map;
 	public static final fun zip (Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function10;)Ljava/util/Map;
@@ -626,7 +620,6 @@ public final class arrow/core/OptionKt {
 	public static final fun toOption (Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun toOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun widen (Larrow/core/Option;)Larrow/core/Option;
 }
 
 public final class arrow/core/PredefKt {
@@ -664,7 +657,6 @@ public final class arrow/core/SequenceKt {
 	public static final fun unweave (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/sequences/Sequence;
 	public static final fun unzip (Lkotlin/sequences/Sequence;)Lkotlin/Pair;
 	public static final fun unzip (Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
-	public static final fun widen (Lkotlin/sequences/Sequence;)Lkotlin/sequences/Sequence;
 	public static final fun zip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function3;)Lkotlin/sequences/Sequence;
 	public static final fun zip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function4;)Lkotlin/sequences/Sequence;
 	public static final fun zip (Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function5;)Lkotlin/sequences/Sequence;

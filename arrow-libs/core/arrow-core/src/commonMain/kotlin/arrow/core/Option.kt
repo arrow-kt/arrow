@@ -586,29 +586,6 @@ public inline fun <reified B> Option<*>.filterIsInstance(): Option<B> =
 public fun <A> Option<Option<A>>.flatten(): Option<A> =
   flatMap(::identity)
 
-/**
- *  Given [A] is a sub type of [B], re-type this value from Option<A> to Option<B>
- *
- *  Option<A> -> Option<B>
- *
- *  ```kotlin
- *  import arrow.core.Option
- *  import arrow.core.some
- *  import arrow.core.widen
- *
- *  fun main(args: Array<String>) {
- *   val result: Option<CharSequence> =
- *   //sampleStart
- *   "Hello".some().map({ "$it World" }).widen()
- *   //sampleEnd
- *   println(result)
- *  }
- *  ```
- * <!--- KNIT example-option-20.kt -->
- */
-public fun <B, A : B> Option<A>.widen(): Option<B> =
-  this
-
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
 public fun <A> Option<A>.combine(other: Option<A>, combine: (A, A) -> A): Option<A> =

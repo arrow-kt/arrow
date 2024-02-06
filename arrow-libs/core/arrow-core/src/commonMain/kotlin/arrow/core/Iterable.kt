@@ -924,36 +924,6 @@ public inline fun <T, A, B> Iterable<T>.separateEither(f: (T) -> Either<A, B>): 
 public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
   flatMap(::identity)
 
-/**
- *  Given [A] is a subtype of [B], re-type this value from Iterable<A> to Iterable<B>
- *
- * ```kotlin
- * import arrow.core.*
- *
- * fun test() {
- *   val original: List<String> = listOf("Hello", ",", "World")
- *   val result: Iterable<CharSequence> = original.widen()
- * }
- * ```
- */
-public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
-  this
-
-/**
- *  Given [A] is a subtype of [B], re-type this value from List<A> to List<B>
- *
- * ```kotlin
- * import arrow.core.*
- *
- * fun main() {
- *   val original: List<String> = listOf("Hello", ",", "World")
- *   val result: Iterable<CharSequence> = original.widen()
- * }
- * ```
- */
-public fun <B, A : B> List<A>.widen(): List<B> =
-  this
-
 public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
     f(a).align(bs) { ior ->

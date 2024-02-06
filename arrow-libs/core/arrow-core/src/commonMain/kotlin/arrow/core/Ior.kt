@@ -455,26 +455,6 @@ public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A,
 public fun <A, B> Ior<A, B>.toIorNel(): IorNel<A, B> =
   mapLeft { it.nel() }
 
-/**
- * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
- *
- * ```kotlin
- * import arrow.core.*
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val string: Ior<Int, String> = Ior.Right("Hello")
- *   val chars: Ior<Int, CharSequence> =
- *     string.widen<Int, CharSequence, String>()
- *   //sampleEnd
- *   println(chars)
- * }
- * ```
- * <!--- KNIT example-ior-12.kt -->
- */
-public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
-  this
-
 public operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(other: Ior<A, B>): Int = fold(
   { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }, { _, _ -> -1 }) },
   { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }, { _, _ -> -1 }) },
