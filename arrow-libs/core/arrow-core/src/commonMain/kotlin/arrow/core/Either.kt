@@ -1397,7 +1397,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *   fallback shouldBe Either.Right(5)
  * }
  * ```
- * <!--- KNIT example-either-35.kt -->
+ * <!--- KNIT example-either-34.kt -->
  * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [EE] into the [Either.Left] channel,
@@ -1414,7 +1414,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
  * ```
- * <!--- KNIT example-either-36.kt -->
+ * <!--- KNIT example-either-35.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
@@ -1451,7 +1451,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  *   failure shouldBe Either.Left("failure")
  * }
  * ```
- * <!--- KNIT example-either-37.kt -->
+ * <!--- KNIT example-either-36.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)

@@ -9,6 +9,9 @@ import io.kotest.matchers.shouldBe
 
 fun test() {
   val error: Option<Int> = none()
-  val fallback: Option<Int> = error.recover { 5 }
-  fallback shouldBe Some(5)
+  fun fallback(): Option<Int> = Some(5)
+  fun failure(): Option<Int> = none()
+
+  error.recover { fallback().bind() } shouldBe Some(5)
+  error.recover { failure().bind() } shouldBe none()
 }
