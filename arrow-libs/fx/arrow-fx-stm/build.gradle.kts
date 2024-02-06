@@ -22,7 +22,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        compileOnly(libs.kotlin.stdlibCommon)
+        compileOnly(libs.kotlin.stdlib)
         implementation(libs.coroutines.core)
       }
     }
@@ -38,17 +38,6 @@ kotlin {
     jvmTest {
       dependencies {
         runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

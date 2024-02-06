@@ -26,7 +26,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
 
@@ -37,18 +37,6 @@ kotlin {
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
         implementation(libs.coroutines.test)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

@@ -1,6 +1,6 @@
 [versions]
 animalSniffer = "1.7.1"
-arrowGradleConfig = "0.12.0-rc.22"
+arrowGradleConfig = "0.12.0-rc.23"
 assertj = "3.25.3"
 coroutines = "1.8.0-RC2"
 classgraph = "4.8.165"
@@ -40,9 +40,7 @@ kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
-kotlin-stdlibCommon = { module = "org.jetbrains.kotlin:kotlin-stdlib-common" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
-kotlin-stdlibJS = { module = "org.jetbrains.kotlin:kotlin-stdlib-js" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }

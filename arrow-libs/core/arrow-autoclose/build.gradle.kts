@@ -22,7 +22,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.kotlin.stdlib)
         implementation(projects.arrowAtomic)
       }
     }
@@ -31,17 +31,6 @@ kotlin {
         implementation(libs.kotlin.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.coroutines.test)
-      }
-    }
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

@@ -22,7 +22,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
 
@@ -45,11 +45,6 @@ kotlin {
       dependencies {
         implementation(libs.kotlin.stdlib)
         api(libs.kotlin.reflect)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

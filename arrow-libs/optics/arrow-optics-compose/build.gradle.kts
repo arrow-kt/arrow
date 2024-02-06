@@ -56,7 +56,7 @@ kotlin {
         api(projects.arrowOptics)
         api(libs.coroutines.core)
         api(compose.runtime)
-        implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.kotlin.stdlib)
       }
     }
 
