@@ -132,7 +132,7 @@ class LensTests {
   }
 
   @Test
-  fun `Lens for sealed class property`() {
+  fun `Lens for sealed class property, one choice`() {
     """
       |$`package`
       |$imports
@@ -140,13 +140,72 @@ class LensTests {
       |sealed class LensSealed {
       |  abstract val property1: String
       |  
-      |   data class dataChild(override val property1: String) : LensSealed()
+      |  data class dataChild(override val property1: String) : LensSealed()
       |   
-      |   companion object 
+      |  companion object 
       |}
       |
       |val l: Lens<LensSealed, String>? = LensSealed.property1
       |val r = l != null
       """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lens for sealed class property, three choices`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |  
+      |  data class dataChild1(override val property1: String) : LensSealed()
+      |  data class dataChild2(override val property1: String, val number: Int) : LensSealed()
+      |  data class dataChild3(override val property1: String, val enabled: Boolean) : LensSealed()
+      |   
+      |  companion object 
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lens for sealed class property, three choices outside`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |  
+      |  companion object
+      |}
+      |  
+      |data class dataChild1(override val property1: String) : LensSealed()
+      |data class dataChild2(override val property1: String, val number: Int) : LensSealed()
+      |data class dataChild3(override val property1: String, val enabled: Boolean) : LensSealed()
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lens for sealed class property, zero choices`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |   
+      |  companion object 
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.compilationFails()
   }
 }

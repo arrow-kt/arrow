@@ -139,7 +139,7 @@ internal fun evalAnnotatedClass(
           Focus(
             fullName = type,
             paramName = name,
-            subclasses = subclasses.map { it.simpleName.asString() }.toList(),
+            subclasses = subclasses.map { it.qualifiedNameOrSimpleName }.toList(),
           )
         }
         .toList()

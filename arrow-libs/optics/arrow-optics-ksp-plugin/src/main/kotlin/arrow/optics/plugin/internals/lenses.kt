@@ -34,7 +34,7 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
     when {
       focus.subclasses.isNotEmpty() -> {
         """when(${adt.sourceName}) {
-        |${focus.subclasses.joinToString(separator = "\n") { "is $sourceClassNameWithParams.$it -> $setBodyCopy" }}
+        |${focus.subclasses.joinToString(separator = "\n") { "is $it -> $setBodyCopy" }}
         |}
         |
         """.trimMargin()
