@@ -6,8 +6,7 @@ import arrow.typeclasses.SemigroupDeprecation
 import kotlin.experimental.ExperimentalTypeInference
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.either
-import arrow.core.raise.fold
-import arrow.core.raise.nullable
+import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.option
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.combine
@@ -328,26 +327,14 @@ public inline fun <K, E, A, B> Map<K, A>.traverse(
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
   @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
-): Either<E, Map<K, B>> {
-  var left: Any? = EmptyValue
-  val right = mutableMapOf<K, B>()
-  for (element in this)
-    fold(
-      { transform(RaiseAccumulate(this), element) },
-      { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) },
-      { right[element.key] = it }
-    )
-  return if (left !== EmptyValue) EmptyValue.unbox<E>(left).left() else right.right()
+): Either<E, Map<K, B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, combine, transform)
 }
 
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
-): Either<NonEmptyList<E>, Map<K, B>> {
-  val left = mutableListOf<E>()
-  val right = mutableMapOf<K, B>()
-  for (element in this)
-    fold({ transform(RaiseAccumulate(this), element) }, { error -> left.addAll(error) }, { right[element.key] = it })
-  return left.toNonEmptyListOrNull()?.left() ?: right.right()
+): Either<NonEmptyList<E>, Map<K, B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, transform)
 }
 
 @Deprecated(
