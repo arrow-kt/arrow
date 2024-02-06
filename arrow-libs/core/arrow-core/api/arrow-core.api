@@ -2550,6 +2550,7 @@ public final class arrow/core/TupleNKt {
 public final class arrow/core/UtilsKt {
 	public static final field DeprecatedAmbiguity Ljava/lang/String;
 	public static final field DeprecatedUnsafeAccess Ljava/lang/String;
+	public static final field DeprecatedWiden Ljava/lang/String;
 	public static final fun constant (Ljava/lang/Object;)Lkotlin/jvm/functions/Function1;
 	public static final fun mapNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 }
@@ -3607,6 +3608,12 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun fold (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun fold (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)V
+	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
+	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Ljava/util/Iterator;Lkotlin/jvm/functions/Function2;)V
+	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Ljava/util/Iterator;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
+	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)V
+	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
 	public static final fun get (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun get (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun getOrElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -3621,6 +3628,10 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Larrow/core/NonEmptyList;Lkotlin/jvm/functions/Function2;)Larrow/core/NonEmptyList;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
+	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
+	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate--YW8gn4 (Larrow/core/raise/Raise;Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
 	public static final fun merge (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun merge (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

@@ -9,7 +9,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.either
-import arrow.core.raise.fold
+import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.option
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidDeprecation
@@ -837,22 +837,14 @@ public fun <E, A, B> Sequence<A>.traverse(
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): Either<Error, List<B>> {
-  var left: Any? = EmptyValue
-  val right = mutableListOf<B>()
-  for (item in this)
-    fold({ transform(RaiseAccumulate(this), item) }, { errors -> left = EmptyValue.combine(left, errors.reduce(combine), combine) }, { b -> right.add(b) })
-  return if (left !== EmptyValue) EmptyValue.unbox<Error>(left).left() else right.right()
+): Either<Error, List<B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, combine, transform)
 }
 
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): Either<NonEmptyList<Error>, List<B>> {
-  val left = mutableListOf<Error>()
-  val right = mutableListOf<B>()
-  for (item in this)
-    fold({ transform(RaiseAccumulate(this), item) }, { errors -> left.addAll(errors) }, { b -> right.add(b) })
-  return left.toNonEmptyListOrNull()?.left() ?: right.right()
+): Either<NonEmptyList<Error>, List<B>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, transform)
 }
 
 @Deprecated(
@@ -1006,6 +998,7 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
 public fun <A> Sequence<A>.void(): Sequence<Unit> =
   map { Unit }
 
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 /**
  * Given [A] is a subtype of [B], re-type this value from Sequence<A> to Sequence<B>
  *

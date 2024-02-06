@@ -502,6 +502,61 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
   return block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i))
 }
 
+@RaiseDSL
+public inline fun <Error, A> Raise<Error>.forEachAccumulating(
+  iterable: Iterable<A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+): Unit = forEachAccumulating(iterable.iterator(), combine, block)
+
+@RaiseDSL
+public inline fun <Error, A> Raise<Error>.forEachAccumulating(
+  sequence: Sequence<A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+): Unit = forEachAccumulating(sequence.iterator(), combine, block)
+
+@RaiseDSL
+public inline fun <Error, A> Raise<Error>.forEachAccumulating(
+  iterator: Iterator<A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+) {
+  var error: Any? = EmptyValue
+  for (item in iterator) {
+    recover({ block(RaiseAccumulate(this), item) }) { errors ->
+      error = combine(error, errors.reduce(combine), combine)
+    }
+  }
+  return if (error === EmptyValue) Unit else raise(unbox<Error>(error))
+}
+
+@RaiseDSL
+public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
+  iterable: Iterable<A>,
+  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+): Unit = forEachAccumulating(iterable.iterator(), block)
+
+@RaiseDSL
+public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
+  sequence: Sequence<A>,
+  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+): Unit = forEachAccumulating(sequence.iterator(), block)
+
+@RaiseDSL
+public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
+  iterator: Iterator<A>,
+  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+) {
+  val error: MutableList<Error> = mutableListOf()
+  for (item in iterator) {
+    recover({ block(RaiseAccumulate(this), item) }) {
+      error.addAll(it)
+    }
+  }
+  error.toNonEmptyListOrNull()?.let(::raise)
+}
+
 /**
  * Transform every element of [iterable] using the given [transform], or accumulate all the occurred errors using [combine].
  *
@@ -514,17 +569,8 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   iterable: Iterable<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): List<B> {
-  var error: Any? = EmptyValue
-  val results = ArrayList<B>(iterable.collectionSizeOrDefault(10))
-  for (item in iterable) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error = combine(error, errors.reduce(combine), combine) },
-      { results.add(it) }
-    )
-  }
-  return if (error === EmptyValue) results else raise(unbox<Error>(error))
+): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
+  forEachAccumulating(iterable, combine) { add(transform(it)) }
 }
 
 /**
@@ -538,17 +584,39 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   iterable: Iterable<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): List<B> {
-  val error = mutableListOf<Error>()
-  val results = ArrayList<B>(iterable.collectionSizeOrDefault(10))
-  for (item in iterable) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error.addAll(errors) },
-      { results.add(it) }
-    )
-  }
-  return error.toNonEmptyListOrNull()?.let { raise(it) } ?: results
+): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
+  forEachAccumulating(iterable) { add(transform(it)) }
+}
+
+/**
+ * Transform every element of [sequence] using the given [transform], or accumulate all the occurred errors using [combine].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
+  sequence: Sequence<A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+): List<B> = buildList {
+  forEachAccumulating(sequence, combine) { add(transform(it)) }
+}
+
+/**
+ * Accumulate the errors obtained by executing the [transform] over every element of [sequence].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+@RaiseDSL
+public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  sequence: Sequence<A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+): List<B> = buildList {
+  forEachAccumulating(sequence) { add(transform(it)) }
 }
 
 /**
@@ -575,17 +643,23 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptySet: NonEmptySet<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): NonEmptySet<B> {
-  val error = mutableListOf<Error>()
-  val results = HashSet<B>(nonEmptySet.collectionSizeOrDefault(10))
-  for (item in nonEmptySet) {
-    fold<NonEmptyList<Error>, B, Unit>(
-      { transform(RaiseAccumulate(this), item) },
-      { errors -> error.addAll(errors) },
-      { results.add(it) }
-    )
-  }
-  return error.toNonEmptyListOrNull()?.let { raise(it) } ?: requireNotNull(results.toNonEmptySetOrNull())
+): NonEmptySet<B> = buildSet(nonEmptySet.size) {
+  forEachAccumulating(nonEmptySet) { add(transform(it)) }
+}.toNonEmptySetOrNull()!!
+
+public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
+  map: Map<K, A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = buildMap(map.size) {
+  forEachAccumulating(map.entries, combine) { put(it.key, transform(it)) }
+}
+
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  map: Map<K, A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = buildMap(map.size) {
+  forEachAccumulating(map.entries) { put(it.key, transform(it)) }
 }
 
 /**
@@ -602,7 +676,7 @@ public open class RaiseAccumulate<Error>(
     raise.raise(nonEmptyListOf(r))
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
-    mapOrAccumulate { (_, a) -> a.bind() }.bindNel()
+    raise.mapOrAccumulate(this) { it.value.bind() }
 
   @RaiseDSL
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
