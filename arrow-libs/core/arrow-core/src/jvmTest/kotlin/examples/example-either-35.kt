@@ -7,6 +7,6 @@ import io.kotest.matchers.shouldBe
 
 fun test() {
   val error: Either<String, Int> = Either.Left("error")
-  val fallback: Either<Nothing, Int> = error.recover { it.length }
-  fallback shouldBe Either.Right(5)
+  val listOfErrors: Either<List<Char>, Int> = error.recover { raise(it.toList()) }
+  listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
 }

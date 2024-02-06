@@ -624,7 +624,7 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  *   fallback shouldBe Some(5)
  * }
  * ```
- * <!--- KNIT example-option-21.kt -->
+ * <!--- KNIT example-option-20.kt -->
  * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [None] into the [Option]:
@@ -645,7 +645,7 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  *   error.recover { failure().bind() } shouldBe none()
  * }
  * ```
- * <!--- KNIT example-option-22.kt -->
+ * <!--- KNIT example-option-21.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Option<A>.recover(recover: SingletonRaise<None>.() -> A): Option<A> =

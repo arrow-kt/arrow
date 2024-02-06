@@ -206,13 +206,6 @@ class IorTest {
     }
   }
 
-  @Test fun widenOk() = runTest {
-    checkAll(Arb.int(), Arb.string()) { a, b ->
-      val ior = Ior.Both(a, b)
-      ior.widen<Int, CharSequence, String>().shouldBeInstanceOf<Ior.Both<Int, CharSequence>>()
-    }
-  }
-
   @Test fun compareToOk() = runTest {
     val left1 = Ior.Left(1)
     val left2 = Ior.Left(2)

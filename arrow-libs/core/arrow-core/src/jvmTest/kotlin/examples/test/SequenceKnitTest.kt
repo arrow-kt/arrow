@@ -21,8 +21,8 @@ class SequenceKnitTest {
     arrow.core.examples.exampleSequence10.test()
   }
 
-  @Test fun exampleSequence17() = runTest {
-    arrow.core.examples.exampleSequence17.test()
+  @Test fun exampleSequence16() = runTest {
+    arrow.core.examples.exampleSequence16.test()
   }
 
 }

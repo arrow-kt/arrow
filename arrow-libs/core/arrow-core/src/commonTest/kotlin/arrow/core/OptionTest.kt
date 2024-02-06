@@ -314,13 +314,6 @@ class OptionTest {
     }
   }
 
-  @Test fun widen() = runTest {
-    checkAll(Arb.string()) { a: String ->
-      val widen: Option<CharSequence> = Option(a).widen()
-      widen.map { it.length } shouldBe Some(a.length)
-    }
-  }
-
   @Test fun compareToWithSomeValues() = runTest {
     checkAll(Arb.int(), Arb.int()) { a: Int, b: Int ->
       val opA = Option(a)

@@ -747,7 +747,7 @@ public fun <A, B, C> Sequence<C>.unzip(fc: (C) -> Pair<A, B>): Pair<Sequence<A>,
  *   .toList() shouldBe listOf(0, 2, 4, 6, 8)
  * }
  * ```
- * <!--- KNIT example-sequence-17.kt -->
+ * <!--- KNIT example-sequence-16.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Sequence<Option<A>>.filterOption(): Sequence<A> =
