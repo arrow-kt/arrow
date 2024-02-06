@@ -26,12 +26,6 @@ kotlin {
         api(libs.kotlin.stdlib)
       }
     }
-
-    commonTest {
-      dependencies {
-        implementation(libs.kotlin.test)
-      }
-    }
   }
 
   jvm {
