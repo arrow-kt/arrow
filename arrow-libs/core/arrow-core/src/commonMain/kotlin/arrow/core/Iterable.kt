@@ -1234,7 +1234,7 @@ public fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, L
 public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
   flatMap(::identity)
 
-@Deprecated(DeprecatedWiden, ReplaceWith("(this as Iterable<B>)"))
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 /**
  *  Given [A] is a subtype of [B], re-type this value from Iterable<A> to Iterable<B>
  *
@@ -1250,7 +1250,7 @@ public fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
 public fun <B, A : B> Iterable<A>.widen(): Iterable<B> =
   this
 
-@Deprecated(DeprecatedWiden, ReplaceWith("(this as List<B>)"))
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 /**
  *  Given [A] is a subtype of [B], re-type this value from List<A> to List<B>
  *

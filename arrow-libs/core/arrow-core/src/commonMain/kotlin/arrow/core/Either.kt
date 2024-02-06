@@ -2062,7 +2062,7 @@ public fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: 
 public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>): Either<A, B> =
   fold<Either<A, B>, Either<A, B>>(MB.empty().right()) { x, y -> Either.zipOrAccumulate(MA::combine, x, y, MB::combine) }
 
-@Deprecated(DeprecatedWiden, ReplaceWith("(this as Either<A, C>)"))
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 /**
  * Given [B] is a sub type of [C], re-type this value from Either<A, B> to Either<A, C>
  *
@@ -2083,7 +2083,7 @@ public fun <A, B> Iterable<Either<A, B>>.combineAll(MA: Monoid<A>, MB: Monoid<B>
 public fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
   this
 
-@Deprecated(DeprecatedWiden, ReplaceWith("(this as Either<AA, B>)"))
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 public fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 

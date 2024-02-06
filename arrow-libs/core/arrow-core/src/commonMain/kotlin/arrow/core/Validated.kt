@@ -959,11 +959,11 @@ public inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> ValidatedNel<E, A>.zip(
  * ```
  * <!--- KNIT example-validated-05.kt -->
  */
-@Deprecated(ValidatedDeprMsg + DeprecatedWiden, ReplaceWith("(this.toEither() as Either<E, B>)"))
+@Deprecated(ValidatedDeprMsg + DeprecatedWiden, ReplaceWith("this.toEither()"))
 public fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
   this
 
-@Deprecated(ValidatedDeprMsg + DeprecatedWiden, ReplaceWith("(this.toEither() as Either<EE, A>)"))
+@Deprecated(ValidatedDeprMsg + DeprecatedWiden, ReplaceWith("this.toEither()"))
 public fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
   this
 
