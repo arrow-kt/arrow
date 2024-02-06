@@ -1170,6 +1170,7 @@ public fun <A, B, C> Ior<A, Validated<B, C>>.sequence(): Validated<B, Ior<A, C>>
 public fun <A, B> Ior<A, B>.toIorNel(): IorNel<A, B> =
   mapLeft { it.nel() }
 
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 /**
  * Given [B] is a sub type of [C], re-type this value from Ior<A, B> to Ior<A, B>
  *
@@ -1190,10 +1191,7 @@ public fun <A, B> Ior<A, B>.toIorNel(): IorNel<A, B> =
 public fun <A, C, B : C> Ior<A, B>.widen(): Ior<A, C> =
   this
 
-@Deprecated(
-  NicheAPI + "Prefer using widen",
-  ReplaceWith("widen()", "arrow.core.widen")
-)
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 public fun <AA, A : AA, B> Ior<A, B>.leftWiden(): Ior<AA, B> =
   this
 

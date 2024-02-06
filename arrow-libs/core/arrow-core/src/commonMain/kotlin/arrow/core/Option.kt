@@ -1601,6 +1601,7 @@ public fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
 public inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
   fold({ None to None }, { f(it).let { (a, b) -> Some(a) to Some(b) } })
 
+@Deprecated(DeprecatedWiden, ReplaceWith("this"))
 /**
  *  Given [A] is a sub type of [B], re-type this value from Option<A> to Option<B>
  *
