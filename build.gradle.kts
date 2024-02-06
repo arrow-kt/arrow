@@ -67,6 +67,7 @@ configure<KnitPluginExtension> {
 dependencies {
   kover(projects.arrowAtomic)
   kover(projects.arrowCore)
+  kover(projects.arrowCoreHighArity)
   kover(projects.arrowCoreRetrofit)
   kover(projects.arrowCoreSerialization)
   kover(projects.arrowFunctions)

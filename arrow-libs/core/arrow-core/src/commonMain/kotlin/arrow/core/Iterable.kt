@@ -285,8 +285,7 @@ public inline fun <B, C, D, E, F, G, H, I, J, K, L> Iterable<B>.zip(
   return list
 }
 
-@PublishedApi
-internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
+public fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
   if (this is Collection<*>) this.size else default
 
 /**
