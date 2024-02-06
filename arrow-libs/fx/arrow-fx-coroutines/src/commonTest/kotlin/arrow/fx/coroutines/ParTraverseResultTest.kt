@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.AtomicInt
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.sequence
 import io.kotest.core.spec.style.StringSpec
@@ -17,7 +19,7 @@ import kotlinx.coroutines.CompletableDeferred
 
 class ParTraverseResultTest : StringSpec({
     "parTraverseResult can traverse effect full computations" {
-      val ref = Atomic(0)
+      val ref = AtomicInt(0)
       (0 until 100).parTraverseResult {
         Result.success(ref.update { it + 1 })
       }
