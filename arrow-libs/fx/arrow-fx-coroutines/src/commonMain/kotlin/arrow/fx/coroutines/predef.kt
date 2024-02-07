@@ -18,21 +18,22 @@ import kotlin.contracts.contract
  */
 public expect fun timeInMillis(): Long
 
+@OptIn(ExperimentalContracts::class)
 @PublishedApi
-internal class FailureValue(val error: Any?) {
-  @OptIn(ExperimentalContracts::class)
-  companion object {
-    @Suppress("UNCHECKED_CAST")
-    fun <E, T> RaiseAccumulate<E>.bindNel(value: Any?): T =
-      withNel {
-        if (value is FailureValue) raise(value.error as NonEmptyList<E>) else value as T
-      }
+internal object FailureValue {
+  private class Failure(val error: Any?)
+  fun failureValue(error: Any?): Any? = Failure(error)
 
-    inline fun <E, T> mightFail(block: Raise<E>.() -> T): Any? {
-      contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-      }
-      return recover(block, ::FailureValue)
+  @Suppress("UNCHECKED_CAST")
+  fun <E, T> RaiseAccumulate<E>.bindNel(value: Any?): T =
+    withNel {
+      if (value is Failure) raise(value.error as NonEmptyList<E>) else value as T
     }
+
+  inline fun <E, T> mightFail(block: Raise<E>.() -> T): Any? {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+    }
+    return recover(block, ::failureValue)
   }
 }

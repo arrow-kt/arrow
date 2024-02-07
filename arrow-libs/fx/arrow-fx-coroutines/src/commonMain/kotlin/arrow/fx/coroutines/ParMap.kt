@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.mapOrAccumulate
 import arrow.core.raise.Raise
-import arrow.fx.coroutines.FailureValue.Companion.bindNel
-import arrow.fx.coroutines.FailureValue.Companion.mightFail
+import arrow.fx.coroutines.FailureValue.bindNel
+import arrow.fx.coroutines.FailureValue.mightFail
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

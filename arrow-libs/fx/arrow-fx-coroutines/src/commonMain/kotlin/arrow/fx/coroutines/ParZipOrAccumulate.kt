@@ -3,8 +3,8 @@ package arrow.fx.coroutines
 import arrow.core.NonEmptyList
 import arrow.core.raise.Raise
 import arrow.core.raise.zipOrAccumulate
-import arrow.fx.coroutines.FailureValue.Companion.bindNel
-import arrow.fx.coroutines.FailureValue.Companion.mightFail
+import arrow.fx.coroutines.FailureValue.bindNel
+import arrow.fx.coroutines.FailureValue.mightFail
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CoroutineScope

@@ -152,13 +152,9 @@ public final class arrow/fx/coroutines/ExitCase$Failure : arrow/fx/coroutines/Ex
 }
 
 public final class arrow/fx/coroutines/FailureValue {
-	public static final field Companion Larrow/fx/coroutines/FailureValue$Companion;
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun getError ()Ljava/lang/Object;
-}
-
-public final class arrow/fx/coroutines/FailureValue$Companion {
+	public static final field INSTANCE Larrow/fx/coroutines/FailureValue;
 	public final fun bindNel (Larrow/core/raise/RaiseAccumulate;Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun failureValue (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun mightFail (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
