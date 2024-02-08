@@ -87,25 +87,29 @@ sealed class Focus {
       paramName: String,
       refinedType: KSType? = null,
       onlyOneSealedSubclass: Boolean = false,
+      subclasses: List<String> = emptyList(),
     ): Focus =
       when {
         fullName.endsWith("?") -> Nullable(
-          fullName,
-          paramName,
-          refinedType,
+          className = fullName,
+          paramName = paramName,
+          refinedType = refinedType,
           onlyOneSealedSubclass = onlyOneSealedSubclass,
+          subclasses = subclasses,
         )
         fullName.startsWith("`arrow`.`core`.`Option`") -> Option(
-          fullName,
-          paramName,
-          refinedType,
+          className = fullName,
+          paramName = paramName,
+          refinedType = refinedType,
           onlyOneSealedSubclass = onlyOneSealedSubclass,
+          subclasses = subclasses,
         )
         else -> NonNull(
-          fullName,
-          paramName,
-          refinedType,
+          className = fullName,
+          paramName = paramName,
+          refinedType = refinedType,
           onlyOneSealedSubclass = onlyOneSealedSubclass,
+          subclasses = subclasses,
         )
       }
   }
@@ -115,6 +119,7 @@ sealed class Focus {
 
   // only used for type-refining prisms
   abstract val refinedType: KSType?
+  abstract val subclasses: List<String>
   abstract val onlyOneSealedSubclass: Boolean
 
   val refinedArguments: List<String>
@@ -127,6 +132,7 @@ sealed class Focus {
     override val paramName: String,
     override val refinedType: KSType?,
     override val onlyOneSealedSubclass: Boolean,
+    override val subclasses: List<String>,
   ) : Focus() {
     val nonNullClassName = className.dropLast(1)
   }
@@ -136,6 +142,7 @@ sealed class Focus {
     override val paramName: String,
     override val refinedType: KSType?,
     override val onlyOneSealedSubclass: Boolean,
+    override val subclasses: List<String>,
   ) : Focus() {
     val nestedClassName =
       Regex("`arrow`.`core`.`Option`<(.*)>$").matchEntire(className)!!.groupValues[1]
@@ -146,6 +153,7 @@ sealed class Focus {
     override val paramName: String,
     override val refinedType: KSType?,
     override val onlyOneSealedSubclass: Boolean,
+    override val subclasses: List<String>,
   ) : Focus()
 }
 
