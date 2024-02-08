@@ -16,7 +16,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
         api(libs.kotlinx.serializationCore)
       }
     }

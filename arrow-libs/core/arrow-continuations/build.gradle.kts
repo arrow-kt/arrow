@@ -22,7 +22,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.kotlin.stdlib)
       }
     }
     commonTest {
@@ -36,16 +36,6 @@ kotlin {
     jvmTest {
       dependencies {
         runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

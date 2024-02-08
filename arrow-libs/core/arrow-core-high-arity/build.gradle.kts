@@ -27,7 +27,7 @@ kotlin {
         api(projects.arrowAtomic)
         api(projects.arrowContinuations)
         api(projects.arrowAnnotations)
-        api(libs.kotlin.stdlibCommon)
+        api(libs.kotlin.stdlib)
       }
     }
 
@@ -43,18 +43,6 @@ kotlin {
     jvmTest {
       dependencies {
         runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }
