@@ -3,6 +3,8 @@ package arrow.optics.plugin.internals
 import arrow.optics.plugin.isDataClass
 import arrow.optics.plugin.isSealed
 import arrow.optics.plugin.isValue
+import com.google.devtools.ksp.getDeclaredProperties
+import com.google.devtools.ksp.isAbstract
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
@@ -21,6 +23,7 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
       when (target) {
         OpticsTarget.LENS ->
           evalAnnotatedDataClass(c, c.qualifiedNameOrSimpleName.lensErrorMessage, logger)
+            .orEmpty()
             .let(::LensTarget)
 
         OpticsTarget.ISO ->
@@ -36,29 +39,21 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
     },
   )
 
-internal fun KSClassDeclaration.targets(): List<OpticsTarget> =
+internal fun KSClassDeclaration.targets(): Set<OpticsTarget> =
   targetsFromOpticsAnnotation().let { targets ->
     when {
-      isSealed ->
-        listOf(OpticsTarget.PRISM, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
-
-      isValue ->
-        listOf(OpticsTarget.ISO, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
-
-      else ->
-        listOf(OpticsTarget.LENS, OpticsTarget.DSL)
-          .filter { targets.isEmpty() || it in targets }
+      isSealed -> targets intersect SEALED_TARGETS
+      isValue -> targets intersect VALUE_TARGETS
+      else -> targets intersect OTHER_TARGETS
     }
   }
 
-internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget> =
+internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): Set<OpticsTarget> =
   annotations
-    .find { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
-    ?.arguments
-    ?.flatMap { arg -> (arg.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
-    ?.mapNotNull {
+    .single { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
+    .arguments
+    .flatMap { (it.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
+    .mapNotNull {
       when (it.qualifiedString()) {
         "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
         "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
@@ -66,7 +61,7 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): List<OpticsTarget
         "arrow.optics.OpticsTarget.DSL" -> OpticsTarget.DSL
         else -> null
       }
-    }.orEmpty().distinct()
+    }.ifEmpty { ALL_TARGETS }.toSet()
 
 internal fun evalAnnotatedPrismElement(
   element: KSClassDeclaration,
@@ -98,17 +93,60 @@ internal fun evalAnnotatedDataClass(
   element: KSClassDeclaration,
   errorMessage: String,
   logger: KSPLogger,
-): List<Focus> =
-  when {
+): List<Focus>? {
+  return when {
     element.isDataClass ->
       element
         .getConstructorTypesNames()
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
+    element.isSealed -> {
+      val properties = element
+        .getDeclaredProperties()
+        .filter { it.isAbstract() && it.extensionReceiver == null }
+
+      if (properties.none()) {
+        logger.info(element.qualifiedNameOrSimpleName.sealedLensNoTargets, element)
+        return null
+      }
+
+      val subclasses = element.getSealedSubclasses()
+
+      if (subclasses.any { !it.isDataClass }) {
+        logger.info(element.qualifiedNameOrSimpleName.sealedLensNonDataClassChildren, element)
+        return null
+      }
+
+      val propertyNames = properties
+        .map { it.simpleName.asString() }
+
+      val nonConstructorOverrides = subclasses
+        .any { subclass ->
+          val parameters = subclass.getConstructorParamNames()
+          propertyNames.any { it !in parameters }
+        }
+
+      if (nonConstructorOverrides) {
+        logger.info(element.qualifiedNameOrSimpleName.sealedLensConstructorOverridesOnly, element)
+        return null
+      }
+
+      properties
+        .map { it.type.resolve().qualifiedString() }
+        .zip(propertyNames) { type, name ->
+          Focus(
+            fullName = type,
+            paramName = name,
+            subclasses = subclasses.map { it.qualifiedNameOrSimpleName }.toList(),
+          )
+        }
+        .toList()
+    }
     else -> {
       logger.error(errorMessage, element)
       emptyList()
     }
   }
+}
 
 internal fun evalAnnotatedValueClass(
   element: KSClassDeclaration,
@@ -139,29 +177,6 @@ internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLog
     element.isSealed ->
       SealedClassDsl(evalAnnotatedPrismElement(element, element.qualifiedNameOrSimpleName.prismErrorMessage, logger))
     else -> throw IllegalStateException("should only be sealed, data, or value by now")
-  }
-
-internal fun evalAnnotatedIsoElement(
-  element: KSClassDeclaration,
-  errorMessage: String,
-  logger: KSPLogger,
-): List<Focus> =
-  when {
-    element.isDataClass ->
-      element
-        .getConstructorTypesNames()
-        .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
-        .takeIf { it.size <= 22 }
-        ?: run {
-          logger.error(element.qualifiedNameOrSimpleName.isoTooBigErrorMessage, element)
-          emptyList()
-        }
-    element.isValue ->
-      listOf(Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()))
-    else -> {
-      logger.error(errorMessage, element)
-      emptyList()
-    }
   }
 
 internal fun KSClassDeclaration.getConstructorTypesNames(): List<String> =
