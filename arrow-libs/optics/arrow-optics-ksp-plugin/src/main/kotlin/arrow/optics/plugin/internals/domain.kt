@@ -74,6 +74,7 @@ data class Focus(
   val paramName: String,
   val refinedType: KSType?,
   val onlyOneSealedSubclass: Boolean = false,
+  val subclasses: List<String> = emptyList(),
 ) {
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
@@ -81,8 +82,8 @@ data class Focus(
     }?.map { it.qualifiedString() }.orEmpty()
 
   companion object {
-    operator fun invoke(fullName: String, paramName: String): Focus =
-      Focus(fullName, paramName, null)
+    operator fun invoke(fullName: String, paramName: String, subclasses: List<String> = emptyList()): Focus =
+      Focus(fullName, paramName, null, subclasses = subclasses)
   }
 }
 

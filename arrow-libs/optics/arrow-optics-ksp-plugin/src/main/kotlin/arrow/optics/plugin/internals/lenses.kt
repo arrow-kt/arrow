@@ -11,6 +11,26 @@ internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget)
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): String {
   val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"
+
+  val setBody = { focus: Focus ->
+    val setBodyCopy = """${adt.sourceName}.copy(${
+      focus.paramName.plusIfNotBlank(
+        prefix = "`",
+        postfix = "`",
+      )
+    } = value)"""
+    when {
+      focus.subclasses.isNotEmpty() -> {
+        """when(${adt.sourceName}) {
+        |${focus.subclasses.joinToString(separator = "\n") { "is $it -> $setBodyCopy" }}
+        |}
+        |
+        """.trimMargin()
+      }
+
+      else -> setBodyCopy
+    }
+  }
   return foci.joinToString(separator = "\n") { focus ->
     val firstLine = when {
       adt.typeParameters.isEmpty() ->
@@ -19,21 +39,18 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
         "${adt.visibilityModifierName} $inlineText fun ${adt.angledTypeParameters} ${adt.sourceClassName}.Companion.${focus.lensParamName()}(): $Lens<$sourceClassNameWithParams, ${focus.className}>"
     }
     """
-  |$firstLine = $Lens(
-  |  get = { ${adt.sourceName}: $sourceClassNameWithParams -> ${adt.sourceName}.${
+      |$firstLine = $Lens(
+      |  get = { ${adt.sourceName}: $sourceClassNameWithParams -> ${adt.sourceName}.${
       focus.paramName.plusIfNotBlank(
         prefix = "`",
         postfix = "`",
       )
     } },
-  |  set = { ${adt.sourceName}: $sourceClassNameWithParams, value: ${focus.className} -> ${adt.sourceName}.copy(${
-      focus.paramName.plusIfNotBlank(
-        prefix = "`",
-        postfix = "`",
-      )
-    } = value) }
-  |)
-  |
+      |  set = { ${adt.sourceName}: $sourceClassNameWithParams, value: ${focus.className} ->
+      |  ${setBody(focus)}
+      |}
+      |)
+      |
     """.trimMargin()
   }
 }
