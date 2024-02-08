@@ -23,7 +23,7 @@ kotlin {
         api(projects.arrowCore)
         api(projects.arrowAutoclose)
         api(libs.coroutines.core)
-        implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.kotlin.stdlib)
       }
     }
 
@@ -34,24 +34,13 @@ kotlin {
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
         implementation(libs.coroutines.test)
+        implementation(projects.arrowAtomic)
       }
     }
 
     jvmTest {
       dependencies {
         runtimeOnly(libs.kotest.runnerJUnit5)
-      }
-    }
-
-    jvmMain {
-      dependencies {
-        implementation(libs.kotlin.stdlib)
-      }
-    }
-
-    jsMain {
-      dependencies {
-        implementation(libs.kotlin.stdlibJS)
       }
     }
   }

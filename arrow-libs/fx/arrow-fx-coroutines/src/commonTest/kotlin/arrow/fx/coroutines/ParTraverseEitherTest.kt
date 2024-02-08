@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.atomic.AtomicInt
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -16,7 +18,7 @@ import kotlinx.coroutines.CompletableDeferred
 
 class ParTraverseEitherTest : StringSpec({
     "parTraverseEither can traverse effect full computations" {
-      val ref = Atomic(0)
+      val ref = AtomicInt(0)
       (0 until 100).parTraverseEither {
         ref.update { it + 1 }.right()
       }
