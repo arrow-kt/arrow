@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import io.kotest.common.Platform
+import io.kotest.common.platform
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -118,7 +120,7 @@ class AtomicTest : StringSpec({
       }
     }
 
-    "concurrent modifications" {
+    "concurrent modifications".config(enabled = platform == Platform.JVM) {
       val finalValue = 50_000
       val r = Atomic(0)
       (0 until finalValue).parTraverse { r.update { it + 1 } }

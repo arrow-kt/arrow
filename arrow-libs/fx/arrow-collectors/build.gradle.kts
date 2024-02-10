@@ -19,7 +19,7 @@ kotlin {
         api(projects.arrowFxCoroutines)
         api(projects.arrowAtomic)
         api(libs.coroutines.core)
-        implementation(libs.kotlin.stdlibCommon)
+        implementation(libs.kotlin.stdlib)
       }
     }
 
