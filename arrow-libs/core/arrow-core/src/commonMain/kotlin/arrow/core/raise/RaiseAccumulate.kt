@@ -564,13 +564,23 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(DelicateRaiseApi::class)
 @RaiseDSL
 public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   iterable: Iterable<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
-  forEachAccumulating(iterable, combine) { add(transform(it)) }
+  var hasError = false
+  forEachAccumulating(iterable, combine) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) add(transformed)
+  }
 }
 
 /**
@@ -580,12 +590,22 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(DelicateRaiseApi::class)
 @RaiseDSL
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   iterable: Iterable<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
-  forEachAccumulating(iterable) { add(transform(it)) }
+  var hasError = false
+  forEachAccumulating(iterable) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) add(transformed)
+  }
 }
 
 /**
@@ -595,13 +615,23 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(DelicateRaiseApi::class)
 @RaiseDSL
 public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   sequence: Sequence<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList {
-  forEachAccumulating(sequence, combine) { add(transform(it)) }
+  var hasError = false
+  forEachAccumulating(sequence, combine) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) add(transformed)
+  }
 }
 
 /**
@@ -611,12 +641,22 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(DelicateRaiseApi::class)
 @RaiseDSL
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   sequence: Sequence<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList {
-  forEachAccumulating(sequence) { add(transform(it)) }
+  var hasError = false
+  forEachAccumulating(sequence) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) add(transformed)
+  }
 }
 
 /**
@@ -639,27 +679,57 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(DelicateRaiseApi::class)
 @RaiseDSL
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptySet: NonEmptySet<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): NonEmptySet<B> = buildSet(nonEmptySet.size) {
-  forEachAccumulating(nonEmptySet) { add(transform(it)) }
+  var hasError = false
+  forEachAccumulating(nonEmptySet) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) add(transformed)
+  }
 }.toNonEmptySetOrNull()!!
 
+@OptIn(DelicateRaiseApi::class)
 public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
   map: Map<K, A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
-  forEachAccumulating(map.entries, combine) { put(it.key, transform(it)) }
+  var hasError = false
+  forEachAccumulating(map.entries, combine) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) put(it.key, transformed)
+  }
 }
 
+@OptIn(DelicateRaiseApi::class)
 public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   map: Map<K, A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
-  forEachAccumulating(map.entries) { put(it.key, transform(it)) }
+  var hasError = false
+  forEachAccumulating(map.entries) {
+    val transformed = try {
+      transform(it)
+    } catch (e: RaiseCancellationException) {
+      hasError = true
+      throw e
+    }
+    if (!hasError) put(it.key, transformed)
+  }
 }
 
 /**
