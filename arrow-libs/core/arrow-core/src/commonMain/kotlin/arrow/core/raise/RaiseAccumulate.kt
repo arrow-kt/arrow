@@ -520,10 +520,10 @@ public inline fun <Error, A> Raise<Error>.forEachAccumulating(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
-): Unit = forEachAccumulating(iterator, combine, block, block)
+): Unit = forEachAccumulatingImpl(iterator, combine, block, block)
 
-@PublishedApi @JvmName("forEachAccumulatingDouble")
-internal inline fun <Error, A> Raise<Error>.forEachAccumulating(
+@PublishedApi
+internal inline fun <Error, A> Raise<Error>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference blockUntilError: RaiseAccumulate<Error>.(A) -> Unit,
@@ -559,14 +559,14 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
 public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
-): Unit = forEachAccumulating(iterator, block, block)
+): Unit = forEachAccumulatingImpl(iterator, block, block)
 
 /**
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
 @PublishedApi @JvmName("forEachAccumulatingDouble")
-internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
+internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   @BuilderInference blockUntilError: RaiseAccumulate<Error>.(A) -> Unit,
   @BuilderInference blockAfterError: RaiseAccumulate<Error>.(A) -> Unit
@@ -598,7 +598,7 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     iterable.iterator(),
     combine,
     blockUntilError = { add(transform(it)) },
@@ -618,7 +618,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   iterable: Iterable<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     iterable.iterator(),
     blockUntilError = { add(transform(it)) },
     blockAfterError = { transform(it) }
@@ -638,7 +638,7 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     sequence.iterator(),
     combine,
     blockUntilError = { add(transform(it)) },
@@ -658,7 +658,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   sequence: Sequence<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     sequence.iterator(),
     blockUntilError = { add(transform(it)) },
     blockAfterError = { transform(it) }
@@ -690,7 +690,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptySet: NonEmptySet<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): NonEmptySet<B> = buildSet(nonEmptySet.size) {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     nonEmptySet.iterator(),
     blockUntilError = { add(transform(it)) },
     blockAfterError = { transform(it) }
@@ -703,7 +703,7 @@ public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     map.entries.iterator(),
     combine,
     blockUntilError = { put(it.key, transform(it)) },
@@ -716,7 +716,7 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   map: Map<K, A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
-  forEachAccumulating(
+  forEachAccumulatingImpl(
     map.entries.iterator(),
     blockUntilError = { put(it.key, transform(it)) },
     blockAfterError = { transform(it) }
@@ -770,7 +770,7 @@ public open class RaiseAccumulate<Error>(
 
   @RaiseDSL
   @JvmName("_mapOrAccumulate")
-  public fun <A, B> mapOrAccumulate(
+  public inline fun <A, B> mapOrAccumulate(
     set: NonEmptySet<A>,
     transform: RaiseAccumulate<Error>.(A) -> B
   ): NonEmptySet<B> = raise.mapOrAccumulate(set, transform)
