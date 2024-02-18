@@ -74,7 +74,7 @@ class ParTraverseTest : StringSpec({
     }
 
     "parTraverseN can traverse effect full computations" {
-      val ref = Atomic(0)
+      val ref = AtomicInt(0)
       (0 until 100).parTraverseN(5) {
         ref.update { it + 1 }
       }
@@ -152,7 +152,7 @@ class ParTraverseTest : StringSpec({
     }
 
     "parSequenceN can traverse effect full computations" {
-      val ref = Atomic(0)
+      val ref = AtomicInt(0)
       (0 until 100)
         .map { suspend { ref.update { it + 1 } } }
         .parSequenceN(5)
