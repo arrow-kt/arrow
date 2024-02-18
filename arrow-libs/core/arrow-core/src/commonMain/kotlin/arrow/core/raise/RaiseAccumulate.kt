@@ -23,6 +23,7 @@ import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmSynthetic
 
 /**
  * Accumulate the errors from running both [action1] and [action2] using the given [combine] function.
@@ -522,7 +523,7 @@ public inline fun <Error, A> Raise<Error>.forEachAccumulating(
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
 ): Unit = forEachAccumulatingImpl(iterator, combine) { item, _ -> block(item) }
 
-@PublishedApi
+@PublishedApi @JvmSynthetic
 internal inline fun <Error, A> Raise<Error>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
@@ -561,7 +562,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
-@PublishedApi
+@PublishedApi @JvmSynthetic
 internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
