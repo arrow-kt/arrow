@@ -3,6 +3,8 @@ package arrow.resilience
 import arrow.atomic.AtomicLong
 import arrow.atomic.updateAndGet
 import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.test.TestResult
@@ -275,6 +277,56 @@ class ScheduleTest {
 
     result.fold({ assertEquals(ex, it) }, { fail("The impossible happened") })
   }
+
+  @Test
+  fun retryRaiseIsStackSafe(): TestResult = runTest {
+    val count = AtomicLong(0)
+    val iterations = stackSafeIteration().toLong()
+
+    suspend fun increment() {
+      count.incrementAndGet()
+    }
+
+    val result = Schedule.recurs<CustomError>(iterations).retryRaise {
+      increment()
+      raise(CustomError)
+    }
+
+    assertTrue { result is Either.Left }
+    assertEquals(iterations + 1, count.get())
+  }
+
+  @Test
+  fun retryRaiseSucceedsIfErrorIsNotRaised(): TestResult = runTest {
+    val result = Schedule.recurs<CustomError>(0).retryRaise { 1 }
+
+    assertTrue { result is Either.Right && result.value == 1 }
+  }
+
+  @Test
+  fun retryEitherIsStackSafe(): TestResult = runTest {
+    val count = AtomicLong(0)
+    val iterations = stackSafeIteration().toLong()
+
+    suspend fun increment() {
+      count.incrementAndGet()
+    }
+
+    val result = Schedule.recurs<CustomError>(iterations).retryEither {
+      increment()
+      CustomError.left()
+    }
+
+    assertTrue { result is Either.Left }
+    assertEquals(iterations + 1, count.get())
+  }
+
+  @Test
+  fun retryEitherSucceedsIfErrorIsNotRaised(): TestResult = runTest {
+    val result = Schedule.recurs<CustomError>(0).retryEither { 1.right() }
+
+    assertTrue { result is Either.Right && result.value == 1 }
+  }
 }
 
 fun <A, B> Schedule.Decision<A, B>.delay(): Duration? = when (this) {
@@ -347,3 +399,5 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Long, List<B>>, expected:
 
   assertContentEquals(expected, result)
 }
+
+private object CustomError

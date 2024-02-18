@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.resilience
 
 import arrow.core.Either
@@ -7,6 +9,9 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.merge
 import arrow.core.nonFatalOrThrow
+import arrow.core.raise.Raise
+import arrow.core.raise.either
+import arrow.core.raise.fold
 import arrow.core.right
 import arrow.core.some
 import arrow.resilience.Schedule.Companion.identity
@@ -17,6 +22,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.retry
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 import kotlin.math.pow
 import kotlin.random.Random
@@ -442,5 +448,56 @@ public suspend fun <Input, Output, A> Schedule<Throwable, Output>.retryOrElseEit
         is Done -> return Either.Left(orElse(e.nonFatalOrThrow(), decision.output))
       }
     }
+  }
+}
+
+/**
+ * Retries [action] using any [Error] that occurred as the input to the [Schedule].
+ * It will return the last [Error] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
+ */
+public suspend inline fun <Error, Result, Output> Schedule<Error, Output>.retryRaise(
+  @BuilderInference action: Raise<Error>.() -> Result,
+): Either<Error, Result> = either {
+  retry(this@retryRaise, action)
+}
+
+/**
+ * Retries [action] using any [Error] that occurred as the input to the [Schedule].
+ * It will return the last [Error] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
+ */
+public suspend inline fun <Error, Result, Output> Schedule<Error, Output>.retryEither(
+  @BuilderInference action: () -> Either<Error, Result>,
+): Either<Error, Result> = retryRaise {
+  action().bind()
+}
+
+/**
+ * Retries [action] using any [Error] that occurred as the input to the [Schedule].
+ * It will return the last [Error] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
+ */
+public suspend inline fun <Error, Result, Output> Raise<Error>.retry(
+  schedule: Schedule<Error, Output>,
+  @BuilderInference action: Raise<Error>.() -> Result,
+): Result {
+  var step: ScheduleStep<Error, Output> = schedule.step
+
+  while (true) {
+    currentCoroutineContext().ensureActive()
+    fold(
+      action,
+      recover = { error ->
+        when (val decision = step(error)) {
+          is Continue -> {
+            if (decision.delay != ZERO) delay(decision.delay)
+            step = decision.step
+          }
+
+          is Done -> raise(error)
+        }
+      },
+      transform = { result ->
+        return result
+      },
+    )
   }
 }
