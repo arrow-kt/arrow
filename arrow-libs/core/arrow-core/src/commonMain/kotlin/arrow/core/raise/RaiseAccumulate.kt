@@ -520,23 +520,19 @@ public inline fun <Error, A> Raise<Error>.forEachAccumulating(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
-): Unit = forEachAccumulatingImpl(iterator, combine, block, block)
+): Unit = forEachAccumulatingImpl(iterator, combine) { item, _ -> block(item) }
 
 @PublishedApi
 internal inline fun <Error, A> Raise<Error>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
-  @BuilderInference blockUntilError: RaiseAccumulate<Error>.(A) -> Unit,
-  @BuilderInference blockAfterError: RaiseAccumulate<Error>.(A) -> Unit
+  @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ) {
   var error: Any? = EmptyValue
-  var errorArose = false
   for (item in iterator) {
     recover({
-      if (errorArose) blockAfterError(RaiseAccumulate(this), item)
-      else blockUntilError(RaiseAccumulate(this), item)
+      block(RaiseAccumulate(this), item, error != EmptyValue)
     }) { errors ->
-      errorArose = true
       error = combine(error, errors.reduce(combine), combine)
     }
   }
@@ -559,26 +555,22 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
 public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
-): Unit = forEachAccumulatingImpl(iterator, block, block)
+): Unit = forEachAccumulatingImpl(iterator) { item, _ -> block(item) }
 
 /**
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
-@PublishedApi @JvmName("forEachAccumulatingDouble")
+@PublishedApi
 internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
-  @BuilderInference blockUntilError: RaiseAccumulate<Error>.(A) -> Unit,
-  @BuilderInference blockAfterError: RaiseAccumulate<Error>.(A) -> Unit
+  @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ) {
   val error: MutableList<Error> = mutableListOf()
-  var errorArose = false
   for (item in iterator) {
     recover({
-      if (errorArose) blockAfterError(RaiseAccumulate(this), item)
-      else blockUntilError(RaiseAccumulate(this), item)
+      block(RaiseAccumulate(this), item, error.isNotEmpty())
     }) {
-      errorArose = true
       error.addAll(it)
     }
   }
@@ -598,12 +590,9 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
-  forEachAccumulatingImpl(
-    iterable.iterator(),
-    combine,
-    blockUntilError = { add(transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(iterable.iterator(), combine) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) add(it) }
+  }
 }
 
 /**
@@ -618,11 +607,9 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   iterable: Iterable<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList(iterable.collectionSizeOrDefault(10)) {
-  forEachAccumulatingImpl(
-    iterable.iterator(),
-    blockUntilError = { add(transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(iterable.iterator()) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) add(it) }
+  }
 }
 
 /**
@@ -638,12 +625,9 @@ public inline fun <Error, A, B> Raise<Error>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList {
-  forEachAccumulatingImpl(
-    sequence.iterator(),
-    combine,
-    blockUntilError = { add(transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(sequence.iterator(), combine) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) add(it) }
+  }
 }
 
 /**
@@ -658,11 +642,9 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   sequence: Sequence<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): List<B> = buildList {
-  forEachAccumulatingImpl(
-    sequence.iterator(),
-    blockUntilError = { add(transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(sequence.iterator()) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) add(it) }
+  }
 }
 
 /**
@@ -690,11 +672,9 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptySet: NonEmptySet<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): NonEmptySet<B> = buildSet(nonEmptySet.size) {
-  forEachAccumulatingImpl(
-    nonEmptySet.iterator(),
-    blockUntilError = { add(transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(nonEmptySet.iterator()) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) add(it) }
+  }
 }.toNonEmptySetOrNull()!!
 
 @RaiseDSL
@@ -703,12 +683,9 @@ public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
-  forEachAccumulatingImpl(
-    map.entries.iterator(),
-    combine,
-    blockUntilError = { put(it.key, transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(map.entries.iterator(), combine) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) put(item.key, it) }
+  }
 }
 
 @RaiseDSL
@@ -716,11 +693,9 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   map: Map<K, A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
-  forEachAccumulatingImpl(
-    map.entries.iterator(),
-    blockUntilError = { put(it.key, transform(it)) },
-    blockAfterError = { transform(it) }
-  )
+  forEachAccumulatingImpl(map.entries.iterator()) { item, hasErrors ->
+    transform(item).also { if (!hasErrors) put(item.key, it) }
+  }
 }
 
 /**
