@@ -994,6 +994,8 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Ljava/util/Iterator;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
 	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)V
 	public static final fun forEachAccumulating (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)V
+	public static final synthetic fun forEachAccumulatingImpl (Larrow/core/raise/Raise;Ljava/util/Iterator;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)V
+	public static final synthetic fun forEachAccumulatingImpl (Larrow/core/raise/Raise;Ljava/util/Iterator;Lkotlin/jvm/functions/Function3;)V
 	public static final fun get (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun get (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun getOrElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
