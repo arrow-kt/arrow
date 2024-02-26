@@ -22,11 +22,11 @@ mockWebServer = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerialization = "1.0.0"
 spotlessVersion = "6.25.0"
-compose = "1.6.1"
-composePlugin = "1.6.0-rc02"
+compose = "1.6.2"
+composePlugin = "1.6.0-rc03"
 agp = "8.2.2"
 android-compileSdk = "34"
-cache4k = "0.12.0"
+cache4k = "0.13.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
