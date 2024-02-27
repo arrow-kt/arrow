@@ -5,6 +5,8 @@ import arrow.core.*
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  listOf("A".left(), 2.right(), "C".left(), 4.right())
-    .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))
+  listOf(1, 2, 3, 4)
+    .separateEither {
+      if (it % 2 == 0) "even: $it".right() else "odd: $it".left()
+    } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))
 }

@@ -18,11 +18,11 @@ public final class arrow/core/serialization/IorSerializer : kotlinx/serializatio
 
 public final class arrow/core/serialization/NonEmptyListSerializer : kotlinx/serialization/KSerializer {
 	public fun <init> (Lkotlinx/serialization/KSerializer;)V
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Larrow/core/NonEmptyList;
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize-0-xjo5U (Lkotlinx/serialization/encoding/Decoder;)Ljava/util/List;
 	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Larrow/core/NonEmptyList;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize-EgRvm48 (Lkotlinx/serialization/encoding/Encoder;Ljava/util/List;)V
 }
 
 public final class arrow/core/serialization/NonEmptySetSerializer : kotlinx/serialization/KSerializer {
@@ -40,15 +40,6 @@ public final class arrow/core/serialization/OptionSerializer : kotlinx/serializa
 	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
 	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
 	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Larrow/core/Option;)V
-	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
-}
-
-public final class arrow/core/serialization/ValidatedSerializer : kotlinx/serialization/KSerializer {
-	public fun <init> (Lkotlinx/serialization/KSerializer;Lkotlinx/serialization/KSerializer;)V
-	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Larrow/core/Validated;
-	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
-	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
-	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Larrow/core/Validated;)V
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 

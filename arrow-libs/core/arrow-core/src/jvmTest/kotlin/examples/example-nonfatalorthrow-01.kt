@@ -11,7 +11,7 @@ fun unsafeFunction(i: Int): String =
         else -> "Hello"
    }
 
-fun main(args: Array<String>) {
+fun main() {
   val nonFatal: Either<Throwable, String> =
   //sampleStart
   try {

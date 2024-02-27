@@ -3,11 +3,12 @@ package arrow.core.raise
 import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.nonEmptyListOf
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class RaiseAccumulateSpec : StringSpec({
-  "RaiseAccumulate takes precedence over extension function" {
+class RaiseAccumulateSpec {
+  @Test fun raiseAccumulateTakesPrecedenceOverExtensionFunction() = runTest {
     either<NonEmptyList<String>, Int> {
       zipOrAccumulate(
         { ensure(false) { "false" } },
@@ -15,4 +16,4 @@ class RaiseAccumulateSpec : StringSpec({
       ) { _, _ -> 1 }
     } shouldBe nonEmptyListOf("false", "1: IsFalse", "2: IsFalse").left()
   }
-})
+}

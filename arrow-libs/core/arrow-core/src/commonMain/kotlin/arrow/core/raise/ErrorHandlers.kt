@@ -23,9 +23,9 @@ import kotlin.jvm.JvmName
  *
  * val error = effect<Error, User> { raise(Error) } // Raise(error)
  *
- * val a = error.recover<Error, Error, User> { error -> User } // Success(User)
- * val b = error.recover<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
- * val c = error.recover<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * val a = error.recover<Error, Error, User> { _ -> User } // Success(User)
+ * val b = error.recover<Error, String, User> { _ -> raise("other-failure") } // Raise(other-failure)
+ * val c = error.recover<Error, Nothing, User> { _ -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
  * <!--- KNIT example-effect-error-01.kt -->
  */
@@ -93,7 +93,7 @@ public fun <Error, A> Effect<Error, A>.catch(): Effect<Error, Result<A>> =
     catch({ Result.success(invoke()) }, Result.Companion::failure)
   }
 
-public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: suspend (error: Error) -> A): A =
+public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: (error: Error) -> A): A =
   recover({ invoke() }) { recover(it) }
 
 /**
@@ -110,9 +110,9 @@ public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: s
  *
  * val error = effect<Error, User> { raise(Error) } // Raise(error)
  *
- * val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
+ * val a = error.mapError<Error, String, User> { _ -> "some-failure" } // Raise(some-failure)
  * val b = error.mapError<Error, String, User>(Any::toString) // Raise(Error)
- * val c = error.mapError<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+ * val c = error.mapError<Error, Nothing, User> { _ -> throw RuntimeException("BOOM") } // Exception(BOOM)
  * ```
  * <!--- KNIT example-effect-error-04.kt -->
  */
@@ -147,7 +147,7 @@ public inline infix fun <Error, A> EagerEffect<Error, A>.getOrElse(recover: (err
  *
  * val error = eagerEffect<Error, User> { raise(Error) } // Raise(error)
  *
- * val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
+ * val a = error.mapError<Error, String, User> { _ -> "some-failure" } // Raise(some-failure)
  * val b = error.mapError<Error, String, User>(Any::toString) // Raise(Error)
  * ```
  * <!--- KNIT example-effect-error-05.kt -->

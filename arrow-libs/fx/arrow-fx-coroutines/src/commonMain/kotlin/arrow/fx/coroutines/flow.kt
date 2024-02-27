@@ -19,64 +19,17 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.produceIn
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.zip
+import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-
-/**
- * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
- * This operator is *transparent* to exceptions that occur in downstream flow and does not retry on exceptions that are thrown
- * to cancel the flow.
- *
- * @see [Schedule] for how to build a schedule.
- *
- * ```kotlin
- * import kotlinx.coroutines.flow.*
- * import arrow.fx.coroutines.*
- * suspend fun main(): Unit {
- *   var counter = 0
- *   val flow = flow {
- *    emit(counter)
- *    if (++counter <= 5) throw RuntimeException("Bang!")
- *   }
- *   //sampleStart
- *  val sum = flow.retry(Schedule.recurs(5))
- *    .reduce(Int::plus)
- *   //sampleEnd
- *   println(sum)
- * }
- * ```
- * <!--- KNIT example-flow-01.kt -->
- *
- * @param schedule - the [Schedule] used for retrying the collection of the flow
- */
-@Deprecated(deprecatedInFavorOfArrowFxResilience, ReplaceWith("retry", "arrow.fx.resilience.retry"))
-public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
-  (schedule as Schedule.ScheduleImpl<Any?, Throwable, B>)
-  var dec: Schedule.Decision<Any?, B>
-  var state: Any? = schedule.initialState()
-
-  val retryWhen = retryWhen { cause, _ ->
-    dec = schedule.update(cause, state)
-    state = dec.state
-
-    if (dec.cont) {
-      delay((dec.delayInNanos / 1_000_000).toLong())
-      true
-    } else {
-      false
-    }
-  }
-  retryWhen.collect {
-    emit(it)
-  }
-}
+import kotlin.time.TimeSource
 
 /**
  * Like [map], but will evaluate [transform] in parallel, emitting the results
@@ -107,7 +60,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-flow-02.kt -->
+ * <!--- KNIT example-flow-01.kt -->
  * The upstream `source` runs concurrently with downstream `parMap`, and thus the upstream
  * concurrently runs, "prefetching", the next element. i.e.
  *
@@ -124,7 +77,7 @@ public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flo
  * //sampleEnd
  * }
  * ```
- * <!--- KNIT example-flow-03.kt -->
+ * <!--- KNIT example-flow-02.kt -->
  *
  * `1, 2, 3` will be emitted from `source` but only "Processing 1" & "Processing 2" will get printed.
  */
@@ -180,7 +133,7 @@ public inline fun <A, B> Flow<A>.parMap(
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-flow-04.kt -->
+ * <!--- KNIT example-flow-03.kt -->
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -217,7 +170,7 @@ public inline fun <A, B> Flow<A>.parMapUnordered(
  * }
  * //sampleEnd
  * ```
- * <!--- KNIT example-flow-05.kt -->
+ * <!--- KNIT example-flow-04.kt -->
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -258,16 +211,17 @@ public fun <A> Flow<A>.repeat(): Flow<A> =
 public fun <A> Flow<A>.metered(period: Duration): Flow<A> =
   fixedRate(period).zip(this) { _, a -> a }
 
+@ExperimentalTime
 public fun <A> Flow<A>.metered(period: Long): Flow<A> =
   fixedRate(period).zip(this) { _, a -> a }
 
 @ExperimentalTime
 public fun fixedRate(
-  period: Duration,
+  periodInMillis: Long,
   dampen: Boolean = true,
-  timeStampInMillis: () -> Long = { timeInMillis() }
+  timeStamp: () -> ComparableTimeMark = { TimeSource.Monotonic.markNow() }
 ): Flow<Unit> =
-  fixedRate(period.inWholeMilliseconds, dampen, timeStampInMillis)
+  fixedRate(periodInMillis.milliseconds, dampen, timeStamp)
 
 /**
  * Flow that emits [Unit] every [period] while taking into account how much time it takes downstream to consume the emission.
@@ -283,19 +237,19 @@ public fun fixedRate(
  *
  * @param period period between [Unit] emits of the resulting [Flow].
  * @param dampen if you set [dampen] to false it will send `n` times [period] time it took downstream to process the emission.
- * @param timeStampInMillis allows for supplying a different timestamp function, useful to override with `runBlockingTest`
+ * @param timeStamp allows for supplying a different timestamp function, useful to override with `runBlockingTest`
  */
 public fun fixedRate(
-  period: Long,
+  period: Duration,
   dampen: Boolean = true,
-  timeStampInMillis: () -> Long = { timeInMillis() }
+  timeStamp: () -> ComparableTimeMark = { TimeSource.Monotonic.markNow() }
 ): Flow<Unit> =
-  if (period == 0L) flowOf(Unit).repeat()
+  if (period == Duration.ZERO) flowOf(Unit).repeat()
   else flow {
-    var lastAwakeAt = timeStampInMillis()
+    var lastAwakeAt = timeStamp()
 
     while (true) {
-      val now = timeStampInMillis()
+      val now = timeStamp()
       val next = lastAwakeAt + period
 
       if (next > now) {
@@ -303,13 +257,13 @@ public fun fixedRate(
         emit(Unit)
         lastAwakeAt = next
       } else {
-        val ticks: Long = (now - lastAwakeAt - 1) / period
+        val ticks: Long = ((now - lastAwakeAt).inWholeMilliseconds - 1) / period.inWholeMilliseconds
         when {
           ticks < 0L -> Unit
           ticks == 0L || dampen -> emit(Unit)
           else -> repeat(ticks.toInt()) { emit(Unit) }
         }
-        lastAwakeAt += (period * ticks)
+        lastAwakeAt += (period * ticks.toDouble())
       }
     }
   }

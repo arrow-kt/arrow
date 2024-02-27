@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import java.time.Duration
+
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -14,8 +17,6 @@ spotless {
   }
 }
 
-apply(plugin = "io.kotest.multiplatform")
-
 kotlin {
   sourceSets {
     commonMain {
@@ -29,18 +30,11 @@ kotlin {
 
     commonTest {
       dependencies {
+        implementation(projects.arrowCore)
         implementation(libs.kotlin.test)
-        implementation(libs.kotest.frameworkEngine)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-        implementation(libs.coroutines.test)
-        implementation(projects.arrowAtomic)
-      }
-    }
-
-    jvmTest {
-      dependencies {
-        runtimeOnly(libs.kotest.runnerJUnit5)
       }
     }
   }
@@ -52,4 +46,26 @@ kotlin {
       }
     }
   }
+
+  js {
+    nodejs {
+      testTask {
+        useMocha {
+          timeout = "60s"
+        }
+      }
+    }
+    browser {
+      testTask {
+        useKarma {
+          useChromeHeadless()
+          timeout.set(Duration.ofMinutes(1))
+        }
+      }
+    }
+  }
+}
+
+tasks.withType<Test>().configureEach {
+  useJUnitPlatform()
 }

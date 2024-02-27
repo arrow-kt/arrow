@@ -5,12 +5,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.collect
-import arrow.fx.coroutines.parMapUnordered
+import arrow.fx.coroutines.parMapNotNullUnordered
 
 suspend fun main(): Unit {
   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-    .parMapUnordered { a ->
+    .parMapNotNullUnordered { a ->
       delay(100)
-      a
-    }.toList() // [3, 5, 4, 6, 2, 8, 7, 1, 9, 10]
+      a.takeIf { a % 2 == 0 }
+    }.toList() // [4, 6, 2, 8, 10]
 }

@@ -14,7 +14,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.fail
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("unused")
 class SagaSpec {
 

@@ -7,7 +7,7 @@ import arrow.core.raise.catch
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  catch({ throw RuntimeException("BOOM") }) { t ->
+  catch({ throw RuntimeException("BOOM") }) { _ ->
     "fallback"
   } shouldBe "fallback"
 

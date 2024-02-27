@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
-@file:Suppress("DEPRECATION")
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 
@@ -8,9 +7,6 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.Validated
-import arrow.core.ValidatedDeprMsg
-import arrow.core.continuations.EffectScope
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
@@ -95,7 +91,6 @@ public annotation class RaiseDSL
  * import arrow.core.raise.effect
  * import arrow.core.raise.ior
  * import arrow.core.raise.toEither
- * import arrow.typeclasses.Semigroup
  * import io.kotest.matchers.shouldBe
  *
  * fun Raise<String>.failure(): Int = raise("failed")
@@ -212,35 +207,6 @@ public interface Raise<in Error> {
   @RaiseDSL
   public fun raise(r: Error): Nothing
 
-  @Deprecated("Use raise instead", ReplaceWith("raise(r)"))
-  public fun <A> shift(r: Error): A = raise(r)
-
-  @RaiseDSL
-  public suspend fun <A> arrow.core.continuations.Effect<Error, A>.bind(): A =
-    fold({ raise(it) }, ::identity)
-
-  // Added for source compatibility with EffectScope / EagerScope
-  @RaiseDSL
-  public suspend fun <A> arrow.core.continuations.EagerEffect<Error, A>.bind(): A =
-    fold({ raise(it) }, ::identity)
-
-  @Deprecated(
-    "Use getOrElse on Raise, Effect or EagerEffect instead.",
-    ReplaceWith("effect { f() }")
-  )
-  public suspend fun <OtherError, A> attempt(
-    @BuilderInference
-    f: suspend EffectScope<OtherError>.() -> A,
-  ): arrow.core.continuations.Effect<OtherError, A> = arrow.core.continuations.effect(f)
-
-  @Deprecated(
-    "Use getOrElse on Raise, Effect or EagerEffect instead.",
-    ReplaceWith("fold({ recover(it) }, ::identity)")
-  )
-  public suspend infix fun <OtherError, A> arrow.core.continuations.Effect<OtherError, A>.catch(
-    recover: suspend Raise<Error>.(otherError: OtherError) -> A,
-  ): A = fold({ recover(it) }, ::identity)
-
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
    * Any _logical failure_ is raised in `this` [Raise] context,
@@ -298,7 +264,7 @@ public interface Raise<in Error> {
    *
    *   either {
    *     val x = one.bind()
-   *     val y = recover({ left.bind() }) { failure : String -> 1 }
+   *     val y = recover({ left.bind() }) { _ : String -> 1 }
    *     x + y
    *   } shouldBe Either.Right(2)
    * }
@@ -320,18 +286,6 @@ public interface Raise<in Error> {
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     mapValues { (_, a) -> a.bind() }
 
-  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bind()"))
-  @RaiseDSL
-  public fun <A> Validated<Error, A>.bind(): A = when (this) {
-    is Validated.Invalid -> raise(value)
-    is Validated.Valid -> value
-  }
-
-  /**
-   * Extracts all the values in the [Iterable], raising every [Either.Left]
-   * as a _logical failure_. In other words, executed [bind] over every
-   * value in this [Iterable].
-   */
   @RaiseDSL
   public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
     map { it.bind() }
@@ -371,7 +325,7 @@ public interface Raise<in Error> {
  *   recover({ raise("failed") }) { str -> str.length } shouldBe 6
  *
  *   either<Int, String> {
- *     recover({ raise("failed") }) { str -> raise(-1) }
+ *     recover({ raise("failed") }) { _ -> raise(-1) }
  *   } shouldBe Either.Left(-1)
  * }
  * ```
@@ -382,7 +336,13 @@ public interface Raise<in Error> {
 public inline fun <Error, A> recover(
   @BuilderInference block: Raise<Error>.() -> A,
   @BuilderInference recover: (error: Error) -> A,
-): A = fold(block, { throw it }, recover, ::identity)
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+  }
+  return fold(block, { throw it }, recover, ::identity)
+}
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
@@ -417,7 +377,14 @@ public inline fun <Error, A> recover(
   @BuilderInference block: Raise<Error>.() -> A,
   @BuilderInference recover: (error: Error) -> A,
   @BuilderInference catch: (throwable: Throwable) -> A,
-): A = fold(block, catch, recover, ::identity)
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return fold(block, catch, recover, ::identity)
+}
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
@@ -453,7 +420,14 @@ public inline fun <reified T : Throwable, Error, A> recover(
   @BuilderInference block: Raise<Error>.() -> A,
   @BuilderInference recover: (error: Error) -> A,
   @BuilderInference catch: (t: T) -> A,
-): A = fold(block, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return fold(block, { t -> if (t is T) catch(t) else throw t }, recover, ::identity)
+}
 
 /**
  * Allows safely catching exceptions without capturing [CancellationException],
@@ -467,7 +441,7 @@ public inline fun <reified T : Throwable, Error, A> recover(
  * -->
  * ```kotlin
  * fun test() {
- *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *   catch({ throw RuntimeException("BOOM") }) { _ ->
  *     "fallback"
  *   } shouldBe "fallback"
  *
@@ -487,12 +461,17 @@ public inline fun <reified T : Throwable, Error, A> recover(
  * This API offers a similar syntax as the top-level [catch] functions like [Either.catch].
  */
 @RaiseDSL
-public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A): A =
-  try {
+public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return try {
     block()
   } catch (t: Throwable) {
     catch(t.nonFatalOrThrow())
   }
+}
 
 /**
  * Allows safely catching exceptions of type `T` without capturing [CancellationException],
@@ -506,7 +485,7 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
  * -->
  * ```kotlin
  * fun test() {
- *   catch({ throw RuntimeException("BOOM") }) { t ->
+ *   catch({ throw RuntimeException("BOOM") }) { _ ->
  *     "fallback"
  *   } shouldBe "fallback"
  *
@@ -527,8 +506,13 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
  */
 @RaiseDSL
 @JvmName("catchReified")
-public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A =
-  catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
+public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T) -> A): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
+}
 
 /**
  * Ensures that the [condition] is met;
@@ -702,4 +686,9 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
 @JvmName("_merge")
 public inline fun <A> merge(
   @BuilderInference block: Raise<A>.() -> A,
-): A = recover(block, ::identity)
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+  }
+  return recover(block, ::identity)
+}

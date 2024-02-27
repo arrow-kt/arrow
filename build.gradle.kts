@@ -40,7 +40,6 @@ plugins {
   alias(libs.plugins.android.library) apply false
   alias(libs.plugins.dokka)
   alias(libs.plugins.animalSniffer) apply false
-  alias(libs.plugins.kotest.multiplatform) apply false
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlinx.serialization) apply false
@@ -67,11 +66,11 @@ configure<KnitPluginExtension> {
 
 dependencies {
   kover(projects.arrowAtomic)
-  kover(projects.arrowContinuations)
   kover(projects.arrowCore)
   kover(projects.arrowCoreHighArity)
   kover(projects.arrowCoreRetrofit)
   kover(projects.arrowCoreSerialization)
+  kover(projects.arrowFunctions)
   kover(projects.arrowFxCoroutines)
   kover(projects.arrowFxStm)
   kover(projects.arrowOptics)

@@ -1,5 +1,7 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -34,9 +36,9 @@ kotlin {
       dependencies {
         implementation(projects.arrowFxCoroutines)
         implementation(libs.kotlin.test)
+        implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
-        implementation(libs.coroutines.test)
       }
     }
   }
@@ -48,4 +50,12 @@ kotlin {
       }
     }
   }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+  kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+}
+
+tasks.withType<Test>().configureEach {
+  useJUnitPlatform()
 }

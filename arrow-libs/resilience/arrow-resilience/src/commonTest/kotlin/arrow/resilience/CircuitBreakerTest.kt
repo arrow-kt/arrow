@@ -5,7 +5,6 @@ import arrow.resilience.CircuitBreaker.OpeningStrategy
 import arrow.resilience.CircuitBreaker.OpeningStrategy.SlidingWindow
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -20,20 +19,18 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.TestTimeSource
 
-@OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
 class CircuitBreakerTest {
-  val dummy = RuntimeException("dummy")
-  val maxFailures = 5
-  val exponentialBackoffFactor = 2.0
-  val resetTimeout = 500.milliseconds
-  val maxTimeout = 1000.milliseconds
+  private val dummy = RuntimeException("dummy")
+  private val maxFailures = 5
+  private val exponentialBackoffFactor = 2.0
+  private val resetTimeout = 500.milliseconds
+  private val maxTimeout = 1000.milliseconds
 
   @Test
   fun shouldWorkForSuccessfulAsyncTasks(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
     var effect = 0
     val iterations = stackSafeIteration()
     Schedule.recurs<Unit>(iterations.toLong()).repeat {
@@ -44,7 +41,7 @@ class CircuitBreakerTest {
 
   @Test
   fun shouldWorkForSuccessfulImmediateTasks(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
     var effect = 0
     val iterations = stackSafeIteration()
     Schedule.recurs<Unit>(iterations.toLong()).repeat {
@@ -55,7 +52,7 @@ class CircuitBreakerTest {
 
   @Test
   fun staysClosedAfterLessThanMaxFailures(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }
@@ -67,7 +64,7 @@ class CircuitBreakerTest {
 
   @Test
   fun closedCircuitBreakerResetsFailureCountAfterSuccess(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }

@@ -2,9 +2,11 @@
 package arrow.core.examples.exampleEither31
 
 import arrow.core.Either
+import arrow.core.Some
+import arrow.core.None
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Right(12).leftOrNull() shouldBe null
-  Either.Left(12).leftOrNull() shouldBe 12
+  Either.Right(12).getOrNone() shouldBe Some(12)
+  Either.Left(12).getOrNone() shouldBe None
 }

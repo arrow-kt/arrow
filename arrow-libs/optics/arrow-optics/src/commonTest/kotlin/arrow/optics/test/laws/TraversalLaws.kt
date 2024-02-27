@@ -1,6 +1,5 @@
 package arrow.optics.test.laws
 
-import arrow.core.compose
 import arrow.core.identity
 import arrow.optics.Traversal
 import io.kotest.property.Arb
@@ -45,6 +44,6 @@ data class TraversalLaws<A, B>(
       funcGen
     ) { a, f, g ->
       modify(modify(a, f), g)
-        .equalUnderTheLaw(modify(a, g compose f), eq)
+        .equalUnderTheLaw(modify(a) { g(f(it)) }, eq)
     }
 }

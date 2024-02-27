@@ -1,9 +1,7 @@
-@file:OptIn(ExperimentalTime::class)
-
 package arrow.resilience
 
+import arrow.atomic.Atomic
 import arrow.core.Either
-import arrow.core.continuations.AtomicRef
 import arrow.core.identity
 import arrow.resilience.CircuitBreaker.State.Closed
 import arrow.resilience.CircuitBreaker.State.HalfOpen
@@ -14,7 +12,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -50,9 +47,7 @@ import kotlin.time.TimeSource
  * import arrow.resilience.CircuitBreaker
  * import kotlinx.coroutines.delay
  * import kotlin.time.Duration.Companion.seconds
- * import kotlin.time.ExperimentalTime
  *
- * @ExperimentalTime
  * suspend fun main(): Unit {
  * //sampleStart
  *   val circuitBreaker = CircuitBreaker(
@@ -92,9 +87,7 @@ import kotlin.time.TimeSource
  * import arrow.resilience.retry
  * import kotlinx.coroutines.delay
  * import kotlin.time.Duration.Companion.seconds
- * import kotlin.time.ExperimentalTime
  *
- * @ExperimentalTime
  * suspend fun main(): Unit {
  *   suspend fun apiCall(): Unit {
  *     println("apiCall . . .")
@@ -134,7 +127,7 @@ import kotlin.time.TimeSource
 
 public class CircuitBreaker
 private constructor(
-  private val state: AtomicRef<State>,
+  private val state: Atomic<State>,
   private val resetTimeout: Duration,
   private val exponentialBackoffFactor: Double,
   private val maxResetTimeout: Duration,
@@ -531,7 +524,7 @@ private constructor(
         "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout"
       }
       return CircuitBreaker(
-        state = AtomicRef(Closed(openingStrategy)),
+        state = Atomic(Closed(openingStrategy)),
         resetTimeout = resetTimeout,
         exponentialBackoffFactor = exponentialBackoffFactor,
         maxResetTimeout = maxResetTimeout,

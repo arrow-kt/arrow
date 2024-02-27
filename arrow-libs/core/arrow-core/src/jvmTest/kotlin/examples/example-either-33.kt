@@ -1,10 +1,11 @@
 // This file was automatically generated from Either.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleEither33
 
-import arrow.core.*
+import arrow.core.Either.Left
+import arrow.core.Either.Right
+import arrow.core.merge
 
- fun main(args: Array<String>) {
-  //sampleStart
-  Either.Left("foo").isEmpty()  // Result: true
-  Either.Right("foo").isEmpty() // Result: false
+fun test() {
+  Right(12).merge() // Result: 12
+  Left(12).merge() // Result: 12
 }

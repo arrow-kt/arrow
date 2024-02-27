@@ -1,6 +1,5 @@
 package arrow.optics.test.laws
 
-import arrow.core.compose
 import arrow.core.identity
 import arrow.optics.Lens
 import io.kotest.property.Arb
@@ -67,7 +66,7 @@ data class LensLaws<A, B>(
   private suspend fun <A, B> lensComposeModify(lensGen: Arb<Lens<A, B>>, aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, lensGen, aGen, funcGen, funcGen) { lens, a, f, g ->
       lens.run {
-        modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), eq)
+        modify(modify(a, f), g).equalUnderTheLaw(modify(a) { g(f(it)) }, eq)
       }
     }
 

@@ -3,10 +3,10 @@ package arrow.fx.coroutines.examples.exampleBracket01
 
 import arrow.fx.coroutines.*
 
-class File(url: String) {
+class File(val url: String) {
   fun open(): File = this
   fun close(): Unit {}
-  override fun toString(): String = "This file contains some interesting content!"
+  override fun toString(): String = "This file contains some interesting content from $url!"
 }
 
 suspend fun openFile(uri: String): File = File(uri).open()

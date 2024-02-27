@@ -2,17 +2,18 @@ package arrow.core.raise
 
 import arrow.core.right
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlin.test.Test
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalTraceApi::class)
-class TraceSpec : StringSpec({
-  "trace is empty when no errors" {
+class TraceSpec {
+  @Test fun traceIsEmptyWhenNoErrors() = runTest {
     checkAll(Arb.int()) { i ->
       either<Nothing, Int> {
         traced({ i }) { _,_ -> unreachable() }
@@ -20,7 +21,7 @@ class TraceSpec : StringSpec({
     }
   }
 
-  "trace is empty with exception" {
+  @Test fun traceIsEmptyWithException() = runTest {
     checkAll(Arb.string()) { msg ->
       val error = RuntimeException(msg)
       shouldThrow<RuntimeException> {
@@ -31,7 +32,7 @@ class TraceSpec : StringSpec({
     }
   }
 
-  "nested tracing - identity" {
+  @Test fun nestedTracingIdentity() = runTest {
     val inner = CompletableDeferred<String>()
     ior(String::plus) {
       traced({
@@ -44,7 +45,7 @@ class TraceSpec : StringSpec({
     }
   }
 
-  "nested tracing - different types" {
+  @Test fun nestedTracingDifferentTypes() = runTest {
     either {
       traced<Any?, _>({
         traced<String, _> ({
@@ -53,4 +54,4 @@ class TraceSpec : StringSpec({
       }) { _, unit -> unit shouldBe Unit }
     }
   }
-})
+}

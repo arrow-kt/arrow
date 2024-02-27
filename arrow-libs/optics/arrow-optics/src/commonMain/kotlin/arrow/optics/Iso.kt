@@ -6,12 +6,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Either.Right
 import arrow.core.Some
-import arrow.core.Validated
-import arrow.core.Validated.Invalid
-import arrow.core.Validated.Valid
-import arrow.core.compose
 import arrow.core.identity
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -40,8 +35,7 @@ private val stringToList: Iso<String, List<Char>> =
  * @param A the focus of a [PIso]
  * @param B the modified target of a [PIso]
  */
-public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Getter<S, A>, POptional<S, T, A, B>,
-  PSetter<S, T, A, B>, Fold<S, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B> {
 
   /**
    * Get the focus of a [PIso]
@@ -65,7 +59,7 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
   override fun modify(source: S, map: (focus: A) -> B): T =
     reverseGet(map(get(source)))
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**
@@ -125,9 +119,8 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
    * Compose a [PIso] with a [PIso]
    */
   public infix fun <C, D> compose(other: PIso<in A, out B, out C, in D>): PIso<S, T, C, D> = PIso(
-    other::get compose this::get,
-    this::reverseGet compose other::reverseGet
-  )
+    { s -> other.get(get(s)) }
+  ) { d -> reverseGet(other.reverseGet(d)) }
 
   public operator fun <C, D> plus(other: PIso<in A, out B, out C, in D>): PIso<S, T, C, D> =
     this compose other
@@ -167,25 +160,6 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
     @JvmStatic
     public fun <A> listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> =
       listToPOptionNel()
-
-    /**
-     * [PIso] that defines the equality between [Either] and [Validated]
-     */
-    @JvmStatic
-    @Deprecated("Validated functionality is being merged into Either.\n Consider using `id` after migration.")
-    public fun <A1, A2, B1, B2> eitherToPValidated(): PIso<Either<A1, B1>, Either<A2, B2>, Validated<A1, B1>, Validated<A2, B2>> =
-      PIso(
-        get = { it.fold(::Invalid, ::Valid) },
-        reverseGet = Validated<A2, B2>::toEither
-      )
-
-    /**
-     * [Iso] that defines the equality between [Either] and [Validated]
-     */
-    @JvmStatic
-    @Deprecated("Validated functionality is being merged into Either.\n Consider using `id` after migration.")
-    public fun <A, B> eitherToValidated(): Iso<Either<A, B>, Validated<A, B>> =
-      eitherToPValidated()
 
     /**
      * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys
@@ -250,22 +224,5 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B>, Gette
     @JvmStatic
     public fun stringToList(): Iso<String, List<Char>> =
       stringToList
-
-    /**
-     * [PIso] that defines equality between [Validated] and [Either]
-     */
-    @JvmStatic
-    public fun <A1, A2, B1, B2> validatedToPEither(): PIso<Validated<A1, B1>, Validated<A2, B2>, Either<A1, B1>, Either<A2, B2>> =
-      PIso(
-        get = Validated<A1, B1>::toEither,
-        reverseGet = Validated.Companion::fromEither
-      )
-
-    /**
-     * [Iso] that defines equality between [Validated] and [Either]
-     */
-    @JvmStatic
-    public fun <A, B> validatedToEither(): Iso<Validated<A, B>, Either<A, B>> =
-      validatedToPEither()
   }
 }

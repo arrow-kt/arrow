@@ -58,14 +58,14 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
+include("arrow-functions")
+project(":arrow-functions").projectDir = file("arrow-libs/core/arrow-functions")
+
 include("arrow-core-high-arity")
 project(":arrow-core-high-arity").projectDir = file("arrow-libs/core/arrow-core-high-arity")
 
 include("arrow-atomic")
 project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
-
-include("arrow-continuations")
-project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
 include("arrow-eval")
 project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")

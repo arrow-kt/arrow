@@ -9,6 +9,6 @@ object Error
 
 val error = effect<Error, User> { raise(Error) } // Raise(error)
 
-val a = error.recover<Error, Error, User> { error -> User } // Success(User)
-val b = error.recover<Error, String, User> { error -> raise("other-failure") } // Raise(other-failure)
-val c = error.recover<Error, Nothing, User> { error -> throw RuntimeException("BOOM") } // Exception(BOOM)
+val a = error.recover<Error, Error, User> { _ -> User } // Success(User)
+val b = error.recover<Error, String, User> { _ -> raise("other-failure") } // Raise(other-failure)
+val c = error.recover<Error, Nothing, User> { _ -> throw RuntimeException("BOOM") } // Exception(BOOM)

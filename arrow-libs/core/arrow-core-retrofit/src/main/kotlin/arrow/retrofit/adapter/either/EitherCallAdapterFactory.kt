@@ -110,7 +110,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     }
   }
 
-  private inline fun extractErrorAndReturnType(wrapperType: Type, returnType: ParameterizedType): Pair<Type, Type> {
+  private fun extractErrorAndReturnType(wrapperType: Type, returnType: ParameterizedType): Pair<Type, Type> {
     if (wrapperType !is ParameterizedType) {
       val name = parseTypeName(returnType)
       throw IllegalArgumentException(

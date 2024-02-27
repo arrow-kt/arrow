@@ -5,20 +5,20 @@ import arrow.optics.Optional
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.OptionalLaws
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.nonEmptyList
 import arrow.optics.test.option
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import kotlin.test.Test
 
-class ListTest : StringSpec({
+class ListTest {
 
+  @Test
+  fun headLaws() =
     testLaws(
-      "Optional list head - ",
       OptionalLaws(
         optional = Optional.listHead(),
         aGen = Arb.list(Arb.int()),
@@ -30,17 +30,12 @@ class ListTest : StringSpec({
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
-      ),
-      SetterLaws(
-        setter = Optional.listHead(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
+  @Test
+  fun tailLaws() =
     testLaws(
-      "Optional list tail - ",
       OptionalLaws(
         optional = Optional.listTail(),
         aGen = Arb.list(Arb.int()),
@@ -49,8 +44,9 @@ class ListTest : StringSpec({
       )
     )
 
+  @Test
+  fun isoToOptionNelLaws() =
     testLaws(
-      "Iso list to Option Nel - ",
       IsoLaws(
         iso = Iso.listToOptionNel(),
         aGen = Arb.list(Arb.int()),
@@ -59,4 +55,4 @@ class ListTest : StringSpec({
       )
     )
 
-})
+}

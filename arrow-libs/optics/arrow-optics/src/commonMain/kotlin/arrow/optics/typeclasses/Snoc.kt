@@ -1,10 +1,8 @@
 package arrow.optics.typeclasses
 
 import arrow.core.Either
-import arrow.core.Nullable
 import arrow.core.left
 import arrow.core.right
-import arrow.optics.Iso
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.Prism
@@ -57,12 +55,6 @@ public fun interface Snoc<S, A> {
   public companion object {
 
     /**
-     * Lift an instance of [Snoc] using an [Iso].
-     */
-    public fun <S, A, B> fromIso(SS: Snoc<A, B>, iso: Iso<S, A>): Snoc<S, B> =
-      Snoc { iso compose SS.snoc() compose iso.reverse().first() }
-
-    /**
      * Construct a [Snoc] instance from a [Prism].
      */
     public operator fun <S, A> invoke(prism: Prism<S, Pair<S, A>>): Snoc<S, A> =
@@ -76,7 +68,9 @@ public fun interface Snoc<S, A> {
       Snoc {
         object : Prism<List<A>, Pair<List<A>, A>> {
           override fun getOrModify(source: List<A>): Either<List<A>, Pair<List<A>, A>> =
-            Nullable.zip(source.dropLast(1), source.lastOrNull(), ::Pair)?.right() ?: source.left()
+            source.lastOrNull()?.let { last ->
+              Pair(source.dropLast(1), last)
+            }?.right() ?: source.left()
 
           override fun reverseGet(focus: Pair<List<A>, A>): List<A> =
             focus.first + focus.second

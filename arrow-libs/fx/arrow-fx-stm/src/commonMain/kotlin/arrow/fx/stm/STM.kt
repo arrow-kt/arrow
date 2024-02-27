@@ -250,7 +250,7 @@ public interface STM {
    * suspend fun main() {
    *   //sampleStart
    *   val result = atomically {
-   *     catch({ throw Throwable() }) { e -> "caught" }
+   *     catch({ throw Throwable() }) { _ -> "caught" }
    *   }
    *   //sampleEnd
    *   println("Result $result")
@@ -1202,6 +1202,7 @@ public interface STM {
    *     tarr.transform { it + 1 }
    *   }
    *   //sampleEnd
+   *   println("Result $result")
    * }
    * ```
  * <!--- KNIT example-stm-41.kt -->
@@ -1538,6 +1539,7 @@ public interface STM {
  *
  * Equal to [suspend] just with an [STM] receiver.
  */
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
 
 /**

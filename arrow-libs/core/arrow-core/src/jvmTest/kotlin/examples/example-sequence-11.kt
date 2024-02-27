@@ -1,13 +1,13 @@
 // This file was automatically generated from Sequence.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleSequence11
 
-import arrow.core.split
-import io.kotest.matchers.shouldBe
+import arrow.core.bothIor
+import arrow.core.leftIor
+import arrow.core.unalign
 
-fun test() {
-  sequenceOf("A", "B", "C").split()?.let { (tail, head) ->
-    head shouldBe "A"
-    tail.toList() shouldBe listOf("B", "C")
-  }
-  emptySequence<String>().split() shouldBe null
+fun main() {
+  //sampleStart
+  val result = sequenceOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor()).unalign()
+  //sampleEnd
+  println("(${result.first}, ${result.second})")
 }

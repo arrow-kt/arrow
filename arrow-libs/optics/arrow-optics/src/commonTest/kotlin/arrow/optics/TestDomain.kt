@@ -42,18 +42,10 @@ internal fun PIso.Companion.token(): Iso<Token, String> = Iso(
   ::Token
 )
 
-internal fun PSetter.Companion.token(): Setter<Token, String> = Setter { token, s ->
-  token.copy(value = s(token.value))
-}
-
 internal fun PIso.Companion.user(): Iso<User, Token> = Iso(
   { user: User -> user.token },
   ::User
 )
-
-internal fun PSetter.Companion.user(): Setter<User, Token> = Setter { user, s ->
-  user.copy(token = s(user.token))
-}
 
 internal data class Token(val value: String) {
   companion object
@@ -71,10 +63,7 @@ internal data class IncompleteUser(val token: Token?)
 
 internal fun Arb.Companion.incompleteUser(): Arb<IncompleteUser> = Arb.constant(IncompleteUser(null))
 
-internal fun Getter.Companion.token(): Getter<Token, String> =
-  Getter { it.value }
-
-internal fun PLens.Companion.user(): Lens<User, Token> = Lens(
+internal fun PLens.Companion.user(): Lens<User, Token> = PLens(
   { user: User -> user.token },
   { user: User, token: Token -> user.copy(token = token) }
 )

@@ -8,7 +8,11 @@ import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
-import org.assertj.core.api.Assertions
+import io.kotest.assertions.withClue
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.net.URLClassLoader
@@ -21,26 +25,30 @@ const val CLASS_FILENAME = "SourceKt"
 
 fun String.failsWith(check: (String) -> Boolean) {
   val compilationResult = compile(this)
-  Assertions.assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
-  Assertions.assertThat(check(compilationResult.messages)).isTrue
+  compilationResult.exitCode shouldNotBe KotlinCompilation.ExitCode.OK
+  check(compilationResult.messages).shouldBeTrue()
 }
 
 fun String.compilationFails() {
   val compilationResult = compile(this)
-  Assertions.assertThat(compilationResult.exitCode).isNotEqualTo(KotlinCompilation.ExitCode.OK)
+  compilationResult.exitCode shouldNotBe KotlinCompilation.ExitCode.OK
 }
 
 fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
   val compilationResult = compile(this, allWarningsAsErrors = allWarningsAsErrors)
-  Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+  withClue(compilationResult.messages) {
+    compilationResult.exitCode shouldBe KotlinCompilation.ExitCode.OK
+  }
 }
 
 fun String.evals(thing: Pair<String, Any?>) {
   val compilationResult = compile(this)
-  Assertions.assertThat(compilationResult.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+  withClue(compilationResult.messages) {
+    compilationResult.exitCode shouldBe KotlinCompilation.ExitCode.OK
+  }
   val classesDirectory = compilationResult.outputDirectory
   val (variable, output) = thing
-  Assertions.assertThat(eval(variable, classesDirectory)).isEqualTo(output)
+  eval(variable, classesDirectory) shouldBe output
 }
 
 // UTILITY FUNCTIONS COPIED FROM META-TEST
@@ -79,10 +87,9 @@ private fun classpathOf(dependency: String): File {
     ClassGraph().classpathFiles.firstOrNull { classpath ->
       dependenciesMatch(classpath, dependency)
     }
-//  println("classpath: ${ClassGraph().classpathFiles}")
-  Assertions.assertThat(file)
-    .`as`("$dependency not found in test runtime. Check your build configuration.")
-    .isNotNull
+  withClue("$dependency not found in test runtime. Check your build configuration.") {
+    file.shouldNotBeNull()
+  }
   return file!!
 }
 
@@ -94,7 +101,7 @@ private fun dependenciesMatch(classpath: File, dependency: String): Boolean {
 }
 
 private fun sanitizeClassPathFileName(dep: String): String =
-  buildList<Char> {
+  buildList {
     var skip = false
     add(dep.first())
     dep.reduce { a, b ->

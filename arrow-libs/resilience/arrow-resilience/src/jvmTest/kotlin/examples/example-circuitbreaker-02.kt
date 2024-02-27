@@ -7,9 +7,7 @@ import arrow.resilience.Schedule
 import arrow.resilience.retry
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
 suspend fun main(): Unit {
   suspend fun apiCall(): Unit {
     println("apiCall . . .")

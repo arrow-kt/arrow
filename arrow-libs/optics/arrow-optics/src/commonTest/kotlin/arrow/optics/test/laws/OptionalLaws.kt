@@ -1,6 +1,5 @@
 package arrow.optics.test.laws
 
-import arrow.core.compose
 import arrow.core.identity
 import arrow.optics.Optional
 import io.kotest.property.Arb
@@ -94,7 +93,7 @@ data class OptionalLaws<A, B>(
     checkAll(100, optionalGen, aGen, funcGen, funcGen) { optional, a, f, g ->
       optional.run {
         modify(modify(a, f), g)
-          .equalUnderTheLaw(modify(a, g compose f), eq)
+          .equalUnderTheLaw(modify(a) { g(f(it)) }, eq)
       }
     }
 

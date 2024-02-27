@@ -5,12 +5,14 @@ import arrow.optics.test.either
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class EitherInstanceTest : StringSpec({
+class EitherInstanceTest {
+  @Test
+  fun eitherLaws() =
     testLaws(
       TraversalLaws(
         traversal = Traversal.either(),
@@ -19,4 +21,4 @@ class EitherInstanceTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
-})
+}

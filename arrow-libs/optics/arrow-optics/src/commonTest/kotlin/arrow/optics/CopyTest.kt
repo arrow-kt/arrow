@@ -1,7 +1,8 @@
 package arrow.optics
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
 // from https://kotlinlang.slack.com/archives/C5UPMM0A0/p1688822411819599
 // and https://github.com/overfullstack/my-lab/blob/master/arrow/src/test/kotlin/ga/overfullstack/optics/OpticsLab.kt
@@ -61,8 +62,8 @@ fun Person.moveToAmsterdamInside(): Person = copy {
   }
 }
 
-class CopyTest : StringSpec({
-  "optics" {
+class CopyTest {
+  @Test fun copyOptics() = runTest {
     val me =
       Person(
         "Gopal",
@@ -81,7 +82,7 @@ class CopyTest : StringSpec({
     Person.address.get(meAfterMoving) shouldBe newAddress
   }
 
-  "optics composition" {
+  @Test fun copyOpticsComposition() = runTest {
     val personCity: Lens<Person, String> = Person.address compose Address.city compose City.name
 
     val me =
@@ -96,7 +97,7 @@ class CopyTest : StringSpec({
     meAtTheCapital.address.city.name shouldBe "Amsterdam"
   }
 
-  "optics copy to modify multiple fields" {
+  @Test fun copyMultiple() = runTest {
     val me =
       Person(
         "Alejandro",
@@ -108,4 +109,4 @@ class CopyTest : StringSpec({
     meAfterMoving1 shouldBe meAfterMoving2
     meAfterMoving1.address.city.name shouldBe "Amsterdam"
   }
-})
+}

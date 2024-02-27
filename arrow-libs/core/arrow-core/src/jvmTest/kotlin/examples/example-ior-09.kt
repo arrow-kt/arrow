@@ -4,7 +4,8 @@ package arrow.core.examples.exampleIor09
 import arrow.core.Ior
 
 fun main() {
-  Ior.Right(12).toEither() // Result: Either.Right(12)
-  Ior.Left(12).toEither()  // Result: Either.Left(12)
-  Ior.Both("power", 12).toEither()  // Result: Either.Right(12)
+  val right: Ior<Int, Int> = Ior.Right(12)
+  right.isLeft { it > 10 }   // Result: false
+  Ior.Both(12, 7).isLeft { it > 10 }    // Result: false
+  Ior.Left(12).isLeft { it > 10 }      // Result: true
 }

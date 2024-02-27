@@ -2,69 +2,78 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
+import io.kotest.mpp.NamedThreadFactory
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import java.util.concurrent.Executors
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
+import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
-class ParZip2JvmTest : StringSpec({
-    "parZip 2 returns to original context" {
-      val zipCtxName = "parZip2"
-      val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { zipCtxName }) }
+class ParZip2JvmTest {
+  @Test fun parZip2ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
+    val zipCtxName = "parZip2"
+    resourceScope {
+      val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
+      withContext(single()) {
+        Thread.currentThread().name shouldStartWith "single"
 
-        single.zip(zipCtx).use { (_single, _zipCtx) ->
-          withContext(_single) {
-            threadName() shouldStartWith singleThreadName
+        val (s1, s2) = parZip(
+          zipCtx,
+          { Thread.currentThread().name },
+          { Thread.currentThread().name }) { a, b -> Pair(a, b) }
 
-            val (s1, s2) = parZip(
-              _zipCtx,
-              { Thread.currentThread().name },
-              { Thread.currentThread().name }) { a, b -> Pair(a, b) }
-
-            s1 shouldStartWith zipCtxName
-            s2 shouldStartWith zipCtxName
-            threadName() shouldStartWith singleThreadName
-          }
-        }
-    }
-
-    "parZip 2 returns to original context on failure" {
-      val zipCtxName = "parZip2"
-      val zipCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { zipCtxName }) }
-
-      checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
-        single.zip(zipCtx).use { (_single, _zipCtx) ->
-          withContext(_single) {
-            threadName() shouldStartWith singleThreadName
-
-            Either.catch {
-              when (choose) {
-                1 -> parZip(_zipCtx, { e.suspend() }, { awaitCancellation() }) { _, _ -> Unit }
-                else -> parZip(_zipCtx, { awaitCancellation() }, { e.suspend() }) { _, _ -> Unit }
-              }
-            } should leftException(e)
-
-            threadName() shouldStartWith singleThreadName
-          }
-        }
+        s1 shouldStartWith zipCtxName
+        s2 shouldStartWith zipCtxName
+        Thread.currentThread().name shouldStartWith "single"
       }
     }
+  }
 
-    "parZip 2 finishes on single thread" {
-      checkAll(Arb.string()) {
-        val res = single.use { ctx ->
-          parZip(ctx, { Thread.currentThread().name }, { Thread.currentThread().name }) { a, b -> listOf(a, b) }
-        }
-        assertSoftly {
-          res.forEach { it shouldStartWith "single" }
+  @Test fun parZip2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+    val zipCtxName = "parZip2"
+    resourceScope {
+      val zipCtx = executor { Executors.newFixedThreadPool(2, NamedThreadFactory(zipCtxName)) }
+      checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
+        withContext(single()) {
+          Thread.currentThread().name shouldStartWith "single"
+
+          Either.catch {
+            when (choose) {
+              1 -> parZip(zipCtx, { throw e }, { awaitCancellation() }) { _, _ -> Unit }
+              else -> parZip(zipCtx, { awaitCancellation() }, { throw e }) { _, _ -> Unit }
+            }
+          } should leftException(e)
+
+          Thread.currentThread().name shouldStartWith "single"
         }
       }
     }
   }
-)
+
+  @Test fun parZip2FinishesOnSingleThread() = runTestUsingDefaultDispatcher {
+    checkAll(Arb.string()) {
+      val res = resourceScope {
+        val ctx = singleThreadContext("single")
+        parZip(ctx, { Thread.currentThread().name }, { Thread.currentThread().name }) { a, b -> listOf(a, b) }
+      }
+      assertSoftly {
+        res.forEach { it shouldStartWith "single" }
+      }
+    }
+  }
+}
+
+suspend fun parallelCtx(
+  nThreads: Int,
+  mapCtxName: String,
+  use: suspend (CoroutineContext, CoroutineContext) -> Unit,
+): Unit = resourceScope {
+  use(singleThreadContext("single"), fixedThreadPoolContext(nThreads, mapCtxName))
+}

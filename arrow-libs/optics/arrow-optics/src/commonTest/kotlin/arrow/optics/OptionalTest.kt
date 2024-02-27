@@ -8,7 +8,6 @@ import arrow.core.toOption
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.testLaws
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -19,11 +18,14 @@ import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class OptionalTest : StringSpec({
+class OptionalTest {
 
+  @Test
+  fun identityLaws() =
     testLaws(
-      "Optional identity - ",
       OptionalLaws(
         optional = Optional.id(),
         aGen = Arb.int(),
@@ -32,8 +34,9 @@ class OptionalTest : StringSpec({
       )
     )
 
+  @Test
+  fun optionalFirstHeadLaws() =
     testLaws(
-      "Optional first head - ",
       OptionalLaws(
         optional = Optional.listHead<Int>().first(),
         aGen = Arb.pair(Arb.list(Arb.int()), Arb.boolean()),
@@ -42,8 +45,9 @@ class OptionalTest : StringSpec({
       )
     )
 
+  @Test
+  fun optionalSecondHeadLaws() =
     testLaws(
-      "Optional second head - ",
       OptionalLaws(
         optional = Optional.listHead<Int>().second(),
         aGen = Arb.pair(Arb.boolean(), Arb.list(Arb.int())),
@@ -52,121 +56,135 @@ class OptionalTest : StringSpec({
       )
     )
 
-    "asSetter should set absent optional" {
-      checkAll(Arb.incompleteUser(), Arb.token()) { user, token ->
-        val updatedUser = Optional.incompleteUserToken().set(user, token)
-        Optional.incompleteUserToken().getOrNull(updatedUser).shouldNotBeNull()
-      }
+  @Test
+  fun setAbsentOptional() = runTest {
+    checkAll(Arb.incompleteUser(), Arb.token()) { user, token ->
+      val updatedUser = Optional.incompleteUserToken().set(user, token)
+      Optional.incompleteUserToken().getOrNull(updatedUser).shouldNotBeNull()
     }
+  }
 
-    with(Optional.listHead<Int>()) {
-
-      "asFold should behave as valid Fold: size" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          size(ints) shouldBe ints.firstOrNull().toOption().map { 1 }.getOrElse { 0 }
-        }
-      }
-
-      "asFold should behave as valid Fold: nonEmpty" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          isNotEmpty(ints) shouldBe ints.firstOrNull().toOption().isSome()
-        }
-      }
-
-      "asFold should behave as valid Fold: isEmpty" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          isEmpty(ints) shouldBe ints.firstOrNull().toOption().isNone()
-        }
-      }
-
-      "asFold should behave as valid Fold: getAll" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          getAll(ints) shouldBe ints.firstOrNull().toOption().toList()
-        }
-      }
-
-      "asFold should behave as valid Fold: fold" {
-        checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
-          fold(0, { x, y -> x + y }, ints) shouldBe
-            ints.firstOrNull().toOption().fold({ 0 }, ::identity)
-        }
-      }
+  @Test
+  fun sizeOk() = runTest {
+    checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
+      Optional.listHead<Int>().size(ints) shouldBe ints.firstOrNull().toOption().map { 1 }.getOrElse { 0 }
     }
+  }
 
-    "listHead.firstOrNull == firstOrNull" {
-      checkAll(Arb.list(Arb.int().orNull())) { ints ->
-        Optional.listHead<Int?>().firstOrNull(ints) shouldBe ints.firstOrNull()
-      }
+  @Test
+  fun nonEmptyOk() = runTest {
+    checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
+      Optional.listHead<Int>().isNotEmpty(ints) shouldBe ints.firstOrNull().toOption().isSome()
     }
+  }
 
-    "listHead.lastOrNull == firstOrNull" {
-      checkAll(Arb.list(Arb.int().orNull())) { ints ->
-        Optional.listHead<Int?>().lastOrNull(ints) shouldBe ints.firstOrNull()
-      }
+  @Test
+  fun isEmptyOk() = runTest {
+    checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
+      Optional.listHead<Int>().isEmpty(ints) shouldBe ints.firstOrNull().toOption().isNone()
     }
+  }
 
-    "unit should always " {
-      checkAll(Arb.string()) { string: String ->
-        Optional.void<String, Int>().getOrNull(string) shouldBe null
-      }
+  @Test
+  fun getAllOk() = runTest {
+    checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
+      Optional.listHead<Int>().getAll(ints) shouldBe ints.firstOrNull().toOption().toList()
     }
+  }
 
-    "unit should always return source when setting target" {
-      checkAll(Arb.int(), Arb.string()) { int: Int, string: String ->
-        Optional.void<String, Int>().set(string, int) shouldBe string
-      }
+  @Test
+  fun foldOk() = runTest {
+    checkAll(Arb.list(Arb.int())) { ints: List<Int> ->
+      Optional.listHead<Int>().fold(0, { x, y -> x + y }, ints) shouldBe
+        ints.firstOrNull().toOption().fold({ 0 }, ::identity)
     }
+  }
 
-    "Checking if there is no target" {
-      checkAll(Arb.list(Arb.int())) { list ->
-        Optional.listHead<Int>().isNotEmpty(list) shouldBe list.isNotEmpty()
-      }
+  @Test
+  fun firstOrNullOk() = runTest {
+    checkAll(Arb.list(Arb.int().orNull())) { ints ->
+      Optional.listHead<Int?>().firstOrNull(ints) shouldBe ints.firstOrNull()
     }
+  }
 
-    "Lift should be consistent with modify" {
-      checkAll(Arb.list(Arb.int())) { list ->
-        val f = { i: Int -> i + 5 }
-        Optional.listHead<Int>().lift(f)(list) shouldBe Optional.listHead<Int>().modify(list, f)
-      }
+  @Test
+  fun lastOrNullOk() = runTest {
+    checkAll(Arb.list(Arb.int().orNull())) { ints ->
+      Optional.listHead<Int?>().lastOrNull(ints) shouldBe ints.firstOrNull()
     }
+  }
 
-    "Checking if a target exists" {
-      checkAll(Arb.list(Arb.int())) { list ->
-        Optional.listHead<Int>().isEmpty(list) shouldBe list.isEmpty()
-      }
+  @Test
+  fun unitAlwaysNull() = runTest {
+    checkAll(Arb.string()) { string: String ->
+      Optional.void<String, Int>().getOrNull(string) shouldBe null
     }
+  }
 
-    "Finding a target using a predicate should be wrapped in the correct option result" {
-      checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
-        (Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
-          ?: false) shouldBe (predicate && list.isNotEmpty())
-      }
+  @Test
+  fun unitDoesNothing() = runTest {
+    checkAll(Arb.int(), Arb.string()) { int: Int, string: String ->
+      Optional.void<String, Int>().set(string, int) shouldBe string
     }
+  }
 
-    "Checking existence predicate over the target should result in same result as predicate" {
-      checkAll(Arb.list(Arb.int().orNull()), Arb.boolean()) { list, predicate ->
-        Optional.listHead<Int?>().exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
-      }
+  @Test
+  fun noTarget() = runTest {
+    checkAll(Arb.list(Arb.int())) { list ->
+      Optional.listHead<Int>().isNotEmpty(list) shouldBe list.isNotEmpty()
     }
+  }
 
-    "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
-      checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
-        Optional.listHead<Int>().all(list) { predicate } shouldBe if (list.isEmpty()) true else predicate
-      }
+  @Test
+  fun liftConsistentWithModify() = runTest {
+    checkAll(Arb.list(Arb.int())) { list ->
+      val f = { i: Int -> i + 5 }
+      Optional.listHead<Int>().lift(f)(list) shouldBe Optional.listHead<Int>().modify(list, f)
     }
+  }
 
-    "Set a value over a non empty list target then the first item of the result should be the value" {
-      checkAll(Arb.list(Arb.int(), 1..200), Arb.int()) { list, value ->
-        Optional.listHead<Int>().set(list, value)[0] shouldBe value
-      }
+  @Test
+  fun checkTargetExists() = runTest {
+    checkAll(Arb.list(Arb.int())) { list ->
+      Optional.listHead<Int>().isEmpty(list) shouldBe list.isEmpty()
     }
+  }
 
-    "Joining two optionals together with same target should yield same result" {
-      val joinedOptional = Optional.listHead<Int>().choice(Optional.defaultHead())
-
-      checkAll(Arb.int()) { int ->
-        joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))
-      }
+  @Test
+  fun findOrNullOk() = runTest {
+    checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
+      (Optional.listHead<Int>().findOrNull(list) { predicate }?.let { true }
+        ?: false) shouldBe (predicate && list.isNotEmpty())
     }
+  }
 
-})
+  @Test
+  fun existsOk() = runTest {
+    checkAll(Arb.list(Arb.int().orNull()), Arb.boolean()) { list, predicate ->
+      Optional.listHead<Int?>().exists(list) { predicate } shouldBe (predicate && list.isNotEmpty())
+    }
+  }
+
+  @Test
+  fun allOk() = runTest {
+    checkAll(Arb.list(Arb.int()), Arb.boolean()) { list, predicate ->
+      Optional.listHead<Int>().all(list) { predicate } shouldBe if (list.isEmpty()) true else predicate
+    }
+  }
+
+  @Test
+  fun setNonEmptyList() = runTest {
+    checkAll(Arb.list(Arb.int(), 1..200), Arb.int()) { list, value ->
+      Optional.listHead<Int>().set(list, value)[0] shouldBe value
+    }
+  }
+
+  @Test
+  fun joinOk() = runTest {
+    val joinedOptional = Optional.listHead<Int>().choice(Optional.defaultHead())
+
+    checkAll(Arb.int()) { int ->
+      joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))
+    }
+  }
+}

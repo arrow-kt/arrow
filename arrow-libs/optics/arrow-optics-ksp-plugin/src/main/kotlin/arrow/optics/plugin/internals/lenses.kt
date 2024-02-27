@@ -1,7 +1,6 @@
 package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.OpticsProcessorOptions
-import java.util.Locale
 
 internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget) =
   Snippet(
@@ -9,17 +8,6 @@ internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget)
     name = ele.simpleName,
     content = processElement(ele, target.foci),
   )
-
-private fun String.toUpperCamelCase(): String =
-  split(" ")
-    .joinToString(
-      "",
-      transform = {
-        it.replaceFirstChar {
-          if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-        }
-      },
-    )
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): String {
   val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"
@@ -67,9 +55,4 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
   }
 }
 
-fun Focus.lensParamName(): String =
-  when (this) {
-    is NullableFocus -> "nullable${paramName.toUpperCamelCase()}"
-    is OptionFocus -> "option${paramName.toUpperCamelCase()}"
-    is NonNullFocus -> paramName
-  }
+fun Focus.lensParamName(): String = paramName

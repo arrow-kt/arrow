@@ -1,28 +1,15 @@
 package arrow.core
 
-import io.kotest.core.spec.style.StringSpec
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class DeadlockTest : StringSpec({
+class DeadlockTest {
 
-  "classloader should not deadlock Validated initialization" {
-    runBlocking {
-      (0..10).map { i ->
-        GlobalScope.launch {
-          if (i % 2 == 0) {
-            Validated.Invalid(Unit)
-          } else {
-            Validated.Valid(null)
-          }
-        }
-      }.joinAll()
-    }
-  }
-
-  "classloader should not deadlock Either initialization" {
+  @Test fun classLoaderShouldNotDeadlockEither() = runTest {
     runBlocking {
       (0..10).map { i ->
         GlobalScope.launch {
@@ -32,11 +19,11 @@ class DeadlockTest : StringSpec({
             Either.Right(null)
           }
         }
-      }.joinAll()
-    }
+      }
+    }.joinAll()
   }
 
-  "classloader should not deadlock Option initialization" {
+  @Test fun classLoaderShouldNotDeadlockOption() = runTest {
     runBlocking {
       (0..10).map { i ->
         GlobalScope.launch {
@@ -50,7 +37,7 @@ class DeadlockTest : StringSpec({
     }
   }
 
-  "classloader should not deadlock Ior initialization" {
+  @Test fun classLoaderShouldNotDeadlockIor() = runTest {
     runBlocking {
       (0..10).map { i ->
         GlobalScope.launch {
@@ -63,18 +50,4 @@ class DeadlockTest : StringSpec({
       }.joinAll()
     }
   }
-
-  "classloader should not deadlock Eval initialization" {
-    runBlocking {
-      (0..10).map { i ->
-        GlobalScope.launch {
-          if (i % 2 == 0) {
-            Eval.Now(Unit)
-          } else {
-            Eval.Later { null }
-          }
-        }
-      }.joinAll()
-    }
-  }
-})
+}

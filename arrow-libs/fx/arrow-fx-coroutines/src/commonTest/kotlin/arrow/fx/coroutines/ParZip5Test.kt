@@ -1,14 +1,10 @@
-package arrow.fx.coroutines.parZip
+package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
+import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple5
-import arrow.fx.coroutines.Atomic
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.awaitExitCase
-import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.throwable
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -22,9 +18,11 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.test.Test
 
-class ParZip5Test : StringSpec({
-    "parZip 5 runs in parallel" {
+class ParZip5Test {
+    @Test
+    fun parZip5RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -53,18 +51,19 @@ class ParZip5Test : StringSpec({
             modifyGate4.complete(Unit)
           },
           {
-            r.set("$e")
+            r.value = "$e"
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e ->
           Tuple5(_a, _b, _c, _d, _e)
         }
 
-        r.get() shouldBe "$e$d$c$b$a"
+        r.value shouldBe "$e$d$c$b$a"
       }
     }
-
-    "Cancelling parZip 5 cancels all participants" {
+    
+    @Test
+    fun CancellingParZip5CancelsAllParticipants() = runTestUsingDefaultDispatcher {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -99,8 +98,9 @@ class ParZip5Test : StringSpec({
         pd.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pe.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
-
-    "parZip 5 cancels losers if a failure occurs in one of the tasks" {
+    
+    @Test
+    fun parZip5CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTestUsingDefaultDispatcher {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4, 5)),
@@ -134,8 +134,9 @@ class ParZip5Test : StringSpec({
         r should leftException(e)
       }
     }
-
-    "parZip CancellationException on right can cancel rest" {
+    
+    @Test
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
       checkAll(Arb.string(), Arb.int(1..5)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -167,4 +168,3 @@ class ParZip5Test : StringSpec({
       }
     }
   }
-)

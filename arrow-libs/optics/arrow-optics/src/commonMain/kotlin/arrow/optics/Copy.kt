@@ -8,9 +8,9 @@ public annotation class OpticsCopyMarker
 @OpticsCopyMarker
 public interface Copy<A> {
   /**
-   * Changes the value of the element(s) pointed by the [Setter].
+   * Changes the value of the element(s) pointed by the [Traversal].
    */
-  public infix fun <B> Setter<A, B>.set(b: B)
+  public infix fun <B> Traversal<A, B>.set(b: B)
 
   /**
    * Transforms the value of the element(s) pointed by the [Traversal].
@@ -46,7 +46,7 @@ public interface Copy<A> {
 
 // mutable builder of copies
 private class CopyImpl<A>(var current: A): Copy<A> {
-  override fun <B> Setter<A, B>.set(b: B) {
+  override fun <B> Traversal<A, B>.set(b: B) {
     current = this.set(current, b)
   }
   override fun <B> Traversal<A, B>.transform(f: (B) -> B) {

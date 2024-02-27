@@ -43,8 +43,8 @@ val default4: Effect<Nothing, Int> =
 
 val default5: Effect<String, Int> =
   foreign
-    .catch { ex: RuntimeException -> -1 }
-    .catch { ex: java.sql.SQLException -> -2 }
+    .catch { _: RuntimeException -> -1 }
+    .catch { _: java.sql.SQLException -> -2 }
 
 suspend fun java.sql.SQLException.isForeignKeyViolation(): Boolean = true
 

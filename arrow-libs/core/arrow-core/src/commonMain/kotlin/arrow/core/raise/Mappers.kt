@@ -6,8 +6,6 @@ import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Validated
-import arrow.core.ValidatedDeprMsg
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -16,29 +14,10 @@ public suspend fun <Error, A> Effect<Error, A>.toEither(): Either<Error, A> = ei
 /** Run the [EagerEffect] by returning [Either.Right] of [A], or [Either.Left] of [Error]. */
 public fun <Error, A> EagerEffect<Error, A>.toEither(): Either<Error, A> = either { invoke() }
 
-/** Run the [Effect] by returning [Validated.Valid] of [A], or [Validated.Invalid] of [Error]. */
-@Deprecated(ValidatedDeprMsg, ReplaceWith("toEither()"))
-public suspend fun <Error, A> Effect<Error, A>.toValidated(): Validated<Error, A> = fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-/** Run the [EagerEffect] by returning [Validated.Valid] of [A], or [Validated.Invalid] of [Error]. */
-@Deprecated(ValidatedDeprMsg, ReplaceWith("toEither()"))
-public fun <Error, A> EagerEffect<Error, A>.toValidated(): Validated<Error, A> = fold({ Validated.Invalid(it) }) { Validated.Valid(it) }
-
 /** Run the [Effect] by returning [Ior.Right] of [A], or [Ior.Left] of [Error]. */
 public suspend fun <Error, A> Effect<Error, A>.toIor(): Ior<Error, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
 /** Run the [EagerEffect] by returning [Ior.Right] of [A], or [Ior.Left] of [Error]. */
 public fun <Error, A> EagerEffect<Error, A>.toIor(): Ior<Error, A> = fold({ Ior.Left(it) }) { Ior.Right(it) }
-
-@Deprecated(
-  "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
-  ReplaceWith("getOrNull()", "arrow.core.raise.getOrNull")
-)
-public suspend fun <Error, A> Effect<Error, A>.orNull(): A? = getOrElse { null }
-
-@Deprecated(
-  "orNull is being renamed to getOrNull to be more consistent with the Kotlin Standard Library naming",
-  ReplaceWith("getOrNull()", "arrow.core.raise.getOrNull")
-)
-public fun <Error, A> EagerEffect<Error, A>.orNull(): A? = getOrElse { null }
 
 /** Run the [Effect] by returning [A], or `null` if raised with [Error]. */
 public suspend fun <Error, A> Effect<Error, A>.getOrNull(): A? = getOrElse { null }

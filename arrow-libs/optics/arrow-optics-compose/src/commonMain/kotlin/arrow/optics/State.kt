@@ -6,7 +6,7 @@ import androidx.compose.runtime.State
 /**
  * Exposes the value of [this] through the optic.
  */
-public fun <T, A> State<T>.optic(g: Getter<T, A>): State<A> = object : State<A> {
+public fun <T, A> State<T>.optic(g: Lens<T, A>): State<A> = object : State<A> {
   override val value: A
     get() = g.get(this@optic.value)
 }

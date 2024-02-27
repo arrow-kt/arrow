@@ -1,15 +1,15 @@
 package arrow.optics
 
 import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -35,14 +35,14 @@ public typealias Prism<S, A> = PPrism<S, S, A, A>
  * @param A the focus of a [PPrism]
  * @param B the modified focus of a [PPrism]
  */
-public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>, POptionalGetter<S, T, A>, PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
 
   override fun getOrModify(source: S): Either<T, A>
 
   public fun reverseGet(focus: B): T
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
-    getOrNull(source)?.let(map) ?: M.empty()
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
+    getOrNull(source)?.let(map) ?: initial
 
   /**
    * Modify the focus of a [PPrism] with a function
@@ -83,7 +83,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
   /**
    * Create a sum of the [PPrism] and a type [C]
    */
-  override fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
+  public fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> =
     PPrism(
       {
         it.fold(
@@ -92,8 +92,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
       },
       {
         when (it) {
-          is Either.Left -> Either.Left(reverseGet(it.value))
-          is Either.Right -> Either.Right(it.value)
+          is Left -> Left(reverseGet(it.value))
+          is Right -> Right(it.value)
         }
       }
     )
@@ -101,7 +101,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
   /**
    * Create a sum of a type [C] and the [PPrism]
    */
-  override fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
+  public fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> =
     PPrism(
       {
         it.fold(
@@ -117,7 +117,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
   public infix fun <C, D> compose(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
     PPrism(
       getOrModify = { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).mapLeft{ set(s, it) } } },
-      reverseGet = this::reverseGet compose other::reverseGet
+      reverseGet = { reverseGet(other.reverseGet(it)) }
     )
 
   public operator fun <C, D> plus(other: PPrism<in A, out B, out C, in D>): PPrism<S, T, C, D> =
@@ -125,7 +125,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id()
+    public fun <S> id(): Iso<S, S> = PIso.id()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
@@ -145,7 +145,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
      * A [PPrism] that checks for equality with a given value [a]
      */
     public fun <A> only(a: A, eq: (constant: A, other: A) -> Boolean = { aa, b -> aa == b }): Prism<A, Unit> = Prism(
-      getOrModify = { a2 -> (if (eq(a, a2)) Either.Left(a) else Either.Right(Unit)) },
+      getOrModify = { a2 -> (if (eq(a, a2)) Left(a) else Right(Unit)) },
       reverseGet = { a }
     )
 
@@ -155,7 +155,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     @JvmStatic
     public fun <A, B> pSome(): PPrism<Option<A>, Option<B>, A, B> =
       PPrism(
-        getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
+        getOrModify = { option -> option.fold({ Left(None) }, ::Right) },
         reverseGet = ::Some
       )
 
@@ -172,7 +172,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B>, PSetter<S, T, A, B>
     @JvmStatic
     public fun <A> none(): Prism<Option<A>, Unit> =
       Prism(
-        getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
+        getOrModify = { option -> option.fold({ Right(Unit) }, { Left(option) }) },
         reverseGet = { _ -> None }
       )
 

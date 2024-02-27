@@ -30,3 +30,5 @@ val userProcessor: Resource<UserProcessor> = resource {
 val userProcessor2: Resource<UserProcessor> = resource({
   UserProcessor().also { it.start() }
 }) { processor, _ -> processor.shutdown() }
+
+val userProcessor3: Resource<UserProcessor> = ResourceScope::userProcessor

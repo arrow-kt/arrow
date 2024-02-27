@@ -86,6 +86,7 @@ public fun <A> STM.newTArray(xs: Iterable<A>): TArray<A> =
  *     tarr.transform { it + 1 }
  *   }
  *   //sampleEnd
+ *   println("Result $result")
  * }
  * ```
  * <!--- KNIT example-tarray-04.kt -->

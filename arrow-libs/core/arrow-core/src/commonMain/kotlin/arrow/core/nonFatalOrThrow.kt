@@ -17,7 +17,7 @@ package arrow.core
  *         else -> "Hello"
  *    }
  *
- * fun main(args: Array<String>) {
+ * fun main() {
  *   val nonFatal: Either<Throwable, String> =
  *   //sampleStart
  *   try {

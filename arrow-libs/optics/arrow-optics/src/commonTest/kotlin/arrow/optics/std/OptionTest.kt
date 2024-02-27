@@ -8,16 +8,17 @@ import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.option
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
+import kotlin.test.Test
 
-class OptionTest : StringSpec({
+class OptionTest {
 
+  @Test
+  fun someLaws() =
     testLaws(
-      "Prism some - ",
       PrismLaws(
         prism = Prism.some(),
         aGen = Arb.option(Arb.int()),
@@ -26,8 +27,9 @@ class OptionTest : StringSpec({
       )
     )
 
+  @Test
+  fun noneLaws() =
     testLaws(
-      "Prism none - ",
       PrismLaws(
         prism = Prism.none(),
         aGen = Arb.option(Arb.int()),
@@ -36,8 +38,9 @@ class OptionTest : StringSpec({
       )
     )
 
+  @Test
+  fun isoToNullable() =
     testLaws(
-      "Iso option to nullable - ",
       IsoLaws(
         iso = Iso.optionToNullable<Int>().reverse(),
         aGen = Arb.int().orNull(),
@@ -46,8 +49,9 @@ class OptionTest : StringSpec({
       )
     )
 
+  @Test
+  fun isoToEither() =
     testLaws(
-      "Iso option to either - ",
       IsoLaws(
         iso = Iso.optionToEither(),
         aGen = Arb.option(Arb.int()),
@@ -56,4 +60,4 @@ class OptionTest : StringSpec({
       )
     )
 
-})
+}

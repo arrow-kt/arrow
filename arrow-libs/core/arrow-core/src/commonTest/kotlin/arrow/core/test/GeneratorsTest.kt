@@ -1,6 +1,5 @@
 package arrow.core.test
 
-import io.kotest.core.spec.style.FreeSpec
 import io.kotest.inspectors.forAll
 import io.kotest.inspectors.forAtLeastOne
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -15,9 +14,11 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class GeneratorsTest : FreeSpec({
-  "functionAToB: should return same result when invoked multiple times" {
+class GeneratorsTest {
+  @Test fun functionAToBShouldReturnSameResultWhenInvokedMultipleTimes() = runTest {
     checkAll(
       Arb.int(),
       Arb.functionAToB<Int, Int>(Arb.int())
@@ -26,7 +27,7 @@ class GeneratorsTest : FreeSpec({
     }
   }
 
-  "functionAToB: should return some different values" {
+  @Test fun functionAToBShouldReturnSomeDifferentValues() = runTest {
     val a = Arb.int().next(fixedRandom)
     val a2 = Arb.int().next(fixedRandom)
 
@@ -37,7 +38,7 @@ class GeneratorsTest : FreeSpec({
     }.shouldNotBeNull()
   }
 
-  "functionABCToD: should return same result when invoked multiple times" {
+  @Test fun functionABCToDShouldReturnSameResultWhenInvokedMultipleTimes() = runTest {
     checkAll(
       Arb.int(),
       Arb.int(),
@@ -48,7 +49,7 @@ class GeneratorsTest : FreeSpec({
     }
   }
 
-  "functionABCToD: should return some different values" {
+  @Test fun functionABCToDShouldReturnSomeDifferentValues() = runTest {
     val a = Arb.int().next(fixedRandom)
     val a2 = Arb.int().next(fixedRandom)
     val b = Arb.int().next(fixedRandom)
@@ -61,7 +62,7 @@ class GeneratorsTest : FreeSpec({
     }.shouldNotBeNull()
   }
 
-  "Arb.map2: at least one sample should share no keys" {
+  @Test fun arbMap2AtLeastOneSampleShouldShareNoKeys() = runTest {
     val result = givenSamples(
       Arb.map2(
         Arb.int(),
@@ -73,7 +74,7 @@ class GeneratorsTest : FreeSpec({
     result.forAtLeastOne { it.shouldBeZero() }
   }
 
-  "Arb.map2: at least one sample should share some keys" {
+  @Test fun arbMap2AtLeastOneSampleShouldShareSomeKeys() = runTest {
     val result = givenSamples(
       Arb.map2(
         Arb.int(),
@@ -85,7 +86,7 @@ class GeneratorsTest : FreeSpec({
     result.forAtLeastOne { it.shouldBeGreaterThan(0) }
   }
 
-  "Arb.map2: no null values if the arb does not produce nullables" {
+  @Test fun arbMap2NoNullValuesIfTheArbDoesNotProduceNullables() = runTest {
     givenSamples(Arb.map2(Arb.int(), Arb.boolean(), Arb.boolean()))
       .forAll { sample ->
         sample.value.first.values.forAll { it.shouldNotBeNull() }
@@ -93,27 +94,27 @@ class GeneratorsTest : FreeSpec({
       }
   }
 
-  "Arb.map2: can contain null values if the arb produces nullables" {
+  @Test fun arbMap2CanContainNullValuesIfTheArbProducesNullables() = runTest {
     givenSamples(Arb.map2(Arb.int(), Arb.boolean().orNull(), Arb.boolean().orNull()))
       .forAtLeastOne { sample -> sample.value.first.values.forAtLeastOne { it.shouldBeNull() } }
       .forAtLeastOne { sample -> sample.value.second.values.forAtLeastOne { it.shouldBeNull() } }
   }
 
-  "Arb.map3: at least one sample should share no keys" {
+  @Test fun arbMap3AtLeastOneSampleShouldShareNoKeys() = runTest {
     val result = givenSamples(Arb.map3(Arb.int(), Arb.boolean(), Arb.boolean(), Arb.boolean()))
       .map { it.value.first.keys.intersect(it.value.second.keys).size }.toList()
 
     result.forAtLeastOne { it.shouldBeZero() }
   }
 
-  "Arb.map3: at least one sample should share some keys" {
+  @Test fun ArbMap3AtLeastOneSampleShouldShareSomeKeys() = runTest {
     val result = givenSamples(Arb.map3(Arb.int(), Arb.boolean(), Arb.boolean(), Arb.boolean()))
       .map { it.value.first.keys.intersect(it.value.second.keys).size }.toList()
 
     result.forAtLeastOne { it.shouldBeGreaterThan(0) }
   }
 
-  "Arb.map3: no null values if the arb does not produce nullables" {
+  @Test fun arbMap3NoNullValuesIfTheArbDoesNotProduceNullables() = runTest {
     givenSamples(Arb.map3(Arb.int(), Arb.boolean(), Arb.boolean(), Arb.boolean()))
       .forAll { sample ->
         sample.value.first.values.forAll { it.shouldNotBeNull() }
@@ -122,13 +123,13 @@ class GeneratorsTest : FreeSpec({
       }
   }
 
-  "Arb.map3: can contain null values if the arb produces nullables" {
+  @Test fun arbMap3CanContainNullValuesIfTheArbProducesNullables() = runTest {
     givenSamples(Arb.map3(Arb.int(), Arb.boolean().orNull(), Arb.boolean().orNull(), Arb.boolean().orNull()))
       .forAtLeastOne { sample -> sample.value.first.values.forAtLeastOne { it.shouldBeNull() } }
       .forAtLeastOne { sample -> sample.value.second.values.forAtLeastOne { it.shouldBeNull() } }
       .forAtLeastOne { sample -> sample.value.third.values.forAtLeastOne { it.shouldBeNull() } }
   }
-})
+}
 
 private fun <T> givenSamples(arb: Arb<T>, count: Int = 250) =
   arb.generate(fixedRandom).take(count).toList()

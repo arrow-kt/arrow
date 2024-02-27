@@ -6,7 +6,7 @@ import arrow.fx.stm.atomically
 suspend fun main() {
   //sampleStart
   val result = atomically {
-    catch({ throw Throwable() }) { e -> "caught" }
+    catch({ throw Throwable() }) { _ -> "caught" }
   }
   //sampleEnd
   println("Result $result")

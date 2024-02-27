@@ -1,15 +1,14 @@
 // This file was automatically generated from ${file.name} by Knit tool. Do not edit.
 package ${test.package}
 
-import io.kotest.core.spec.style.StringSpec
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class ${test.name} : StringSpec({
+class ${test.name} {
 <#list cases as case>
-  "${case.name}" {
+  @Test fun ${case.knit.name}() = runTest {
     ${case.knit.package}.${case.knit.name}.test()
   }
 
 </#list>
-}) {
-  override fun timeout(): Long = 1000
 }

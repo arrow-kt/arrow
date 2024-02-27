@@ -2,12 +2,9 @@ package arrow.optics
 
 import arrow.optics.test.functionAToB
 import arrow.optics.test.option
-import arrow.optics.test.laws.SetterLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.nonEmptyList
-import arrow.optics.test.sequence
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
@@ -15,28 +12,22 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class TraversalTest : StringSpec({
+class TraversalTest {
 
+  @Test fun traversalListLaws() =
     testLaws(
-      "Traversal list - ",
       TraversalLaws(
         traversal = Traversal.list(),
-        aGen = Arb.list(Arb.int()),
-        bGen = Arb.int(),
-        funcGen = Arb.functionAToB(Arb.int()),
-      ),
-
-      SetterLaws(
-        setter = Traversal.list(),
         aGen = Arb.list(Arb.int()),
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       )
     )
 
+  @Test fun traversalNonEmptyListLaws() =
     testLaws(
-      "Traversal Nel - ",
       TraversalLaws(
         traversal = Traversal.nonEmptyList(),
         aGen = Arb.nonEmptyList(Arb.int()),
@@ -45,19 +36,19 @@ class TraversalTest : StringSpec({
       )
     )
 
+  @Test fun traversalSequenceLaws() =
     testLaws(
-      "Traversal sequence - ",
       TraversalLaws(
         traversal = Traversal.sequence(),
-        aGen = Arb.sequence(Arb.int()),
+        aGen = Arb.list(Arb.int()).map { it.asSequence() },
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
         eq = { a, b -> a.toList() == b.toList() }
       )
     )
 
+  @Test fun traversalMapLaws() =
     testLaws(
-      "Traversal map - ",
       TraversalLaws(
         traversal = Traversal.map(),
         aGen = Arb.map(Arb.int(), Arb.long()),
@@ -66,8 +57,8 @@ class TraversalTest : StringSpec({
       )
     )
 
+  @Test fun traversalOptionLaws() =
     testLaws(
-      "Traversal option - ",
       TraversalLaws(
         traversal = Traversal.option(),
         aGen = Arb.option(Arb.string()),
@@ -76,8 +67,8 @@ class TraversalTest : StringSpec({
       )
     )
 
+  @Test fun traversalStringLaws() =
     testLaws(
-      "Traversal string - ",
       TraversalLaws(
         traversal = Traversal.string(),
         aGen = Arb.string(),
@@ -86,4 +77,4 @@ class TraversalTest : StringSpec({
       )
     )
 
-})
+}

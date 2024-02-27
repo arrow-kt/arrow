@@ -1,6 +1,6 @@
 package arrow.optics.plugin
 
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 // from https://kotlinlang.slack.com/archives/C5UPMM0A0/p1688822411819599
 // and https://github.com/overfullstack/my-lab/blob/master/arrow/src/test/kotlin/ga/overfullstack/optics/OpticsLab.kt

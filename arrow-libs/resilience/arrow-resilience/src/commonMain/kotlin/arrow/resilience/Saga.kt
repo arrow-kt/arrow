@@ -1,7 +1,7 @@
 package arrow.resilience
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.updateAndGet
+import arrow.atomic.Atomic
+import arrow.atomic.updateAndGet
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -84,6 +84,7 @@ public interface SagaScope {
  * By doing so we can guarantee that any transactional like operations made by the [Saga] will
  * guarantee that it results in the correct state.
  */
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <A> saga(noinline block: suspend SagaScope.() -> A): Saga<A> = block
 
 /** Create a lazy [Saga] that will only run when the [Saga] is invoked. */
@@ -119,7 +120,7 @@ public object SagaActionStep
 // Internal implementation of the `saga { }` builder.
 @PublishedApi
 internal class SagaBuilder(
-  private val stack: AtomicRef<List<suspend () -> Unit>> = AtomicRef(emptyList())
+  private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
 ) : SagaScope {
 
   @SagaDSLMarker

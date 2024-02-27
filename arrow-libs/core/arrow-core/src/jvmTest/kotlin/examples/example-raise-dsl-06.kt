@@ -10,6 +10,6 @@ fun test() {
   recover({ raise("failed") }) { str -> str.length } shouldBe 6
 
   either<Int, String> {
-    recover({ raise("failed") }) { str -> raise(-1) }
+    recover({ raise("failed") }) { _ -> raise(-1) }
   } shouldBe Either.Left(-1)
 }

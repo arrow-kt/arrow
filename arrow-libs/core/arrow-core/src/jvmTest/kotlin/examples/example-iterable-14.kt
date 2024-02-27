@@ -8,5 +8,5 @@ fun test() {
    listOf(1, 2, 3, 4).unalign {
      if(it % 2 == 0) it.rightIor()
      else it.leftIor()
-   } shouldBe Pair(listOf(1, 3), listOf(2, 4))
+   } shouldBe Pair(listOf(1, null, 3, null), listOf(null, 2, null, 4))
 }

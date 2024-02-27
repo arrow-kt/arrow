@@ -9,5 +9,5 @@ object Error
 
 val error = eagerEffect<Error, User> { raise(Error) } // Raise(error)
 
-val a = error.mapError<Error, String, User> { error -> "some-failure" } // Raise(some-failure)
+val a = error.mapError<Error, String, User> { _ -> "some-failure" } // Raise(some-failure)
 val b = error.mapError<Error, String, User>(Any::toString) // Raise(Error)
