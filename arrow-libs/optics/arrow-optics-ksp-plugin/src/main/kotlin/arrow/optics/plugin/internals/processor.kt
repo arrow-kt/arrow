@@ -8,6 +8,7 @@ import com.google.devtools.ksp.isAbstract
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSTypeParameter
@@ -119,7 +120,13 @@ internal fun evalAnnotatedClass(
         return null
       }
 
-      val propertyNames = properties
+      val (goodProperties, badProperties) = properties.partition { it.sameInChildren(subclasses) }
+
+      badProperties.forEach {
+        logger.info(it.qualifiedNameOrSimpleName.sealedLensChangedProperties, element)
+      }
+
+      val propertyNames = goodProperties
         .map { it.simpleName.asString() }
 
       val nonConstructorOverrides = subclasses
@@ -133,7 +140,7 @@ internal fun evalAnnotatedClass(
         return null
       }
 
-      properties
+      goodProperties
         .map { it.type.resolve().qualifiedString() }
         .zip(propertyNames) { type, name ->
           Focus(
@@ -150,6 +157,15 @@ internal fun evalAnnotatedClass(
     }
   }
 }
+
+fun KSPropertyDeclaration.sameInChildren(subclasses: Sequence<KSClassDeclaration>): Boolean =
+  subclasses.all { subclass ->
+    val property = subclass.getAllProperties().singleOrNull { it.simpleName == this.simpleName }
+    when (property) {
+      null -> false
+      else -> property.type.resolve() == this.type.resolve()
+    }
+  }
 
 internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLogger): Target =
   when {
