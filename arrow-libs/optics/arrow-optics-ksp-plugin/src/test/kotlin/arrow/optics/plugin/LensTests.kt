@@ -229,4 +229,31 @@ class LensTests {
       |val r = l != null
       """.compilationFails()
   }
+
+  @Test
+  fun `Lens for sealed class property, ignoring changed types`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed interface Base<out T> {
+      |    val prop: T
+      |
+      |    companion object
+      |}
+      |
+      |@optics
+      |data class Child1(override val prop: String) : Base<String> {
+      |    companion object
+      |}
+      |
+      |@optics
+      |data class Child2(override val prop: Int) : Base<Int> {
+      |    companion object
+      |}
+      |
+      |val l: Lens<Base<String>, String> = Base.prop()
+      |val r = l != null
+      """.compilationFails()
+  }
 }
