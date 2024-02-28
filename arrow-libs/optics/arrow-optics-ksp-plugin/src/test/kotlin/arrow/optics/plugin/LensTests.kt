@@ -208,4 +208,25 @@ class LensTests {
       |val r = l != null
       """.compilationFails()
   }
+
+  @Test
+  fun `Lens for sealed class property, ignoring changed nullability`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String?
+      |  
+      |  data class dataChild1(override val property1: String?) : LensSealed()
+      |  data class dataChild2(override val property1: String?, val number: Int) : LensSealed()
+      |  data class dataChild3(override val property1: String, val enabled: Boolean) : LensSealed()
+      |   
+      |  companion object 
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.compilationFails()
+  }
 }
