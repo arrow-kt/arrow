@@ -1,0 +1,160 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Companion</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            Arrow
+                    </a>            </div>
+            <div class="library-version">1.2.3
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-eval:dokkaHtmlPartial/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-eval::arrow.eval/Eval.Companion///PointingToDeclaration//355500211">
+  <div class="breadcrumbs"><a href="../../../index.html">arrow-eval</a><span class="delimiter">/</span><a href="../../index.html">arrow.eval</a><span class="delimiter">/</span><a href="../index.html">Eval</a><span class="delimiter">/</span><span class="current">Companion</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Companion</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Companion</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-eval/src/commonMain/kotlin/arrow/eval/Eval.kt#L67">source</a>)</span></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1915108690%2FFunctions%2F355500211" anchor-label="always" id="1915108690%2FFunctions%2F355500211" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="always.html"><span><span>always</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1915108690%2FFunctions%2F355500211"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="always.html">A</a><span class="token operator">&gt; </span><a href="always.html"><span class="token function">always</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">crossinline </span>f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="always.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-always/index.html">Eval.Always</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="always.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Creates an Eval instance from a function deferring it's evaluation until <code class="lang-kotlin">.value()</code> is invoked recomputing each time <code class="lang-kotlin">.value()</code> is invoked.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1870393136%2FFunctions%2F355500211" anchor-label="defer" id="1870393136%2FFunctions%2F355500211" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="defer.html"><span><span>defer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1870393136%2FFunctions%2F355500211"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="defer.html">A</a><span class="token operator">&gt; </span><a href="defer.html"><span class="token function">defer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">crossinline </span>f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="defer.html">A</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="defer.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="350995361%2FFunctions%2F355500211" anchor-label="later" id="350995361%2FFunctions%2F355500211" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="later.html"><span><span>later</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="350995361%2FFunctions%2F355500211"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="later.html">A</a><span class="token operator">&gt; </span><a href="later.html"><span class="token function">later</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">crossinline </span>f<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="later.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-later/index.html">Eval.Later</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="later.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Creates an Eval instance from a function deferring it's evaluation until <code class="lang-kotlin">.value()</code> is invoked memoizing the computed value.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2109636240%2FFunctions%2F355500211" anchor-label="now" id="2109636240%2FFunctions%2F355500211" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="now.html"><span><span>now</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2109636240%2FFunctions%2F355500211"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="now.html">A</a><span class="token operator">&gt; </span><a href="now.html"><span class="token function">now</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">a<span class="token operator">: </span><a href="now.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="now.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with <code class="lang-kotlin">map</code> and <code class="lang-kotlin">flatMap</code></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1264923589%2FFunctions%2F355500211" anchor-label="raise" id="1264923589%2FFunctions%2F355500211" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-eval:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="raise.html"><span><span>raise</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1264923589%2FFunctions%2F355500211"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html"><span class="token annotation builtin">JvmStatic</span></a></div></div><span class="token keyword"></span><span class="token keyword">fun </span><a href="raise.html"><span class="token function">raise</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">t<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,308 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Collectors</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../index.html">
+                            Arrow
+                    </a>            </div>
+            <div class="library-version">1.2.3
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-collectors:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-collectors:dokkaHtmlPartial/jvmMain">jvm</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-collectors::arrow.collectors/Collectors///PointingToDeclaration//-1214323255">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-collectors</a><span class="delimiter">/</span><a href="../index.html">arrow.collectors</a><span class="delimiter">/</span><span class="current">Collectors</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Collectors</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Collectors</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-collectors/src/commonMain/kotlin/arrow/collectors/Collectors.kt#L10">source</a>)</span></span></div><p class="paragraph">Library of <a href="../-collector/index.html">Collector</a>s.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-717527246%2FProperties%2F-1214323255" anchor-label="length" id="-717527246%2FProperties%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="length.html"><span><span>length</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-717527246%2FProperties%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="length.html">length</a><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Counts the number of elements in the flow.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1302098409%2FProperties%2F-1214323255" anchor-label="sum" id="-1302098409%2FProperties%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sum.html"><span><span>sum</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1302098409%2FProperties%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="sum.html">sum</a><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Sum of all the values in the flow.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-634299591%2FFunctions%2F-1214323255" anchor-label="bestBy" id="-634299591%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="best-by.html"><span>best</span><wbr><span><span>By</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-634299591%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="best-by.html">M</a><span class="token operator">&gt; </span><a href="best-by.html"><span class="token function">bestBy</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">selectNew<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span>old<span class="token operator">: </span><a href="best-by.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span>new<span class="token operator">: </span><a href="best-by.html">M</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="best-by.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="best-by.html">M</a><span class="token operator">?</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns the "best" value from the value.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1220496062%2FFunctions%2F1210261261" anchor-label="concurrentMap" id="-1220496062%2FFunctions%2F1210261261" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../concurrent-map.html"><span>concurrent</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1220496062%2FFunctions%2F1210261261"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-collectors:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../concurrent-map.html">V</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-map.html"><span class="token function">concurrentMap</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../concurrent-map.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html">ConcurrentMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../concurrent-map.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="27627700%2FFunctions%2F1210261261" anchor-label="concurrentMapFromEntries" id="27627700%2FFunctions%2F1210261261" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../concurrent-map-from-entries.html"><span>concurrent</span><wbr><span>Map</span><wbr><span>From</span><wbr><span><span>Entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="27627700%2FFunctions%2F1210261261"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-collectors:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-map-from-entries.html"><span class="token function">concurrentMapFromEntries</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html">ConcurrentMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1284732232%2FFunctions%2F1210261261" anchor-label="concurrentSet" id="1284732232%2FFunctions%2F1210261261" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../concurrent-set.html"><span>concurrent</span><wbr><span><span>Set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1284732232%2FFunctions%2F1210261261"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-collectors:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-set.html">T</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-set.html"><span class="token function">concurrentSet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-set.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../concurrent-set.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a set.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1169848842%2FFunctions%2F-1214323255" anchor-label="constant" id="1169848842%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="constant.html"><span><span>constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1169848842%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="constant.html">R</a><span class="token operator">&gt; </span><a href="constant.html"><span class="token function">constant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="constant.html">R</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="constant.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns always the same value, regardless of the collected flow.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2126339998%2FFunctions%2F-1214323255" anchor-label="intReducer" id="-2126339998%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="int-reducer.html"><span>int</span><wbr><span><span>Reducer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2126339998%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="int-reducer.html"><span class="token function">intReducer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initial<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">combine<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2008309499%2FFunctions%2F1210261261" anchor-label="jvm" id="-2008309499%2FFunctions%2F1210261261" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../jvm.html"><span><span>jvm</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2008309499%2FFunctions%2F1210261261"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-collectors:dokkaHtmlPartial/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../jvm.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../jvm.html">R</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../jvm.html"><span class="token function">jvm</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">collector<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html">Collector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../jvm.html">T</a><span class="token punctuation">, </span><span class="token operator">*</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../jvm.html">R</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../jvm.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../jvm.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Wraps a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html">java.util.stream.Collector</a> to use with <a href="../collect.html">collect</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-433226950%2FFunctions%2F-1214323255" anchor-label="list" id="-433226950%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="list.html"><span><span>list</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-433226950%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="list.html">T</a><span class="token operator">&gt; </span><a href="list.html"><span class="token function">list</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="list.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="list.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a list, in the order in which they are emitted.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1733030874%2FFunctions%2F-1214323255" anchor-label="map" id="-1733030874%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="map.html"><span><span>map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1733030874%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map.html">V</a><span class="token operator">&gt; </span><a href="map.html"><span class="token function">map</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="606582030%2FFunctions%2F-1214323255" anchor-label="mapFromEntries" id="606582030%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="map-from-entries.html"><span>map</span><wbr><span>From</span><wbr><span><span>Entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="606582030%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-from-entries.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map-from-entries.html">V</a><span class="token operator">&gt; </span><a href="map-from-entries.html"><span class="token function">mapFromEntries</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-from-entries.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="map-from-entries.html">K</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1482522645%2FFunctions%2F-1214323255" anchor-label="reducer" id="1482522645%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="reducer.html"><span><span>reducer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1482522645%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token operator">&gt; </span><a href="reducer.html"><span class="token function">reducer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initial<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token punctuation">, </span></span><span class="parameter ">combine<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token punctuation">, </span></span><span class="parameter ">unordered<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="reducer.html">M</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="709085152%2FFunctions%2F-1214323255" anchor-label="set" id="709085152%2FFunctions%2F-1214323255" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-collectors:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-collectors:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set.html"><span><span>set</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="709085152%2FFunctions%2F-1214323255"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">T</a><span class="token operator">&gt; </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">T</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="set.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a set.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

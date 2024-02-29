@@ -41,7 +41,7 @@
 <a class="library-name--link" href="../../../index.html">
                             Arrow
                     </a>            </div>
-            <div class="library-version">1.2.1
+            <div class="library-version">1.2.3
             </div>
         </div>
         <div class="filter-section" id="filter-section">
@@ -358,6 +358,21 @@
               </div>
             </div>
           </div>
+<a data-name="298058817%2FFunctions%2F601698448" anchor-label="toIorNel" id="298058817%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../to-ior-nel.html"><span>to</span><wbr><span>Ior</span><wbr><span><span>Nel</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="298058817%2FFunctions%2F601698448"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../to-ior-nel.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../to-ior-nel.html">B</a><span class="token operator">&gt; </span><a href="index.html">Ior</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../to-ior-nel.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../to-ior-nel.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../to-ior-nel.html"><span class="token function">toIorNel</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-ior-nel/index.html">IorNel</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../to-ior-nel.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../to-ior-nel.html">B</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Given an <a href="index.html">Ior</a> with an error type <a href="../to-ior-nel.html">A</a>, returns an <a href="../-ior-nel/index.html">IorNel</a> with the same error type. Wraps the original error in a <a href="../-non-empty-list/index.html">NonEmptyList</a> so that it can be combined with an <a href="../-ior-nel/index.html">IorNel</a> in a Raise DSL which operates on one.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="-706964198%2FFunctions%2F601698448" anchor-label="toPair" id="-706964198%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
           <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
@@ -403,28 +418,13 @@
               </div>
             </div>
           </div>
-<a data-name="1240113388%2FFunctions%2F601698448" anchor-label="widen" id="1240113388%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="../widen.html"><span><span>widen</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1240113388%2FFunctions%2F601698448"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../widen.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../widen.html">C</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../widen.html">B</a><span class="token operator"> : </span><a href="../widen.html">C</a><span class="token operator">&gt; </span><a href="index.html">Ior</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../widen.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../widen.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../widen.html"><span class="token function">widen</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Ior</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../widen.html">A</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../widen.html">C</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Given <a href="../widen.html">B</a> is a sub type of <a href="../widen.html">C</a>, re-type this value from Ior<a, b> to Ior<a, b></a,></a,></p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
       <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
             </div>
         </div>
