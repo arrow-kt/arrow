@@ -169,6 +169,7 @@ class AutoCloseTest {
     closed.receive() shouldBe res3
     closed.receive() shouldBe res2
     closed.receive() shouldBe res1
+    closed.cancel()
   }
 
   @OptIn(ExperimentalStdlibApi::class)
