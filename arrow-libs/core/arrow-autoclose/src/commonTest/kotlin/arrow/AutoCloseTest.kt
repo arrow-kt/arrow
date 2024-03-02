@@ -4,6 +4,8 @@ import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
@@ -132,6 +134,41 @@ class AutoCloseTest {
 
     wasActive.await() shouldBe true
     res.isActive() shouldBe false
+  }
+
+  @Test
+  fun closeInReversedOrder() = runTest {
+    val res1 = Resource()
+    val res2 = Resource()
+    val res3 = Resource()
+
+    val wasActive = Channel<Boolean>(Channel.UNLIMITED)
+    val closed = Channel<Resource>(Channel.UNLIMITED)
+
+    autoCloseScope {
+      val r1 = autoClose({ res1 }) { r, _ ->
+        closed.trySend(r).getOrThrow()
+        r.shutdown()
+      }
+      val r2 = autoClose({ res2 }) { r, _ ->
+        closed.trySend(r).getOrThrow()
+        r.shutdown()
+      }
+      val r3 = autoClose({ res3 }) { r, _ ->
+        closed.trySend(r).getOrThrow()
+        r.shutdown()
+      }
+
+      wasActive.trySend(r1.isActive()).getOrThrow()
+      wasActive.trySend(r2.isActive()).getOrThrow()
+      wasActive.trySend(r3.isActive()).getOrThrow()
+      wasActive.close()
+    }
+
+    wasActive.toList() shouldBe listOf(true, true, true)
+    closed.receive() shouldBe res3
+    closed.receive() shouldBe res2
+    closed.receive() shouldBe res1
   }
 
   @OptIn(ExperimentalStdlibApi::class)
