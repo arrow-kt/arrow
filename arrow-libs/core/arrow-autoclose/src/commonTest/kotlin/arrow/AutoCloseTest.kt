@@ -78,7 +78,7 @@ class AutoCloseTest {
     }
 
     e shouldBe error
-    e.suppressedExceptions shouldBe listOf(error2, error3)
+    e.suppressedExceptions shouldBe listOf(error3, error2)
     promise.await() shouldBe error
     wasActive.await() shouldBe true
     res.isActive() shouldBe false
