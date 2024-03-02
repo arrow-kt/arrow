@@ -10,6 +10,7 @@ import arrow.typeclasses.SemigroupDeprecation
 import arrow.typeclasses.combine
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmSynthetic
 import kotlin.collections.unzip as stdlibUnzip
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -153,48 +154,43 @@ public typealias Nel<A> = NonEmptyList<A>
  * - `a.zip(b, c) { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `zip`
  *
  */
-public class NonEmptyList<out A>(
-  public override val head: A,
-  public val tail: List<A>
+public class NonEmptyList<out A> private constructor(
+  public val all: List<A>,
 ) : AbstractList<A>(), NonEmptyCollection<A> {
+  public constructor(head: A, tail: Iterable<A>) : this(listOf(head) + tail)
 
-  private constructor(list: List<A>) : this(list[0], list.drop(1))
-
-  override val size: Int =
-    1 + tail.size
-
-  public val all: List<A>
-    get() = toList()
+  override val size: Int get() = all.size
 
   public override operator fun get(index: Int): A {
     if (index < 0 || index >= size) throw IndexOutOfBoundsException("$index is not in 1..${size - 1}")
-    return if (index == 0) head else tail[index - 1]
+    return all[index]
   }
 
   override fun isEmpty(): Boolean = false
 
-  public fun toList(): List<A> = listOf(head) + tail
+  override val head: A get() = all[0]
 
-  override fun lastOrNull(): A = when {
-    tail.isNotEmpty() -> tail.last()
-    else -> head
-  }
+  public val tail: List<A> = all.subList(1, all.size)
+
+  public fun toList(): List<A> = all.toList()
+
+  override fun lastOrNull(): A = all.last()
 
   @Suppress("OVERRIDE_BY_INLINE")
   public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
-    NonEmptyList(transform(head), tail.map(transform))
+    unsafeOf(all.map(transform))
 
   @Suppress("OVERRIDE_BY_INLINE")
   public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
-    NonEmptyList(transform(0, head), tail.mapIndexed { ix, e -> transform(ix + 1, e) })
+    unsafeOf(all.mapIndexed(transform))
 
   @Suppress("OVERRIDE_BY_INLINE")
   public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
-    transform(head).toNonEmptyList() + tail.flatMap(transform)
+    unsafeOf(all.flatMap(transform))
 
   @Suppress("OVERRIDE_BY_INLINE")
   public override inline fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
-    all.distinctBy(selector).toNonEmptyListOrNull()!!
+    unsafeOf(all.distinctBy(selector))
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
     this + l.all
@@ -205,8 +201,8 @@ public class NonEmptyList<out A>(
   public override operator fun plus(element: @UnsafeVariance A): NonEmptyList<A> =
     NonEmptyList(all + element)
 
-  public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
-    this.tail.fold(f(b, this.head), f)
+  public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B = 
+    all.fold(b, f)
 
   public fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> {
     val buf = mutableListOf<B>()
@@ -234,7 +230,7 @@ public class NonEmptyList<out A>(
     "NonEmptyList(${all.joinToString()})"
 
   public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
-    NonEmptyList(Ior.Both(head, b.head), tail.align(b.tail))
+    NonEmptyList(all.align(b.all))
 
   @Deprecated(SemigroupDeprecation, ReplaceWith("padZip(b, ::identity, ::identity, {a1, a2 -> a1 + a2})"))
   public fun salign(SA: Semigroup<@UnsafeVariance A>, b: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
@@ -244,9 +240,15 @@ public class NonEmptyList<out A>(
     padZip(other, { it to null }, { null to it }, { a, b -> a to b })
 
   public inline fun <B, C> padZip(other: NonEmptyList<B>, left: (A) -> C, right: (B) -> C, both: (A, B) -> C): NonEmptyList<C> =
-    NonEmptyList(both(head, other.head), tail.padZip(other.tail, left, right, both))
+    unsafeOf(all.padZip(other.all, left, right, both))
 
   public companion object {
+    /**
+     * Used in public inline functions.
+     */
+    @PublishedApi
+    @JvmSynthetic
+    internal fun <A> unsafeOf(elements: List<A>): NonEmptyList<A> = NonEmptyList(elements)
 
     @Deprecated(
       "Use toNonEmptyListOrNull instead",
@@ -283,20 +285,14 @@ public class NonEmptyList<out A>(
     b: NonEmptyList<B>,
     map: (A, B) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head),
-      tail.zip(b.tail, map)
-    )
+    unsafeOf(all.zip(b.all, map))
 
   public inline fun <B, C, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     map: (A, B, C) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head),
-      tail.zip(b.tail, c.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, map))
 
   public inline fun <B, C, D, Z> zip(
     b: NonEmptyList<B>,
@@ -304,10 +300,7 @@ public class NonEmptyList<out A>(
     d: NonEmptyList<D>,
     map: (A, B, C, D) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head),
-      tail.zip(b.tail, c.tail, d.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, map))
 
   public inline fun <B, C, D, E, Z> zip(
     b: NonEmptyList<B>,
@@ -316,10 +309,7 @@ public class NonEmptyList<out A>(
     e: NonEmptyList<E>,
     map: (A, B, C, D, E) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, e.all, map))
 
   public inline fun <B, C, D, E, F, Z> zip(
     b: NonEmptyList<B>,
@@ -329,10 +319,7 @@ public class NonEmptyList<out A>(
     f: NonEmptyList<F>,
     map: (A, B, C, D, E, F) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, e.all, f.all, map))
 
   public inline fun <B, C, D, E, F, G, Z> zip(
     b: NonEmptyList<B>,
@@ -343,10 +330,7 @@ public class NonEmptyList<out A>(
     g: NonEmptyList<G>,
     map: (A, B, C, D, E, F, G) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, map))
 
   public inline fun <B, C, D, E, F, G, H, Z> zip(
     b: NonEmptyList<B>,
@@ -358,10 +342,7 @@ public class NonEmptyList<out A>(
     h: NonEmptyList<H>,
     map: (A, B, C, D, E, F, G, H) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, map))
 
   public inline fun <B, C, D, E, F, G, H, I, Z> zip(
     b: NonEmptyList<B>,
@@ -374,10 +355,7 @@ public class NonEmptyList<out A>(
     i: NonEmptyList<I>,
     map: (A, B, C, D, E, F, G, H, I) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, map))
 
   public inline fun <B, C, D, E, F, G, H, I, J, Z> zip(
     b: NonEmptyList<B>,
@@ -391,10 +369,7 @@ public class NonEmptyList<out A>(
     j: NonEmptyList<J>,
     map: (A, B, C, D, E, F, G, H, I, J) -> Z
   ): NonEmptyList<Z> =
-    NonEmptyList(
-      map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head),
-      tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail, map)
-    )
+    unsafeOf(all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, map))
 }
 
 public fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
@@ -433,7 +408,8 @@ public fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyL
   "Traverse for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
   ReplaceWith(
     "let<NonEmptyList<A>, Either<E, NonEmptyList<B>>> { nel -> either<E, NonEmptyList<B>> { nel.map<A, B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.either")
+    "arrow.core.raise.either"
+  )
 )
 public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
   traverse(f)
@@ -442,7 +418,8 @@ public inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B
   "Traverse for Either is being deprecated in favor of Either DSL + NonEmptyList.map.\n$NicheAPI",
   ReplaceWith(
     "let<NonEmptyList<A>, Either<E, NonEmptyList<B>>> { nel -> either<E, NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.either")
+    "arrow.core.raise.either"
+  )
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -526,7 +503,8 @@ public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
   "Traverse for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
   ReplaceWith(
     "let<NonEmptyList<A>, Option<NonEmptyList<B>>> { nel -> option<NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.option")
+    "arrow.core.raise.option"
+  )
 )
 public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Option<NonEmptyList<B>> =
   traverse(f)
@@ -535,7 +513,8 @@ public inline fun <A, B> NonEmptyList<A>.traverseOption(f: (A) -> Option<B>): Op
   "Traverse for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
   ReplaceWith(
     "let<NonEmptyList<A>, Option<NonEmptyList<B>>> { nel -> option<NonEmptyList<B>> { nel.map<B> { f(it).bind<B>() } } }",
-    "arrow.core.raise.option")
+    "arrow.core.raise.option"
+  )
 )
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
@@ -546,7 +525,8 @@ public inline fun <A, B> NonEmptyList<A>.traverse(f: (A) -> Option<B>): Option<N
   "Sequence for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
   ReplaceWith(
     "option<NonEmptyList<A>> { this.map<A> { it.bind<A>() } }",
-    "arrow.core.raise.option")
+    "arrow.core.raise.option"
+  )
 )
 public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>> =
   sequence()
@@ -555,7 +535,8 @@ public fun <A> NonEmptyList<Option<A>>.sequenceOption(): Option<NonEmptyList<A>>
   "Sequence for Option is being deprecated in favor of Option DSL + NonEmptyList.map.\\n$NicheAPI",
   ReplaceWith(
     "option<NonEmptyList<A>> { this.map<A> { it.bind<A>() } }",
-    "arrow.core.raise.option")
+    "arrow.core.raise.option"
+  )
 )
 public fun <A> NonEmptyList<Option<A>>.sequence(): Option<NonEmptyList<A>> =
   traverse(::identity)
