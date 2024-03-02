@@ -1,13 +1,14 @@
 package arrow.core
 
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmSynthetic
 
 @JvmInline
 public value class NonEmptySet<out A> private constructor(
   @PublishedApi internal val elements: Set<A>
 ) : Set<A> by elements, NonEmptyCollection<A> {
 
-  public constructor(first: A, rest: Set<A>) : this(setOf(first) + rest)
+  public constructor(first: A, rest: Iterable<A>) : this(setOf(first) + rest)
 
   public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptySet<A> =
     NonEmptySet(this.elements + elements)
@@ -49,15 +50,21 @@ public value class NonEmptySet<out A> private constructor(
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =
     elements.hashCode()
+
+  internal companion object {
+    @JvmSynthetic
+    internal inline fun <A> unsafeOf(iterator: Iterator<A>): NonEmptySet<A> =
+      NonEmptySet(Iterable { iterator }.toSet())
+  }
 }
 
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
-  NonEmptySet(first, rest.toSet())
+  NonEmptySet(first, rest.asList())
 
 public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
   val iter = iterator()
   if (!iter.hasNext()) return null
-  return NonEmptySet(iter.next(), Iterable { iter }.toSet())
+  return NonEmptySet.unsafeOf(iter)
 }
 
 public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
