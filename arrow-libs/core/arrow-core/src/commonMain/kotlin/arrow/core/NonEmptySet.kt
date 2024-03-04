@@ -7,7 +7,7 @@ public value class NonEmptySet<out A> private constructor(
   @PublishedApi internal val elements: Set<A>
 ) : Set<A> by elements, NonEmptyCollection<A> {
 
-  public constructor(first: A, rest: Set<A>) : this(setOf(first) + rest)
+  public constructor(first: A, rest: Iterable<A>) : this(setOf(first) + rest)
 
   public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptySet<A> =
     NonEmptySet(this.elements + elements)
@@ -43,7 +43,7 @@ public value class NonEmptySet<out A> private constructor(
   public override fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
     NonEmptyList(elements.flatMap(transform))
 
-  public override fun <B> mapIndexed(transform: (index:Int, A) -> B): NonEmptyList<B> =
+  public override fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
     NonEmptyList(elements.mapIndexed(transform))
 
   override fun <B> zip(other: NonEmptyCollection<B>): NonEmptyList<Pair<A, B>> =
