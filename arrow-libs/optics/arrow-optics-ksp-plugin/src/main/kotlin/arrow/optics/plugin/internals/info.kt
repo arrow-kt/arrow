@@ -23,4 +23,3 @@ val String.sealedLensConstructorOverridesOnly
       |                                       ^
       |To generate Lens for a sealed class make sure all children override target properties in constructors.
     """.trimMargin()
-
