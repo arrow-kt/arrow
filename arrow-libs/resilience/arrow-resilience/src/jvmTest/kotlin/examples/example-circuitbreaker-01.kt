@@ -5,9 +5,7 @@ import arrow.core.Either
 import arrow.resilience.CircuitBreaker
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
 suspend fun main(): Unit {
   val circuitBreaker = CircuitBreaker(
     resetTimeout = 2.seconds,

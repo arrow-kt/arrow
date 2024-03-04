@@ -15,9 +15,9 @@ data class User(val username: String, val email: Option<String>) {
   }
 }
 
-fun main(args: Array<String>) {
+fun main() {
   val original = User("arrow-user", None)
   val set = User.email.set(original, "arRoW-UsEr@arrow-Kt.IO")
-  val modified = User.email.modify(set, String::toLowerCase)
+  val modified = User.email.modify(set, String::lowercase)
   println("original: $original, set: $set, modified: $modified")
 }

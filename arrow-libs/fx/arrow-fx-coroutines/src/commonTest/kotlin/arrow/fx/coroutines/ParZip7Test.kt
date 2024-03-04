@@ -1,14 +1,10 @@
-package arrow.fx.coroutines.parZip
+package arrow.fx.coroutines
 
+import arrow.atomic.Atomic
+import arrow.atomic.update
+import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple7
-import arrow.fx.coroutines.Atomic
-import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.awaitExitCase
-import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.parZip
-import arrow.fx.coroutines.throwable
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -22,9 +18,11 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.test.Test
 
-class ParZip7Test : StringSpec({
-    "parZip 7 runs in parallel" {
+class ParZip7Test {
+    @Test
+    fun parZip7RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
@@ -65,18 +63,19 @@ class ParZip7Test : StringSpec({
             modifyGate6.complete(Unit)
           },
           {
-            r.set("$g")
+            r.value = "$g"
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e, _f, _g ->
           Tuple7(_a, _b, _c, _d, _e, _f, _g)
         }
 
-        r.get() shouldBe "$g$f$e$d$c$b$a"
+        r.value shouldBe "$g$f$e$d$c$b$a"
       }
     }
-
-    "Cancelling parZip 7 cancels all participants" {
+    
+    @Test
+    fun CancellingParZip7CancelsAllParticipants() = runTestUsingDefaultDispatcher {
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()
@@ -111,8 +110,9 @@ class ParZip7Test : StringSpec({
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
         pg.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
-
-    "parZip 7 cancels losers if a failure occurs in one of the tasks" {
+    
+    @Test
+    fun parZip7CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTestUsingDefaultDispatcher {
       checkAll(
         Arb.throwable(),
         Arb.element(listOf(1, 2, 3, 4, 5, 6, 7))
@@ -155,8 +155,9 @@ class ParZip7Test : StringSpec({
         r should leftException(e)
       }
     }
-
-    "parZip CancellationException on right can cancel rest" {
+    
+    @Test
+    fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
       checkAll(Arb.string(), Arb.int(1..7)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
@@ -195,5 +196,4 @@ class ParZip7Test : StringSpec({
         pf.await().shouldBeTypeOf<ExitCase.Cancelled>()
       }
     }
-  }
-)
+}

@@ -20,11 +20,11 @@ import kotlin.coroutines.EmptyCoroutineContext
  * ```kotlin
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
- * import kotlinx.coroutines.suspendCancellableCoroutine
+ * import kotlinx.coroutines.awaitCancellation
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
- *     guaranteeCase({ never() }) { exitCase ->
+ *     guaranteeCase({ awaitCancellation() }) { exitCase ->
  *       println("I can never win the race. Finished with $exitCase.")
  *     }
  *
@@ -62,11 +62,11 @@ public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.()
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
  * import kotlinx.coroutines.Dispatchers
- * import kotlinx.coroutines.suspendCancellableCoroutine
+ * import kotlinx.coroutines.awaitCancellation
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
- *     guaranteeCase({ never() }) { exitCase ->
+ *     guaranteeCase({ awaitCancellation() }) { exitCase ->
  *       println("I can never win the race. Finished with $exitCase.")
  *     }
  *

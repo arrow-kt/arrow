@@ -4,8 +4,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidDeprecation
 import kotlin.js.JsName
 import kotlin.jvm.JvmStatic
 
@@ -573,7 +571,3 @@ public fun <A, B> Eval<A>.replicate(n: Int, initial: () -> B, combine: (A, B) ->
 
 public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   replicate(n, { emptyList() }) { x, xs -> listOf(x) + xs }
-
-@Deprecated(MonoidDeprecation, ReplaceWith("replicate(n, MA::empty) { x, xs -> MA.run { x + xs } }", "arrow.eval.replicate"))
-public fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> =
-  replicate(n, MA::empty) { x, xs -> MA.run { x + xs } }

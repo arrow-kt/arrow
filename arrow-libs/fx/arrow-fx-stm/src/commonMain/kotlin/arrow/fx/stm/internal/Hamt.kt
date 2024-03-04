@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package arrow.fx.stm.internal
 
 import arrow.fx.stm.TVar
@@ -22,7 +24,7 @@ public inline fun <A> STM.lookupHamtWithHash(hmt: Hamt<A>, hash: Int, test: (A) 
     val branches = hamt.branches.read()
     when (val branch = branches[branchInd]) {
       null -> return null
-      is Branch.Leaf -> return@lookupHamtWithHash (branch.value as Array<A>).find(test)
+      is Branch.Leaf -> return (branch.value as Array<A>).find(test)
       is Branch.Branches -> {
         depth = depth.nextDepth()
         hamt = branch.sub

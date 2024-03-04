@@ -4,23 +4,23 @@ import arrow.optics.Iso
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.testLaws
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.set
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class MapTest : StringSpec({
+class MapTest {
 
-    testLaws(
-      IsoLaws(
-        iso = Iso.mapToSet(),
-        aGen = Arb.map(Arb.long(), Arb.constant(Unit)),
-        bGen = Arb.set(Arb.long()),
-        funcGen = Arb.functionAToB(Arb.set(Arb.long())),
-      )
+  @Test
+  fun mapToSetLaws() = testLaws(
+    IsoLaws(
+      iso = Iso.mapToSet(),
+      aGen = Arb.map(Arb.string(), Arb.constant(Unit), maxSize = 20),
+      bGen = Arb.set(Arb.string(), range = 0 .. 20),
+      funcGen = Arb.functionAToB(Arb.set(Arb.string(), range = 0 .. 20)),
     )
+  )
 
-})
+}

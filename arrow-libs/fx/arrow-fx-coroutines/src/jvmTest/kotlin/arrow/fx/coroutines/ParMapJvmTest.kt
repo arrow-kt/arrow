@@ -1,26 +1,26 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlin.test.Test
 
-class ParMapJvmTest : StringSpec({
-  "parMap runs on provided context" { // 100 is same default length as Arb.list
+class ParMapJvmTest {
+  @Test fun parMapRunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
-        (0 until i).parMap(ctx) { Thread.currentThread().name }
+      val res = resourceScope {
+        (0 until i).parMap(single()) { Thread.currentThread().name }
       }
       res.forEach { it shouldStartWith "single" }
     }
   }
 
-  "parMap(concurrency = 3) runs on provided context" {
+  @Test fun parMapConcurrency3RunsOnProvidedContext() = runTestUsingDefaultDispatcher {
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
-        (0 until i).parMap(ctx, concurrency = 3) {
+      val res = resourceScope {
+        (0 until i).parMap(single(), concurrency = 3) {
           Thread.currentThread().name
         }
       }
@@ -28,10 +28,10 @@ class ParMapJvmTest : StringSpec({
     }
   }
 
-  "parMapOrAccumulate(combine = emptyError) runs on provided context" { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateCombineEmptyErrorRunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
-        (0 until i).parMapOrAccumulate<Nothing, Int, String>(ctx, combine = emptyError) { Thread.currentThread().name }
+      val res = resourceScope {
+        (0 until i).parMapOrAccumulate<Nothing, Int, String>(single(), combine = emptyError) { Thread.currentThread().name }
       }
       res.fold(
         { fail("Expected Right but found $res") },
@@ -40,11 +40,11 @@ class ParMapJvmTest : StringSpec({
     }
   }
 
-  "parMapOrAccumulate(combine = emptyError, concurrency = 3) runs on provided context" { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateCombineEmptyErrorConcurrency3RunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
+      val res = resourceScope {
         (0 until i).parMapOrAccumulate<Nothing, Int, String>(
-          ctx,
+          single(),
           combine = emptyError,
           concurrency = 3
         ) { Thread.currentThread().name }
@@ -56,10 +56,10 @@ class ParMapJvmTest : StringSpec({
     }
   }
 
-  "parMapOrAccumulate runs on provided context" { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateRunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
-        (0 until i).parMapOrAccumulate<Nothing, Int, String>(ctx) {
+      val res = resourceScope {
+        (0 until i).parMapOrAccumulate<Nothing, Int, String>(single()) {
           Thread.currentThread().name
         }
       }
@@ -70,10 +70,11 @@ class ParMapJvmTest : StringSpec({
     }
   }
 
-  "parMapOrAccumulate(concurrency = 3) runs on provided context" { // 100 is same default length as Arb.list
+  @Test fun parMapOrAccumulateConcurrency3RunsOnProvidedContext() = runTestUsingDefaultDispatcher { // 100 is same default length as Arb.list
     checkAll(Arb.int(min = Int.MIN_VALUE, max = 100)) { i ->
-      val res = single.use { ctx ->
-        (0 until i).parMapOrAccumulate<Nothing, Int, String>(ctx, concurrency = 3) {
+
+      val res = resourceScope {
+        (0 until i).parMapOrAccumulate<Nothing, Int, String>(single(), concurrency = 3) {
           Thread.currentThread().name
         }
       }
@@ -83,7 +84,9 @@ class ParMapJvmTest : StringSpec({
       )
     }
   }
-})
+}
 
 private val emptyError: (Nothing, Nothing) -> Nothing =
   { _, _ -> throw AssertionError("Should not be called") }
+
+suspend fun ResourceScope.single() = singleThreadContext("single")

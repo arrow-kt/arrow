@@ -1,6 +1,6 @@
 package arrow.optics.plugin
 
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class OptionalTests {
 
@@ -14,8 +14,9 @@ class OptionalTests {
       |  val field1: String?
       |) { companion object }
       |
-      |val i: Optional<OptionalData, String> = OptionalData.field1
-      |val r = i != null
+      |val i: Lens<OptionalData, String?> = OptionalData.field1
+      |val j: Optional<OptionalData, String> = OptionalData.field1.notNull
+      |val r = i != null && j != null
       """.evals("r" to true)
   }
 
@@ -29,8 +30,9 @@ class OptionalTests {
       |  val field1: A?
       |) { companion object }
       |
-      |val i: Optional<OptionalData<String>, String> = OptionalData.field1()
-      |val r = i != null
+      |val i: Lens<OptionalData<String>, String?> = OptionalData.field1()
+      |val j: Optional<OptionalData<String>, String> = OptionalData.field1<String>().notNull
+      |val r = i != null && j != null
       """.evals("r" to true)
   }
 
@@ -45,8 +47,9 @@ class OptionalTests {
       |  companion object
       |}
       |
-      |val i: Optional<OptionalSecondaryConstructor, String> = OptionalSecondaryConstructor.fieldString
-      |val r = i != null
+      |val i: Lens<OptionalSecondaryConstructor, String?> = OptionalSecondaryConstructor.fieldString
+      |val j: Optional<OptionalSecondaryConstructor, String> = OptionalSecondaryConstructor.fieldString.notNull
+      |val r = i != null && j != null
       """.evals("r" to true)
   }
 }

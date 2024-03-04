@@ -4,11 +4,11 @@ package arrow.fx.coroutines.examples.exampleRace202
 import arrow.core.Either
 import arrow.fx.coroutines.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.awaitCancellation
 
 suspend fun main(): Unit {
   suspend fun loser(): Int =
-    guaranteeCase({ never() }) { exitCase ->
+    guaranteeCase({ awaitCancellation() }) { exitCase ->
       println("I can never win the race. Finished with $exitCase.")
     }
 

@@ -6,8 +6,6 @@ import arrow.core.merge
 import arrow.core.none
 import arrow.core.test.either
 import arrow.core.toOption
-import arrow.core.raise.toOption
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.constant
@@ -17,89 +15,77 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
+import kotlin.test.Test
+import kotlinx.coroutines.test.runTest
 
-class MappersSpec : StringSpec({
-  "effect - toEither" {
+class MappersSpec {
+  @Test fun effectToEither() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       effect { a.bind() }.toEither() shouldBe a
     }
   }
 
-  "eagerEffect - toEither" {
+  @Test fun eagerEffectToEither() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       eagerEffect { a.bind() }.toEither() shouldBe a
     }
   }
 
-  "effect - toValidated" {
-    checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
-      effect { a.bind() }.toValidated() shouldBe a.toValidated()
-    }
-  }
-
-  "eagerEffect - toValidated" {
-    checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
-      eagerEffect { a.bind() }.toValidated() shouldBe a.toValidated()
-    }
-  }
-
-  "effect - toIor" {
+  @Test fun effectToIor() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       effect { a.bind() }.toIor() shouldBe a.fold({ Ior.Left(it) }, { Ior.Right(it) })
     }
   }
 
-  "eagerEffect - toIor" {
+  @Test fun eagerEffectToIor() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       eagerEffect { a.bind() }.toIor() shouldBe a.fold({ Ior.Left(it) }, { Ior.Right(it) })
     }
   }
 
-  "effect - getOrNull" {
+  @Test fun effectGetOrNull() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
-      effect { a.bind() }.orNull() shouldBe a.getOrNull()
       effect { a.bind() }.getOrNull() shouldBe a.getOrNull()
     }
   }
 
-  "eagerEffect - getOrNull" {
+  @Test fun eagerEffectGetOrNull() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
-      eagerEffect { a.bind() }.orNull() shouldBe a.getOrNull()
       eagerEffect { a.bind() }.getOrNull() shouldBe a.getOrNull()
     }
   }
 
-  "effect - toOption { none() }" {
+  @Test fun effectToOptionNone() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       effect { a.bind() }.toOption { none() } shouldBe a.getOrNull().toOption()
     }
   }
 
-  "eagerEffect - toOption { none() }" {
+  @Test fun eagerEffectToOptionNone() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       eagerEffect { a.bind() }.toOption { none() } shouldBe a.getOrNull().toOption()
     }
   }
 
-  "effect - toOption" {
+  @Test fun effectToOption() = runTest {
     checkAll(Arb.either(Arb.constant(None), Arb.string())) { a ->
       effect { a.bind() }.toOption() shouldBe a.getOrNull().toOption()
     }
   }
 
-  "eagerEffect - toOption" {
+  @Test fun eagerEffectToOption() = runTest {
     checkAll(Arb.either(Arb.constant(None), Arb.string())) { a ->
       eagerEffect { a.bind() }.toOption() shouldBe a.getOrNull().toOption()
     }
   }
 
-  "effect - toResult { }" {
+  @Test fun effectToResultWithBlock() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       effect { a.bind() }.toResult { success(it) } shouldBe a.fold({ success(it) }, { success(it) })
     }
   }
 
-  "eagerEffect - toResult { }" {
+  @Test fun eagerEffectToResultWithBlock() = runTest {
     checkAll(Arb.either(Arb.int(), Arb.string())) { a ->
       eagerEffect { a.bind() }.toResult { success(it) } shouldBe a.fold({ success(it) }, { success(it) })
     }
@@ -107,47 +93,47 @@ class MappersSpec : StringSpec({
 
   val boom = RuntimeException("Boom!")
 
-  "effect - toResult { } - exception" {
+  @Test fun effectToResultWithBlockException() = runTest {
     effect<Int, String> { throw boom }.toResult { success(it) } shouldBe failure(boom)
   }
 
-  "eagerEffect - toResult { } - exception" {
+  @Test fun eagerEffectToResultWithBlockException() = runTest {
     checkAll(Arb.string()) { a ->
       eagerEffect<Int, String> { throw boom }.toResult { success(it) } shouldBe failure(boom)
     }
   }
 
-  "effect - toResult()" {
+  @Test fun effectToResult() = runTest {
     checkAll(Arb.either(Arb.string().map { RuntimeException(it) }, Arb.string())) { a ->
       effect { a.bind() }.toResult() shouldBe a.fold({ failure(it) }, { success(it) })
     }
   }
 
-  "eagerEffect - toResult()" {
+  @Test fun eagerEffectToResult() = runTest {
     checkAll(Arb.either(Arb.string().map { RuntimeException(it) }, Arb.string())) { a ->
       eagerEffect { a.bind() }.toResult() shouldBe a.fold({ failure(it) }, { success(it) })
     }
   }
 
-  "effect - toResult() - exception" {
+  @Test fun effectToResultException() = runTest {
     effect<Throwable, String> { throw boom }.toResult() shouldBe failure(boom)
   }
 
-  "eagerEffect - toResult() - exception" {
+  @Test fun eagerEffectToResultException() = runTest {
     checkAll(Arb.string()) { a ->
       eagerEffect<Throwable, String> { throw boom }.toResult() shouldBe failure(boom)
     }
   }
 
-  "effect - merge" {
+  @Test fun effectMerge() = runTest {
     checkAll(Arb.either(Arb.string(), Arb.string())) { a ->
       effect { a.bind() }.merge() shouldBe a.merge()
     }
   }
 
-  "eagerEffect - merge" {
+  @Test fun eagerEffectMerge() = runTest {
     checkAll(Arb.either(Arb.string(), Arb.string())) { a ->
       eagerEffect { a.bind() }.merge() shouldBe a.merge()
     }
   }
-})
+}
