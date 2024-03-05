@@ -1273,36 +1273,75 @@ public fun <A> Iterable<A>.fold(MA: Monoid<A>): A =
 public fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B =
   fold(MB.empty()) { acc, a -> MB.run { acc.combine(f(a)) } }
 
+/**
+ * Applies function [f] to each element
+ * and returns a list for the applied result Iterable<B>.
+ *
+ * ```kotlin
+ * import arrow.core.crosswalk
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val ints = listOf(1, 2)
+ *   val res = ints.crosswalk { i -> listOf("a${i}", "b${i}", "c${i}") }
+ *   res shouldBe listOf(listOf("a1", "a2"), listOf("b1", "b2"), listOf("c1", "c2"))
+ * }
+ * ```
+ */
 public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->
     f(a).align(bs) { ior ->
       ior.fold(
         { listOf(it) },
         ::identity,
-        { l, r -> listOf(l) + r }
+        { l, r -> r + l }
       )
     }
   }
 
+/**
+ * Applies function [f] to each element
+ * and returns the concatenated Map of the applied result Map<K, V>.
+ *
+ * ```kotlin
+ * import arrow.core.crosswalk
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val ints = listOf(1, 2)
+ *   val res = ints.crosswalkMap { i -> mapOf("a" to i, "b" to i, "c" to i) }
+ *   res shouldBe listOf("a", "b", "c").map { a -> a to ints }.toMap()
+ * }
+ * ```
+ */
 public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<V>> =
   fold(emptyMap()) { bs, a ->
     f(a).align(bs) { (_, ior) ->
       ior.fold(
         { listOf(it) },
         ::identity,
-        { l, r -> listOf(l) + r }
+        { l, r -> r + l }
       )
     }
   }
 
+/**
+ * Applies function [f] to each element
+ * and returns the result Iterable<B> without null.
+ *
+ * ```kotlin
+ * import arrow.core.crosswalk
+ * import io.kotest.matchers.shouldBe
+ *
+ * fun test() {
+ *   val ints = listOf(1, 2)
+ *   val res = ints.crosswalkNull { i -> if (i % 2 == 0) "x${i}" else null }
+ *   res shouldBe listOf("x2")
+ * }
+ * ```
+ */
 public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
-  fold<A, List<B>?>(emptyList()) { bs, a ->
-    Ior.fromNullables(f(a), bs)?.fold(
-      { listOf(it) },
-      ::identity,
-      { l, r -> listOf(l) + r }
-    )
-  }
+  mapNotNull(f).takeIf { it.isNotEmpty() || !this.any() }
 
 @Deprecated("Not being used anymore. Will be removed from the binary in 2.0.0")
 @PublishedApi
