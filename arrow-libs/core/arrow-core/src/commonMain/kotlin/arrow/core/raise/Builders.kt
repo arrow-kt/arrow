@@ -23,6 +23,11 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+public const val PotentialRaiseLeak: String = """Returning a lazy computation or closure from 'fold' breaks the context scope, and may lead to leaked exceptions on later execution.
+  Make sure all calls to 'raise' and 'bind' occur within the lifecycle of nullable { }, either { } or similar builders.
+   
+  See Arrow documentation on 'Typed errors' for further information."""
+
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Either].
  * - [Either.Right] represents success,
@@ -36,6 +41,9 @@ import kotlin.jvm.JvmName
 public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> =
   fold({ block.invoke(this) }, { Either.Left(it) }, { Either.Right(it) })
 
+public inline fun <A> nullableUnsafe(block: NullableRaise.() -> A): A? =
+  merge { block(NullableRaise(this)) }
+
 /**
  * Runs a computation [block] using [Raise], and return its outcome as nullable type,
  * where `null` represents logical failure.
@@ -48,8 +56,39 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
  * @see NullableRaise.ignoreErrors By default, `nullable` only allows raising `null`.
  * Calling [ignoreErrors][NullableRaise.ignoreErrors] inside `nullable` allows to raise any error, which will be returned to the caller as if `null` was raised.
  */
+@OverloadResolutionByLambdaReturnType
 public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
-  merge { block(NullableRaise(this)) }
+  nullableUnsafe(block)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("nullableUnsafe(block)"),
+)
+@JvmName("nullableFunction")
+public inline fun nullable(block: NullableRaise.() -> Function<*>): Function<*>? =
+  error(PotentialRaiseLeak)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("nullableUnsafe(block)"),
+)
+@JvmName("nullableLazy")
+public inline fun nullable(block: NullableRaise.() -> Lazy<*>): Lazy<*>? =
+  error(PotentialRaiseLeak)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("nullableUnsafe(block)"),
+)
+@JvmName("nullableSequence")
+public inline fun nullable(block: NullableRaise.() -> Sequence<*>): Sequence<*>? =
+  error(PotentialRaiseLeak)
+
+public inline fun <A> resultUnsafe(block: ResultRaise.() -> A): Result<A> =
+  fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Result].
@@ -58,8 +97,39 @@ public inline fun <A> nullable(block: NullableRaise.() -> A): A? =
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
+@OverloadResolutionByLambdaReturnType
 public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
-  fold({ block(ResultRaise(this)) }, Result.Companion::failure, Result.Companion::failure, Result.Companion::success)
+  resultUnsafe(block)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("resultUnsafe(block)"),
+)
+@JvmName("resultFunction")
+public inline fun result(block: ResultRaise.() -> Function<*>): Result<Function<*>> =
+  error(PotentialRaiseLeak)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("resultUnsafe(block)"),
+)
+@JvmName("resultLazy")
+public inline fun result(block: ResultRaise.() -> Lazy<*>): Result<Lazy<*>> =
+  error(PotentialRaiseLeak)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("resultUnsafe(block)"),
+)
+@JvmName("resultSequence")
+public inline fun result(block: ResultRaise.() -> Sequence<*>): Result<Sequence<*>> =
+  error(PotentialRaiseLeak)
+
+public inline fun <A> optionUnsafe(block: OptionRaise.() -> A): Option<A> =
+  fold({ block(OptionRaise(this)) }, ::identity, ::Some)
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Option].
@@ -71,8 +141,36 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> =
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
+@OverloadResolutionByLambdaReturnType
 public inline fun <A> option(block: OptionRaise.() -> A): Option<A> =
-  fold({ block(OptionRaise(this)) }, ::identity, ::Some)
+  optionUnsafe(block)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("optionUnsafe(block)"),
+)
+@JvmName("optionFunction")
+public inline fun option(block: OptionRaise.() -> Function<*>): Option<Function<*>> =
+  error(PotentialRaiseLeak)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("optionUnsafe(block)"),
+)
+@JvmName("optionLazy")
+public inline fun option(block: OptionRaise.() -> Lazy<*>): Option<Lazy<*>> =
+  error(PotentialRaiseLeak)
+
+@Deprecated(
+  PotentialRaiseLeak,
+  level = DeprecationLevel.ERROR,
+  replaceWith = ReplaceWith("optionUnsafe(block)"),
+)
+@JvmName("optionSequence")
+public inline fun option(block: OptionRaise.() -> Sequence<*>): Option<Sequence<*>> =
+  error(PotentialRaiseLeak)
 
 /**
  * Runs a computation [block] using [Raise], and return its outcome as [Ior].

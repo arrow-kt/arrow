@@ -135,18 +135,7 @@ public inline fun <Error, A, B> fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return foldUnsafe(block, catch, recover) {
-    if (it is Function<*> || it is Lazy<*> || it is Sequence<*>)
-      throw IllegalStateException(
-        """
-  Returning a lazy computation or closure from 'fold' breaks the context scope, and may lead to leaked exceptions on later execution.
-  Make sure all calls to 'raise' and 'bind' occur within the lifecycle of nullable { }, either { } or similar builders.
- 
-  See Arrow documentation on 'Typed errors' for further information.
-  """.trimIndent()
-      )
-    transform(it)
-  }
+  return foldUnsafe(block, catch, recover, transform)
 }
 
 /**

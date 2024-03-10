@@ -1,5 +1,6 @@
 package arrow.core.raise
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
@@ -8,7 +9,7 @@ class ResultSpec : StringSpec({
   val boom = RuntimeException("Boom!")
 
   "Result - exception" {
-    result {
+    result<Nothing> {
       throw boom
     } shouldBe Result.failure(boom)
   }
@@ -18,7 +19,7 @@ class ResultSpec : StringSpec({
   }
 
   "Result - raise" {
-    result { raise(boom) } shouldBe Result.failure(boom)
+    result<Nothing> { raise(boom) } shouldBe Result.failure(boom)
   }
 
   "Recover works as expected" {
@@ -27,5 +28,19 @@ class ResultSpec : StringSpec({
       val two = Result.success(2).bind()
       one + two
     } shouldBe Result.success(3)
+  }
+
+  "Detects potential leaked exceptions" {
+    @Suppress("DEPRECATION_ERROR")
+    shouldThrow<IllegalStateException> {
+      result { lazy { raise(Exception()) } }
+    }
+  }
+
+  "Unsafe leakage of exceptions" {
+    val l: Lazy<Int> = resultUnsafe { lazy { raise(Exception()) } }.getOrThrow()
+    shouldThrow<IllegalStateException> {
+      l.value
+    }
   }
 })
