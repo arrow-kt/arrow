@@ -1,0 +1,16 @@
+// KLib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-optics-compose>
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (androidx.compose.runtime/MutableState<#A>).arrow.optics/optic(arrow.optics/PLens<#A, #A, #B, #B>): androidx.compose.runtime/MutableState<#B> // arrow.optics/optic|optic@androidx.compose.runtime.MutableState<0:0>(arrow.optics.PLens<0:0,0:0,0:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (androidx.compose.runtime/State<#A>).arrow.optics/optic(arrow.optics/Getter<#A, #B>): androidx.compose.runtime/State<#B> // arrow.optics/optic|optic@androidx.compose.runtime.State<0:0>(arrow.optics.Getter<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/MutableStateFlow<#A>).arrow.optics/optic(arrow.optics/PLens<#A, #A, #B, #B>): kotlinx.coroutines.flow/MutableStateFlow<#B> // arrow.optics/optic|optic@kotlinx.coroutines.flow.MutableStateFlow<0:0>(arrow.optics.PLens<0:0,0:0,0:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/SharedFlow<#A>).arrow.optics/optic(arrow.optics/Getter<#A, #B>): kotlinx.coroutines.flow/SharedFlow<#B> // arrow.optics/optic|optic@kotlinx.coroutines.flow.SharedFlow<0:0>(arrow.optics.Getter<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/StateFlow<#A>).arrow.optics/optic(arrow.optics/Getter<#A, #B>): kotlinx.coroutines.flow/StateFlow<#B> // arrow.optics/optic|optic@kotlinx.coroutines.flow.StateFlow<0:0>(arrow.optics.Getter<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (androidx.compose.runtime/MutableState<#A>).arrow.optics/updateCopy(kotlin/Function1<arrow.optics/Copy<#A>, kotlin/Unit>) // arrow.optics/updateCopy|updateCopy@androidx.compose.runtime.MutableState<0:0>(kotlin.Function1<arrow.optics.Copy<0:0>,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlinx.coroutines.flow/MutableStateFlow<#A>).arrow.optics/updateCopy(kotlin/Function1<arrow.optics/Copy<#A>, kotlin/Unit>) // arrow.optics/updateCopy|updateCopy@kotlinx.coroutines.flow.MutableStateFlow<0:0>(kotlin.Function1<arrow.optics.Copy<0:0>,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (androidx.compose.runtime/MutableState<#A>).arrow.optics/update(crossinline kotlin/Function1<#A, #A>) // arrow.optics/update|update@androidx.compose.runtime.MutableState<0:0>(kotlin.Function1<0:0,0:0>){0§<kotlin.Any?>}[0]

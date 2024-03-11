@@ -1,0 +1,50 @@
+// KLib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-continuations>
+abstract fun interface <#A: kotlin/Any?> arrow.continuations/Effect { // arrow.continuations/Effect|null[0]
+    abstract fun control(): arrow.continuations.generic/DelimitedScope<#A> // arrow.continuations/Effect.control|control(){}[0]
+    final object Companion { // arrow.continuations/Effect.Companion|null[0]
+        final inline fun <#A2: arrow.continuations/Effect<*>, #B2: kotlin/Any?, #C2: kotlin/Any?> restricted(crossinline kotlin/Function1<arrow.continuations.generic/DelimitedScope<#B2>, #A2>, crossinline kotlin/Function1<#C2, #B2>, crossinline kotlin.coroutines/SuspendFunction1<#A2, #C2>): #B2 // arrow.continuations/Effect.Companion.restricted|restricted(kotlin.Function1<arrow.continuations.generic.DelimitedScope<0:1>,0:0>;kotlin.Function1<0:2,0:1>;kotlin.coroutines.SuspendFunction1<0:0,0:2>){0§<arrow.continuations.Effect<*>>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+        final suspend inline fun <#A2: arrow.continuations/Effect<*>, #B2: kotlin/Any?, #C2: kotlin/Any?> suspended(crossinline kotlin/Function1<arrow.continuations.generic/DelimitedScope<#B2>, #A2>, crossinline kotlin/Function1<#C2, #B2>, crossinline kotlin.coroutines/SuspendFunction1<#A2, #C2>): #B2 // arrow.continuations/Effect.Companion.suspended|suspended(kotlin.Function1<arrow.continuations.generic.DelimitedScope<0:1>,0:0>;kotlin.Function1<0:2,0:1>;kotlin.coroutines.SuspendFunction1<0:0,0:2>){0§<arrow.continuations.Effect<*>>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+    }
+}
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> arrow.continuations.generic/DelimitedContinuation { // arrow.continuations.generic/DelimitedContinuation|null[0]
+    abstract suspend fun invoke(#A): #B // arrow.continuations.generic/DelimitedContinuation.invoke|invoke(1:0){}[0]
+}
+abstract interface <#A: kotlin/Any?> arrow.continuations.generic/DelimitedScope { // arrow.continuations.generic/DelimitedScope|null[0]
+    abstract suspend fun <#A1: kotlin/Any?> shift(#A): #A1 // arrow.continuations.generic/DelimitedScope.shift|shift(1:0){0§<kotlin.Any?>}[0]
+}
+abstract interface <#A: kotlin/Any?> arrow.continuations.generic/RestrictedScope : arrow.continuations.generic/DelimitedScope<#A> { // arrow.continuations.generic/RestrictedScope|null[0]
+    abstract suspend fun <#A1: kotlin/Any?> shift(kotlin.coroutines/SuspendFunction2<arrow.continuations.generic/RestrictedScope<#A>, arrow.continuations.generic/DelimitedContinuation<#A1, #A>, #A>): #A1 // arrow.continuations.generic/RestrictedScope.shift|shift(kotlin.coroutines.SuspendFunction2<arrow.continuations.generic.RestrictedScope<1:0>,arrow.continuations.generic.DelimitedContinuation<0:0,1:0>,1:0>){0§<kotlin.Any?>}[0]
+    open suspend fun <#A1: kotlin/Any?> shift(#A): #A1 // arrow.continuations.generic/RestrictedScope.shift|shift(1:0){0§<kotlin.Any?>}[0]
+}
+abstract interface <#A: kotlin/Any?> arrow.continuations.generic/SuspendedScope : arrow.continuations.generic/DelimitedScope<#A> // arrow.continuations.generic/SuspendedScope|null[0]
+final class <#A: kotlin/Any?> arrow.continuations.generic/AtomicRef { // arrow.continuations.generic/AtomicRef|null[0]
+    constructor <init>(#A) // arrow.continuations.generic/AtomicRef.<init>|<init>(1:0){}[0]
+    final fun compareAndSet(#A, #A): kotlin/Boolean // arrow.continuations.generic/AtomicRef.compareAndSet|compareAndSet(1:0;1:0){}[0]
+    final fun get(): #A // arrow.continuations.generic/AtomicRef.get|get(){}[0]
+    final fun getAndSet(#A): #A // arrow.continuations.generic/AtomicRef.getAndSet|getAndSet(1:0){}[0]
+    final fun set(#A) // arrow.continuations.generic/AtomicRef.set|set(1:0){}[0]
+}
+final class arrow.continuations.generic/ShortCircuit : arrow.continuations.generic/ControlThrowable { // arrow.continuations.generic/ShortCircuit|null[0]
+    final val raiseValue // arrow.continuations.generic/ShortCircuit.raiseValue|{}raiseValue[0]
+        final fun <get-raiseValue>(): kotlin/Any? // arrow.continuations.generic/ShortCircuit.raiseValue.<get-raiseValue>|<get-raiseValue>(){}[0]
+}
+final const val arrow.continuations.generic/deprecateArrowContinuation // arrow.continuations.generic/deprecateArrowContinuation|{}deprecateArrowContinuation[0]
+    final fun <get-deprecateArrowContinuation>(): kotlin/String // arrow.continuations.generic/deprecateArrowContinuation.<get-deprecateArrowContinuation>|<get-deprecateArrowContinuation>(){}[0]
+final inline fun <#A: kotlin/Any?> (arrow.continuations.generic/AtomicRef<#A>).arrow.continuations.generic/getAndUpdate(kotlin/Function1<#A, #A>): #A // arrow.continuations.generic/getAndUpdate|getAndUpdate@arrow.continuations.generic.AtomicRef<0:0>(kotlin.Function1<0:0,0:0>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (arrow.continuations.generic/AtomicRef<#A>).arrow.continuations.generic/loop(kotlin/Function1<#A, kotlin/Unit>): kotlin/Nothing // arrow.continuations.generic/loop|loop@arrow.continuations.generic.AtomicRef<0:0>(kotlin.Function1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (arrow.continuations.generic/AtomicRef<#A>).arrow.continuations.generic/update(kotlin/Function1<#A, #A>) // arrow.continuations.generic/update|update@arrow.continuations.generic.AtomicRef<0:0>(kotlin.Function1<0:0,0:0>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> (arrow.continuations.generic/AtomicRef<#A>).arrow.continuations.generic/updateAndGet(kotlin/Function1<#A, #A>): #A // arrow.continuations.generic/updateAndGet|updateAndGet@arrow.continuations.generic.AtomicRef<0:0>(kotlin.Function1<0:0,0:0>){0§<kotlin.Any?>}[0]
+final object arrow.continuations/Reset { // arrow.continuations/Reset|null[0]
+    final fun <#A1: kotlin/Any?> restricted(kotlin.coroutines/SuspendFunction1<arrow.continuations.generic/RestrictedScope<#A1>, #A1>): #A1 // arrow.continuations/Reset.restricted|restricted(kotlin.coroutines.SuspendFunction1<arrow.continuations.generic.RestrictedScope<0:0>,0:0>){0§<kotlin.Any?>}[0]
+    final suspend fun <#A1: kotlin/Any?> suspended(kotlin.coroutines/SuspendFunction1<arrow.continuations.generic/SuspendedScope<#A1>, #A1>): #A1 // arrow.continuations/Reset.suspended|suspended(kotlin.coroutines.SuspendFunction1<arrow.continuations.generic.SuspendedScope<0:0>,0:0>){0§<kotlin.Any?>}[0]
+}
+open class arrow.continuations.generic/ControlThrowable : kotlin/Throwable { // arrow.continuations.generic/ControlThrowable|null[0]
+    constructor <init>() // arrow.continuations.generic/ControlThrowable.<init>|<init>(){}[0]
+}

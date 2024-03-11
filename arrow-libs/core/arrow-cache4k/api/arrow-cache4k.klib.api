@@ -1,0 +1,17 @@
+// KLib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-cache4k>
+final fun <#A: kotlin/Any, #B: kotlin/Any> arrow.core/buildCache4K(kotlin/Function1<io.github.reactivecircus.cache4k/Cache.Builder<#A, #B>, kotlin/Unit>): io.github.reactivecircus.cache4k/Cache<#A, #B> // arrow.core/buildCache4K|buildCache4K(kotlin.Function1<io.github.reactivecircus.cache4k.Cache.Builder<0:0,0:1>,kotlin.Unit>){0§<kotlin.Any>;1§<kotlin.Any>}[0]
+final value class <#A: kotlin/Any, #B: kotlin/Any> arrow.core/Cache4kMemoizationCache : arrow.core/MemoizationCache<#A, #B> { // arrow.core/Cache4kMemoizationCache|null[0]
+    constructor <init>(io.github.reactivecircus.cache4k/Cache<#A, #B>) // arrow.core/Cache4kMemoizationCache.<init>|<init>(io.github.reactivecircus.cache4k.Cache<1:0,1:1>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.core/Cache4kMemoizationCache.equals|equals(kotlin.Any?){}[0]
+    final fun get(#A): #B? // arrow.core/Cache4kMemoizationCache.get|get(1:0){}[0]
+    final fun hashCode(): kotlin/Int // arrow.core/Cache4kMemoizationCache.hashCode|hashCode(){}[0]
+    final fun set(#A, #B): #B // arrow.core/Cache4kMemoizationCache.set|set(1:0;1:1){}[0]
+    final fun toString(): kotlin/String // arrow.core/Cache4kMemoizationCache.toString|toString(){}[0]
+}
