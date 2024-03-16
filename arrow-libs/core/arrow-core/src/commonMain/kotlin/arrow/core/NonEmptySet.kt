@@ -58,7 +58,7 @@ public value class NonEmptySet<out A> private constructor(
 }
 
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
-  NonEmptySet(first, rest.asList())
+  NonEmptySet(first, rest.asIterable())
 
 public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
   val iter = iterator()
