@@ -1,7 +1,6 @@
 package arrow.core
 
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmSynthetic
 
 @JvmInline
 public value class NonEmptySet<out A> private constructor(
