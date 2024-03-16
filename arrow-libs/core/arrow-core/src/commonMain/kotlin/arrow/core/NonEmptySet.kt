@@ -49,12 +49,6 @@ public value class NonEmptySet<out A> private constructor(
 
   override fun <B> zip(other: NonEmptyCollection<B>): NonEmptyList<Pair<A, B>> =
     NonEmptyList(elements.zip(other))
-
-  internal companion object {
-    @JvmSynthetic
-    internal inline fun <A> unsafeOf(iterator: Iterator<A>): NonEmptySet<A> =
-      NonEmptySet(Iterable { iterator }.toSet())
-  }
 }
 
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
@@ -63,7 +57,7 @@ public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
 public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
   val iter = iterator()
   if (!iter.hasNext()) return null
-  return NonEmptySet.unsafeOf(iter)
+  return NonEmptySet(iter.next(), Iterable { iter })
 }
 
 public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
