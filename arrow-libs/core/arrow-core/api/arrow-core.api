@@ -502,7 +502,7 @@ public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/
 	public fun addAll (Ljava/util/Collection;)Z
 	public static final synthetic fun box-impl (Ljava/util/Set;)Larrow/core/NonEmptySet;
 	public fun clear ()V
-	public static fun constructor-impl (Ljava/lang/Object;Ljava/util/Set;)Ljava/util/Set;
+	public static fun constructor-impl (Ljava/lang/Object;Ljava/lang/Iterable;)Ljava/util/Set;
 	public fun contains (Ljava/lang/Object;)Z
 	public static fun contains-impl (Ljava/util/Set;Ljava/lang/Object;)Z
 	public fun containsAll (Ljava/util/Collection;)Z
