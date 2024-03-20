@@ -1,6 +1,7 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import kotlinx.knit.KnitPluginExtension
+import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -139,4 +140,6 @@ tasks {
 
 apiValidation {
   ignoredProjects.add("arrow-optics-ksp-plugin")
+  @OptIn(ExperimentalBCVApi::class)
+  klib.enabled = true
 }
