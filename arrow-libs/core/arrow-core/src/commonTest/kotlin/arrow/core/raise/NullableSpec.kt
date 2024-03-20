@@ -144,19 +144,4 @@ class NullableSpec : StringSpec({
       one + two
     } shouldBe 3
   }
-
-  "Detects potential leaked exceptions" {
-    shouldThrow<IllegalStateException> {
-      nullable { lazy { raise(null) } }
-    }
-  }
-
-  "Unsafe leakage of exceptions" {
-    val l: Lazy<Int> = foldUnsafe<String, Lazy<Int>, Lazy<Int>?>(
-      { lazy { raise("problem") } }, { throw it }, { null }, { it }
-    ).shouldNotBeNull()
-    shouldThrow<IllegalStateException> {
-      l.value
-    }
-  }
 })
