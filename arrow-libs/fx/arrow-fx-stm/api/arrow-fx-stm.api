@@ -239,64 +239,6 @@ public final class arrow/fx/stm/internal/BlockedIndefinitely : java/lang/Throwab
 	public fun <init> ()V
 }
 
-public abstract class arrow/fx/stm/internal/Branch {
-}
-
-public final class arrow/fx/stm/internal/Branch$Branches : arrow/fx/stm/internal/Branch {
-	public fun <init> (Larrow/fx/stm/internal/Hamt;)V
-	public final fun component1 ()Larrow/fx/stm/internal/Hamt;
-	public final fun copy (Larrow/fx/stm/internal/Hamt;)Larrow/fx/stm/internal/Branch$Branches;
-	public static synthetic fun copy$default (Larrow/fx/stm/internal/Branch$Branches;Larrow/fx/stm/internal/Hamt;ILjava/lang/Object;)Larrow/fx/stm/internal/Branch$Branches;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getSub ()Larrow/fx/stm/internal/Hamt;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/fx/stm/internal/Branch$Leaf : arrow/fx/stm/internal/Branch {
-	public fun <init> (I[Ljava/lang/Object;)V
-	public final fun component1 ()I
-	public final fun component2 ()[Ljava/lang/Object;
-	public final fun copy (I[Ljava/lang/Object;)Larrow/fx/stm/internal/Branch$Leaf;
-	public static synthetic fun copy$default (Larrow/fx/stm/internal/Branch$Leaf;I[Ljava/lang/Object;ILjava/lang/Object;)Larrow/fx/stm/internal/Branch$Leaf;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getHash ()I
-	public final fun getValue ()[Ljava/lang/Object;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/fx/stm/internal/Hamt {
-	public static final field Companion Larrow/fx/stm/internal/Hamt$Companion;
-	public fun <init> (Larrow/fx/stm/TVar;)V
-	public final fun component1 ()Larrow/fx/stm/TVar;
-	public final fun copy (Larrow/fx/stm/TVar;)Larrow/fx/stm/internal/Hamt;
-	public static synthetic fun copy$default (Larrow/fx/stm/internal/Hamt;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/internal/Hamt;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getBranches ()Larrow/fx/stm/TVar;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class arrow/fx/stm/internal/Hamt$Companion {
-	public final fun new (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class arrow/fx/stm/internal/HamtKt {
-	public static final field ARR_SIZE I
-	public static final field DEPTH_STEP I
-	public static final field MASK I
-	public static final fun alterHamtWithHash (Larrow/fx/stm/STM;Larrow/fx/stm/internal/Hamt;ILkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Z
-	public static final fun atDepth (II)I
-	public static final fun clearHamt (Larrow/fx/stm/STM;Larrow/fx/stm/internal/Hamt;)V
-	public static final fun index (I)I
-	public static final fun indexAtDepth (II)I
-	public static final fun lookupHamtWithHash (Larrow/fx/stm/STM;Larrow/fx/stm/internal/Hamt;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static final fun newHamt (Larrow/fx/stm/STM;)Larrow/fx/stm/internal/Hamt;
-	public static final fun nextDepth (I)I
-	public static final fun pair (Larrow/fx/stm/STM;IILarrow/fx/stm/internal/Branch;ILarrow/fx/stm/internal/Branch;)Larrow/fx/stm/internal/Hamt;
-}
-
 public final class arrow/fx/stm/internal/RetryException : java/lang/Throwable {
 	public static final field INSTANCE Larrow/fx/stm/internal/RetryException;
 	public fun fillInStackTrace ()Ljava/lang/Throwable;

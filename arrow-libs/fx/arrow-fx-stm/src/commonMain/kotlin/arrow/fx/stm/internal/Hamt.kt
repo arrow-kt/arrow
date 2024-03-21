@@ -8,13 +8,13 @@ import arrow.fx.stm.STM
  *
  * Based on http://lampwww.epfl.ch/papers/idealhashtrees.pdf and https://hackage.haskell.org/package/stm-hamt.
  */
-public data class Hamt<A>(val branches: TVar<Array<Branch<A>?>>) {
-  public companion object {
-    public suspend fun <A> new(): Hamt<A> = Hamt(TVar.new(arrayOfNulls(ARR_SIZE)))
+internal data class Hamt<A>(val branches: TVar<Array<Branch<A>?>>) {
+  companion object {
+    suspend fun <A> new(): Hamt<A> = Hamt(TVar.new(arrayOfNulls(ARR_SIZE)))
   }
 }
 
-public inline fun <A> STM.lookupHamtWithHash(hmt: Hamt<A>, hash: Int, test: (A) -> Boolean): A? {
+internal fun <A> STM.lookupHamtWithHash(hmt: Hamt<A>, hash: Int, test: (A) -> Boolean): A? {
   var depth = 0
   var hamt = hmt
   while (true) {
@@ -22,7 +22,7 @@ public inline fun <A> STM.lookupHamtWithHash(hmt: Hamt<A>, hash: Int, test: (A) 
     val branches = hamt.branches.read()
     when (val branch = branches[branchInd]) {
       null -> return null
-      is Branch.Leaf -> return@lookupHamtWithHash (branch.value as Array<A>).find(test)
+      is Branch.Leaf -> return branch.value.find(test)
       is Branch.Branches -> {
         depth = depth.nextDepth()
         hamt = branch.sub
@@ -31,7 +31,7 @@ public inline fun <A> STM.lookupHamtWithHash(hmt: Hamt<A>, hash: Int, test: (A) 
   }
 }
 
-public fun <A> STM.pair(depth: Int, hash1: Int, branch1: Branch<A>, hash2: Int, branch2: Branch<A>): Hamt<A> {
+internal fun <A> STM.pair(depth: Int, hash1: Int, branch1: Branch<A>, hash2: Int, branch2: Branch<A>): Hamt<A> {
   val branchInd1 = hash1.indexAtDepth(depth)
   val branchInd2 = hash2.indexAtDepth(depth)
   val branches = arrayOfNulls<Branch<A>>(ARR_SIZE)
@@ -45,9 +45,9 @@ public fun <A> STM.pair(depth: Int, hash1: Int, branch1: Branch<A>, hash2: Int, 
   return Hamt(newTVar(branches))
 }
 
-public fun <A> STM.clearHamt(hamt: Hamt<A>): Unit = hamt.branches.write(arrayOfNulls(ARR_SIZE))
+// internal fun <A> STM.clearHamt(hamt: Hamt<A>): Unit = hamt.branches.write(arrayOfNulls(ARR_SIZE))
 
-public inline fun <A> STM.alterHamtWithHash(
+internal fun <A> STM.alterHamtWithHash(
   hamt: Hamt<A>,
   hash: Int,
   test: (A) -> Boolean,
@@ -62,46 +62,35 @@ public inline fun <A> STM.alterHamtWithHash(
       null -> {
         val el = fn(null) ?: return false
         val new = branches.copyOf()
-        new[branchInd] = Branch.Leaf(hash, arrayOf(el))
+        new[branchInd] = Branch.leaf(hash, el)
         hmt.branches.write(new)
         return true
       }
       is Branch.Leaf -> {
-        if (hash == branch.hash) {
-          val ind = (branch.value as Array<A>).indexOfFirst(test).takeIf { it != -1 }
+        val atIndex = if (hash == branch.hash) {
+          val ind = branch.value.indexOfFirst(test).takeIf { it != -1 }
           when (val el = ind?.let { branch.value[it] }) {
             null -> {
               // insert new value with a colliding hash
               val newEl = fn(null) ?: return false
-              val new = branches.copyOf()
-              new[branchInd] = Branch.Leaf(hash, arrayOf(newEl, *branch.value))
-              hmt.branches.write(new)
-              return true
+              Branch.leaf(hash, newEl, *branch.value)
             }
             else -> {
-              when (val newEl = fn(el)) {
-                null -> {
+              val newEl = fn(el)
+              when {
+                newEl == null && branch.value.size <= 1 ->
+                  null
+                newEl == null -> {
                   // remove element
-                  if (branch.value.size > 1) {
-                    val newLeafArray: Array<Any?> = Array(branch.value.size - 1) { i ->
-                      if (i >= ind) branch.value[i + 1]
-                      else branch.value[i]
-                    }
-                  } else {
-                    val new = branches.copyOf()
-                    new[branchInd] = null
-                    hmt.branches.write(new)
-                  }
-                  return true
+                  val newLeafArray = branch.value.copyOf(branch.value.size - 1) as Array<A>
+                  branch.value.copyInto(newLeafArray, ind, ind + 1)
+                  Branch.Leaf(hash, newLeafArray)
                 }
                 else -> {
                   // update element
                   val newLeafArr = branch.value.copyOf()
                   newLeafArr[ind] = newEl
-                  val new = branches.copyOf()
-                  new[branchInd] = Branch.Leaf(hash, newLeafArr as Array<Any?>)
-                  hmt.branches.write(new)
-                  return true
+                  Branch.Leaf(hash, newLeafArr)
                 }
               }
             }
@@ -111,15 +100,16 @@ public inline fun <A> STM.alterHamtWithHash(
           val newHamt = pair(
             depth.nextDepth(),
             hash,
-            Branch.Leaf(hash, arrayOf(el)),
+            Branch.leaf(hash, el),
             branch.hash,
             branch
           )
-          val new = branches.copyOf()
-          new[branchInd] = Branch.Branches(newHamt)
-          hmt.branches.write(new)
-          return true
+          Branch.Branches(newHamt)
         }
+        val new = branches.copyOf()
+        new[branchInd] = atIndex
+        hmt.branches.write(new)
+        return true
       }
       is Branch.Branches -> {
         depth = depth.nextDepth()
@@ -129,18 +119,22 @@ public inline fun <A> STM.alterHamtWithHash(
   }
 }
 
-public fun <A> STM.newHamt(): Hamt<A> = Hamt(newTVar(arrayOfNulls(ARR_SIZE)))
+internal fun <A> STM.newHamt(): Hamt<A> = Hamt(newTVar(arrayOfNulls(ARR_SIZE)))
 
-public sealed class Branch<out A> {
-  public data class Branches<A>(val sub: Hamt<A>) : Branch<A>()
-  public data class Leaf<A>(val hash: Int, val value: Array<Any?>) : Branch<A>()
+internal sealed class Branch<A> {
+  data class Branches<A>(val sub: Hamt<A>) : Branch<A>()
+  data class Leaf<A>(val hash: Int, val value: Array<A>) : Branch<A>()
+
+  companion object {
+    fun <A> leaf(hash: Int, vararg value: A): Leaf<A> = Leaf(hash, value) as Leaf<A>
+  }
 }
 
-public const val ARR_SIZE: Int = 32 // 2^DEPTH_STEP
-public const val DEPTH_STEP: Int = 5
-public const val MASK: Int = 1.shl(DEPTH_STEP) - 1
+internal const val ARR_SIZE: Int = 32 // 2^DEPTH_STEP
+internal const val DEPTH_STEP: Int = 5
+internal const val MASK: Int = 1.shl(DEPTH_STEP) - 1
 
-public fun Int.index(): Int = MASK.and(this)
-public fun Int.atDepth(d: Int): Int = shr(d)
-public fun Int.indexAtDepth(d: Int): Int = atDepth(d).index()
-public fun Int.nextDepth(): Int = this + DEPTH_STEP
+internal fun Int.index(): Int = MASK.and(this)
+internal fun Int.atDepth(d: Int): Int = shr(d)
+internal fun Int.indexAtDepth(d: Int): Int = atDepth(d).index()
+internal fun Int.nextDepth(): Int = this + DEPTH_STEP
