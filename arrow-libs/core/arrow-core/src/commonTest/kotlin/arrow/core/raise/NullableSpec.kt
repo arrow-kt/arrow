@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 @Suppress("UNREACHABLE_CODE")
 class NullableSpec : StringSpec({
   "ensure null in nullable computation" {
-    GlobalScope.launch(context = coroutineContext) {  }
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
       nullable {
         ensure(predicate)

@@ -20,14 +20,12 @@ plugins {
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
-  }
-}
-
 kotlin {
   explicitApi()
+
+  jvm {
+    jvmToolchain(8)
+  }
   js(IR) {
     browser()
     nodejs()
