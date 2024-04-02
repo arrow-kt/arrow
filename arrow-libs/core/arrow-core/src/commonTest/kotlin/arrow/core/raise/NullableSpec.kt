@@ -11,10 +11,13 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Suppress("UNREACHABLE_CODE")
 class NullableSpec : StringSpec({
   "ensure null in nullable computation" {
+    GlobalScope.launch(context = coroutineContext) {  }
     checkAll(Arb.boolean(), Arb.int()) { predicate, i ->
       nullable {
         ensure(predicate)

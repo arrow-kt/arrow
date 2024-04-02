@@ -254,7 +254,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
       - name: JVM (Kotlin 2.0) tests
-        run: ./gradlew jvmTest -Pkotlin_version=2.0.0-Beta3 -Pksp_version=2.0.0-Beta3-1.0.17 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0
+        run: ./gradlew jvmTest -Pkotlin_version=2.0.0-Beta5 -Pksp_version=2.0.0-Beta5-1.0.19 -Pkotlin_language_version=2.0 -Pkotlin_api_version=2.0
 
       - name: Upload reports
         if: failure()
