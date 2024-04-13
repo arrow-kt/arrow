@@ -124,6 +124,7 @@ public inline fun <Error, A, B> fold(
  * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
  * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
  */
+@OptIn(DelicateRaiseApi::class)
 @JvmName("_fold")
 public inline fun <Error, A, B> fold(
   @BuilderInference block: Raise<Error>.() -> A,
@@ -133,38 +134,6 @@ public inline fun <Error, A, B> fold(
 ): B {
   contract {
     callsInPlace(block, AT_MOST_ONCE)
-    callsInPlace(catch, AT_MOST_ONCE)
-    callsInPlace(recover, AT_MOST_ONCE)
-    callsInPlace(transform, AT_MOST_ONCE)
-  }
-  return foldUnsafe(block, catch, recover) {
-    if (it is Function<*> || it is Lazy<*> || it is Sequence<*>)
-      throw IllegalStateException(
-        """
-  Returning a lazy computation or closure from 'fold' breaks the context scope, and may lead to leaked exceptions on later execution.
-  Make sure all calls to 'raise' and 'bind' occur within the lifecycle of nullable { }, either { } or similar builders.
- 
-  See Arrow documentation on 'Typed errors' for further information.
-  """.trimIndent()
-      )
-    transform(it)
-  }
-}
-
-/**
- * Similar to [fold], but does *not* check for
- * potential lazy return types which break the
- * [Raise] context barrier.
- */
-@JvmName("_foldUnsafe")
-@OptIn(DelicateRaiseApi::class)
-public inline fun <Error, A, B> foldUnsafe(
-  @BuilderInference block: Raise<Error>.() -> A,
-  catch: (throwable: Throwable) -> B,
-  recover: (error: Error) -> B,
-  transform: (value: A) -> B,
-): B {
-  contract {
     callsInPlace(catch, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)

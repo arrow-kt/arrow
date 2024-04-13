@@ -42,7 +42,7 @@ jobs:
           path: '**/build/reports/**'
 
   ios_watchos:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
@@ -130,7 +130,7 @@ jobs:
           file_pattern: arrow-libs/**/*.kt
 
   macos_tvos:
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
