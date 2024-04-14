@@ -3,8 +3,6 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.Some
 import arrow.core.test.any
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -165,4 +163,4 @@ class NullableSpec {
       one + two
     } shouldBe 3
   }
-})
+}
