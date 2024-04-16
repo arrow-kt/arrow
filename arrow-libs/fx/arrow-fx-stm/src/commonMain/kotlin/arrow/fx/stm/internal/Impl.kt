@@ -90,8 +90,11 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
    *
    * If we have not seen this variable before we add a read which stores it in the read set as well.
    */
-  override fun <A> TVar<A>.write(a: A): Unit =
-    accessMap[this as TVar<Any?>]?.update(a) ?: readI().let { accessMap[this] = Entry(it, a) }
+  @Suppress("UNCHECKED_CAST")
+  override fun <A> TVar<A>.write(a: A) {
+    this as TVar<Any?>
+    accessMap[this]?.update(a) ?: readI().let { accessMap[this] = Entry(it, a) }
+  }
 
   internal fun validate(): Boolean =
     accessMap.all { (tv, entry) -> tv.value === entry.initialVal }
