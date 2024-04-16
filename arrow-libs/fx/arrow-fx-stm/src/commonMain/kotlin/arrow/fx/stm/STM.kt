@@ -310,7 +310,7 @@ public interface STM {
    * - When committing the value inside the [TVar], at the time of calling [write], has to be the
    *   same as the current value otherwise the transaction will retry
    */
-  public fun <A> TVar<A>.write(a: A): Unit
+  public fun <A> TVar<A>.write(a: A)
 
   /**
    * Modify the value of a [TVar]
@@ -683,7 +683,7 @@ public interface STM {
    *
    * @see TSemaphore.tryAcquire for a version that does not retry.
    */
-  public fun TSemaphore.acquire(n: Int): Unit {
+  public fun TSemaphore.acquire(n: Int) {
     val curr = v.read()
     check(curr - n >= 0)
     v.write(curr - n)
@@ -1103,7 +1103,7 @@ public interface STM {
    *
    * > This function has to access both [TVar]'s and thus may lead to increased contention, use sparingly.
    */
-  public fun <A> TQueue<A>.removeAll(pred: (A) -> Boolean): Unit {
+  public fun <A> TQueue<A>.removeAll(pred: (A) -> Boolean) {
     reads.modify { it.filter(pred) }
     writes.modify { it.filter(pred) }
   }
@@ -1333,7 +1333,7 @@ public interface STM {
    * ```
  * <!--- KNIT example-stm-46.kt -->
    */
-  public fun <K, V> TMap<K, V>.insert(k: K, v: V): Unit {
+  public fun <K, V> TMap<K, V>.insert(k: K, v: V) {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { k to v }
   }
 
@@ -1398,8 +1398,8 @@ public interface STM {
    * ```
  * <!--- KNIT example-stm-49.kt -->
    */
-  public fun <K, V> TMap<K, V>.update(k: K, fn: (V) -> V): Unit {
-    alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { it?.second?.let(fn)?.let { k to it } }
+  public fun <K, V> TMap<K, V>.update(k: K, fn: (V) -> V) {
+    alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { it?.second?.let(fn)?.let { r -> k to r } }
   }
 
   /**
@@ -1421,7 +1421,7 @@ public interface STM {
    * ```
  * <!--- KNIT example-stm-50.kt -->
    */
-  public fun <K, V> TMap<K, V>.remove(k: K): Unit {
+  public fun <K, V> TMap<K, V>.remove(k: K) {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { null }
   }
 
@@ -1467,7 +1467,7 @@ public interface STM {
    * ```
  * <!--- KNIT example-stm-52.kt -->
    */
-  public fun <A> TSet<A>.insert(a: A): Unit {
+  public fun <A> TSet<A>.insert(a: A) {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { a }
   }
 
@@ -1510,7 +1510,7 @@ public interface STM {
    * ```
  * <!--- KNIT example-stm-54.kt -->
    */
-  public fun <A> TSet<A>.remove(a: A): Unit {
+  public fun <A> TSet<A>.remove(a: A) {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { null }
   }
 }
