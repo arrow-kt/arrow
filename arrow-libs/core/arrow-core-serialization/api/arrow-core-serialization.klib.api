@@ -1,0 +1,43 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-core-serialization>
+final class <#A: kotlin/Any> arrow.core.serialization/OptionSerializer : kotlinx.serialization/KSerializer<arrow.core/Option<#A>> { // arrow.core.serialization/OptionSerializer|null[0]
+    constructor <init>(kotlinx.serialization/KSerializer<#A>) // arrow.core.serialization/OptionSerializer.<init>|<init>(kotlinx.serialization.KSerializer<1:0>){}[0]
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): arrow.core/Option<#A> // arrow.core.serialization/OptionSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, arrow.core/Option<#A>) // arrow.core.serialization/OptionSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;arrow.core.Option<1:0>){}[0]
+    final val descriptor // arrow.core.serialization/OptionSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // arrow.core.serialization/OptionSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+}
+final class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core.serialization/EitherSerializer : kotlinx.serialization/KSerializer<arrow.core/Either<#A, #B>> { // arrow.core.serialization/EitherSerializer|null[0]
+    constructor <init>(kotlinx.serialization/KSerializer<#A>, kotlinx.serialization/KSerializer<#B>) // arrow.core.serialization/EitherSerializer.<init>|<init>(kotlinx.serialization.KSerializer<1:0>;kotlinx.serialization.KSerializer<1:1>){}[0]
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): arrow.core/Either<#A, #B> // arrow.core.serialization/EitherSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, arrow.core/Either<#A, #B>) // arrow.core.serialization/EitherSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;arrow.core.Either<1:0,1:1>){}[0]
+    final val descriptor // arrow.core.serialization/EitherSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // arrow.core.serialization/EitherSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+}
+final class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core.serialization/IorSerializer : kotlinx.serialization/KSerializer<arrow.core/Ior<#A, #B>> { // arrow.core.serialization/IorSerializer|null[0]
+    constructor <init>(kotlinx.serialization/KSerializer<#A>, kotlinx.serialization/KSerializer<#B>) // arrow.core.serialization/IorSerializer.<init>|<init>(kotlinx.serialization.KSerializer<1:0>;kotlinx.serialization.KSerializer<1:1>){}[0]
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): arrow.core/Ior<#A, #B> // arrow.core.serialization/IorSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, arrow.core/Ior<#A, #B>) // arrow.core.serialization/IorSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;arrow.core.Ior<1:0,1:1>){}[0]
+    final val descriptor // arrow.core.serialization/IorSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // arrow.core.serialization/IorSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+}
+final class <#A: kotlin/Any?> arrow.core.serialization/NonEmptyListSerializer : kotlinx.serialization/KSerializer<arrow.core/NonEmptyList<#A>> { // arrow.core.serialization/NonEmptyListSerializer|null[0]
+    constructor <init>(kotlinx.serialization/KSerializer<#A>) // arrow.core.serialization/NonEmptyListSerializer.<init>|<init>(kotlinx.serialization.KSerializer<1:0>){}[0]
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): arrow.core/NonEmptyList<#A> // arrow.core.serialization/NonEmptyListSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, arrow.core/NonEmptyList<#A>) // arrow.core.serialization/NonEmptyListSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;arrow.core.NonEmptyList<1:0>){}[0]
+    final val descriptor // arrow.core.serialization/NonEmptyListSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // arrow.core.serialization/NonEmptyListSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+}
+final class <#A: kotlin/Any?> arrow.core.serialization/NonEmptySetSerializer : kotlinx.serialization/KSerializer<arrow.core/NonEmptySet<#A>> { // arrow.core.serialization/NonEmptySetSerializer|null[0]
+    constructor <init>(kotlinx.serialization/KSerializer<#A>) // arrow.core.serialization/NonEmptySetSerializer.<init>|<init>(kotlinx.serialization.KSerializer<1:0>){}[0]
+    final fun deserialize(kotlinx.serialization.encoding/Decoder): arrow.core/NonEmptySet<#A> // arrow.core.serialization/NonEmptySetSerializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+    final fun serialize(kotlinx.serialization.encoding/Encoder, arrow.core/NonEmptySet<#A>) // arrow.core.serialization/NonEmptySetSerializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;arrow.core.NonEmptySet<1:0>){}[0]
+    final val descriptor // arrow.core.serialization/NonEmptySetSerializer.descriptor|{}descriptor[0]
+        final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // arrow.core.serialization/NonEmptySetSerializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+}
