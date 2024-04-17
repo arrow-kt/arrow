@@ -5,7 +5,8 @@ import arrow.core.left
 import arrow.core.right
 import arrow.retrofit.adapter.either.EitherCallAdapterFactory
 import arrow.retrofit.adapter.mock.ResponseMock
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.test.runTest
@@ -18,6 +19,7 @@ import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.net.SocketException
 import java.net.SocketTimeoutException
@@ -166,7 +168,7 @@ class NetworkEitherCallAdapterTestGson : NetworkEitherCallAdapterTest(GsonConver
   @Test override fun shouldReturnCallErrorWithUnitForNonNullBody() = super.shouldReturnCallErrorWithUnitForNonNullBody()
 }
 
-class NetworkEitherCallAdapterTestMoshi : NetworkEitherCallAdapterTest(MoshiConverterFactory.create()) {
+class NetworkEitherCallAdapterTestMoshi : NetworkEitherCallAdapterTest(MoshiConverterFactory.create(Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build())) {
   @BeforeTest override fun initialize() {
     super.initialize()
   }

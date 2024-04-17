@@ -20,7 +20,7 @@ apply(from = property("ANIMALSNIFFER"))
 dependencies {
   compileOnly(libs.kotlin.stdlib)
   compileOnly(projects.arrowCore)
-  compileOnly(libs.squareup.retrofit)
+  compileOnly(libs.squareup.retrofit.lib)
 
   testImplementation(projects.arrowCore)
   testImplementation(libs.kotlin.test)
@@ -29,10 +29,11 @@ dependencies {
   testImplementation(libs.kotest.property)
   testCompileOnly(libs.kotlin.reflect)
   testImplementation(libs.squareup.okhttpMockWebServer)
-  testImplementation(libs.squareup.retrofitConverterGson)
-  testImplementation(libs.squareup.retrofitConverterMoshi)
+  testImplementation(libs.squareup.retrofit.converter.gson)
+  testImplementation(libs.squareup.retrofit.converter.moshi)
   testImplementation(libs.kotlinx.serializationJson)
-  testImplementation(libs.jakewharton.retrofitConverterKotlinxSerialization)
+  testImplementation(libs.squareup.retrofit.converter.kotlinxSerialization)
+  testImplementation(libs.squareup.moshi.kotlin)
 }
 
 tasks.jar {
