@@ -20,7 +20,7 @@ kspVersion = "1.9.23-1.0.20"
 kotlinxSerialization = "1.6.3"
 mockWebServer = "4.12.0"
 retrofit = "2.11.0"
-retrofitKotlinxSerialization = "1.0.0"
+moshi = "1.15.1"
 spotlessVersion = "6.25.0"
 compose = "1.6.5"
 composePlugin = "1.6.2"
@@ -46,10 +46,11 @@ kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "k
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
-squareup-retrofitConverterGson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
-squareup-retrofitConverterMoshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
-jakewharton-retrofitConverterKotlinxSerialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerialization" }
-squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+squareup-retrofit-lib = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+squareup-retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+squareup-retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+squareup-retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
+squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
