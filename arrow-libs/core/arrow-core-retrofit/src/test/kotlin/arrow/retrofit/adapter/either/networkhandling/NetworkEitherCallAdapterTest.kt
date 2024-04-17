@@ -5,7 +5,8 @@ import arrow.core.left
 import arrow.core.right
 import arrow.retrofit.adapter.either.EitherCallAdapterFactory
 import arrow.retrofit.adapter.mock.ResponseMock
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.spec.style.stringSpec
 import io.kotest.matchers.shouldBe
@@ -20,6 +21,7 @@ import okhttp3.mockwebserver.SocketPolicy
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.net.SocketException
 import java.net.SocketTimeoutException
@@ -28,8 +30,9 @@ import java.util.concurrent.TimeUnit
 @ExperimentalSerializationApi
 class NetworkEitherCallAdapterTestSuite : StringSpec({
   include(networkEitherCallAdapterTests(GsonConverterFactory.create()))
-  include(networkEitherCallAdapterTests(MoshiConverterFactory.create()))
   include(networkEitherCallAdapterTests(Json.asConverterFactory("application/json".toMediaType())))
+  val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+  include(networkEitherCallAdapterTests(MoshiConverterFactory.create(moshi)))
 })
 
 private fun networkEitherCallAdapterTests(
