@@ -164,15 +164,6 @@ fun KSPropertyDeclaration.sameInChildren(subclasses: Sequence<KSClassDeclaration
     }
   }
 
-fun KSPropertyDeclaration.sameInChildren(subclasses: Sequence<KSClassDeclaration>): Boolean =
-  subclasses.all { subclass ->
-    val property = subclass.getAllProperties().singleOrNull { it.simpleName == this.simpleName }
-    when (property) {
-      null -> false
-      else -> property.type.resolve() == this.type.resolve()
-    }
-  }
-
 internal fun evalAnnotatedValueClass(
   element: KSClassDeclaration,
   errorMessage: String,
