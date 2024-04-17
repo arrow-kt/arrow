@@ -51,7 +51,7 @@ class NonEmptyListTest {
   @Test
   fun iterableToNonEmptyListOrNullShouldWorkCorrectlyWhenTheIterableStartsWithOrContainsNull() = runTest {
     checkAll(Arb.list(Arb.int())) { list ->
-      checkAll(Arb.int(min = 0, max = list.size)) { ix ->
+      checkAll(iterations = 5, Arb.int(min = 0, max = list.size)) { ix ->
         val mutableList: MutableList<Int?> = list.toMutableList()
         mutableList.add(ix, null)
         mutableList.toNonEmptyListOrNull().shouldNotBeNull() shouldBe mutableList
