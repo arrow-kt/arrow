@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.17.1"
+  id("com.gradle.develocity") version "3.17.1"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
@@ -114,9 +114,9 @@ project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-o
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
 
-gradleEnterprise {
+develocity {
   buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
+    termsOfUseUrl = "https://gradle.com/terms-of-service"
+    termsOfUseAgree = "yes"
   }
 }
