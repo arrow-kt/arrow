@@ -138,7 +138,7 @@ public inline fun <Error, A, B> fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  val raise = DefaultRaise(false)
+  val raise = DefaultRaise<Error>(false)
   return try {
     val res = block(raise)
     raise.complete()
@@ -201,7 +201,7 @@ public inline fun <Error, A> Raise<Error>.traced(
     callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(trace, AT_MOST_ONCE)
   }
-  val nested = DefaultRaise(true)
+  val nested = DefaultRaise<Error>(true)
   return try {
     block(nested).also { nested.complete() }
   } catch (e: Traced) {
@@ -227,21 +227,20 @@ internal fun Traced.withCause(cause: Traced): Traced =
 @PublishedApi
 @DelicateRaiseApi
 @Suppress("UNCHECKED_CAST")
-internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
+internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise<R>): R =
   when {
     this is RaiseCancellationException && this.raise === raise -> raised as R
     else -> throw this
   }
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
-@PublishedApi
-internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Raise<Any?> {
+public class DefaultRaise<Error>(@PublishedApi internal val isTraced: Boolean) : Raise<Error> {
   private val isActive = AtomicBoolean(true)
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
   @OptIn(DelicateRaiseApi::class)
-  override fun raise(r: Any?): Nothing = when {
+  override fun raise(r: Error): Nothing = when {
     isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
@@ -259,17 +258,18 @@ public annotation class DelicateRaiseApi
 @DelicateRaiseApi
 public sealed class RaiseCancellationException(
   internal val raised: Any?,
-  internal val raise: Raise<Any?>
+  internal val raise: Raise<*>
 ) : CancellationException(RaiseCancellationExceptionCaptured)
 
 @DelicateRaiseApi
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+internal expect class NoTrace(raised: Any?, raise: Raise<*>) : RaiseCancellationException
 
 @DelicateRaiseApi
-internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
+internal class Traced(raised: Any?, raise: Raise<*>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
 
-private class RaiseLeakedException : IllegalStateException(
+@PublishedApi
+internal class RaiseLeakedException : IllegalStateException(
   """
   'raise' or 'bind' was leaked outside of its context scope.
   Make sure all calls to 'raise' and 'bind' occur within the lifecycle of nullable { }, either { } or similar builders.

@@ -521,21 +521,22 @@ public inline fun <Error, A> Raise<Error>.forEachAccumulating(
   @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
 ): Unit = forEachAccumulatingImpl(iterator, combine) { item, _ -> block(item) }
 
+@OptIn(DelicateRaiseApi::class)
 @PublishedApi @JvmSynthetic
 internal inline fun <Error, A> Raise<Error>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
-) {
+): Unit = reusableRaise<NonEmptyList<Error>, _> {
   var error: Any? = EmptyValue
   for (item in iterator) {
-    recover({
+    recoverReused({
       block(RaiseAccumulate(this), item, error != EmptyValue)
     }) { errors ->
       error = combine(error, errors.reduce(combine), combine)
     }
   }
-  return if (error === EmptyValue) Unit else raise(unbox<Error>(error))
+  return if (error === EmptyValue) Unit else this@forEachAccumulatingImpl.raise(unbox<Error>(error))
 }
 
 @RaiseDSL
@@ -560,20 +561,21 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
+@OptIn(DelicateRaiseApi::class)
 @PublishedApi @JvmSynthetic
 internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
-) {
+): Unit = reusableRaise {
   val error: MutableList<Error> = mutableListOf()
   for (item in iterator) {
-    recover({
+    recoverReused({
       block(RaiseAccumulate(this), item, error.isNotEmpty())
     }) {
       error.addAll(it)
     }
   }
-  error.toNonEmptyListOrNull()?.let(::raise)
+  error.toNonEmptyListOrNull()?.let(this@forEachAccumulatingImpl::raise)
 }
 
 /**
