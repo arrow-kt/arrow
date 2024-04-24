@@ -44,7 +44,6 @@ plugins {
   alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlinx.serialization) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
-  alias(libs.plugins.arrowGradleConfig.nexus)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.jetbrainsCompose) apply false
 }

@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
-  alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
 }

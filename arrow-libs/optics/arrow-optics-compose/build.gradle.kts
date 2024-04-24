@@ -12,7 +12,7 @@ repositories {
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   // alias(libs.plugins.arrowGradleConfig.kotlin)
-  alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
   alias(libs.plugins.jetbrainsCompose)
   alias(libs.plugins.android.library)
@@ -78,7 +78,7 @@ compose {
   // override the choice of Compose if we use a Kotlin -dev version
   val kotlinVersion = project.rootProject.properties["kotlin_version"] as? String
   if (kotlinVersion != null && kotlinVersion.contains("-dev-")) {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("2.0.0-Beta1"))
+    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("2.0.0-RC1"))
     kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
   }
 }

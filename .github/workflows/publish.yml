@@ -1,10 +1,7 @@
 name: "Publish all libs, Arrow-stack and Docs"
 
-on:
-  push:
-    branch:
-      - 'arrow-2'
-#on:
+## Change before merging, change 2.0.0-SNAPSHOT back to ${{ inputs.version }}
+on: pull_request
 #  workflow_dispatch:
 #    branches: [main]
 #    inputs:
@@ -45,7 +42,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
       - name: Assemble
-        run: ./gradlew assemble -Pversion=${{ inputs.version }}
+        run: ./gradlew assemble -Pversion=2.0.0-SNAPSHOT
 
       - name: Upload reports
         if: failure()
@@ -55,4 +52,4 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Publish next major SNAPSHOT version
-        run: ./gradlew -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository
+        run: ./gradlew -Pversion=2.0.0-SNAPSHOT  publishToSonatype closeSonatypeStagingRepository
