@@ -4,17 +4,18 @@ import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.typeclasses.Snoc
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class SnocInstanceTest : StringSpec({
+class SnocInstanceTest {
+  @Test
+  fun snocListLaws() =
     testLaws(
-      "Snoc list - ",
       PrismLaws(
         prism = Snoc.list<Int>().snoc(),
         aGen = Arb.list(Arb.int()),
@@ -22,8 +23,10 @@ class SnocInstanceTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.pair(Arb.list(Arb.int()), Arb.int())),
       )
     )
+
+  @Test
+  fun snocStringLaws() =
     testLaws(
-      "Snoc string - ",
       PrismLaws(
         prism = Snoc.string().snoc(),
         aGen = Arb.string(),
@@ -31,4 +34,4 @@ class SnocInstanceTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.pair(Arb.string(), Arb.char())),
       )
     )
-})
+}

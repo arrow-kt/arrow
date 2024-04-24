@@ -1,10 +1,11 @@
 package arrow.core
 
 import io.kotest.assertions.throwables.shouldThrowAny
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class NonFatalJvmTest : StringSpec({
+class NonFatalJvmTest {
   val fatals: List<Throwable> =
     listOf(
       InterruptedException(),
@@ -15,16 +16,17 @@ class NonFatalJvmTest : StringSpec({
       },
     )
 
-  "Test fatals using #invoke()" {
+  @Test fun testFatalsUsingInvoke() = runTest {
     fatals.forEach {
       NonFatal(it) shouldBe false
     }
   }
-  "Test fatals using Throwable#nonFatalOrThrow" {
+
+  @Test fun testFatalsUsingThrowableNonFatalOrThrow() = runTest {
     fatals.forEach {
       shouldThrowAny {
         it.nonFatalOrThrow()
       }
     }
   }
-})
+}

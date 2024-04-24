@@ -1,21 +1,20 @@
 package arrow.core
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class TupleTest : StringSpec({
+class TupleTest {
 
-  "shortToString" {
+  @Test fun shortToString() = runTest {
     checkAll(
       Arb.int(),
       Arb.int(),
@@ -36,7 +35,7 @@ class TupleTest : StringSpec({
     }
   }
 
-  "plus" {
+  @Test fun plus() = runTest {
     checkAll(
       Arb.int(),
       Arb.int(),
@@ -58,7 +57,7 @@ class TupleTest : StringSpec({
     }
   }
 
-  "compareTo(equals)" {
+  @Test fun compareToEquals() = runTest {
     checkAll(
       Arb.int(),
       Arb.string(),
@@ -81,7 +80,7 @@ class TupleTest : StringSpec({
     }
   }
 
-  "compareTo(not equals)" {
+  @Test fun compareToNotEquals() = runTest {
     checkAll(
       Arb.intOpenEnded(),
       Arb.intOpenEnded(),
@@ -104,7 +103,7 @@ class TupleTest : StringSpec({
     }
   }
 
-  "compareTo(deep not equals)" {
+  @Test fun compareToDeepNotEquals() = runTest {
     checkAll(
       Arb.intOpenEnded(),
       Arb.intOpenEnded(),
@@ -161,87 +160,6 @@ class TupleTest : StringSpec({
       Tuple9(a, b, c, d, e, f, g, h, i).compareTo(Tuple9(a, b, c, d, e, f, g, h, i + 1)) shouldBe -1
     }
   }
-
-  "toStringN" {
-    checkAll(
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int(),
-      Arb.int()
-    ) { a, b, c, d, e, f, g, h, i, j ->
-      Tuple10(a, b, c, d, e, f, g, h, i, j).toString() shouldBe "($a, $b, $c, $d, $e, $f, $g, $h, $i, $j)"
-    }
-  }
-
-  "plusN" {
-    checkAll(
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 2..2),
-    ) { (a, b, c, d), (e, f, g, h), (i, j, k, l), (m, n, o, p), (q, r, s, t), (u, v) ->
-      Tuple9(a, b, c, d, e, f, g, h, i) + j shouldBe Tuple10(a, b, c, d, e, f, g, h, i, j)
-      Tuple10(a, b, c, d, e, f, g, h, i, j) + k shouldBe Tuple11(a, b, c, d, e, f, g, h, i, j, k)
-      Tuple11(a, b, c, d, e, f, g, h, i, j, k) + l shouldBe Tuple12(a, b, c, d, e, f, g, h, i, j, k, l)
-      Tuple12(a, b, c, d, e, f, g, h, i, j, k, l) + m shouldBe Tuple13(a, b, c, d, e, f, g, h, i, j, k, l, m)
-      Tuple13(a, b, c, d, e, f, g, h, i, j, k, l, m) + n shouldBe Tuple14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)
-      Tuple14(a, b, c, d, e, f, g, h, i, j, k, l, m, n) + o shouldBe Tuple15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-      Tuple15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) + p shouldBe Tuple16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
-      Tuple16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) + q shouldBe Tuple17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
-      Tuple17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) + r shouldBe Tuple18(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)
-      Tuple18(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r) + s shouldBe Tuple19(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)
-      Tuple19(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s) + t shouldBe Tuple20(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)
-      Tuple20(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t) + u shouldBe Tuple21(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)
-      Tuple21(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u) + v shouldBe Tuple22(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v)
-    }
-  }
-
-  "compareToN(equals)" {
-    checkAll(
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 4..4),
-      Arb.list(Arb.int(), 2..2),
-    ) { (a, b, c, d), (e, f, g, h), (i, j) ->
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e, f, g, h, i, j)) shouldBe 0
-    }
-  }
-
-  "compareToN(not equals)" {
-    checkAll(
-      Arb.list(Arb.intOpenEnded(), 4..4),
-      Arb.list(Arb.intOpenEnded(), 4..4),
-      Arb.list(Arb.intOpenEnded(), 2..2),
-    ) { (a, b, c, d), (e, f, g, h), (i, j) ->
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a + 1, b, c, d, e, f, g, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a - 1, b, c, d, e, f, g, h, i, j)) shouldBe 1
-    }
-  }
-
-  "compareToN(deep not equals)" {
-    checkAll(
-      Arb.list(Arb.intOpenEnded(), 4..4),
-      Arb.list(Arb.intOpenEnded(), 4..4),
-      Arb.list(Arb.intOpenEnded(), 2..2),
-    ) { (a, b, c, d), (e, f, g, h), (i, j) ->
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b + 1, c, d, e, f, g, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c + 1, d, e, f, g, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d + 1, e, f, g, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e + 1, f, g, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e, f + 1, g, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e, f, g + 1, h, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e, f, g, h + 1, i, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e, f, g, h, i + 1, j)) shouldBe -1
-      Tuple10(a, b, c, d, e, f, g, h, i, j).compareTo(Tuple10(a, b, c, d, e, f, g, h, i, j + 1)) shouldBe -1
-    }
-  }
-})
+}
 
 private fun Arb.Companion.intOpenEnded() = Arb.int(Int.MIN_VALUE + 1, Int.MAX_VALUE - 1)

@@ -1,6 +1,5 @@
 package arrow.optics.test.laws
 
-import arrow.core.compose
 import arrow.core.identity
 import arrow.optics.Prism
 import io.kotest.property.Arb
@@ -43,7 +42,7 @@ data class PrismLaws<A, B>(
 
   private suspend fun <A, B> Prism<A, B>.composeModify(aGen: Arb<A>, funcGen: Arb<(B) -> B>, eq: (A, A) -> Boolean): PropertyContext =
     checkAll(100, aGen, funcGen, funcGen) { a, f, g ->
-      modify(modify(a, f), g).equalUnderTheLaw(modify(a, g compose f), eq)
+      modify(modify(a, f), g).equalUnderTheLaw(modify(a) { g(f(it)) }, eq)
     }
 
   private suspend fun <A, B> Prism<A, B>.consistentSetModify(aGen: Arb<A>, bGen: Arb<B>, eq: (A, A) -> Boolean): PropertyContext =

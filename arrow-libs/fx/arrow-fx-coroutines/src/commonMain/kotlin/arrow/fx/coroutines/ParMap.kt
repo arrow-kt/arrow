@@ -3,9 +3,9 @@ package arrow.fx.coroutines
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.flattenOrAccumulate
 import arrow.core.raise.Raise
 import arrow.core.raise.either
+import arrow.core.flattenOrAccumulate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

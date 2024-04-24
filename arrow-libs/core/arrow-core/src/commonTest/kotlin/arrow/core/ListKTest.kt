@@ -2,18 +2,20 @@ package arrow.core
 
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.testLaws
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class ListKTest : StringSpec({
+class ListKTest {
 
+  @Test fun monoidLaws() =
     testLaws(MonoidLaws("List", emptyList(), List<Int>::plus, Arb.list(Arb.int())))
 
-    "mapNotNull() should map list and filter out null values" {
+  @Test fun mapNotNullOk() = runTest {
       checkAll(Arb.list(Arb.int())) { listk ->
         listk.mapNotNull {
           when (it % 2 == 0) {
@@ -24,4 +26,4 @@ class ListKTest : StringSpec({
       }
     }
 
-})
+}

@@ -1,14 +1,14 @@
 // This file was automatically generated from Sequence.kt by Knit tool. Do not edit.
 package arrow.core.examples.exampleSequence08
 
-import arrow.core.padZip
+import arrow.core.rightPadZip
 
-val padZipRight = sequenceOf(1, 2).padZip(sequenceOf(3)) { l, r -> (l?:0) + (r?:0) }  // Result: [4, 2]
-val padZipLeft = sequenceOf(1).padZip(sequenceOf(3, 4)) { l, r -> (l?:0) + (r?:0) }   // Result: [4, 4]
-val noPadding = sequenceOf(1, 2).padZip(sequenceOf(3, 4)) { l, r -> (l?:0) + (r?:0) } // Result: [4, 6]
+val left = sequenceOf(1, 2).rightPadZip(sequenceOf(3)) { l, r -> l + (r?:0) }    // Result: [4, 2]
+val right = sequenceOf(1).rightPadZip(sequenceOf(3, 4)) { l, r -> l + (r?:0) }   // Result: [4]
+val both = sequenceOf(1, 2).rightPadZip(sequenceOf(3, 4)) { l, r -> l + (r?:0) } // Result: [4, 6]
 
 fun main() {
-  println("padZipRight = $padZipRight")
-  println("padZipLeft = $padZipLeft")
-  println("noPadding = $noPadding")
+  println("left = $left")
+  println("right = $right")
+  println("both = $both")
 }

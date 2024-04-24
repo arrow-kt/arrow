@@ -4,7 +4,7 @@ package arrow.core.examples.exampleIor05
 import arrow.core.Ior
 
 fun main() {
-  Ior.Right(12).bimap ({ "flower" }, { 12 }) // Result: Right(12)
-  Ior.Left(12).bimap({ "flower" }, { 12 })  // Result: Left("flower")
-  Ior.Both(12, "power").bimap ({ it * 2 }, { b -> "flower $b" })   // Result: Both("flower power", 24)
+  Ior.Right(12).mapLeft { "flower" } // Result: Right(12)
+  Ior.Left(12).mapLeft { "flower" }  // Result: Left("power")
+  Ior.Both(12, "power").mapLeft { "flower $it" }  // Result: Both("flower 12", "power")
 }

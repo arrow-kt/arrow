@@ -20,20 +20,21 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT =
   ADT(
     c.packageName,
     c,
-    c.targets().mapNotNull { target ->
+    c.targets().map { target ->
       when (target) {
         OpticsTarget.LENS ->
-          evalAnnotatedClass(c, c.qualifiedNameOrSimpleName.lensErrorMessage, logger)
-            ?.let(::LensTarget)
-        OpticsTarget.OPTIONAL ->
-          evalAnnotatedClass(c, c.qualifiedNameOrSimpleName.optionalErrorMessage, logger)
-            ?.let(::OptionalTarget)
+          evalAnnotatedDataClass(c, c.qualifiedNameOrSimpleName.lensErrorMessage, logger)
+            .orEmpty()
+            .let(::LensTarget)
+
         OpticsTarget.ISO ->
-          evalAnnotatedIsoElement(c, c.qualifiedNameOrSimpleName.isoErrorMessage, logger)
+          evalAnnotatedValueClass(c, c.qualifiedNameOrSimpleName.isoErrorMessage, logger)
             .let(::IsoTarget)
+
         OpticsTarget.PRISM ->
           evalAnnotatedPrismElement(c, c.qualifiedNameOrSimpleName.prismErrorMessage, logger)
             .let(::PrismTarget)
+
         OpticsTarget.DSL -> evalAnnotatedDslElement(c, logger)
       }
     },
@@ -58,7 +59,6 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): Set<OpticsTarget>
         "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
         "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
         "arrow.optics.OpticsTarget.PRISM" -> OpticsTarget.PRISM
-        "arrow.optics.OpticsTarget.OPTIONAL" -> OpticsTarget.OPTIONAL
         "arrow.optics.OpticsTarget.DSL" -> OpticsTarget.DSL
         else -> null
       }
@@ -90,10 +90,7 @@ internal fun evalAnnotatedPrismElement(
 internal val KSDeclaration.qualifiedNameOrSimpleName: String
   get() = (qualifiedName ?: simpleName).asSanitizedString()
 
-internal fun KSClassDeclaration.sealedSubclassFqNameList(): List<String> =
-  getSealedSubclasses().mapNotNull { it.qualifiedName?.asString() }.toList()
-
-internal fun evalAnnotatedClass(
+internal fun evalAnnotatedDataClass(
   element: KSClassDeclaration,
   errorMessage: String,
   logger: KSPLogger,
@@ -167,6 +164,20 @@ fun KSPropertyDeclaration.sameInChildren(subclasses: Sequence<KSClassDeclaration
     }
   }
 
+internal fun evalAnnotatedValueClass(
+  element: KSClassDeclaration,
+  errorMessage: String,
+  logger: KSPLogger,
+): List<Focus> =
+  when {
+    element.isValue ->
+      listOf(Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()))
+    else -> {
+      logger.error(errorMessage, element)
+      emptyList()
+    }
+  }
+
 internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLogger): Target =
   when {
     element.isDataClass ->
@@ -182,29 +193,6 @@ internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLog
     element.isSealed ->
       SealedClassDsl(evalAnnotatedPrismElement(element, element.qualifiedNameOrSimpleName.prismErrorMessage, logger))
     else -> throw IllegalStateException("should only be sealed, data, or value by now")
-  }
-
-internal fun evalAnnotatedIsoElement(
-  element: KSClassDeclaration,
-  errorMessage: String,
-  logger: KSPLogger,
-): List<Focus> =
-  when {
-    element.isDataClass ->
-      element
-        .getConstructorTypesNames()
-        .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
-        .takeIf { it.size <= 22 }
-        ?: run {
-          logger.error(element.qualifiedNameOrSimpleName.isoTooBigErrorMessage, element)
-          emptyList()
-        }
-    element.isValue ->
-      listOf(Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()))
-    else -> {
-      logger.error(errorMessage, element)
-      emptyList()
-    }
   }
 
 internal fun KSClassDeclaration.getConstructorTypesNames(): List<String> =

@@ -1,7 +1,8 @@
 package arrow.fx.coroutines
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.loop
+import arrow.atomic.Atomic
+import arrow.atomic.loop
+import arrow.atomic.value
 import kotlinx.coroutines.CompletableDeferred
 
 /**
@@ -13,7 +14,7 @@ import kotlinx.coroutines.CompletableDeferred
  */
 public class CountDownLatch(private val initial: Long) {
   private val signal = CompletableDeferred<Unit>()
-  private val count = AtomicRef(initial)
+  private val count = Atomic(initial)
   
   init {
     require(initial > 0) {
@@ -22,14 +23,12 @@ public class CountDownLatch(private val initial: Long) {
   }
   
   /** Remaining count */
-  public fun count(): Long = count.get()
+  public fun count(): Long = count.value
   
   /** Await [count] to reach zero */
-  public suspend fun await(): Unit =
-    when (count.get()) {
-      0L -> { }
-      else -> signal.await()
-    }
+  public suspend fun await() {
+    if (count.value > 0L) signal.await()
+  }
   
   /** Decrement [count] by one */
   @Suppress("ReturnCount")

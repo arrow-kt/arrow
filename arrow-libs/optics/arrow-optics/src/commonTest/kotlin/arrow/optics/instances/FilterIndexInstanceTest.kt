@@ -4,20 +4,20 @@ import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.TraversalLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.test.nonEmptyList
-import arrow.optics.test.sequence
 import arrow.optics.typeclasses.FilterIndex
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class FilterIndexInstanceTest : StringSpec({
+class FilterIndexInstanceTest {
 
+  @Test
+  fun filterIndexListLaws() =
     testLaws(
-      "FilterIndex list - ",
       TraversalLaws(
         traversal = FilterIndex.list<Int>().filter { true },
         aGen = Arb.list(Arb.int()),
@@ -26,18 +26,20 @@ class FilterIndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun filterIndexSequenceLaws() =
     testLaws(
-      "FilterIndex sequence - ",
       TraversalLaws(
         traversal = FilterIndex.sequence<Int>().filter { true },
-        aGen = Arb.sequence(Arb.int()),
+        aGen = Arb.list(Arb.int()).map { it.asSequence() },
         bGen = Arb.int(),
         funcGen = Arb.functionAToB(Arb.int()),
       ) { a, b -> a.toList() == b.toList() }
     )
 
+  @Test
+  fun filterIndexNonEmptyListLaws() =
     testLaws(
-      "FilterIndex Nel - ",
       TraversalLaws(
         traversal = FilterIndex.nonEmptyList<Int>().filter { true },
         aGen = Arb.nonEmptyList(Arb.int()),
@@ -46,8 +48,9 @@ class FilterIndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun filterIndexMapLaws() =
     testLaws(
-      "FilterIndex map - ",
       TraversalLaws(
         traversal = FilterIndex.map<Char, Int>().filter { true },
         aGen = Arb.map(Arb.char(), Arb.int()),
@@ -56,8 +59,9 @@ class FilterIndexInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun filterIndexStringLaws() =
     testLaws(
-      "FilterIndex string - ",
       TraversalLaws(
         traversal = FilterIndex.string().filter { true },
         aGen = Arb.string(),
@@ -65,4 +69,4 @@ class FilterIndexInstanceTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.char()),
       )
     )
-})
+}

@@ -4,17 +4,18 @@ import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.testLaws
 import arrow.optics.typeclasses.Cons
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
+import kotlin.test.Test
 
-class ConsInstanceTest : StringSpec({
+class ConsInstanceTest {
+  @Test
+  fun consListLaws() =
     testLaws(
-      "Const list - ",
       PrismLaws(
         prism = Cons.list<Int>().cons(),
         aGen = Arb.list(Arb.int()),
@@ -23,8 +24,9 @@ class ConsInstanceTest : StringSpec({
       )
     )
 
+  @Test
+  fun consStringLaws() =
     testLaws(
-      "Cons string - ",
       PrismLaws(
         prism = Cons.string().cons(),
         aGen = Arb.string(),
@@ -32,4 +34,4 @@ class ConsInstanceTest : StringSpec({
         funcGen = Arb.functionAToB(Arb.pair(Arb.char(), Arb.string())),
       )
     )
-})
+}

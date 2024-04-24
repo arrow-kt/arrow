@@ -1,15 +1,10 @@
 [versions]
 animalSniffer = "1.7.1"
 arrowGradleConfig = "0.12.0-rc.24"
-assertj = "3.25.3"
 coroutines = "1.8.0"
 classgraph = "4.8.172"
 dokka = "1.9.20"
-jUnit = "4.13.2"
-jUnitJupiter = "5.10.2"
-jUnitVintage = "5.10.2"
 kotest = "5.8.1"
-kotestGradle = "5.8.1"
 kover = "0.7.6"
 kotlin = "1.9.23"
 kotlinxSerializationPlugin = "1.9.23"
@@ -31,14 +26,8 @@ cache4k = "0.13.0"
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-jUnitJUnit = { module = "junit:junit", version.ref = "jUnit" }
-jUnitVintageEngine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "jUnitVintage" }
-junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jUnitJupiter" }
-junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jUnitJupiter" }
 kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-frameworkEngine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-kotest-runnerJUnit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
@@ -53,7 +42,6 @@ squareup-retrofit-converter-kotlinxSerialization = { module = "com.squareup.retr
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
 kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
-assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
@@ -68,7 +56,6 @@ arrowGradleConfig-nexus = { id = "io.arrow-kt.arrow-gradle-config-nexus", versio
 arrowGradleConfig-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", version.ref = "arrowGradleConfig" }
 arrowGradleConfig-versioning = { id = "io.arrow-kt.arrow-gradle-config-versioning", version.ref = "arrowGradleConfig" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotestGradle" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }

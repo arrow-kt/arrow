@@ -107,6 +107,7 @@ public inline fun <Error, A, B> fold(
   transform: (value: A) -> B,
 ): B {
   contract {
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
@@ -132,6 +133,7 @@ public inline fun <Error, A, B> fold(
   transform: (value: A) -> B,
 ): B {
   contract {
+    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(catch, AT_MOST_ONCE)
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
@@ -195,6 +197,10 @@ public inline fun <Error, A> Raise<Error>.traced(
   @BuilderInference block: Raise<Error>.() -> A,
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(trace, AT_MOST_ONCE)
+  }
   val nested = DefaultRaise(true)
   return try {
     block(nested).also { nested.complete() }

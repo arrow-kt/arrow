@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.enterprise") version "3.17.2"
+  id("com.gradle.develocity") version "3.17.2"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
@@ -58,14 +58,14 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
+include("arrow-functions")
+project(":arrow-functions").projectDir = file("arrow-libs/core/arrow-functions")
+
 include("arrow-core-high-arity")
 project(":arrow-core-high-arity").projectDir = file("arrow-libs/core/arrow-core-high-arity")
 
 include("arrow-atomic")
 project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
-
-include("arrow-continuations")
-project(":arrow-continuations").projectDir = file("arrow-libs/core/arrow-continuations")
 
 include("arrow-eval")
 project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")
@@ -114,9 +114,9 @@ project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-o
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
 
-gradleEnterprise {
+develocity {
   buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
+    termsOfUseUrl = "https://gradle.com/terms-of-service"
+    termsOfUseAgree = "yes"
   }
 }

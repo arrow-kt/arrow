@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Exposes the values of [this] through the optic.
  */
-public fun <T, A> SharedFlow<T>.optic(g: Getter<T, A>): SharedFlow<A> = object : SharedFlow<A> {
+public fun <T, A> SharedFlow<T>.optic(g: Lens<T, A>): SharedFlow<A> = object : SharedFlow<A> {
   override suspend fun collect(collector: FlowCollector<A>): Nothing =
     this@optic.collect { collector.emit(g.get(it)) }
 
@@ -20,7 +20,7 @@ public fun <T, A> SharedFlow<T>.optic(g: Getter<T, A>): SharedFlow<A> = object :
 /**
  * Exposes the values of [this] through the optic.
  */
-public fun <T, A> StateFlow<T>.optic(g: Getter<T, A>): StateFlow<A> = object : StateFlow<A> {
+public fun <T, A> StateFlow<T>.optic(g: Lens<T, A>): StateFlow<A> = object : StateFlow<A> {
   override val value: A
     get() = g.get(this@optic.value)
 

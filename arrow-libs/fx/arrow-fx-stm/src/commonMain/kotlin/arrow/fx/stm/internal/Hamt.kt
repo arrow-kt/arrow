@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package arrow.fx.stm.internal
 
 import arrow.fx.stm.TVar

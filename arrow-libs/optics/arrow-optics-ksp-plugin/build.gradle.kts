@@ -24,9 +24,8 @@ dependencies {
   implementation(libs.ksp)
 
   testImplementation(libs.kotlin.stdlib)
-  testImplementation(libs.junitJupiter)
-  testImplementation(libs.junitJupiterEngine)
-  testImplementation(libs.assertj)
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.kotest.assertionsCore)
   testImplementation(libs.classgraph)
   testImplementation(libs.kotlinCompileTesting) {
     exclude(
@@ -45,8 +44,7 @@ dependencies {
   testRuntimeOnly(projects.arrowOptics)
 }
 
-tasks {
-  withType<Test>().configureEach {
-    maxParallelForks = 1
-  }
+tasks.withType<Test>().configureEach {
+  maxParallelForks = 1
+  useJUnitPlatform()
 }

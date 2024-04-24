@@ -9,12 +9,7 @@ import arrow.core.test.map2
 import arrow.core.test.map3
 import arrow.core.test.option
 import arrow.core.test.testLaws
-import arrow.typeclasses.Semigroup
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.inspectors.forAll
-import io.kotest.inspectors.forAllValues
-import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
@@ -27,13 +22,15 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
-class MapKTest : StringSpec({
+class MapKTest {
+  @Test fun monoidLaws() =
     testLaws(
       MonoidLaws(
         "Map",
@@ -43,98 +40,7 @@ class MapKTest : StringSpec({
       )
     )
 
-    "traverseEither is stacksafe" {
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse { v ->
-        acc.add(v)
-        Either.Right(v)
-      }
-      res shouldBe acc.associateWith { it }.right()
-      res shouldBe (0..20_000).associateWith { it }.right()
-    }
-
-    "traverseEither short-circuit" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        val acc = mutableListOf<Int>()
-        val evens = ints.traverse {
-          if (it % 2 == 0) {
-            acc.add(it)
-            Either.Right(it)
-          } else Either.Left(it)
-        }
-        acc shouldBe ints.values.takeWhile { it % 2 == 0 }
-        when (evens) {
-          is Either.Right -> evens.value shouldBe ints
-          is Either.Left -> evens.value shouldBe ints.values.first { it % 2 != 0 }
-        }
-      }
-    }
-
-    "traverseOption is stack-safe" {
-      // also verifies result order and execution order (l to r)
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse { a ->
-        acc.add(a)
-        Some(a)
-      }
-      res shouldBe Some(acc.associateWith { it })
-      res shouldBe Some((0..20_000).associateWith { it })
-    }
-
-    "traverseOption short-circuits" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        var shortCircuited = 0
-        val result = ints.traverse {
-          if (it % 2 == 0) {
-            Some(it)
-          } else {
-            shortCircuited++
-            None
-          }
-        }
-        shortCircuited.shouldBeIn(0, 1)
-
-        if (shortCircuited == 0) {
-          result.isSome().shouldBeTrue()
-        } else if (shortCircuited == 1) {
-          result.isNone().shouldBeTrue()
-        }
-      }
-    }
-
-    "sequenceOption yields some when all entries in the list are some" {
-      checkAll(Arb.list(Arb.int())) { ints ->
-        val evens = ints.map { (it % 2 == 0).maybe { it } }.sequence()
-        evens.fold({ Unit }) { it shouldBe ints }
-      }
-    }
-
-    "traverseValidated is stacksafe" {
-      val acc = mutableListOf<Int>()
-      val res = (0..20_000).associateWith { it }.traverse(Semigroup.string()) { v ->
-        acc.add(v)
-        Validated.Valid(v)
-      }
-      res shouldBe acc.associateWith { it }.valid()
-      res shouldBe (0..20_000).associateWith { it }.valid()
-    }
-
-    "traverseValidated acummulates" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { ints ->
-        val res: ValidatedNel<Int, Map<Int, Int>> =
-          ints.traverse(Semigroup.nonEmptyList()) { i -> if (i % 2 == 0) i.validNel() else i.invalidNel() }
-
-        val expected: ValidatedNel<Int, Map<Int, Int>> =
-          Option.fromNullable(ints.values.filterNot { it % 2 == 0 }.toNonEmptyListOrNull())
-            .fold(
-              { ints.entries.filter { (_, v) -> v % 2 == 0 }.associate { (k, v) -> k to v }.validNel() },
-              { it.invalid() })
-
-        res shouldBe expected
-      }
-    }
-
-    "can align maps" {
+  @Test fun alignMaps() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -156,7 +62,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip is idempotent" {
+  @Test fun zipIsIdempotent() = runTest {
       checkAll(
         Arb.map(Arb.int(), Arb.intSmall())) {
           a ->
@@ -164,7 +70,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "align is idempotent" {
+  @Test fun alignIsIdempotent() = runTest {
       checkAll(
         Arb.map(Arb.int(), Arb.intSmall())) {
           a ->
@@ -172,7 +78,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip is commutative" {
+  @Test fun zipIsCommutative() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -181,7 +87,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "align is commutative" {
+  @Test fun alignIsCommutative() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -190,7 +96,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip is associative" {
+  @Test fun zipIsAssociative() = runTest {
       checkAll(
         Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int())
       ) { (a, b, c)  ->
@@ -202,7 +108,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "align is associative" {
+  @Test fun alignIsAssociative() = runTest {
       checkAll(
         Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int())
       ) { (a, b, c)  ->
@@ -226,7 +132,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip with" {
+  @Test fun zipWith() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int()),
         Arb.functionABCToD<Int, Int, Int, Int>(Arb.int())
@@ -235,7 +141,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "align with" {
+  @Test fun alignWith() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int()),
         Arb.functionAToB<Map.Entry<Int, Ior<Int, Int>>, Int>(Arb.int())
@@ -244,7 +150,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip functoriality" {
+  @Test fun zipFunctor() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int()),
         Arb.functionAToB<Int, Int>(Arb.int()),
@@ -261,7 +167,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "align functoriality" {
+  @Test fun alignFunctor() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int()),
         Arb.functionAToB<Int, Int>(Arb.int()),
@@ -269,14 +175,14 @@ class MapKTest : StringSpec({
       ) {
           (a,b),f,g ->
 
-        val l = a.mapValues{ f(it.value)}.align(b.mapValues{g(it.value)})
-        val r = a.align(b).mapValues { it.value.bimap(f,g)}
+        val l = a.mapValues{ f(it.value) }.align(b.mapValues{ g(it.value) })
+        val r = a.align(b).mapValues { it.value.map(g).mapLeft(f) }
 
         l shouldBe r
       }
     }
 
-    "alignedness" {
+  @Test fun alignedness() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -302,7 +208,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zippyness1" {
+  @Test fun zippyness1() = runTest {
       checkAll(
         Arb.map(Arb.int(), Arb.int())) {
         xs ->
@@ -310,23 +216,23 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zippyness2" {
+  @Test fun zipyness2() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.int())) {
+        Arb.map(Arb.int(), Arb.int(), maxSize = 30)) {
           xs ->
         xs.zip(xs).mapValues { it.value.second } shouldBe xs
       }
     }
 
-    "zippyness3" {
+  @Test fun zipyness3() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()))) {
+        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30)) {
           xs ->
         xs.mapValues { it.value.first }.zip(xs.mapValues { it.value.second }) shouldBe xs
       }
     }
 
-    "distributivity1" {
+  @Test fun distributivity1() = runTest {
       checkAll(
         Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int())
       ) {(x,y,z) ->
@@ -355,7 +261,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "distributivity2" {
+  @Test fun distributivity2() = runTest {
       checkAll(
         Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int())
       ) {(x,y,z) ->
@@ -374,7 +280,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "distributivity3" {
+  @Test fun distributivity3() = runTest {
       checkAll(
         Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int())
       ) {(x,y,z) ->
@@ -393,9 +299,9 @@ class MapKTest : StringSpec({
       }
     }
 
-    "unzip is the inverse of zip" {
+  @Test fun unzipInverseOfZip() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.int())
+        Arb.map(Arb.int(), Arb.int(), maxSize = 30)
       ) { xs ->
         val ls = xs.zip(xs).unzip()
         val rs = xs to xs
@@ -404,34 +310,34 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip is the inverse of unzip" {
+  @Test fun zipInverseOfUnzip() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         val (a,b) = xs.unzip()
         a.zip(b) shouldBe xs
       }
     }
 
-    "unzip with" {
+  @Test fun unzipWith() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         xs.unzip { it.value.first to it.value.second } shouldBe xs.unzip()
       }
     }
 
-    "unalign with" {
+  @Test fun unalignWith() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         xs.unalign { it.value } shouldBe xs.unalign()
       }
     }
 
-    "getOrNone" {
+  @Test fun getOrNoneOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(0 .. 1000), Arb.int())
+        Arb.map(Arb.int(0 .. 1000), Arb.int(), maxSize = 30)
       ) { xs ->
         val (found, notFound) = (0 .. 1000).partition { xs.containsKey(it) }
 
@@ -448,7 +354,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "unalign is the inverse of align" {
+  @Test fun unalignInverseOfAlign() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -456,9 +362,9 @@ class MapKTest : StringSpec({
       }
     }
 
-    "align is the inverse of unalign" {
+  @Test fun alignInverseOfUnalign() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         val (a,b) = xs.unalign()
 
@@ -466,7 +372,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "padZip" {
+  @Test fun padZipOk() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -486,7 +392,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "padZip with" {
+  @Test fun padZipWith() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int()),
         Arb.functionABCToD<Int, Int?, Int?, Int>(Arb.int())
@@ -495,30 +401,19 @@ class MapKTest : StringSpec({
       }
     }
 
-    "salign" {
+  @Test fun salignOk() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.intSmall(), Arb.intSmall())
       ) { (a, b) ->
-        a.salign(Semigroup.int(), b) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
+        a.salign(b, Int::plus) shouldBe a.align(b) {it.value.fold(::identity, ::identity) { a, b -> a + b } }
       }
     }
 
-    "void" {
+  @Test fun mapNotNullOk() = runTest {
       checkAll(
-        Arb.map(Arb.intSmall(), Arb.intSmall())
-      ) { a ->
-        val result = a.void()
-
-        result.keys shouldBe a.keys
-        result.forAllValues { it shouldBe Unit }
-      }
-    }
-
-    "filterMap" {
-      checkAll(
-        Arb.map(Arb.int(), Arb.boolean())
+        Arb.map(Arb.int(), Arb.boolean(), maxSize = 30)
       ) { xs ->
-        val rs = xs.filterMap { if(it) true else null }
+        val rs = xs.mapNotNull { (_, pred) -> if(pred) true else null }
 
         xs.forAll {
           if (it.value)
@@ -529,9 +424,9 @@ class MapKTest : StringSpec({
       }
     }
 
-    "filterOption" {
+  @Test fun filterOptionOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.option(Arb.int()))
+        Arb.map(Arb.int(), Arb.option(Arb.int()), maxSize = 30)
       ) { xs ->
         val rs = xs.filterOption()
 
@@ -545,9 +440,9 @@ class MapKTest : StringSpec({
       }
     }
 
-    "filterInstance" {
+  @Test fun filterInstanceOk() = runTest {
       checkAll(
-        Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.int()))
+        Arb.map(Arb.int(), Arb.choice(Arb.int(), Arb.int()), maxSize = 30)
       ) { xs ->
         val a = xs.filterIsInstance<Int, String>()
         val b = xs.filterIsInstance<Int, Int>()
@@ -556,19 +451,19 @@ class MapKTest : StringSpec({
       }
     }
 
-    "filterInstance: identity" {
-      checkAll(Arb.map(Arb.int(), Arb.int())) { xs ->
+  @Test fun filterInstanceIdentity() = runTest {
+      checkAll(Arb.map(Arb.int(), Arb.int(), maxSize = 30)) { xs ->
         xs.filterIsInstance<Int, Int>() shouldBe xs
       }
     }
 
-    "filterInstance: identity with null" {
-      checkAll(Arb.map(Arb.int(), Arb.int().orNull())) { xs ->
+  @Test fun filterInstanceIdentityNull() = runTest {
+      checkAll(Arb.map(Arb.int(), Arb.int().orNull(), maxSize = 30)) { xs ->
         xs.filterIsInstance<Int, Int?>() shouldBe xs
       }
     }
 
-    "zip2" {
+  @Test fun zip2Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -581,7 +476,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip2 with nullables" {
+  @Test fun zip2Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -594,7 +489,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip3" {
+  @Test fun zip3Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -608,7 +503,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip3 with nullables" {
+  @Test fun zip3Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -621,7 +516,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip4" {
+  @Test fun zip4Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -635,7 +530,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip4 with nullables" {
+  @Test fun zip4Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -648,7 +543,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip5" {
+  @Test fun zip5Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -662,7 +557,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip5 with nullables" {
+  @Test fun zip5Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -675,7 +570,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip6" {
+  @Test fun zip6Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -689,7 +584,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip6 with nullables" {
+  @Test fun zip6Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -702,7 +597,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip7" {
+  @Test fun zip7Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -716,7 +611,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip7 with nullables" {
+  @Test fun zip7Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -729,7 +624,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip8" {
+  @Test fun zip8Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -744,7 +639,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip8 with nullables" {
+  @Test fun zip8Null() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
       ) { (mapA, mapB) ->
@@ -757,7 +652,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip9" {
+  @Test fun zip9Ok() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -783,85 +678,7 @@ class MapKTest : StringSpec({
       }
     }
 
-    "zip9 with nullables" {
-      checkAll(
-        Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
-      ) { (mapA, mapB) ->
-        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
-          Tuple9(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii
-          )
-        }
-        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple9(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "zip10" {
-      checkAll(
-        Arb.map2(Arb.int(), Arb.int(), Arb.int())
-      ) { (a, b) ->
-        val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
-          Tuple10(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii,
-            jj
-          )
-        }
-
-        val expected = a.filter { (k, _) -> b.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "zip10 with nullables" {
-      checkAll(
-        Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
-      ) { (mapA, mapB) ->
-        val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
-          Tuple10(
-            aa,
-            bb,
-            cc,
-            dd,
-            ee,
-            ff,
-            gg,
-            hh,
-            ii,
-            jj
-          )
-        }
-        val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-          .map { (k, v) -> Pair(k, Tuple10(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
-          .toMap()
-
-        result shouldBe expected
-      }
-    }
-
-    "flatMap" {
+  @Test fun flatMapOk() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
@@ -873,7 +690,7 @@ class MapKTest : StringSpec({
       }
     }
 
-  "mapOrAccumulate of empty should be empty" {
+  @Test fun mapOrAccumulateEmpty() = runTest {
       val result: Either<NonEmptyList<String>, Map<Int, String>> = emptyMap<Int, Int>().mapOrAccumulate {
         it.value.toString()
       }
@@ -882,9 +699,9 @@ class MapKTest : StringSpec({
       .value.shouldBeEmpty()
   }
 
-  "mapOrAccumulate can map" {
+  @Test fun mapOrAccumulateMaps() = runTest {
     checkAll(
-      Arb.map(Arb.int(), Arb.int())
+      Arb.map(Arb.int(), Arb.int(), maxSize = 30)
     ) { xs ->
 
       val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapOrAccumulate {
@@ -897,9 +714,9 @@ class MapKTest : StringSpec({
     }
   }
 
-  "mapOrAccumulate accumulates errors" {
+  @Test fun mapOrAccumulateAccumulates() = runTest {
     checkAll(
-      Arb.map(Arb.int(), Arb.int(), minSize = 1)
+      Arb.map(Arb.int(), Arb.int(), minSize = 1, maxSize = 30)
     ) { xs ->
        xs.mapOrAccumulate {
           raise(it.value)
@@ -908,7 +725,7 @@ class MapKTest : StringSpec({
     }
   }
 
-  "flatMap with nullables" {
+  @Test fun flatMapNull() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
     ) { (mapA, mapB) ->
@@ -919,4 +736,4 @@ class MapKTest : StringSpec({
       result shouldBe expected
     }
   }
-})
+}

@@ -289,8 +289,8 @@ import kotlin.jvm.JvmName
  * ```kotlin
  * val default5: Effect<String, Int> =
  *   foreign
- *     .catch { ex: RuntimeException -> -1 }
- *     .catch { ex: java.sql.SQLException -> -2 }
+ *     .catch { _: RuntimeException -> -1 }
+ *     .catch { _: java.sql.SQLException -> -2 }
  * ```
  *
  * Finally, since `catch` also supports `suspend` we can safely call other `suspend` code and throw `Throwable` into the `suspend` system.
@@ -366,7 +366,7 @@ import kotlin.jvm.JvmName
  * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
- * import arrow.fx.coroutines.parTraverse
+ * import arrow.fx.coroutines.parMap
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
  * import io.kotest.matchers.types.shouldBeTypeOf
@@ -384,7 +384,7 @@ import kotlin.jvm.JvmName
  *   val error = "Error"
  *   val exits = (0..3).map { CompletableDeferred<ExitCase>() }
  *   effect<String, List<Unit>> {
- *     (0..4).parTraverse { index ->
+ *     (0..4).parMap { index ->
  *       if (index == 4) raise(error)
  *       else awaitExitCase(exits[index])
  *     }
@@ -456,7 +456,7 @@ import kotlin.jvm.JvmName
  *   effect<String, Int> {
  *     bracketCase(
  *       acquire = { File("build.gradle.kts").bufferedReader() },
- *       use = { reader: BufferedReader -> raise(error) },
+ *       use = { _: BufferedReader -> raise(error) },
  *       release = { reader, exitCase ->
  *         reader.close()
  *         exit.complete(exitCase)
@@ -664,11 +664,13 @@ import kotlin.jvm.JvmName
  */
 public typealias Effect<Error, A> = suspend Raise<Error>.() -> A
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <Error, A> effect(@BuilderInference noinline block: suspend Raise<Error>.() -> A): Effect<Error, A> = block
 
 /** The same behavior and API as [Effect] except without requiring _suspend_. */
 public typealias EagerEffect<Error, A> = Raise<Error>.() -> A
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <Error, A> eagerEffect(@BuilderInference noinline block: Raise<Error>.() -> A): EagerEffect<Error, A> = block
 
 public suspend fun <A> Effect<A, A>.merge(): A = merge { invoke() }

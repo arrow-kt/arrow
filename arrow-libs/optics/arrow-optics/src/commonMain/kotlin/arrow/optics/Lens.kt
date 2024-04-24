@@ -3,7 +3,6 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.identity
-import arrow.typeclasses.Monoid
 import kotlin.jvm.JvmStatic
 
 /**
@@ -28,17 +27,16 @@ public typealias Lens<S, A> = PLens<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSetter<S, T, A, B>,
-  PTraversal<S, T, A, B>, PEvery<S, T, A, B> {
+public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
 
-  override fun get(source: S): A
+  public fun get(source: S): A
 
   override fun set(source: S, focus: B): T
 
   override fun getOrModify(source: S): Either<T, A> =
     Either.Right(get(source))
 
-  override fun <R> foldMap(M: Monoid<R>, source: S, map: (focus: A) -> R): R =
+  override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: A) -> R): R =
     map(get(source))
 
   /**
@@ -87,7 +85,7 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
 
   public companion object {
 
-    public fun <S> id(): PIso<S, S, S, S> = PIso.id()
+    public fun <S> id(): Iso<S, S> = PIso.id()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
@@ -211,5 +209,14 @@ public interface PLens<S, T, A, B> : Getter<S, A>, POptional<S, T, A, B>, PSette
     @JvmStatic
     public fun <A, B, C> tripleThird(): Lens<Triple<A, B, C>, C> =
       triplePThird()
+
+    /**
+     * Defines equality between String and [List] of [Char]
+     */
+    @JvmStatic
+    public fun stringToList(): Lens<String, List<Char>> = PLens(
+      get = CharSequence::toList,
+      set = { _, ss -> ss.joinToString(separator = "") }
+    )
   }
 }

@@ -10,15 +10,13 @@ import arrow.core.EmptyValue.combine
 import arrow.core.EmptyValue.unbox
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.Validated
-import arrow.core.ValidatedDeprMsg
 import arrow.core.collectionSizeOrDefault
-import arrow.core.ValidatedNel
 import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -767,14 +765,11 @@ public open class RaiseAccumulate<Error>(
     is Either.Right -> value
   }
 
-  @Deprecated(ValidatedDeprMsg, ReplaceWith("toEither().bindNel()"))
   @RaiseDSL
-  public fun <A> ValidatedNel<Error, A>.bindNel(): A = when (this) {
-    is Validated.Invalid -> raise.raise(value)
-    is Validated.Valid -> value
+  public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A {
+    contract {
+      callsInPlace(block, EXACTLY_ONCE)
+    }
+    return block(raise)
   }
-
-  @RaiseDSL
-  public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A =
-    block(raise)
 }

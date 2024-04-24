@@ -1,24 +1,13 @@
 package arrow.core.test
 
-import arrow.core.Either
-import arrow.core.Endo
-import arrow.core.Eval
-import arrow.core.Ior
-import arrow.core.NonEmptyList
-import arrow.core.NonEmptySet
-import arrow.core.Option
-import arrow.core.Validated
-import arrow.core.left
-import arrow.core.memoize
-import arrow.core.right
-import arrow.core.toNonEmptySetOrNull
-import arrow.core.toOption
+import arrow.core.*
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.set
@@ -41,7 +30,9 @@ import kotlin.coroutines.startCoroutine
 // copied from kotest-extensions-arrow
 
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
-  Arb.bind(arb, Arb.list(arb, range), ::NonEmptyList)
+  Arb.list(arb, max(range.first, 1) .. range.last)
+    .filter { it.isNotEmpty() }
+    .map { NonEmptyList(it) }
 
 fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
   Arb.set(arb, max(range.first, 1) .. range.last).map { it.toNonEmptySetOrNull()!! }
@@ -50,11 +41,13 @@ fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Seq
   Arb.list(arb, range).map { it.asSequence() }
 
 fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> = arbitrary { random ->
-  { _: A -> arb.next(random) }.memoize()
+  val memoized = MemoizedDeepRecursiveFunction<A, B> { _ -> arb.next(random) }
+  fun (x: A): B = memoized(x)
 }
 
 fun <A, B, C, D> Arb.Companion.functionABCToD(arb: Arb<D>): Arb<(A, B, C) -> D> = arbitrary { random ->
-  { _: A, _:B, _:C -> arb.next(random)}.memoize()
+  val memoized = MemoizedDeepRecursiveFunction<Triple<A, B, C>, D> { _ -> arb.next(random) }
+  fun (x: A, y: B, z: C): D = memoized(Triple(x, y, z))
 }
 
 fun Arb.Companion.throwable(): Arb<Throwable> =
@@ -69,8 +62,6 @@ fun Arb.Companion.intSmall(factor: Int = 10000): Arb<Int> =
 fun Arb.Companion.longSmall(): Arb<Long> =
   Arb.long((Long.MIN_VALUE / 100000L)..(Long.MAX_VALUE / 100000L))
 
-fun <A> Arb.Companion.endo(arb: Arb<A>): Arb<Endo<A>> = arb.map { a: A -> Endo { a } }
-
 fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> =
   arb.orNull().map { it.toOption() }
 
@@ -80,20 +71,19 @@ fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
   return Arb.choice(arbLeft, arbRight)
 }
 
-fun <E, A> Arb.Companion.validated(arbE: Arb<E>, arbA: Arb<A>): Arb<Validated<E, A>> =
-  Arb.either(arbE, arbA).map { Validated.fromEither(it) }
-
 fun Arb.Companion.unit(): Arb<Unit> =
   Arb.constant(Unit)
 
 fun <A, B> Arb.Companion.ior(arbA: Arb<A>, arbB: Arb<B>): Arb<Ior<A, B>> =
   arbA.alignWith(arbB) { it }
 
-fun <A> Arb<A>.eval(): Arb<Eval<A>> =
-  map { Eval.now(it) }
-
 private fun <A, B, R> Arb<A>.alignWith(arbB: Arb<B>, transform: (Ior<A, B>) -> R): Arb<R> =
-  Arb.bind(this, arbB) { a, b -> transform(Ior.Both(a, b)) }
+  Arb.choice(
+    this.map { Ior.Left(it) },
+    Arb.bind(this, arbB) { a, b -> Ior.Both(a, b) },
+    arbB.map { Ior.Right(it) }
+  ).map(transform)
+
 
 fun Arb.Companion.suspendFunThatReturnsEitherAnyOrAnyOrThrows(): Arb<suspend () -> Either<Any, Any>> =
   choice(
@@ -233,7 +223,7 @@ private fun <K, A, B> Map<K, Pair<Option<A>?, Option<B>?>>.destructured(): Pair<
 }
 
 fun <K, A, B> Arb.Companion.map2(arbK: Arb<K>, arbA: Arb<A>, arbB: Arb<B>): Arb<Pair<Map<K, A>, Map<K, B>>> =
-  Arb.map(keyArb = arbK, valueArb = value2(arbA, arbB))
+  Arb.map(keyArb = arbK, valueArb = value2(arbA, arbB), maxSize = 30)
     .map { it.destructured() }
 
 fun <K, A, B, C> Arb.Companion.map3(
@@ -242,5 +232,5 @@ fun <K, A, B, C> Arb.Companion.map3(
   arbB: Arb<B>,
   arbC: Arb<C>
 ): Arb<Triple<Map<K, A>, Map<K, B>, Map<K, C>>> =
-  Arb.map(arbK, value3(arbA, arbB, arbC))
+  Arb.map(arbK, value3(arbA, arbB, arbC), maxSize = 30)
     .map { it.destructured() }

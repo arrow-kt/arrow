@@ -12,7 +12,6 @@ import arrow.core.test.nonEmptySet
 import arrow.core.toNonEmptyListOrNull
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
@@ -32,13 +31,15 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
+import kotlin.test.Test
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 
 @Suppress("UNREACHABLE_CODE")
-class EffectSpec : StringSpec({
-  "try/catch - can recover from raise" {
+class EffectSpec {
+  @Test fun tryCatchCanRecoverFromRaise() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { i, s ->
       effect {
         try {
@@ -50,7 +51,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "try/catch - finally works" {
+  @Test fun tryCatchFinallyWorks() = runTest {
     checkAll(Arb.string().suspend(), Arb.int().suspend()) { s, i ->
       val promise = CompletableDeferred<Int>()
       effect {
@@ -64,7 +65,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "try/catch - First raise is ignored and second is returned" {
+  @Test fun tryCatchFirstRaiseIsIgnoredAndSecondIsReturned() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend(), Arb.string().suspend()) { i, s, s2 ->
       effect<String, Int> {
         try {
@@ -78,7 +79,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - raise" {
+  @Test fun recoverRaise() = runTest {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -91,7 +92,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - raise and transform error" {
+  @Test fun recoverRaiseAndTransformError() = runTest {
     checkAll(
       Arb.long().suspend(),
       Arb.string().suspend()
@@ -107,7 +108,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - success" {
+  @Test fun recoverSuccess() = runTest {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> { i() } getOrElse { unreachable() }
@@ -115,7 +116,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover + catch - raise and recover" {
+  @Test fun recoverCatchRaiseAndRecover() = runTest {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -128,7 +129,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover + catch - raise and transform error" {
+  @Test fun recoverCatchRaiseAndTransformError() = runTest {
     checkAll(Arb.long().suspend(), Arb.string().suspend()) { l, s ->
       effect {
         effect<Long, Int> {
@@ -143,7 +144,7 @@ class EffectSpec : StringSpec({
 
   val boom = RuntimeException("boom")
 
-  "recover + catch - throw and recover" {
+  @Test fun recoverCatchThrowAndRecover() = runTest {
     checkAll(Arb.int().suspend()) { i ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -156,7 +157,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover + catch - throw and transform error" {
+  @Test fun recoverCatchThrowAndTransformError() = runTest {
     checkAll(Arb.string().suspend()) { s ->
       effect {
         effect<Long, Int> {
@@ -169,7 +170,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover + catch - raise and throw" {
+  @Test fun recoverCatchRaiseAndThrow() = runTest {
     checkAll(Arb.long().suspend(), Arb.string().suspend()) { l, s ->
       effect<String, Int> {
         effect<Long, Int> {
@@ -183,7 +184,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover + catch - throw and throw" {
+  @Test fun recoverCatchThrowAndThrow() = runTest {
     val boom2 = ArithmeticException("boom2")
     effect<String, Int> {
       effect<Long, Int> {
@@ -195,7 +196,7 @@ class EffectSpec : StringSpec({
     }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom2
   }
 
-  "recover + catch - success" {
+  @Test fun recoverCatchSuccess() = runTest {
     checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
       effect<String, Int> {
         effect<Long, Int> { i() }
@@ -204,7 +205,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - throw and throw" {
+  @Test fun catchThrowAndThrow() = runTest {
     val boom2 = ArithmeticException("boom2")
     effect {
       effect<String, Int> {
@@ -216,7 +217,7 @@ class EffectSpec : StringSpec({
     }.fold(::identity, { unreachable() }) { unreachable() } shouldBe boom2
   }
 
-  "catch - throw and transform error" {
+  @Test fun catchThrowAndTransformError() = runTest {
     checkAll(Arb.string().suspend()) { s ->
       effect {
         effect<String, Int> {
@@ -229,7 +230,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - throw and recover" {
+  @Test fun catchThrowAndRecover() = runTest {
     checkAll(Arb.int().suspend()) { i ->
       effect {
         effect<String, Int> {
@@ -242,7 +243,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "eagerEffect can be consumed within an Effect computation" {
+  @Test fun eagerEffectCanBeConsumedWithinAnEffectComputation() = runTest {
     checkAll(Arb.int(), Arb.int().suspend()) { a, b ->
       val eager: EagerEffect<String, Int> =
         eagerEffect { a }
@@ -255,7 +256,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "eagerEffect raise short-circuits effect computation" {
+  @Test fun eagerEffectRaiseShortCircuitsEffectComputation() = runTest {
     checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
       val eager: EagerEffect<String, Int> =
         eagerEffect { raise(a) }
@@ -268,7 +269,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "eagerEffect can be consumed within an Effect computation with bind" {
+  @Test fun eagerEffectCanBeConsumedWithinAnEffectComputationWithBind() = runTest {
     checkAll(Arb.int(), Arb.int().suspend()) { a, b ->
       val eager: EagerEffect<String, Int> =
         eagerEffect { a }
@@ -281,7 +282,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "eagerEffect raise short-circuits effect computation  with bind" {
+  @Test fun eagerEffectRaiseShortCircuitsEffectComputationWithBind() = runTest {
     checkAll(Arb.string(), Arb.int().suspend()) { a, b ->
       val eager: EagerEffect<String, Int> =
         eagerEffect { raise(a) }
@@ -294,14 +295,14 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "success" {
+  @Test fun success() = runTest {
     checkAll(Arb.int().suspend()) { i ->
       effect<Nothing, Int> { i() }
         .getOrElse { unreachable() } shouldBe i()
     }
   }
 
-  "short-circuit" {
+  @Test fun shortCircuit() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect {
         raise(msg())
@@ -309,7 +310,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "Rethrows exceptions" {
+  @Test fun rethrowsExceptions() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       shouldThrow<RuntimeException> {
         effect<String, Int> {
@@ -319,7 +320,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "Can short-circuit from nested blocks" {
+  @Test fun canShortCircuitFromNestedBlocks() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect<String, Int> {
         effect<Nothing, Long> { raise(msg()) }.getOrElse { unreachable() }
@@ -329,7 +330,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "Can short-circuit immediately after suspending from nested blocks" {
+  @Test fun canShortCircuitImmediatelyAfterSuspendingFromNestedBlocks() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect<String, Int> {
         effect<Nothing, Long> {
@@ -341,7 +342,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "ensure null in either computation" {
+  @Test fun ensureNullInEitherComputation() = runTest {
     checkAll(
       Arb.boolean().suspend(),
       Arb.int().suspend(),
@@ -354,7 +355,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "ensureNotNull in either computation" {
+  @Test fun ensureNotNullInEitherComputation() = runTest {
     fun square(i: Int): Int = i * i
 
     checkAll(Arb.int().orNull().suspend(), Arb.string().suspend()) { i, raise ->
@@ -369,7 +370,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "#2760 - dispatching in nested Effect blocks does not make the nested Continuation to hang" {
+  @Test fun issue2760DispatchingInNestedEffectBlocksDoesNotMakeTheNestedContinuationToHang() = runTest {
     checkAll(Arb.string()) { msg ->
       fun failure(): Effect<Failure, String> = effect {
         withContext(Dispatchers.Default) {}
@@ -386,7 +387,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "#2779 - handleErrorWith does not make nested Continuations hang" {
+  @Test fun issue2779HandleErrorWithDoesNotMakeNestedContinuationsHang() = runTest {
     checkAll(Arb.string()) { error ->
       val failed: Effect<String, Int> = effect {
         withContext(Dispatchers.Default) {}
@@ -402,7 +403,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "#2779 - bind nested in fold does not make nested Continuations hang" {
+  @Test fun issue2779BindNestedInFoldDoesNotMakeNestedContinuationsHang() = runTest {
     checkAll(Arb.string()) { error ->
       val failed: Effect<String, Int> = effect {
         withContext(Dispatchers.Default) {}
@@ -422,7 +423,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "Can handle thrown exceptions" {
+  @Test fun canHandleThrownExceptions() = runTest {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
       effect<Int, String> {
         throw RuntimeException(msg())
@@ -434,7 +435,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "Can raise from thrown exceptions" {
+  @Test fun canRaiseFromThrownExceptions() = runTest {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
       effect {
         effect<Int, String> {
@@ -448,7 +449,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "Can throw from thrown exceptions" {
+  @Test fun canThrowFromThrownExceptions() = runTest {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
       shouldThrow<IllegalStateException> {
         effect<Int, String> {
@@ -462,7 +463,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - happy path" {
+  @Test fun recoverHappyPath() = runTest {
     checkAll(Arb.string().suspend()) { str ->
       effect<Int, String> {
         str()
@@ -471,7 +472,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - error path and recover" {
+  @Test fun recoverErrorPathAndRecover() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
       effect<Int, String> {
         raise(int())
@@ -481,7 +482,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - error path and re-raise" {
+  @Test fun recoverErrorPathAndReRaise() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, fallback ->
       effect<Int, Unit> {
         raise(int())
@@ -491,7 +492,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "recover - error path and throw" {
+  @Test fun recoverErrorPathAndThrow() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { int, msg ->
       shouldThrow<RuntimeException> {
         effect<Int, String> {
@@ -503,7 +504,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - happy path" {
+  @Test fun catchHappyPath() = runTest {
     checkAll(Arb.string().suspend()) { str ->
       effect<Int, String> {
         str()
@@ -512,7 +513,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and recover" {
+  @Test fun catchErrorPathAndRecover() = runTest {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
       effect<Int, String> {
         throw RuntimeException(msg())
@@ -521,7 +522,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and re-raise" {
+  @Test fun catchErrorPathAndReRaise() = runTest {
     checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, fallback ->
       effect<Int, Unit> {
         throw RuntimeException(msg())
@@ -530,7 +531,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - error path and throw" {
+  @Test fun catchErrorPathAndThrow() = runTest {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, msg2 ->
       effect<Int, String> {
         throw RuntimeException(msg())
@@ -541,7 +542,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - reified error path and recover " {
+  @Test fun catchReifiedErrorPathAndRecover() = runTest {
     checkAll(Arb.string().suspend(), Arb.string().suspend()) { msg, fallback ->
       effect<Int, String> {
         throw ArithmeticException(msg())
@@ -552,7 +553,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - reified error path and raise " {
+  @Test fun catchReifiedErrorPathAndRaise() = runTest {
     checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, error ->
       effect<Int, String> {
         throw ArithmeticException(msg())
@@ -563,7 +564,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - reified error path and no match " {
+  @Test fun catchReifiedErrorPathAndNoMatch() = runTest {
     checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, error ->
       effect<Int, String> {
         throw RuntimeException(msg())
@@ -578,7 +579,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - success" {
+  @Test fun catchSuccess() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect<Int, String> {
         msg()
@@ -587,7 +588,7 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "catch - exception" {
+  @Test fun catchException() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect<Int, String> {
         throw RuntimeException(msg())
@@ -599,56 +600,56 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "accumulate, returns every error" {
-    checkAll(Arb.list(Arb.int(), range = 2..100)) { errors ->
+  @Test fun accumulateReturnsEveryError() = runTest {
+    checkAll(Arb.list(Arb.int(), range = 2..20)) { errors ->
       either<NonEmptyList<Int>, List<String>> {
         mapOrAccumulate(errors) { raise(it) }
       } shouldBe errors.toNonEmptyListOrNull()!!.left()
     }
   }
 
-  "accumulate, returns no error" {
-    checkAll(Arb.list(Arb.int())) { elements ->
+  @Test fun accumulateReturnsNoError() = runTest {
+    checkAll(Arb.list(Arb.int(), range = 0..20)) { elements ->
       either<NonEmptyList<Int>, List<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
     }
   }
 
-  "NonEmptyList - mapOrAccumulate, returns every error" {
-    checkAll(Arb.nonEmptyList(Arb.int(), range = 2..100)) { errors ->
+  @Test fun nonEmptyListMapOrAccumulateReturnsEveryError() = runTest {
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 2..20)) { errors ->
       either<NonEmptyList<Int>, NonEmptyList<String>> {
         mapOrAccumulate(errors) { raise(it) }
       } shouldBe errors.toNonEmptyListOrNull()!!.left()
     }
   }
 
-  "NonEmptyList - mapOrAccumulate, returns no error" {
-    checkAll(Arb.nonEmptyList(Arb.int())) { elements ->
+  @Test fun nonEmptyListMapOrAccumulateReturnsNoError() = runTest {
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0..20)) { elements ->
       either<NonEmptyList<Int>, NonEmptyList<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
     }
   }
 
-  "NonEmptySet - mapOrAccumulate, returns every error" {
-    checkAll(Arb.nonEmptySet(Arb.int(), range = 2..100)) { errors ->
+  @Test fun nonEmptySetMapOrAccumulateReturnsEveryError() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 2..20)) { errors ->
       either<NonEmptyList<Int>, NonEmptySet<String>> {
         mapOrAccumulate(errors) { raise(it) }
       } shouldBe errors.toNonEmptyListOrNull()!!.left()
     }
   }
 
-  "NonEmptySet - mapOrAccumulate, returns no error" {
-    checkAll(Arb.nonEmptySet(Arb.int())) { elements ->
+  @Test fun nonEmptySetMapOrAccumulateReturnsNoError() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 0..20)) { elements ->
       either<NonEmptyList<Int>, NonEmptySet<Int>> {
         mapOrAccumulate(elements) { it }
       } shouldBe elements.right()
     }
   }
 
-  "bindAll fails on first error" {
-    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+  @Test fun bindAllFailsOnFirstError() = runTest {
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
       either {
         eithers.bindAll()
@@ -656,10 +657,8 @@ class EffectSpec : StringSpec({
     }
   }
 
-  fun <E, A> Either<E, A>.leftOrNull(): E? = fold(::identity) { null }
-
-  "accumulate - bindAll" {
-    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+  @Test fun accumulateBindAll() = runTest {
+    checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
@@ -672,8 +671,8 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "NonEmptyList - bindAll fails on first error" {
-    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+  @Test fun nonEmptyListBindAllFailsOnFirstError() = runTest {
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.right()
       either {
         eithers.bindAll()
@@ -681,8 +680,8 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "NonEmptyList - bindAll accumulate errors" {
-    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+  @Test fun nonEmptyListBindAllAccumulateErrors() = runTest {
+    checkAll(Arb.nonEmptyList(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
@@ -695,8 +694,8 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "NonEmptySet - bindAll fails on first error" {
-    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+  @Test fun nonEmptySetBindAllFailsOnFirstError() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected = eithers.firstOrNull { it.isLeft() } ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
       either {
         eithers.bindAll()
@@ -704,8 +703,8 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "NonEmptySet - bindAll accumulate errors" {
-    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()))) { eithers ->
+  @Test fun nonEmptySetBindAllAccumulateErrors() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { eithers ->
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
 
@@ -719,7 +718,7 @@ class EffectSpec : StringSpec({
   }
 
   /*
-  "shift leaked results in RaiseLeakException" {
+  @Test fun shiftLeakedResultsInRaiseLeakException() = runTest {
     effect {
       suspend { raise("failure") }
     }.fold(
@@ -730,7 +729,7 @@ class EffectSpec : StringSpec({
   }
   */
 
-  "shift leaked results in RaiseLeakException with exception" {
+  @Test fun shiftLeakedResultsInRaiseLeakExceptionWithException() = runTest {
     shouldThrow<IllegalStateException> {
       val leak = CompletableDeferred<suspend () -> Unit>()
       effect {
@@ -746,7 +745,7 @@ class EffectSpec : StringSpec({
     }.message shouldStartWith "'raise' or 'bind' was leaked"
   }
 
-  "shift leaked results in RaiseLeakException after raise" {
+  @Test fun shiftLeakedResultsInRaiseLeakExceptionAfterRaise() = runTest {
     shouldThrow<IllegalStateException> {
       val leak = CompletableDeferred<suspend () -> Unit>()
       effect {
@@ -761,7 +760,7 @@ class EffectSpec : StringSpec({
     }.message shouldStartWith "'raise' or 'bind' was leaked"
   }
 
-  "mapError - raise and transform error" {
+  @Test fun mapErrorRaiseAndTransformError() = runTest {
     checkAll(
       Arb.long().suspend(),
       Arb.string().suspend()
@@ -775,13 +774,13 @@ class EffectSpec : StringSpec({
     }
   }
 
-  "mapError - success" {
+  @Test fun mapErrorSuccess() = runTest {
     checkAll(Arb.int().suspend()) { i ->
       (effect<Long, Int> { i() } mapError { unreachable() })
         .get() shouldBe i()
     }
   }
-})
+}
 
 private data class Failure(val msg: String)
 

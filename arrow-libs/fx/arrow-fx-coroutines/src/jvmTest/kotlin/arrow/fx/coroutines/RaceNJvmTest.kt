@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
@@ -10,122 +9,115 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
+import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
-class RaceNJvmTest : StringSpec({
-    "race2 returns to original context" {
+class RaceNJvmTest {
+    @Test fun race2ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
       val racerName = "race2"
-      val racer = executor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
-
       checkAll(Arb.int(1..2)) { choose ->
-        single.zip(racer).use { (single, raceCtx) ->
-          withContext(single) {
-            threadName() shouldStartWith singleThreadName
-
+        resourceScope {
+          val pool = fixedThreadPoolContext(2, racerName)
+          withContext(singleThreadContext("single")) {
+            Thread.currentThread().name shouldStartWith "single"
+            
             val racedOn = when (choose) {
-              1 -> raceN(raceCtx, { threadName() }, { awaitCancellation() }).swap().getOrNull()
-              else -> raceN(raceCtx, { awaitCancellation() }, { threadName() }).getOrNull()
+              1 -> raceN<String, Nothing>(pool, { Thread.currentThread().name }, { awaitCancellation() }).swap().getOrNull()
+              else -> raceN<Nothing, String>(pool, { awaitCancellation() }, { Thread.currentThread().name }).getOrNull()
             }
-
+            
             racedOn shouldStartWith racerName
-            threadName() shouldStartWith singleThreadName
+            Thread.currentThread().name shouldStartWith "single"
           }
         }
       }
     }
 
-    "race2 returns to original context on failure" {
+    @Test fun race2ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race2"
-      val racer = executor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
-
+      
       checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
-        single.zip(racer).use { (single, raceCtx) ->
-          withContext(single) {
-            threadName() shouldStartWith singleThreadName
-
+        resourceScope {
+          val pool = fixedThreadPoolContext(2, racerName)
+          withContext(singleThreadContext("single")) {
+            Thread.currentThread().name shouldStartWith "single"
+            
             Either.catch {
               when (choose) {
-                1 -> raceN(raceCtx, { e.suspend() }, { awaitCancellation() }).swap().getOrNull()
-                else -> raceN(raceCtx, { awaitCancellation() }, { e.suspend() }).getOrNull()
+                1 -> raceN(pool, { throw e }, { awaitCancellation() }).swap().getOrNull()
+                else -> raceN(pool, { awaitCancellation() }, { throw e }).getOrNull()
               }
             } should leftException(e)
-
-            threadName() shouldStartWith singleThreadName
+            
+            Thread.currentThread().name shouldStartWith "single"
           }
         }
       }
     }
-
-    "race3 returns to original context" {
+    
+    @Test fun firstRacerOutOf2AlwaysWinsOnASingleThread() = runTestUsingDefaultDispatcher {
+      resourceScope {
+        val ctx = singleThreadContext("single")
+        raceN(ctx, { Thread.currentThread().name }, { Thread.currentThread().name })
+      }.swap().getOrNull() shouldStartWith "single"
+    }
+    
+    @Test fun race3ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
-      val racer = executor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
 
       checkAll(Arb.int(1..3)) { choose ->
-        single.zip(racer).use { (single, raceCtx) ->
+        parallelCtx(3, racerName) { single, raceCtx ->
           withContext(single) {
-            threadName() shouldStartWith singleThreadName
-
+            Thread.currentThread().name shouldStartWith "single"
+            
             val racedOn = when (choose) {
               1 ->
-                raceN(raceCtx, { threadName() }, { awaitCancellation() }, { awaitCancellation() })
+                raceN(raceCtx, { Thread.currentThread().name }, { awaitCancellation() }, { awaitCancellation() })
                   .fold(::identity, { null }, { null })
+              
               2 ->
-                raceN(raceCtx, { awaitCancellation() }, { threadName() }, { awaitCancellation() })
+                raceN(raceCtx, { awaitCancellation() }, { Thread.currentThread().name }, { awaitCancellation() })
                   .fold({ null }, ::identity, { null })
+              
               else ->
-                raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { threadName() })
+                raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { Thread.currentThread().name })
                   .fold({ null }, { null }, ::identity)
             }
-
+            
             racedOn shouldStartWith racerName
-            threadName() shouldStartWith singleThreadName
+            Thread.currentThread().name shouldStartWith "single"
           }
         }
       }
     }
-
-    "race3 returns to original context on failure" {
+    
+    @Test fun race3ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
       val racerName = "race3"
-      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
-
+      
       checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
-        single.zip(racer).use { (single, raceCtx) ->
+        parallelCtx(3, racerName) { single, raceCtx ->
           withContext(single) {
-            threadName() shouldStartWith singleThreadName
-
+            Thread.currentThread().name shouldStartWith "single"
+            
             Either.catch {
               when (choose) {
                 1 ->
-                  raceN(raceCtx, { e.suspend() }, { awaitCancellation() }, { awaitCancellation() })
-                    .fold(::identity, { null }, { null })
+                  raceN(raceCtx, { throw e }, { awaitCancellation() }, { awaitCancellation() })
+                    .fold({ x: String? -> x }, { null }, { null })
+                
                 2 ->
-                  raceN(raceCtx, { awaitCancellation() }, { e.suspend() }, { awaitCancellation() })
-                    .fold({ null }, ::identity, { null })
+                  raceN(raceCtx, { awaitCancellation() }, { throw e }, { awaitCancellation() })
+                    .fold({ null }, { x: String? -> x }, { null })
+                
                 else ->
-                  raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { e.suspend() })
-                    .fold({ null }, { null }, ::identity)
+                  raceN(raceCtx, { awaitCancellation() }, { awaitCancellation() }, { throw e })
+                    .fold({ null }, { null }, { x: String? -> x })
               }
             } should leftException(e)
-
-            threadName() shouldStartWith singleThreadName
+            
+            Thread.currentThread().name shouldStartWith "single"
           }
         }
       }
     }
-
-    /* These tests seem to not hold anymore
-
-    "first racer out of 2 always wins on a single thread" {
-      single.use { ctx ->
-            raceN(ctx, { threadName() }, { threadName() })
-          }.swap().getOrNull() shouldStartWith "single"
-    }
-
-    "first racer out of 3 always wins on a single thread" {
-      (single.use { ctx ->
-        raceN(ctx, { threadName() }, { threadName() }, { threadName() })
-      } as? Race3.First)?.winner shouldStartWith "single"
-    }
-    */
   }
-)
