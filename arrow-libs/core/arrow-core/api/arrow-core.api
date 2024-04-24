@@ -895,6 +895,7 @@ public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi
 
 public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun <init> (Lkotlin/jvm/functions/Function2;Ljava/util/concurrent/atomic/AtomicReference;Larrow/core/raise/Raise;)V
+	public final fun accumulate (Ljava/lang/Object;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bind (Larrow/core/Ior;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -909,6 +910,7 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public final fun bindAllIor (Ljava/util/Set;)Ljava/util/Set;
 	public final fun combine (Ljava/lang/Object;)Ljava/lang/Object;
 	public final fun getCombineError ()Lkotlin/jvm/functions/Function2;
+	public final fun getOrAccumulate (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
