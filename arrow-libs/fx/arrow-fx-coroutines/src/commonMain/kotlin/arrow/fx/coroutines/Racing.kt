@@ -8,7 +8,15 @@ import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
 import arrow.core.raise.DelicateRaiseApi
 import arrow.core.raise.RaiseCancellationException
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.SelectBuilder
 import kotlinx.coroutines.selects.select
 import kotlin.coroutines.CoroutineContext
@@ -75,7 +83,7 @@ private class SelectRacingScope<A>(
   private val select: SelectBuilder<A>,
   private val scope: CoroutineScope,
   private val handleException: (context: CoroutineContext, exception: Throwable) -> Unit
-) : RacingScope<A>, CoroutineScope by scope {
+) : RacingScope<A> {
   val racers: Atomic<List<Deferred<A>>> = Atomic(emptyList())
 
   override suspend fun raceOrFail(
@@ -93,7 +101,7 @@ private class SelectRacingScope<A>(
       block = block
     )
     racers.update { racer prependTo it }
-    if (isActive) {
+    if (scope.isActive) {
       require(racer.start()) { "Racer not started" }
       return with(select) {
         racer.onAwait.invoke(::identity)
