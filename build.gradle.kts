@@ -6,6 +6,12 @@ import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+allprojects {
+  if (property("version") == "unspecified") {
+    setProperty("version", "2.0.0-SNAPSHOT")
+  }
+}
+
 buildscript {
   repositories {
     mavenCentral()
@@ -45,10 +51,10 @@ plugins {
   alias(libs.plugins.kotlinx.serialization) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.spotless) apply false
+  alias(libs.plugins.publish) apply false
   alias(libs.plugins.jetbrainsCompose) apply false
+  alias(libs.plugins.kotlinx.knit)
 }
-
-apply(plugin = libs.plugins.kotlinx.knit.get().pluginId)
 
 configure<KnitPluginExtension> {
   siteRoot = "https://arrow-kt.io/"
