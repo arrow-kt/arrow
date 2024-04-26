@@ -3,7 +3,7 @@
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
-  alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.serialization) // Needed for testing only
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
@@ -18,8 +18,8 @@ spotless {
 apply(from = property("ANIMALSNIFFER"))
 
 dependencies {
-  compileOnly(libs.kotlin.stdlib)
-  compileOnly(projects.arrowCore)
+  implementation(libs.kotlin.stdlib)
+  api(projects.arrowCore)
   compileOnly(libs.squareup.retrofit.lib)
 
   testImplementation(projects.arrowCore)

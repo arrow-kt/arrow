@@ -3,7 +3,7 @@
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
-  alias(libs.plugins.arrowGradleConfig.publish)
+  alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
 }
@@ -19,7 +19,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        compileOnly(libs.kotlin.stdlib)
+        implementation(libs.kotlin.stdlib)
         implementation(libs.coroutines.core)
       }
     }
