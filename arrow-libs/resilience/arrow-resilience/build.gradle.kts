@@ -19,7 +19,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        compileOnly(libs.kotlin.stdlib)
+        implementation(libs.kotlin.stdlib)
         implementation(libs.coroutines.core)
       }
     }

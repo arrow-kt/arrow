@@ -52,4 +52,4 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Publish next major SNAPSHOT version
-        run: ./gradlew -Pversion=2.0.0-SNAPSHOT  publishToSonatype closeSonatypeStagingRepository
+        run: ./gradlew -Pversion=2.0.0-SNAPSHOT  publishAllPublicationsToMavenCentralRepository

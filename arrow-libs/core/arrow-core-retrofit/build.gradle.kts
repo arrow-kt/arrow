@@ -18,8 +18,8 @@ spotless {
 apply(from = property("ANIMALSNIFFER"))
 
 dependencies {
-  compileOnly(libs.kotlin.stdlib)
-  compileOnly(projects.arrowCore)
+  implementation(libs.kotlin.stdlib)
+  api(projects.arrowCore)
   compileOnly(libs.squareup.retrofit.lib)
 
   testImplementation(projects.arrowCore)
