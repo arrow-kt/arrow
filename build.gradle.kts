@@ -113,7 +113,7 @@ subprojects {
         kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
           sourceLink {
             localDirectory.set(srcDir)
-            remoteUrl.set(uri("https://github.com/arrow-kt/arrow//blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
+remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
             remoteLineSuffix.set("#L")
           }
         }
