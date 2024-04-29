@@ -24,6 +24,9 @@ data class ContextualEitherInside<A, B>(@Contextual val thing: Either<A, B>)
 data class ContextualIorInside<A, B>(@Contextual val thing: Ior<A, B>)
 
 @Serializable
+data class ContextualOptionInside<A>(@Contextual val thing: Option<A>)
+
+@Serializable
 data class ContextualNonEmptyListInside<A>(@Contextual val thing: NonEmptyList<A>)
 
 @Serializable
@@ -45,6 +48,10 @@ class ModuleTest {
     backAgain(Arb.ior(Arb.string(), Arb.int()), jsonWithModule)
 
   @Test
+  fun backAgainOption() =
+    backAgain(Arb.option(Arb.string()), jsonWithModule)
+
+  @Test
   fun backAgainNonEmptyList() =
     backAgain(Arb.nonEmptyList(Arb.int()), jsonWithModule)
 
@@ -59,6 +66,10 @@ class ModuleTest {
   @Test
   fun backAgainContextualIor() =
     backAgain(Arb.ior(Arb.string(), Arb.int()).map(::ContextualIorInside), jsonWithModule)
+
+  @Test
+  fun backAgainContextualOption() =
+    backAgain(Arb.option(Arb.string()).map(::ContextualOptionInside), jsonWithModule)
 
   @Test
   fun backAgainContextualNonEmptyList() =

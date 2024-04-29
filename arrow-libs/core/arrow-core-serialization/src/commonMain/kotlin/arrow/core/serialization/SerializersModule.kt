@@ -8,5 +8,6 @@ public val ArrowModule: SerializersModule = SerializersModule {
   contextual(Ior::class) { (a, b) -> IorSerializer(a, b) }
   contextual(NonEmptyList::class) { (t) -> NonEmptyListSerializer(t) }
   contextual(NonEmptySet::class) { (t) -> NonEmptySetSerializer(t) }
+  contextual(Option::class) { (t) -> OptionSerializer(t) }
 }
 
