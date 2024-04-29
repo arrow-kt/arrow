@@ -47,11 +47,11 @@ data class NonEmptyListInside<A>(val thing: NonEmptyList<A>)
 @Serializable
 data class NonEmptySetInside<A>(val thing: NonEmptySet<A>)
 
-inline fun <reified T> backAgain(generator: Arb<T>) =
+inline fun <reified T> backAgain(generator: Arb<T>, json: Json = Json) =
   runTest {
     checkAll(generator) { e ->
-      val result = Json.encodeToJsonElement<T>(e)
-      val back = Json.decodeFromJsonElement<T>(result)
+      val result = json.encodeToJsonElement<T>(e)
+      val back = json.decodeFromJsonElement<T>(result)
       back shouldBe e
     }
   }
