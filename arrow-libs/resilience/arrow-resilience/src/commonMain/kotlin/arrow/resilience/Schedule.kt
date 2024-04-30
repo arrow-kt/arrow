@@ -1,8 +1,10 @@
 @file:OptIn(ExperimentalTypeInference::class)
+@file:Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 
 package arrow.resilience
 
 import arrow.core.Either
+import arrow.core.NonFatal
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.identity
@@ -37,8 +39,8 @@ public typealias ScheduleStep<Input, Output> =
  * A [Schedule] describes how a `suspend fun` should [retry] or [repeat].
  *
  * It's defined by a [step] function that takes an [Input] and returns a [Decision],
-* the [Decision] determines if the `suspend fun` should be [Continue] to be retried or repeated
-* (and if so, the `delay` until the next attempt),
+ * the [Decision] determines if the `suspend fun` should be [Continue] to be retried or repeated
+ * (and if so, the `delay` until the next attempt),
  * or if the [Schedule] is [Done] retrying or repeating.
  */
 @JvmInline
@@ -384,6 +386,7 @@ public value class Schedule<in Input, out Output>(public val step: ScheduleStep<
           transform(this.output, other.output),
           combineDuration(this.delay, other.delay)
         ) { this.step(it).and(other.step(it), transform, combineDuration) }
+
       else -> Done(transform(this.output, other.output))
     }
 
@@ -400,6 +403,7 @@ public value class Schedule<in Input, out Output>(public val step: ScheduleStep<
           transform(this.output, other.output),
           combineDuration(this.delay, other.delay)
         ) { this.step(it).or(other.step(it), transform, combineDuration) }
+
       else -> throw IllegalStateException()
     }
   }
@@ -413,6 +417,13 @@ public suspend fun <A> Schedule<Throwable, *>.retry(action: suspend () -> A): A 
   retryOrElse(action) { e, _ -> throw e }
 
 /**
+ * Retries [action] only when [E] has occurred, otherwise it immediately retries the other exception.
+ * It will throw the last [E] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
+ */
+public suspend inline fun <A, reified E : Throwable> Schedule<E, *>.retry(action: suspend () -> A): A =
+  retryOrElse<A, Any?, E>(action) { e, _ -> throw e }
+
+/**
  * Retries [action] using any [Throwable] that occurred as the input to the [Schedule].
  * If the [Schedule] is exhausted,
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback [Input] value.
@@ -423,6 +434,16 @@ public suspend fun <Input, Output> Schedule<Throwable, Output>.retryOrElse(
 ): Input = retryOrElseEither(action, orElse).merge()
 
 /**
+ * Retries [action] only when [E] has occurred, otherwise it immediately retries the other exception.
+ * If the [Schedule] is exhausted,
+ * it will invoke [orElse] with the last [E] and the output of the [Schedule] to produce a fallback [Input] value.
+ */
+public suspend inline fun <Input, Output, reified E : Throwable> Schedule<E, Output>.retryOrElse(
+  action: suspend () -> Input,
+  orElse: suspend (Throwable, Output) -> Input
+): Input = retryOrElseEither<Input, Output, Input, E>(action, orElse).merge()
+
+/**
  * Retries [action] using any [Throwable] that occurred as the input to the [Schedule].
  * If the [Schedule] is exhausted,
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback value of [A].
@@ -431,21 +452,35 @@ public suspend fun <Input, Output> Schedule<Throwable, Output>.retryOrElse(
 public suspend fun <Input, Output, A> Schedule<Throwable, Output>.retryOrElseEither(
   action: suspend () -> Input,
   orElse: suspend (Throwable, Output) -> A
+): Either<A, Input> =
+  retryOrElseEither<Input, Output, A, Throwable>(action, orElse)
+
+/**
+ * Retries [action] only when [E] has occurred, otherwise it immediately retries the other exception.
+ * If the [Schedule] is exhausted,
+ * it will invoke [orElse] with the last [E] and the output of the [Schedule] to produce a fallback value of [A].
+ * Returns [Either] with the fallback value if the [Schedule] is exhausted, or the successful result of [action].
+ */
+public suspend inline fun <Input, Output, A, reified E : Throwable> Schedule<E, Output>.retryOrElseEither(
+  action: suspend () -> Input,
+  orElse: suspend (E, Output) -> A
 ): Either<A, Input> {
-  var step: ScheduleStep<Throwable, Output> = step
+  var step: ScheduleStep<E, Output> = step
 
   while (true) {
     currentCoroutineContext().ensureActive()
     try {
       return Either.Right(action.invoke())
     } catch (e: Throwable) {
+      if (e !is E) throw e
       when (val decision = step(e)) {
         is Continue -> {
           if (decision.delay != ZERO) delay(decision.delay)
           step = decision.step
         }
 
-        is Done -> return Either.Left(orElse(e.nonFatalOrThrow(), decision.output))
+        is Done ->
+          if (NonFatal(e)) Either.Left(orElse(e, decision.output)) else throw e
       }
     }
   }
