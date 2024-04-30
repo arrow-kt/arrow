@@ -26,6 +26,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.retry
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmName
 import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -420,6 +421,7 @@ public suspend fun <A> Schedule<Throwable, *>.retry(action: suspend () -> A): A 
  * Retries [action] only when [E] has occurred, otherwise it immediately retries the other exception.
  * It will throw the last [E] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
+@JvmName("retryReified")
 public suspend inline fun <A, reified E : Throwable> Schedule<E, *>.retry(action: suspend () -> A): A =
   retryOrElse<A, Any?, E>(action) { e, _ -> throw e }
 
@@ -438,6 +440,7 @@ public suspend fun <Input, Output> Schedule<Throwable, Output>.retryOrElse(
  * If the [Schedule] is exhausted,
  * it will invoke [orElse] with the last [E] and the output of the [Schedule] to produce a fallback [Input] value.
  */
+@JvmName("retryOrElseReified")
 public suspend inline fun <Input, Output, reified E : Throwable> Schedule<E, Output>.retryOrElse(
   action: suspend () -> Input,
   orElse: suspend (Throwable, Output) -> Input
@@ -461,6 +464,7 @@ public suspend fun <Input, Output, A> Schedule<Throwable, Output>.retryOrElseEit
  * it will invoke [orElse] with the last [E] and the output of the [Schedule] to produce a fallback value of [A].
  * Returns [Either] with the fallback value if the [Schedule] is exhausted, or the successful result of [action].
  */
+@JvmName("retryOrElseEitherReified")
 public suspend inline fun <Input, Output, A, reified E : Throwable> Schedule<E, Output>.retryOrElseEither(
   action: suspend () -> Input,
   orElse: suspend (E, Output) -> A
