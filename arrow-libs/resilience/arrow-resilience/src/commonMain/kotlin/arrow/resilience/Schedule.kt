@@ -484,7 +484,8 @@ public suspend inline fun <Input, Output, A, reified E : Throwable> Schedule<E, 
         }
 
         is Done ->
-          if (NonFatal(e)) Either.Left(orElse(e, decision.output)) else throw e
+          if (NonFatal(e)) return Either.Left(orElse(e, decision.output))
+          else throw e
       }
     }
   }
