@@ -1,8 +1,5 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-
 repositories {
   google()
   mavenCentral()
@@ -14,18 +11,23 @@ plugins {
   // alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
-  alias(libs.plugins.jetbrainsCompose)
+  alias(libs.plugins.compose.jetbrains)
+  alias(libs.plugins.compose.compiler)
   alias(libs.plugins.android.library)
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(8))
+  }
+}
+
 kotlin {
   explicitApi()
 
-  jvm {
-    jvmToolchain(8)
-  }
+  jvm()
   js(IR) {
     browser()
     nodejs()
@@ -74,12 +76,11 @@ tasks.withType<Test>().configureEach {
   useJUnitPlatform()
 }
 
-compose {
+composeCompiler {
   // override the choice of Compose if we use a Kotlin -dev version
   val kotlinVersion = project.rootProject.properties["kotlin_version"] as? String
   if (kotlinVersion != null && kotlinVersion.contains("-dev-")) {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("2.0.0-RC1"))
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=$kotlinVersion")
+    ext["suppressKotlinVersionCompatibilityCheck"] = kotlinVersion
   }
 }
 
@@ -91,5 +92,16 @@ android {
 tasks.named<Jar>("jvmJar").configure {
   manifest {
     attributes["Automatic-Module-Name"] = "arrow.optics.compose"
+  }
+}
+
+// https://youtrack.jetbrains.com/issue/KT-68095/MPP-Compose-Kover-Cannot-expand-ZIP-build-kover-default.artifact
+afterEvaluate {
+  tasks.named("iosArm64ResolveResourcesFromDependencies") {
+    doFirst {
+      rootProject.subprojects.forEach {
+        delete(it.layout.buildDirectory.file("kover/default.artifact"))
+      }
+    }
   }
 }
