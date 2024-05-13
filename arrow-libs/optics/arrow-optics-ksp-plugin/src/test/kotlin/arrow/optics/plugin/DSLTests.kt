@@ -11,7 +11,7 @@ class DSLTests {
       |$imports
       |$dslModel
       |$dslValues
-      |val modify = Employees.employees.every(Every.list()).company.notNull.address
+      |val modify = Employees.employees.every.company.notNull.address
       |  .street.name.modify(employees, String::toUpperCase)
       |val r = modify.employees.map { it.company?.address?.street?.name }.toString()
       """.evals("r" to "[LAMBDA STREET, LAMBDA STREET]")
