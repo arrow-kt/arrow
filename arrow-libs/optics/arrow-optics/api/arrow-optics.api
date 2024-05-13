@@ -466,6 +466,7 @@ public final class arrow/optics/dsl/EitherKt {
 
 public final class arrow/optics/dsl/EveryKt {
 	public static final fun every (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun getEvery (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 }
 
 public final class arrow/optics/dsl/IndexKt {
