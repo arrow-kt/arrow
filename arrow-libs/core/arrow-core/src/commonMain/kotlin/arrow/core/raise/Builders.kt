@@ -287,7 +287,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
     recover: (Throwable) -> A,
   ): A = result(block).fold(
     onSuccess = { it },
-    onFailure =  { recover(it) }
+    onFailure = { recover(it) }
   )
 }
 
@@ -303,6 +303,13 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   @Suppress("UNCHECKED_CAST")
   @PublishedApi
   internal fun combine(e: Error): Error = state.updateAndGet { EmptyValue.combine(it, e, combineError) } as Error
+
+  @RaiseDSL
+  public fun accumulate(value: Error): Unit = Ior.Both(value, Unit).bind()
+
+  @RaiseDSL
+  public fun <A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A =
+    fold(ifLeft = { Ior.Both(it, recover(it)) }, ifRight = { Ior.Right(it) }).bind()
 
   @RaiseDSL
   @JvmName("bindAllIor")
