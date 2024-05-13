@@ -318,7 +318,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
       - name: Compile WebAssembly
-        run: ./gradlew wasmJsTest -Penable_wasm=true --scan
+        run: ./gradlew wasmJsApiBuild wasmJsJar wasmJsTest -Penable_wasm=true --scan
 
       - name: Upload reports
         if: failure()
