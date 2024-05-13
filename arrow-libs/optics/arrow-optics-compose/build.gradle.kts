@@ -96,18 +96,15 @@ tasks.named<Jar>("jvmJar").configure {
 }
 
 // https://youtrack.jetbrains.com/issue/KT-68095/MPP-Compose-Kover-Cannot-expand-ZIP-build-kover-default.artifact
+val compileTargetsThatNeedKoverFix = listOf("iosSimulatorArm64", "iosX64", "iosArm64", "watchosSimulatorArm64", "watchosX64", "macosArm64", "macosX64", "tvosSimulatorArm64", "tvosX64", "js", "mingwX64", "linuxX64")
+
 afterEvaluate {
-  tasks.named("iosArm64ResolveResourcesFromDependencies") {
-    doFirst {
-      rootProject.subprojects.forEach {
-        delete(it.layout.buildDirectory.file("kover/default.artifact"))
-      }
-    }
-  }
-  tasks.named("jsResolveResourcesFromDependencies") {
-    doFirst {
-      rootProject.subprojects.forEach {
-        delete(it.layout.buildDirectory.file("kover/default.artifact"))
+  for (task in compileTargetsThatNeedKoverFix) {
+    tasks.named("${task}ResolveResourcesFromDependencies") {
+      doFirst {
+        rootProject.subprojects.forEach {
+          delete(it.layout.buildDirectory.file("kover/default.artifact"))
+        }
       }
     }
   }
