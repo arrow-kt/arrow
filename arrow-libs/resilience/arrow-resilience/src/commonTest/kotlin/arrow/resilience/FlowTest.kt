@@ -13,7 +13,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
-import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -79,12 +78,5 @@ class FlowTest {
   }
 }
 
-inline fun <A> assertThrowable(executable: () -> A): Throwable {
-  val a = try {
-    executable.invoke()
-  } catch (e: Throwable) {
-    e
-  }
-
-  return if (a is Throwable) a else fail("Expected an exception but found: $a")
-}
+inline fun assertThrowable(executable: () -> Unit): Throwable =
+  assertThrows<Throwable>(executable)
