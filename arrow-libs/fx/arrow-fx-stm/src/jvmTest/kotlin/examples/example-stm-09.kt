@@ -8,7 +8,7 @@ suspend fun main() {
   //sampleStart
   val tvar = TVar.new(10)
   val result = atomically {
-    tvar.modify { it * 2 }
+    tvar.write(20)
   }
   //sampleEnd
   println(result)

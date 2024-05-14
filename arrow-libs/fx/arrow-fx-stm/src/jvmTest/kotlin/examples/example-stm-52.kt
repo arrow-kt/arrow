@@ -1,14 +1,14 @@
 // This file was automatically generated from STM.kt by Knit tool. Do not edit.
 package arrow.fx.stm.examples.exampleStm52
 
-import arrow.fx.stm.TSet
+import arrow.fx.stm.TMap
 import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tset = TSet.new<String>()
+  val tmap = TMap.new<Int, String>()
   atomically {
-    tset.insert("Hello")
+    tmap += (1 to "Hello")
   }
   //sampleEnd
 }

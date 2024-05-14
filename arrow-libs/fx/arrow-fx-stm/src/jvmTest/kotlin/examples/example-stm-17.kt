@@ -6,10 +6,11 @@ import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tmvar = TMVar.empty<Int>()
+  val tmvar = TMVar.new(30)
   val result = atomically {
-    tmvar.isEmpty()
+    tmvar.read()
   }
   //sampleEnd
   println("Result $result")
+  println("New value ${atomically { tmvar.tryTake() } }")
 }

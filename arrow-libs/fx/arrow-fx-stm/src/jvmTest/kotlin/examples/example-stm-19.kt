@@ -6,9 +6,9 @@ import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tmvar = TMVar.new(30)
+  val tmvar = TMVar.new(20)
   val result = atomically {
-    tmvar.swap(40)
+    tmvar.tryPut(30)
   }
   //sampleEnd
   println("Result $result")
