@@ -43,7 +43,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
       - name: Assemble
-        run: ./gradlew assemble -Pversion=${{ inputs.version }}
+        run: ./gradlew assemble -Pversion=${{ inputs.version }} -Penable_wasm=true
 
       - name: Upload reports
         if: failure()
