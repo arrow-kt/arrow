@@ -412,7 +412,7 @@ public value class Schedule<in Input, out Output>(public val step: ScheduleStep<
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
-public suspend inline fun <reified E: Throw, Throw: Throwable, A> Schedule<Throw, *>.retry(
+public suspend inline fun <reified E: Throwable, A> Schedule<E, *>.retry(
   noinline action: suspend () -> A
 ): A = retry(E::class, action)
 
@@ -420,7 +420,7 @@ public suspend inline fun <reified E: Throw, Throw: Throwable, A> Schedule<Throw
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
-public suspend fun <E: Throw, Throw: Throwable, A> Schedule<Throw, *>.retry(
+public suspend fun <E: Throwable, A> Schedule<E, *>.retry(
   exceptionClass: KClass<E>,
   action: suspend () -> A
 ): A = retryOrElse(exceptionClass, action) { e, _ -> throw e }
@@ -430,7 +430,7 @@ public suspend fun <E: Throw, Throw: Throwable, A> Schedule<Throw, *>.retry(
  * If the [Schedule] is exhausted,
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback [Input] value.
  */
-public suspend inline fun <reified E: Throw, Throw: Throwable, Input, Output> Schedule<Throw, Output>.retryOrElse(
+public suspend inline fun <reified E: Throwable, Input, Output> Schedule<E, Output>.retryOrElse(
   noinline action: suspend () -> Input,
   noinline orElse: suspend (Throwable, Output) -> Input
 ): Input = retryOrElse(E::class, action, orElse)
@@ -440,7 +440,7 @@ public suspend inline fun <reified E: Throw, Throw: Throwable, Input, Output> Sc
  * If the [Schedule] is exhausted,
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback [Input] value.
  */
-public suspend fun <E: Throw, Throw: Throwable, Input, Output> Schedule<Throw, Output>.retryOrElse(
+public suspend fun <E: Throwable, Input, Output> Schedule<E, Output>.retryOrElse(
   exceptionClass: KClass<E>,
   action: suspend () -> Input,
   orElse: suspend (E, Output) -> Input
@@ -452,7 +452,7 @@ public suspend fun <E: Throw, Throw: Throwable, Input, Output> Schedule<Throw, O
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback value of [A].
  * Returns [Either] with the fallback value if the [Schedule] is exhausted, or the successful result of [action].
  */
-public suspend inline fun <reified E: Throw, Throw: Throwable, Input, Output, A> Schedule<Throw, Output>.retryOrElseEither(
+public suspend inline fun <reified E: Throwable, Input, Output, A> Schedule<E, Output>.retryOrElseEither(
   noinline action: suspend () -> Input,
   noinline orElse: suspend (E, Output) -> A
 ): Either<A, Input> = retryOrElseEither(E::class, action, orElse)
@@ -463,12 +463,12 @@ public suspend inline fun <reified E: Throw, Throw: Throwable, Input, Output, A>
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback value of [A].
  * Returns [Either] with the fallback value if the [Schedule] is exhausted, or the successful result of [action].
  */
-public suspend fun <E: Throw, Throw: Throwable, Input, Output, A> Schedule<Throw, Output>.retryOrElseEither(
+public suspend fun <E: Throwable, Input, Output, A> Schedule<E, Output>.retryOrElseEither(
   exceptionClass: KClass<E>,
   action: suspend () -> Input,
   orElse: suspend (E, Output) -> A
 ): Either<A, Input> {
-  var step: ScheduleStep<Throw, Output> = step
+  var step: ScheduleStep<E, Output> = step
 
   while (true) {
     currentCoroutineContext().ensureActive()

@@ -308,7 +308,7 @@ class ScheduleTest {
     assertThrows<IllegalStateException> {
       Schedule.recurs<Throwable>(2)
         .log { e, _ -> buffer.add(e) }
-        .retry<IllegalStateException, _, _> { throw ex }
+        .retry<IllegalStateException, _> { throw ex }
     }
 
     assertEquals<List<Throwable>>(listOf(ex, ex), buffer)
@@ -322,7 +322,7 @@ class ScheduleTest {
     assertThrows<IllegalStateException> {
       Schedule.recurs<Throwable>(2)
         .log { e, _ -> buffer.add(e) }
-        .retry<IllegalArgumentException, _, _> { throw ex }
+        .retry<IllegalArgumentException, _> { throw ex }
     }
 
     assertEquals(emptyList(), buffer)
@@ -345,7 +345,7 @@ class ScheduleTest {
     var count = 0
 
     val i = Schedule.forever<Throwable>()
-      .retry<IllegalStateException, _, _> { if (count++ == 0) throw ex else 1 }
+      .retry<IllegalStateException, _> { if (count++ == 0) throw ex else 1 }
 
     assertEquals(1, i)
   }
@@ -357,7 +357,7 @@ class ScheduleTest {
 
     assertThrows<IllegalStateException> {
       Schedule.forever<Throwable>()
-        .retry<IllegalArgumentException, _, _> { if (count++ == 0) throw ex else 1 }
+        .retry<IllegalArgumentException, _> { if (count++ == 0) throw ex else 1 }
     }
   }
 
