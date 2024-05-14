@@ -2,6 +2,8 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.left
+import arrow.core.right
 import arrow.core.test.nonEmptyList
 import arrow.core.toIorNel
 import io.kotest.assertions.throwables.shouldThrow
@@ -153,5 +155,26 @@ class IorSpec {
       val two = Ior.Both("ErrorTwo", 2).toIorNel().bind()
       one + two
     } shouldBe Ior.Both(listOf("ErrorOne", "ErrorTwo"), 3)
+  }
+
+  @Test fun accumulateErrorManually() {
+    ior(String::plus) {
+      accumulate("nonfatal")
+      "output"
+    } shouldBe Ior.Both("nonfatal", "output")
+  }
+
+  @Test fun getOrAccumulateRightEither() {
+    ior(String::plus) {
+      val result = "success".right().getOrAccumulate { "failed" }
+      "output: $result"
+    } shouldBe Ior.Right("output: success")
+  }
+
+  @Test fun getOrAccumulateLeftEither() {
+    ior(String::plus) {
+      val result = "nonfatal".left().getOrAccumulate { "failed" }
+      "output: $result"
+    } shouldBe Ior.Both("nonfatal", "output: failed")
   }
 }

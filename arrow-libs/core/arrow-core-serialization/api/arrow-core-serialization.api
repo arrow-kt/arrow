@@ -43,3 +43,7 @@ public final class arrow/core/serialization/OptionSerializer : kotlinx/serializa
 	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
 }
 
+public final class arrow/core/serialization/SerializersModuleKt {
+	public static final fun getArrowModule ()Lkotlinx/serialization/modules/SerializersModule;
+}
+
