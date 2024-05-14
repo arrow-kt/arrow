@@ -301,6 +301,34 @@ class ScheduleTest {
   }
 
   @Test
+  fun captureExceptionDifferentInput(): TestResult = runTest {
+    val ex = IllegalStateException("Hello")
+    val buffer = mutableListOf<Throwable>()
+
+    assertThrows<IllegalStateException> {
+      Schedule.recurs<Throwable>(2)
+        .log { e, _ -> buffer.add(e) }
+        .retry<IllegalStateException, _, _> { throw ex }
+    }
+
+    assertEquals<List<Throwable>>(listOf(ex, ex), buffer)
+  }
+
+  @Test
+  fun notCaptureExceptionDifferentInput(): TestResult = runTest {
+    val ex = IllegalStateException("Hello")
+    val buffer = mutableListOf<Throwable>()
+
+    assertThrows<IllegalStateException> {
+      Schedule.recurs<Throwable>(2)
+        .log { e, _ -> buffer.add(e) }
+        .retry<IllegalArgumentException, _, _> { throw ex }
+    }
+
+    assertEquals(emptyList(), buffer)
+  }
+
+  @Test
   fun retriesMatchedException(): TestResult = runTest {
     val ex = IllegalStateException("Hello")
     var count = 0
@@ -309,6 +337,28 @@ class ScheduleTest {
       .retry { if (count++ == 0) throw ex else 1 }
 
     assertEquals(1, i)
+  }
+
+  @Test
+  fun retriesMatchedExceptionDifferentInput(): TestResult = runTest {
+    val ex = IllegalStateException("Hello")
+    var count = 0
+
+    val i = Schedule.forever<Throwable>()
+      .retry<IllegalStateException, _, _> { if (count++ == 0) throw ex else 1 }
+
+    assertEquals(1, i)
+  }
+
+  @Test
+  fun notRetriesMatchedExceptionDifferentInput(): TestResult = runTest {
+    val ex = IllegalStateException("Hello")
+    var count = 0
+
+    assertThrows<IllegalStateException> {
+      Schedule.forever<Throwable>()
+        .retry<IllegalArgumentException, _, _> { if (count++ == 0) throw ex else 1 }
+    }
   }
 
   @Test
