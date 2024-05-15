@@ -39,6 +39,7 @@ import kotlinx.coroutines.withContext
 
 @Suppress("UNREACHABLE_CODE")
 class EffectSpec {
+  @OptIn(DelicateRaiseApi::class)
   @Test fun tryCatchCanRecoverFromRaise() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend()) { i, s ->
       effect {
@@ -65,6 +66,7 @@ class EffectSpec {
     }
   }
 
+  @OptIn(DelicateRaiseApi::class)
   @Test fun tryCatchFirstRaiseIsIgnoredAndSecondIsReturned() = runTest {
     checkAll(Arb.int().suspend(), Arb.string().suspend(), Arb.string().suspend()) { i, s, s2 ->
       effect<String, Int> {

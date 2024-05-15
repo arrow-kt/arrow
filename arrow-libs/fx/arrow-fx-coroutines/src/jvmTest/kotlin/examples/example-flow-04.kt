@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.collect
 import arrow.fx.coroutines.parMapNotNullUnordered
 
+@OptIn(kotlinx.coroutines.FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 suspend fun main(): Unit {
   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     .parMapNotNullUnordered { a ->
