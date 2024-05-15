@@ -68,12 +68,12 @@ kotlin {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
+  compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
 }
 
 // enables context receivers for Jvm Tests
 tasks.named<KotlinCompile>("compileTestKotlinJvm") {
-  kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
 }
 
 tasks.withType<Test>().configureEach {

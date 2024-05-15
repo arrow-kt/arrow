@@ -130,5 +130,49 @@ class DSLTests {
       """.compilationSucceeds()
   }
 
+  @Test
+  fun `Using S as a type, #3399`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class Box<S>(val s: S) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<Box<Int>, Int> = Box.s()
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Nested generic sealed hierarchies, #3384`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed interface LoadingContentOrError<out Data> {
+      |    data object Loading : LoadingContentOrError<Nothing>
+      |
+      |    @optics
+      |    sealed interface ContentOrError<out Data> : LoadingContentOrError<Data> {
+      |        companion object
+      |    }
+      |
+      |    @optics
+      |    data class Content<out Data>(val data: Data) : ContentOrError<Data> {
+      |        companion object
+      |    }
+      |
+      |    @optics
+      |    data class Error(val error: Throwable) : ContentOrError<Nothing> {
+      |        companion object
+      |    }
+      |
+      |    companion object
+      |}
+      """.compilationSucceeds()
+  }
+
   // Db.content.at(At.map(), One).set(db, None)
 }

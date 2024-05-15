@@ -10,8 +10,13 @@ import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.core.some
+import arrow.core.toOption
+import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.reflect.KClass
+import kotlin.reflect.safeCast
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
@@ -217,6 +222,24 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
         },
         reverseGet = { it.right() }
       )
+
+    /**
+     * [Prism] to focus on a particular subtype [B]
+     */
+    @JvmStatic @JsName("instanceOfReified")
+    public inline fun <A, reified B: A> instanceOf(): Prism<A, B> = Prism(
+      getOption = { s -> if (s is B) s.some() else arrow.core.none() },
+      reverseGet = { s -> s }
+    )
+
+    /**
+     * [Prism] to focus on a particular subtype [B]
+     */
+    @JvmStatic
+    public inline fun <A: Any, B: A> instanceOf(klass: KClass<B>): Prism<A, B> = Prism(
+      getOption = { s -> klass.safeCast(s).toOption() },
+      reverseGet = { s -> s }
+    )
   }
 }
 

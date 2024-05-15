@@ -31,6 +31,10 @@ public final class arrow/optics/Every {
 	public static final fun tuple9 ()Larrow/optics/PTraversal;
 }
 
+public final class arrow/optics/LensKt {
+	public static final fun composeNull (Larrow/optics/PLens;Larrow/optics/PLens;)Larrow/optics/PLens;
+}
+
 public final class arrow/optics/ListKt {
 	public static final fun cons (Ljava/lang/Object;Ljava/util/List;)Ljava/util/List;
 	public static final fun get (Larrow/optics/PLens;I)Larrow/optics/POptional;
@@ -280,6 +284,7 @@ public abstract interface class arrow/optics/PPrism : arrow/optics/POptional {
 	public abstract fun first ()Larrow/optics/PPrism;
 	public abstract fun foldMap (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun getOrModify (Ljava/lang/Object;)Larrow/core/Either;
+	public static fun instanceOf (Lkotlin/reflect/KClass;)Larrow/optics/PPrism;
 	public abstract fun left ()Larrow/optics/PPrism;
 	public abstract fun liftNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 	public abstract fun modify (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -299,6 +304,7 @@ public final class arrow/optics/PPrism$Companion {
 	public final fun eitherLeft ()Larrow/optics/PPrism;
 	public final fun eitherRight ()Larrow/optics/PPrism;
 	public final fun id ()Larrow/optics/PIso;
+	public final fun instanceOf (Lkotlin/reflect/KClass;)Larrow/optics/PPrism;
 	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/optics/PPrism;
 	public final fun none ()Larrow/optics/PPrism;
 	public final fun only (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Larrow/optics/PPrism;
