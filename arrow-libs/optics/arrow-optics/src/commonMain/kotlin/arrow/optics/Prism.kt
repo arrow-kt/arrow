@@ -12,6 +12,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.some
 import arrow.core.toOption
+import kotlin.js.JsName
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
@@ -225,7 +226,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     /**
      * [Prism] to focus on a particular subtype [B]
      */
-    @JvmStatic
+    @JvmStatic @JsName("instanceOfReified")
     public inline fun <A, reified B: A> pInstanceOf(): Prism<A, B> = Prism(
       getOption = { s -> if (s is B) s.some() else arrow.core.none() },
       reverseGet = { s -> s }
