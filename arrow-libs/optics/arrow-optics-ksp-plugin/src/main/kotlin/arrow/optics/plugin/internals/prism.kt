@@ -25,6 +25,6 @@ private fun OpticsProcessorOptions.processElement(ele: ADT, foci: List<Focus>): 
       else ->
         "${ele.visibilityModifierName} $inlineText fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.classNameWithParameters}>"
     }
-    "$firstLine = $Prism.pInstanceOf()"
+    "$firstLine = $Prism.instanceOf()"
   }
 }
