@@ -67,7 +67,7 @@ class IterableTest {
     }
 
   @Test fun mapOrAccumulateString() = runTest {
-      listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
+      listOf(1, 2, 3).mapOrAccumulate(String::plus) {
         raise("fail")
       } shouldBe Either.Left("failfailfail")
     }
@@ -312,7 +312,7 @@ class IterableTest {
     checkAll(Arb.list(Arb.int())) { xs ->
 
       val zipped = xs.zip(xs)
-      val ls = zipped.unzip()
+      val ls = @Suppress("DEPRECATION") zipped.unzip()
       val rs = xs to xs
 
       ls shouldBe rs
@@ -321,7 +321,7 @@ class IterableTest {
 
   @Test fun unzipOk() = runTest {
     checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { xs ->
-      xs.unzip { it } shouldBe xs.unzip()
+      (@Suppress("DEPRECATION")  xs.unzip { it }) shouldBe (@Suppress("DEPRECATION") xs.unzip())
     }
   }
 

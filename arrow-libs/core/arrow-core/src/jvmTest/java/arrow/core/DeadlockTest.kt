@@ -1,5 +1,6 @@
 package arrow.core
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -7,6 +8,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
+
+@OptIn(DelicateCoroutinesApi::class)
 class DeadlockTest {
 
   @Test fun classLoaderShouldNotDeadlockEither() = runTest {

@@ -6,6 +6,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * Inspired by KotlinX Coroutines:
  * https://github.com/Kotlin/kotlinx.coroutines/blob/3788889ddfd2bcfedbff1bbca10ee56039e024a2/kotlinx-coroutines-core/jvm/src/Exceptions.kt#L29
  */
+@OptIn(DelicateRaiseApi::class)
 @Suppress(
   "EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING",
   "SEALED_INHERITOR_IN_DIFFERENT_MODULE"
