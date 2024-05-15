@@ -44,4 +44,4 @@ jobs:
         run: ./gradlew assemble -Pversion=2.0.0-alpha.1 -Penable_wasm=true
 
       - name: Publish artifacts
-        run: ./gradlew -Pversion=2.0.0-alpha.1 publish
+        run: ./gradlew -Pversion=2.0.0-alpha.1 publish -Penable_wasm=true
