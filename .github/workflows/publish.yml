@@ -2,7 +2,7 @@ name: "Publish all libs, Arrow-stack and Docs"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ publish-2.0.0-alpha.1 ]
   workflow_dispatch:
     branches: [ main ]
     inputs:
@@ -40,17 +40,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Assemble
-        run: ./gradlew assemble -Pversion=${{ inputs.version }} -Penable_wasm=true
+        run: ./gradlew assemble -Pversion=2.0.0-alpha.1 -Penable_wasm=true
 
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'reports-${{ matrix.os }}'
-          path: '**/build/reports/**'
-
-      - name: Publish next major SNAPSHOT version
-        run: ./gradlew -Pversion=${{ inputs.version }} publish
+      - name: Publish artifacts
+        run: ./gradlew -Pversion=2.0.0-alpha.1 publishToMavenCentral
