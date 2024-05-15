@@ -75,6 +75,7 @@ data class Focus(
   val refinedType: KSType?,
   val onlyOneSealedSubclass: Boolean = false,
   val subclasses: List<String> = emptyList(),
+  val classNameWithParameters: String? = className,
 ) {
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {

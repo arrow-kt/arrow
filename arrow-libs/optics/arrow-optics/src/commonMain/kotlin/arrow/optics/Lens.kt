@@ -220,3 +220,15 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
     )
   }
 }
+
+/**
+ * Compose two lenses, where the first one has a nullable focus,
+ * keeping the nullability in the types.
+ */
+public infix fun <S, T, A, B, C, D> PLens<S, T, A?, B?>.composeNull(other: PLens<A, B, C, D>): PLens<S, T, C?, D?> = PLens(
+  get = { ss -> this.get(ss)?.let { other.get(it) } },
+  set = { ss, b ->
+    val newA = this.get(ss)?.let { a -> b?.let { other.set(a, it) } }
+    this.set(ss, newA)
+  }
+)
