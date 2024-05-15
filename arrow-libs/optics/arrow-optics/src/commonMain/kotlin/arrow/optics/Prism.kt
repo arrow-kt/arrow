@@ -227,7 +227,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
      * [Prism] to focus on a particular subtype [B]
      */
     @JvmStatic @JsName("instanceOfReified")
-    public inline fun <A, reified B: A> pInstanceOf(): Prism<A, B> = Prism(
+    public inline fun <A, reified B: A> instanceOf(): Prism<A, B> = Prism(
       getOption = { s -> if (s is B) s.some() else arrow.core.none() },
       reverseGet = { s -> s }
     )
@@ -236,7 +236,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
      * [Prism] to focus on a particular subtype [B]
      */
     @JvmStatic
-    public inline fun <A: Any, B: A> pInstanceOf(klass: KClass<B>): Prism<A, B> = Prism(
+    public inline fun <A: Any, B: A> instanceOf(klass: KClass<B>): Prism<A, B> = Prism(
       getOption = { s -> klass.safeCast(s).toOption() },
       reverseGet = { s -> s }
     )
