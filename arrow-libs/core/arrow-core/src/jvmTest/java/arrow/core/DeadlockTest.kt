@@ -8,7 +8,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-
 @OptIn(DelicateCoroutinesApi::class)
 class DeadlockTest {
 
