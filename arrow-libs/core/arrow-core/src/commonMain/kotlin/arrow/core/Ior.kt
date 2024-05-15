@@ -144,7 +144,7 @@ public sealed class Ior<out A, out B> {
    * @param fab the function to apply if this is a [Both]
    * @return the results of applying the function
    */
-  public inline fun <C> fold(crossinline fa: (A) -> C, crossinline fb: (B) -> C, crossinline fab: (A, B) -> C): C {
+  public inline fun <C> fold(fa: (A) -> C, fb: (B) -> C, fab: (A, B) -> C): C {
     contract {
       callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
       callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
@@ -411,7 +411,7 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Io
     }
   }
 
-public inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: (A) -> B): B {
+public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
   return when (this) {
     is Left -> default(this.value)

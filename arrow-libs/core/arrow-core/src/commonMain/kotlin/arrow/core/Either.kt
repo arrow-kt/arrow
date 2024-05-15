@@ -582,7 +582,7 @@ public sealed class Either<out A, out B> {
    * @param ifRight transform the [Either.Right] type [B] to [C].
    * @return the transformed value [C] by applying [ifLeft] or [ifRight] to [A] or [B] respectively.
    */
-  public inline fun <C> fold(crossinline ifLeft: (left: A) -> C, crossinline ifRight: (right: B) -> C): C {
+  public inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C {
     contract {
       callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
       callsInPlace(ifRight, InvocationKind.AT_MOST_ONCE)
@@ -1311,7 +1311,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  * <!--- KNIT example-either-32.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline infix fun <A, B> Either<A, B>.getOrElse(crossinline default: (A) -> B): B {
+public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
   return when(this) {
     is Left -> default(this.value)
