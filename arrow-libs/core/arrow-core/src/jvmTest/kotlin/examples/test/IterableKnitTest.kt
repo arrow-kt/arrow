@@ -61,20 +61,12 @@ class IterableKnitTest {
     arrow.core.examples.exampleIterable14.test()
   }
 
-  @Test fun exampleIterable15() = runTest {
-    arrow.core.examples.exampleIterable15.test()
-  }
-
   @Test fun exampleIterable16() = runTest {
     arrow.core.examples.exampleIterable16.test()
   }
 
-  @Test fun exampleIterable18() = runTest {
-    arrow.core.examples.exampleIterable18.test()
-  }
-
-  @Test fun exampleIterable19() = runTest {
-    arrow.core.examples.exampleIterable19.test()
+  @Test fun exampleIterable17() = runTest {
+    arrow.core.examples.exampleIterable17.test()
   }
 
 }

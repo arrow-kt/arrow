@@ -47,6 +47,7 @@ public typealias NonSuspendCollector<Value, Result> = NonSuspendCollectorI<*, Va
  */
 public interface CollectorI<InternalAccumulator, in Value, out Result> {
   public val characteristics: Set<Characteristics>
+  public fun has(vararg ch: Characteristics): Boolean = ch.all { it in characteristics }
   public suspend fun supply(): InternalAccumulator
   public suspend fun accumulate(current: InternalAccumulator, value: Value)
   public suspend fun finish(current: InternalAccumulator): Result
