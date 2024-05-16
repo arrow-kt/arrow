@@ -292,8 +292,6 @@ public final class arrow/core/IterableKt {
 	public static final fun unalign (Ljava/lang/Iterable;)Lkotlin/Pair;
 	public static final fun unalign (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun unweave (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public static final fun unzip (Ljava/lang/Iterable;)Lkotlin/Pair;
-	public static final fun unzip (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun zip (Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function10;)Ljava/util/List;
 	public static final fun zip (Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function9;)Ljava/util/List;
 	public static final fun zip (Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function8;)Ljava/util/List;

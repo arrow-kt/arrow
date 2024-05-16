@@ -5,8 +5,7 @@ import arrow.core.*
 import io.kotest.matchers.shouldBe
 
 fun test() {
-   listOf(1, 2, 3, 4).unalign {
-     if(it % 2 == 0) it.rightIor()
-     else it.leftIor()
-   } shouldBe Pair(listOf(1, null, 3, null), listOf(null, 2, null, 4))
+  val list1 = listOf(1, 2, 3)
+  val list2 = listOf(4, 5, 6, 7, 8)
+  list1.interleave(list2) shouldBe listOf(1, 4, 2, 5, 3, 6, 7, 8)
 }

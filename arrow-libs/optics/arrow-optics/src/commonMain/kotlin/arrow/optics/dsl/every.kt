@@ -1,5 +1,6 @@
 package arrow.optics.dsl
 
+import arrow.optics.Every
 import arrow.optics.Traversal
 
 /**
@@ -10,3 +11,6 @@ import arrow.optics.Traversal
  * @return [Traversal] with a focus in [A]
  */
 public fun <T, S, A> Traversal<T, S>.every(tr: Traversal<S, A>): Traversal<T, A> = this.compose(tr)
+
+public val <T, A> Traversal<T, List<A>>.every: Traversal<T, A>
+  get() = this.compose(Every.list())

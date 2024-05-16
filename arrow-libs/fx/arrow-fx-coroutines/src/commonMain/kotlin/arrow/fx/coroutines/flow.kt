@@ -50,6 +50,7 @@ import kotlin.time.TimeSource
  * import kotlinx.coroutines.flow.collect
  * import arrow.fx.coroutines.parMap
  *
+ * @OptIn(kotlinx.coroutines.FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
  * //sampleStart
  * suspend fun main(): Unit {
  *   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -67,6 +68,7 @@ import kotlin.time.TimeSource
  *  ```kotlin
  *  import arrow.fx.coroutines.*
  *
+ *  @OptIn(kotlinx.coroutines.FlowPreview::class)
  *  suspend fun main(): Unit {
  *  //sampleStart
  *  val source = flowOf(1, 2, 3, 4)
@@ -123,6 +125,7 @@ public inline fun <A, B> Flow<A>.parMap(
  * import kotlinx.coroutines.flow.collect
  * import arrow.fx.coroutines.parMapUnordered
  *
+ * @OptIn(kotlinx.coroutines.FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
  * //sampleStart
  * suspend fun main(): Unit {
  *   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -160,6 +163,7 @@ public inline fun <A, B> Flow<A>.parMapUnordered(
  * import kotlinx.coroutines.flow.collect
  * import arrow.fx.coroutines.parMapNotNullUnordered
  *
+ * @OptIn(kotlinx.coroutines.FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
  * //sampleStart
  * suspend fun main(): Unit {
  *   flowOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)

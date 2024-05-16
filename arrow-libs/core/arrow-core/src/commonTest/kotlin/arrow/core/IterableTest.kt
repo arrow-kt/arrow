@@ -1,5 +1,3 @@
-@file:Suppress("DUPLICATE_PARAMETER_NAME_IN_FUNCTION_TYPE")
-
 package arrow.core
 
 import arrow.core.test.either
@@ -12,7 +10,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
-import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
@@ -67,7 +64,7 @@ class IterableTest {
     }
 
   @Test fun mapOrAccumulateString() = runTest {
-      listOf(1, 2, 3).mapOrAccumulate(String::plus) { i ->
+      listOf(1, 2, 3).mapOrAccumulate(String::plus) {
         raise("fail")
       } shouldBe Either.Left("failfailfail")
     }
@@ -307,23 +304,6 @@ class IterableTest {
         list shouldBe ints.partition { it % 2 == 0 }
       }
     }
-
-  @Test fun unzipInverseOfZip() = runTest {
-    checkAll(Arb.list(Arb.int())) { xs ->
-
-      val zipped = xs.zip(xs)
-      val ls = zipped.unzip()
-      val rs = xs to xs
-
-      ls shouldBe rs
-    }
-  }
-
-  @Test fun unzipOk() = runTest {
-    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.int()))) { xs ->
-      xs.unzip { it } shouldBe xs.unzip()
-    }
-  }
 
   @Test fun unalignInverseOfAlign() = runTest {
     fun <A, B> Pair<List<A?>, List<B?>>.fix(): Pair<List<A>, List<B>> =

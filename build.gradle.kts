@@ -1,9 +1,11 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
 import kotlinx.knit.KnitPluginExtension
+import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 allprojects {
@@ -15,8 +17,8 @@ allprojects {
 buildscript {
   repositories {
     mavenCentral()
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 
   dependencies {
@@ -27,15 +29,16 @@ buildscript {
 allprojects {
   repositories {
     mavenCentral()
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 
   tasks {
     withType<KotlinCompile> {
-      kotlinOptions {
-        (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = it }
-        (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = it }
+      compilerOptions {
+        (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
+        (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
       }
     }
   }
@@ -52,7 +55,8 @@ plugins {
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.publish) apply false
-  alias(libs.plugins.jetbrainsCompose) apply false
+  alias(libs.plugins.compose.jetbrains) apply false
+  alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.kotlinx.knit)
 }
 
@@ -71,16 +75,19 @@ configure<KnitPluginExtension> {
 
 dependencies {
   kover(projects.arrowAtomic)
+  kover(projects.arrowAutoclose)
   kover(projects.arrowCore)
   kover(projects.arrowCoreHighArity)
   kover(projects.arrowCoreRetrofit)
   kover(projects.arrowCoreSerialization)
+  kover(projects.arrowCache4k)
   kover(projects.arrowFunctions)
   kover(projects.arrowFxCoroutines)
   kover(projects.arrowFxStm)
   kover(projects.arrowOptics)
   kover(projects.arrowOpticsKspPlugin)
   kover(projects.arrowOpticsReflect)
+  kover(projects.arrowOpticsCompose)
   kover(projects.arrowResilience)
   kover(projects.arrowCollectors)
   kover(projects.arrowEval)
@@ -146,4 +153,6 @@ tasks {
 
 apiValidation {
   ignoredProjects.add("arrow-optics-ksp-plugin")
+  @OptIn(ExperimentalBCVApi::class)
+  klib.enabled = true
 }

@@ -72,12 +72,13 @@ internal fun evalAnnotatedPrismElement(
   when {
     element.isSealed -> {
       val sealedSubclasses = element.getSealedSubclasses().toList()
-      sealedSubclasses.map {
+      sealedSubclasses.map { subclass ->
         Focus(
-          it.primaryConstructor?.returnType?.resolve()?.qualifiedString() ?: it.qualifiedNameOrSimpleName,
-          it.simpleName.asString().replaceFirstChar { c -> c.lowercase(Locale.getDefault()) },
-          it.superTypes.first().resolve(),
+          subclass.qualifiedNameOrSimpleName,
+          subclass.simpleName.asString().replaceFirstChar { c -> c.lowercase(Locale.getDefault()) },
+          subclass.superTypes.first().resolve(),
           onlyOneSealedSubclass = sealedSubclasses.size == 1,
+          classNameWithParameters = subclass.qualifiedNameOrSimpleNameWithTypeParameters,
         )
       }
     }
@@ -89,6 +90,12 @@ internal fun evalAnnotatedPrismElement(
 
 internal val KSDeclaration.qualifiedNameOrSimpleName: String
   get() = (qualifiedName ?: simpleName).asSanitizedString()
+
+internal val KSClassDeclaration.qualifiedNameOrSimpleNameWithTypeParameters: String
+  get() = when {
+    typeParameters.isEmpty() -> qualifiedNameOrSimpleName
+    else -> "$qualifiedNameOrSimpleName<${typeParameters.joinToString { it.simpleName.asString() }}>"
+  }
 
 internal fun evalAnnotatedDataClass(
   element: KSClassDeclaration,

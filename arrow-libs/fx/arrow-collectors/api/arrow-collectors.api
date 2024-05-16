@@ -34,6 +34,7 @@ public abstract interface class arrow/collectors/CollectorI {
 	public abstract fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public abstract fun finish (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getCharacteristics ()Ljava/util/Set;
+	public abstract fun has ([Larrow/collectors/Characteristics;)Z
 	public abstract fun map (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public abstract fun supply (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun zip (Larrow/collectors/CollectorI;)Larrow/collectors/CollectorI;
@@ -49,6 +50,7 @@ public final class arrow/collectors/CollectorI$Companion {
 
 public final class arrow/collectors/CollectorI$DefaultImpls {
 	public static fun contramap (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public static fun has (Larrow/collectors/CollectorI;[Larrow/collectors/Characteristics;)Z
 	public static fun map (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public static fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;)Larrow/collectors/CollectorI;
 	public static fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function3;)Larrow/collectors/CollectorI;
@@ -98,6 +100,7 @@ public final class arrow/collectors/NonSuspendCollectorI$DefaultImpls {
 	public static fun contramap (Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public static fun contramapNonSuspend (Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function1;)Larrow/collectors/NonSuspendCollectorI;
 	public static fun finish (Larrow/collectors/NonSuspendCollectorI;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun has (Larrow/collectors/NonSuspendCollectorI;[Larrow/collectors/Characteristics;)Z
 	public static fun map (Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public static fun mapNonSuspend (Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function1;)Larrow/collectors/NonSuspendCollectorI;
 	public static fun supply (Larrow/collectors/NonSuspendCollectorI;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
