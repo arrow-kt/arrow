@@ -17,8 +17,8 @@ allprojects {
 buildscript {
   repositories {
     mavenCentral()
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 
   dependencies {
@@ -29,8 +29,9 @@ buildscript {
 allprojects {
   repositories {
     mavenCentral()
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 
   tasks {
