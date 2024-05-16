@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import java.nio.file.Path
 import kotlin.io.path.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
   closeable { path.toFile().outputStream() }
     .asFlow()

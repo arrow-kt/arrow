@@ -5,9 +5,6 @@ import arrow.core.*
 import io.kotest.matchers.shouldBe
 
 fun test() {
-   listOf(
-     Pair("A", 1).bothIor(),
-     Pair("B", 2).bothIor(),
-     "C".leftIor()
-   ).separateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
+  emptyList<Int>().split() shouldBe null
+  listOf("A", "B", "C").split() shouldBe Pair(listOf("B", "C"), "A")
 }

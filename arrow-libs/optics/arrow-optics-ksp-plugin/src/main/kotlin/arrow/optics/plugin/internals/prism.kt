@@ -21,30 +21,10 @@ private fun OpticsProcessorOptions.processElement(ele: ADT, foci: List<Focus>): 
     }
     val firstLine = when {
       ele.typeParameters.isEmpty() ->
-        "${ele.visibilityModifierName} $inlineText val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.className}> $inlineText get()"
+        "${ele.visibilityModifierName} $inlineText val ${ele.sourceClassName}.Companion.${focus.paramName}: $Prism<${ele.sourceClassName}, ${focus.classNameWithParameters}> $inlineText get()"
       else ->
-        "${ele.visibilityModifierName} $inlineText fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.className}>"
+        "${ele.visibilityModifierName} $inlineText fun $angledTypeParameters ${ele.sourceClassName}.Companion.${focus.paramName}(): $Prism<$sourceClassNameWithParams, ${focus.classNameWithParameters}>"
     }
-
-    val elseBranch = if (focus.onlyOneSealedSubclass) {
-      ""
-    } else {
-      """
-  |      else -> ${ele.sourceName}.left()
-      """.trimMargin()
-    }
-
-    """
-  |$firstLine = $Prism(
-  |  getOrModify = { ${ele.sourceName}: $sourceClassNameWithParams ->
-  |    when (${ele.sourceName}) {
-  |      is ${focus.className} -> ${ele.sourceName}.right()
-  |      $elseBranch
-  |    }
-  |  },
-  |  reverseGet = ::identity
-  |)
-  |
-    """.trimMargin()
+    "$firstLine = $Prism.instanceOf()"
   }
 }
