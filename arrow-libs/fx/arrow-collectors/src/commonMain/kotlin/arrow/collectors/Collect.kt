@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 
 /**
@@ -115,22 +114,20 @@ internal suspend fun <A, T, R> Flow<T>.collectI(
   concurrency: Int = DEFAULT_CONCURRENCY,
 ): R {
   var accumulator: A
+
   val started = this.onStart { accumulator = collector.supply() }
+
   val continued = when {
-    Characteristics.CONCURRENT in collector.characteristics -> when {
-      Characteristics.UNORDERED in collector.characteristics ->
-        started.parMapUnordered(concurrency) { collector.accumulate(accumulator, it) }
-
-      else ->
-        started.parMap(concurrency) { collector.accumulate(accumulator, it) }
-    }
-
+    collector.has(Characteristics.CONCURRENT, Characteristics.UNORDERED) ->
+      started.parMapUnordered(concurrency) { collector.accumulate(accumulator, it) }
+    collector.has(Characteristics.CONCURRENT) ->
+      started.parMap(concurrency) { collector.accumulate(accumulator, it) }
     else -> started.map { collector.accumulate(accumulator, it) }
   }
   continued.collect()
 
   return when {
-    Characteristics.IDENTITY_FINISH in collector.characteristics -> accumulator as R
+    collector.has(Characteristics.IDENTITY_FINISH) -> accumulator as R
     else -> collector.finish(accumulator)
   }
 }
@@ -142,7 +139,7 @@ internal fun <A, T, R> Iterator<T>.collectI(
   val accumulator = collector.supplyNonSuspend()
   forEach { collector.accumulateNonSuspend(accumulator, it) }
   return when {
-    Characteristics.IDENTITY_FINISH in collector.characteristics -> accumulator as R
+    collector.has(Characteristics.IDENTITY_FINISH) -> accumulator as R
     else -> collector.finishNonSuspend(accumulator)
   }
 }
