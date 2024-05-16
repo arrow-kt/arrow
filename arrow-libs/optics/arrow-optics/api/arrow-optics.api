@@ -457,8 +457,14 @@ public final class arrow/optics/PrismKt {
 
 public final class arrow/optics/dsl/AtKt {
 	public static final fun at (Larrow/optics/PLens;Larrow/optics/typeclasses/At;Ljava/lang/Object;)Larrow/optics/PLens;
+	public static final fun at (Larrow/optics/PLens;Ljava/lang/Object;)Larrow/optics/PLens;
 	public static final fun at (Larrow/optics/POptional;Larrow/optics/typeclasses/At;Ljava/lang/Object;)Larrow/optics/POptional;
+	public static final fun at (Larrow/optics/POptional;Ljava/lang/Object;)Larrow/optics/POptional;
 	public static final fun at (Larrow/optics/PTraversal;Larrow/optics/typeclasses/At;Ljava/lang/Object;)Larrow/optics/PTraversal;
+	public static final fun at (Larrow/optics/PTraversal;Ljava/lang/Object;)Larrow/optics/PTraversal;
+	public static final fun atSet (Larrow/optics/PLens;Ljava/lang/Object;)Larrow/optics/PLens;
+	public static final fun atSet (Larrow/optics/POptional;Ljava/lang/Object;)Larrow/optics/POptional;
+	public static final fun atSet (Larrow/optics/PTraversal;Ljava/lang/Object;)Larrow/optics/PTraversal;
 }
 
 public final class arrow/optics/dsl/EitherKt {
@@ -472,12 +478,37 @@ public final class arrow/optics/dsl/EitherKt {
 
 public final class arrow/optics/dsl/EveryKt {
 	public static final fun every (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyChar (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyNonEmptyList (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyRight (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everySequence (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everySome (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyValue (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun getEvery (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 }
 
+public final class arrow/optics/dsl/FilterIndexKt {
+	public static final fun filter (Larrow/optics/PTraversal;Larrow/optics/typeclasses/FilterIndex;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
+	public static final fun filter (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
+	public static final fun filterChars (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
+	public static final fun filterNonEmptyList (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
+	public static final fun filterSequence (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
+	public static final fun filterValues (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
+}
+
 public final class arrow/optics/dsl/IndexKt {
+	public static final fun index (Larrow/optics/POptional;I)Larrow/optics/POptional;
 	public static final fun index (Larrow/optics/POptional;Larrow/optics/typeclasses/Index;Ljava/lang/Object;)Larrow/optics/POptional;
+	public static final fun index (Larrow/optics/PTraversal;I)Larrow/optics/PTraversal;
 	public static final fun index (Larrow/optics/PTraversal;Larrow/optics/typeclasses/Index;Ljava/lang/Object;)Larrow/optics/PTraversal;
+	public static final fun indexNonEmptyList (Larrow/optics/POptional;I)Larrow/optics/POptional;
+	public static final fun indexNonEmptyList (Larrow/optics/PTraversal;I)Larrow/optics/PTraversal;
+	public static final fun indexSequence (Larrow/optics/POptional;I)Larrow/optics/POptional;
+	public static final fun indexSequence (Larrow/optics/PTraversal;I)Larrow/optics/PTraversal;
+	public static final fun indexString (Larrow/optics/POptional;I)Larrow/optics/POptional;
+	public static final fun indexString (Larrow/optics/PTraversal;I)Larrow/optics/PTraversal;
+	public static final fun indexValues (Larrow/optics/POptional;Ljava/lang/Object;)Larrow/optics/POptional;
+	public static final fun indexValues (Larrow/optics/PTraversal;Ljava/lang/Object;)Larrow/optics/PTraversal;
 }
 
 public final class arrow/optics/dsl/NullableKt {
