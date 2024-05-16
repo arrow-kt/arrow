@@ -7,6 +7,7 @@ import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 val resource =
   resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
 
+@OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
 suspend fun main(): Unit {
   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
   try {

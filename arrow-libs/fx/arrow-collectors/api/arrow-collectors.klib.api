@@ -20,6 +20,7 @@ abstract interface <#A: kotlin/Any?, #B: in kotlin/Any?, #C: out kotlin/Any?> ar
     open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> zip(arrow.collectors/CollectorI<#A1, #B, #B1>): arrow.collectors/CollectorI<*, #B, kotlin/Pair<#C, #B1>> // arrow.collectors/CollectorI.zip|zip(arrow.collectors.CollectorI<0:0,1:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/Any?> contramap(kotlin.coroutines/SuspendFunction1<#A1, #B>): arrow.collectors/CollectorI<*, #A1, #C> // arrow.collectors/CollectorI.contramap|contramap(kotlin.coroutines.SuspendFunction1<0:0,1:1>){0§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/Any?> map(kotlin.coroutines/SuspendFunction1<#C, #A1>): arrow.collectors/CollectorI<*, #B, #A1> // arrow.collectors/CollectorI.map|map(kotlin.coroutines.SuspendFunction1<1:2,0:0>){0§<kotlin.Any?>}[0]
+    open fun has(kotlin/Array<out arrow.collectors/Characteristics>...): kotlin/Boolean // arrow.collectors/CollectorI.has|has(kotlin.Array<out|arrow.collectors.Characteristics>...){}[0]
 }
 abstract interface <#A: kotlin/Any?, #B: in kotlin/Any?, #C: out kotlin/Any?> arrow.collectors/NonSuspendCollectorI : arrow.collectors/CollectorI<#A, #B, #C> { // arrow.collectors/NonSuspendCollectorI|null[0]
     abstract fun accumulateNonSuspend(#A, #B) // arrow.collectors/NonSuspendCollectorI.accumulateNonSuspend|accumulateNonSuspend(1:0;1:1){}[0]

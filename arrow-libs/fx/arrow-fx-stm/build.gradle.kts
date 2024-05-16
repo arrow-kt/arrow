@@ -1,5 +1,6 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
@@ -20,6 +21,9 @@ spotless {
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {
+  @OptIn(ExperimentalKotlinGradlePluginApi::class)
+  compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+
   sourceSets {
     commonMain {
       dependencies {
@@ -46,10 +50,6 @@ kotlin {
       }
     }
   }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions.freeCompilerArgs += "-Xexpect-actual-classes"
 }
 
 tasks.withType<Test>().configureEach {

@@ -414,6 +414,7 @@ public fun <A> resource(
  * import java.nio.file.Path
  * import kotlin.io.path.*
  *
+ * @OptIn(ExperimentalCoroutinesApi::class)
  * fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
  *   closeable { path.toFile().outputStream() }
  *     .asFlow()
@@ -452,6 +453,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  * val resource =
  *   resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
  *
+ * @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
  * suspend fun main(): Unit {
  *   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
  *   try {

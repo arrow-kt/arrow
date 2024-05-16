@@ -236,7 +236,7 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
      * [Prism] to focus on a particular subtype [B]
      */
     @JvmStatic
-    public inline fun <A: Any, B: A> instanceOf(klass: KClass<B>): Prism<A, B> = Prism(
+    public fun <A: Any, B: A> instanceOf(klass: KClass<B>): Prism<A, B> = Prism(
       getOption = { s -> klass.safeCast(s).toOption() },
       reverseGet = { s -> s }
     )
