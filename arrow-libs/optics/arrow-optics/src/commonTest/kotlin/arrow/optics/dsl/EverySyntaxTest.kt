@@ -8,14 +8,6 @@ import kotlin.test.assertEquals
 
 class EverySyntaxTest {
 
-  @JvmInline
-  value class Wrapper<A>(val value: A) {
-    companion object {
-      fun <A> lens(): Lens<Wrapper<A>, A> =
-        Lens(Wrapper<A>::value) { _, a -> Wrapper(a) }
-    }
-  }
-
   @Test
   fun list() {
     val original = listOf(1, 2)
