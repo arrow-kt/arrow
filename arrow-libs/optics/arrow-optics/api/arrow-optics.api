@@ -472,6 +472,12 @@ public final class arrow/optics/dsl/EitherKt {
 
 public final class arrow/optics/dsl/EveryKt {
 	public static final fun every (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyChar (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyNonEmptyList (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyRight (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everySequence (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everySome (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyValue (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun getEvery (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 }
 
