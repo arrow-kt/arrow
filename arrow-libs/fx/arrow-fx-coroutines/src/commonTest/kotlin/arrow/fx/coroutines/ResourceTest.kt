@@ -1,12 +1,11 @@
 package arrow.fx.coroutines
 
-import arrow.autoCloseScope
+import arrow.atomic.AtomicBoolean
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -28,11 +27,12 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import kotlin.random.Random
 import kotlin.test.Test
+import kotlinx.coroutines.channels.toList
 
 class ResourceTest {
 
@@ -632,5 +632,58 @@ class ResourceTest {
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
       released.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
+  }
+
+  @OptIn(ExperimentalStdlibApi::class)
+  private class Res : AutoCloseable {
+    private val isActive = AtomicBoolean(true)
+
+    fun isActive(): Boolean = isActive.get()
+
+    fun shutdown() {
+      require(isActive.compareAndSet(expected = true, new = false)) {
+        "Already shut down"
+      }
+    }
+
+    override fun close() {
+      shutdown()
+    }
+  }
+
+  @Test
+  fun closeInReversedOrder() = runTest {
+    val res1 = Res()
+    val res2 = Res()
+    val res3 = Res()
+
+    val wasActive = Channel<Boolean>(Channel.UNLIMITED)
+    val closed = Channel<Res>(Channel.UNLIMITED)
+
+    resourceScope {
+      val r1 = autoClose({ res1 }) { r, _ ->
+        closed.trySend(r).getOrThrow()
+        r.shutdown()
+      }
+      val r2 = autoClose({ res2 }) { r, _ ->
+        closed.trySend(r).getOrThrow()
+        r.shutdown()
+      }
+      val r3 = autoClose({ res3 }) { r, _ ->
+        closed.trySend(r).getOrThrow()
+        r.shutdown()
+      }
+
+      wasActive.trySend(r1.isActive()).getOrThrow()
+      wasActive.trySend(r2.isActive()).getOrThrow()
+      wasActive.trySend(r3.isActive()).getOrThrow()
+      wasActive.close()
+    }
+
+    wasActive.toList() shouldBe listOf(true, true, true)
+    closed.receive() shouldBe res3
+    closed.receive() shouldBe res2
+    closed.receive() shouldBe res1
+    closed.cancel()
   }
 }
