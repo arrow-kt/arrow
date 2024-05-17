@@ -8,7 +8,7 @@ suspend fun main() {
   //sampleStart
   val tsem = TSemaphore.new(5)
   atomically {
-    tsem.release()
+    tsem.acquire()
   }
   //sampleEnd
   println("Permits remaining ${atomically { tsem.available() }}")

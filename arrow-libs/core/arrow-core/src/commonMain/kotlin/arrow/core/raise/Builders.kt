@@ -229,13 +229,13 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
   @RaiseDSL
   public inline fun <A> recover(
     block: SingletonRaise<E>.() -> A,
-    recover: () -> A,
+    raise: () -> A,
   ): A {
     contract {
       callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(raise, InvocationKind.AT_MOST_ONCE)
     }
-    return singleton(recover) { ignoreErrors(block) }
+    return recover<_, A>({ block(SingletonRaise(this)) }) { raise() }
   }
 
   /**

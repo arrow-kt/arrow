@@ -8,8 +8,9 @@ suspend fun main() {
   //sampleStart
   val tmvar = TMVar.empty<Int>()
   val result = atomically {
-    tmvar.isNotEmpty()
+    tmvar.tryTake()
   }
   //sampleEnd
   println("Result $result")
+  println("New value ${atomically { tmvar.tryTake() } }")
 }

@@ -10,7 +10,7 @@ public inline fun <A> identity(a: A): A = a
  * always prefer to use `Option` in actual business code when needed in generic code.
  */
 public object EmptyValue {
-  @Suppress("UNCHECKED_CAST")
+  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   public inline fun <A> unbox(value: Any?): A =
     fold(value, { null as A }, ::identity)
 

@@ -1,16 +1,15 @@
 // This file was automatically generated from STM.kt by Knit tool. Do not edit.
 package arrow.fx.stm.examples.exampleStm30
 
-import arrow.fx.stm.TQueue
+import arrow.fx.stm.TSemaphore
 import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tq = TQueue.new<Int>()
-  val result = atomically {
-    tq.tryRead()
+  val tsem = TSemaphore.new(5)
+  atomically {
+    tsem.release(2)
   }
   //sampleEnd
-  println("Result $result")
-  println("Items in queue ${atomically { tq.flush() }}")
+  println("Permits remaining ${atomically { tsem.available() }}")
 }

@@ -7,13 +7,9 @@ import arrow.fx.stm.atomically
 suspend fun main() {
   //sampleStart
   val tq = TQueue.new<Int>()
-  val result = atomically {
+  atomically {
     tq.write(2)
-    tq.write(4)
-
-    tq.flush()
   }
   //sampleEnd
-  println("Result $result")
   println("Items in queue ${atomically { tq.flush() }}")
 }

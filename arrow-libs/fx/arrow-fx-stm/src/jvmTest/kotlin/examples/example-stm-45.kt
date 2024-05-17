@@ -1,17 +1,14 @@
 // This file was automatically generated from STM.kt by Knit tool. Do not edit.
 package arrow.fx.stm.examples.exampleStm45
 
-import arrow.fx.stm.TMap
+import arrow.fx.stm.TArray
 import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tmap = TMap.new<Int, String>()
+  val tarr = TArray.new(size = 10, 2)
   val result = atomically {
-    tmap[1] = "Hello"
-    tmap[2] = "World"
-
-    tmap[2]
+    tarr.transform { it + 1 }
   }
   //sampleEnd
   println("Result $result")

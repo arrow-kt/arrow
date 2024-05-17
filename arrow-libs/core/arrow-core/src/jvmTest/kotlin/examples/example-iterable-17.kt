@@ -5,8 +5,8 @@ import arrow.core.*
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  val ints = listOf(1, 2)
-  val res = ints.unweave { i -> listOf(i, i + 1, i + 2) }
-  res shouldBe listOf(1, 2, 2, 3, 3, 4)
-  res shouldBe ints.interleave(ints.flatMap { listOf(it + 1, it + 2) })
+  listOf(1, 2, 3, 4)
+    .separateEither {
+      if (it % 2 == 0) "even: $it".right() else "odd: $it".left()
+    } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))
 }

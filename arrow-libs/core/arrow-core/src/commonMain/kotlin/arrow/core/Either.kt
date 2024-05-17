@@ -650,10 +650,11 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
-    contract {
-      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
+      is Left -> Left(f(value))
+      is Right -> Right(value)
     }
-    return fold({ Left(f(it)) }, { Right(it) })
   }
 
   /**
@@ -1312,7 +1313,10 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  */
 public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return fold(default, ::identity)
+  return when(this) {
+    is Left -> default(this.value)
+    is Right -> this.value
+  }
 }
 
 /**
@@ -1332,8 +1336,7 @@ public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  * <!--- KNIT example-either-33.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-@Suppress("NOTHING_TO_INLINE")
-public inline fun <A> Either<A, A>.merge(): A =
+public fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
 
 public fun <A> A.left(): Either<A, Nothing> = Left(this)

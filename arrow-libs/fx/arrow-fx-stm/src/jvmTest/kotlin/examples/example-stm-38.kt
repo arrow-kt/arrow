@@ -7,9 +7,10 @@ import arrow.fx.stm.atomically
 suspend fun main() {
   //sampleStart
   val tq = TQueue.new<Int>()
-  val result = atomically {
-    tq.size()
+  atomically {
+    tq.write(1)
+    tq.writeFront(2)
   }
   //sampleEnd
-  println("Result $result")
+  println("Items in queue ${atomically { tq.flush() }}")
 }

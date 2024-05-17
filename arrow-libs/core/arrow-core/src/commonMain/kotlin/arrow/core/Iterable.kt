@@ -13,7 +13,6 @@ import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapOrAccumulate
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
-import kotlin.collections.unzip as stdlibUnzip
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
   c: Iterable<C>,
@@ -590,53 +589,6 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
   this.align(b, ::identity)
 
 /**
- * unzips the structure holding the resulting elements in an `Pair`
- *
- * ```kotlin
- * import arrow.core.*
- * import io.kotest.matchers.shouldBe
- *
- * fun test() {
- *   listOf("A" to 1, "B" to 2)
- *     .unzip() shouldBe Pair(listOf("A", "B"), listOf(1, 2))
- * }
- * ```
- * <!--- KNIT example-iterable-11.kt -->
- * <!--- TEST lines.isEmpty() -->
- */
-@Deprecated(
-  "Unzip is being deprecated in favor of the standard library version.\n$NicheAPI",
-  ReplaceWith("unzip()", "kotlin.collections.unzip")
-)
-public fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
-   stdlibUnzip()
-
-/**
- * after applying the given function unzip the resulting structure into its elements.
- *
- * ```kotlin
- * import arrow.core.*
- * import io.kotest.matchers.shouldBe
- *
- * fun test() {
- *   listOf("A:1", "B:2", "C:3").unzip { e ->
- *     e.split(":").let {
- *       it.first() to it.last()
- *     }
- *   } shouldBe Pair(listOf("A", "B", "C"), listOf("1", "2", "3"))
- * }
- * ```
- * <!--- KNIT example-iterable-12.kt -->
- * <!--- TEST lines.isEmpty() -->
- */
-@Deprecated(
-  "Unzip is being deprecated in favor of the standard library version.\n$NicheAPI",
-  ReplaceWith("map(fc).unzip()", "kotlin.collections.unzip")
-)
-public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
-  map(fc).stdlibUnzip()
-
-/**
  * splits a union into its component parts.
  *
  * <!--- INCLUDE
@@ -652,7 +604,7 @@ public inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<
  *    ).separateIor() shouldBe Pair(listOf("A", "B", "C"), listOf(1, 2))
  * }
  * ```
- * <!--- KNIT example-iterable-13.kt -->
+ * <!--- KNIT example-iterable-11.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Ior<A, B>>.separateIor(): Pair<List<A>, List<B>> =
@@ -687,7 +639,7 @@ public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A?>, List<B?>> =
  *    } shouldBe Pair(listOf(1, null, 3, null), listOf(null, 2, null, 4))
  * }
  * ```
- * <!--- KNIT example-iterable-14.kt -->
+ * <!--- KNIT example-iterable-12.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A?>, List<B?>> =
@@ -814,7 +766,7 @@ private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
  *   listOf("A", "B", "C").split() shouldBe Pair(listOf("B", "C"), "A")
  * }
  * ```
- * <!--- KNIT example-iterable-15.kt -->
+ * <!--- KNIT example-iterable-13.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
@@ -841,7 +793,7 @@ public fun <A> Iterable<A>.tail(): List<A> =
  *   list1.interleave(list2) shouldBe listOf(1, 4, 2, 5, 3, 6, 7, 8)
  * }
  * ```
- * <!--- KNIT example-iterable-16.kt -->
+ * <!--- KNIT example-iterable-14.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
@@ -863,7 +815,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  *   res shouldBe ints.interleave(ints.flatMap { listOf(it + 1, it + 2) })
  * }
  * ```
- * <!--- KNIT example-iterable-17.kt -->
+ * <!--- KNIT example-iterable-15.kt -->
  */
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
@@ -882,7 +834,7 @@ public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
  *     .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))
  * }
  * ```
- * <!--- KNIT example-iterable-18.kt -->
+ * <!--- KNIT example-iterable-16.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
@@ -904,7 +856,7 @@ public fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>
  *     } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))
  * }
  * ```
- * <!--- KNIT example-iterable-19.kt -->
+ * <!--- KNIT example-iterable-17.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <T, A, B> Iterable<T>.separateEither(f: (T) -> Either<A, B>): Pair<List<A>, List<B>> {
