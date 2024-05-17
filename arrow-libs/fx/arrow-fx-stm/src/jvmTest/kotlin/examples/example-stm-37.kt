@@ -7,10 +7,10 @@ import arrow.fx.stm.atomically
 suspend fun main() {
   //sampleStart
   val tq = TQueue.new<Int>()
-  atomically {
-    tq.write(0)
-    tq.removeAll { it != 0 }
+  val result = atomically {
+    tq.tryPeek()
   }
   //sampleEnd
+  println("Result $result")
   println("Items in queue ${atomically { tq.flush() }}")
 }

@@ -1,15 +1,16 @@
 // This file was automatically generated from STM.kt by Knit tool. Do not edit.
 package arrow.fx.stm.examples.exampleStm12
 
-import arrow.fx.stm.TMVar
+import arrow.fx.stm.TVar
 import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tmvar = TMVar.empty<Int>()
-  atomically {
-    tmvar.put(20)
+  val tvar = TVar.new(10)
+  val result = atomically {
+    var x by tvar
+    x = 20
   }
   //sampleEnd
-  println("New value ${atomically { tmvar.tryTake() } }")
+  println(result)
 }

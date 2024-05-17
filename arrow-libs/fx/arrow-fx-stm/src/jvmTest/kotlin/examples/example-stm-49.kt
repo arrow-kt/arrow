@@ -8,8 +8,9 @@ suspend fun main() {
   //sampleStart
   val tmap = TMap.new<Int, String>()
   val result = atomically {
-    tmap[2] = "Hello"
-    tmap.update(2) { it.reversed() }
+    tmap[1] = "Hello"
+    tmap[2] = "World"
+
     tmap[2]
   }
   //sampleEnd

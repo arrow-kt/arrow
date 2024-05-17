@@ -8,7 +8,8 @@ suspend fun main() {
   //sampleStart
   val tq = TQueue.new<Int>()
   val result = atomically {
-    tq.tryPeek()
+    tq.write(2)
+    tq.read()
   }
   //sampleEnd
   println("Result $result")

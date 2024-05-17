@@ -8,8 +8,11 @@ suspend fun main() {
   //sampleStart
   val tq = TQueue.new<Int>()
   val result = atomically {
-    tq.isNotEmpty()
+    tq.write(2)
+
+    tq.peek()
   }
   //sampleEnd
   println("Result $result")
+  println("Items in queue ${atomically { tq.flush() }}")
 }

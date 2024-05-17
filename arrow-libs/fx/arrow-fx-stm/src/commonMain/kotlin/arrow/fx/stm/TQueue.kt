@@ -260,8 +260,8 @@ public data class TQueue<A> internal constructor(
  *   implement queues.
  */
 internal sealed class PList<out A> {
-  public data class Cons<A>(val value: A, @JsName("_tail") val tail: PList<A>) : PList<A>()
-  object Nil : PList<Nothing>()
+  data class Cons<A>(val value: A, @JsName("_tail") val tail: PList<A>) : PList<A>()
+  data object Nil : PList<Nothing>()
 
   /**
    * O(1)
@@ -290,47 +290,46 @@ internal sealed class PList<out A> {
   fun isNotEmpty(): Boolean = this != Nil
 
   /**
+   * Execute an action on every element
+   */
+  private inline fun forEach(crossinline action: (A) -> Unit) {
+    var xs = this
+    while (xs is Cons) {
+      action(xs.value)
+      xs = xs.tail
+    }
+  }
+
+  /**
    * O(n) and the entire list is copied
    */
   fun reverse(): PList<A> {
     var new: PList<A> = Nil
-    var xs = this
-    while (xs is Cons) {
-      new = Cons(xs.value, new)
-      xs = xs.tail
-    }
+    this.forEach { new = Cons(it, new) }
     return new
   }
 
   /**
    * O(n)
    */
-  inline fun filter(pred: Predicate<A>): PList<A> {
-    var new: PList<A> = Nil
-    var xs = this
-    while (xs is Cons) {
-      if (pred(xs.value)) new = Cons(xs.value, new)
-      xs = xs.tail
+  fun filter(pred: Predicate<A>): PList<A> {
+    var chosen: PList<A> = Nil
+    this.forEach {
+      if (pred(it)) chosen = Cons(it, chosen)
     }
-    return new.reverse()
+    return chosen.reverse()
   }
 
   /**
    * O(n)
    */
-  inline fun filterNot(pred: Predicate<A>): PList<A> = filter { pred(it).not() }
+  // fun filterNot(pred: Predicate<A>): PList<A> = filter { pred(it).not() }
 
   /**
    * O(n)
    */
-  fun toList(): List<A> {
-    val mutList = mutableListOf<A>()
-    var xs = this
-    while (xs is Cons) {
-      mutList.add(xs.value)
-      xs = xs.tail
-    }
-    return mutList
+  fun toList(): List<A> = buildList {
+    this@PList.forEach { add(it) }
   }
 
   /**
@@ -338,11 +337,7 @@ internal sealed class PList<out A> {
    */
   fun size(): Int {
     var sz = 0
-    var xs = this
-    while (xs is Cons) {
-      sz += 1
-      xs = xs.tail
-    }
+    this.forEach { sz++ }
     return sz
   }
 }

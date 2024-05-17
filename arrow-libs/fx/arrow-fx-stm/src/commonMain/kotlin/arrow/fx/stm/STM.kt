@@ -3,6 +3,7 @@ package arrow.fx.stm
 import arrow.fx.stm.internal.STMTransaction
 import arrow.fx.stm.internal.alterHamtWithHash
 import arrow.fx.stm.internal.lookupHamtWithHash
+import kotlin.reflect.KProperty
 
 /**
  * # Consistent and safe concurrent state updates
@@ -287,6 +288,32 @@ public interface STM {
   public fun <A> TVar<A>.read(): A
 
   /**
+   * Read the value from a [TVar].
+   *
+   * ```kotlin
+   * import arrow.fx.stm.TVar
+   * import arrow.fx.stm.atomically
+   *
+   * suspend fun main() {
+   *   //sampleStart
+   *   val tvar = TVar.new(10)
+   *   val result = atomically {
+   *     tvar.value
+   *   }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   * <!--- KNIT example-stm-08.kt -->
+   *
+   * This comes with a few guarantees:
+   * - Any given [TVar] is only ever read once during a transaction.
+   * - When committing the transaction the value read has to be equal to the current value otherwise the
+   *   transaction will retry
+   */
+  public val <A> TVar<A>.value: A get() = read()
+
+  /**
    * Set the value of a [TVar].
    *
    * ```kotlin
@@ -303,7 +330,7 @@ public interface STM {
    *   println(result)
    * }
    * ```
- * <!--- KNIT example-stm-08.kt -->
+ * <!--- KNIT example-stm-09.kt -->
    *
    * Similarly to [read] this comes with a few guarantees:
    * - For multiple writes to the same [TVar] in a transaction only the last will actually be performed
@@ -311,6 +338,78 @@ public interface STM {
    *   same as the current value otherwise the transaction will retry
    */
   public fun <A> TVar<A>.write(a: A)
+
+  /**
+   * Set the value of a [TVar].
+   *
+   * ```kotlin
+   * import arrow.fx.stm.TVar
+   * import arrow.fx.stm.atomically
+   *
+   * suspend fun main() {
+   *   //sampleStart
+   *   val tvar = TVar.new(10)
+   *   val result = atomically {
+   *     tvar.set(20)
+   *   }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   * <!--- KNIT example-stm-10.kt -->
+   *
+   * Similarly to [value] this comes with a few guarantees:
+   * - For multiple writes to the same [TVar] in a transaction only the last will actually be performed
+   * - When committing the value inside the [TVar], at the time of calling [set], has to be the
+   *   same as the current value otherwise the transaction will retry
+   */
+  public fun <A> TVar<A>.set(a: A) { write(a) }
+
+  /**
+   * Use a [TVar] using property delegation.
+   *
+   * ```kotlin
+   * import arrow.fx.stm.TVar
+   * import arrow.fx.stm.atomically
+   *
+   * suspend fun main() {
+   *   //sampleStart
+   *   val tvar = TVar.new(10)
+   *   val result = atomically {
+   *     val x by tvar
+   *     x
+   *   }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   *
+   * <!--- KNIT example-stm-11.kt -->
+   */
+  public operator fun <A> TVar<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = read()
+
+  /**
+   * Use a [TVar] using property delegation.
+   *
+   * ```kotlin
+   * import arrow.fx.stm.TVar
+   * import arrow.fx.stm.atomically
+   *
+   * suspend fun main() {
+   *   //sampleStart
+   *   val tvar = TVar.new(10)
+   *   val result = atomically {
+   *     var x by tvar
+   *     x = 20
+   *   }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   * 
+   * <!--- KNIT example-stm-12.kt -->
+   */
+  public operator fun <A> TVar<A>.setValue(thisRef: Nothing?, property: KProperty<*>, value: A) { write(value) }
 
   /**
    * Modify the value of a [TVar]
@@ -329,7 +428,7 @@ public interface STM {
    *   println(result)
    * }
    * ```
- * <!--- KNIT example-stm-09.kt -->
+ * <!--- KNIT example-stm-13.kt -->
    *
    * `modify(f) = write(f(read()))`
    */
@@ -353,7 +452,7 @@ public interface STM {
    *   println("New value ${tvar.unsafeRead()}")
    * }
    * ```
- * <!--- KNIT example-stm-10.kt -->
+ * <!--- KNIT example-stm-14.kt -->
    *
    * @return The previous value stored inside the [TVar]
    */
@@ -383,7 +482,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
- * <!--- KNIT example-stm-11.kt -->
+ * <!--- KNIT example-stm-15.kt -->
    *
    * This retries if the [TMVar] is empty and leaves the [TMVar] empty if it succeeded.
    *
@@ -412,7 +511,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
- * <!--- KNIT example-stm-12.kt -->
+ * <!--- KNIT example-stm-16.kt -->
    *
    * This retries if the [TMVar] is not empty.
    *
@@ -441,7 +540,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
- * <!--- KNIT example-stm-13.kt -->
+ * <!--- KNIT example-stm-17.kt -->
    *
    * This retries if the [TMVar] is empty but does not take the value out if it succeeds.
    *
@@ -471,7 +570,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
- * <!--- KNIT example-stm-14.kt -->
+ * <!--- KNIT example-stm-18.kt -->
    */
   public fun <A> TMVar<A>.tryTake(): A? = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.None) }
@@ -496,7 +595,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
- * <!--- KNIT example-stm-15.kt -->
+ * <!--- KNIT example-stm-19.kt -->
    *
    * This function never retries.
    *
@@ -524,7 +623,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-16.kt -->
+ * <!--- KNIT example-stm-20.kt -->
    *
    * @see TMVar.read for a function that retries if the [TMVar] is empty.
    * @see TMVar.tryTake for a function that leaves the [TMVar] empty after reading.
@@ -551,7 +650,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-17.kt -->
+ * <!--- KNIT example-stm-21.kt -->
    *
    * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
    *  reads in the *same* transaction.
@@ -575,7 +674,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-18.kt -->
+ * <!--- KNIT example-stm-22.kt -->
    *
    * > Because the state of a transaction is constant there can never be a race condition between checking if a `TMVar` is empty and subsequent
    *  reads in the *same* transaction.
@@ -601,7 +700,7 @@ public interface STM {
    *   println("New value ${atomically { tmvar.tryTake() } }")
    * }
    * ```
- * <!--- KNIT example-stm-19.kt -->
+ * <!--- KNIT example-stm-23.kt -->
    */
   public fun <A> TMVar<A>.swap(a: A): A = when (val ret = v.read()) {
     is Option.Some -> ret.a.also { v.write(Option.Some(a)) }
@@ -627,7 +726,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-20.kt -->
+ * <!--- KNIT example-stm-24.kt -->
    *
    * This function never retries.
    */
@@ -651,7 +750,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-21.kt -->
+ * <!--- KNIT example-stm-25.kt -->
    *
    * This function will retry if there are no permits available.
    *
@@ -677,7 +776,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-22.kt -->
+ * <!--- KNIT example-stm-26.kt -->
    *
    * This function will retry if there are less than [n] permits available.
    *
@@ -707,7 +806,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-23.kt -->
+ * <!--- KNIT example-stm-27.kt -->
    *
    * This function never retries.
    *
@@ -734,7 +833,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-24.kt -->
+ * <!--- KNIT example-stm-28.kt -->
    *
    * This function never retries.
    *
@@ -760,7 +859,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-25.kt -->
+ * <!--- KNIT example-stm-29.kt -->
    *
    * This function never retries.
    */
@@ -784,7 +883,7 @@ public interface STM {
    *   println("Permits remaining ${atomically { tsem.available() }}")
    * }
    * ```
- * <!--- KNIT example-stm-26.kt -->
+ * <!--- KNIT example-stm-30.kt -->
    *
    * [n] must be non-negative.
    *
@@ -816,7 +915,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-27.kt -->
+ * <!--- KNIT example-stm-31.kt -->
    *
    * This function never retries.
    */
@@ -840,7 +939,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-28.kt -->
+ * <!--- KNIT example-stm-32.kt -->
    *
    * This function never retries.
    */
@@ -865,7 +964,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-29.kt -->
+ * <!--- KNIT example-stm-33.kt -->
    *
    * @see TQueue.tryRead for a version that does not retry.
    * @see TQueue.peek for a version that does not remove the element.
@@ -903,7 +1002,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-30.kt -->
+ * <!--- KNIT example-stm-34.kt -->
    *
    * This function never retries.
    */
@@ -931,7 +1030,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-31.kt -->
+ * <!--- KNIT example-stm-35.kt -->
    *
    * This function never retries.
    */
@@ -961,7 +1060,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-32.kt -->
+ * <!--- KNIT example-stm-36.kt -->
    *
    * This function retries if the [TQueue] is empty.
    *
@@ -989,7 +1088,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-33.kt -->
+ * <!--- KNIT example-stm-37.kt -->
    *
    * This function never retries.
    *
@@ -1017,7 +1116,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-34.kt -->
+ * <!--- KNIT example-stm-38.kt -->
    *
    * Mainly used to implement [TQueue.peek] and since this writes to the read variable of a [TQueue] excessive use
    *  can lead to contention on consumers. Prefer appending to a [TQueue] if possible.
@@ -1044,7 +1143,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-35.kt -->
+ * <!--- KNIT example-stm-39.kt -->
    *
    * This function never retries.
    *
@@ -1070,7 +1169,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-36.kt -->
+ * <!--- KNIT example-stm-40.kt -->
    *
    * This function never retries.
    *
@@ -1097,7 +1196,7 @@ public interface STM {
    *   println("Items in queue ${atomically { tq.flush() }}")
    * }
    * ```
- * <!--- KNIT example-stm-37.kt -->
+ * <!--- KNIT example-stm-41.kt -->
    *
    * This function never retries.
    *
@@ -1125,7 +1224,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-38.kt -->
+ * <!--- KNIT example-stm-42.kt -->
    *
    * This function never retries.
    *
@@ -1151,7 +1250,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-39.kt -->
+ * <!--- KNIT example-stm-43.kt -->
    *
    * Throws if [i] is out of bounds.
    *
@@ -1179,7 +1278,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-40.kt -->
+ * <!--- KNIT example-stm-44.kt -->
    *
    * Throws if [i] is out of bounds.
    *
@@ -1205,7 +1304,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-41.kt -->
+ * <!--- KNIT example-stm-45.kt -->
    *
    * This function never retries.
    */
@@ -1229,7 +1328,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-42.kt -->
+ * <!--- KNIT example-stm-46.kt -->
    *
    * This function never retries.
    */
@@ -1255,7 +1354,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-43.kt -->
+ * <!--- KNIT example-stm-47.kt -->
    *
    * This function never retries.
    */
@@ -1282,7 +1381,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-44.kt -->
+ * <!--- KNIT example-stm-48.kt -->
    *
    * > If the key is not present [STM.lookup] will not retry, instead it returns `null`.
    */
@@ -1309,7 +1408,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-45.kt -->
+ * <!--- KNIT example-stm-49.kt -->
    *
    * > If the key is not present [STM.get] will not retry, instead it returns `null`.
    */
@@ -1331,7 +1430,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-46.kt -->
+ * <!--- KNIT example-stm-50.kt -->
    */
   public fun <K, V> TMap<K, V>.insert(k: K, v: V) {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { k to v }
@@ -1353,7 +1452,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-47.kt -->
+ * <!--- KNIT example-stm-51.kt -->
    */
   public operator fun <K, V> TMap<K, V>.set(k: K, v: V): Unit = insert(k, v)
 
@@ -1373,7 +1472,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-48.kt -->
+ * <!--- KNIT example-stm-52.kt -->
    */
   public operator fun <K, V> TMap<K, V>.plusAssign(kv: Pair<K, V>): Unit = insert(kv.first, kv.second)
 
@@ -1396,7 +1495,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-49.kt -->
+ * <!--- KNIT example-stm-53.kt -->
    */
   public fun <K, V> TMap<K, V>.update(k: K, fn: (V) -> V) {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { it?.second?.let(fn)?.let { r -> k to r } }
@@ -1419,7 +1518,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-50.kt -->
+ * <!--- KNIT example-stm-54.kt -->
    */
   public fun <K, V> TMap<K, V>.remove(k: K) {
     alterHamtWithHash(hamt, hashFn(k), { it.first == k }) { null }
@@ -1444,7 +1543,7 @@ public interface STM {
    *   println("Result $result")
    * }
    * ```
- * <!--- KNIT example-stm-51.kt -->
+ * <!--- KNIT example-stm-55.kt -->
    */
   public fun <A> TSet<A>.member(a: A): Boolean =
     lookupHamtWithHash(hamt, hashFn(a)) { it == a } != null
@@ -1465,7 +1564,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-52.kt -->
+ * <!--- KNIT example-stm-56.kt -->
    */
   public fun <A> TSet<A>.insert(a: A) {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { a }
@@ -1487,7 +1586,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-53.kt -->
+ * <!--- KNIT example-stm-57.kt -->
    */
   public operator fun <A> TSet<A>.plusAssign(a: A): Unit = insert(a)
 
@@ -1508,7 +1607,7 @@ public interface STM {
    *   //sampleEnd
    * }
    * ```
- * <!--- KNIT example-stm-54.kt -->
+ * <!--- KNIT example-stm-58.kt -->
    */
   public fun <A> TSet<A>.remove(a: A) {
     alterHamtWithHash(hamt, hashFn(a), { it == a }) { null }
@@ -1535,7 +1634,7 @@ public interface STM {
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-stm-55.kt -->
+ * <!--- KNIT example-stm-59.kt -->
  *
  * Equal to [suspend] just with an [STM] receiver.
  */
@@ -1562,7 +1661,7 @@ public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
  *   println("Result $result")
  * }
  * ```
- * <!--- KNIT example-stm-56.kt -->
+ * <!--- KNIT example-stm-60.kt -->
  *
  * `check(b) = if (b.not()) retry() else Unit`
  */
