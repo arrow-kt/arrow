@@ -16,6 +16,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -307,6 +308,43 @@ public interface Raise<in Error> {
   @RaiseDSL
   public fun <A> NonEmptySet<Either<Error, A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }.toNonEmptySet()
+}
+
+@JvmInline public value class ReusableRaise<Error>(public val raise: DefaultRaise<Error>)
+
+@DelicateRaiseApi
+@RaiseDSL
+public inline fun <Error, A> reusableRaise(
+  @BuilderInference block: ReusableRaise<Error>.() -> A,
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+  }
+  val raise = DefaultRaise<Error>(false)
+  try {
+    return block(ReusableRaise(raise))
+  } catch(e: RaiseCancellationException) {
+    e.raisedOrRethrow(raise)
+    throw RaiseLeakedException()
+  } finally {
+    raise.complete()
+  }
+}
+
+@DelicateRaiseApi
+@RaiseDSL
+public inline fun <Error, A> ReusableRaise<Error>.recoverReused(
+  @BuilderInference block: Raise<Error>.() -> A,
+  recover: (error: Error) -> A
+): A {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+  }
+  return try {
+    block(raise)
+  } catch (e: RaiseCancellationException) {
+    recover(e.raisedOrRethrow(raise))
+  }
 }
 
 /**

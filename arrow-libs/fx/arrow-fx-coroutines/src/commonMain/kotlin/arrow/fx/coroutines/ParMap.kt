@@ -5,7 +5,10 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.raise.Raise
 import arrow.core.raise.either
-import arrow.core.flattenOrAccumulate
+import arrow.core.raise.DelicateRaiseApi
+import arrow.core.raise.mapOrAccumulate
+import arrow.core.raise.recoverReused
+import arrow.core.raise.reusableRaise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -52,68 +55,100 @@ public class ScopedRaiseAccumulate<Error>(
   scope: CoroutineScope
 ) : CoroutineScope by scope, RaiseAccumulate<Error>(raise)
 
+@OptIn(DelicateRaiseApi::class)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
   combine: (Error, Error) -> Error,
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<Error, List<B>> =
-  coroutineScope {
-    val semaphore = Semaphore(concurrency)
-    map {
-      async(context) {
-        either {
-          semaphore.withPermit {
-            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+  either {
+    coroutineScope {
+      reusableRaise<NonEmptyList<Error>, _> {
+        val semaphore = Semaphore(concurrency)
+        val asyncs = map {
+          async(context) {
+            semaphore.withPermit {
+              transform(ScopedRaiseAccumulate(raise, this@coroutineScope), it)
+            }
+          }
+        }
+        mapOrAccumulate(asyncs, combine) {
+          withNel {
+            recoverReused({ it.await() }, this::raise)
           }
         }
       }
-    }.awaitAll().flattenOrAccumulate(combine)
+    }
   }
 
+@OptIn(DelicateRaiseApi::class)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   combine: (Error, Error) -> Error,
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<Error, List<B>> =
-  coroutineScope {
-    map {
-      async(context) {
-        either {
-          transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+  either {
+    coroutineScope {
+      reusableRaise<NonEmptyList<Error>, _> {
+        val asyncs = map {
+          async(context) {
+            transform(ScopedRaiseAccumulate(raise, this@coroutineScope), it)
+          }
+        }
+        mapOrAccumulate(asyncs, combine) {
+          withNel {
+            recoverReused({ it.await() }, this::raise)
+          }
         }
       }
-    }.awaitAll().flattenOrAccumulate(combine)
+    }
   }
 
+@OptIn(DelicateRaiseApi::class)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<NonEmptyList<Error>, List<B>> =
-  coroutineScope {
-    val semaphore = Semaphore(concurrency)
-    map {
-      async(context) {
-        either {
-          semaphore.withPermit {
-            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+  either {
+    coroutineScope {
+      reusableRaise<NonEmptyList<Error>, _> {
+        val semaphore = Semaphore(concurrency)
+        val asyncs = map {
+          async(context) {
+            semaphore.withPermit {
+              transform(ScopedRaiseAccumulate(raise, this@coroutineScope), it)
+            }
+          }
+        }
+        mapOrAccumulate(asyncs) {
+          withNel {
+            recoverReused({ it.await() }, this::raise)
           }
         }
       }
-    }.awaitAll().flattenOrAccumulate()
+    }
   }
 
+@OptIn(DelicateRaiseApi::class)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   transform: suspend ScopedRaiseAccumulate<Error>.(A) -> B
 ): Either<NonEmptyList<Error>, List<B>> =
-  coroutineScope {
-    map {
-      async(context) {
-        either {
-          transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+  either {
+    coroutineScope {
+      reusableRaise<NonEmptyList<Error>, _> {
+        val asyncs = map {
+          async(context) {
+            transform(ScopedRaiseAccumulate(raise, this@coroutineScope), it)
+          }
+        }
+        mapOrAccumulate(asyncs) {
+          withNel {
+            recoverReused({ it.await() }, this::raise)
+          }
         }
       }
-    }.awaitAll().flattenOrAccumulate()
+    }
   }

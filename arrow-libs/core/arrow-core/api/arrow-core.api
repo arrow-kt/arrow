@@ -1024,7 +1024,9 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
 	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
+	public static final fun recoverReused-W4bXG9A (Larrow/core/raise/DefaultRaise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun reusableRaise (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun singleton (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -1057,6 +1059,10 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 }
 
+public final class arrow/core/raise/RaiseLeakedException : java/lang/IllegalStateException {
+	public fun <init> ()V
+}
+
 public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
@@ -1076,6 +1082,20 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class arrow/core/raise/ReusableRaise {
+	public static final synthetic fun box-impl (Larrow/core/raise/DefaultRaise;)Larrow/core/raise/ReusableRaise;
+	public static fun constructor-impl (Larrow/core/raise/DefaultRaise;)Larrow/core/raise/DefaultRaise;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Larrow/core/raise/DefaultRaise;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Larrow/core/raise/DefaultRaise;Larrow/core/raise/DefaultRaise;)Z
+	public final fun getRaise ()Larrow/core/raise/DefaultRaise;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Larrow/core/raise/DefaultRaise;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Larrow/core/raise/DefaultRaise;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Larrow/core/raise/DefaultRaise;
 }
 
 public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Raise {
