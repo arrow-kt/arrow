@@ -14,15 +14,17 @@ public annotation class ExperimentalTraceApi
 
 /** Tracing result. Allows to inspect the traces from where raise was called. */
 @ExperimentalTraceApi
+@OptIn(DelicateRaiseApi::class)
 @JvmInline
-public value class Trace(private val exception: CancellationException) {
+public value class Trace
+@PublishedApi internal constructor(private val exception: Traced) {
   /**
    * Returns the stacktrace as a [String]
    *
    * Note, the first line in the stacktrace will be the `RaiseCancellationException`.
    * The users call to `raise` can found in the_second line of the stacktrace.
    */
-  public fun stackTraceToString(): String = (exception.cause ?: exception).stackTraceToString()
+  public fun stackTraceToString(): String = exception.originalTrace?.stackTraceToString() ?: exception.stackTraceToString()
 
   /**
    * Prints the stacktrace.
@@ -31,7 +33,7 @@ public value class Trace(private val exception: CancellationException) {
    * The users call to `raise` can found in the_second line of the stacktrace.
    */
   public fun printStackTrace(): Unit =
-    (exception.cause ?: exception).printStackTrace()
+    exception.originalTrace?.printStackTrace() ?: exception.printStackTrace()
 
   /**
    * Returns the suppressed exceptions that occurred during cancellation of the surrounding coroutines,
@@ -41,5 +43,5 @@ public value class Trace(private val exception: CancellationException) {
    * if the finalizer then results in a `Throwable` it will be added as a `suppressedException` to the [CancellationException].
    */
   public fun suppressedExceptions(): List<Throwable> =
-    exception.cause?.suppressedExceptions.orEmpty() + exception.suppressedExceptions
+    exception.originalTrace?.suppressedExceptions().orEmpty() + exception.suppressedExceptions
 }

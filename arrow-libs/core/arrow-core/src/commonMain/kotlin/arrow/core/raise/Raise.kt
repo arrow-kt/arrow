@@ -144,6 +144,7 @@ public annotation class RaiseDSL
  * <!--- TEST lines.isEmpty() -->
  */
 public interface Raise<in Error> {
+  public val underlyingRaise: Raise<*> get() = this
 
   /**
    * Raises a _logical failure_ of type [Error].
@@ -653,6 +654,7 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
  * <!--- KNIT example-raise-dsl-11.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
+@OptIn(DelicateRaiseApi::class, ExperimentalTraceApi::class)
 @RaiseDSL
 public inline fun <Error, OtherError, A> Raise<Error>.withError(
   transform: (OtherError) -> Error,
@@ -661,7 +663,9 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   contract {
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return recover(block) { raise(transform(it)) }
+  val outer = realUnderlying()
+  return if (outer?.isTraced == true) recoverTraced(block) { t, r -> raiseWithTrace(t, transform(r)) }
+  else recover(block) { raise(transform(it)) }
 }
 
 /**
