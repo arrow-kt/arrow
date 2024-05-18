@@ -472,8 +472,28 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
 internal value class ResourceScopeImpl(
   private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
 ) : ResourceScope {
-  override fun onRelease(release: suspend (ExitCase) -> Unit) =
+  override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
+
+  override fun onRelease(release: suspend (ExitCase) -> Unit) {
     finalizers.update(release::prependTo)
+  }
+
+  override suspend fun <A> install(acquire: suspend AcquireStep.() -> A, release: suspend (A, ExitCase) -> Unit): A =
+    bracketCase({
+      val a = acquire(AcquireStep)
+      onRelease { ex: ExitCase -> release(a, ex) }
+      a
+    }, ::identity, { a, ex ->
+      // Only if ExitCase.Failure, or ExitCase.Cancelled during acquire we cancel
+      // Otherwise we've saved the finalizer, and it will be called from somewhere else.
+      if (ex != ExitCase.Completed) {
+        val e = cancelAll(ex)
+        val e2 = kotlin.runCatching { release(a, ex) }.exceptionOrNull()
+        e?.apply {
+          e2?.let(::addSuppressed)
+        }?.let { throw it }
+      }
+    })
 
   suspend fun cancelAll(exitCase: ExitCase) {
     withContext(NonCancellable) {

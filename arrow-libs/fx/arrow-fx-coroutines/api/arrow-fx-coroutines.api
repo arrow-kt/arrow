@@ -251,6 +251,7 @@ public final class arrow/fx/coroutines/ResourceKt {
 public abstract interface class arrow/fx/coroutines/ResourceScope : arrow/AutoCloseScope {
 	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun onClose (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun install (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun onRelease (Lkotlin/jvm/functions/Function2;)V
 	public abstract fun release (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun releaseCase (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
