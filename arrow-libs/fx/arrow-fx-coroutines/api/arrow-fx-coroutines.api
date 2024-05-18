@@ -5,6 +5,7 @@ public final class arrow/fx/coroutines/AcquireStep {
 public final class arrow/fx/coroutines/BracketKt {
 	public static final fun bracket (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun bracketCase (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getThrowableOrNull (Larrow/fx/coroutines/ExitCase;)Ljava/lang/Throwable;
 	public static final fun guarantee (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun guaranteeCase (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun onCancel (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -30,7 +31,7 @@ public final class arrow/fx/coroutines/CyclicBarrierCancellationException : java
 	public fun <init> ()V
 }
 
-public abstract class arrow/fx/coroutines/ExitCase {
+public abstract interface class arrow/fx/coroutines/ExitCase {
 	public static final field Companion Larrow/fx/coroutines/ExitCase$Companion;
 }
 
@@ -51,6 +52,8 @@ public final class arrow/fx/coroutines/ExitCase$Companion {
 
 public final class arrow/fx/coroutines/ExitCase$Completed : arrow/fx/coroutines/ExitCase {
 	public static final field INSTANCE Larrow/fx/coroutines/ExitCase$Completed;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -238,25 +241,54 @@ public final class arrow/fx/coroutines/ResourceExtensionsKt {
 public final class arrow/fx/coroutines/ResourceKt {
 	public static final fun allocated (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun asFlow (Lkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun install (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun resource (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun resource (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
-	public static final fun resourceScope (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun resourceScope (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun use (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/fx/coroutines/ResourceScope : arrow/AutoCloseScope {
 	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun install (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun onRelease (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun onClose (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun onRelease (Lkotlin/jvm/functions/Function2;)V
 	public abstract fun release (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun releaseCase (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/coroutines/ResourceScope$DefaultImpls {
+	public static fun bind (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun install (Larrow/fx/coroutines/ResourceScope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
-	public static fun onRelease (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun onClose (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function1;)V
 	public static fun release (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun releaseCase (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/ResourceScopeImpl : arrow/fx/coroutines/ResourceScope {
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bind-impl (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final synthetic fun box-impl (Ljava/util/concurrent/atomic/AtomicReference;)Larrow/fx/coroutines/ResourceScopeImpl;
+	public static final fun cancelAll-impl (Ljava/util/concurrent/atomic/AtomicReference;Larrow/fx/coroutines/ExitCase;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun constructor-impl (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/util/concurrent/atomic/AtomicReference;
+	public static synthetic fun constructor-impl$default (Ljava/util/concurrent/atomic/AtomicReference;ILkotlin/jvm/internal/DefaultConstructorMarker;)Ljava/util/concurrent/atomic/AtomicReference;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/util/concurrent/atomic/AtomicReference;Ljava/util/concurrent/atomic/AtomicReference;)Z
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/util/concurrent/atomic/AtomicReference;)I
+	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+	public static fun install-impl (Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+	public fun onClose (Lkotlin/jvm/functions/Function1;)V
+	public static fun onClose-impl (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function1;)V
+	public fun onRelease (Lkotlin/jvm/functions/Function2;)V
+	public static fun onRelease-impl (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function2;)V
+	public fun release (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun release-impl (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun releaseCase (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun releaseCase-impl (Ljava/util/concurrent/atomic/AtomicReference;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/util/concurrent/atomic/AtomicReference;
 }
 
 public abstract interface annotation class arrow/fx/coroutines/ScopeDSL : java/lang/annotation/Annotation {
