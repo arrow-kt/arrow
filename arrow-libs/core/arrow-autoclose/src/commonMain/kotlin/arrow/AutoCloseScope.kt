@@ -74,6 +74,7 @@ public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A = with(De
 public interface AutoCloseScope {
   public fun onClose(release: (Throwable?) -> Unit)
 
+  @ExperimentalStdlibApi
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoCloseable.also { onClose { autoCloseable.close() } }
 }
