@@ -477,9 +477,7 @@ internal value class ResourceScopeImpl(
 
   suspend fun cancelAll(exitCase: ExitCase): Unit = withContext(NonCancellable) {
     finalizers.value.fold(exitCase.throwableOrNull) { acc, finalizer ->
-      val e = runCatching { finalizer(exitCase) }.exceptionOrNull()
-      println("Adding $e with $acc")
-      acc.add(e)
+      acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
     }?.let { throw it }
   }
 }
