@@ -475,9 +475,11 @@ internal value class ResourceScopeImpl(
   override fun onRelease(release: suspend (ExitCase) -> Unit) =
     finalizers.update(release::prependTo)
 
-  suspend fun cancelAll(exitCase: ExitCase): Unit = withContext(NonCancellable) {
-    finalizers.value.fold(exitCase.throwableOrNull) { acc, finalizer ->
-      acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
+  suspend fun cancelAll(exitCase: ExitCase) {
+    withContext(NonCancellable) {
+      finalizers.value.fold(exitCase.throwableOrNull) { acc, finalizer ->
+        acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
+      }
     }?.let { throw it }
   }
 }
