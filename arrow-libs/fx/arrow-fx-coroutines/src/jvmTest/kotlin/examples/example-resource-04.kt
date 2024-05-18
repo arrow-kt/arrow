@@ -3,6 +3,7 @@ package arrow.fx.coroutines.examples.exampleResource04
 
 import arrow.fx.coroutines.ResourceScope
 import arrow.fx.coroutines.Resource
+import arrow.fx.coroutines.install
 import arrow.fx.coroutines.resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

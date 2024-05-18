@@ -5,19 +5,24 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
-public sealed class ExitCase {
-  public object Completed : ExitCase() {
-    override fun toString(): String =
-      "ExitCase.Completed"
-  }
-
-  public data class Cancelled(val exception: CancellationException) : ExitCase()
-  public data class Failure(val failure: Throwable) : ExitCase()
+public sealed interface ExitCase {
+  public data object Completed : ExitCase
+  public data class Cancelled(val exception: CancellationException) : ExitCase
+  public data class Failure(val failure: Throwable) : ExitCase
 
   public companion object {
-    public fun ExitCase(error: Throwable): ExitCase =
-      if (error is CancellationException) Cancelled(error) else Failure(error)
+    public fun ExitCase(error: Throwable?): ExitCase = when (error) {
+      null -> Completed
+      is CancellationException -> Cancelled(error)
+      else -> Failure(error)
+    }
   }
+}
+
+public val ExitCase.throwableOrNull: Throwable? get() = when (this) {
+  ExitCase.Completed -> null
+  is ExitCase.Cancelled -> exception
+  is ExitCase.Failure -> failure
 }
 
 /**

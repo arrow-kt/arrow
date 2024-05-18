@@ -2,7 +2,8 @@ package arrow
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
-import kotlin.coroutines.cancellation.CancellationException
+import arrow.atomic.value
+import kotlin.jvm.JvmInline
 
 /**
  * The [AutoCloseScope] DSL allows for elegantly working with close-ables,
@@ -61,53 +62,46 @@ import kotlin.coroutines.cancellation.CancellationException
  * ```
  * <!--- KNIT example-autocloseable-02.kt -->
  */
-public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
-  val scope = DefaultAutoCloseScope()
-  return try {
-    block(scope)
-      .also { scope.close(null) }
-  } catch (e: CancellationException) {
-    scope.close(e) ?: throw e
+public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A = with(DefaultAutoCloseScope()) {
+  try {
+    block()
   } catch (e: Throwable) {
-    scope.close(e.throwIfFatal()) ?: throw e
-  }
+    closeAll(e.throwIfFatal())
+    error("Unreachable, closeAll should throw the exception passed to it. Please report this bug to the Arrow team.")
+  }.also { closeAll(null) }
 }
 
 public interface AutoCloseScope {
-  public fun <A> autoClose(
-    acquire: () -> A,
-    release: (A, Throwable?) -> Unit
-  ): A
+  public fun onClose(release: (Throwable?) -> Unit)
 
-  @ExperimentalStdlibApi
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
-    autoClose({ autoCloseable }) { a, _ -> a.close() }
+    autoCloseable.also { onClose { autoCloseable.close() } }
 }
 
+public inline fun <A> AutoCloseScope.autoClose(
+  acquire: () -> A,
+  crossinline release: (A, Throwable?) -> Unit
+): A = acquire().also { a -> onClose { e -> release(a, e) } }
+
+@JvmInline
 @PublishedApi
-internal class DefaultAutoCloseScope : AutoCloseScope {
-  private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())
+internal value class DefaultAutoCloseScope(
+  private val finalizers: Atomic<List<(Throwable?) -> Unit>> = Atomic(emptyList())
+) : AutoCloseScope {
+  override fun onClose(release: (Throwable?) -> Unit) =
+    finalizers.update { listOf(release) + it }
 
-  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    try {
-      acquire().also { a ->
-        finalizers.update { it + { e -> release(a, e) } }
-      }
-    } catch (e: Throwable) {
-      throw e
-    }
-
-  fun close(error: Throwable?): Nothing? {
-    return finalizers.get().asReversed().fold(error) { acc, function ->
-      acc.add(runCatching { function.invoke(error) }.exceptionOrNull())
+  fun closeAll(error: Throwable?) {
+    finalizers.value.fold(error) { acc, function ->
+      acc.add(runCatching { function(error) }.exceptionOrNull())
     }?.let { throw it }
   }
-
-  private fun Throwable?.add(other: Throwable?): Throwable? =
-    this?.apply {
-      other?.let { addSuppressed(it) }
-    } ?: other
 }
+
+private fun Throwable?.add(other: Throwable?): Throwable? =
+  this?.apply {
+    other?.let { addSuppressed(it) }
+  } ?: other
 
 @PublishedApi
 internal expect fun Throwable.throwIfFatal(): Throwable

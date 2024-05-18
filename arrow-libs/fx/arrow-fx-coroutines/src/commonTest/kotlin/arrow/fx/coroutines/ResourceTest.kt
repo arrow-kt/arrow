@@ -1,15 +1,13 @@
 package arrow.fx.coroutines
 
-import arrow.autoCloseScope
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.collections.shouldHaveSingleElement
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -31,7 +29,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import kotlin.random.Random
 import kotlin.test.Test
 
 class ResourceTest {
@@ -599,7 +596,7 @@ class ResourceTest {
       }
 
       exception shouldBe original
-      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      exception.suppressedExceptions.shouldHaveSingleElement(suppressed)
       released.await().shouldBeTypeOf<ExitCase.Failure>()
     }
   }
@@ -629,7 +626,7 @@ class ResourceTest {
       }
 
       exception shouldBe cancellation
-      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      exception.suppressedExceptions.shouldHaveSingleElement(suppressed)
       released.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
