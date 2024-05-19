@@ -660,7 +660,7 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptyList : arrow.core/Non
     final fun asJsReadonlyArrayView(): kotlin.js.collections/JsReadonlyArray<#A> // arrow.core/NonEmptyList.asJsReadonlyArrayView|asJsReadonlyArrayView(){}[0]
 }
 final value class <#A: out kotlin/Any?> arrow.core/NonEmptySet : arrow.core/NonEmptyCollection<#A>, kotlin.collections/Set<#A> { // arrow.core/NonEmptySet|null[0]
-    constructor <init>(#A, kotlin.collections/Set<#A>) // arrow.core/NonEmptySet.<init>|<init>(1:0;kotlin.collections.Set<1:0>){}[0]
+    constructor <init>(#A, kotlin.collections/Iterable<#A>) // arrow.core/NonEmptySet.<init>|<init>(1:0;kotlin.collections.Iterable<1:0>){}[0]
     final fun <#A1: kotlin/Any?> distinctBy(kotlin/Function1<#A, #A1>): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptySet.distinctBy|distinctBy(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> flatMap(kotlin/Function1<#A, arrow.core/NonEmptyCollection<#A1>>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptySet.flatMap|flatMap(kotlin.Function1<1:0,arrow.core.NonEmptyCollection<0:0>>){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> map(kotlin/Function1<#A, #A1>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptySet.map|map(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
