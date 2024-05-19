@@ -8,8 +8,7 @@ suspend fun main() {
   //sampleStart
   val tmap = TMap.new<Int, String>()
   atomically {
-    tmap[1] = "Hello"
-    tmap.remove(1)
+    tmap.insert(10, "Hello")
   }
   //sampleEnd
 }

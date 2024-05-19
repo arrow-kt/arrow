@@ -1,16 +1,16 @@
 // This file was automatically generated from STM.kt by Knit tool. Do not edit.
 package arrow.fx.stm.examples.exampleStm23
 
-import arrow.fx.stm.TSemaphore
+import arrow.fx.stm.TMVar
 import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tsem = TSemaphore.new(0)
+  val tmvar = TMVar.new(30)
   val result = atomically {
-    tsem.tryAcquire()
+    tmvar.swap(40)
   }
   //sampleEnd
   println("Result $result")
-  println("Permits remaining ${atomically { tsem.available() }}")
+  println("New value ${atomically { tmvar.tryTake() } }")
 }

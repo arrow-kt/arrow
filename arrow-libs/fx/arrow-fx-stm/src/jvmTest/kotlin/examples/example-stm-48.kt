@@ -7,8 +7,12 @@ import arrow.fx.stm.atomically
 suspend fun main() {
   //sampleStart
   val tmap = TMap.new<Int, String>()
-  atomically {
-    tmap += (1 to "Hello")
+  val result = atomically {
+    tmap[1] = "Hello"
+    tmap[2] = "World"
+
+    tmap.lookup(1)
   }
   //sampleEnd
+  println("Result $result")
 }

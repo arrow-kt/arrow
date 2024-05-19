@@ -8,9 +8,8 @@ suspend fun main() {
   //sampleStart
   val tvar = TVar.new(10)
   val result = atomically {
-    tvar.swap(20)
+    tvar.set(20)
   }
   //sampleEnd
-  println("Result $result")
-  println("New value ${tvar.unsafeRead()}")
+  println(result)
 }
