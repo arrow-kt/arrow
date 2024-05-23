@@ -34,18 +34,13 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
   return foci.joinToString(separator = "\n") { focus ->
     val firstLine = when {
       adt.typeParameters.isEmpty() ->
-        "${adt.visibilityModifierName} $inlineText val ${adt.sourceClassName}.Companion.${focus.lensParamName()}: $Lens<${adt.sourceClassName}, ${focus.className}> $inlineText get()"
+        "${adt.visibilityModifierName} $inlineText val ${adt.sourceClassName}.Companion.${focus.escapedParamName}: $Lens<${adt.sourceClassName}, ${focus.className}> $inlineText get()"
       else ->
-        "${adt.visibilityModifierName} $inlineText fun ${adt.angledTypeParameters} ${adt.sourceClassName}.Companion.${focus.lensParamName()}(): $Lens<$sourceClassNameWithParams, ${focus.className}>"
+        "${adt.visibilityModifierName} $inlineText fun ${adt.angledTypeParameters} ${adt.sourceClassName}.Companion.${focus.escapedParamName}(): $Lens<$sourceClassNameWithParams, ${focus.className}>"
     }
     """
       |$firstLine = $Lens(
-      |  get = { ${adt.sourceName}: $sourceClassNameWithParams -> ${adt.sourceName}.${
-      focus.paramName.plusIfNotBlank(
-        prefix = "`",
-        postfix = "`",
-      )
-    } },
+      |  get = { ${adt.sourceName}: $sourceClassNameWithParams -> ${adt.sourceName}.${focus.escapedParamName} },
       |  set = { ${adt.sourceName}: $sourceClassNameWithParams, value: ${focus.className} ->
       |  ${setBody(focus)}
       |}
@@ -54,5 +49,3 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
     """.trimMargin()
   }
 }
-
-fun Focus.lensParamName(): String = paramName
