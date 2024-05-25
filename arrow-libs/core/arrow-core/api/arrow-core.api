@@ -960,6 +960,7 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun mapOrAccumulate-FrVv2gs (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-nfMsDo0 (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
+	public final fun raise-GZgkXh4 (Ljava/util/List;)Ljava/lang/Void;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
