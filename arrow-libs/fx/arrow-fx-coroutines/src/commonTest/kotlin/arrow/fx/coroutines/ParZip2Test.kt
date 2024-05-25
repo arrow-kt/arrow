@@ -43,27 +43,6 @@ class ParZip2Test {
     }
   }
 
-  @Test fun parZip2RunsInParallelWithConcurrently() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
-      val r = AtomicInt(0)
-      val modifyGate = CompletableDeferred<Int>()
-
-      parZip {
-        val _a = concurrently {
-          modifyGate.await()
-          r.update { i -> i + a }
-        }
-        val _b = concurrently {
-          r.value = b
-          modifyGate.complete(0)
-        }
-        Pair(_a.value(), _b.value())
-      }
-
-      r.value shouldBe b + a
-    }
-  }
-
   @Test fun cancellingParZip2CancelsAllParticipants() = runTestUsingDefaultDispatcher {
     checkAll(10, Arb.int(), Arb.int()) { a, b ->
       val s = Channel<Unit>()

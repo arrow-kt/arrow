@@ -38,6 +38,12 @@ public class RaiseNel<Error>(
   internal fun hasErrors(): Boolean = errors.isNotEmpty()
   internal fun raiseErrors(): Nothing = raise.raise(errors.toNonEmptyListOrNull()!!)
 
+  public fun <A> Either<Error, A>.bindAccumulating(): Value<A> =
+    accumulating { this@bindAccumulating.bind() }
+
+  public fun <A> Iterable<Either<Error, A>>.bindAllAccumulating(): Value<List<A>> =
+    accumulating { this@bindAllAccumulating.bindAll() }
+
   public fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> =
     recover({
       Ok(block(RaiseAccumulate(this)))

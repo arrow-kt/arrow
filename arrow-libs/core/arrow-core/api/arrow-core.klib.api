@@ -106,6 +106,8 @@ final class <#A: kotlin/Any?> arrow.core.raise/IorRaise : arrow.core.raise/Raise
 final class <#A: kotlin/Any?> arrow.core.raise/RaiseNel : arrow.core.raise/Raise<#A> { // arrow.core.raise/RaiseNel|null[0]
     constructor <init>(arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>) // arrow.core.raise/RaiseNel.<init>|<init>(arrow.core.raise.Raise<arrow.core.NonEmptyList<1:0>>){}[0]
 
+    final fun <#A1: kotlin/Any?> (arrow.core/Either<#A, #A1>).bindAccumulating(): arrow.core.raise/RaiseNel.Value<#A1, #A> // arrow.core.raise/RaiseNel.bindAccumulating|bindAccumulating@arrow.core.Either<1:0,0:0>(){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.collections/Iterable<arrow.core/Either<#A, #A1>>).bindAllAccumulating(): arrow.core.raise/RaiseNel.Value<kotlin.collections/List<#A1>, #A> // arrow.core.raise/RaiseNel.bindAllAccumulating|bindAllAccumulating@kotlin.collections.Iterable<arrow.core.Either<1:0,0:0>>(){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> accumulating(kotlin/Function1<arrow.core.raise/RaiseAccumulate<#A>, #A1>): arrow.core.raise/RaiseNel.Value<#A1, #A> // arrow.core.raise/RaiseNel.accumulating|accumulating(kotlin.Function1<arrow.core.raise.RaiseAccumulate<1:0>,0:0>){0§<kotlin.Any?>}[0]
     final fun raise(#A): kotlin/Nothing // arrow.core.raise/RaiseNel.raise|raise(1:0){}[0]
 

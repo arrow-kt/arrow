@@ -60,21 +60,6 @@ final class arrow.fx.coroutines/CyclicBarrierCancellationException : kotlin.coro
     constructor <init>() // arrow.fx.coroutines/CyclicBarrierCancellationException.<init>|<init>(){}[0]
 }
 
-final class arrow.fx.coroutines/ParZipScope : kotlinx.coroutines/CoroutineScope { // arrow.fx.coroutines/ParZipScope|null[0]
-    constructor <init>(kotlinx.coroutines/CoroutineScope, kotlin.coroutines/CoroutineContext) // arrow.fx.coroutines/ParZipScope.<init>|<init>(kotlinx.coroutines.CoroutineScope;kotlin.coroutines.CoroutineContext){}[0]
-
-    final val coroutineContext // arrow.fx.coroutines/ParZipScope.coroutineContext|{}coroutineContext[0]
-        final fun <get-coroutineContext>(): kotlin.coroutines/CoroutineContext // arrow.fx.coroutines/ParZipScope.coroutineContext.<get-coroutineContext>|<get-coroutineContext>(){}[0]
-
-    final fun <#A1: kotlin/Any?> concurrently(kotlin.coroutines/SuspendFunction1<kotlinx.coroutines/CoroutineScope, #A1>): arrow.fx.coroutines/ParZipScope.Value<#A1> // arrow.fx.coroutines/ParZipScope.concurrently|concurrently(kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope,0:0>){0§<kotlin.Any?>}[0]
-
-    final inner class <#A1: kotlin/Any?> Value { // arrow.fx.coroutines/ParZipScope.Value|null[0]
-        constructor <init>(kotlinx.coroutines/Deferred<#A1>) // arrow.fx.coroutines/ParZipScope.Value.<init>|<init>(kotlinx.coroutines.Deferred<1:0>){}[0]
-
-        final suspend fun value(): #A1 // arrow.fx.coroutines/ParZipScope.Value.value|value(){}[0]
-    }
-}
-
 sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?, #C: out kotlin/Any?> arrow.fx.coroutines/Race3 { // arrow.fx.coroutines/Race3|null[0]
     final inline fun <#A1: kotlin/Any?> fold(kotlin/Function1<#A, #A1>, kotlin/Function1<#B, #A1>, kotlin/Function1<#C, #A1>): #A1 // arrow.fx.coroutines/Race3.fold|fold(kotlin.Function1<1:0,0:0>;kotlin.Function1<1:1,0:0>;kotlin.Function1<1:2,0:0>){0§<kotlin.Any?>}[0]
 
@@ -181,7 +166,6 @@ final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.coroutines/SuspendF
 final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ResourceScope, #A>).arrow.fx.coroutines/allocated(): kotlin/Pair<#A, kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ExitCase, kotlin/Unit>> // arrow.fx.coroutines/allocated|allocated@kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ResourceScope,0:0>(){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?> (kotlinx.coroutines/CoroutineScope).arrow.fx.coroutines.await/awaitAll(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines.await/AwaitAllScope, #A>): #A // arrow.fx.coroutines.await/awaitAll|awaitAll@kotlinx.coroutines.CoroutineScope(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.await.AwaitAllScope,0:0>){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?> arrow.fx.coroutines.await/awaitAll(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines.await/AwaitAllScope, #A>): #A // arrow.fx.coroutines.await/awaitAll|awaitAll(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.await.AwaitAllScope,0:0>){0§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Any?> arrow.fx.coroutines/parZip(kotlin.coroutines/CoroutineContext = ..., kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ParZipScope, #A>): #A // arrow.fx.coroutines/parZip|parZip(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ParZipScope,0:0>){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?> arrow.fx.coroutines/resourceScope(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ResourceScope, #A>): #A // arrow.fx.coroutines/resourceScope|resourceScope(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ResourceScope,0:0>){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/AutoCloseable> (arrow.fx.coroutines/ResourceScope).arrow.fx.coroutines/autoCloseable(kotlinx.coroutines/CoroutineDispatcher = ..., kotlin.coroutines/SuspendFunction0<#A>): #A // arrow.fx.coroutines/autoCloseable|autoCloseable@arrow.fx.coroutines.ResourceScope(kotlinx.coroutines.CoroutineDispatcher;kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.AutoCloseable>}[0]
 final suspend fun arrow.fx.coroutines/cancelAndCompose(kotlinx.coroutines/Deferred<*>, kotlinx.coroutines/Deferred<*>) // arrow.fx.coroutines/cancelAndCompose|cancelAndCompose(kotlinx.coroutines.Deferred<*>;kotlinx.coroutines.Deferred<*>){}[0]

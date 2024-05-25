@@ -1067,10 +1067,12 @@ public final class arrow/core/raise/RaiseNel : arrow/core/raise/Raise {
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun bindAccumulating (Larrow/core/Either;)Larrow/core/raise/RaiseNel$Value;
 	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
 	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
 	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
 	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
+	public final fun bindAllAccumulating (Ljava/lang/Iterable;)Larrow/core/raise/RaiseNel$Value;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;

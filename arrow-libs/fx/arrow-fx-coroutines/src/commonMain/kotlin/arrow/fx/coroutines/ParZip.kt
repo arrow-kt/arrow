@@ -826,33 +826,3 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
   val res = awaitAll(faa, fbb, fcc, fdd, fee, fDef, fgg, fhh, fii)
   f(res[0] as A, res[1] as B, res[2] as C, res[3] as D, res[4] as E, res[5] as F, res[6] as G, res[7] as H, res[8] as I)
 }
-
-public suspend fun <A> parZip(
-  ctx: CoroutineContext = EmptyCoroutineContext,
-  block: suspend ParZipScope.() -> A
-): A = coroutineScope {
-  block(ParZipScope(this@coroutineScope, ctx))
-}
-
-public class ParZipScope(
-  private val scope: CoroutineScope,
-  private val ctx: CoroutineContext
-): CoroutineScope by scope {
-  private val tasks: MutableList<Deferred<*>> = mutableListOf()
-
-  internal suspend fun runTasks() = tasks.awaitAll()
-
-  public fun <A> concurrently(block: suspend CoroutineScope.() -> A): Value<A> {
-    val task = async(context = ctx, block = block)
-    tasks.add(task)
-    return Value(task)
-  }
-
-  public inner class Value<A>(private val task: Deferred<A>) {
-    // public suspend operator fun getValue(value: Nothing?, property: KProperty<*>): A {
-    public suspend fun value(): A {
-      runTasks()
-      return task.await()
-    }
-  }
-}

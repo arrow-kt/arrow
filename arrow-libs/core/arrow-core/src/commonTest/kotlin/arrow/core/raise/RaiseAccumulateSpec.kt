@@ -45,6 +45,14 @@ class RaiseAccumulateSpec {
     } shouldBe nonEmptyListOf("bye").left()
   }
 
+  @Test fun raiseAccumulatingOneFailureEither() {
+    eitherNel {
+      val x: Int by 1.right().bindAccumulating()
+      val y: Int by "bye".left().bindAccumulating()
+      x + y
+    } shouldBe nonEmptyListOf("bye").left()
+  }
+
   @Test fun raiseAccumulatingNoFailure() {
     eitherNel<String, _> {
       val x by accumulating { 1 }
