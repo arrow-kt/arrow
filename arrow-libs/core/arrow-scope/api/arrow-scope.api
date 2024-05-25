@@ -18,7 +18,7 @@ public final class arrow/AutoCloseableExtensionsKt {
 }
 
 public final class arrow/CoroutineScopeKt {
-	public static final fun coroutineScope (Larrow/Scope;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun coroutineScope (Larrow/Finally;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope {
@@ -29,22 +29,22 @@ public final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope {
 	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
 }
 
-public final class arrow/SagaKt {
-	public static final fun saga (Larrow/Scope;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public abstract interface class arrow/Scope : arrow/AutoCloseScope {
+public abstract interface class arrow/Finally : arrow/AutoCloseScope {
 	public abstract fun autoClose (Lkotlin/jvm/functions/Function1;)V
 	public abstract fun finalise (Lkotlin/jvm/functions/Function2;)V
 }
 
-public final class arrow/Scope$DefaultImpls {
-	public static fun autoClose (Larrow/Scope;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public static fun install (Larrow/Scope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+public final class arrow/Finally$DefaultImpls {
+	public static fun autoClose (Larrow/Finally;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun install (Larrow/Finally;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
 }
 
-public final class arrow/ScopeKt {
-	public static final fun scoped (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public final class arrow/FinallyScopeKt {
+	public static final fun finally (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/SagaKt {
+	public static final fun saga (Larrow/Finally;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/ThrowIfFatalKt {

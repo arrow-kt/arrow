@@ -11,9 +11,9 @@ abstract interface arrow/AutoCloseScope { // arrow/AutoCloseScope|null[0]
     open fun <#A1: kotlin/Any?> autoClose(kotlin/Function0<#A1>, kotlin/Function2<#A1, kotlin/Throwable?, kotlin/Unit>): #A1 // arrow/AutoCloseScope.autoClose|autoClose(kotlin.Function0<0:0>;kotlin.Function2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/AutoCloseable> install(#A1): #A1 // arrow/AutoCloseScope.install|install(0:0){0§<kotlin.AutoCloseable>}[0]
 }
-abstract interface arrow/Scope : arrow/AutoCloseScope { // arrow/Scope|null[0]
-    abstract fun autoClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/Scope.autoClose|autoClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
-    abstract fun finalise(kotlin.coroutines/SuspendFunction1<kotlin/Throwable?, kotlin/Unit>) // arrow/Scope.finalise|finalise(kotlin.coroutines.SuspendFunction1<kotlin.Throwable?,kotlin.Unit>){}[0]
+abstract interface arrow/Finally : arrow/AutoCloseScope { // arrow/Finally|null[0]
+    abstract fun autoClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/Finally.autoClose|autoClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
+    abstract fun finalise(kotlin.coroutines/SuspendFunction1<kotlin/Throwable?, kotlin/Unit>) // arrow/Finally.finalise|finalise(kotlin.coroutines.SuspendFunction1<kotlin.Throwable?,kotlin.Unit>){}[0]
 }
 final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope { // arrow/DefaultAutoCloseScope|null[0]
     constructor <init>() // arrow/DefaultAutoCloseScope.<init>|<init>(){}[0]
@@ -22,6 +22,6 @@ final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope { // arrow/Defaul
 }
 final fun (kotlin/Throwable).arrow/throwIfFatal(): kotlin/Throwable // arrow/throwIfFatal|throwIfFatal@kotlin.Throwable(){}[0]
 final inline fun <#A: kotlin/Any?> arrow/autoCloseScope(kotlin/Function1<arrow/AutoCloseScope, #A>): #A // arrow/autoCloseScope|autoCloseScope(kotlin.Function1<arrow.AutoCloseScope,0:0>){0§<kotlin.Any?>}[0]
-final suspend fun (arrow/Scope).arrow/coroutineScope(kotlin.coroutines/CoroutineContext): kotlinx.coroutines/CoroutineScope // arrow/coroutineScope|coroutineScope@arrow.Scope(kotlin.coroutines.CoroutineContext){}[0]
-final suspend fun <#A: kotlin/Any?> (arrow/Scope).arrow/saga(kotlin.coroutines/SuspendFunction0<#A>, kotlin.coroutines/SuspendFunction2<#A, kotlin/Throwable?, kotlin/Unit>): #A // arrow/saga|saga@arrow.Scope(kotlin.coroutines.SuspendFunction0<0:0>;kotlin.coroutines.SuspendFunction2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Any?> arrow/scoped(kotlin/Function1<arrow/Scope, #A>): #A // arrow/scoped|scoped(kotlin.Function1<arrow.Scope,0:0>){0§<kotlin.Any?>}[0]
+final suspend fun (arrow/Finally).arrow/coroutineScope(kotlin.coroutines/CoroutineContext): kotlinx.coroutines/CoroutineScope // arrow/coroutineScope|coroutineScope@arrow.Finally(kotlin.coroutines.CoroutineContext){}[0]
+final suspend fun <#A: kotlin/Any?> (arrow/Finally).arrow/saga(kotlin.coroutines/SuspendFunction0<#A>, kotlin.coroutines/SuspendFunction2<#A, kotlin/Throwable?, kotlin/Unit>): #A // arrow/saga|saga@arrow.Finally(kotlin.coroutines.SuspendFunction0<0:0>;kotlin.coroutines.SuspendFunction2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final suspend fun <#A: kotlin/Any?> arrow/finally(kotlin/Function1<arrow/Finally, #A>): #A // arrow/finally|finally(kotlin.Function1<arrow.Finally,0:0>){0§<kotlin.Any?>}[0]
