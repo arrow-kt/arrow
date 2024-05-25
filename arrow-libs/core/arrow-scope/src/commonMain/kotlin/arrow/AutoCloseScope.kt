@@ -61,6 +61,20 @@ import kotlin.coroutines.cancellation.CancellationException
  * ```
  * <!--- KNIT example-autocloseable-02.kt -->
  */
+public interface AutoCloseScope {
+  public fun autoClose(close: (Throwable?) -> Unit): Unit
+
+  public fun <A> autoClose(
+    acquire: () -> A,
+    release: (A, Throwable?) -> Unit
+  ): A =
+    acquire().also { a -> autoClose { e -> release(a, e) } }
+
+  @ExperimentalStdlibApi
+  public fun <A : AutoCloseable> install(autoCloseable: A): A =
+    autoClose({ autoCloseable }) { a, _ -> a.close() }
+}
+
 public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   val scope = DefaultAutoCloseScope()
   return try {
@@ -73,29 +87,11 @@ public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   }
 }
 
-public interface AutoCloseScope {
-  public fun <A> autoClose(
-    acquire: () -> A,
-    release: (A, Throwable?) -> Unit
-  ): A
-
-  @ExperimentalStdlibApi
-  public fun <A : AutoCloseable> install(autoCloseable: A): A =
-    autoClose({ autoCloseable }) { a, _ -> a.close() }
-}
-
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {
   private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())
-
-  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    try {
-      acquire().also { a ->
-        finalizers.update { it + { e -> release(a, e) } }
-      }
-    } catch (e: Throwable) {
-      throw e
-    }
+  override fun autoClose(close: (Throwable?) -> Unit) =
+    finalizers.update { it + { e -> close(e) } }
 
   fun close(error: Throwable?): Nothing? {
     return finalizers.get().asReversed().fold(error) { acc, function ->

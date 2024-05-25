@@ -22,7 +22,7 @@ kotlin {
     commonMain {
       dependencies {
         api(projects.arrowCore)
-        api(projects.arrowAutoclose)
+        api(projects.arrowScope)
         api(libs.coroutines.core)
         implementation(libs.kotlin.stdlib)
       }
