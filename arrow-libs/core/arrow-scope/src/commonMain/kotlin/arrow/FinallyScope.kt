@@ -4,14 +4,13 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import kotlin.coroutines.cancellation.CancellationException
 
-
-public interface Scope : AutoCloseScope {
+public interface Finally : AutoCloseScope {
   public override fun autoClose(close: (Throwable?) -> Unit): Unit
   public fun finalise(block: suspend (Throwable?) -> Unit): Unit
 }
 
-public suspend fun <A> scoped(block: Scope.() -> A): A {
-  val scope = DefaultScope()
+public suspend fun <A> finally(block: Finally.() -> A): A {
+  val scope = DefaultFinally()
   return try {
     block(scope)
   } catch (e: CancellationException) {
@@ -21,7 +20,7 @@ public suspend fun <A> scoped(block: Scope.() -> A): A {
   }
 }
 
-private class DefaultScope : Scope {
+private class DefaultFinally : Finally {
   private val closeables: Atomic<List<suspend (Throwable?) -> Unit>> = Atomic(emptyList())
 
   suspend fun close(error: Throwable?): Nothing? {

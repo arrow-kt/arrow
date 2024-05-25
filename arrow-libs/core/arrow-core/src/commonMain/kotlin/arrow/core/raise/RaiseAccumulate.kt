@@ -710,9 +710,6 @@ public open class RaiseAccumulate<Error>(
   public override fun raise(r: Error): Nothing =
     raise.raise(nonEmptyListOf(r))
 
-  public fun raise(r: NonEmptyList<Error>): Nothing =
-    TODO()
-
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapOrAccumulate(this) { it.value.bind() }
 
