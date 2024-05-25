@@ -30,7 +30,7 @@ class SagaSpec {
   fun sagaRunsCompensationIfThrowInBuilderAndRethrowsException(): TestResult = runTest {
     val value = Random.nextInt()
     val compensation = CompletableDeferred<Int>()
-    val saga = saga {
+    val saga = sagaScope {
       saga({ value }) { compensation.complete(it) }
       throw SagaFailed("Exception in builder")
     }
@@ -42,7 +42,7 @@ class SagaSpec {
   fun sagaRunsCompensationIfThrowInSagaAndRethrowsException(): TestResult = runTest {
     val value = Random.nextInt()
     val compensation = CompletableDeferred<Int>()
-    val saga = saga {
+    val saga = sagaScope {
       saga({ value }) { compensation.complete(it) }
       saga({ throw SagaFailed("Exception in saga") }) { fail("Doesn't run") }
     }
@@ -56,7 +56,7 @@ class SagaSpec {
     val valueB = Random.nextInt()
 
     val compensations = Channel<Int>(2)
-    val saga = saga {
+    val saga = sagaScope {
       saga({ valueA }) { compensations.send(it) }
       saga({ valueB }) { compensations.send(it) }
       saga({ throw SagaFailed("Exception in saga") }) { fail("Doesn't run") }
@@ -73,7 +73,7 @@ class SagaSpec {
     val compensationA = CompletableDeferred<Int>()
     val original = SagaFailed("Exception in saga")
     val compensation = SagaFailed("Exception in compensation")
-    val saga = saga {
+    val saga = sagaScope {
       saga({ value }) { compensationA.complete(it) }
       saga({}) { throw compensation }
       saga({ throw original }) { fail("Doesn't run") }
@@ -92,7 +92,7 @@ class SagaSpec {
     val original = SagaFailed("Exception in builder")
     val compensation = SagaFailed("Exception in compensation")
 
-    val saga = saga {
+    val saga = sagaScope {
       saga({ value }) { compensationA.complete(it) }
       saga({}) { throw compensation }
       throw original
@@ -111,7 +111,7 @@ class SagaSpec {
     val valueC = Random.nextInt()
     val values = listOf(valueA, valueB, valueC)
 
-    val result = saga { values.map { saga({ it }) { fail("Doesn't run") } } }.transact()
+    val result = sagaScope { values.map { saga({ it }) { fail("Doesn't run") } } }.transact()
     assertEquals(values, result)
   }
 
@@ -122,7 +122,7 @@ class SagaSpec {
     val valueC = Random.nextInt()
     val values = listOf(valueA, valueB, valueC)
 
-    val result = saga { values.parMap(Dispatchers.Default) { saga({ it }) { fail("Doesn't run") } } }.transact()
+    val result = sagaScope { values.parMap(Dispatchers.Default) { saga({ it }) { fail("Doesn't run") } } }.transact()
     assertEquals(values, result)
   }
 
@@ -132,7 +132,7 @@ class SagaSpec {
 
     val compensationA = CompletableDeferred<Int>()
     val latch = CompletableDeferred<Unit>()
-    val saga = saga {
+    val saga = sagaScope {
       parZip({
         saga({
           latch.complete(Unit)
@@ -156,7 +156,7 @@ class SagaSpec {
 
     val compensationB = CompletableDeferred<Int>()
     val latch = CompletableDeferred<Unit>()
-    val saga = saga {
+    val saga = sagaScope {
       parZip({
         saga({
           latch.await()

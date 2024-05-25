@@ -75,7 +75,7 @@ configure<KnitPluginExtension> {
 
 dependencies {
   kover(projects.arrowAtomic)
-  kover(projects.arrowAutoclose)
+  kover(projects.arrowScope)
   kover(projects.arrowCore)
   kover(projects.arrowCoreHighArity)
   kover(projects.arrowCoreRetrofit)

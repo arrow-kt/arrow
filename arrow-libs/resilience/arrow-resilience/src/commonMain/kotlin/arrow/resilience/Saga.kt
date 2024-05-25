@@ -84,14 +84,19 @@ public interface SagaScope {
  * By doing so we can guarantee that any transactional like operations made by the [Saga] will
  * guarantee that it results in the correct state.
  */
-@Suppress("NOTHING_TO_INLINE")
+public inline fun <A> sagaScope(noinline block: suspend SagaScope.() -> A): Saga<A> = block
+
+@Deprecated(
+  "saga DSL builder is deprecated, use sagaScope instead.",
+  ReplaceWith("sagaScope(block)", "arrow.resilience.sagaScope")
+)
 public inline fun <A> saga(noinline block: suspend SagaScope.() -> A): Saga<A> = block
 
 /** Create a lazy [Saga] that will only run when the [Saga] is invoked. */
 public fun <A> saga(
   action: suspend SagaActionStep.() -> A,
   compensation: suspend (A) -> Unit
-): Saga<A> = saga { saga(action, compensation) }
+): Saga<A> = sagaScope { saga(action, compensation) }
 
 /**
  * Transact runs the [Saga] turning it into a [suspend] effect that results in [A]. If the saga
@@ -109,7 +114,8 @@ public suspend fun <A> Saga<A>.transact(): A {
 }
 
 /** DSL Marker for the SagaEffect DSL */
-@DslMarker public annotation class SagaDSLMarker
+@DslMarker
+public annotation class SagaDSLMarker
 
 /**
  * Marker object to protect [SagaScope.saga] from calling [SagaScope.bind] in its `action` step.
