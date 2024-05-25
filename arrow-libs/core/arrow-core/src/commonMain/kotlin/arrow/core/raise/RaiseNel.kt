@@ -4,6 +4,7 @@
 package arrow.core.raise
 
 import arrow.core.Either
+import arrow.core.EitherNel
 import arrow.core.NonEmptyList
 import arrow.core.toNonEmptyListOrNull
 import kotlin.contracts.ExperimentalContracts
@@ -14,7 +15,7 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty
 
-public fun <Error, A> Raise<NonEmptyList<Error>>.nel(
+public fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   block: RaiseNel<Error>.() -> A
 ): A {
   contract { callsInPlace(block, EXACTLY_ONCE) }
@@ -24,9 +25,12 @@ public fun <Error, A> Raise<NonEmptyList<Error>>.nel(
   return result
 }
 
-public fun <Error, A> eitherNel(block: RaiseNel<Error>.() -> A): Either<NonEmptyList<Error>, A> {
+public fun <Error, A, R> accumulate(
+  raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
+  block: RaiseNel<Error>.() -> A
+): R {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  return fold({ nel(block) }, { Either.Left(it) }, { Either.Right(it) })
+  return raise { accumulate(block) }
 }
 
 public class RaiseNel<Error>(
@@ -44,6 +48,17 @@ public class RaiseNel<Error>(
   public fun <A> Iterable<Either<Error, A>>.bindAllAccumulating(): Value<List<A>> =
     accumulating { this@bindAllAccumulating.bindAll() }
 
+  public fun <A> EitherNel<Error, A>.bindNelAccumulating(): Value<A> =
+    accumulating { this@bindNelAccumulating.bindNel() }
+
+  public fun ensure(condition: Boolean, raise: () -> Error) {
+    accumulating { ensure(condition, raise) }
+  }
+
+  public fun <B: Any> ensureNotNull(value: B?, raise: () -> Error) {
+    ensure(value != null, raise)
+  }
+
   public fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> =
     recover({
       Ok(block(RaiseAccumulate(this)))
@@ -53,12 +68,11 @@ public class RaiseNel<Error>(
     }
 
   public abstract inner class Value<out A> {
-    public abstract operator fun getValue(value: Nothing?, property: KProperty<*>): A
+    public abstract val result: A
+    public operator fun getValue(value: Nothing?, property: KProperty<*>): A = result
   }
   internal inner class Error: Value<Nothing>() {
-    override fun getValue(value: Nothing?, property: KProperty<*>): Nothing = raiseErrors()
+    override val result: Nothing = raiseErrors()
   }
-  internal inner class Ok<out A>(val result: A): Value<A>() {
-    override fun getValue(value: Nothing?, property: KProperty<*>): A = result
-  }
+  internal inner class Ok<out A>(override val result: A): Value<A>()
 }

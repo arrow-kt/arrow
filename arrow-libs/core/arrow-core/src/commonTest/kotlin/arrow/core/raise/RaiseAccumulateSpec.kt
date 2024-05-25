@@ -19,7 +19,7 @@ class RaiseAccumulateSpec {
   }
 
   @Test fun raiseAccumulateTakesPrecedenceOverExtensionFunctionNel() {
-    eitherNel {
+    accumulate(::either) {
       val x by accumulating { ensure(false) { "false" } }
       val y by accumulating { mapOrAccumulate(1..2) { ensure(false) { "$it: IsFalse" } } }
       1
@@ -27,7 +27,7 @@ class RaiseAccumulateSpec {
   }
 
   @Test fun raiseAccumulatingTwoFailures() {
-    eitherNel {
+    accumulate(::either) {
       val x by accumulating {
         raise("hello")
         1
@@ -38,7 +38,7 @@ class RaiseAccumulateSpec {
   }
 
   @Test fun raiseAccumulatingOneFailure() {
-    eitherNel {
+    accumulate(::either) {
       val x by accumulating { 1 }
       val y by accumulating { raise("bye") ; 2 }
       x + y
@@ -46,7 +46,7 @@ class RaiseAccumulateSpec {
   }
 
   @Test fun raiseAccumulatingOneFailureEither() {
-    eitherNel {
+    accumulate(::either) {
       val x: Int by 1.right().bindAccumulating()
       val y: Int by "bye".left().bindAccumulating()
       x + y
@@ -54,7 +54,7 @@ class RaiseAccumulateSpec {
   }
 
   @Test fun raiseAccumulatingNoFailure() {
-    eitherNel<String, _> {
+    accumulate<String, _, _>(::either) {
       val x by accumulating { 1 }
       val y by accumulating { 2 }
       x + y
@@ -62,7 +62,7 @@ class RaiseAccumulateSpec {
   }
 
   @Test fun raiseAccumulatingIntermediateRaise() {
-    eitherNel {
+    accumulate(::either) {
       val x by accumulating { raise("hello") ; 1 }
       raise("hi")
       val y by accumulating { 2 }
