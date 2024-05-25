@@ -103,6 +103,19 @@ final class <#A: kotlin/Any?> arrow.core.raise/IorRaise : arrow.core.raise/Raise
     final suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<#A>, #A1>).invoke(): #A1 // arrow.core.raise/IorRaise.invoke|invoke@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<1:0>,0:0>(){0§<kotlin.Any?>}[0]
 }
 
+final class <#A: kotlin/Any?> arrow.core.raise/RaiseNel : arrow.core.raise/Raise<#A> { // arrow.core.raise/RaiseNel|null[0]
+    constructor <init>(arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>) // arrow.core.raise/RaiseNel.<init>|<init>(arrow.core.raise.Raise<arrow.core.NonEmptyList<1:0>>){}[0]
+
+    final fun <#A1: kotlin/Any?> accumulating(kotlin/Function1<arrow.core.raise/RaiseAccumulate<#A>, #A1>): arrow.core.raise/RaiseNel.Value<#A1, #A> // arrow.core.raise/RaiseNel.accumulating|accumulating(kotlin.Function1<arrow.core.raise.RaiseAccumulate<1:0>,0:0>){0§<kotlin.Any?>}[0]
+    final fun raise(#A): kotlin/Nothing // arrow.core.raise/RaiseNel.raise|raise(1:0){}[0]
+
+    abstract inner class <#A1: out kotlin/Any?> Value { // arrow.core.raise/RaiseNel.Value|null[0]
+        constructor <init>() // arrow.core.raise/RaiseNel.Value.<init>|<init>(){}[0]
+
+        abstract fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseNel.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
+    }
+}
+
 final class <#A: out kotlin/Any?, #B: out kotlin/Any?, #C: out kotlin/Any?, #D: out kotlin/Any?, #E: out kotlin/Any?, #F: out kotlin/Any?, #G: out kotlin/Any?, #H: out kotlin/Any?, #I: out kotlin/Any?> arrow.core/Tuple9 { // arrow.core/Tuple9|null[0]
     constructor <init>(#A, #B, #C, #D, #E, #F, #G, #H, #I) // arrow.core/Tuple9.<init>|<init>(1:0;1:1;1:2;1:3;1:4;1:5;1:6;1:7;1:8){}[0]
 
@@ -717,6 +730,7 @@ final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin.sequences/
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin/Function1<arrow.core.raise/Raise<#A>, #C>).arrow.core.raise/mapError(kotlin/Function1<#A, #B>): kotlin/Function1<arrow.core.raise/Raise<#B>, #C> // arrow.core.raise/mapError|mapError@kotlin.Function1<arrow.core.raise.Raise<0:0>,0:2>(kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin/Function1<arrow.core.raise/Raise<#A>, #C>).arrow.core.raise/recover(kotlin/Function2<arrow.core.raise/Raise<#B>, #A, #C>): kotlin/Function1<arrow.core.raise/Raise<#B>, #C> // arrow.core.raise/recover|recover@kotlin.Function1<arrow.core.raise.Raise<0:0>,0:2>(kotlin.Function2<arrow.core.raise.Raise<0:1>,0:0,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin/Pair<#A, #B>).arrow.core/plus(#C): kotlin/Triple<#A, #B, #C> // arrow.core/plus|plus@kotlin.Pair<0:0,0:1>(0:2){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>).arrow.core.raise/nel(kotlin/Function1<arrow.core.raise/RaiseNel<#A>, #B>): #B // arrow.core.raise/nel|nel@arrow.core.raise.Raise<arrow.core.NonEmptyList<0:0>>(kotlin.Function1<arrow.core.raise.RaiseNel<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.core/Either<#A, #B>).arrow.core/combine(arrow.core/Either<#A, #B>, kotlin/Function2<#A, #A, #A>, kotlin/Function2<#B, #B, #B>): arrow.core/Either<#A, #B> // arrow.core/combine|combine@arrow.core.Either<0:0,0:1>(arrow.core.Either<0:0,0:1>;kotlin.Function2<0:0,0:0,0:0>;kotlin.Function2<0:1,0:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.core/Either<#A, #B>).arrow.core/toEitherNel(): arrow.core/Either<arrow.core/NonEmptyList<#A>, #B> // arrow.core/toEitherNel|toEitherNel@arrow.core.Either<0:0,0:1>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.core/Either<#A, arrow.core/Either<#A, #B>>).arrow.core/flatten(): arrow.core/Either<#A, #B> // arrow.core/flatten|flatten@arrow.core.Either<0:0,arrow.core.Either<0:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
@@ -758,6 +772,7 @@ final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin/Function1<arrow.core.raise/
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin/Function1<arrow.core.raise/Raise<#A>, #B>).arrow.core.raise/toEither(): arrow.core/Either<#A, #B> // arrow.core.raise/toEither|toEither@kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin/Function1<arrow.core.raise/Raise<#A>, #B>).arrow.core.raise/toIor(): arrow.core/Ior<#A, #B> // arrow.core.raise/toIor|toIor@kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin/Pair<#A, #B>).arrow.core/bothIor(): arrow.core/Ior<#A, #B> // arrow.core/bothIor|bothIor@kotlin.Pair<0:0,0:1>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core.raise/eitherNel(kotlin/Function1<arrow.core.raise/RaiseNel<#A>, #B>): arrow.core/Either<arrow.core/NonEmptyList<#A>, #B> // arrow.core.raise/eitherNel|eitherNel(kotlin.Function1<arrow.core.raise.RaiseNel<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/MemoizedDeepRecursiveFunction(arrow.core/MemoizationCache<#A, #B> = ..., kotlin.coroutines/SuspendFunction2<kotlin/DeepRecursiveScope<#A, #B>, #A, #B>): kotlin/DeepRecursiveFunction<#A, #B> // arrow.core/MemoizedDeepRecursiveFunction|MemoizedDeepRecursiveFunction(arrow.core.MemoizationCache<0:0,0:1>;kotlin.coroutines.SuspendFunction2<kotlin.DeepRecursiveScope<0:0,0:1>,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/constant(#B): kotlin/Function1<#A, #B> // arrow.core/constant|constant(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (#A).arrow.core/left(): arrow.core/Either<#A, kotlin/Nothing> // arrow.core/left|left@0:0(){0§<kotlin.Any?>}[0]
