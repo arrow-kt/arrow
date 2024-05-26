@@ -26,13 +26,24 @@ class RaiseAccumulateSpec {
     } shouldBe nonEmptyListOf("false", "1: IsFalse", "2: IsFalse").left()
   }
 
+  @Test fun accumulateWithBindAndMap() {
+    accumulate(::either) {
+      (1 .. 2).map { "$it: IsFalse".left() }.map {
+        it.bindOrAccumulate()
+      }
+    } shouldBe nonEmptyListOf("1: IsFalse", "2: IsFalse").left()
+  }
+
   @Test fun raiseAccumulatingTwoFailures() {
     accumulate(::either) {
       val x by accumulating {
         raise("hello")
         1
       }
-      val y by accumulating { raise("bye") ; 2 }
+      val y by accumulating {
+        raise("bye")
+        2
+      }
       x + y
     } shouldBe nonEmptyListOf("hello", "bye").left()
   }
@@ -47,8 +58,8 @@ class RaiseAccumulateSpec {
 
   @Test fun raiseAccumulatingOneFailureEither() {
     accumulate(::either) {
-      val x: Int by 1.right().bindAccumulating()
-      val y: Int by "bye".left().bindAccumulating()
+      val x: Int by 1.right().bindOrAccumulate()
+      val y: Int by "bye".left().bindOrAccumulate()
       x + y
     } shouldBe nonEmptyListOf("bye").left()
   }
