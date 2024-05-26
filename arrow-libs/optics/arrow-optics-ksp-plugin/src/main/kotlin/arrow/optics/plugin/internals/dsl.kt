@@ -60,9 +60,9 @@ private fun processPrismSyntax(ele: ADT, dsl: SealedClassDsl, className: String)
   if (ele.typeParameters.isEmpty()) {
     dsl.foci.joinToString(separator = "\n\n") { focus ->
       """
-    |${ele.visibilityModifierName} inline val <__S> $Optional<__S, ${ele.sourceClassName}>.${focus.paramName}: $Optional<__S, ${focus.classNameWithParameters}> inline get() = this + $className.${focus.paramName}
-    |${ele.visibilityModifierName} inline val <__S> $Prism<__S, ${ele.sourceClassName}>.${focus.paramName}: $Prism<__S, ${focus.classNameWithParameters}> inline get() = this + $className.${focus.paramName}
-    |${ele.visibilityModifierName} inline val <__S> $Traversal<__S, ${ele.sourceClassName}>.${focus.paramName}: $Traversal<__S, ${focus.classNameWithParameters}> inline get() = this + $className.${focus.paramName}
+    |${ele.visibilityModifierName} inline val <__S> $Optional<__S, ${ele.sourceClassName}>.${focus.escapedParamName}: $Optional<__S, ${focus.classNameWithParameters}> inline get() = this + $className.${focus.escapedParamName}
+    |${ele.visibilityModifierName} inline val <__S> $Prism<__S, ${ele.sourceClassName}>.${focus.escapedParamName}: $Prism<__S, ${focus.classNameWithParameters}> inline get() = this + $className.${focus.escapedParamName}
+    |${ele.visibilityModifierName} inline val <__S> $Traversal<__S, ${ele.sourceClassName}>.${focus.escapedParamName}: $Traversal<__S, ${focus.classNameWithParameters}> inline get() = this + $className.${focus.escapedParamName}
     |
       """.trimMargin()
     }
@@ -74,9 +74,9 @@ private fun processPrismSyntax(ele: ADT, dsl: SealedClassDsl, className: String)
         else -> focus.refinedArguments.joinToString(separator = ",")
       }
       """
-    |${ele.visibilityModifierName} inline fun <__S,$joinedTypeParams> $Optional<__S, $sourceClassNameWithParams>.${focus.paramName}(): $Optional<__S, ${focus.classNameWithParameters}> = this + $className.${focus.paramName}()
-    |${ele.visibilityModifierName} inline fun <__S,$joinedTypeParams> $Prism<__S, $sourceClassNameWithParams>.${focus.paramName}(): $Prism<__S, ${focus.classNameWithParameters}> = this + $className.${focus.paramName}()
-    |${ele.visibilityModifierName} inline fun <__S,$joinedTypeParams> $Traversal<__S, $sourceClassNameWithParams>.${focus.paramName}(): $Traversal<__S, ${focus.classNameWithParameters}> = this + $className.${focus.paramName}()
+    |${ele.visibilityModifierName} inline fun <__S,$joinedTypeParams> $Optional<__S, $sourceClassNameWithParams>.${focus.escapedParamName}(): $Optional<__S, ${focus.classNameWithParameters}> = this + $className.${focus.escapedParamName}()
+    |${ele.visibilityModifierName} inline fun <__S,$joinedTypeParams> $Prism<__S, $sourceClassNameWithParams>.${focus.escapedParamName}(): $Prism<__S, ${focus.classNameWithParameters}> = this + $className.${focus.escapedParamName}()
+    |${ele.visibilityModifierName} inline fun <__S,$joinedTypeParams> $Traversal<__S, $sourceClassNameWithParams>.${focus.escapedParamName}(): $Traversal<__S, ${focus.classNameWithParameters}> = this + $className.${focus.escapedParamName}()
     |
       """.trimMargin()
     }
