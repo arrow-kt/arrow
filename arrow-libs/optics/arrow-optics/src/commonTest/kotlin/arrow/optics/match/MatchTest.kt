@@ -2,6 +2,8 @@ package arrow.optics.match
 
 import arrow.optics.Lens
 import arrow.optics.Prism
+import io.kotest.matchers.shouldBe
+import kotlin.test.Test
 
 data class Name(
   val firstName: String, val lastName: String
@@ -59,8 +61,20 @@ data class Company(
   }
 }
 
-val User.name: String get() = this.match {
+val User.shownName: String get() = this.match {
   User.person(Person.name(Name.firstName), Person.age.suchThat { it < 18 }) then { (fn, _) -> fn }
   User.person(Person.name(Name.firstName, Name.lastName)) then { (fn, ln) -> "Sir/Madam $fn $ln" }
   User.company(Company.name, Company.director(Name.lastName)) then { (nm, d) -> "$nm, att. $d" }
+}
+
+class MatchTest {
+  @Test fun userKid() {
+    val p = Person(Name("Jimmy", "Jones"), 7)
+    p.shownName shouldBe "Jimmy"
+  }
+
+  @Test fun userAdult() {
+    val p = Person(Name("Jimmy", "Jones"), 20)
+    p.shownName shouldBe "Sir/Madam Jimmy Jones"
+  }
 }
