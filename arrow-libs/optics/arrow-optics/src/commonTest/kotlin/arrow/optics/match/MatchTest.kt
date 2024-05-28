@@ -67,14 +67,21 @@ val User.shownName: String get() = this.matchOrThrow {
   User.company(Company.name, Company.director(Name.lastName)) then { (nm, d) -> "$nm, att. $d" }
 }
 
+val Person.shownNameForPerson: String get() = this.matchOrThrow {
+  it(Person.name(Name.firstName), Person.age.suchThat { it < 18 }) then { (fn, _) -> fn }
+  it(Person.name(Name.firstName, Name.lastName)) then { (fn, ln) -> "Sir/Madam $fn $ln" }
+}
+
 class MatchTest {
   @Test fun userKid() {
     val p = Person(Name("Jimmy", "Jones"), 7)
     p.shownName shouldBe "Jimmy"
+    p.shownNameForPerson shouldBe "Jimmy"
   }
 
   @Test fun userAdult() {
     val p = Person(Name("Jimmy", "Jones"), 20)
     p.shownName shouldBe "Sir/Madam Jimmy Jones"
+    p.shownNameForPerson shouldBe "Sir/Madam Jimmy Jones"
   }
 }

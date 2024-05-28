@@ -529,6 +529,11 @@ public final class arrow/optics/match/CombinatorsKt {
 	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static final fun predicate (Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
 	public static final fun suchThat (Larrow/optics/POptional;Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
 }
