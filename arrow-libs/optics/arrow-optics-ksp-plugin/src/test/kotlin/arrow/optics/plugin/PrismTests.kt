@@ -35,6 +35,36 @@ class PrismTests {
   }
 
   @Test
+  fun `Prism will be generated for sealed class and subclasses having keywords as names`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class PrismSealed(val field: String, val nullable: String?) {
+      | data class In(private val a: String?) : PrismSealed("", a)
+      | data class PrismSealed2(private val b: String?) : PrismSealed("", b)
+      | companion object
+      |}
+      |val i: Prism<PrismSealed, PrismSealed.In> = PrismSealed.`in`
+      """.compilationSucceeds(allWarningsAsErrors = true)
+  }
+
+  @Test
+  fun `Prism will be generated for generic sealed class and subclasses having keywords as names`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class PrismSealed<A,B>(val field: A, val nullable: B?) {
+      | data class In(private val a: String?) : PrismSealed<String, String>("", a)
+      | data class PrismSealed2<C>(private val b: C?) : PrismSealed<String, C>("", b)
+      | companion object
+      |}
+      |val i: Prism<PrismSealed<String, String>, PrismSealed.In> = PrismSealed.`in`()
+      """.compilationSucceeds(allWarningsAsErrors = true)
+  }
+
+  @Test
   fun `Prism will be generated without warning for sealed class with only one subclass`() {
     """
       |$`package`
