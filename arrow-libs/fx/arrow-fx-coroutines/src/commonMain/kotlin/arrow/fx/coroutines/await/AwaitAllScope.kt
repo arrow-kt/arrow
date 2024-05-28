@@ -6,21 +6,21 @@ import kotlinx.coroutines.async as coroutinesAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.awaitAll as coroutinesAwaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-public suspend fun <A> await(
-  block: suspend AwaitScope.() -> A
-): A = coroutineScope { block(AwaitScope(this)) }
+public suspend fun <A> awaitAll(
+  block: suspend AwaitAllScope.() -> A
+): A = coroutineScope { block(AwaitAllScope(this)) }
 
-public suspend fun <A> CoroutineScope.await(
-  block: suspend AwaitScope.() -> A
-): A = block(AwaitScope(this))
+public suspend fun <A> CoroutineScope.awaitAll(
+  block: suspend AwaitAllScope.() -> A
+): A = block(AwaitAllScope(this))
 
 /**
- * Within an [AwaitScope], any call to [kotlinx.coroutines.Deferred.await]
+ * Within an [AwaitAllScope], any call to [kotlinx.coroutines.Deferred.await]
  * causes all the other [Deferred] in the same block to be awaited too.
  * That way you can get more concurrency without having to sacrifice
  * readability.
@@ -46,7 +46,7 @@ public suspend fun <A> CoroutineScope.await(
  * }
  * ```
  */
-public class AwaitScope(
+public class AwaitAllScope(
   private val scope: CoroutineScope
 ): CoroutineScope by scope {
   private val tasks: Atomic<List<Deferred<*>>> = Atomic(emptyList())
@@ -65,7 +65,7 @@ public class AwaitScope(
     private val deferred: Deferred<T>
   ): Deferred<T> by deferred {
     override suspend fun await(): T {
-      tasks.getAndSet(emptyList()).awaitAll()
+      tasks.getAndSet(emptyList()).coroutinesAwaitAll()
       return deferred.await()
     }
   }
