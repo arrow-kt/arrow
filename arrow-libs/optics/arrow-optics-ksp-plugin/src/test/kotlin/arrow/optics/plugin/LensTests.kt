@@ -20,6 +20,30 @@ class LensTests {
   }
 
   @Test
+  fun `Lenses will be generated for data class with parameters having keywords as names`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData(
+      |  val `in`: String
+      |) { companion object }
+      """.compilationSucceeds()
+  }
+
+  @Test
+  fun `Lenses will be generated for generic data class with parameters having keywords as names`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData<T>(
+      |  val `in`: T
+      |) { companion object }
+      """.compilationSucceeds()
+  }
+
+  @Test
   fun `Lenses will be generated for data class with secondary constructors`() {
     """
       |$`package`
