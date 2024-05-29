@@ -521,6 +521,42 @@ public final class arrow/optics/dsl/OptionKt {
 	public static final fun getSome (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 }
 
+public final class arrow/optics/match/CombinatorsKt {
+	public static final fun equalsTo (Ljava/lang/Object;)Larrow/optics/POptional;
+	public static final fun ifEquals (Larrow/optics/POptional;Ljava/lang/Object;)Larrow/optics/POptional;
+	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun invoke (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun it (Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
+	public static final fun predicate (Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
+	public static final fun suchThat (Larrow/optics/POptional;Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
+}
+
+public final class arrow/optics/match/MatchKt {
+	public static final fun matchOrElse (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun matchOrRaise (Larrow/core/raise/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun matchOrRaise (Larrow/core/raise/SingletonRaise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun matchOrThrow (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun matchOrThrow$default (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun matchUnit (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/optics/match/MatchNotFound : java/lang/Throwable {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun getValue ()Ljava/lang/Object;
+}
+
+public abstract interface class arrow/optics/match/MatchScope {
+	public abstract fun default (Lkotlin/jvm/functions/Function0;)V
+	public abstract fun then (Larrow/optics/POptional;Lkotlin/jvm/functions/Function1;)V
+}
+
 public abstract interface class arrow/optics/typeclasses/At {
 	public static final field Companion Larrow/optics/typeclasses/At$Companion;
 	public abstract fun at (Larrow/optics/PLens;Ljava/lang/Object;)Larrow/optics/PLens;
