@@ -1,6 +1,7 @@
 package arrow.optics.match
 
 import arrow.core.raise.Raise
+import arrow.core.raise.SingletonRaise
 import arrow.optics.Optional
 
 public interface MatchScope<S, R> {
@@ -41,6 +42,11 @@ public fun <S, R> Raise<MatchNotFound>.matchOrRaise(
   value: S,
   cases: MatchScope<S, R>.() -> Unit,
 ): R = value.matchOrElse({ raise(MatchNotFound(value)) }, cases)
+
+public fun <S, R, E> SingletonRaise<E>.matchOrRaise(
+  value: S,
+  cases: MatchScope<S, R>.() -> Unit,
+): R = value.matchOrElse({ raise() }, cases)
 
 public fun <S> S.matchUnit(
   cases: MatchScope<S, Unit>.() -> Unit,
