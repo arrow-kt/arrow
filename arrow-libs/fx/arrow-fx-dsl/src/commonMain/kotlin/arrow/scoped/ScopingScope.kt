@@ -1,16 +1,21 @@
-package arrow
+// Import throwIfFatal from AutoCloseScope
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
+package arrow.scoped
+
+import arrow.AutoCloseScope
+import arrow.throwIfFatal
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import kotlin.coroutines.cancellation.CancellationException
 
-public interface FinallyScope : AutoCloseScope {
+public interface ScopingScope : AutoCloseScope {
   public override fun autoClose(close: (Throwable?) -> Unit): Unit
-  public fun finalise(block: suspend (Throwable?) -> Unit): Unit
+  public fun closing(block: suspend (Throwable?) -> Unit): Unit
 }
 
-public suspend fun <A> finally(block: FinallyScope.() -> A): A {
-  val scope = DefaultFinallyScope()
+public suspend fun <A> scoped(block: suspend ScopingScope.() -> A): A {
+  val scope = DefaultScopingScope()
   return try {
     block(scope)
   } catch (e: CancellationException) {
@@ -20,7 +25,7 @@ public suspend fun <A> finally(block: FinallyScope.() -> A): A {
   }
 }
 
-private class DefaultFinallyScope : FinallyScope {
+private class DefaultScopingScope : ScopingScope {
   private val closeables: Atomic<List<suspend (Throwable?) -> Unit>> = Atomic(emptyList())
 
   suspend fun close(error: Throwable?): Nothing? {
@@ -29,7 +34,7 @@ private class DefaultFinallyScope : FinallyScope {
     }?.let { throw it }
   }
 
-  override fun finalise(block: suspend (Throwable?) -> Unit): Unit =
+  override fun closing(block: suspend (Throwable?) -> Unit): Unit =
     closeables.update {
       val closeLambda: suspend (Throwable?) -> Unit =
         { e: Throwable? -> close(e) }
@@ -37,7 +42,7 @@ private class DefaultFinallyScope : FinallyScope {
     }
 
   override fun autoClose(close: (Throwable?) -> Unit) =
-    finalise(close)
+    closing(close)
 }
 
 private fun Throwable?.add(other: Throwable?): Throwable? =

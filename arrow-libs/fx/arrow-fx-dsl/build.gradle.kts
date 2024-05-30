@@ -24,6 +24,7 @@ kotlin {
       dependencies {
         implementation(libs.coroutines.core)
         implementation(projects.arrowAtomic)
+        implementation(projects.arrowAutoclose)
       }
     }
     commonTest {

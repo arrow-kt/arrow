@@ -8,7 +8,6 @@ repositories {
 
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
-  // alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
   alias(libs.plugins.compose.jetbrains)
