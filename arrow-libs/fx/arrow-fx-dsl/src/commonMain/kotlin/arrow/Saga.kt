@@ -3,7 +3,7 @@ package arrow
 /**
  * Saga DSL derived from Scope
  */
-public suspend fun <A> Finally.saga(
+public suspend fun <A> FinallyScope.saga(
   action: suspend () -> A,
   compensation: suspend (A, Throwable?) -> Unit
 ): A = action().also { a ->

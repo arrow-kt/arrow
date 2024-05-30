@@ -79,10 +79,13 @@ project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-co
 include("arrow-cache4k")
 project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
 
-include("arrow-scope")
-project(":arrow-scope").projectDir = file("arrow-libs/core/arrow-scope")
+include("arrow-autoclose")
+project(":arrow-autoclose").projectDir = file("arrow-libs/core/arrow-autoclose")
 
 // FX
+include("arrow-fx-dsl")
+project(":arrow-fx-dsl").projectDir = file("arrow-libs/fx/arrow-fx-dsl")
+
 include("arrow-fx-coroutines")
 project(":arrow-fx-coroutines").projectDir = file("arrow-libs/fx/arrow-fx-coroutines")
 

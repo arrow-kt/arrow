@@ -4,7 +4,7 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Builds a [CoroutineScope] on top of the [Finally] DSL,
+ * Builds a [CoroutineScope] on top of the [FinallyScope] DSL,
  * this gives the same guarantees as:
  * ```kotlin
  * coroutineScope {
@@ -27,7 +27,7 @@ import kotlin.coroutines.CoroutineContext
  *   KConsumer(coroutineScope(), settings)
  * ```
  */
-public suspend fun Finally.coroutineScope(context: CoroutineContext): CoroutineScope {
+public suspend fun FinallyScope.coroutineScope(context: CoroutineContext): CoroutineScope {
   val oldContext = currentCoroutineContext()
   val newContext = currentCoroutineContext() + context
   val newJob = newContext[Job] ?: Job(oldContext[Job])
