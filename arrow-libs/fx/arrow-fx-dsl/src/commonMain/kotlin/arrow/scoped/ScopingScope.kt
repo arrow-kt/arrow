@@ -7,6 +7,8 @@ import arrow.AutoCloseScope
 import arrow.throwIfFatal
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
 public interface ScopingScope : AutoCloseScope {
@@ -29,9 +31,11 @@ private class DefaultScopingScope : ScopingScope {
   private val closeables: Atomic<List<suspend (Throwable?) -> Unit>> = Atomic(emptyList())
 
   suspend fun close(error: Throwable?): Nothing? {
-    return closeables.get().asReversed().fold(error) { acc, function ->
-      acc.add(runCatching { function(error) }.exceptionOrNull())
-    }?.let { throw it }
+    return withContext(NonCancellable) {
+      closeables.get().asReversed().fold(error) { acc, function ->
+        acc.add(runCatching { function(error) }.exceptionOrNull())
+      }?.let { throw it }
+    }
   }
 
   override fun closing(block: suspend (Throwable?) -> Unit): Unit =
