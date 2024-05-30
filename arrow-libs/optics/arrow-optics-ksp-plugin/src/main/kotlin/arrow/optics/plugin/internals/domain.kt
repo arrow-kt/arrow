@@ -77,6 +77,10 @@ data class Focus(
   val subclasses: List<String> = emptyList(),
   val classNameWithParameters: String? = className,
 ) {
+  val escapedParamName = paramName.plusIfNotBlank(
+    prefix = "`",
+    postfix = "`",
+  )
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
       it.type?.resolve()?.declaration is KSTypeParameter
