@@ -389,7 +389,7 @@ class EffectSpec {
     }
   }
 
-  @Test fun issue2779HandleErrorWithDoesNotMakeNestedContinuationsHang() = runTest {
+  @Test fun issue2779HandleErrorWithDoesNotMakeNestedEffectHang() = runTest {
     checkAll(Arb.string()) { error ->
       val failed: Effect<String, Int> = effect {
         withContext(Dispatchers.Default) {}
@@ -405,7 +405,7 @@ class EffectSpec {
     }
   }
 
-  @Test fun issue2779BindNestedInFoldDoesNotMakeNestedContinuationsHang() = runTest {
+  @Test fun issue2779BindNestedInFoldDoesNotMakeNestedEffectHang() = runTest {
     checkAll(Arb.string()) { error ->
       val failed: Effect<String, Int> = effect {
         withContext(Dispatchers.Default) {}
