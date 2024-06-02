@@ -484,24 +484,19 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
     abstract inner class <#A1: out kotlin/Any?> Value { // arrow.core.raise/RaiseAccumulate.Value|null[0]
         constructor <init>() // arrow.core.raise/RaiseAccumulate.Value.<init>|<init>(){}[0]
 
-        abstract val result // arrow.core.raise/RaiseAccumulate.Value.result|{}result[0]
-            abstract fun <get-result>(): #A1 // arrow.core.raise/RaiseAccumulate.Value.result.<get-result>|<get-result>(){}[0]
-
-        final fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
+        abstract fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
     }
 
     final inner class <#A1: out kotlin/Any?> Ok : arrow.core.raise/RaiseAccumulate.Value<#A1, #A> { // arrow.core.raise/RaiseAccumulate.Ok|null[0]
         constructor <init>(#A1) // arrow.core.raise/RaiseAccumulate.Ok.<init>|<init>(1:0){}[0]
 
-        final val result // arrow.core.raise/RaiseAccumulate.Ok.result|{}result[0]
-            final fun <get-result>(): #A1 // arrow.core.raise/RaiseAccumulate.Ok.result.<get-result>|<get-result>(){}[0]
+        final fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.Ok.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
     }
 
     final inner class Error : arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing, #A> { // arrow.core.raise/RaiseAccumulate.Error|null[0]
         constructor <init>() // arrow.core.raise/RaiseAccumulate.Error.<init>|<init>(){}[0]
 
-        final val result // arrow.core.raise/RaiseAccumulate.Error.result|{}result[0]
-            final fun <get-result>(): kotlin/Nothing // arrow.core.raise/RaiseAccumulate.Error.result.<get-result>|<get-result>(){}[0]
+        final fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): kotlin/Nothing // arrow.core.raise/RaiseAccumulate.Error.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
     }
 }
 
@@ -935,7 +930,7 @@ final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin.col
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin.collections/Map<#A, #B>).arrow.core/fold(#C, kotlin/Function2<#C, kotlin.collections/Map.Entry<#A, #B>, #C>): #C // arrow.core/fold|fold@kotlin.collections.Map<0:0,0:1>(0:2;kotlin.Function2<0:2,kotlin.collections.Map.Entry<0:0,0:1>,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin/Function1<arrow.core.raise/Raise<#A>, #B>).arrow.core.raise/fold(kotlin/Function1<#A, #C>, kotlin/Function1<#B, #C>): #C // arrow.core.raise/fold|fold@kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>(kotlin.Function1<0:0,0:2>;kotlin.Function1<0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (kotlin/Function1<arrow.core.raise/Raise<#A>, #B>).arrow.core.raise/fold(kotlin/Function1<kotlin/Throwable, #C>, kotlin/Function1<#A, #C>, kotlin/Function1<#B, #C>): #C // arrow.core.raise/fold|fold@kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>(kotlin.Function1<kotlin.Throwable,0:2>;kotlin.Function1<0:0,0:2>;kotlin.Function1<0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> arrow.core.raise/accumulate(kotlin/Function1<kotlin/Function1<arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>, #B>, #C>, noinline kotlin/Function1<arrow.core.raise/RaiseAccumulate<#A>, #B>): #C // arrow.core.raise/accumulate|accumulate(kotlin.Function1<kotlin.Function1<arrow.core.raise.Raise<arrow.core.NonEmptyList<0:0>>,0:1>,0:2>;kotlin.Function1<arrow.core.raise.RaiseAccumulate<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> arrow.core.raise/accumulate(kotlin/Function1<kotlin/Function1<arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>, #B>, #C>, crossinline kotlin/Function1<arrow.core.raise/RaiseAccumulate<#A>, #B>): #C // arrow.core.raise/accumulate|accumulate(kotlin.Function1<kotlin.Function1<arrow.core.raise.Raise<arrow.core.NonEmptyList<0:0>>,0:1>,0:2>;kotlin.Function1<arrow.core.raise.RaiseAccumulate<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> arrow.core.raise/fold(kotlin/Function1<arrow.core.raise/Raise<#A>, #B>, kotlin/Function1<#A, #C>, kotlin/Function1<#B, #C>): #C // arrow.core.raise/fold|fold(kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>;kotlin.Function1<0:0,0:2>;kotlin.Function1<0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> arrow.core.raise/fold(kotlin/Function1<arrow.core.raise/Raise<#A>, #B>, kotlin/Function1<kotlin/Throwable, #C>, kotlin/Function1<#A, #C>, kotlin/Function1<#B, #C>): #C // arrow.core.raise/fold|fold(kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>;kotlin.Function1<kotlin.Throwable,0:2>;kotlin.Function1<0:0,0:2>;kotlin.Function1<0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.core.raise/Raise<#A>).arrow.core.raise/forEachAccumulating(kotlin.collections/Iterable<#B>, kotlin/Function2<#A, #A, #A>, kotlin/Function2<arrow.core.raise/RaiseAccumulate<#A>, #B, kotlin/Unit>) // arrow.core.raise/forEachAccumulating|forEachAccumulating@arrow.core.raise.Raise<0:0>(kotlin.collections.Iterable<0:1>;kotlin.Function2<0:0,0:0,0:0>;kotlin.Function2<arrow.core.raise.RaiseAccumulate<0:0>,0:1,kotlin.Unit>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]

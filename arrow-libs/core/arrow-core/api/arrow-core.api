@@ -976,19 +976,18 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 
 public final class arrow/core/raise/RaiseAccumulate$Error : arrow/core/raise/RaiseAccumulate$Value {
 	public fun <init> (Larrow/core/raise/RaiseAccumulate;)V
-	public synthetic fun getResult ()Ljava/lang/Object;
-	public fun getResult ()Ljava/lang/Void;
+	public synthetic fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+	public fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Void;
 }
 
 public final class arrow/core/raise/RaiseAccumulate$Ok : arrow/core/raise/RaiseAccumulate$Value {
 	public fun <init> (Larrow/core/raise/RaiseAccumulate;Ljava/lang/Object;)V
-	public fun getResult ()Ljava/lang/Object;
+	public fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 }
 
 public abstract class arrow/core/raise/RaiseAccumulate$Value {
 	public fun <init> (Larrow/core/raise/RaiseAccumulate;)V
-	public abstract fun getResult ()Ljava/lang/Object;
-	public final fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+	public abstract fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 }
 
 public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {

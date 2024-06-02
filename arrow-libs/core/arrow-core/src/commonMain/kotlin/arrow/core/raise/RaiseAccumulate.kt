@@ -683,7 +683,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
 
 public inline fun <Error, A, R> accumulate(
   raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
-  noinline block: RaiseAccumulate<Error>.() -> A
+  crossinline block: RaiseAccumulate<Error>.() -> A
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return raise { accumulate(block) }
@@ -797,16 +797,14 @@ public open class RaiseAccumulate<Error>(
     }
 
   public abstract inner class Value<out A> {
-    public abstract val result: A
-    public operator fun getValue(value: Nothing?, property: KProperty<*>): A = result
+    public abstract operator fun getValue(value: Nothing?, property: KProperty<*>): A
   }
   @PublishedApi internal inner class Error: Value<Nothing>() {
-    override val result: Nothing
-      // WARNING: do not turn this into a value with initializer!!
-      //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-      get() {
-        raiseErrors()
-      }
+    // WARNING: do not turn this into a property with initializer!!
+    //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
+    override fun getValue(value: Nothing?, property: KProperty<*>): Nothing = raiseErrors()
   }
-  @PublishedApi internal inner class Ok<out A>(override val result: A): Value<A>()
+  @PublishedApi internal inner class Ok<out A>(private val result: A): Value<A>() {
+    override fun getValue(value: Nothing?, property: KProperty<*>): A = result
+  }
 }
