@@ -113,6 +113,28 @@ class DSLTests {
   }
 
   @Test
+  fun `DSL for a class in a package including it, issue #3441`() {
+    """
+      |package it.facile.assicurati
+      |
+      |$imports
+      |
+      |@optics
+      |data class Source(val models: String) {
+      |  companion object
+      |}
+      |
+      |@optics
+      |sealed class PrismSealed(val field: String, val nullable: String?) {
+      | data class PrismSealed1(private val a: String?) : PrismSealed("", a)
+      | data class PrismSealed2(private val b: String?) : PrismSealed("", b)
+      | companion object
+      |}
+      |
+      """.compilationSucceeds()
+  }
+
+  @Test
   fun `DSL works with variance, issue #3057`() {
     """
       |$`package`
@@ -173,6 +195,4 @@ class DSLTests {
       |}
       """.compilationSucceeds()
   }
-
-  // Db.content.at(At.map(), One).set(db, None)
 }
