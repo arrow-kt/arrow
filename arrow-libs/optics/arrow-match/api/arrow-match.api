@@ -1,0 +1,41 @@
+public final class arrow/match/BuildersKt {
+	public static final fun getNotEmpty (Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun self ()Lkotlin/reflect/KProperty1;
+	public static final fun suchThat (Lkotlin/reflect/KProperty1;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlin/reflect/KProperty1;
+	public static synthetic fun suchThat$default (Lkotlin/reflect/KProperty1;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/reflect/KProperty1;
+}
+
+public final class arrow/match/DoesNotMatch : java/lang/Throwable {
+	public static final field INSTANCE Larrow/match/DoesNotMatch;
+}
+
+public final class arrow/match/MatchKt {
+	public static final fun matchOrElse (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun matchOrRaise (Larrow/core/raise/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun matchOrRaise (Larrow/core/raise/SingletonRaise;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun matchOrThrow (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun matchOrThrow$default (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun matchUnit (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/match/MatchNotFound : java/lang/Throwable {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun getValue ()Ljava/lang/Object;
+}
+
+public abstract class arrow/match/MatchScope {
+	public fun <init> ()V
+	public abstract fun default (Lkotlin/jvm/functions/Function0;)V
+	public final fun getIt ()Lkotlin/reflect/KProperty1;
+	public abstract fun then (Lkotlin/reflect/KProperty1;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/match/MatcherKt {
+	public static final fun Matcher (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlin/reflect/KProperty1;
+}
+
