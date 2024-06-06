@@ -1,5 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
+
 repositories {
   google()
   mavenCentral()
@@ -32,6 +35,7 @@ kotlin {
     browser()
     nodejs()
   }
+  @OptIn(ExperimentalWasmDsl::class) wasmJs()
   androidTarget()
   // Native: https://kotlinlang.org/docs/native-target-support.html
   // -- Tier 1 --
