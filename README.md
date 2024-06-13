@@ -1,6 +1,6 @@
 <a href="https://arrow-kt.io" title="Arrow website"><img src="https://arrow-kt.io/img/arrow-brand.svg" width="200" alt=""></a>
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://central.sonatype.com/search?q=g:io.arrow-kt)
 [![Kotlin version](https://img.shields.io/badge/Kotlin-1.8.10-blue)](https://kotlinlang.org/docs/whatsnew18.html)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
