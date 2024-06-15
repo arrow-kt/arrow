@@ -14,15 +14,31 @@ public annotation class DelicateOptic
 /**
  * Focuses on the value only if the [predicate] is true.
  *
- * Warning: any modification to the value this optic is
- * applied to should keep the status of the [predicate].
+ * Warning: when using [modify], the transformation should
+ * not alter whether the predicate holds on the value.
+ *
+ * Otherwise, this optic does not satisfy the rule that
+ * applying two modifications in a row is equivalent to
+ * applying those two modifications at once.
+ *
+ * ```
+ * val p = Optional.filter<Int> { it % 2 == 0 }  // focus on even numbers
+ * val n = 2  // an even number
+ *
+ * p.modify(p.modify(n) { it + 1 }) { it + 1 }
+ * //       ---------------------- = 3
+ * // ---------------------------------------- = null
+ *
+ * p.modify(n) { it + 2 }
+ * // ------------------- = 4
+ * ```
  */
 @DelicateOptic
-public fun <S> PPrism.Companion.filter(
+public fun <S> POptional.Companion.filter(
   predicate: (S) -> Boolean
-): Prism<S, S> = Prism(
+): Optional<S, S> = Optional(
   getOption = { if (predicate(it)) Some(it) else None },
-  reverseGet = { it },
+  set = { s, x -> if (predicate(s)) x else s }
 )
 
 /**

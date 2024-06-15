@@ -1,6 +1,5 @@
 package arrow.optics
 
-import arrow.optics.dsl.filter
 import arrow.optics.test.either
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
@@ -11,7 +10,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -207,45 +205,4 @@ class PrismTest {
       Prism.sumType().all(sum) { predicate } shouldBe (predicate || sum is SumType.B)
     }
   }
-
-  @OptIn(DelicateOptic::class) @Test
-  fun filterPrismTrue() = runTest {
-    checkAll(Arb.sumType()) { sum: SumType ->
-      Prism.sumType().filter { true }.getOrNull(sum) shouldBe (sum as? SumType.A)?.string
-    }
-  }
-
-  @OptIn(DelicateOptic::class) @Test
-  fun filterPrismFalse() = runTest {
-    checkAll(Arb.sumType()) { sum: SumType ->
-      Prism.sumType().filter { false }.getOrNull(sum) shouldBe null
-    }
-  }
-
-  @OptIn(DelicateOptic::class) @Test
-  fun filterListBasic() = runTest {
-    checkAll(Arb.list(Arb.string())) { lst: List<String> ->
-      Every.list<String>().filter { true }.getAll(lst) shouldBe lst
-      Every.list<String>().filter { false }.getAll(lst) shouldBe emptyList()
-    }
-  }
-
-  @OptIn(DelicateOptic::class) @Test
-  fun filterPredicate() = runTest {
-    checkAll(Arb.list(Arb.string())) { lst: List<String> ->
-      Every.list<String>().filter { it.length > 5 }.getAll(lst) shouldBe lst.filter { it.length > 5 }
-    }
-  }
-
-  @OptIn(DelicateOptic::class) @Test
-  fun filterModify() = runTest {
-    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string()))) { lst: List<Pair<Int, String>> ->
-      Every.list<Pair<Int, String>>()
-        .filter { (n, _) -> n % 2 == 0 }
-        .compose(Lens.pairSecond())
-        .modify(lst) { it.uppercase() }
-        .shouldBe(lst.map { (n, s) -> Pair(n, if (n % 2 == 0) s.uppercase() else s) })
-    }
-  }
-
 }

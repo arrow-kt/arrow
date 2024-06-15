@@ -13,7 +13,7 @@ public final class arrow/optics/CopyKt {
 }
 
 public final class arrow/optics/DelicateKt {
-	public static final fun filter (Larrow/optics/PPrism$Companion;Lkotlin/jvm/functions/Function1;)Larrow/optics/PPrism;
+	public static final fun filter (Larrow/optics/POptional$Companion;Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
 	public static final fun fromLenses (Larrow/optics/PTraversal$Companion;Larrow/optics/PLens;[Larrow/optics/PLens;)Larrow/optics/PTraversal;
 }
 
@@ -531,7 +531,6 @@ public final class arrow/optics/dsl/OptionKt {
 
 public final class arrow/optics/dsl/UnsafeKt {
 	public static final fun filter (Larrow/optics/POptional;Lkotlin/jvm/functions/Function1;)Larrow/optics/POptional;
-	public static final fun filter (Larrow/optics/PPrism;Lkotlin/jvm/functions/Function1;)Larrow/optics/PPrism;
 	public static final fun filter (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)Larrow/optics/PTraversal;
 }
 
