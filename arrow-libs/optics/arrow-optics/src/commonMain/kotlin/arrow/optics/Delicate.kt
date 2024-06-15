@@ -14,8 +14,10 @@ public annotation class DelicateOptic
 /**
  * Focuses on the value only if the [predicate] is true.
  *
- * Warning: when using [modify], the transformation should
- * not alter whether the predicate holds on the value.
+ * ⚠️ The optic is perfectly OK when used to get values using
+ * `getOrNull` or `getAll`. However, when using `modify`,
+ * the transformation should not alter whether the predicate
+ * holds on the value.
  *
  * Otherwise, this optic does not satisfy the rule that
  * applying two modifications in a row is equivalent to
