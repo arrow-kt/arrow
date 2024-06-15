@@ -1,3 +1,5 @@
+@file:JvmName("ComposeFlowKt")
+
 package arrow.optics
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -5,6 +7,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.jvm.JvmName
 
 /**
  * Exposes the values of [this] through the optic.
