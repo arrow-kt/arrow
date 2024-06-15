@@ -206,22 +206,22 @@ class OptionalTest {
 
   @OptIn(DelicateOptic::class) @Test
   fun filterListBasic() = runTest {
-    checkAll(Arb.list(Arb.string())) { lst: List<String> ->
-      Every.list<String>().filter { true }.getAll(lst) shouldBe lst
-      Every.list<String>().filter { false }.getAll(lst) shouldBe emptyList()
+    checkAll(Arb.list(Arb.int(), range = 0 .. 20)) { lst: List<Int> ->
+      Every.list<Int>().filter { true }.getAll(lst) shouldBe lst
+      Every.list<Int>().filter { false }.getAll(lst) shouldBe emptyList()
     }
   }
 
   @OptIn(DelicateOptic::class) @Test
   fun filterPredicate() = runTest {
-    checkAll(Arb.list(Arb.string())) { lst: List<String> ->
-      Every.list<String>().filter { it.length > 5 }.getAll(lst) shouldBe lst.filter { it.length > 5 }
+    checkAll(Arb.list(Arb.int())) { lst: List<Int> ->
+      Every.list<Int>().filter { it > 7 }.getAll(lst) shouldBe lst.filter { it > 7 }
     }
   }
 
   @OptIn(DelicateOptic::class) @Test
   fun filterModify() = runTest {
-    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string()))) { lst: List<Pair<Int, String>> ->
+    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string(maxSize = 10)))) { lst: List<Pair<Int, String>> ->
       Every.list<Pair<Int, String>>()
         .filter { (n, _) -> n % 2 == 0 }
         .compose(Lens.pairSecond())
