@@ -13,15 +13,21 @@ public annotation class DelicateOptic
 
 /**
  * Focuses on the value only if the [predicate] is true.
+ * This optics The optic is perfectly OK when used to get
+ * values using `getOrNull` or `getAll`; but requires
+ * some caution using `modify` with it.
  *
- * ⚠️ The optic is perfectly OK when used to get values using
- * `getOrNull` or `getAll`. However, when using `modify`,
- * the transformation should not alter whether the predicate
- * holds on the value.
+ * ⚠️ Warning: when using `modify` with this optic,
+ * the transformation should not alter the values that are
+ * taken into account by the predicate. For example, it is
+ * fine to `filter` by `name` and then increase the `age`,
+ * but not to `filter` by `name` and then capitalize the `name`.
  *
- * Otherwise, this optic does not satisfy the rule that
+ * In general terms, this optic does not satisfy the rule that
  * applying two modifications in a row is equivalent to
- * applying those two modifications at once.
+ * applying those two modifications at once. The following
+ * example shows that increasing by one twice is not equivalent
+ * to increasing by two.
  *
  * ```
  * val p = Optional.filter<Int> { it % 2 == 0 }  // focus on even numbers
@@ -34,6 +40,11 @@ public annotation class DelicateOptic
  * p.modify(n) { it + 2 }
  * // ------------------- = 4
  * ```
+ *
+ * The reader interested in a (deep) discussion about why
+ * this rule is important may consult the blog post
+ * [_Finding (correct) lens laws_](https://oleg.fi/gists/posts/2018-12-12-find-correct-laws.html)
+ * by Oleg Genrus.
  */
 @DelicateOptic
 public fun <S> POptional.Companion.filter(
