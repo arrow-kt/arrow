@@ -1,9 +1,12 @@
+@file:JvmName("ComposeCopyKt")
+
 package arrow.optics
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.jvm.JvmName
 
 /**
  * Modifies the value in this [MutableState]
