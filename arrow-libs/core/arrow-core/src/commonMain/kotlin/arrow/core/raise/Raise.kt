@@ -660,6 +660,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
 ): A {
   contract {
     callsInPlace(transform, AT_MOST_ONCE)
+    callsInPlace(block, AT_MOST_ONCE)
   }
   return recover(block) { raise(transform(it)) }
 }
