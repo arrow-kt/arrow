@@ -1,0 +1,53 @@
+public abstract interface class arrow/AutoCloseScope {
+	public abstract fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun autoClose (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+}
+
+public final class arrow/AutoCloseScope$DefaultImpls {
+	public static fun autoClose (Larrow/AutoCloseScope;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun install (Larrow/AutoCloseScope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+}
+
+public final class arrow/AutoCloseScopeKt {
+	public static final fun autoCloseScope (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class arrow/AutoCloseableExtensionsKt {
+	public static final fun install (Larrow/AutoCloseScope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+}
+
+public final class arrow/CoroutineScopeKt {
+	public static final fun coroutineScope (Larrow/Scope;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope {
+	public fun <init> ()V
+	public fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun autoClose (Lkotlin/jvm/functions/Function1;)V
+	public final fun close (Ljava/lang/Throwable;)Ljava/lang/Void;
+	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+}
+
+public final class arrow/SagaKt {
+	public static final fun saga (Larrow/Scope;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/Scope : arrow/AutoCloseScope {
+	public abstract fun autoClose (Lkotlin/jvm/functions/Function1;)V
+	public abstract fun finalise (Lkotlin/jvm/functions/Function2;)V
+}
+
+public final class arrow/Scope$DefaultImpls {
+	public static fun autoClose (Larrow/Scope;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun install (Larrow/Scope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+}
+
+public final class arrow/ScopeKt {
+	public static final fun scoped (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/ThrowIfFatalKt {
+	public static final fun throwIfFatal (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+}
+

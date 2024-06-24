@@ -513,6 +513,9 @@ private value class ResourceScopeImpl(
       }
     })
 
+  override fun autoClose(close: (Throwable?) -> Unit) =
+    autoClose({ }) { _, e -> close(e) }
+
   override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
     acquire().also { a ->
       val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
