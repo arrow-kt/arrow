@@ -6,22 +6,27 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-annotations>
+open annotation class arrow.optics/optics : kotlin/Annotation { // arrow.optics/optics|null[0]
+    constructor <init>(kotlin/Array<arrow.optics/OpticsTarget> = ...) // arrow.optics/optics.<init>|<init>(kotlin.Array<arrow.optics.OpticsTarget>){}[0]
+
+    final val targets // arrow.optics/optics.targets|{}targets[0]
+        final fun <get-targets>(): kotlin/Array<arrow.optics/OpticsTarget> // arrow.optics/optics.targets.<get-targets>|<get-targets>(){}[0]
+}
+
+open annotation class arrow/synthetic : kotlin/Annotation { // arrow/synthetic|null[0]
+    constructor <init>() // arrow/synthetic.<init>|<init>(){}[0]
+}
+
 final enum class arrow.optics/OpticsTarget : kotlin/Enum<arrow.optics/OpticsTarget> { // arrow.optics/OpticsTarget|null[0]
     enum entry DSL // arrow.optics/OpticsTarget.DSL|null[0]
     enum entry ISO // arrow.optics/OpticsTarget.ISO|null[0]
     enum entry LENS // arrow.optics/OpticsTarget.LENS|null[0]
     enum entry OPTIONAL // arrow.optics/OpticsTarget.OPTIONAL|null[0]
     enum entry PRISM // arrow.optics/OpticsTarget.PRISM|null[0]
-    final fun valueOf(kotlin/String): arrow.optics/OpticsTarget // arrow.optics/OpticsTarget.valueOf|valueOf#static(kotlin.String){}[0]
-    final fun values(): kotlin/Array<arrow.optics/OpticsTarget> // arrow.optics/OpticsTarget.values|values#static(){}[0]
+
     final val entries // arrow.optics/OpticsTarget.entries|#static{}entries[0]
         final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.optics/OpticsTarget> // arrow.optics/OpticsTarget.entries.<get-entries>|<get-entries>#static(){}[0]
-}
-open annotation class arrow.optics/optics : kotlin/Annotation { // arrow.optics/optics|null[0]
-    constructor <init>(kotlin/Array<arrow.optics/OpticsTarget> = ...) // arrow.optics/optics.<init>|<init>(kotlin.Array<arrow.optics.OpticsTarget>){}[0]
-    final val targets // arrow.optics/optics.targets|{}targets[0]
-        final fun <get-targets>(): kotlin/Array<arrow.optics/OpticsTarget> // arrow.optics/optics.targets.<get-targets>|<get-targets>(){}[0]
-}
-open annotation class arrow/synthetic : kotlin/Annotation { // arrow/synthetic|null[0]
-    constructor <init>() // arrow/synthetic.<init>|<init>(){}[0]
+
+    final fun valueOf(kotlin/String): arrow.optics/OpticsTarget // arrow.optics/OpticsTarget.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<arrow.optics/OpticsTarget> // arrow.optics/OpticsTarget.values|values#static(){}[0]
 }
