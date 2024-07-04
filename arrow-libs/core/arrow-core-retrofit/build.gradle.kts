@@ -1,5 +1,9 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
+
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   alias(libs.plugins.arrowGradleConfig.kotlin)
@@ -34,6 +38,13 @@ dependencies {
   testImplementation(libs.kotlinx.serializationJson)
   testImplementation(libs.squareup.retrofit.converter.kotlinxSerialization)
   testImplementation(libs.squareup.moshi.kotlin)
+}
+
+kotlin {
+  compilerOptions {
+    (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
+    (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
+  }
 }
 
 tasks.jar {
