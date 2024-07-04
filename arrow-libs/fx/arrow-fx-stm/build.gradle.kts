@@ -2,7 +2,6 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
@@ -23,7 +22,10 @@ apply(from = property("ANIMALSNIFFER_MPP"))
 
 kotlin {
   @OptIn(ExperimentalKotlinGradlePluginApi::class)
-  compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+  compilerOptions {
+    freeCompilerArgs.add("-Xexpect-actual-classes")
+    freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
+  }
 
   sourceSets {
     commonMain {
