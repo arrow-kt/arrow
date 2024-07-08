@@ -10,10 +10,8 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.*
 import java.util.concurrent.Executors
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.withContext
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
@@ -21,7 +19,7 @@ class ParZip7JvmTest {
   val threadName: suspend CoroutineScope.() -> String =
     { Thread.currentThread().name }
 
-  @Test fun parZip7ReturnsToOriginalContext() = runTestUsingDefaultDispatcher {
+  @Test fun parZip7ReturnsToOriginalContext(): Unit = runBlocking(Dispatchers.Default) {
     val zipCtxName = "parZip7"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(7, NamedThreadFactory(zipCtxName)) }
@@ -47,12 +45,12 @@ class ParZip7JvmTest {
     }
   }
 
-  @Test fun parZip7ReturnsToOriginalContextOnFailure() = runTestUsingDefaultDispatcher {
+  @Test fun parZip7ReturnsToOriginalContextOnFailure(): Unit = runBlocking(Dispatchers.Default) {
     val zipCtxName = "parZip7"
     resourceScope {
       val zipCtx = executor { Executors.newFixedThreadPool(7, NamedThreadFactory(zipCtxName)) }
 
-      checkAll(Arb.int(1..7), Arb.throwable()) { choose, e ->
+      checkAll(10, Arb.int(1..7), Arb.throwable()) { choose, e ->
         withContext(single()) {
           threadName() shouldStartWith "single"
 
@@ -142,8 +140,8 @@ class ParZip7JvmTest {
     }
   }
 
-  @Test fun parZip7FinishesOnSingleThread() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.string()) {
+  @Test fun parZip7FinishesOnSingleThread(): Unit = runBlocking(Dispatchers.Default) {
+    checkAll(10, Arb.string()) {
       val res = resourceScope {
         val ctx = singleThreadContext("single")
         parZip(

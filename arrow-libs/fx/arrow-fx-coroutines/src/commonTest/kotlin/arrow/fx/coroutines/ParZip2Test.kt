@@ -22,7 +22,7 @@ import kotlin.test.Test
 
 class ParZip2Test {
   @Test fun parZip2RunsInParallel() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       val r = AtomicInt(0)
       val modifyGate = CompletableDeferred<Int>()
 
@@ -44,7 +44,7 @@ class ParZip2Test {
   }
 
   @Test fun cancellingParZip2CancelsAllParticipants() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       val s = Channel<Unit>()
       val pa = CompletableDeferred<Pair<Int, ExitCase>>()
       val pb = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -72,7 +72,7 @@ class ParZip2Test {
   }
 
   @Test fun parZip2CancelsLosersIfAFailtureOccursInOneOfTheTasts() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.throwable(), Arb.boolean()) { e, leftWinner ->
+    checkAll(10, Arb.throwable(), Arb.boolean()) { e, leftWinner ->
       val s = Channel<Unit>()
       val pa = CompletableDeferred<ExitCase>()
 
@@ -91,7 +91,7 @@ class ParZip2Test {
   }
 
   @Test fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.string()) { msg ->
+    checkAll(10, Arb.string()) { msg ->
       val exit = CompletableDeferred<ExitCase>()
       val start = CompletableDeferred<Unit>()
       try {

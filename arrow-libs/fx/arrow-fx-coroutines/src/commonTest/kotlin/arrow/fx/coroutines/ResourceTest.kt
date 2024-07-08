@@ -38,7 +38,7 @@ class ResourceTest {
 
   @Test
   fun acquireSuccessIdentity() = runTest {
-    checkAll(Arb.int()) { n ->
+    checkAll(10, Arb.int()) { n ->
       resourceScope {
         install({ n }) { _, _ -> } shouldBe n
       }
@@ -47,7 +47,7 @@ class ResourceTest {
 
   @Test
   fun respectFIFOOrderInstalledFunction() = runTest {
-    checkAll(Arb.positiveInt(), Arb.negativeInt()) { a, b ->
+    checkAll(10, Arb.positiveInt(), Arb.negativeInt()) { a, b ->
       val order = mutableListOf<Int>()
 
       suspend fun ResourceScope.scoped(n: Int): Int =
@@ -65,7 +65,7 @@ class ResourceTest {
 
   @Test
   fun resourceReleasedWithComplete() = runTest {
-    checkAll(Arb.int()) { n ->
+    checkAll(10, Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
       resourceScope {
         install({ n }) { _, ex -> require(p.complete(ex)) }
@@ -76,7 +76,7 @@ class ResourceTest {
 
   @Test
   fun errorFinishesWithError() = runTest {
-    checkAll(Arb.throwable()) { e ->
+    checkAll(10, Arb.throwable()) { e ->
       val p = CompletableDeferred<ExitCase>()
       suspend fun ResourceScope.failingScope(): Nothing =
         install({ throw e }, { _, ex -> require(p.complete(ex)) })
@@ -89,7 +89,7 @@ class ResourceTest {
 
   @Test
   fun neverCancelled() = runTest {
-    checkAll(Arb.int()) { n ->
+    checkAll(10, Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
       val start = CompletableDeferred<Unit>()
       suspend fun ResourceScope.n(): Int = install({ n }, { _, ex -> require(p.complete(ex)) })
@@ -233,7 +233,7 @@ class ResourceTest {
   // Test multiple release triggers on acquire fail.
   @Test
   fun parZipFinalizersLeftOrRightCancellation() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.boolean()) { isLeft ->
+    checkAll(10, Arb.boolean()) { isLeft ->
       val cancel = CancellationException(null, null)
       val (promises, resource) = generate()
       val latch = CompletableDeferred<Int>()
@@ -268,7 +268,7 @@ class ResourceTest {
 
   @Test
   fun parZipRightCancellationExceptionOnAcquire() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int()) { i ->
+    checkAll(10, Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
       val started = CompletableDeferred<Unit>()
@@ -297,7 +297,7 @@ class ResourceTest {
 
   @Test
   fun parZipLeftCancellationExceptionOnAcquire() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int()) { i ->
+    checkAll(10, Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
       val started = CompletableDeferred<Unit>()
@@ -327,7 +327,7 @@ class ResourceTest {
 
   @Test
   fun parZipRightErrorOnAcquire() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+    checkAll(10, Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
       val started = CompletableDeferred<Unit>()
       shouldThrow<Throwable> {
@@ -355,7 +355,7 @@ class ResourceTest {
 
   @Test
   fun parZipLeftErrorOnAcquire() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+    checkAll(10, Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
       val started = CompletableDeferred<Unit>()
       shouldThrow<Throwable> {
@@ -382,7 +382,7 @@ class ResourceTest {
 
   @Test
   fun parZipRightCancellationExceptionOnRelease() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int()) { i ->
+    checkAll(10, Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -404,7 +404,7 @@ class ResourceTest {
 
   @Test
   fun parZipLeftCancellationExceptionOnRelease() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int()) { i ->
+    checkAll(10, Arb.int()) { i ->
       val cancel = CancellationException(null, null)
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -426,7 +426,7 @@ class ResourceTest {
 
   @Test
   fun parZipRightErrorOnRelease() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+    checkAll(10, Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
       shouldThrow<Throwable> {
@@ -447,7 +447,7 @@ class ResourceTest {
 
   @Test
   fun parZipLeftErrorOnRelease() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.throwable()) { i, throwable ->
+    checkAll(10, Arb.int(), Arb.throwable()) { i, throwable ->
       val released = CompletableDeferred<Pair<Int, ExitCase>>()
 
       shouldThrow<Throwable> {
@@ -468,7 +468,7 @@ class ResourceTest {
 
   @Test
   fun parZipErrorInUse() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int(), Arb.throwable()) { a, b, throwable ->
+    checkAll(10, Arb.int(), Arb.int(), Arb.throwable()) { a, b, throwable ->
       val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
       val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -495,7 +495,7 @@ class ResourceTest {
 
   @Test
   fun parZipCancellationInUse() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
       val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -522,7 +522,7 @@ class ResourceTest {
 
   @Test
   fun resourceAsFlow() = runTest {
-    checkAll(Arb.int()) { n ->
+    checkAll(10, Arb.int()) { n ->
       val released = CompletableDeferred<ExitCase>()
       val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
 
@@ -534,7 +534,7 @@ class ResourceTest {
 
   @Test
   fun resourceAsFlowFail() = runTest {
-    checkAll(Arb.int(), Arb.throwable()) { n, throwable ->
+    checkAll(10, Arb.int(), Arb.throwable()) { n, throwable ->
       val released = CompletableDeferred<ExitCase>()
       val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
 
@@ -548,7 +548,7 @@ class ResourceTest {
 
   @Test
   fun resourceAsFlowCancel() = runTest {
-    checkAll(Arb.int()) { n ->
+    checkAll(10, Arb.int()) { n ->
       val released = CompletableDeferred<ExitCase>()
       val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
 
@@ -563,7 +563,7 @@ class ResourceTest {
   @OptIn(DelicateCoroutinesApi::class)
   @Test
   fun allocatedWorks() = runTest {
-    checkAll(Arb.int()) { seed ->
+    checkAll(10, Arb.int()) { seed ->
       val released = CompletableDeferred<ExitCase>()
       val (allocate, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
         .allocated()

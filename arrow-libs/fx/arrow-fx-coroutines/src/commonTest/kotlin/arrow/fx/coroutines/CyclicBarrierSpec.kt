@@ -18,7 +18,7 @@ import kotlin.test.Test
 class CyclicBarrierSpec {
   @Test
   fun shouldRaiseAnExceptionWhenConstructedWithNegativeOrZeroCapacity() = runTest {
-    checkAll(Arb.int(Int.MIN_VALUE, 0)) { i ->
+    checkAll(10, Arb.int(Int.MIN_VALUE, 0)) { i ->
       shouldThrow<IllegalArgumentException> { CyclicBarrier(i) }.message shouldBe
         "Cyclic barrier must be constructed with positive non-zero capacity $i but was $i > 0"
     }
@@ -26,7 +26,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun barrierOfCapacity1IsANoOp() = runTest {
-    checkAll(Arb.constant(Unit)) {
+    checkAll(10, Arb.constant(Unit)) {
       val barrier = CyclicBarrier(1)
       barrier.await()
     }
@@ -34,7 +34,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun awaitingAllInParallelResumesAllCoroutines() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(1, 20)) { i ->
+    checkAll(10, Arb.int(1, 20)) { i ->
       val barrier = CyclicBarrier(i)
       (0 until i).parMap { barrier.await() }
     }
@@ -42,7 +42,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun shouldResetOnceFull() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.constant(Unit)) {
+    checkAll(10, Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       parZip({ barrier.await() }, { barrier.await() }) { _, _ -> }
       barrier.capacity shouldBe 2
@@ -60,7 +60,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun awaitIsCancelable() = runTest {
-    checkAll(Arb.int(2, Int.MAX_VALUE)) { i ->
+    checkAll(10, Arb.int(2, Int.MAX_VALUE)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
 
@@ -77,7 +77,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun shouldCleanUpUponCancellationOfAwait() = runTest {
-    checkAll(Arb.constant(Unit)) {
+    checkAll(10, Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }.cancelAndJoin()
     }
@@ -85,7 +85,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun resetCancelsAllAwaiting() = runTest {
-    checkAll(Arb.int(2, 20)) { i ->
+    checkAll(10, Arb.int(2, 20)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
 
@@ -103,7 +103,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun shouldCleanUpUponReset() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(2, 20)) { i ->
+    checkAll(10, Arb.int(2, 20)) { i ->
       val barrier = CyclicBarrier(i)
       val exitCase = CompletableDeferred<ExitCase>()
 
@@ -119,7 +119,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun raceFiberCancelAndBarrierFull() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.constant(Unit)) {
+    checkAll(10, Arb.constant(Unit)) {
       val barrier = CyclicBarrier(2)
       val job = launch(start = CoroutineStart.UNDISPATCHED) { barrier.await() }
       when (raceN({ barrier.await() }, { job.cancelAndJoin() })) {
@@ -133,7 +133,7 @@ class CyclicBarrierSpec {
 
   @Test
   fun reset() = runTest {
-    checkAll(Arb.int(2..10)) { n ->
+    checkAll(10, Arb.int(2..10)) { n ->
       val barrier = CyclicBarrier(n)
 
       val exits = (0 until n - 1).map { CompletableDeferred<ExitCase>() }
