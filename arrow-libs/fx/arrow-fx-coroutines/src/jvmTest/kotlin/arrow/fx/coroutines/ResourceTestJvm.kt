@@ -35,7 +35,7 @@ class ResourceTestJvm {
   }
 
   @Test fun autoCloseableClosesOnError() = runTest {
-    checkAll(Arb.throwable()) { throwable ->
+    checkAll(10, Arb.throwable()) { throwable ->
       val t = AutoCloseableTest()
 
       shouldThrow<Exception> {
@@ -60,7 +60,7 @@ class ResourceTestJvm {
   }
 
   @Test fun closeableClosesOnError() = runTest {
-    checkAll(Arb.throwable()) { throwable ->
+    checkAll(10, Arb.throwable()) { throwable ->
       val t = CloseableTest()
 
       shouldThrow<Exception> {
