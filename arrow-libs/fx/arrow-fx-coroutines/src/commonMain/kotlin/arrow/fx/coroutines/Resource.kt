@@ -299,7 +299,7 @@ public interface ResourceScope : AutoCloseScope {
   public suspend fun <A> Resource<A>.bind(): A
   /**
    * Install [A] into the [ResourceScope].
-   * It's [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
+   * Its [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
    * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
    */
   @ResourceDSL
