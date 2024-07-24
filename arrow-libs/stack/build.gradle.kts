@@ -28,5 +28,6 @@ dependencies {
     api("io.arrow-kt:arrow-optics-compose:$version")
     api("io.arrow-kt:arrow-optics-reflect:$version")
     api("io.arrow-kt:arrow-optics-ksp-plugin:$version")
+    api("io.arrow-kt:arrow-match:$version")
   }
 }
