@@ -7,8 +7,6 @@
 
 // Library unique name: <io.arrow-kt:arrow-eval>
 sealed class <#A: out kotlin/Any?> arrow.eval/Eval { // arrow.eval/Eval|null[0]
-    constructor <init>() // arrow.eval/Eval.<init>|<init>(){}[0]
-
     abstract fun memoize(): arrow.eval/Eval<#A> // arrow.eval/Eval.memoize|memoize(){}[0]
     abstract fun value(): #A // arrow.eval/Eval.value|value(){}[0]
     final fun <#A1: kotlin/Any?> flatMap(kotlin/Function1<#A, arrow.eval/Eval<#A1>>): arrow.eval/Eval<#A1> // arrow.eval/Eval.flatMap|flatMap(kotlin.Function1<1:0,arrow.eval.Eval<0:0>>){0§<kotlin.Any?>}[0]

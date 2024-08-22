@@ -49,8 +49,6 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
     }
 
     sealed class OpeningStrategy { // arrow.resilience/CircuitBreaker.OpeningStrategy|null[0]
-        constructor <init>() // arrow.resilience/CircuitBreaker.OpeningStrategy.<init>|<init>(){}[0]
-
         final class Count : arrow.resilience/CircuitBreaker.OpeningStrategy { // arrow.resilience/CircuitBreaker.OpeningStrategy.Count|null[0]
             constructor <init>(kotlin/Int, kotlin/Int = ...) // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.<init>|<init>(kotlin.Int;kotlin.Int){}[0]
 
@@ -99,8 +97,6 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
     }
 
     sealed class State { // arrow.resilience/CircuitBreaker.State|null[0]
-        constructor <init>() // arrow.resilience/CircuitBreaker.State.<init>|<init>(){}[0]
-
         abstract val openingStrategy // arrow.resilience/CircuitBreaker.State.openingStrategy|{}openingStrategy[0]
             abstract fun <get-openingStrategy>(): arrow.resilience/CircuitBreaker.OpeningStrategy // arrow.resilience/CircuitBreaker.State.openingStrategy.<get-openingStrategy>|<get-openingStrategy>(){}[0]
 
