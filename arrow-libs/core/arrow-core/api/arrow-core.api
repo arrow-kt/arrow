@@ -490,7 +490,10 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun min-GZgkXh4 (Ljava/util/List;)Ljava/lang/Comparable;
 	public static final fun minBy-ZALtuoE (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun nel (Ljava/lang/Object;)Ljava/util/List;
+	public static final fun nelOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/List;
 	public static final fun nonEmptyListOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/List;
+	public static final fun toNelOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
+	public static final fun toNelOrNull (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun toNonEmptyListOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun toNonEmptyListOrNull (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun unzip-GZgkXh4 (Ljava/util/List;)Lkotlin/Pair;
