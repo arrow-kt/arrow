@@ -340,6 +340,9 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
 public fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
   NonEmptyList(listOf(head) + t)
 
+public fun <A> nelOf(head: A, vararg t: A): NonEmptyList<A> =
+  nonEmptyListOf(head, *t)
+
 @JvmName("nel")
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <A> A.nel(): NonEmptyList<A> =
@@ -391,6 +394,12 @@ public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? {
   return NonEmptyList(iter.next(), Iterable { iter }.toList())
 }
 
+public fun <A> Iterable<A>.toNelOrNull(): NonEmptyList<A>? =
+  toNonEmptyListOrNull()
+
 @JvmName("toNonEmptyListOrNone")
 public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
   toNonEmptyListOrNull().toOption()
+
+public fun <A> Iterable<A>.toNelOrNone(): Option<NonEmptyList<A>> =
+  toNonEmptyListOrNone()
