@@ -68,7 +68,6 @@ abstract interface arrow.fx.stm/STM { // arrow.fx.stm/STM|null[0]
 }
 
 final class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.fx.stm/TMap { // arrow.fx.stm/TMap|null[0]
-    final fun copy(arrow.fx.stm.internal/Hamt<kotlin/Pair<#A, #B>> = ..., kotlin/Function1<#A, kotlin/Int> = ...): arrow.fx.stm/TMap<#A, #B> // arrow.fx.stm/TMap.copy|copy(arrow.fx.stm.internal.Hamt<kotlin.Pair<1:0,1:1>>;kotlin.Function1<1:0,kotlin.Int>){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TMap.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TMap.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // arrow.fx.stm/TMap.toString|toString(){}[0]
@@ -80,7 +79,6 @@ final class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.fx.stm/TMap { // arrow.fx.s
 }
 
 final class <#A: kotlin/Any?> arrow.fx.stm/TArray { // arrow.fx.stm/TArray|null[0]
-    final fun copy(kotlin/Array<arrow.fx.stm/TVar<#A>> = ...): arrow.fx.stm/TArray<#A> // arrow.fx.stm/TArray.copy|copy(kotlin.Array<arrow.fx.stm.TVar<1:0>>){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TArray.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TArray.hashCode|hashCode(){}[0]
     final fun size(): kotlin/Int // arrow.fx.stm/TArray.size|size(){}[0]
@@ -95,7 +93,6 @@ final class <#A: kotlin/Any?> arrow.fx.stm/TArray { // arrow.fx.stm/TArray|null[
 }
 
 final class <#A: kotlin/Any?> arrow.fx.stm/TMVar { // arrow.fx.stm/TMVar|null[0]
-    final fun copy(arrow.fx.stm/TVar<arrow.fx.stm/Option<#A>> = ...): arrow.fx.stm/TMVar<#A> // arrow.fx.stm/TMVar.copy|copy(arrow.fx.stm.TVar<arrow.fx.stm.Option<1:0>>){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TMVar.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TMVar.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // arrow.fx.stm/TMVar.toString|toString(){}[0]
@@ -107,7 +104,6 @@ final class <#A: kotlin/Any?> arrow.fx.stm/TMVar { // arrow.fx.stm/TMVar|null[0]
 }
 
 final class <#A: kotlin/Any?> arrow.fx.stm/TQueue { // arrow.fx.stm/TQueue|null[0]
-    final fun copy(arrow.fx.stm/TVar<arrow.fx.stm/PList<#A>> = ..., arrow.fx.stm/TVar<arrow.fx.stm/PList<#A>> = ...): arrow.fx.stm/TQueue<#A> // arrow.fx.stm/TQueue.copy|copy(arrow.fx.stm.TVar<arrow.fx.stm.PList<1:0>>;arrow.fx.stm.TVar<arrow.fx.stm.PList<1:0>>){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TQueue.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TQueue.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // arrow.fx.stm/TQueue.toString|toString(){}[0]
@@ -118,7 +114,6 @@ final class <#A: kotlin/Any?> arrow.fx.stm/TQueue { // arrow.fx.stm/TQueue|null[
 }
 
 final class <#A: kotlin/Any?> arrow.fx.stm/TSet { // arrow.fx.stm/TSet|null[0]
-    final fun copy(arrow.fx.stm.internal/Hamt<#A> = ..., kotlin/Function1<#A, kotlin/Int> = ...): arrow.fx.stm/TSet<#A> // arrow.fx.stm/TSet.copy|copy(arrow.fx.stm.internal.Hamt<1:0>;kotlin.Function1<1:0,kotlin.Int>){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TSet.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TSet.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // arrow.fx.stm/TSet.toString|toString(){}[0]
@@ -144,7 +139,6 @@ final class arrow.fx.stm.internal/BlockedIndefinitely : kotlin/Throwable { // ar
 }
 
 final class arrow.fx.stm/TSemaphore { // arrow.fx.stm/TSemaphore|null[0]
-    final fun copy(arrow.fx.stm/TVar<kotlin/Int> = ...): arrow.fx.stm/TSemaphore // arrow.fx.stm/TSemaphore.copy|copy(arrow.fx.stm.TVar<kotlin.Int>){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TSemaphore.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TSemaphore.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // arrow.fx.stm/TSemaphore.toString|toString(){}[0]

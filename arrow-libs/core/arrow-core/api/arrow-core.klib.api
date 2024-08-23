@@ -474,8 +474,6 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
 }
 
 sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.core/Either { // arrow.core/Either|null[0]
-    constructor <init>() // arrow.core/Either.<init>|<init>(){}[0]
-
     final fun getOrNone(): arrow.core/Option<#B> // arrow.core/Either.getOrNone|getOrNone(){}[0]
     final fun getOrNull(): #B? // arrow.core/Either.getOrNull|getOrNull(){}[0]
     final fun isLeft(): kotlin/Boolean // arrow.core/Either.isLeft|isLeft(){}[0]
@@ -559,8 +557,6 @@ sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.core/Either { // a
 }
 
 sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.core/Ior { // arrow.core/Ior|null[0]
-    constructor <init>() // arrow.core/Ior.<init>|<init>(){}[0]
-
     final fun getOrNull(): #B? // arrow.core/Ior.getOrNull|getOrNull(){}[0]
     final fun isBoth(): kotlin/Boolean // arrow.core/Ior.isBoth|isBoth(){}[0]
     final fun isLeft(): kotlin/Boolean // arrow.core/Ior.isLeft|isLeft(){}[0]
@@ -632,8 +628,6 @@ sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.core/Ior { // arro
 }
 
 sealed class <#A: out kotlin/Any?> arrow.core/Option { // arrow.core/Option|null[0]
-    constructor <init>() // arrow.core/Option.<init>|<init>(){}[0]
-
     final fun getOrNull(): #A? // arrow.core/Option.getOrNull|getOrNull(){}[0]
     final fun isNone(): kotlin/Boolean // arrow.core/Option.isNone|isNone(){}[0]
     final fun isSome(): kotlin/Boolean // arrow.core/Option.isSome|isSome(){}[0]
@@ -657,9 +651,7 @@ sealed class <#A: out kotlin/Any?> arrow.core/Option { // arrow.core/Option|null
     }
 }
 
-sealed class arrow.core.raise/RaiseCancellationException : kotlin.coroutines.cancellation/CancellationException { // arrow.core.raise/RaiseCancellationException|null[0]
-    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>) // arrow.core.raise/RaiseCancellationException.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]
-}
+sealed class arrow.core.raise/RaiseCancellationException : kotlin.coroutines.cancellation/CancellationException // arrow.core.raise/RaiseCancellationException|null[0]
 
 final object arrow.core/ArrowCoreInternalException : kotlin/RuntimeException // arrow.core/ArrowCoreInternalException|null[0]
 

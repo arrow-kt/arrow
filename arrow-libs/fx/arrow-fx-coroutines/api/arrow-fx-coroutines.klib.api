@@ -61,8 +61,6 @@ final class arrow.fx.coroutines/CyclicBarrierCancellationException : kotlin.coro
 }
 
 sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?, #C: out kotlin/Any?> arrow.fx.coroutines/Race3 { // arrow.fx.coroutines/Race3|null[0]
-    constructor <init>() // arrow.fx.coroutines/Race3.<init>|<init>(){}[0]
-
     final inline fun <#A1: kotlin/Any?> fold(kotlin/Function1<#A, #A1>, kotlin/Function1<#B, #A1>, kotlin/Function1<#C, #A1>): #A1 // arrow.fx.coroutines/Race3.fold|fold(kotlin.Function1<1:0,0:0>;kotlin.Function1<1:1,0:0>;kotlin.Function1<1:2,0:0>){0§<kotlin.Any?>}[0]
 
     final class <#A1: kotlin/Any?> First : arrow.fx.coroutines/Race3<#A1, kotlin/Nothing, kotlin/Nothing> { // arrow.fx.coroutines/Race3.First|null[0]
@@ -106,8 +104,6 @@ sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?, #C: out kotlin/Any?> arr
 }
 
 sealed class arrow.fx.coroutines/ExitCase { // arrow.fx.coroutines/ExitCase|null[0]
-    constructor <init>() // arrow.fx.coroutines/ExitCase.<init>|<init>(){}[0]
-
     final class Cancelled : arrow.fx.coroutines/ExitCase { // arrow.fx.coroutines/ExitCase.Cancelled|null[0]
         constructor <init>(kotlin.coroutines.cancellation/CancellationException) // arrow.fx.coroutines/ExitCase.Cancelled.<init>|<init>(kotlin.coroutines.cancellation.CancellationException){}[0]
 
