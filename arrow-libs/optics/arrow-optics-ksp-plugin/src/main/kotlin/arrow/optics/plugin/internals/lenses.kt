@@ -14,10 +14,7 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): 
 
   val setBody = { focus: Focus ->
     val setBodyCopy = """${adt.sourceName}.copy(${
-      focus.paramName.plusIfNotBlank(
-        prefix = "`",
-        postfix = "`",
-      )
+      focus.escapedParamName
     } = value)"""
     when {
       focus.subclasses.isNotEmpty() -> {
