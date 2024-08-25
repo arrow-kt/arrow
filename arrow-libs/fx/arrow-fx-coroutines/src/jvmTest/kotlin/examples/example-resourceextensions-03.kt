@@ -2,12 +2,13 @@
 package arrow.fx.coroutines.examples.exampleResourceextensions03
 
 import arrow.fx.coroutines.resourceScope
-import arrow.fx.coroutines.autoCloseable
-import java.io.FileInputStream
+import arrow.fx.coroutines.singleThreadContext
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
 
-suspend fun copyFile(src: String, dest: String): Unit =
-  resourceScope {
-    val a: FileInputStream = autoCloseable { FileInputStream(src) }
-    val b: FileInputStream = autoCloseable { FileInputStream(dest) }
-    /** read from [a] and write to [b]. **/
-  } // Both resources will be closed accordingly to their #close methods
+suspend fun main(): Unit = resourceScope {
+  val single: ExecutorCoroutineDispatcher = singleThreadContext("single")
+  withContext(single) {
+    println("I am running on ${Thread.currentThread().name}")
+  }
+}

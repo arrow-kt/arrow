@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
+internal actual val IODispatcher: CoroutineDispatcher = Dispatchers.IO
+
 /**
  * Creates a single threaded [CoroutineContext] as a [Resource].
  * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
@@ -100,36 +102,6 @@ public fun <A : Closeable> closeable(
 }
 
 /**
- * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
- *
- * ```kotlin
- * import arrow.fx.coroutines.resourceScope
- * import arrow.fx.coroutines.autoCloseable
- * import java.io.FileInputStream
- *
- * suspend fun copyFile(src: String, dest: String): Unit =
- *   resourceScope {
- *     val a: FileInputStream = autoCloseable { FileInputStream(src) }
- *     val b: FileInputStream = autoCloseable { FileInputStream(dest) }
- *     /** read from [a] and write to [b]. **/
- *   } // Both resources will be closed accordingly to their #close methods
- * ```
- * <!--- KNIT example-resourceextensions-03.kt -->
- */
-@ResourceDSL
-public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
-  closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-  autoCloseable: suspend () -> A,
-): A = install({ autoCloseable() } ) { s: A, _: ExitCase -> withContext(closingDispatcher) { s.close() } }
-
-public fun <A : AutoCloseable> autoCloseable(
-  closingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-  autoCloseable: suspend () -> A,
-): Resource<A> = resource {
-  autoCloseable(closingDispatcher, autoCloseable)
-}
-
-/**
  * Creates a single threaded [CoroutineContext] as a [Resource].
  * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
  * tasks are executed, but no new tasks will be accepted.
@@ -150,7 +122,7 @@ public fun <A : AutoCloseable> autoCloseable(
  * ```text
  * I am running on single
  * ```
- * <!--- KNIT example-resourceextensions-04.kt -->
+ * <!--- KNIT example-resourceextensions-03.kt -->
  */
 @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 @ResourceDSL
@@ -181,7 +153,7 @@ public fun singleThreadContext(name: String): Resource<ExecutorCoroutineDispatch
  * ```text
  * I am running on custom-pool-1
  * ```
- * <!--- KNIT example-resourceextensions-05.kt -->
+ * <!--- KNIT example-resourceextensions-04.kt -->
  */
 @OptIn(DelicateCoroutinesApi::class)
 @ResourceDSL

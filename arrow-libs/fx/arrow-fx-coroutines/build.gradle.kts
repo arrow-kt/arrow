@@ -33,6 +33,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowCore)
+        implementation(projects.arrowAtomic)
         implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
