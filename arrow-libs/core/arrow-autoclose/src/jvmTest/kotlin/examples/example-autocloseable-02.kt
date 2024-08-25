@@ -4,7 +4,6 @@ package arrow.autocloseable.examples.exampleAutocloseable02
 
 import arrow.AutoCloseScope
 import arrow.autoCloseScope
-import arrow.install
 
 public class Scanner(
   private val path: String,

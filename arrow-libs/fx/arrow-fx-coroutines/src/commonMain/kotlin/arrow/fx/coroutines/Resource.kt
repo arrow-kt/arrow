@@ -552,7 +552,7 @@ internal expect val IODispatcher: CoroutineDispatcher
  *     /** read from [a] and write to [b]. **/
  *   } // Both resources will be closed accordingly to their #close methods
  * ```
- * <!--- KNIT example-resourceextensions-01.kt -->
+ * <!--- KNIT example-resource-10.kt -->
  */
 @ResourceDSL
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
