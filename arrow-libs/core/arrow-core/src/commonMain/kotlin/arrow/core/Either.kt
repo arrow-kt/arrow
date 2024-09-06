@@ -1367,7 +1367,7 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
 /**
  * Combine two [Either] values.
  * If both are [Right] then combine both [B] values using [combineRight] or if both are [Left] then combine both [A] values using [combineLeft],
- * otherwise it returns the `this` or fallbacks to [other] in case `this` is [Left].
+ * otherwise return the sole [Left] value (either `this` or [other]).
  */
 public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> =
   when (val one = this) {
