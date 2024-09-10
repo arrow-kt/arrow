@@ -195,4 +195,37 @@ class DSLTests {
       |}
       """.compilationSucceeds()
   }
+
+  @Test
+  fun `Using Object as the name a class, prisms, #3474`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |@optics
+      |sealed interface Thing {
+      |  data class Object(val value: Int) : Thing
+      |  companion object
+      |}
+      |
+      |val i: Prism<Thing, Thing.Object> = Thing.`object`
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Using Object as the name a class, lenses, #3474`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |@optics
+      |data class Object(val value: Int) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<Object, Int> = Object.value
+      |val r = i != null
+      """.evals("r" to true)
+  }
 }
