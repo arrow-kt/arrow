@@ -6,11 +6,8 @@ import arrow.atomic.Atomic
 import arrow.atomic.value
 import arrow.core.identity
 import arrow.core.prependTo
-import arrow.fx.coroutines.ExitCase.Cancelled
-import arrow.fx.coroutines.ExitCase.Companion.ExitCase
-import arrow.fx.coroutines.ExitCase.Completed
-import arrow.fx.coroutines.ExitCase.Failure
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -517,9 +514,9 @@ private value class ResourceScopeImpl(
     acquire().also { a ->
       val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
         val errorOrNull = when (exitCase) {
-          Completed -> null
-          is Cancelled -> exitCase.exception
-          is Failure -> exitCase.failure
+          ExitCase.Completed -> null
+          is ExitCase.Cancelled -> exitCase.exception
+          is ExitCase.Failure -> exitCase.failure
         }
         release(a, errorOrNull)
       }
@@ -535,4 +532,37 @@ private value class ResourceScopeImpl(
       acc?.apply { addSuppressed(other) } ?: other
     } ?: acc
   }
+}
+
+/** Platform-dependent IO [CoroutineDispatcher] **/
+internal expect val IODispatcher: CoroutineDispatcher
+
+/**
+ * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.resourceScope
+ * import arrow.fx.coroutines.autoCloseable
+ * import java.io.FileInputStream
+ *
+ * suspend fun copyFile(src: String, dest: String): Unit =
+ *   resourceScope {
+ *     val a: FileInputStream = autoCloseable { FileInputStream(src) }
+ *     val b: FileInputStream = autoCloseable { FileInputStream(dest) }
+ *     /** read from [a] and write to [b]. **/
+ *   } // Both resources will be closed accordingly to their #close methods
+ * ```
+ * <!--- KNIT example-resource-10.kt -->
+ */
+@ResourceDSL
+public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
+  closingDispatcher: CoroutineDispatcher = IODispatcher,
+  autoCloseable: suspend () -> A,
+): A = install({ autoCloseable() } ) { s: A, _: ExitCase -> withContext(closingDispatcher) { s.close() } }
+
+public fun <A : AutoCloseable> autoCloseable(
+  closingDispatcher: CoroutineDispatcher = IODispatcher,
+  autoCloseable: suspend () -> A,
+): Resource<A> = resource {
+  autoCloseable(closingDispatcher, autoCloseable)
 }
