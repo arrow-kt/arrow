@@ -646,8 +646,8 @@ sealed class <#A: out kotlin/Any?> arrow.core/Option { // arrow.core/Option|null
     final object Companion { // arrow.core/Option.Companion|null[0]
         final fun <#A2: kotlin/Any?> fromNullable(#A2?): arrow.core/Option<#A2> // arrow.core/Option.Companion.fromNullable|fromNullable(0:0?){0§<kotlin.Any?>}[0]
         final fun <#A2: kotlin/Any?> invoke(#A2): arrow.core/Option<#A2> // arrow.core/Option.Companion.invoke|invoke(0:0){0§<kotlin.Any?>}[0]
-        final inline fun <#A2: kotlin/Any?> catch(kotlin/Function0<#A2>): arrow.core/Option<#A2> // arrow.core/Option.Companion.catch|catch(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
-        final inline fun <#A2: kotlin/Any?> catch(kotlin/Function1<kotlin/Throwable, arrow.core/Option<#A2>>, kotlin/Function0<#A2>): arrow.core/Option<#A2> // arrow.core/Option.Companion.catch|catch(kotlin.Function1<kotlin.Throwable,arrow.core.Option<0:0>>;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> catch(kotlin/Function1<arrow.core.raise/SingletonRaise<arrow.core/None>, #A2>): arrow.core/Option<#A2> // arrow.core/Option.Companion.catch|catch(kotlin.Function1<arrow.core.raise.SingletonRaise<arrow.core.None>,0:0>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> catch(kotlin/Function1<kotlin/Throwable, arrow.core/Option<#A2>>, kotlin/Function1<arrow.core.raise/SingletonRaise<arrow.core/None>, #A2>): arrow.core/Option<#A2> // arrow.core/Option.Companion.catch|catch(kotlin.Function1<kotlin.Throwable,arrow.core.Option<0:0>>;kotlin.Function1<arrow.core.raise.SingletonRaise<arrow.core.None>,0:0>){0§<kotlin.Any?>}[0]
     }
 }
 
