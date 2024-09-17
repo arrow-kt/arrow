@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package arrow.core
 
+import arrow.core.raise.RaiseAccumulate
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -49,6 +53,17 @@ public value class NonEmptySet<out A> private constructor(
   override fun <B> zip(other: NonEmptyCollection<B>): NonEmptyList<Pair<A, B>> =
     NonEmptyList(elements.zip(other))
 }
+
+public inline fun <E, A, B> NonEmptySet<A>.mapOrAccumulate(
+  combine: (E, E) -> E,
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
+): Either<E, NonEmptySet<B>> =
+  elements.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptySetOrNull()) }
+
+public inline fun <E, A, B> NonEmptySet<A>.mapOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
+): Either<NonEmptyList<E>, NonEmptySet<B>> =
+  elements.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptySetOrNull()) }
 
 public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
   NonEmptySet(first, rest.asIterable())
