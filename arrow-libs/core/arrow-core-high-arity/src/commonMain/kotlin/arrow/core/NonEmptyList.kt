@@ -1,4 +1,8 @@
+@file:JvmName("NonEmptyListHighArityKt")
+
 package arrow.core
+
+import kotlin.jvm.JvmName
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> NonEmptyList<A>.zip(
   t1: NonEmptyList<T1>,

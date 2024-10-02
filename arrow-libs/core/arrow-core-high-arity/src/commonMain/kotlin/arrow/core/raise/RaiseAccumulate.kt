@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 @file:JvmMultifileClass
-@file:JvmName("RaiseKt")
+@file:JvmName("RaiseHighArityKt")
 
 package arrow.core.raise
 
