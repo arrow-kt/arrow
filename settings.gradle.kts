@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "3.18"
+  id("com.gradle.develocity") version "3.18.1"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
@@ -107,6 +107,9 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
+
+include("arrow-match")
+project(":arrow-match").projectDir = file("arrow-libs/optics/arrow-match")
 
 // STACK
 include("arrow-stack")

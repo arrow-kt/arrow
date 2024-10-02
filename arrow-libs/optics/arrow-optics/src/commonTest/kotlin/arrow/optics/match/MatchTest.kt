@@ -62,13 +62,13 @@ data class Company(
 }
 
 val User.shownName: String get() = this.matchOrThrow {
-  User.person(Person.name(Name.firstName), Person.age.suchThat { it < 18 }) then { (fn, _) -> fn }
+  User.person(Person.name(Name.firstName), Person.age.takeIf { it < 18 }) then { (fn, _) -> fn }
   User.person(Person.name(Name.firstName, Name.lastName)) then { (fn, ln) -> "Sir/Madam $fn $ln" }
   User.company(Company.name, Company.director(Name.lastName)) then { (nm, d) -> "$nm, att. $d" }
 }
 
 val Person.shownNameForPerson: String get() = this.matchOrThrow {
-  it(Person.name(Name.firstName), Person.age.suchThat { it < 18 }) then { (fn, _) -> fn }
+  it(Person.name(Name.firstName), Person.age.takeIf { it < 18 }) then { (fn, _) -> fn }
   it(Person.name(Name.firstName, Name.lastName)) then { (fn, ln) -> "Sir/Madam $fn $ln" }
 }
 
