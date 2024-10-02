@@ -4,44 +4,13 @@
 
 package arrow.core.raise
 
-import arrow.core.EmptyValue
-import arrow.core.EmptyValue.unbox
 import arrow.core.NonEmptyList
-import arrow.core.toNonEmptyListOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
-
-@RaiseDSL
-public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, R> Raise<NonEmptyList<Error>>.zipOrAccumulate(
-  @BuilderInference action1: RaiseAccumulate<Error>.() -> T1,
-  @BuilderInference action2: RaiseAccumulate<Error>.() -> T2,
-  @BuilderInference action3: RaiseAccumulate<Error>.() -> T3,
-  @BuilderInference action4: RaiseAccumulate<Error>.() -> T4,
-  @BuilderInference action5: RaiseAccumulate<Error>.() -> T5,
-  @BuilderInference action6: RaiseAccumulate<Error>.() -> T6,
-  @BuilderInference action7: RaiseAccumulate<Error>.() -> T7,
-  @BuilderInference action8: RaiseAccumulate<Error>.() -> T8,
-  @BuilderInference action9: RaiseAccumulate<Error>.() -> T9,
-  block: (T1, T2, T3, T4, T5, T6, T7, T8, T9) -> R,
-): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9))
-}
 
 @RaiseDSL
 public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> Raise<NonEmptyList<Error>>.zipOrAccumulate(
@@ -58,19 +27,19 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> Raise<NonE
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    block(a, b, c, d, e, f, g, h, i, j)
+  }
 }
 
 @RaiseDSL
@@ -89,20 +58,20 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> Raise
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    block(a, b, c, d, e, f, g, h, i, j, k)
+  }
 }
 
 @RaiseDSL
@@ -122,21 +91,21 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> 
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    block(a, b, c, d, e, f, g, h, i, j, k, l)
+  }
 }
 
 @RaiseDSL
@@ -157,22 +126,22 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m)
+  }
 }
 
 @RaiseDSL
@@ -194,23 +163,23 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n)
+  }
 }
 
 @RaiseDSL
@@ -233,24 +202,24 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t15 = recover({ action15(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14), unbox(t15))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    val o by accumulating(action15)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
+  }
 }
 
 @RaiseDSL
@@ -274,25 +243,25 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t15 = recover({ action15(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t16 = recover({ action16(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14), unbox(t15), unbox(t16))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    val o by accumulating(action15)
+    val p by accumulating(action16)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
+  }
 }
 
 @RaiseDSL
@@ -317,26 +286,26 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t15 = recover({ action15(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t16 = recover({ action16(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t17 = recover({ action17(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14), unbox(t15), unbox(t16), unbox(t17))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    val o by accumulating(action15)
+    val p by accumulating(action16)
+    val q by accumulating(action17)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
+  }
 }
 
 @RaiseDSL
@@ -362,27 +331,27 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t15 = recover({ action15(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t16 = recover({ action16(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t17 = recover({ action17(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t18 = recover({ action18(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14), unbox(t15), unbox(t16), unbox(t17), unbox(t18))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    val o by accumulating(action15)
+    val p by accumulating(action16)
+    val q by accumulating(action17)
+    val r by accumulating(action18)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)
+  }
 }
 
 @RaiseDSL
@@ -409,28 +378,28 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t15 = recover({ action15(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t16 = recover({ action16(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t17 = recover({ action17(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t18 = recover({ action18(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t19 = recover({ action19(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14), unbox(t15), unbox(t16), unbox(t17), unbox(t18), unbox(t19))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    val o by accumulating(action15)
+    val p by accumulating(action16)
+    val q by accumulating(action17)
+    val r by accumulating(action18)
+    val s by accumulating(action19)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)
+  }
 }
 
 @RaiseDSL
@@ -458,28 +427,28 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) -> R,
 ): R {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val t1 = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t2 = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t3 = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t4 = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t5 = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t6 = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t7 = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t8 = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t9 = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t10 = recover({ action10(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t11 = recover({ action11(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t12 = recover({ action12(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t13 = recover({ action13(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t14 = recover({ action14(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t15 = recover({ action15(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t16 = recover({ action16(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t17 = recover({ action17(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t18 = recover({ action18(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t19 = recover({ action19(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val t20 = recover({ action20(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(t1), unbox(t2), unbox(t3), unbox(t4), unbox(t5), unbox(t6), unbox(t7), unbox(t8), unbox(t9), unbox(t10), unbox(t11), unbox(t12), unbox(t13), unbox(t14), unbox(t15), unbox(t16), unbox(t17), unbox(t18), unbox(t19), unbox(t20))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    val j by accumulating(action10)
+    val k by accumulating(action11)
+    val l by accumulating(action12)
+    val m by accumulating(action13)
+    val n by accumulating(action14)
+    val o by accumulating(action15)
+    val p by accumulating(action16)
+    val q by accumulating(action17)
+    val r by accumulating(action18)
+    val s by accumulating(action19)
+    val t by accumulating(action20)
+    block(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)
+  }
 }
 
