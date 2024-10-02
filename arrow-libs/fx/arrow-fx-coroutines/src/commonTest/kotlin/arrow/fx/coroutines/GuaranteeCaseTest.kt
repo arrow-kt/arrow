@@ -16,7 +16,7 @@ class GuaranteeCaseTest {
 
   @Test
   fun releaseForSuccessWasInvoked() = runTest {
-    checkAll(Arb.int()) { i ->
+    checkAll(10, Arb.int()) { i ->
       val p = CompletableDeferred<ExitCase>()
 
       val res = guaranteeCase(
@@ -31,7 +31,7 @@ class GuaranteeCaseTest {
 
   @Test
   fun releaseForErrorWasInvoked() = runTest {
-    checkAll(Arb.throwable()) { e ->
+    checkAll(10, Arb.throwable()) { e ->
       val p = CompletableDeferred<ExitCase>()
       val attempted = Either.catch {
         guaranteeCase<Int>(

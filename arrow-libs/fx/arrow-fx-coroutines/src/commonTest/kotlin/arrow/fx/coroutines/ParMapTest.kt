@@ -144,7 +144,7 @@ class ParMapTest {
   }
 
   @Test fun parMapOrAccumulateAccumulatesShifts() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.string()) { e ->
+    checkAll(10, Arb.string()) { e ->
       (0 until 10).parMapOrAccumulate { _ ->
         raise(e)
       } shouldBe NonEmptyList(e, (1 until 10).map { e }).left()
@@ -213,7 +213,7 @@ class ParMapTest {
   }
 
   @Test fun parMapNotNullRetainsNonNulls() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int()) { i ->
+    checkAll(10, Arb.int()) { i ->
       (0 until 10).parMapNotNull { _ ->
         i
       } shouldBe List(10) { i }

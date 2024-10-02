@@ -5,6 +5,7 @@ import arrow.core.raise.EagerEffect
 import arrow.core.raise.Effect
 import arrow.core.raise.SingletonRaise
 import arrow.core.raise.option
+import arrow.core.raise.recover
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -309,23 +310,19 @@ public sealed class Option<out A> {
     /**
      * Ignores exceptions and returns None if one is thrown
      */
-    public inline fun <A> catch(f: () -> A): Option<A> {
+    public inline fun <A> catch(f: SingletonRaise<None>.() -> A): Option<A> {
       contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
       return catch({ None }, f)
     }
 
     @JvmStatic
     @JvmName("tryCatch")
-    public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: () -> A): Option<A> {
+    public inline fun <A> catch(recover: (Throwable) -> Option<A>, f: SingletonRaise<None>.() -> A): Option<A> {
       contract {
         callsInPlace(f, InvocationKind.AT_MOST_ONCE)
         callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
       }
-      return try {
-        Some(f())
-      } catch (t: Throwable) {
-        recover(t.nonFatalOrThrow())
-      }
+      return recover({ f(SingletonRaise(this)).some() }, { None }, recover)
     }
   }
 

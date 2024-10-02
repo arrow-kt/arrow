@@ -6,61 +6,72 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-resilience>
+open annotation class arrow.resilience/SagaDSLMarker : kotlin/Annotation { // arrow.resilience/SagaDSLMarker|null[0]
+    constructor <init>() // arrow.resilience/SagaDSLMarker.<init>|<init>(){}[0]
+}
+
+final enum class arrow.resilience.common/Platform : kotlin/Enum<arrow.resilience.common/Platform> { // arrow.resilience.common/Platform|null[0]
+    enum entry JS // arrow.resilience.common/Platform.JS|null[0]
+    enum entry JVM // arrow.resilience.common/Platform.JVM|null[0]
+    enum entry Native // arrow.resilience.common/Platform.Native|null[0]
+    enum entry Wasm // arrow.resilience.common/Platform.Wasm|null[0]
+
+    final val entries // arrow.resilience.common/Platform.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.resilience.common/Platform> // arrow.resilience.common/Platform.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): arrow.resilience.common/Platform // arrow.resilience.common/Platform.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<arrow.resilience.common/Platform> // arrow.resilience.common/Platform.values|values#static(){}[0]
+}
+
 abstract interface arrow.resilience/SagaScope { // arrow.resilience/SagaScope|null[0]
     abstract suspend fun <#A1: kotlin/Any?> saga(kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaActionStep, #A1>, kotlin.coroutines/SuspendFunction1<#A1, kotlin/Unit>): #A1 // arrow.resilience/SagaScope.saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaActionStep,0:0>;kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
     open suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A1>).bind(): #A1 // arrow.resilience/SagaScope.bind|bind@kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaScope,0:0>(){0§<kotlin.Any?>}[0]
     open suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A1>).invoke(): #A1 // arrow.resilience/SagaScope.invoke|invoke@kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaScope,0:0>(){0§<kotlin.Any?>}[0]
 }
+
 final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker|null[0]
+    final fun doOnClosed(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnClosed|doOnClosed(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+    final fun doOnHalfOpen(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnHalfOpen|doOnHalfOpen(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+    final fun doOnOpen(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnOpen|doOnOpen(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+    final fun doOnRejectedTask(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnRejectedTask|doOnRejectedTask(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+    final suspend fun <#A1: kotlin/Any?> protectEither(kotlin.coroutines/SuspendFunction0<#A1>): arrow.core/Either<arrow.resilience/CircuitBreaker.ExecutionRejected, #A1> // arrow.resilience/CircuitBreaker.protectEither|protectEither(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
+    final suspend fun <#A1: kotlin/Any?> protectOrThrow(kotlin.coroutines/SuspendFunction0<#A1>): #A1 // arrow.resilience/CircuitBreaker.protectOrThrow|protectOrThrow(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
+    final suspend fun awaitClose() // arrow.resilience/CircuitBreaker.awaitClose|awaitClose(){}[0]
+    final suspend fun state(): arrow.resilience/CircuitBreaker.State // arrow.resilience/CircuitBreaker.state|state(){}[0]
+
     final class ExecutionRejected : kotlin/Throwable { // arrow.resilience/CircuitBreaker.ExecutionRejected|null[0]
         constructor <init>(kotlin/String, arrow.resilience/CircuitBreaker.State) // arrow.resilience/CircuitBreaker.ExecutionRejected.<init>|<init>(kotlin.String;arrow.resilience.CircuitBreaker.State){}[0]
+
         final val reason // arrow.resilience/CircuitBreaker.ExecutionRejected.reason|{}reason[0]
             final fun <get-reason>(): kotlin/String // arrow.resilience/CircuitBreaker.ExecutionRejected.reason.<get-reason>|<get-reason>(){}[0]
         final val state // arrow.resilience/CircuitBreaker.ExecutionRejected.state|{}state[0]
             final fun <get-state>(): arrow.resilience/CircuitBreaker.State // arrow.resilience/CircuitBreaker.ExecutionRejected.state.<get-state>|<get-state>(){}[0]
     }
-    final fun doOnClosed(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnClosed|doOnClosed(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
-    final fun doOnHalfOpen(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnHalfOpen|doOnHalfOpen(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
-    final fun doOnOpen(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnOpen|doOnOpen(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
-    final fun doOnRejectedTask(kotlin.coroutines/SuspendFunction0<kotlin/Unit>): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.doOnRejectedTask|doOnRejectedTask(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
-    final object Companion { // arrow.resilience/CircuitBreaker.Companion|null[0]
-        final fun invoke(kotlin.time/Duration, arrow.resilience/CircuitBreaker.OpeningStrategy, kotlin/Double = ..., kotlin.time/Duration = ..., kotlin.time/TimeSource = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ...): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.Companion.invoke|invoke(kotlin.time.Duration;arrow.resilience.CircuitBreaker.OpeningStrategy;kotlin.Double;kotlin.time.Duration;kotlin.time.TimeSource;kotlin.coroutines.SuspendFunction0<kotlin.Unit>;kotlin.coroutines.SuspendFunction0<kotlin.Unit>;kotlin.coroutines.SuspendFunction0<kotlin.Unit>;kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
-    }
-    final suspend fun <#A1: kotlin/Any?> protectEither(kotlin.coroutines/SuspendFunction0<#A1>): arrow.core/Either<arrow.resilience/CircuitBreaker.ExecutionRejected, #A1> // arrow.resilience/CircuitBreaker.protectEither|protectEither(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
-    final suspend fun <#A1: kotlin/Any?> protectOrThrow(kotlin.coroutines/SuspendFunction0<#A1>): #A1 // arrow.resilience/CircuitBreaker.protectOrThrow|protectOrThrow(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
-    final suspend fun awaitClose() // arrow.resilience/CircuitBreaker.awaitClose|awaitClose(){}[0]
-    final suspend fun state(): arrow.resilience/CircuitBreaker.State // arrow.resilience/CircuitBreaker.state|state(){}[0]
+
     sealed class OpeningStrategy { // arrow.resilience/CircuitBreaker.OpeningStrategy|null[0]
-        constructor <init>() // arrow.resilience/CircuitBreaker.OpeningStrategy.<init>|<init>(){}[0]
         final class Count : arrow.resilience/CircuitBreaker.OpeningStrategy { // arrow.resilience/CircuitBreaker.OpeningStrategy.Count|null[0]
             constructor <init>(kotlin/Int, kotlin/Int = ...) // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.<init>|<init>(kotlin.Int;kotlin.Int){}[0]
+
+            final val failuresCount // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.failuresCount|{}failuresCount[0]
+                final fun <get-failuresCount>(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.failuresCount.<get-failuresCount>|<get-failuresCount>(){}[0]
+            final val maxFailures // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.maxFailures|{}maxFailures[0]
+                final fun <get-maxFailures>(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.maxFailures.<get-maxFailures>|<get-maxFailures>(){}[0]
+
             final fun component1(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.component1|component1(){}[0]
             final fun component2(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.component2|component2(){}[0]
             final fun copy(kotlin/Int = ..., kotlin/Int = ...): arrow.resilience/CircuitBreaker.OpeningStrategy.Count // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.copy|copy(kotlin.Int;kotlin.Int){}[0]
             final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.equals|equals(kotlin.Any?){}[0]
             final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.hashCode|hashCode(){}[0]
             final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.toString|toString(){}[0]
+
             final object Companion { // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.Companion|null[0]
                 final fun invoke(kotlin/Int): arrow.resilience/CircuitBreaker.OpeningStrategy.Count // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.Companion.invoke|invoke(kotlin.Int){}[0]
             }
-            final val failuresCount // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.failuresCount|{}failuresCount[0]
-                final fun <get-failuresCount>(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.failuresCount.<get-failuresCount>|<get-failuresCount>(){}[0]
-            final val maxFailures // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.maxFailures|{}maxFailures[0]
-                final fun <get-maxFailures>(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.Count.maxFailures.<get-maxFailures>|<get-maxFailures>(){}[0]
         }
+
         final class SlidingWindow : arrow.resilience/CircuitBreaker.OpeningStrategy { // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow|null[0]
             constructor <init>(kotlin.time/TimeSource, kotlin.collections/List<kotlin.time/TimeMark>, kotlin.time/Duration, kotlin/Int) // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.<init>|<init>(kotlin.time.TimeSource;kotlin.collections.List<kotlin.time.TimeMark>;kotlin.time.Duration;kotlin.Int){}[0]
-            final fun component1(): kotlin.time/TimeSource // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component1|component1(){}[0]
-            final fun component2(): kotlin.collections/List<kotlin.time/TimeMark> // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component2|component2(){}[0]
-            final fun component3(): kotlin.time/Duration // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component3|component3(){}[0]
-            final fun component4(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component4|component4(){}[0]
-            final fun copy(kotlin.time/TimeSource = ..., kotlin.collections/List<kotlin.time/TimeMark> = ..., kotlin.time/Duration = ..., kotlin/Int = ...): arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.copy|copy(kotlin.time.TimeSource;kotlin.collections.List<kotlin.time.TimeMark>;kotlin.time.Duration;kotlin.Int){}[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.toString|toString(){}[0]
-            final object Companion { // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.Companion|null[0]
-                final fun invoke(kotlin.time/TimeSource, kotlin.time/Duration, kotlin/Int): arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.Companion.invoke|invoke(kotlin.time.TimeSource;kotlin.time.Duration;kotlin.Int){}[0]
-            }
+
             final val failures // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.failures|{}failures[0]
                 final fun <get-failures>(): kotlin.collections/List<kotlin.time/TimeMark> // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.failures.<get-failures>|<get-failures>(){}[0]
             final val maxFailures // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.maxFailures|{}maxFailures[0]
@@ -69,32 +80,48 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
                 final fun <get-timeSource>(): kotlin.time/TimeSource // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.timeSource.<get-timeSource>|<get-timeSource>(){}[0]
             final val windowDuration // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.windowDuration|{}windowDuration[0]
                 final fun <get-windowDuration>(): kotlin.time/Duration // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.windowDuration.<get-windowDuration>|<get-windowDuration>(){}[0]
+
+            final fun component1(): kotlin.time/TimeSource // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component1|component1(){}[0]
+            final fun component2(): kotlin.collections/List<kotlin.time/TimeMark> // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component2|component2(){}[0]
+            final fun component3(): kotlin.time/Duration // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component3|component3(){}[0]
+            final fun component4(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.component4|component4(){}[0]
+            final fun copy(kotlin.time/TimeSource = ..., kotlin.collections/List<kotlin.time/TimeMark> = ..., kotlin.time/Duration = ..., kotlin/Int = ...): arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.copy|copy(kotlin.time.TimeSource;kotlin.collections.List<kotlin.time.TimeMark>;kotlin.time.Duration;kotlin.Int){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.toString|toString(){}[0]
+
+            final object Companion { // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.Companion|null[0]
+                final fun invoke(kotlin.time/TimeSource, kotlin.time/Duration, kotlin/Int): arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow // arrow.resilience/CircuitBreaker.OpeningStrategy.SlidingWindow.Companion.invoke|invoke(kotlin.time.TimeSource;kotlin.time.Duration;kotlin.Int){}[0]
+            }
         }
     }
+
     sealed class State { // arrow.resilience/CircuitBreaker.State|null[0]
         abstract val openingStrategy // arrow.resilience/CircuitBreaker.State.openingStrategy|{}openingStrategy[0]
             abstract fun <get-openingStrategy>(): arrow.resilience/CircuitBreaker.OpeningStrategy // arrow.resilience/CircuitBreaker.State.openingStrategy.<get-openingStrategy>|<get-openingStrategy>(){}[0]
-        constructor <init>() // arrow.resilience/CircuitBreaker.State.<init>|<init>(){}[0]
+
         final class Closed : arrow.resilience/CircuitBreaker.State { // arrow.resilience/CircuitBreaker.State.Closed|null[0]
             constructor <init>(arrow.resilience/CircuitBreaker.OpeningStrategy) // arrow.resilience/CircuitBreaker.State.Closed.<init>|<init>(arrow.resilience.CircuitBreaker.OpeningStrategy){}[0]
+
             final val openingStrategy // arrow.resilience/CircuitBreaker.State.Closed.openingStrategy|{}openingStrategy[0]
                 final fun <get-openingStrategy>(): arrow.resilience/CircuitBreaker.OpeningStrategy // arrow.resilience/CircuitBreaker.State.Closed.openingStrategy.<get-openingStrategy>|<get-openingStrategy>(){}[0]
         }
+
         final class HalfOpen : arrow.resilience/CircuitBreaker.State { // arrow.resilience/CircuitBreaker.State.HalfOpen|null[0]
             constructor <init>(arrow.resilience/CircuitBreaker.OpeningStrategy, kotlin.time/Duration) // arrow.resilience/CircuitBreaker.State.HalfOpen.<init>|<init>(arrow.resilience.CircuitBreaker.OpeningStrategy;kotlin.time.Duration){}[0]
             constructor <init>(arrow.resilience/CircuitBreaker.OpeningStrategy, kotlin/Double) // arrow.resilience/CircuitBreaker.State.HalfOpen.<init>|<init>(arrow.resilience.CircuitBreaker.OpeningStrategy;kotlin.Double){}[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.State.HalfOpen.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.State.HalfOpen.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.State.HalfOpen.toString|toString(){}[0]
+
             final val openingStrategy // arrow.resilience/CircuitBreaker.State.HalfOpen.openingStrategy|{}openingStrategy[0]
                 final fun <get-openingStrategy>(): arrow.resilience/CircuitBreaker.OpeningStrategy // arrow.resilience/CircuitBreaker.State.HalfOpen.openingStrategy.<get-openingStrategy>|<get-openingStrategy>(){}[0]
             final val resetTimeout // arrow.resilience/CircuitBreaker.State.HalfOpen.resetTimeout|{}resetTimeout[0]
                 final fun <get-resetTimeout>(): kotlin.time/Duration // arrow.resilience/CircuitBreaker.State.HalfOpen.resetTimeout.<get-resetTimeout>|<get-resetTimeout>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.State.HalfOpen.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.State.HalfOpen.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.State.HalfOpen.toString|toString(){}[0]
         }
+
         final class Open : arrow.resilience/CircuitBreaker.State { // arrow.resilience/CircuitBreaker.State.Open|null[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.State.Open.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.State.Open.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.State.Open.toString|toString(){}[0]
             final val expiresAt // arrow.resilience/CircuitBreaker.State.Open.expiresAt|{}expiresAt[0]
                 final fun <get-expiresAt>(): kotlin.time/TimeMark // arrow.resilience/CircuitBreaker.State.Open.expiresAt.<get-expiresAt>|<get-expiresAt>(){}[0]
             final val openingStrategy // arrow.resilience/CircuitBreaker.State.Open.openingStrategy|{}openingStrategy[0]
@@ -103,42 +130,31 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
                 final fun <get-resetTimeout>(): kotlin.time/Duration // arrow.resilience/CircuitBreaker.State.Open.resetTimeout.<get-resetTimeout>|<get-resetTimeout>(){}[0]
             final val startedAt // arrow.resilience/CircuitBreaker.State.Open.startedAt|{}startedAt[0]
                 final fun <get-startedAt>(): kotlin.time/TimeMark // arrow.resilience/CircuitBreaker.State.Open.startedAt.<get-startedAt>|<get-startedAt>(){}[0]
+
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.State.Open.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.State.Open.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.State.Open.toString|toString(){}[0]
         }
     }
+
+    final object Companion { // arrow.resilience/CircuitBreaker.Companion|null[0]
+        final fun invoke(kotlin.time/Duration, arrow.resilience/CircuitBreaker.OpeningStrategy, kotlin/Double = ..., kotlin.time/Duration = ..., kotlin.time/TimeSource = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit> = ...): arrow.resilience/CircuitBreaker // arrow.resilience/CircuitBreaker.Companion.invoke|invoke(kotlin.time.Duration;arrow.resilience.CircuitBreaker.OpeningStrategy;kotlin.Double;kotlin.time.Duration;kotlin.time.TimeSource;kotlin.coroutines.SuspendFunction0<kotlin.Unit>;kotlin.coroutines.SuspendFunction0<kotlin.Unit>;kotlin.coroutines.SuspendFunction0<kotlin.Unit>;kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+    }
 }
+
 final class arrow.resilience/SagaBuilder : arrow.resilience/SagaScope { // arrow.resilience/SagaBuilder|null[0]
     constructor <init>(arrow.atomic/Atomic<kotlin.collections/List<kotlin.coroutines/SuspendFunction0<kotlin/Unit>>> = ...) // arrow.resilience/SagaBuilder.<init>|<init>(arrow.atomic.Atomic<kotlin.collections.List<kotlin.coroutines.SuspendFunction0<kotlin.Unit>>>){}[0]
+
     final suspend fun <#A1: kotlin/Any?> saga(kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaActionStep, #A1>, kotlin.coroutines/SuspendFunction1<#A1, kotlin/Unit>): #A1 // arrow.resilience/SagaBuilder.saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaActionStep,0:0>;kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
     final suspend fun totalCompensation() // arrow.resilience/SagaBuilder.totalCompensation|totalCompensation(){}[0]
 }
-final enum class arrow.resilience.common/Platform : kotlin/Enum<arrow.resilience.common/Platform> { // arrow.resilience.common/Platform|null[0]
-    enum entry JS // arrow.resilience.common/Platform.JS|null[0]
-    enum entry JVM // arrow.resilience.common/Platform.JVM|null[0]
-    enum entry Native // arrow.resilience.common/Platform.Native|null[0]
-    enum entry Wasm // arrow.resilience.common/Platform.Wasm|null[0]
-    final fun valueOf(kotlin/String): arrow.resilience.common/Platform // arrow.resilience.common/Platform.valueOf|valueOf#static(kotlin.String){}[0]
-    final fun values(): kotlin/Array<arrow.resilience.common/Platform> // arrow.resilience.common/Platform.values|values#static(){}[0]
-    final val entries // arrow.resilience.common/Platform.entries|#static{}entries[0]
-        final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.resilience.common/Platform> // arrow.resilience.common/Platform.entries.<get-entries>|<get-entries>#static(){}[0]
-}
-final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/Flow<#A>).arrow.resilience/retry(arrow.resilience/Schedule<kotlin/Throwable, #B>): kotlinx.coroutines.flow/Flow<#A> // arrow.resilience/retry|retry@kotlinx.coroutines.flow.Flow<0:0>(arrow.resilience.Schedule<kotlin.Throwable,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> arrow.resilience/saga(kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaActionStep, #A>, kotlin.coroutines/SuspendFunction1<#A, kotlin/Unit>): kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A> // arrow.resilience/saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaActionStep,0:0>;kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
-final inline fun <#A: kotlin/Any?> arrow.resilience/saga(noinline kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A>): kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A> // arrow.resilience/saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaScope,0:0>){0§<kotlin.Any?>}[0]
-final object arrow.resilience/SagaActionStep // arrow.resilience/SagaActionStep|null[0]
-final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A>).arrow.resilience/transact(): #A // arrow.resilience/transact|transact@kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaScope,0:0>(){0§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElseEither(kotlin.reflect/KClass<#A>, kotlin.coroutines/SuspendFunction0<#B>, kotlin.coroutines/SuspendFunction2<#A, #C, #D>): arrow.core/Either<#D, #B> // arrow.resilience/retryOrElseEither|retryOrElseEither@arrow.resilience.Schedule<0:0,0:2>(kotlin.reflect.KClass<0:0>;kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<0:0,0:2,0:3>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElse(kotlin.reflect/KClass<#A>, kotlin.coroutines/SuspendFunction0<#B>, kotlin.coroutines/SuspendFunction2<#A, #C, #B>): #B // arrow.resilience/retryOrElse|retryOrElse@arrow.resilience.Schedule<0:0,0:2>(kotlin.reflect.KClass<0:0>;kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<0:0,0:2,0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Throwable, #B: kotlin/Any?> (arrow.resilience/Schedule<#A, *>).arrow.resilience/retry(kotlin.reflect/KClass<#A>, kotlin.coroutines/SuspendFunction0<#B>): #B // arrow.resilience/retry|retry@arrow.resilience.Schedule<0:0,*>(kotlin.reflect.KClass<0:0>;kotlin.coroutines.SuspendFunction0<0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>}[0]
-final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.core.raise/Raise<#A>).arrow.resilience/retry(arrow.resilience/Schedule<#A, #C>, kotlin/Function1<arrow.core.raise/Raise<#A>, #B>): #B // arrow.resilience/retry|retry@arrow.core.raise.Raise<0:0>(arrow.resilience.Schedule<0:0,0:2>;kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryEither(kotlin/Function0<arrow.core/Either<#A, #B>>): arrow.core/Either<#A, #B> // arrow.resilience/retryEither|retryEither@arrow.resilience.Schedule<0:0,0:2>(kotlin.Function0<arrow.core.Either<0:0,0:1>>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryRaise(kotlin/Function1<arrow.core.raise/Raise<#A>, #B>): arrow.core/Either<#A, #B> // arrow.resilience/retryRaise|retryRaise@arrow.resilience.Schedule<0:0,0:2>(kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-final suspend inline fun <#A: reified kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElseEither(noinline kotlin.coroutines/SuspendFunction0<#B>, noinline kotlin.coroutines/SuspendFunction2<#A, #C, #D>): arrow.core/Either<#D, #B> // arrow.resilience/retryOrElseEither|retryOrElseEither@arrow.resilience.Schedule<0:0,0:2>(kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<0:0,0:2,0:3>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
-final suspend inline fun <#A: reified kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElse(noinline kotlin.coroutines/SuspendFunction0<#B>, noinline kotlin.coroutines/SuspendFunction2<kotlin/Throwable, #C, #B>): #B // arrow.resilience/retryOrElse|retryOrElse@arrow.resilience.Schedule<0:0,0:2>(kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<kotlin.Throwable,0:2,0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-final suspend inline fun <#A: reified kotlin/Throwable, #B: kotlin/Any?> (arrow.resilience/Schedule<#A, *>).arrow.resilience/retry(noinline kotlin.coroutines/SuspendFunction0<#B>): #B // arrow.resilience/retry|retry@arrow.resilience.Schedule<0:0,*>(kotlin.coroutines.SuspendFunction0<0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>}[0]
-final val arrow.resilience.common/platform // arrow.resilience.common/platform|{}platform[0]
-    final fun <get-platform>(): arrow.resilience.common/Platform // arrow.resilience.common/platform.<get-platform>|<get-platform>(){}[0]
+
 final value class <#A: in kotlin/Any?, #B: out kotlin/Any?> arrow.resilience/Schedule { // arrow.resilience/Schedule|null[0]
     constructor <init>(kotlin.coroutines/SuspendFunction1<#A, arrow.resilience/Schedule.Decision<#A, #B>>) // arrow.resilience/Schedule.<init>|<init>(kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
+
+    final val step // arrow.resilience/Schedule.step|{}step[0]
+        final fun <get-step>(): kotlin.coroutines/SuspendFunction1<#A, arrow.resilience/Schedule.Decision<#A, #B>> // arrow.resilience/Schedule.step.<get-step>|<get-step>(){}[0]
+
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> and(arrow.resilience/Schedule<#A, #A1>, kotlin.coroutines/SuspendFunction2<#B, #A1, #B1>): arrow.resilience/Schedule<#A, #B1> // arrow.resilience/Schedule.and|and(arrow.resilience.Schedule<1:0,0:0>;kotlin.coroutines.SuspendFunction2<1:1,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> and(arrow.resilience/Schedule<#A, #A1>, kotlin.coroutines/SuspendFunction2<#B, #A1, #B1>, kotlin.coroutines/SuspendFunction2<kotlin.time/Duration, kotlin.time/Duration, kotlin.time/Duration>): arrow.resilience/Schedule<#A, #B1> // arrow.resilience/Schedule.and|and(arrow.resilience.Schedule<1:0,0:0>;kotlin.coroutines.SuspendFunction2<1:1,0:0,0:1>;kotlin.coroutines.SuspendFunction2<kotlin.time.Duration,kotlin.time.Duration,kotlin.time.Duration>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> andThen(arrow.resilience/Schedule<#A, #A1>, kotlin.coroutines/SuspendFunction1<#B, #B1>, kotlin.coroutines/SuspendFunction1<#A1, #B1>): arrow.resilience/Schedule<#A, #B1> // arrow.resilience/Schedule.andThen|andThen(arrow.resilience.Schedule<1:0,0:0>;kotlin.coroutines.SuspendFunction1<1:1,0:1>;kotlin.coroutines.SuspendFunction1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
@@ -160,6 +176,56 @@ final value class <#A: in kotlin/Any?, #B: out kotlin/Any?> arrow.resilience/Sch
     final fun log(kotlin.coroutines/SuspendFunction2<#A, #B, kotlin/Unit>): arrow.resilience/Schedule<#A, #B> // arrow.resilience/Schedule.log|log(kotlin.coroutines.SuspendFunction2<1:0,1:1,kotlin.Unit>){}[0]
     final fun mapDecision(kotlin.coroutines/SuspendFunction1<arrow.resilience/Schedule.Decision<#A, #B>, arrow.resilience/Schedule.Decision<#A, #B>>): arrow.resilience/Schedule<#A, #B> // arrow.resilience/Schedule.mapDecision|mapDecision(kotlin.coroutines.SuspendFunction1<arrow.resilience.Schedule.Decision<1:0,1:1>,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
     final fun toString(): kotlin/String // arrow.resilience/Schedule.toString|toString(){}[0]
+    final suspend fun <#A1: kotlin/Any?> repeatOrElseEither(kotlin.coroutines/SuspendFunction0<#A>, kotlin.coroutines/SuspendFunction2<kotlin/Throwable, #B?, #A1>): arrow.core/Either<#A1, #B> // arrow.resilience/Schedule.repeatOrElseEither|repeatOrElseEither(kotlin.coroutines.SuspendFunction0<1:0>;kotlin.coroutines.SuspendFunction2<kotlin.Throwable,1:1?,0:0>){0§<kotlin.Any?>}[0]
+    final suspend fun repeat(kotlin.coroutines/SuspendFunction0<#A>): #B // arrow.resilience/Schedule.repeat|repeat(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+    final suspend fun repeatOrElse(kotlin.coroutines/SuspendFunction0<#A>, kotlin.coroutines/SuspendFunction2<kotlin/Throwable, #B?, #B>): #B // arrow.resilience/Schedule.repeatOrElse|repeatOrElse(kotlin.coroutines.SuspendFunction0<1:0>;kotlin.coroutines.SuspendFunction2<kotlin.Throwable,1:1?,1:1>){}[0]
+
+    sealed interface <#A1: in kotlin/Any?, #B1: out kotlin/Any?> Decision { // arrow.resilience/Schedule.Decision|null[0]
+        abstract val output // arrow.resilience/Schedule.Decision.output|{}output[0]
+            abstract fun <get-output>(): #B1 // arrow.resilience/Schedule.Decision.output.<get-output>|<get-output>(){}[0]
+
+        open suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> and(arrow.resilience/Schedule.Decision<#A1, #A2>, kotlin.coroutines/SuspendFunction2<#B1, #A2, #B2>, kotlin.coroutines/SuspendFunction2<kotlin.time/Duration, kotlin.time/Duration, kotlin.time/Duration>): arrow.resilience/Schedule.Decision<#A1, #B2> // arrow.resilience/Schedule.Decision.and|and(arrow.resilience.Schedule.Decision<1:0,0:0>;kotlin.coroutines.SuspendFunction2<1:1,0:0,0:1>;kotlin.coroutines.SuspendFunction2<kotlin.time.Duration,kotlin.time.Duration,kotlin.time.Duration>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+        open suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> andThen(kotlin.coroutines/SuspendFunction1<#A1, arrow.resilience/Schedule.Decision<#A1, #A2>>, kotlin.coroutines/SuspendFunction1<#B1, #B2>, kotlin.coroutines/SuspendFunction1<#A2, #B2>): arrow.resilience/Schedule.Decision<#A1, #B2> // arrow.resilience/Schedule.Decision.andThen|andThen(kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,0:0>>;kotlin.coroutines.SuspendFunction1<1:1,0:1>;kotlin.coroutines.SuspendFunction1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+        open suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> or(arrow.resilience/Schedule.Decision<#A1, #A2>, kotlin.coroutines/SuspendFunction2<#B1?, #A2?, #B2>, kotlin.coroutines/SuspendFunction2<kotlin.time/Duration?, kotlin.time/Duration?, kotlin.time/Duration>): arrow.resilience/Schedule.Decision<#A1, #B2> // arrow.resilience/Schedule.Decision.or|or(arrow.resilience.Schedule.Decision<1:0,0:0>;kotlin.coroutines.SuspendFunction2<1:1?,0:0?,0:1>;kotlin.coroutines.SuspendFunction2<kotlin.time.Duration?,kotlin.time.Duration?,kotlin.time.Duration>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+        open suspend fun <#A2: kotlin/Any?> contramap(kotlin.coroutines/SuspendFunction1<#A2, #A1>): arrow.resilience/Schedule.Decision<#A2, #B1> // arrow.resilience/Schedule.Decision.contramap|contramap(kotlin.coroutines.SuspendFunction1<0:0,1:0>){0§<kotlin.Any?>}[0]
+        open suspend fun <#A2: kotlin/Any?> map(kotlin.coroutines/SuspendFunction1<#B1, #A2>): arrow.resilience/Schedule.Decision<#A1, #A2> // arrow.resilience/Schedule.Decision.map|map(kotlin.coroutines.SuspendFunction1<1:1,0:0>){0§<kotlin.Any?>}[0]
+        open suspend fun andThen(kotlin.coroutines/SuspendFunction1<#A1, arrow.resilience/Schedule.Decision<#A1, #B1>>): arrow.resilience/Schedule.Decision<#A1, #B1> // arrow.resilience/Schedule.Decision.andThen|andThen(kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
+        open suspend fun delayed(kotlin.coroutines/SuspendFunction2<#B1, kotlin.time/Duration, kotlin.time/Duration>): arrow.resilience/Schedule.Decision<#A1, #B1> // arrow.resilience/Schedule.Decision.delayed|delayed(kotlin.coroutines.SuspendFunction2<1:1,kotlin.time.Duration,kotlin.time.Duration>){}[0]
+        open suspend fun recursiveMap(kotlin.coroutines/SuspendFunction1<arrow.resilience/Schedule.Decision<#A1, #B1>, arrow.resilience/Schedule.Decision<#A1, #B1>>): arrow.resilience/Schedule.Decision<#A1, #B1> // arrow.resilience/Schedule.Decision.recursiveMap|recursiveMap(kotlin.coroutines.SuspendFunction1<arrow.resilience.Schedule.Decision<1:0,1:1>,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
+
+        final class <#A2: in kotlin/Any?, #B2: out kotlin/Any?> Continue : arrow.resilience/Schedule.Decision<#A2, #B2> { // arrow.resilience/Schedule.Decision.Continue|null[0]
+            constructor <init>(#B2, kotlin.time/Duration, kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>>) // arrow.resilience/Schedule.Decision.Continue.<init>|<init>(1:1;kotlin.time.Duration;kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
+
+            final val delay // arrow.resilience/Schedule.Decision.Continue.delay|{}delay[0]
+                final fun <get-delay>(): kotlin.time/Duration // arrow.resilience/Schedule.Decision.Continue.delay.<get-delay>|<get-delay>(){}[0]
+            final val output // arrow.resilience/Schedule.Decision.Continue.output|{}output[0]
+                final fun <get-output>(): #B2 // arrow.resilience/Schedule.Decision.Continue.output.<get-output>|<get-output>(){}[0]
+            final val step // arrow.resilience/Schedule.Decision.Continue.step|{}step[0]
+                final fun <get-step>(): kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>> // arrow.resilience/Schedule.Decision.Continue.step.<get-step>|<get-step>(){}[0]
+
+            final fun component1(): #B2 // arrow.resilience/Schedule.Decision.Continue.component1|component1(){}[0]
+            final fun component2(): kotlin.time/Duration // arrow.resilience/Schedule.Decision.Continue.component2|component2(){}[0]
+            final fun component3(): kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>> // arrow.resilience/Schedule.Decision.Continue.component3|component3(){}[0]
+            final fun copy(#B2 = ..., kotlin.time/Duration = ..., kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>> = ...): arrow.resilience/Schedule.Decision.Continue<#A2, #B2> // arrow.resilience/Schedule.Decision.Continue.copy|copy(1:1;kotlin.time.Duration;kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/Schedule.Decision.Continue.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.resilience/Schedule.Decision.Continue.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.resilience/Schedule.Decision.Continue.toString|toString(){}[0]
+        }
+
+        final class <#A2: out kotlin/Any?> Done : arrow.resilience/Schedule.Decision<kotlin/Any?, #A2> { // arrow.resilience/Schedule.Decision.Done|null[0]
+            constructor <init>(#A2) // arrow.resilience/Schedule.Decision.Done.<init>|<init>(1:0){}[0]
+
+            final val output // arrow.resilience/Schedule.Decision.Done.output|{}output[0]
+                final fun <get-output>(): #A2 // arrow.resilience/Schedule.Decision.Done.output.<get-output>|<get-output>(){}[0]
+
+            final fun component1(): #A2 // arrow.resilience/Schedule.Decision.Done.component1|component1(){}[0]
+            final fun copy(#A2 = ...): arrow.resilience/Schedule.Decision.Done<#A2> // arrow.resilience/Schedule.Decision.Done.copy|copy(1:0){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/Schedule.Decision.Done.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.resilience/Schedule.Decision.Done.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.resilience/Schedule.Decision.Done.toString|toString(){}[0]
+        }
+    }
+
     final object Companion { // arrow.resilience/Schedule.Companion|null[0]
         final fun <#A2: kotlin/Any?, #B2: kotlin/Any?> unfold(#B2, kotlin.coroutines/SuspendFunction1<#B2, #B2>): arrow.resilience/Schedule<#A2, #B2> // arrow.resilience/Schedule.Companion.unfold|unfold(0:1;kotlin.coroutines.SuspendFunction1<0:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
         final fun <#A2: kotlin/Any?> collect(): arrow.resilience/Schedule<#A2, kotlin.collections/List<#A2>> // arrow.resilience/Schedule.Companion.collect|collect(){0§<kotlin.Any?>}[0]
@@ -173,50 +239,23 @@ final value class <#A: in kotlin/Any?, #B: out kotlin/Any?> arrow.resilience/Sch
         final fun <#A2: kotlin/Any?> recurs(kotlin/Long): arrow.resilience/Schedule<#A2, kotlin/Long> // arrow.resilience/Schedule.Companion.recurs|recurs(kotlin.Long){0§<kotlin.Any?>}[0]
         final fun <#A2: kotlin/Any?> spaced(kotlin.time/Duration): arrow.resilience/Schedule<#A2, kotlin/Long> // arrow.resilience/Schedule.Companion.spaced|spaced(kotlin.time.Duration){0§<kotlin.Any?>}[0]
     }
-    final suspend fun <#A1: kotlin/Any?> repeatOrElseEither(kotlin.coroutines/SuspendFunction0<#A>, kotlin.coroutines/SuspendFunction2<kotlin/Throwable, #B?, #A1>): arrow.core/Either<#A1, #B> // arrow.resilience/Schedule.repeatOrElseEither|repeatOrElseEither(kotlin.coroutines.SuspendFunction0<1:0>;kotlin.coroutines.SuspendFunction2<kotlin.Throwable,1:1?,0:0>){0§<kotlin.Any?>}[0]
-    final suspend fun repeat(kotlin.coroutines/SuspendFunction0<#A>): #B // arrow.resilience/Schedule.repeat|repeat(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
-    final suspend fun repeatOrElse(kotlin.coroutines/SuspendFunction0<#A>, kotlin.coroutines/SuspendFunction2<kotlin/Throwable, #B?, #B>): #B // arrow.resilience/Schedule.repeatOrElse|repeatOrElse(kotlin.coroutines.SuspendFunction0<1:0>;kotlin.coroutines.SuspendFunction2<kotlin.Throwable,1:1?,1:1>){}[0]
-    final val step // arrow.resilience/Schedule.step|{}step[0]
-        final fun <get-step>(): kotlin.coroutines/SuspendFunction1<#A, arrow.resilience/Schedule.Decision<#A, #B>> // arrow.resilience/Schedule.step.<get-step>|<get-step>(){}[0]
-    sealed interface <#A1: in kotlin/Any?, #B1: out kotlin/Any?> Decision { // arrow.resilience/Schedule.Decision|null[0]
-        abstract val output // arrow.resilience/Schedule.Decision.output|{}output[0]
-            abstract fun <get-output>(): #B1 // arrow.resilience/Schedule.Decision.output.<get-output>|<get-output>(){}[0]
-        final class <#A2: in kotlin/Any?, #B2: out kotlin/Any?> Continue : arrow.resilience/Schedule.Decision<#A2, #B2> { // arrow.resilience/Schedule.Decision.Continue|null[0]
-            constructor <init>(#B2, kotlin.time/Duration, kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>>) // arrow.resilience/Schedule.Decision.Continue.<init>|<init>(1:1;kotlin.time.Duration;kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
-            final fun component1(): #B2 // arrow.resilience/Schedule.Decision.Continue.component1|component1(){}[0]
-            final fun component2(): kotlin.time/Duration // arrow.resilience/Schedule.Decision.Continue.component2|component2(){}[0]
-            final fun component3(): kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>> // arrow.resilience/Schedule.Decision.Continue.component3|component3(){}[0]
-            final fun copy(#B2 = ..., kotlin.time/Duration = ..., kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>> = ...): arrow.resilience/Schedule.Decision.Continue<#A2, #B2> // arrow.resilience/Schedule.Decision.Continue.copy|copy(1:1;kotlin.time.Duration;kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/Schedule.Decision.Continue.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/Schedule.Decision.Continue.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience/Schedule.Decision.Continue.toString|toString(){}[0]
-            final val delay // arrow.resilience/Schedule.Decision.Continue.delay|{}delay[0]
-                final fun <get-delay>(): kotlin.time/Duration // arrow.resilience/Schedule.Decision.Continue.delay.<get-delay>|<get-delay>(){}[0]
-            final val output // arrow.resilience/Schedule.Decision.Continue.output|{}output[0]
-                final fun <get-output>(): #B2 // arrow.resilience/Schedule.Decision.Continue.output.<get-output>|<get-output>(){}[0]
-            final val step // arrow.resilience/Schedule.Decision.Continue.step|{}step[0]
-                final fun <get-step>(): kotlin.coroutines/SuspendFunction1<#A2, arrow.resilience/Schedule.Decision<#A2, #B2>> // arrow.resilience/Schedule.Decision.Continue.step.<get-step>|<get-step>(){}[0]
-        }
-        final class <#A2: out kotlin/Any?> Done : arrow.resilience/Schedule.Decision<kotlin/Any?, #A2> { // arrow.resilience/Schedule.Decision.Done|null[0]
-            constructor <init>(#A2) // arrow.resilience/Schedule.Decision.Done.<init>|<init>(1:0){}[0]
-            final fun component1(): #A2 // arrow.resilience/Schedule.Decision.Done.component1|component1(){}[0]
-            final fun copy(#A2 = ...): arrow.resilience/Schedule.Decision.Done<#A2> // arrow.resilience/Schedule.Decision.Done.copy|copy(1:0){}[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/Schedule.Decision.Done.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/Schedule.Decision.Done.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience/Schedule.Decision.Done.toString|toString(){}[0]
-            final val output // arrow.resilience/Schedule.Decision.Done.output|{}output[0]
-                final fun <get-output>(): #A2 // arrow.resilience/Schedule.Decision.Done.output.<get-output>|<get-output>(){}[0]
-        }
-        open suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> and(arrow.resilience/Schedule.Decision<#A1, #A2>, kotlin.coroutines/SuspendFunction2<#B1, #A2, #B2>, kotlin.coroutines/SuspendFunction2<kotlin.time/Duration, kotlin.time/Duration, kotlin.time/Duration>): arrow.resilience/Schedule.Decision<#A1, #B2> // arrow.resilience/Schedule.Decision.and|and(arrow.resilience.Schedule.Decision<1:0,0:0>;kotlin.coroutines.SuspendFunction2<1:1,0:0,0:1>;kotlin.coroutines.SuspendFunction2<kotlin.time.Duration,kotlin.time.Duration,kotlin.time.Duration>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-        open suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> andThen(kotlin.coroutines/SuspendFunction1<#A1, arrow.resilience/Schedule.Decision<#A1, #A2>>, kotlin.coroutines/SuspendFunction1<#B1, #B2>, kotlin.coroutines/SuspendFunction1<#A2, #B2>): arrow.resilience/Schedule.Decision<#A1, #B2> // arrow.resilience/Schedule.Decision.andThen|andThen(kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,0:0>>;kotlin.coroutines.SuspendFunction1<1:1,0:1>;kotlin.coroutines.SuspendFunction1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-        open suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> or(arrow.resilience/Schedule.Decision<#A1, #A2>, kotlin.coroutines/SuspendFunction2<#B1?, #A2?, #B2>, kotlin.coroutines/SuspendFunction2<kotlin.time/Duration?, kotlin.time/Duration?, kotlin.time/Duration>): arrow.resilience/Schedule.Decision<#A1, #B2> // arrow.resilience/Schedule.Decision.or|or(arrow.resilience.Schedule.Decision<1:0,0:0>;kotlin.coroutines.SuspendFunction2<1:1?,0:0?,0:1>;kotlin.coroutines.SuspendFunction2<kotlin.time.Duration?,kotlin.time.Duration?,kotlin.time.Duration>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-        open suspend fun <#A2: kotlin/Any?> contramap(kotlin.coroutines/SuspendFunction1<#A2, #A1>): arrow.resilience/Schedule.Decision<#A2, #B1> // arrow.resilience/Schedule.Decision.contramap|contramap(kotlin.coroutines.SuspendFunction1<0:0,1:0>){0§<kotlin.Any?>}[0]
-        open suspend fun <#A2: kotlin/Any?> map(kotlin.coroutines/SuspendFunction1<#B1, #A2>): arrow.resilience/Schedule.Decision<#A1, #A2> // arrow.resilience/Schedule.Decision.map|map(kotlin.coroutines.SuspendFunction1<1:1,0:0>){0§<kotlin.Any?>}[0]
-        open suspend fun andThen(kotlin.coroutines/SuspendFunction1<#A1, arrow.resilience/Schedule.Decision<#A1, #B1>>): arrow.resilience/Schedule.Decision<#A1, #B1> // arrow.resilience/Schedule.Decision.andThen|andThen(kotlin.coroutines.SuspendFunction1<1:0,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
-        open suspend fun delayed(kotlin.coroutines/SuspendFunction2<#B1, kotlin.time/Duration, kotlin.time/Duration>): arrow.resilience/Schedule.Decision<#A1, #B1> // arrow.resilience/Schedule.Decision.delayed|delayed(kotlin.coroutines.SuspendFunction2<1:1,kotlin.time.Duration,kotlin.time.Duration>){}[0]
-        open suspend fun recursiveMap(kotlin.coroutines/SuspendFunction1<arrow.resilience/Schedule.Decision<#A1, #B1>, arrow.resilience/Schedule.Decision<#A1, #B1>>): arrow.resilience/Schedule.Decision<#A1, #B1> // arrow.resilience/Schedule.Decision.recursiveMap|recursiveMap(kotlin.coroutines.SuspendFunction1<arrow.resilience.Schedule.Decision<1:0,1:1>,arrow.resilience.Schedule.Decision<1:0,1:1>>){}[0]
-    }
 }
-open annotation class arrow.resilience/SagaDSLMarker : kotlin/Annotation { // arrow.resilience/SagaDSLMarker|null[0]
-    constructor <init>() // arrow.resilience/SagaDSLMarker.<init>|<init>(){}[0]
-}
+
+final object arrow.resilience/SagaActionStep // arrow.resilience/SagaActionStep|null[0]
+
+final val arrow.resilience.common/platform // arrow.resilience.common/platform|{}platform[0]
+    final fun <get-platform>(): arrow.resilience.common/Platform // arrow.resilience.common/platform.<get-platform>|<get-platform>(){}[0]
+
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/Flow<#A>).arrow.resilience/retry(arrow.resilience/Schedule<kotlin/Throwable, #B>): kotlinx.coroutines.flow/Flow<#A> // arrow.resilience/retry|retry@kotlinx.coroutines.flow.Flow<0:0>(arrow.resilience.Schedule<kotlin.Throwable,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> arrow.resilience/saga(kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaActionStep, #A>, kotlin.coroutines/SuspendFunction1<#A, kotlin/Unit>): kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A> // arrow.resilience/saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaActionStep,0:0>;kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> arrow.resilience/saga(noinline kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A>): kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A> // arrow.resilience/saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaScope,0:0>){0§<kotlin.Any?>}[0]
+final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A>).arrow.resilience/transact(): #A // arrow.resilience/transact|transact@kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaScope,0:0>(){0§<kotlin.Any?>}[0]
+final suspend fun <#A: kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElseEither(kotlin.reflect/KClass<#A>, kotlin.coroutines/SuspendFunction0<#B>, kotlin.coroutines/SuspendFunction2<#A, #C, #D>): arrow.core/Either<#D, #B> // arrow.resilience/retryOrElseEither|retryOrElseEither@arrow.resilience.Schedule<0:0,0:2>(kotlin.reflect.KClass<0:0>;kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<0:0,0:2,0:3>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
+final suspend fun <#A: kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElse(kotlin.reflect/KClass<#A>, kotlin.coroutines/SuspendFunction0<#B>, kotlin.coroutines/SuspendFunction2<#A, #C, #B>): #B // arrow.resilience/retryOrElse|retryOrElse@arrow.resilience.Schedule<0:0,0:2>(kotlin.reflect.KClass<0:0>;kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<0:0,0:2,0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final suspend fun <#A: kotlin/Throwable, #B: kotlin/Any?> (arrow.resilience/Schedule<#A, *>).arrow.resilience/retry(kotlin.reflect/KClass<#A>, kotlin.coroutines/SuspendFunction0<#B>): #B // arrow.resilience/retry|retry@arrow.resilience.Schedule<0:0,*>(kotlin.reflect.KClass<0:0>;kotlin.coroutines.SuspendFunction0<0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>}[0]
+final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.core.raise/Raise<#A>).arrow.resilience/retry(arrow.resilience/Schedule<#A, #C>, kotlin/Function1<arrow.core.raise/Raise<#A>, #B>): #B // arrow.resilience/retry|retry@arrow.core.raise.Raise<0:0>(arrow.resilience.Schedule<0:0,0:2>;kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryEither(kotlin/Function0<arrow.core/Either<#A, #B>>): arrow.core/Either<#A, #B> // arrow.resilience/retryEither|retryEither@arrow.resilience.Schedule<0:0,0:2>(kotlin.Function0<arrow.core.Either<0:0,0:1>>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryRaise(kotlin/Function1<arrow.core.raise/Raise<#A>, #B>): arrow.core/Either<#A, #B> // arrow.resilience/retryRaise|retryRaise@arrow.resilience.Schedule<0:0,0:2>(kotlin.Function1<arrow.core.raise.Raise<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final suspend inline fun <#A: reified kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElseEither(noinline kotlin.coroutines/SuspendFunction0<#B>, noinline kotlin.coroutines/SuspendFunction2<#A, #C, #D>): arrow.core/Either<#D, #B> // arrow.resilience/retryOrElseEither|retryOrElseEither@arrow.resilience.Schedule<0:0,0:2>(kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<0:0,0:2,0:3>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
+final suspend inline fun <#A: reified kotlin/Throwable, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.resilience/Schedule<#A, #C>).arrow.resilience/retryOrElse(noinline kotlin.coroutines/SuspendFunction0<#B>, noinline kotlin.coroutines/SuspendFunction2<kotlin/Throwable, #C, #B>): #B // arrow.resilience/retryOrElse|retryOrElse@arrow.resilience.Schedule<0:0,0:2>(kotlin.coroutines.SuspendFunction0<0:1>;kotlin.coroutines.SuspendFunction2<kotlin.Throwable,0:2,0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final suspend inline fun <#A: reified kotlin/Throwable, #B: kotlin/Any?> (arrow.resilience/Schedule<#A, *>).arrow.resilience/retry(noinline kotlin.coroutines/SuspendFunction0<#B>): #B // arrow.resilience/retry|retry@arrow.resilience.Schedule<0:0,*>(kotlin.coroutines.SuspendFunction0<0:1>){0§<kotlin.Throwable>;1§<kotlin.Any?>}[0]

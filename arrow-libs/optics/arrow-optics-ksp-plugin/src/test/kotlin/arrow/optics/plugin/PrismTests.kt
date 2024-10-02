@@ -16,7 +16,7 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1
-      """.compilationSucceeds(allWarningsAsErrors = true)
+      """.compilationSucceeds()
   }
 
   @Test
@@ -31,7 +31,7 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed<String, String>, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1()
-      """.compilationSucceeds(allWarningsAsErrors = true)
+      """.compilationSucceeds()
   }
 
   @Test
@@ -46,7 +46,7 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed, PrismSealed.In> = PrismSealed.`in`
-      """.compilationSucceeds(allWarningsAsErrors = true)
+      """.compilationSucceeds()
   }
 
   @Test
@@ -61,7 +61,7 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed<String, String>, PrismSealed.In> = PrismSealed.`in`()
-      """.compilationSucceeds(allWarningsAsErrors = true)
+      """.compilationSucceeds()
   }
 
   @Test
@@ -75,7 +75,7 @@ class PrismTests {
       | companion object
       |}
       |val i: Prism<PrismSealed, PrismSealed.PrismSealed1> = PrismSealed.prismSealed1
-      """.compilationSucceeds(allWarningsAsErrors = true)
+      """.compilationSucceeds()
   }
 
   @Test

@@ -23,12 +23,12 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation "org.codehaus.mojo:animal-sniffer-annotations:1.23"
+                implementation "org.codehaus.mojo:animal-sniffer-annotations:1.24"
             }
         }
         jvmMain {
             dependencies {
-                implementation "org.codehaus.mojo:animal-sniffer-annotations:1.23"
+                implementation "org.codehaus.mojo:animal-sniffer-annotations:1.24"
             }
          }
      }

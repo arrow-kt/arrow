@@ -1,7 +1,10 @@
+@file:JvmName("ComposeStateKt")
+
 package arrow.optics
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import kotlin.jvm.JvmName
 
 /**
  * Exposes the value of [this] through the optic.

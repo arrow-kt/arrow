@@ -1,16 +1,16 @@
-public final class arrow/optics/CopyKt {
+public final class arrow/optics/ComposeCopyKt {
 	public static final fun update (Landroidx/compose/runtime/MutableState;Lkotlin/jvm/functions/Function1;)V
 	public static final fun updateCopy (Landroidx/compose/runtime/MutableState;Lkotlin/jvm/functions/Function1;)V
 	public static final fun updateCopy (Lkotlinx/coroutines/flow/MutableStateFlow;Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class arrow/optics/FlowKt {
+public final class arrow/optics/ComposeFlowKt {
 	public static final fun optic (Lkotlinx/coroutines/flow/MutableStateFlow;Larrow/optics/PLens;)Lkotlinx/coroutines/flow/MutableStateFlow;
 	public static final fun optic (Lkotlinx/coroutines/flow/SharedFlow;Larrow/optics/PLens;)Lkotlinx/coroutines/flow/SharedFlow;
 	public static final fun optic (Lkotlinx/coroutines/flow/StateFlow;Larrow/optics/PLens;)Lkotlinx/coroutines/flow/StateFlow;
 }
 
-public final class arrow/optics/StateKt {
+public final class arrow/optics/ComposeStateKt {
 	public static final fun optic (Landroidx/compose/runtime/MutableState;Larrow/optics/PLens;)Landroidx/compose/runtime/MutableState;
 	public static final fun optic (Landroidx/compose/runtime/State;Larrow/optics/PLens;)Landroidx/compose/runtime/State;
 }

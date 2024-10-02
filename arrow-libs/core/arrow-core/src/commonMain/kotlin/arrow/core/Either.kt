@@ -1292,6 +1292,21 @@ public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>):
   }
 }
 
+/**
+ * Binds the given function across [Left], that is,
+ * Map, or transform, the left value [A] of this [Either] into a new [Either] with a left value of type [C].
+ * Returns a new [Either] with either the original right value of type [B] or the newly transformed left value of type [C].
+ *
+ * @param f The function to bind across [Left].
+ */
+public fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return when (this) {
+    is Left -> f(this.value)
+    is Right -> this
+  }
+}
+
 public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
 
@@ -1352,7 +1367,7 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
 /**
  * Combine two [Either] values.
  * If both are [Right] then combine both [B] values using [combineRight] or if both are [Left] then combine both [A] values using [combineLeft],
- * otherwise it returns the `this` or fallbacks to [other] in case `this` is [Left].
+ * otherwise return the sole [Left] value (either `this` or [other]).
  */
 public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> =
   when (val one = this) {

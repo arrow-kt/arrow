@@ -19,7 +19,7 @@ import kotlin.time.ExperimentalTime
 class BracketCaseTest {
   @Test
   fun immediateAcquireBracketCaseFinishesSuccessfully() = runTest {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       var once = true
       bracketCase(
         acquire = { a },
@@ -34,7 +34,7 @@ class BracketCaseTest {
 
   @Test
   fun suspendedAcquireBracketCaseFinishedSuccessfully() = runTest {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       var once = true
       bracketCase(
         acquire = { a.suspend() },
@@ -49,7 +49,7 @@ class BracketCaseTest {
 
   @Test
   fun immediateErrorInAcquireStaysTheSameError() = runTest {
-    checkAll(Arb.throwable()) { e ->
+    checkAll(10, Arb.throwable()) { e ->
       Either.catch {
         bracketCase<Unit, Int>(
           acquire = { throw e },
@@ -62,7 +62,7 @@ class BracketCaseTest {
 
   @Test
   fun suspendErrorInAcquireStaysTheSameError() = runTest {
-    checkAll(Arb.throwable()) { e ->
+    checkAll(10, Arb.throwable()) { e ->
       Either.catch {
         bracketCase<Unit, Int>(
           acquire = { e.suspend() },
@@ -75,7 +75,7 @@ class BracketCaseTest {
 
   @Test
   fun immediateUseBracketCaseFinishedSuccessfully() = runTest {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       var once = true
       bracketCase(
         acquire = { a },
@@ -90,7 +90,7 @@ class BracketCaseTest {
 
   @Test
   fun suspendedUseBracketCaseFinishesSuccessfully() = runTest {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
+    checkAll(10, Arb.int(), Arb.int()) { a, b ->
       var once = true
       bracketCase(
         acquire = { a },
@@ -105,7 +105,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustRunReleaseTaskOnUseImmediateError() = runTest {
-    checkAll(Arb.int(), Arb.throwable()) { i, e ->
+    checkAll(10, Arb.int(), Arb.throwable()) { i, e ->
       val promise = CompletableDeferred<ExitCase>()
 
       Either.catch {
@@ -124,7 +124,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustRunReleaseTaskOnUseSuspendedError() = runTest {
-    checkAll(Arb.int(), Arb.throwable()) { x, e ->
+    checkAll(10, Arb.int(), Arb.throwable()) { x, e ->
       val promise = CompletableDeferred<Pair<Int, ExitCase>>()
 
       Either.catch {
@@ -143,7 +143,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustAlwaysRunImmediateRelease() = runTest {
-    checkAll(Arb.int()) { x ->
+    checkAll(10, Arb.int()) { x ->
       val promise = CompletableDeferred<Pair<Int, ExitCase>>()
 
       Either.catch {
@@ -162,7 +162,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustAlwaysRunSuspendedRelease() = runTest {
-    checkAll(Arb.int()) { x ->
+    checkAll(10, Arb.int()) { x ->
       val promise = CompletableDeferred<Pair<Int, ExitCase>>()
 
       Either.catch {
@@ -182,7 +182,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustAlwaysRunImmediateReleaseError() = runTest {
-    checkAll(Arb.int(), Arb.throwable()) { n, e ->
+    checkAll(10, Arb.int(), Arb.throwable()) { n, e ->
       Either.catch {
         bracketCase(
           acquire = { n },
@@ -195,7 +195,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustAlwaysRunSuspendedReleaseError() = runTest {
-    checkAll(Arb.int(), Arb.throwable()) { n, e ->
+    checkAll(10, Arb.int(), Arb.throwable()) { n, e ->
       Either.catch {
         bracketCase(
           acquire = { n },
@@ -211,7 +211,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustComposeImmediateUseAndImmediateReleaseError() = runTest {
-    checkAll(Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -224,7 +224,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustComposeSuspendUseAndImmediateReleaseError() = runTest {
-    checkAll(Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -237,7 +237,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustComposeImmediateUseAndSuspendReleaseError() = runTest {
-    checkAll(Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -250,7 +250,7 @@ class BracketCaseTest {
 
   @Test
   fun bracketCaseMustComposeSuspendUseAndSuspendReleaseError() = runTest {
-    checkAll(Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -338,7 +338,7 @@ class BracketCaseTest {
 
   @Test
   fun acquireOnBracketCaseIsNotCancellable() = runTest {
-    checkAll(Arb.int(), Arb.int()) { x, y ->
+    checkAll(10, Arb.int(), Arb.int()) { x, y ->
       val mVar = Channel<Int>(1).apply { send(x) }
       val latch = CompletableDeferred<Unit>()
       val p = CompletableDeferred<ExitCase>()
@@ -367,7 +367,7 @@ class BracketCaseTest {
 
   @Test
   fun releaseOnBracketCaseIsNotCancellable() = runTest {
-    checkAll(Arb.int(), Arb.int()) { x, y ->
+    checkAll(10, Arb.int(), Arb.int()) { x, y ->
       val mVar = Channel<Int>(1).apply { send(x) }
       val latch = CompletableDeferred<Unit>()
 

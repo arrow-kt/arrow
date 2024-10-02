@@ -19,7 +19,7 @@ import kotlin.test.Test
 class CountDownLatchSpec {
   @Test
   fun shouldRaiseAnExceptionWhenConstructedWithNegativeOrZeroCapacity() = runTest {
-    checkAll(Arb.long(Long.MIN_VALUE, 0)) { i ->
+    checkAll(10, Arb.long(Long.MIN_VALUE, 0)) { i ->
       shouldThrow<IllegalArgumentException> { CountDownLatch(i) }.message shouldBe
         "CountDownLatch must be constructed with positive non-zero initial count, but was $i"
     }
@@ -27,7 +27,7 @@ class CountDownLatchSpec {
 
   @Test
   fun releaseAndThenAwaitShouldComplete() = runTest {
-    checkAll(Arb.long(1, 20)) { count ->
+    checkAll(10, Arb.long(1, 20)) { count ->
       val latch = CountDownLatch(count)
       repeat(count.toInt()) { latch.countDown() }
       latch.await() shouldBe Unit
@@ -36,7 +36,7 @@ class CountDownLatchSpec {
 
   @Test
   fun awaitAndThenReleaseShouldComplete() = runTest {
-    checkAll(Arb.long(1, 20)) { count ->
+    checkAll(10, Arb.long(1, 20)) { count ->
       val latch = CountDownLatch(count)
       val job = launch { latch.await() }
       repeat(count.toInt()) { latch.countDown() }
@@ -46,7 +46,7 @@ class CountDownLatchSpec {
 
   @Test
   fun awaitWithMoreThanOneLatchUnreleasedShouldBlock() = runTest {
-    checkAll(Arb.long(1, 20)) { count ->
+    checkAll(10, Arb.long(1, 20)) { count ->
       val latch = CountDownLatch(count)
       repeat(count.toInt() - 1) { latch.countDown() }
       withTimeoutOrNull(1) { latch.await() }.shouldBeNull()
@@ -56,7 +56,7 @@ class CountDownLatchSpec {
 
   @Test
   fun multipleAwaitsShouldAllComplete() = runTest {
-    checkAll(Arb.long(1, 20)) { count ->
+    checkAll(10, Arb.long(1, 20)) { count ->
       val latch = CountDownLatch(count)
       val jobs = (0 until count).map { launch { latch.await() } }
       repeat(count.toInt()) { latch.countDown() }

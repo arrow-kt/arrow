@@ -4,9 +4,10 @@ import kotlinx.knit.KnitPluginExtension
 import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 allprojects {
   if (property("version") == "unspecified") {
@@ -32,15 +33,6 @@ allprojects {
     (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-  }
-
-  tasks {
-    withType<KotlinCompile> {
-      compilerOptions {
-        (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
-        (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
-      }
-    }
   }
 }
 
