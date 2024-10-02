@@ -17,13 +17,13 @@ data class Company(
 ): User
 
 val User.shownName: String get() = this.matchOrThrow {
-  Person::class.of(Person::name.of(Name::firstName), Person::age.suchThat { it < 18 }) then { (fn, _) -> fn }
+  Person::class.of(Person::name.of(Name::firstName), Person::age.takeIf { it < 18 }) then { (fn, _) -> fn }
   Person::class.of(Person::name.of(Name::firstName, Name::lastName)) then { (fn, ln) -> "Sir/Madam $fn $ln" }
   Company::class.of(Company::name, Company::director.of(Name::lastName)) then { (nm, d) -> "$nm, att. $d" }
 }
 
 val Person.shownNameForPerson: String get() = this.matchOrThrow {
-  it.of(Person::name.of(Name::firstName), Person::age.suchThat { it < 18 }) then { (fn, _) -> fn }
+  it.of(Person::name.of(Name::firstName), Person::age.takeIf { it < 18 }) then { (fn, _) -> fn }
   it.of(Person::name.of(Name::firstName, Name::lastName)) then { (fn, ln) -> "Sir/Madam $fn $ln" }
 }
 

@@ -8,7 +8,7 @@ import arrow.core.raise.ensure
 import arrow.optics.Optional
 import arrow.optics.Prism
 
-public fun <S, A> Optional<S, A>.suchThat(
+public fun <S, A> Optional<S, A>.takeIf(
   predicate: (A) -> Boolean,
 ): Optional<S, A> = this.compose(predicate(predicate))
 
@@ -24,7 +24,7 @@ public fun <A> predicate(
   set = { x, _ -> x }
 )
 
-public fun <S, A> Optional<S, A>.ifEquals(value: A): Optional<S, A> = this.suchThat { it == value }
+public fun <S, A> Optional<S, A>.ifEquals(value: A): Optional<S, A> = this.takeIf { it == value }
 
 public fun <A> equalsTo(value: A): Optional<A, A> = predicate { it == value }
 

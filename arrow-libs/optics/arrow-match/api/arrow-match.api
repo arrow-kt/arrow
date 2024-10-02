@@ -1,17 +1,18 @@
 public final class arrow/match/BuildersKt {
-	public static final fun getNotEmpty (Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
+	public static final fun identity ()Lkotlin/reflect/KProperty1;
+	public static final fun isNotEmpty (Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
 	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
 	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
 	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
 	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
 	public static final fun of (Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Lkotlin/reflect/KProperty1;
-	public static final fun self ()Lkotlin/reflect/KProperty1;
-	public static final fun suchThat (Lkotlin/reflect/KProperty1;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlin/reflect/KProperty1;
-	public static synthetic fun suchThat$default (Lkotlin/reflect/KProperty1;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/reflect/KProperty1;
+	public static final fun takeIf (Lkotlin/reflect/KProperty1;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlin/reflect/KProperty1;
+	public static synthetic fun takeIf$default (Lkotlin/reflect/KProperty1;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/reflect/KProperty1;
 }
 
 public final class arrow/match/DoesNotMatch : java/lang/Throwable {
-	public static final field INSTANCE Larrow/match/DoesNotMatch;
+	public fun <init> ()V
+	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
 public final class arrow/match/MatchKt {

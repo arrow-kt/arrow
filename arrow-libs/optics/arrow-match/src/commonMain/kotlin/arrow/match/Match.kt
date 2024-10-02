@@ -14,25 +14,25 @@ public abstract class MatchScope<S, R> {
 
   public inline fun <reified A: S & Any, B> KClass<A>.of(
     field: Matcher<A, B>
-  ): Matcher<S, B> = it<S, A>().of(field)
+  ): Matcher<S, B> = instanceOf<S, A>().of(field)
 
   public inline fun <reified A: S & Any, B, C> KClass<A>.of(
     field1: Matcher<A, B>,
     field2: Matcher<A, C>
-  ): Matcher<S, Pair<B, C>> = it<S, A>().of(field1, field2)
+  ): Matcher<S, Pair<B, C>> = instanceOf<S, A>().of(field1, field2)
 
   public inline fun <reified A: S & Any, B, C, D> KClass<A>.of(
     field1: Matcher<A, B>,
     field2: Matcher<A, C>,
     field3: Matcher<A, D>
-  ): Matcher<S, Triple<B, C, D>> = it<S, A>().of(field1, field2, field3)
+  ): Matcher<S, Triple<B, C, D>> = instanceOf<S, A>().of(field1, field2, field3)
 
   public inline fun <reified A: S & Any, B, C, D, E> KClass<A>.of(
     field1: Matcher<A, B>,
     field2: Matcher<A, C>,
     field3: Matcher<A, D>,
     field4: Matcher<A, E>
-  ): Matcher<S, Tuple4<B, C, D, E>> = it<S, A>().of(field1, field2, field3, field4)
+  ): Matcher<S, Tuple4<B, C, D, E>> = instanceOf<S, A>().of(field1, field2, field3, field4)
 
   public inline fun <reified A: S & Any, B, C, D, E, F> KClass<A>.of(
     field1: Matcher<A, B>,
@@ -40,7 +40,7 @@ public abstract class MatchScope<S, R> {
     field3: Matcher<A, D>,
     field4: Matcher<A, E>,
     field5: Matcher<A, F>
-  ): Matcher<S, Tuple5<B, C, D, E, F>> = it<S, A>().of(field1, field2, field3, field4, field5)
+  ): Matcher<S, Tuple5<B, C, D, E, F>> = instanceOf<S, A>().of(field1, field2, field3, field4, field5)
 }
 
 private class MatchScopeImpl<S, R>(val subject: S): MatchScope<S, R>() {

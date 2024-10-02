@@ -15,25 +15,25 @@ public expect fun <S, A> Matcher(
   get: (S) -> A
 ): Matcher<S, A>
 
-public object DoesNotMatch: Throwable()
+public expect class DoesNotMatch(): Throwable
 
-public fun <S> self(): Matcher<S, S> = Matcher("self") { it }
+public fun <S> identity(): Matcher<S, S> = Matcher("identity") { it }
 
-public inline fun <S, reified A: S> it(): Matcher<S, A> =
-  Matcher("is<${A::class.simpleName}>") {
-    if (it is A) it else throw DoesNotMatch
+public inline fun <S, reified A: S> instanceOf(): Matcher<S, A> =
+  Matcher("instanceOf<${A::class.simpleName}>") {
+    if (it is A) it else throw DoesNotMatch()
   }
 
-public fun <S, A> Matcher<S, A>.suchThat(
+public fun <S, A> Matcher<S, A>.takeIf(
   description: String? = null,
   predicate: (A) -> Boolean
 ): Matcher<S, A> = Matcher("${this.name}.${description ?: "suchThat"}") {
   val value = this.get(it)
-  if (predicate(value)) value else throw DoesNotMatch
+  if (predicate(value)) value else throw DoesNotMatch()
 }
 
-public val <S, A> Matcher<S, Collection<A>>.notEmpty: Matcher<S, Collection<A>>
-  get() = this.suchThat("notEmpty") { it.isNotEmpty() }
+public val <S, A> Matcher<S, Collection<A>>.isNotEmpty: Matcher<S, Collection<A>>
+  get() = this.takeIf("isNotEmpty") { it.isNotEmpty() }
 
 public fun <S, A, B> Matcher<S, A>.of(
   field: Matcher<A, B>
