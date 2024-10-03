@@ -1,5 +1,5 @@
 // Klib ABI Dump
-// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
 // Rendering settings:
 // - Signature version: 2
 // - Show manifest properties: true
@@ -8,23 +8,29 @@
 // Library unique name: <io.arrow-kt:arrow-atomic>
 final class <#A: kotlin/Any?> arrow.atomic/Atomic { // arrow.atomic/Atomic|null[0]
     constructor <init>(#A) // arrow.atomic/Atomic.<init>|<init>(1:0){}[0]
+
     final fun compareAndSet(#A, #A): kotlin/Boolean // arrow.atomic/Atomic.compareAndSet|compareAndSet(1:0;1:0){}[0]
     final fun get(): #A // arrow.atomic/Atomic.get|get(){}[0]
     final fun getAndSet(#A): #A // arrow.atomic/Atomic.getAndSet|getAndSet(1:0){}[0]
     final fun set(#A) // arrow.atomic/Atomic.set|set(1:0){}[0]
 }
+
 final class arrow.atomic/AtomicBoolean { // arrow.atomic/AtomicBoolean|null[0]
     constructor <init>(kotlin/Boolean) // arrow.atomic/AtomicBoolean.<init>|<init>(kotlin.Boolean){}[0]
+
+    final var value // arrow.atomic/AtomicBoolean.value|{}value[0]
+        final fun <get-value>(): kotlin/Boolean // arrow.atomic/AtomicBoolean.value.<get-value>|<get-value>(){}[0]
+        final fun <set-value>(kotlin/Boolean) // arrow.atomic/AtomicBoolean.value.<set-value>|<set-value>(kotlin.Boolean){}[0]
+
     final fun compareAndSet(kotlin/Boolean, kotlin/Boolean): kotlin/Boolean // arrow.atomic/AtomicBoolean.compareAndSet|compareAndSet(kotlin.Boolean;kotlin.Boolean){}[0]
     final fun get(): kotlin/Boolean // arrow.atomic/AtomicBoolean.get|get(){}[0]
     final fun getAndSet(kotlin/Boolean): kotlin/Boolean // arrow.atomic/AtomicBoolean.getAndSet|getAndSet(kotlin.Boolean){}[0]
     final fun set(kotlin/Boolean) // arrow.atomic/AtomicBoolean.set|set(kotlin.Boolean){}[0]
-    final var value // arrow.atomic/AtomicBoolean.value|{}value[0]
-        final fun <get-value>(): kotlin/Boolean // arrow.atomic/AtomicBoolean.value.<get-value>|<get-value>(){}[0]
-        final fun <set-value>(kotlin/Boolean) // arrow.atomic/AtomicBoolean.value.<set-value>|<set-value>(kotlin.Boolean){}[0]
 }
+
 final class arrow.atomic/AtomicInt { // arrow.atomic/AtomicInt|null[0]
     constructor <init>(kotlin/Int) // arrow.atomic/AtomicInt.<init>|<init>(kotlin.Int){}[0]
+
     final fun addAndGet(kotlin/Int): kotlin/Int // arrow.atomic/AtomicInt.addAndGet|addAndGet(kotlin.Int){}[0]
     final fun compareAndSet(kotlin/Int, kotlin/Int): kotlin/Boolean // arrow.atomic/AtomicInt.compareAndSet|compareAndSet(kotlin.Int;kotlin.Int){}[0]
     final fun decrementAndGet(): kotlin/Int // arrow.atomic/AtomicInt.decrementAndGet|decrementAndGet(){}[0]
@@ -33,8 +39,10 @@ final class arrow.atomic/AtomicInt { // arrow.atomic/AtomicInt|null[0]
     final fun incrementAndGet(): kotlin/Int // arrow.atomic/AtomicInt.incrementAndGet|incrementAndGet(){}[0]
     final fun set(kotlin/Int) // arrow.atomic/AtomicInt.set|set(kotlin.Int){}[0]
 }
+
 final class arrow.atomic/AtomicLong { // arrow.atomic/AtomicLong|null[0]
     constructor <init>(kotlin/Long) // arrow.atomic/AtomicLong.<init>|<init>(kotlin.Long){}[0]
+
     final fun addAndGet(kotlin/Long): kotlin/Long // arrow.atomic/AtomicLong.addAndGet|addAndGet(kotlin.Long){}[0]
     final fun compareAndSet(kotlin/Long, kotlin/Long): kotlin/Boolean // arrow.atomic/AtomicLong.compareAndSet|compareAndSet(kotlin.Long;kotlin.Long){}[0]
     final fun decrementAndGet(): kotlin/Long // arrow.atomic/AtomicLong.decrementAndGet|decrementAndGet(){}[0]
@@ -43,6 +51,17 @@ final class arrow.atomic/AtomicLong { // arrow.atomic/AtomicLong|null[0]
     final fun incrementAndGet(): kotlin/Long // arrow.atomic/AtomicLong.incrementAndGet|incrementAndGet(){}[0]
     final fun set(kotlin/Long) // arrow.atomic/AtomicLong.set|set(kotlin.Long){}[0]
 }
+
+final var arrow.atomic/value // arrow.atomic/value|@arrow.atomic.Atomic<0:0>{0§<kotlin.Any?>}value[0]
+    final fun <#A1: kotlin/Any?> (arrow.atomic/Atomic<#A1>).<get-value>(): #A1 // arrow.atomic/value.<get-value>|<get-value>@arrow.atomic.Atomic<0:0>(){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (arrow.atomic/Atomic<#A1>).<set-value>(#A1) // arrow.atomic/value.<set-value>|<set-value>@arrow.atomic.Atomic<0:0>(0:0){0§<kotlin.Any?>}[0]
+final var arrow.atomic/value // arrow.atomic/value|@arrow.atomic.AtomicInt{}value[0]
+    final fun (arrow.atomic/AtomicInt).<get-value>(): kotlin/Int // arrow.atomic/value.<get-value>|<get-value>@arrow.atomic.AtomicInt(){}[0]
+    final fun (arrow.atomic/AtomicInt).<set-value>(kotlin/Int) // arrow.atomic/value.<set-value>|<set-value>@arrow.atomic.AtomicInt(kotlin.Int){}[0]
+final var arrow.atomic/value // arrow.atomic/value|@arrow.atomic.AtomicLong{}value[0]
+    final fun (arrow.atomic/AtomicLong).<get-value>(): kotlin/Long // arrow.atomic/value.<get-value>|<get-value>@arrow.atomic.AtomicLong(){}[0]
+    final fun (arrow.atomic/AtomicLong).<set-value>(kotlin/Long) // arrow.atomic/value.<set-value>|<set-value>@arrow.atomic.AtomicLong(kotlin.Long){}[0]
+
 final inline fun (arrow.atomic/AtomicBoolean).arrow.atomic/getAndUpdate(kotlin/Function1<kotlin/Boolean, kotlin/Boolean>): kotlin/Boolean // arrow.atomic/getAndUpdate|getAndUpdate@arrow.atomic.AtomicBoolean(kotlin.Function1<kotlin.Boolean,kotlin.Boolean>){}[0]
 final inline fun (arrow.atomic/AtomicBoolean).arrow.atomic/loop(kotlin/Function1<kotlin/Boolean, kotlin/Unit>): kotlin/Nothing // arrow.atomic/loop|loop@arrow.atomic.AtomicBoolean(kotlin.Function1<kotlin.Boolean,kotlin.Unit>){}[0]
 final inline fun (arrow.atomic/AtomicBoolean).arrow.atomic/tryUpdate(kotlin/Function1<kotlin/Boolean, kotlin/Boolean>): kotlin/Boolean // arrow.atomic/tryUpdate|tryUpdate@arrow.atomic.AtomicBoolean(kotlin.Function1<kotlin.Boolean,kotlin.Boolean>){}[0]
@@ -71,12 +90,3 @@ final inline fun <#A: kotlin/Any?> (arrow.atomic/Atomic<#A>).arrow.atomic/update
 final inline fun <#A: kotlin/Any?> (arrow.atomic/AtomicBoolean).arrow.atomic/update(kotlin/Function1<kotlin/Boolean, kotlin/Boolean>, kotlin/Function2<kotlin/Boolean, kotlin/Boolean, #A>): #A // arrow.atomic/update|update@arrow.atomic.AtomicBoolean(kotlin.Function1<kotlin.Boolean,kotlin.Boolean>;kotlin.Function2<kotlin.Boolean,kotlin.Boolean,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (arrow.atomic/AtomicInt).arrow.atomic/update(kotlin/Function1<kotlin/Int, kotlin/Int>, kotlin/Function2<kotlin/Int, kotlin/Int, #A>): #A // arrow.atomic/update|update@arrow.atomic.AtomicInt(kotlin.Function1<kotlin.Int,kotlin.Int>;kotlin.Function2<kotlin.Int,kotlin.Int,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (arrow.atomic/AtomicLong).arrow.atomic/update(kotlin/Function1<kotlin/Long, kotlin/Long>, kotlin/Function2<kotlin/Long, kotlin/Long, #A>): #A // arrow.atomic/update|update@arrow.atomic.AtomicLong(kotlin.Function1<kotlin.Long,kotlin.Long>;kotlin.Function2<kotlin.Long,kotlin.Long,0:0>){0§<kotlin.Any?>}[0]
-final var arrow.atomic/value // arrow.atomic/value|@arrow.atomic.Atomic<0:0>{0§<kotlin.Any?>}value[0]
-    final fun <#A1: kotlin/Any?> (arrow.atomic/Atomic<#A1>).<get-value>(): #A1 // arrow.atomic/value.<get-value>|<get-value>@arrow.atomic.Atomic<0:0>(){0§<kotlin.Any?>}[0]
-    final fun <#A1: kotlin/Any?> (arrow.atomic/Atomic<#A1>).<set-value>(#A1) // arrow.atomic/value.<set-value>|<set-value>@arrow.atomic.Atomic<0:0>(0:0){0§<kotlin.Any?>}[0]
-final var arrow.atomic/value // arrow.atomic/value|@arrow.atomic.AtomicInt{}value[0]
-    final fun (arrow.atomic/AtomicInt).<get-value>(): kotlin/Int // arrow.atomic/value.<get-value>|<get-value>@arrow.atomic.AtomicInt(){}[0]
-    final fun (arrow.atomic/AtomicInt).<set-value>(kotlin/Int) // arrow.atomic/value.<set-value>|<set-value>@arrow.atomic.AtomicInt(kotlin.Int){}[0]
-final var arrow.atomic/value // arrow.atomic/value|@arrow.atomic.AtomicLong{}value[0]
-    final fun (arrow.atomic/AtomicLong).<get-value>(): kotlin/Long // arrow.atomic/value.<get-value>|<get-value>@arrow.atomic.AtomicLong(){}[0]
-    final fun (arrow.atomic/AtomicLong).<set-value>(kotlin/Long) // arrow.atomic/value.<set-value>|<set-value>@arrow.atomic.AtomicLong(kotlin.Long){}[0]

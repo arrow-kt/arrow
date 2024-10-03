@@ -1,45 +1,22 @@
 // Klib ABI Dump
-// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
 // Rendering settings:
 // - Signature version: 2
 // - Show manifest properties: true
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-collectors>
-abstract interface <#A: kotlin/Any?, #B: in kotlin/Any?, #C: out kotlin/Any?> arrow.collectors/CollectorI { // arrow.collectors/CollectorI|null[0]
-    abstract suspend fun accumulate(#A, #B) // arrow.collectors/CollectorI.accumulate|accumulate(1:0;1:1){}[0]
-    abstract suspend fun finish(#A): #C // arrow.collectors/CollectorI.finish|finish(1:0){}[0]
-    abstract suspend fun supply(): #A // arrow.collectors/CollectorI.supply|supply(){}[0]
-    abstract val characteristics // arrow.collectors/CollectorI.characteristics|{}characteristics[0]
-        abstract fun <get-characteristics>(): kotlin.collections/Set<arrow.collectors/Characteristics> // arrow.collectors/CollectorI.characteristics.<get-characteristics>|<get-characteristics>(){}[0]
-    final object Companion { // arrow.collectors/CollectorI.Companion|null[0]
-        final fun <#A2: kotlin/Any?, #B2: kotlin/Any?, #C2: kotlin/Any?> nonSuspendOf(kotlin/Function0<#A2>, kotlin/Function2<#A2, #B2, kotlin/Unit>, kotlin/Function1<#A2, #C2>, kotlin.collections/Set<arrow.collectors/Characteristics> = ...): arrow.collectors/NonSuspendCollectorI<*, #B2, #C2> // arrow.collectors/CollectorI.Companion.nonSuspendOf|nonSuspendOf(kotlin.Function0<0:0>;kotlin.Function2<0:0,0:1,kotlin.Unit>;kotlin.Function1<0:0,0:2>;kotlin.collections.Set<arrow.collectors.Characteristics>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-        final fun <#A2: kotlin/Any?, #B2: kotlin/Any?, #C2: kotlin/Any?> of(kotlin.coroutines/SuspendFunction0<#A2>, kotlin.coroutines/SuspendFunction2<#A2, #B2, kotlin/Unit>, kotlin.coroutines/SuspendFunction1<#A2, #C2>, kotlin.collections/Set<arrow.collectors/Characteristics> = ...): arrow.collectors/CollectorI<*, #B2, #C2> // arrow.collectors/CollectorI.Companion.of|of(kotlin.coroutines.SuspendFunction0<0:0>;kotlin.coroutines.SuspendFunction2<0:0,0:1,kotlin.Unit>;kotlin.coroutines.SuspendFunction1<0:0,0:2>;kotlin.collections.Set<arrow.collectors.Characteristics>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-    }
-    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?, #C1: kotlin/Any?> zip(arrow.collectors/CollectorI<#A1, #B, #B1>, kotlin.coroutines/SuspendFunction2<#C, #B1, #C1>): arrow.collectors/CollectorI<*, #B, #C1> // arrow.collectors/CollectorI.zip|zip(arrow.collectors.CollectorI<0:0,1:1,0:1>;kotlin.coroutines.SuspendFunction2<1:2,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> zip(arrow.collectors/CollectorI<#A1, #B, #B1>): arrow.collectors/CollectorI<*, #B, kotlin/Pair<#C, #B1>> // arrow.collectors/CollectorI.zip|zip(arrow.collectors.CollectorI<0:0,1:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-    open fun <#A1: kotlin/Any?> contramap(kotlin.coroutines/SuspendFunction1<#A1, #B>): arrow.collectors/CollectorI<*, #A1, #C> // arrow.collectors/CollectorI.contramap|contramap(kotlin.coroutines.SuspendFunction1<0:0,1:1>){0§<kotlin.Any?>}[0]
-    open fun <#A1: kotlin/Any?> map(kotlin.coroutines/SuspendFunction1<#C, #A1>): arrow.collectors/CollectorI<*, #B, #A1> // arrow.collectors/CollectorI.map|map(kotlin.coroutines.SuspendFunction1<1:2,0:0>){0§<kotlin.Any?>}[0]
-    open fun has(kotlin/Array<out arrow.collectors/Characteristics>...): kotlin/Boolean // arrow.collectors/CollectorI.has|has(kotlin.Array<out|arrow.collectors.Characteristics>...){}[0]
-}
-abstract interface <#A: kotlin/Any?, #B: in kotlin/Any?, #C: out kotlin/Any?> arrow.collectors/NonSuspendCollectorI : arrow.collectors/CollectorI<#A, #B, #C> { // arrow.collectors/NonSuspendCollectorI|null[0]
-    abstract fun accumulateNonSuspend(#A, #B) // arrow.collectors/NonSuspendCollectorI.accumulateNonSuspend|accumulateNonSuspend(1:0;1:1){}[0]
-    abstract fun finishNonSuspend(#A): #C // arrow.collectors/NonSuspendCollectorI.finishNonSuspend|finishNonSuspend(1:0){}[0]
-    abstract fun supplyNonSuspend(): #A // arrow.collectors/NonSuspendCollectorI.supplyNonSuspend|supplyNonSuspend(){}[0]
-    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?, #C1: kotlin/Any?> zipNonSuspend(arrow.collectors/NonSuspendCollectorI<#A1, #B, #B1>, kotlin/Function2<#C, #B1, #C1>): arrow.collectors/NonSuspendCollectorI<*, #B, #C1> // arrow.collectors/NonSuspendCollectorI.zipNonSuspend|zipNonSuspend(arrow.collectors.NonSuspendCollectorI<0:0,1:1,0:1>;kotlin.Function2<1:2,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
-    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> zip(arrow.collectors/NonSuspendCollectorI<#A1, #B, #B1>): arrow.collectors/NonSuspendCollectorI<*, #B, kotlin/Pair<#C, #B1>> // arrow.collectors/NonSuspendCollectorI.zip|zip(arrow.collectors.NonSuspendCollectorI<0:0,1:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-    open fun <#A1: kotlin/Any?> contramapNonSuspend(kotlin/Function1<#A1, #B>): arrow.collectors/NonSuspendCollectorI<*, #A1, #C> // arrow.collectors/NonSuspendCollectorI.contramapNonSuspend|contramapNonSuspend(kotlin.Function1<0:0,1:1>){0§<kotlin.Any?>}[0]
-    open fun <#A1: kotlin/Any?> mapNonSuspend(kotlin/Function1<#C, #A1>): arrow.collectors/NonSuspendCollectorI<*, #B, #A1> // arrow.collectors/NonSuspendCollectorI.mapNonSuspend|mapNonSuspend(kotlin.Function1<1:2,0:0>){0§<kotlin.Any?>}[0]
-    open suspend fun accumulate(#A, #B) // arrow.collectors/NonSuspendCollectorI.accumulate|accumulate(1:0;1:1){}[0]
-    open suspend fun finish(#A): #C // arrow.collectors/NonSuspendCollectorI.finish|finish(1:0){}[0]
-    open suspend fun supply(): #A // arrow.collectors/NonSuspendCollectorI.supply|supply(){}[0]
-}
 final enum class arrow.collectors/Characteristics : kotlin/Enum<arrow.collectors/Characteristics> { // arrow.collectors/Characteristics|null[0]
     enum entry CONCURRENT // arrow.collectors/Characteristics.CONCURRENT|null[0]
     enum entry IDENTITY_FINISH // arrow.collectors/Characteristics.IDENTITY_FINISH|null[0]
     enum entry UNORDERED // arrow.collectors/Characteristics.UNORDERED|null[0]
+
+    final val entries // arrow.collectors/Characteristics.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.collectors/Characteristics> // arrow.collectors/Characteristics.entries.<get-entries>|<get-entries>#static(){}[0]
+
     final fun valueOf(kotlin/String): arrow.collectors/Characteristics // arrow.collectors/Characteristics.valueOf|valueOf#static(kotlin.String){}[0]
     final fun values(): kotlin/Array<arrow.collectors/Characteristics> // arrow.collectors/Characteristics.values|values#static(){}[0]
+
     final object Companion { // arrow.collectors/Characteristics.Companion|null[0]
         final val CONCURRENT_UNORDERED // arrow.collectors/Characteristics.Companion.CONCURRENT_UNORDERED|{}CONCURRENT_UNORDERED[0]
             final fun <get-CONCURRENT_UNORDERED>(): kotlin.collections/Set<arrow.collectors/Characteristics> // arrow.collectors/Characteristics.Companion.CONCURRENT_UNORDERED.<get-CONCURRENT_UNORDERED>|<get-CONCURRENT_UNORDERED>(){}[0]
@@ -52,17 +29,46 @@ final enum class arrow.collectors/Characteristics : kotlin/Enum<arrow.collectors
         final val IDENTITY_UNORDERED // arrow.collectors/Characteristics.Companion.IDENTITY_UNORDERED|{}IDENTITY_UNORDERED[0]
             final fun <get-IDENTITY_UNORDERED>(): kotlin.collections/Set<arrow.collectors/Characteristics> // arrow.collectors/Characteristics.Companion.IDENTITY_UNORDERED.<get-IDENTITY_UNORDERED>|<get-IDENTITY_UNORDERED>(){}[0]
     }
-    final val entries // arrow.collectors/Characteristics.entries|#static{}entries[0]
-        final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.collectors/Characteristics> // arrow.collectors/Characteristics.entries.<get-entries>|<get-entries>#static(){}[0]
 }
-final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?> arrow.collectors/zip(arrow.collectors/CollectorI<*, #A, #B>, arrow.collectors/CollectorI<*, #A, #C>, arrow.collectors/CollectorI<*, #A, #D>, kotlin.coroutines/SuspendFunction3<#B, #C, #D, #E>): arrow.collectors/CollectorI<*, #A, #E> // arrow.collectors/zip|zip(arrow.collectors.CollectorI<*,0:0,0:1>;arrow.collectors.CollectorI<*,0:0,0:2>;arrow.collectors.CollectorI<*,0:0,0:3>;kotlin.coroutines.SuspendFunction3<0:1,0:2,0:3,0:4>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?> arrow.collectors/zip(arrow.collectors/NonSuspendCollectorI<*, #A, #B>, arrow.collectors/NonSuspendCollectorI<*, #A, #C>, arrow.collectors/NonSuspendCollectorI<*, #A, #D>, kotlin/Function3<#B, #C, #D, #E>): arrow.collectors/NonSuspendCollectorI<*, #A, #E> // arrow.collectors/zip|zip(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>;arrow.collectors.NonSuspendCollectorI<*,0:0,0:2>;arrow.collectors.NonSuspendCollectorI<*,0:0,0:3>;kotlin.Function3<0:1,0:2,0:3,0:4>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> arrow.collectors/zip(arrow.collectors/CollectorI<*, #A, #B>, arrow.collectors/CollectorI<*, #A, #C>, kotlin.coroutines/SuspendFunction2<#B, #C, #D>): arrow.collectors/CollectorI<*, #A, #D> // arrow.collectors/zip|zip(arrow.collectors.CollectorI<*,0:0,0:1>;arrow.collectors.CollectorI<*,0:0,0:2>;kotlin.coroutines.SuspendFunction2<0:1,0:2,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> arrow.collectors/zip(arrow.collectors/NonSuspendCollectorI<*, #A, #B>, arrow.collectors/NonSuspendCollectorI<*, #A, #C>, kotlin/Function2<#B, #C, #D>): arrow.collectors/NonSuspendCollectorI<*, #A, #D> // arrow.collectors/zip|zip(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>;arrow.collectors.NonSuspendCollectorI<*,0:0,0:2>;kotlin.Function2<0:1,0:2,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterable<#A>).arrow.collectors/collect(arrow.collectors/NonSuspendCollectorI<*, #A, #B>): #B // arrow.collectors/collect|collect@kotlin.collections.Iterable<0:0>(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterator<#A>).arrow.collectors/collect(arrow.collectors/NonSuspendCollectorI<*, #A, #B>): #B // arrow.collectors/collect|collect@kotlin.collections.Iterator<0:0>(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.sequences/Sequence<#A>).arrow.collectors/collect(arrow.collectors/NonSuspendCollectorI<*, #A, #B>): #B // arrow.collectors/collect|collect@kotlin.sequences.Sequence<0:0>(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+
+abstract interface <#A: kotlin/Any?, #B: in kotlin/Any?, #C: out kotlin/Any?> arrow.collectors/CollectorI { // arrow.collectors/CollectorI|null[0]
+    abstract val characteristics // arrow.collectors/CollectorI.characteristics|{}characteristics[0]
+        abstract fun <get-characteristics>(): kotlin.collections/Set<arrow.collectors/Characteristics> // arrow.collectors/CollectorI.characteristics.<get-characteristics>|<get-characteristics>(){}[0]
+
+    abstract suspend fun accumulate(#A, #B) // arrow.collectors/CollectorI.accumulate|accumulate(1:0;1:1){}[0]
+    abstract suspend fun finish(#A): #C // arrow.collectors/CollectorI.finish|finish(1:0){}[0]
+    abstract suspend fun supply(): #A // arrow.collectors/CollectorI.supply|supply(){}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?, #C1: kotlin/Any?> zip(arrow.collectors/CollectorI<#A1, #B, #B1>, kotlin.coroutines/SuspendFunction2<#C, #B1, #C1>): arrow.collectors/CollectorI<*, #B, #C1> // arrow.collectors/CollectorI.zip|zip(arrow.collectors.CollectorI<0:0,1:1,0:1>;kotlin.coroutines.SuspendFunction2<1:2,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> zip(arrow.collectors/CollectorI<#A1, #B, #B1>): arrow.collectors/CollectorI<*, #B, kotlin/Pair<#C, #B1>> // arrow.collectors/CollectorI.zip|zip(arrow.collectors.CollectorI<0:0,1:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> contramap(kotlin.coroutines/SuspendFunction1<#A1, #B>): arrow.collectors/CollectorI<*, #A1, #C> // arrow.collectors/CollectorI.contramap|contramap(kotlin.coroutines.SuspendFunction1<0:0,1:1>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> map(kotlin.coroutines/SuspendFunction1<#C, #A1>): arrow.collectors/CollectorI<*, #B, #A1> // arrow.collectors/CollectorI.map|map(kotlin.coroutines.SuspendFunction1<1:2,0:0>){0§<kotlin.Any?>}[0]
+    open fun has(kotlin/Array<out arrow.collectors/Characteristics>...): kotlin/Boolean // arrow.collectors/CollectorI.has|has(kotlin.Array<out|arrow.collectors.Characteristics>...){}[0]
+
+    final object Companion { // arrow.collectors/CollectorI.Companion|null[0]
+        final fun <#A2: kotlin/Any?, #B2: kotlin/Any?, #C2: kotlin/Any?> nonSuspendOf(kotlin/Function0<#A2>, kotlin/Function2<#A2, #B2, kotlin/Unit>, kotlin/Function1<#A2, #C2>, kotlin.collections/Set<arrow.collectors/Characteristics> = ...): arrow.collectors/NonSuspendCollectorI<*, #B2, #C2> // arrow.collectors/CollectorI.Companion.nonSuspendOf|nonSuspendOf(kotlin.Function0<0:0>;kotlin.Function2<0:0,0:1,kotlin.Unit>;kotlin.Function1<0:0,0:2>;kotlin.collections.Set<arrow.collectors.Characteristics>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+        final fun <#A2: kotlin/Any?, #B2: kotlin/Any?, #C2: kotlin/Any?> of(kotlin.coroutines/SuspendFunction0<#A2>, kotlin.coroutines/SuspendFunction2<#A2, #B2, kotlin/Unit>, kotlin.coroutines/SuspendFunction1<#A2, #C2>, kotlin.collections/Set<arrow.collectors/Characteristics> = ...): arrow.collectors/CollectorI<*, #B2, #C2> // arrow.collectors/CollectorI.Companion.of|of(kotlin.coroutines.SuspendFunction0<0:0>;kotlin.coroutines.SuspendFunction2<0:0,0:1,kotlin.Unit>;kotlin.coroutines.SuspendFunction1<0:0,0:2>;kotlin.collections.Set<arrow.collectors.Characteristics>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+    }
+}
+
+abstract interface <#A: kotlin/Any?, #B: in kotlin/Any?, #C: out kotlin/Any?> arrow.collectors/NonSuspendCollectorI : arrow.collectors/CollectorI<#A, #B, #C> { // arrow.collectors/NonSuspendCollectorI|null[0]
+    abstract fun accumulateNonSuspend(#A, #B) // arrow.collectors/NonSuspendCollectorI.accumulateNonSuspend|accumulateNonSuspend(1:0;1:1){}[0]
+    abstract fun finishNonSuspend(#A): #C // arrow.collectors/NonSuspendCollectorI.finishNonSuspend|finishNonSuspend(1:0){}[0]
+    abstract fun supplyNonSuspend(): #A // arrow.collectors/NonSuspendCollectorI.supplyNonSuspend|supplyNonSuspend(){}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?, #C1: kotlin/Any?> zipNonSuspend(arrow.collectors/NonSuspendCollectorI<#A1, #B, #B1>, kotlin/Function2<#C, #B1, #C1>): arrow.collectors/NonSuspendCollectorI<*, #B, #C1> // arrow.collectors/NonSuspendCollectorI.zipNonSuspend|zipNonSuspend(arrow.collectors.NonSuspendCollectorI<0:0,1:1,0:1>;kotlin.Function2<1:2,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> zip(arrow.collectors/NonSuspendCollectorI<#A1, #B, #B1>): arrow.collectors/NonSuspendCollectorI<*, #B, kotlin/Pair<#C, #B1>> // arrow.collectors/NonSuspendCollectorI.zip|zip(arrow.collectors.NonSuspendCollectorI<0:0,1:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> contramapNonSuspend(kotlin/Function1<#A1, #B>): arrow.collectors/NonSuspendCollectorI<*, #A1, #C> // arrow.collectors/NonSuspendCollectorI.contramapNonSuspend|contramapNonSuspend(kotlin.Function1<0:0,1:1>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> mapNonSuspend(kotlin/Function1<#C, #A1>): arrow.collectors/NonSuspendCollectorI<*, #B, #A1> // arrow.collectors/NonSuspendCollectorI.mapNonSuspend|mapNonSuspend(kotlin.Function1<1:2,0:0>){0§<kotlin.Any?>}[0]
+    open suspend fun accumulate(#A, #B) // arrow.collectors/NonSuspendCollectorI.accumulate|accumulate(1:0;1:1){}[0]
+    open suspend fun finish(#A): #C // arrow.collectors/NonSuspendCollectorI.finish|finish(1:0){}[0]
+    open suspend fun supply(): #A // arrow.collectors/NonSuspendCollectorI.supply|supply(){}[0]
+}
+
 final object arrow.collectors/Collectors { // arrow.collectors/Collectors|null[0]
+    final val length // arrow.collectors/Collectors.length|{}length[0]
+        final fun <get-length>(): arrow.collectors/NonSuspendCollectorI<*, kotlin/Any?, kotlin/Int> // arrow.collectors/Collectors.length.<get-length>|<get-length>(){}[0]
+    final val sum // arrow.collectors/Collectors.sum|{}sum[0]
+        final fun <get-sum>(): arrow.collectors/NonSuspendCollectorI<*, kotlin/Int, kotlin/Int> // arrow.collectors/Collectors.sum.<get-sum>|<get-sum>(){}[0]
+
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> map(): arrow.collectors/NonSuspendCollectorI<*, kotlin/Pair<#A1, #B1>, kotlin.collections/Map<#A1, #B1>> // arrow.collectors/Collectors.map|map(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> mapFromEntries(): arrow.collectors/NonSuspendCollectorI<*, kotlin.collections/Map.Entry<#A1, #B1>, kotlin.collections/Map<#A1, #B1>> // arrow.collectors/Collectors.mapFromEntries|mapFromEntries(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> bestBy(kotlin/Function2<#A1, #A1, kotlin/Boolean>): arrow.collectors/NonSuspendCollectorI<*, #A1, #A1?> // arrow.collectors/Collectors.bestBy|bestBy(kotlin.Function2<0:0,0:0,kotlin.Boolean>){0§<kotlin.Any?>}[0]
@@ -71,11 +77,15 @@ final object arrow.collectors/Collectors { // arrow.collectors/Collectors|null[0
     final fun <#A1: kotlin/Any?> reducer(kotlin/Function0<#A1>, kotlin/Function2<#A1, #A1, #A1>, kotlin/Boolean = ...): arrow.collectors/NonSuspendCollectorI<*, #A1, #A1> // arrow.collectors/Collectors.reducer|reducer(kotlin.Function0<0:0>;kotlin.Function2<0:0,0:0,0:0>;kotlin.Boolean){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> set(): arrow.collectors/NonSuspendCollectorI<*, #A1, kotlin.collections/Set<#A1>> // arrow.collectors/Collectors.set|set(){0§<kotlin.Any?>}[0]
     final fun intReducer(kotlin/Function0<kotlin/Int>, kotlin/Function2<kotlin/Int, kotlin/Int, kotlin/Int>): arrow.collectors/NonSuspendCollectorI<*, kotlin/Int, kotlin/Int> // arrow.collectors/Collectors.intReducer|intReducer(kotlin.Function0<kotlin.Int>;kotlin.Function2<kotlin.Int,kotlin.Int,kotlin.Int>){}[0]
-    final val length // arrow.collectors/Collectors.length|{}length[0]
-        final fun <get-length>(): arrow.collectors/NonSuspendCollectorI<*, kotlin/Any?, kotlin/Int> // arrow.collectors/Collectors.length.<get-length>|<get-length>(){}[0]
-    final val sum // arrow.collectors/Collectors.sum|{}sum[0]
-        final fun <get-sum>(): arrow.collectors/NonSuspendCollectorI<*, kotlin/Int, kotlin/Int> // arrow.collectors/Collectors.sum.<get-sum>|<get-sum>(){}[0]
 }
+
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?> arrow.collectors/zip(arrow.collectors/CollectorI<*, #A, #B>, arrow.collectors/CollectorI<*, #A, #C>, arrow.collectors/CollectorI<*, #A, #D>, kotlin.coroutines/SuspendFunction3<#B, #C, #D, #E>): arrow.collectors/CollectorI<*, #A, #E> // arrow.collectors/zip|zip(arrow.collectors.CollectorI<*,0:0,0:1>;arrow.collectors.CollectorI<*,0:0,0:2>;arrow.collectors.CollectorI<*,0:0,0:3>;kotlin.coroutines.SuspendFunction3<0:1,0:2,0:3,0:4>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?> arrow.collectors/zip(arrow.collectors/NonSuspendCollectorI<*, #A, #B>, arrow.collectors/NonSuspendCollectorI<*, #A, #C>, arrow.collectors/NonSuspendCollectorI<*, #A, #D>, kotlin/Function3<#B, #C, #D, #E>): arrow.collectors/NonSuspendCollectorI<*, #A, #E> // arrow.collectors/zip|zip(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>;arrow.collectors.NonSuspendCollectorI<*,0:0,0:2>;arrow.collectors.NonSuspendCollectorI<*,0:0,0:3>;kotlin.Function3<0:1,0:2,0:3,0:4>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> arrow.collectors/zip(arrow.collectors/CollectorI<*, #A, #B>, arrow.collectors/CollectorI<*, #A, #C>, kotlin.coroutines/SuspendFunction2<#B, #C, #D>): arrow.collectors/CollectorI<*, #A, #D> // arrow.collectors/zip|zip(arrow.collectors.CollectorI<*,0:0,0:1>;arrow.collectors.CollectorI<*,0:0,0:2>;kotlin.coroutines.SuspendFunction2<0:1,0:2,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> arrow.collectors/zip(arrow.collectors/NonSuspendCollectorI<*, #A, #B>, arrow.collectors/NonSuspendCollectorI<*, #A, #C>, kotlin/Function2<#B, #C, #D>): arrow.collectors/NonSuspendCollectorI<*, #A, #D> // arrow.collectors/zip|zip(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>;arrow.collectors.NonSuspendCollectorI<*,0:0,0:2>;kotlin.Function2<0:1,0:2,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterable<#A>).arrow.collectors/collect(arrow.collectors/NonSuspendCollectorI<*, #A, #B>): #B // arrow.collectors/collect|collect@kotlin.collections.Iterable<0:0>(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterator<#A>).arrow.collectors/collect(arrow.collectors/NonSuspendCollectorI<*, #A, #B>): #B // arrow.collectors/collect|collect@kotlin.collections.Iterator<0:0>(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.sequences/Sequence<#A>).arrow.collectors/collect(arrow.collectors/NonSuspendCollectorI<*, #A, #B>): #B // arrow.collectors/collect|collect@kotlin.sequences.Sequence<0:0>(arrow.collectors.NonSuspendCollectorI<*,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterable<#A>).arrow.collectors/parCollect(arrow.collectors/CollectorI<*, #A, #B>, kotlin/Int = ...): #B // arrow.collectors/parCollect|parCollect@kotlin.collections.Iterable<0:0>(arrow.collectors.CollectorI<*,0:0,0:1>;kotlin.Int){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.sequences/Sequence<#A>).arrow.collectors/parCollect(arrow.collectors/CollectorI<*, #A, #B>, kotlin/Int = ...): #B // arrow.collectors/parCollect|parCollect@kotlin.sequences.Sequence<0:0>(arrow.collectors.CollectorI<*,0:0,0:1>;kotlin.Int){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/Flow<#A>).arrow.collectors/collect(arrow.collectors/CollectorI<*, #A, #B>, kotlin/Int = ...): #B // arrow.collectors/collect|collect@kotlinx.coroutines.flow.Flow<0:0>(arrow.collectors.CollectorI<*,0:0,0:1>;kotlin.Int){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]

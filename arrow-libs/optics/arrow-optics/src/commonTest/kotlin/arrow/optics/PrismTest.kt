@@ -205,5 +205,4 @@ class PrismTest {
       Prism.sumType().all(sum) { predicate } shouldBe (predicate || sum is SumType.B)
     }
   }
-
 }
