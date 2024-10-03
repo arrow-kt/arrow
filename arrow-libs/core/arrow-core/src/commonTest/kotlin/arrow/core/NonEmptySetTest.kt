@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.core.test.nonEmptySet
+import arrow.core.test.stackSafeIteration
 import io.kotest.assertions.withClue
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
@@ -8,6 +9,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.negativeInt
 import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.checkAll
@@ -75,5 +77,41 @@ class NonEmptySetTest {
       }
     }
   }
-}
 
+  @Test
+  fun mapOrAccumulateIsStackSafe() = runTest {
+    val acc = mutableSetOf<Int>()
+    val res = (0..stackSafeIteration())
+      .toNonEmptySetOrNull()!!
+      .mapOrAccumulate(String::plus) {
+        acc.add(it)
+        it
+      }
+    res shouldBe Either.Right(acc)
+  }
+
+  @Test
+  fun mapOrAccumulateAccumulatesErrors() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 0 .. 20)) { nes ->
+      val res = nes.mapOrAccumulate { i ->
+        if (i % 2 == 0) i else raise(i)
+      }
+
+      val expected = nes.filterNot { it % 2 == 0 }
+        .toNonEmptyListOrNull()?.left() ?: nes.filter { it % 2 == 0 }.toNonEmptySetOrNull()!!.right()
+
+      res shouldBe expected
+    }
+  }
+
+  @Test
+  fun mapOrAccumulateAccumulatesErrorsWithCombineFunction() = runTest {
+    checkAll(Arb.nonEmptySet(Arb.negativeInt(), range = 0 .. 20)) { nes ->
+      val res = nes.mapOrAccumulate(String::plus) { i ->
+        if (i > 0) i else raise("Negative")
+      }
+
+      res shouldBe nes.map { "Negative" }.joinToString("").left()
+    }
+  }
+}

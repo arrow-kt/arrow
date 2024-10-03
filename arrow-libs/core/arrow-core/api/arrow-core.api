@@ -559,6 +559,8 @@ public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/
 }
 
 public final class arrow/core/NonEmptySetKt {
+	public static final fun mapOrAccumulate-EyVDDLY (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun mapOrAccumulate-jkbboic (Ljava/util/Set;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/Set;
 	public static final fun toNonEmptySetOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final synthetic fun toNonEmptySetOrNone (Ljava/util/Set;)Larrow/core/Option;
