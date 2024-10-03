@@ -1,4 +1,8 @@
+@file:JvmName("MapHighArityKt")
+
 package arrow.core
+
+import kotlin.jvm.JvmName
 
 @Suppress("UNCHECKED_CAST")
 public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> Map<Key, A>.zip(
