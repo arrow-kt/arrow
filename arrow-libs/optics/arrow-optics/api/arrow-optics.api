@@ -113,6 +113,7 @@ public final class arrow/optics/PIso$DefaultImpls {
 	public static fun compose (Larrow/optics/PIso;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static fun compose (Larrow/optics/PIso;Larrow/optics/PPrism;)Larrow/optics/PPrism;
 	public static fun compose (Larrow/optics/PIso;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static fun composeLazy (Larrow/optics/PIso;Lkotlin/jvm/functions/Function0;)Larrow/optics/PTraversal;
 	public static fun exists (Larrow/optics/PIso;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public static fun findOrNull (Larrow/optics/PIso;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun first (Larrow/optics/PIso;)Larrow/optics/PIso;
@@ -201,6 +202,7 @@ public final class arrow/optics/PLens$DefaultImpls {
 	public static fun compose (Larrow/optics/PLens;Larrow/optics/PLens;)Larrow/optics/PLens;
 	public static fun compose (Larrow/optics/PLens;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static fun compose (Larrow/optics/PLens;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static fun composeLazy (Larrow/optics/PLens;Lkotlin/jvm/functions/Function0;)Larrow/optics/PTraversal;
 	public static fun exists (Larrow/optics/PLens;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public static fun findOrNull (Larrow/optics/PLens;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun first (Larrow/optics/PLens;)Larrow/optics/PLens;
@@ -263,6 +265,7 @@ public final class arrow/optics/POptional$DefaultImpls {
 	public static fun choice (Larrow/optics/POptional;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun compose (Larrow/optics/POptional;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static fun compose (Larrow/optics/POptional;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static fun composeLazy (Larrow/optics/POptional;Lkotlin/jvm/functions/Function0;)Larrow/optics/PTraversal;
 	public static fun exists (Larrow/optics/POptional;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public static fun findOrNull (Larrow/optics/POptional;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun first (Larrow/optics/POptional;)Larrow/optics/POptional;
@@ -331,6 +334,7 @@ public final class arrow/optics/PPrism$DefaultImpls {
 	public static fun compose (Larrow/optics/PPrism;Larrow/optics/POptional;)Larrow/optics/POptional;
 	public static fun compose (Larrow/optics/PPrism;Larrow/optics/PPrism;)Larrow/optics/PPrism;
 	public static fun compose (Larrow/optics/PPrism;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static fun composeLazy (Larrow/optics/PPrism;Lkotlin/jvm/functions/Function0;)Larrow/optics/PTraversal;
 	public static fun exists (Larrow/optics/PPrism;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public static fun findOrNull (Larrow/optics/PPrism;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun first (Larrow/optics/PPrism;)Larrow/optics/PPrism;
@@ -363,6 +367,7 @@ public abstract interface class arrow/optics/PTraversal {
 	public abstract fun any (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public abstract fun choice (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public abstract fun compose (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public abstract fun composeLazy (Lkotlin/jvm/functions/Function0;)Larrow/optics/PTraversal;
 	public static fun either ()Larrow/optics/PTraversal;
 	public abstract fun exists (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public abstract fun findOrNull (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -445,6 +450,7 @@ public final class arrow/optics/PTraversal$DefaultImpls {
 	public static fun any (Larrow/optics/PTraversal;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public static fun choice (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun compose (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static fun composeLazy (Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function0;)Larrow/optics/PTraversal;
 	public static fun exists (Larrow/optics/PTraversal;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Z
 	public static fun findOrNull (Larrow/optics/PTraversal;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun firstOrNull (Larrow/optics/PTraversal;Ljava/lang/Object;)Ljava/lang/Object;
@@ -568,6 +574,18 @@ public final class arrow/optics/match/MatchNotFound : java/lang/Throwable {
 public abstract interface class arrow/optics/match/MatchScope {
 	public abstract fun default (Lkotlin/jvm/functions/Function0;)V
 	public abstract fun then (Larrow/optics/POptional;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/optics/regex/RegexKt {
+	public static final fun and (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun onceOrMore (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun times (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun zeroOrMore (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+}
+
+public final class arrow/optics/regex/dsl/RegexKt {
+	public static final fun onceOrMore (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun zeroOrMore (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 }
 
 public abstract interface class arrow/optics/typeclasses/At {
