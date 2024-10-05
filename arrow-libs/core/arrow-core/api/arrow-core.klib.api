@@ -10,6 +10,10 @@ open annotation class arrow.core.raise/DelicateRaiseApi : kotlin/Annotation { //
     constructor <init>() // arrow.core.raise/DelicateRaiseApi.<init>|<init>(){}[0]
 }
 
+open annotation class arrow.core.raise/ExperimentalRaiseAccumulateApi : kotlin/Annotation { // arrow.core.raise/ExperimentalRaiseAccumulateApi|null[0]
+    constructor <init>() // arrow.core.raise/ExperimentalRaiseAccumulateApi.<init>|<init>(){}[0]
+}
+
 open annotation class arrow.core.raise/ExperimentalTraceApi : kotlin/Annotation { // arrow.core.raise/ExperimentalTraceApi|null[0]
     constructor <init>() // arrow.core.raise/ExperimentalTraceApi.<init>|<init>(){}[0]
 }

@@ -460,7 +460,7 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
-@RaiseDSL
+@RaiseDSL @OptIn(ExperimentalRaiseAccumulateApi::class)
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
@@ -540,7 +540,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
-@PublishedApi @JvmSynthetic
+@PublishedApi @JvmSynthetic @OptIn(ExperimentalRaiseAccumulateApi::class)
 internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
@@ -671,6 +671,12 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   }
 }
 
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+public annotation class ExperimentalRaiseAccumulateApi
+
+@ExperimentalRaiseAccumulateApi
 public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   block: RaiseAccumulate<Error>.() -> A
 ): A {
@@ -681,6 +687,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   return result
 }
 
+@ExperimentalRaiseAccumulateApi
 public inline fun <Error, A, R> accumulate(
   raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
   crossinline block: RaiseAccumulate<Error>.() -> A
@@ -771,24 +778,30 @@ public open class RaiseAccumulate<Error>(
   @PublishedApi internal fun hasErrors(): Boolean = errors.isNotEmpty()
   @PublishedApi internal fun raiseErrors(): Nothing = raise.raise(errors.toNonEmptyListOrNull()!!)
 
+  @ExperimentalRaiseAccumulateApi
   public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> =
     accumulating { this@bindOrAccumulate.bind() }
 
+  @ExperimentalRaiseAccumulateApi
   public fun <A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> =
     accumulating { this@bindAllOrAccumulate.bindAll() }
 
+  @ExperimentalRaiseAccumulateApi
   public fun <A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
     accumulating { this@bindNelOrAccumulate.bindNel() }
 
+  @ExperimentalRaiseAccumulateApi
   public fun ensureOrAccumulate(condition: Boolean, raise: () -> Error) {
     accumulating { ensure(condition, raise) }
   }
 
+  @ExperimentalRaiseAccumulateApi
   public fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
     contract { returns() implies (value != null) }
     ensureOrAccumulate(value != null, raise)
   }
 
+  @ExperimentalRaiseAccumulateApi
   public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> =
     recover(inner@{
       Ok(block(RaiseAccumulate(this@inner)))
