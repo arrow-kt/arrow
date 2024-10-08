@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
@@ -15,7 +16,7 @@ apply(from = property("ANIMALSNIFFER_MPP"))
 
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
+    languageVersion.set(JavaLanguageVersion.of(17))
   }
 }
 
@@ -27,6 +28,13 @@ kotlin {
       dependencies {
         api(projects.arrowCore)
         api(libs.cache4k)
+      }
+    }
+    commonTest {
+      dependencies {
+        implementation(libs.kotlin.test)
+        implementation(libs.kotest.assertionsCore)
+        implementation(libs.coroutines.test)
       }
     }
   }
@@ -74,4 +82,9 @@ tasks.named<Jar>("jvmJar").configure {
   manifest {
     attributes["Automatic-Module-Name"] = "arrow.cache4k"
   }
+}
+
+// enables context receivers for Jvm Tests
+tasks.named<KotlinCompile>("compileTestKotlinJvm") {
+  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
 }
