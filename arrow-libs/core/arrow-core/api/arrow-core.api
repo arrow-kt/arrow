@@ -892,6 +892,9 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : java/lang/annotation/Annotation {
 }
 
+public abstract interface annotation class arrow/core/raise/ExperimentalRaiseAccumulateApi : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 

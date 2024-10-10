@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalRaiseAccumulateApi::class)
 package arrow.core.raise
 
 import arrow.core.NonEmptyList

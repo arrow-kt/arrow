@@ -6,15 +6,23 @@ import kotlinx.coroutines.async as coroutinesAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.InternalForInheritanceCoroutinesApi
 import kotlinx.coroutines.awaitAll as coroutinesAwaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+public annotation class ExperimentalAwaitAllApi
+
+@ExperimentalAwaitAllApi
 public suspend fun <A> awaitAll(
   block: suspend AwaitAllScope.() -> A
 ): A = coroutineScope { block(AwaitAllScope(this)) }
 
+@ExperimentalAwaitAllApi
 public suspend fun <A> CoroutineScope.awaitAll(
   block: suspend AwaitAllScope.() -> A
 ): A = block(AwaitAllScope(this))
@@ -61,6 +69,7 @@ public class AwaitAllScope(
     return Await(deferred)
   }
 
+  @OptIn(InternalForInheritanceCoroutinesApi::class)
   private inner class Await<T>(
     private val deferred: Deferred<T>
   ): Deferred<T> by deferred {

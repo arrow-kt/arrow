@@ -6,6 +6,10 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-fx-coroutines>
+open annotation class arrow.fx.coroutines.await/ExperimentalAwaitAllApi : kotlin/Annotation { // arrow.fx.coroutines.await/ExperimentalAwaitAllApi|null[0]
+    constructor <init>() // arrow.fx.coroutines.await/ExperimentalAwaitAllApi.<init>|<init>(){}[0]
+}
+
 open annotation class arrow.fx.coroutines/ResourceDSL : kotlin/Annotation { // arrow.fx.coroutines/ResourceDSL|null[0]
     constructor <init>() // arrow.fx.coroutines/ResourceDSL.<init>|<init>(){}[0]
 }

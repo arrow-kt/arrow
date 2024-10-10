@@ -279,3 +279,6 @@ public final class arrow/fx/coroutines/await/AwaitAllScopeKt {
 	public static final fun awaitAll (Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface annotation class arrow/fx/coroutines/await/ExperimentalAwaitAllApi : java/lang/annotation/Annotation {
+}
+
