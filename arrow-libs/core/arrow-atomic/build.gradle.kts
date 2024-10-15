@@ -34,6 +34,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
+        implementation(projects.arrowPlatform)
         implementation(libs.kotlin.test)
         implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)

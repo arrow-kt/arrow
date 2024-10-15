@@ -4,7 +4,6 @@ import arrow.core.Either
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
-import io.kotest.mpp.NamedThreadFactory
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 import kotlin.test.Test
