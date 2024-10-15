@@ -8,9 +8,9 @@ internal fun ADT.snippets(options: OpticsProcessorOptions): List<Snippet> =
       is IsoTarget -> options.generateIsos(this, it)
       is PrismTarget -> options.generatePrisms(this, it)
       is LensTarget -> options.generateLenses(this, it)
-      is SealedClassDsl -> generatePrismDsl(this, it)
-      is DataClassDsl -> generateLensDsl(this, it)
-      is ValueClassDsl -> generateIsoDsl(this, it)
+      is SealedClassDsl -> options.generatePrismDsl(this, it)
+      is DataClassDsl -> options.generateLensDsl(this, it)
+      is ValueClassDsl -> options.generateIsoDsl(this, it)
     }
   }
 
