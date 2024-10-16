@@ -111,9 +111,6 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
 
-include("arrow-match")
-project(":arrow-match").projectDir = file("arrow-libs/optics/arrow-match")
-
 // STACK
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
