@@ -1,0 +1,25 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-platform>
+final enum class arrow.platform/Platform : kotlin/Enum<arrow.platform/Platform> { // arrow.platform/Platform|null[0]
+    enum entry JS // arrow.platform/Platform.JS|null[0]
+    enum entry JVM // arrow.platform/Platform.JVM|null[0]
+    enum entry Native // arrow.platform/Platform.Native|null[0]
+    enum entry WebAssembly // arrow.platform/Platform.WebAssembly|null[0]
+
+    final val entries // arrow.platform/Platform.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.platform/Platform> // arrow.platform/Platform.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): arrow.platform/Platform // arrow.platform/Platform.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<arrow.platform/Platform> // arrow.platform/Platform.values|values#static(){}[0]
+}
+
+final val arrow.platform/platform // arrow.platform/platform|{}platform[0]
+    final fun <get-platform>(): arrow.platform/Platform // arrow.platform/platform.<get-platform>|<get-platform>(){}[0]
+
+final fun arrow.platform/stackSafeIteration(): kotlin/Int // arrow.platform/stackSafeIteration|stackSafeIteration(){}[0]

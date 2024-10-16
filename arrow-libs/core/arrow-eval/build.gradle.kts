@@ -34,6 +34,7 @@ kotlin {
         implementation(libs.kotlin.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
+        implementation(projects.arrowPlatform)
       }
     }
   }

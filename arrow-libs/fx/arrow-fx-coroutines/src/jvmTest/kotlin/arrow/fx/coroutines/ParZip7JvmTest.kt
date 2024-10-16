@@ -5,7 +5,6 @@ import arrow.core.Tuple7
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
-import io.kotest.mpp.NamedThreadFactory
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
@@ -13,7 +12,6 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 import kotlin.test.Test
-import kotlin.time.Duration.Companion.seconds
 
 class ParZip7JvmTest {
   val threadName: suspend CoroutineScope.() -> String =

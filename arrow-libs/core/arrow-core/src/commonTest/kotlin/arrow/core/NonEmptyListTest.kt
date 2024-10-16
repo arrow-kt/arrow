@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.core.test.nonEmptyList
-import arrow.core.test.stackSafeIteration
+import arrow.platform.stackSafeIteration
 import io.kotest.assertions.withClue
 import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue

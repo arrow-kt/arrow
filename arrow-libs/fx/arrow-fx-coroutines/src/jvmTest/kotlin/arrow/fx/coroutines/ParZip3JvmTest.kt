@@ -4,7 +4,6 @@ import arrow.core.Either
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
-import io.kotest.mpp.NamedThreadFactory
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string

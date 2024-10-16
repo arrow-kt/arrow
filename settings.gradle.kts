@@ -55,6 +55,9 @@ dependencyResolutionManagement {
 include("arrow-annotations")
 project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotations")
 
+include("arrow-platform")
+project(":arrow-platform").projectDir = file("arrow-libs/core/arrow-platform")
+
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
