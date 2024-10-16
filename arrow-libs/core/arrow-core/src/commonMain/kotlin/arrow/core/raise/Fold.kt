@@ -94,7 +94,7 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Erro
 
 /**
  * The most general way to execute a computation using [Raise].
- * Depending on the outcome of the block, one of the two continuations is run:
+ * Depending on the outcome of the block, one of the two lambdas is run:
  * - _success_ [transform] result of [A] to a value of [B].
  * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
  *
@@ -116,7 +116,7 @@ public inline fun <Error, A, B> fold(
 
 /**
  * The most general way to execute a computation using [Raise].
- * Depending on the outcome of the block, one of the three continuations is run:
+ * Depending on the outcome of the block, one of the three lambdas is run:
  * - _success_ [transform] result of [A] to a value of [B].
  * - _raised_ [recover] from `raised` value of [Error] to a value of [B].
  * - _exception_ [catch] from [Throwable] by transforming value into [B].
@@ -172,16 +172,16 @@ public inline fun <Error, A, B> fold(
  * }
  * ```
  * ```text
- * arrow.core.continuations.RaiseCancellationException: Raised Continuation
- *   at arrow.core.continuations.DefaultRaise.raise(Fold.kt:77)
+ * arrow.core.raise.RaiseCancellationException: Raised Continuation
+ *   at arrow.core.raise.DefaultRaise.raise(Fold.kt:77)
  *   at MainKtKt$main$error$1.invoke(MainKt.kt:6)
  *   at MainKtKt$main$error$1.invoke(MainKt.kt:6)
- *   at arrow.core.continuations.Raise$DefaultImpls.bind(Raise.kt:22)
- *   at arrow.core.continuations.DefaultRaise.bind(Fold.kt:74)
- *   at arrow.core.continuations.Effect__TracingKt$traced$2.invoke(Traced.kt:46)
- *   at arrow.core.continuations.Effect__TracingKt$traced$2.invoke(Traced.kt:46)
- *   at arrow.core.continuations.Effect__FoldKt.fold(Fold.kt:92)
- *   at arrow.core.continuations.Effect.fold(Unknown Source)
+ *   at arrow.core.raise.Raise$DefaultImpls.bind(Raise.kt:22)
+ *   at arrow.core.raise.DefaultRaise.bind(Fold.kt:74)
+ *   at arrow.core.raise.Effect__TracingKt$traced$2.invoke(Traced.kt:46)
+ *   at arrow.core.raise.Effect__TracingKt$traced$2.invoke(Traced.kt:46)
+ *   at arrow.core.raise.Effect__FoldKt.fold(Fold.kt:92)
+ *   at arrow.core.raise.Effect.fold(Unknown Source)
  *   at MainKtKt.main(MainKt.kt:8)
  *   at MainKtKt.main(MainKt.kt)
  * ```
