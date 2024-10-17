@@ -438,7 +438,7 @@ private fun linear(base: Duration): Sequence<Duration> =
  */
 private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Long): List<Schedule.Decision<I, A>> =
   buildList {
-    var step = this@calculateSchedule.step
+    var step = this@calculateSchedule
     for (i in 0 until n) {
       when (val decision = step(input)) {
         is Continue -> {
