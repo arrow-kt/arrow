@@ -974,8 +974,10 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-FrVv2gs (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-nfMsDo0 (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
+	public final fun mapValuesOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun raiseErrors ()Ljava/lang/Void;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;

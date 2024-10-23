@@ -751,6 +751,16 @@ public open class RaiseAccumulate<Error>(
   ): NonEmptySet<B> = raise.mapOrAccumulate(this, transform)
 
   @RaiseDSL
+  public inline fun <K, A, B> Map<K, A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+  ): List<B> = raise.mapOrAccumulate(entries, transform)
+
+  @RaiseDSL
+  public inline fun <K, A, B> Map<K, A>.mapValuesOrAccumulate(
+    transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+  ): Map<K, B> = raise.mapValuesOrAccumulate(this, transform)
+
+  @RaiseDSL
   @JvmName("_mapOrAccumulate")
   public inline fun <A, B> mapOrAccumulate(
     iterable: Iterable<A>,
