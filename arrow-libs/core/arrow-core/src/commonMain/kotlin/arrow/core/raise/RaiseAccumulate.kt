@@ -651,7 +651,28 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 }.toNonEmptySetOrNull()!!
 
 @RaiseDSL
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(map, combine, transform)"),
+)
 public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
+  map: Map<K, A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = mapValuesOrAccumulate(map, combine, transform)
+
+@RaiseDSL
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(map, transform)")
+)
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  map: Map<K, A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = mapValuesOrAccumulate(map, transform)
+
+@RaiseDSL
+public inline fun <K, Error, A, B> Raise<Error>.mapValuesOrAccumulate(
   map: Map<K, A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
@@ -662,7 +683,7 @@ public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
 }
 
 @RaiseDSL
-public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapValuesOrAccumulate(
   map: Map<K, A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
@@ -712,7 +733,7 @@ public open class RaiseAccumulate<Error>(
     raise.raise((errors + r).toNonEmptyListOrNull()!!)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
-    raise.mapOrAccumulate(this) { it.value.bind() }
+    raise.mapValuesOrAccumulate(this) { it.value.bind() }
 
   @RaiseDSL
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
