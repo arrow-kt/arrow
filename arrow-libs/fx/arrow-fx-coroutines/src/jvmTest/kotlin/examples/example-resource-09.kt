@@ -9,7 +9,7 @@ val resource =
 
 @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
 suspend fun main(): Unit {
-  val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
+  val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocate()
   try {
     /** Do something with A */
     release(ExitCase.Completed)
