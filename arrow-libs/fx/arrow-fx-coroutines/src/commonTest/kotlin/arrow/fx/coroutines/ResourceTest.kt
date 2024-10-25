@@ -136,6 +136,18 @@ class ResourceTest {
     exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
   }
 
+  @Test
+  fun resourceCloseOnNonLocalReturn() = runTest {
+    val exit = CompletableDeferred<ExitCase>()
+    run {
+      resourceScope {
+        onRelease(exit::complete)
+        return@run
+      }
+    }
+    exit.await() shouldBe ExitCase.Completed
+  }
+
   private val depth = 10
 
   class CheckableAutoClose {

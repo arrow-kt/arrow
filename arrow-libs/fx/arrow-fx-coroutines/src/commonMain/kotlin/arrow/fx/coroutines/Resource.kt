@@ -356,17 +356,22 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
 @ScopeDSL
 public suspend inline fun <A> resourceScope(action: ResourceScope.() -> A): A {
   val (scope, finalize) = allocateResourceScope()
+  var finalized = false
   val a: A = try {
     action(scope)
   } catch (e: Throwable) {
     val ec = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
     val ee = withContext(NonCancellable) {
+      finalized = true
       finalize(ec, e) ?: e
     }
     throw ee
-  }
-  withContext(NonCancellable) {
-    finalize(ExitCase.Completed, null)?.let { throw it }
+  } finally {
+    if (!finalized) {
+      withContext(NonCancellable) {
+        finalize(ExitCase.Completed, null)?.let { throw it }
+      }
+    }
   }
   return a
 }
@@ -474,7 +479,7 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
   val allocated: A = invoke(effect)
   val release: suspend (ExitCase) -> Unit = { e ->
     val suppressed: Throwable? = finalize(e, null)
-    val original: Throwable? = when(e) {
+    val original: Throwable? = when (e) {
       ExitCase.Completed -> null
       is ExitCase.Cancelled -> e.exception
       is ExitCase.Failure -> e.failure
@@ -495,7 +500,7 @@ private value class ResourceScopeImpl(
   private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
 ) : ResourceScope {
   override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
-  
+
   override suspend fun <A> install(acquire: suspend AcquireStep.() -> A, release: suspend (A, ExitCase) -> Unit): A =
     bracketCase({
       val a = acquire(AcquireStep)
@@ -562,7 +567,7 @@ internal expect val IODispatcher: CoroutineDispatcher
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
-): A = install({ autoCloseable() } ) { s: A, _: ExitCase -> withContext(closingDispatcher) { s.close() } }
+): A = install({ autoCloseable() }) { s: A, _: ExitCase -> withContext(closingDispatcher) { s.close() } }
 
 public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
