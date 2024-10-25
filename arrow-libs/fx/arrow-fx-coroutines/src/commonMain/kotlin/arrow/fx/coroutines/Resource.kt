@@ -354,19 +354,19 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
  * <!--- KNIT example-resource-06.kt -->
  */
 @ScopeDSL
-public suspend fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
-  val scope = ResourceScopeImpl()
+public suspend inline fun <A> resourceScope(action: ResourceScope.() -> A): A {
+  val (scope, finalize) = allocateResourceScope()
   val a: A = try {
     action(scope)
   } catch (e: Throwable) {
-    val ex = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
+    val ec = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
     val ee = withContext(NonCancellable) {
-      scope.cancelAll(ex, e) ?: e
+      finalize(ec, e) ?: e
     }
     throw ee
   }
   withContext(NonCancellable) {
-    scope.cancelAll(ExitCase.Completed)?.let { throw it }
+    finalize(ExitCase.Completed, null)?.let { throw it }
   }
   return a
 }
@@ -470,10 +470,10 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  */
 @DelicateCoroutinesApi
 public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Unit> {
-  val effect = ResourceScopeImpl()
+  val (effect, finalize) = allocateResourceScope()
   val allocated: A = invoke(effect)
   val release: suspend (ExitCase) -> Unit = { e ->
-    val suppressed: Throwable? = effect.cancelAll(e)
+    val suppressed: Throwable? = finalize(e, null)
     val original: Throwable? = when(e) {
       ExitCase.Completed -> null
       is ExitCase.Cancelled -> e.exception
@@ -485,6 +485,10 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
   }
   return Pair(allocated, release)
 }
+
+@PublishedApi
+internal fun allocateResourceScope(): Pair<ResourceScope, suspend (exitCase: ExitCase, first: Throwable?) -> Throwable?> =
+  ResourceScopeImpl().let { it to it::cancelAll }
 
 @JvmInline
 private value class ResourceScopeImpl(
