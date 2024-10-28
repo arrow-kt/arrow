@@ -409,11 +409,11 @@ class MapKTest {
       }
     }
 
-  @Test fun mapNotNullOk() = runTest {
+  @Test fun mapValuesNotNullOk() = runTest {
       checkAll(
         Arb.map(Arb.int(), Arb.boolean(), maxSize = 30)
       ) { xs ->
-        val rs = xs.mapNotNull { (_, pred) -> if(pred) true else null }
+        val rs = xs.mapValuesNotNull { (_, pred) -> if(pred) true else null }
 
         xs.forAll {
           if (it.value)
@@ -678,11 +678,11 @@ class MapKTest {
       }
     }
 
-  @Test fun flatMapOk() = runTest {
+  @Test fun flatMapValuesOk() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
-        val result = a.flatMap { b }
+        val result = a.flatMapValues { b }
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, _) -> Pair(k, b[k]!!) }
           .toMap()
@@ -725,11 +725,11 @@ class MapKTest {
     }
   }
 
-  @Test fun flatMapNull() = runTest {
+  @Test fun flatMapValuesNull() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
     ) { (mapA, mapB) ->
-      val result = mapA.flatMap { mapB }
+      val result = mapA.flatMapValues { mapB }
       val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
         .map { (k, _) -> Pair(k, mapB[k]) }
         .toMap()
