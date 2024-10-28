@@ -354,29 +354,23 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
  * <!--- KNIT example-resource-06.kt -->
  */
 @ScopeDSL
-public suspend inline fun <A> resourceScope(action: ResourceScope.() -> A): A {
-  val (scope, finalize) = allocateResourceScope()
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
+  val (scope, finalizer) = allocateResourceScope()
   var finalized = false
   val a: A = try {
     action(scope)
   } catch (e: Throwable) {
-    val ec = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
-    val ee = withContext(NonCancellable) {
-      finalized = true
-      finalize(ec, e) ?: e
-    }
-    throw ee
+    finalized = true
+    throw finalizer.finalize(e) ?: e
   } finally {
-    if (!finalized) {
-      withContext(NonCancellable) {
-        finalize(ExitCase.Completed, null)?.let { throw it }
-      }
-    }
+    if (!finalized) finalizer.finalize()?.let { throw it }
   }
   return a
 }
 
-public suspend infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+public suspend inline infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
   resourceScope { f(bind()) }
 
 /**
@@ -491,8 +485,20 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
   return Pair(allocated, release)
 }
 
+private typealias ResourceScopeFinalizer = suspend (exitCase: ExitCase, first: Throwable?) -> Throwable?
+
 @PublishedApi
-internal fun allocateResourceScope(): Pair<ResourceScope, suspend (exitCase: ExitCase, first: Throwable?) -> Throwable?> =
+internal suspend fun ResourceScopeFinalizer.finalize(e: Throwable? = null): Throwable? = when (e) {
+  null -> withContext(NonCancellable) { invoke(ExitCase.Completed, null) }
+  else -> {
+    val ec = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
+    val ee = withContext(NonCancellable) { invoke(ec, e) ?: e }
+    throw ee
+  }
+}
+
+@PublishedApi
+internal fun allocateResourceScope(): Pair<ResourceScope, ResourceScopeFinalizer> =
   ResourceScopeImpl().let { it to it::cancelAll }
 
 @JvmInline

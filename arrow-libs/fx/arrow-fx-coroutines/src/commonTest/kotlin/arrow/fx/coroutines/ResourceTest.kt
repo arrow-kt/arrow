@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
+import arrow.atomic.AtomicInt
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
@@ -644,6 +645,18 @@ class ResourceTest {
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
       released.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
+  }
+
+  @Test
+  fun closedOnNonLocalReturn() = runTest {
+    val p = CompletableDeferred<ExitCase>()
+    val res = resource { onRelease(p::complete) }
+    run {
+      res.use {
+        return@run
+      }
+    }
+    p.await() shouldBe ExitCase.Completed
   }
 
   @OptIn(ExperimentalStdlibApi::class)
