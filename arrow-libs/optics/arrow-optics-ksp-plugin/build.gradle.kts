@@ -27,6 +27,12 @@ kotlin {
   }
 }
 
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
+}
+
 apply(from = property("ANIMALSNIFFER_MPP"))
 
 dependencies {
