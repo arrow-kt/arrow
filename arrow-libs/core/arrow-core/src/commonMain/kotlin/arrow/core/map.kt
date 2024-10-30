@@ -244,9 +244,9 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
  * only keeping the [Map.Entry] of the transformed map that match the input [Map.Entry].
  */
 @Suppress("UNCHECKED_CAST")
-public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
+public fun <K, A, B> Map<K, A>.flatMapValues(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   buildMap {
-    this@flatMap.forEach { entry ->
+    this@flatMapValues.forEach { entry ->
       val nestedMap = f(entry)
       if (nestedMap.containsKey(entry.key)) {
         put(entry.key, nestedMap[entry.key] as B)
@@ -267,9 +267,9 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   mapOrAccumulate(this@mapOrAccumulate, transform)
 }
 
-public fun <K, A, B> Map<K, A>.mapNotNull(transform: (Map.Entry<K, A>) -> B?): Map<K, B> =
+public inline fun <K, A, B> Map<K, A>.mapValuesNotNull(transform: (Map.Entry<K, A>) -> B?): Map<K, B> =
   buildMap {
-    this@mapNotNull.forEach { entry ->
+    this@mapValuesNotNull.forEach { entry ->
       transform(entry)?.let { put(entry.key, it) }
     }
   }
