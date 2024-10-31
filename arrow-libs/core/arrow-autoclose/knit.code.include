@@ -1,5 +1,4 @@
 // This file was automatically generated from ${file.name} by Knit tool. Do not edit.
-@file:OptIn(ExperimentalStdlibApi::class)
 package ${knit.package}.${knit.name}
 
 import arrow.AutoCloseScope

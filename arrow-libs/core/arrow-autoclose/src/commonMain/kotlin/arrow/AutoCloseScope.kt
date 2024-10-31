@@ -63,42 +63,46 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   val scope = DefaultAutoCloseScope()
+  var finalized = false
   return try {
     block(scope)
-      .also { scope.close(null) }
   } catch (e: CancellationException) {
-    scope.close(e) ?: throw e
+    finalized = true
+    scope.close(e)
+    throw e
   } catch (e: Throwable) {
-    scope.close(e.throwIfFatal()) ?: throw e
+    finalized = true
+    scope.close(e.throwIfFatal())
+    throw e
+  } finally {
+      if (!finalized) {
+        scope.close(null)
+      }
   }
 }
 
 public interface AutoCloseScope {
-  public fun <A> autoClose(
-    acquire: () -> A,
-    release: (A, Throwable?) -> Unit
-  ): A
+  public fun onClose(release: (Throwable?) -> Unit)
 
-  @ExperimentalStdlibApi
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoClose({ autoCloseable }) { a, _ -> a.close() }
 }
+
+public inline fun <A> AutoCloseScope.autoClose(
+  acquire: () -> A,
+  crossinline release: (A, Throwable?) -> Unit
+): A = acquire().also { a -> onClose { release(a, it) } }
 
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {
   private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())
 
-  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    try {
-      acquire().also { a ->
-        finalizers.update { it + { e -> release(a, e) } }
-      }
-    } catch (e: Throwable) {
-      throw e
-    }
+  override fun onClose(release: (Throwable?) -> Unit) {
+    finalizers.update { it + release }
+  }
 
-  fun close(error: Throwable?): Nothing? {
-    return finalizers.get().asReversed().fold(error) { acc, function ->
+  fun close(error: Throwable?) {
+    finalizers.get().asReversed().fold(error) { acc, function ->
       acc.add(runCatching { function.invoke(error) }.exceptionOrNull())
     }?.let { throw it }
   }

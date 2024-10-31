@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 
-@OptIn(ExperimentalStdlibApi::class)
 class AutoCloseTest {
 
   @Test
@@ -137,6 +136,23 @@ class AutoCloseTest {
   }
 
   @Test
+  fun closeTheAutoScopeOnNonLocalReturn() = runTest {
+    val wasActive = CompletableDeferred<Boolean>()
+    val res = Resource()
+
+    run {
+      autoCloseScope {
+        val r = install(res)
+        wasActive.complete(r.isActive())
+        return@run
+      }
+    }
+
+    wasActive.await() shouldBe true
+    res.isActive() shouldBe false
+  }
+
+  @Test
   fun closeInReversedOrder() = runTest {
     val res1 = Resource()
     val res2 = Resource()
@@ -172,7 +188,6 @@ class AutoCloseTest {
     closed.cancel()
   }
 
-  @OptIn(ExperimentalStdlibApi::class)
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 

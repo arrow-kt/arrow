@@ -510,18 +510,18 @@ private value class ResourceScopeImpl(
       }
     })
 
-  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    acquire().also { a ->
-      val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
-        val errorOrNull = when (exitCase) {
-          ExitCase.Completed -> null
-          is ExitCase.Cancelled -> exitCase.exception
-          is ExitCase.Failure -> exitCase.failure
-        }
-        release(a, errorOrNull)
-      }
-      finalizers.update(finalizer::prependTo)
+  override fun onClose(release: (Throwable?) -> Unit) {
+    val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
+      release(exitCase.errorOrNull)
     }
+    finalizers.update(finalizer::prependTo)
+  }
+
+  private val ExitCase.errorOrNull get() = when (this) {
+    ExitCase.Completed -> null
+    is ExitCase.Cancelled -> exception
+    is ExitCase.Failure -> failure
+  }
 
   suspend fun cancelAll(
     exitCase: ExitCase,

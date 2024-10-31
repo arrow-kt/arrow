@@ -7,16 +7,17 @@
 
 // Library unique name: <io.arrow-kt:arrow-autoclose>
 abstract interface arrow/AutoCloseScope { // arrow/AutoCloseScope|null[0]
-    abstract fun <#A1: kotlin/Any?> autoClose(kotlin/Function0<#A1>, kotlin/Function2<#A1, kotlin/Throwable?, kotlin/Unit>): #A1 // arrow/AutoCloseScope.autoClose|autoClose(kotlin.Function0<0:0>;kotlin.Function2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    abstract fun onClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/AutoCloseScope.onClose|onClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
     open fun <#A1: kotlin/AutoCloseable> install(#A1): #A1 // arrow/AutoCloseScope.install|install(0:0){0§<kotlin.AutoCloseable>}[0]
 }
 
 final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope { // arrow/DefaultAutoCloseScope|null[0]
     constructor <init>() // arrow/DefaultAutoCloseScope.<init>|<init>(){}[0]
 
-    final fun <#A1: kotlin/Any?> autoClose(kotlin/Function0<#A1>, kotlin/Function2<#A1, kotlin/Throwable?, kotlin/Unit>): #A1 // arrow/DefaultAutoCloseScope.autoClose|autoClose(kotlin.Function0<0:0>;kotlin.Function2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]
-    final fun close(kotlin/Throwable?): kotlin/Nothing? // arrow/DefaultAutoCloseScope.close|close(kotlin.Throwable?){}[0]
+    final fun close(kotlin/Throwable?) // arrow/DefaultAutoCloseScope.close|close(kotlin.Throwable?){}[0]
+    final fun onClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/DefaultAutoCloseScope.onClose|onClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
 }
 
 final fun (kotlin/Throwable).arrow/throwIfFatal(): kotlin/Throwable // arrow/throwIfFatal|throwIfFatal@kotlin.Throwable(){}[0]
+final inline fun <#A: kotlin/Any?> (arrow/AutoCloseScope).arrow/autoClose(kotlin/Function0<#A>, crossinline kotlin/Function2<#A, kotlin/Throwable?, kotlin/Unit>): #A // arrow/autoClose|autoClose@arrow.AutoCloseScope(kotlin.Function0<0:0>;kotlin.Function2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> arrow/autoCloseScope(kotlin/Function1<arrow/AutoCloseScope, #A>): #A // arrow/autoCloseScope|autoCloseScope(kotlin.Function1<arrow.AutoCloseScope,0:0>){0§<kotlin.Any?>}[0]

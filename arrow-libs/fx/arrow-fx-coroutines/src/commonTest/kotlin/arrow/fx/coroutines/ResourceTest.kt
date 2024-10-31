@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
+import arrow.autoClose
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
@@ -634,7 +635,6 @@ class ResourceTest {
     }
   }
 
-  @OptIn(ExperimentalStdlibApi::class)
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
