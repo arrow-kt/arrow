@@ -95,7 +95,7 @@ class ResourceTest {
     checkAll(10, Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
       val start = CompletableDeferred<Unit>()
-      fun ResourceScope.n(): Int = n.also { onRelease { ex -> require(p.complete(ex)) } }
+      suspend fun ResourceScope.n(): Int = install({ n }, { _, ex -> require(p.complete(ex)) })
 
       val f = async {
         resourceScope {

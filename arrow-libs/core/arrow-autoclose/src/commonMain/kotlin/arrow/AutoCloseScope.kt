@@ -80,13 +80,13 @@ public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
 public interface AutoCloseScope {
   public fun onClose(release: (Throwable?) -> Unit)
 
-  public fun <A : AutoCloseable> install(autoCloseable: A): A =
-    autoCloseable.also { onClose { autoCloseable.close() } }
-
   public fun <A> autoClose(
     acquire: () -> A,
     release: (A, Throwable?) -> Unit
   ): A = acquire().also { a -> onClose { release(a, it) } }
+
+  public fun <A : AutoCloseable> install(autoCloseable: A): A =
+    autoCloseable.also { onClose { autoCloseable.close() } }
 }
 
 @PublishedApi
