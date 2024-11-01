@@ -64,18 +64,15 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   val scope = DefaultAutoCloseScope()
-  var finalized = false
+  var throwable: Throwable? = null
   return try {
     block(scope)
   } catch (e: Throwable) {
-    finalized = true
-    if (e !is CancellationException) e.throwIfFatal()
-    scope.close(e)
+    throwable = e
     throw e
   } finally {
-    if (!finalized) {
-      scope.close(null)
-    }
+    if (throwable !is CancellationException) throwable?.throwIfFatal()
+    scope.close(throwable)
   }
 }
 
