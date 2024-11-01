@@ -351,21 +351,11 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
  * <!--- KNIT example-resource-06.kt -->
  */
 @ScopeDSL
+@OptIn(DelicateCoroutinesApi::class)
 @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
-  val scope = ResourceScopeImpl()
-  var finished = false
-  return try {
-    action(scope)
-  } catch (e: Throwable) {
-    finished = true
-    scope.cancelAll(ExitCase.ExitCase(e))
-    throw e
-  } finally {
-    if (!finished) {
-      scope.cancelAll(ExitCase.Completed)
-    }
-  }
+  val (scope, cancelAll) = resource { this }.allocated()
+  return finalizeCase({ scope.action() }) { cancelAll(it) }
 }
 
 @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
@@ -471,7 +461,6 @@ public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Un
   bind() to this::cancelAll
 }
 
-@PublishedApi
 internal class ResourceScopeImpl : ResourceScope {
   private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList())
   override fun onRelease(release: suspend (ExitCase) -> Unit) {

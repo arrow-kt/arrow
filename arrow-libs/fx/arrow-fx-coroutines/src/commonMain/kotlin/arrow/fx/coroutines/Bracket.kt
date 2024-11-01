@@ -20,7 +20,8 @@ public sealed class ExitCase {
   }
 }
 
-internal val ExitCase.errorOrNull
+@PublishedApi
+internal val ExitCase.errorOrNull: Throwable?
   get() = when (this) {
     ExitCase.Completed -> null
     is ExitCase.Cancelled -> exception
@@ -66,17 +67,7 @@ public suspend inline fun <A> onCancel(
 public suspend inline fun <A> guarantee(
   fa: suspend () -> A,
   crossinline finalizer: suspend () -> Unit
-): A {
-  val res = try {
-    fa.invoke()
-  } catch (e: CancellationException) {
-    runReleaseAndRethrow(e) { finalizer() }
-  } catch (t: Throwable) {
-    runReleaseAndRethrow(t.nonFatalOrThrow()) { finalizer() }
-  }
-  withContext(NonCancellable) { finalizer() }
-  return res
-}
+): A = guaranteeCase(fa) { finalizer() }
 
 /**
  * Guarantees execution of a given [finalizer] after [fa] regardless of success, error or cancellation, allowing
@@ -96,16 +87,8 @@ public suspend inline fun <A> guarantee(
 public suspend inline fun <A> guaranteeCase(
   fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
-): A {
-  val res = try {
-    fa()
-  } catch (e: CancellationException) {
-    runReleaseAndRethrow(e) { finalizer(ExitCase.Cancelled(e)) }
-  } catch (t: Throwable) {
-    runReleaseAndRethrow(t.nonFatalOrThrow()) { finalizer(ExitCase.Failure(t)) }
-  }
-  withContext(NonCancellable) { finalizer(ExitCase.Completed) }
-  return res
+): A = finalizeCase({ fa() }) { ex ->
+  runReleaseAndRethrow(ex.errorOrNull) { finalizer(ex) }
 }
 
 /**
@@ -153,22 +136,7 @@ public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
   use: suspend (A) -> B,
   crossinline release: suspend (A) -> Unit
-): B {
-  val acquired = withContext(NonCancellable) {
-    acquire()
-  }
-
-  val res = try {
-    use(acquired)
-  } catch (e: CancellationException) {
-    runReleaseAndRethrow(e) { release(acquired) }
-  } catch (t: Throwable) {
-    runReleaseAndRethrow(t.nonFatalOrThrow()) { release(acquired) }
-  }
-
-  withContext(NonCancellable) { release(acquired) }
-  return res
-}
+): B = bracketCase(acquire, use) { acquired, _ -> release(acquired) }
 
 /**
  * A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -238,31 +206,35 @@ public suspend inline fun <A, B> bracketCase(
   use: suspend (A) -> B,
   crossinline release: suspend (A, ExitCase) -> Unit
 ): B {
-  val acquired = withContext(NonCancellable) {
-    acquire()
-  }
-
-  val res = try {
-    use(acquired)
-  } catch (e: CancellationException) {
-    runReleaseAndRethrow(e) { release(acquired, ExitCase.Cancelled(e)) }
-  } catch (t: Throwable) {
-    runReleaseAndRethrow(t.nonFatalOrThrow()) { release(acquired, ExitCase.Failure(t.nonFatalOrThrow())) }
-  }
-
-  withContext(NonCancellable) { release(acquired, ExitCase.Completed) }
-
-  return res
+  val acquired = withContext(NonCancellable) { acquire() }
+  return guaranteeCase({ use(acquired) }) { release(acquired, it) }
 }
 
 @PublishedApi
-internal suspend inline fun runReleaseAndRethrow(original: Throwable, crossinline f: suspend () -> Unit): Nothing {
+internal suspend inline fun runReleaseAndRethrow(original: Throwable?, crossinline f: suspend () -> Unit) {
   try {
     withContext(NonCancellable) {
       f()
     }
   } catch (e: Throwable) {
-    original.addSuppressed(e.nonFatalOrThrow())
+    original?.addSuppressed(e.nonFatalOrThrow()) ?: throw e
   }
-  throw original
+  original?.let { throw it }
+}
+
+@PublishedApi
+internal inline fun <R> finalizeCase(block: () -> R, finalizer: (ExitCase) -> Unit): R {
+  var finished = false
+  return try {
+    block()
+  } catch (e: Throwable) {
+    finished = true
+    if (e !is CancellationException) e.nonFatalOrThrow()
+    finalizer(ExitCase.ExitCase(e))
+    throw e
+  } finally {
+    if (!finished) {
+      finalizer(ExitCase.Completed)
+    }
+  }
 }
