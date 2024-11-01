@@ -40,6 +40,9 @@ fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
 fun Arb.Companion.throwable(): Arb<Throwable> =
   Arb.of(listOf(IndexOutOfBoundsException(), NoSuchElementException(), IllegalArgumentException()))
 
+fun Arb.Companion.throwableConstructor(): Arb<() -> Throwable> =
+  Arb.of(listOf({ IndexOutOfBoundsException() }, { NoSuchElementException() }, { IllegalArgumentException() }))
+
 fun <E, A> Arb.Companion.either(arbE: Arb<E>, arbA: Arb<A>): Arb<Either<E, A>> {
   val arbLeft = arbE.map { Either.Left(it) }
   val arbRight = arbA.map { Either.Right(it) }
@@ -81,17 +84,20 @@ fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
             { "Expected exception of type ${e::class} but found ${value.value::class}" },
             { "Should not be exception of type ${e::class}" }
           )
+
           value.value.message != e.message -> MatcherResult(
             false,
             { "Expected exception with message ${e.message} but found ${value.value.message}" },
             { "Should not be exception with message ${e.message}" }
           )
+
           else -> MatcherResult(
             true,
             { "Expected exception of type ${e::class} and found ${value.value::class}" },
             { "Expected exception of type ${e::class} and found ${value.value::class}" }
           )
         }
+
         is Either.Right -> MatcherResult(
           false,
           { "Expected Either.Left with exception of type ${e::class} and found Right with ${value.value}" },
@@ -122,6 +128,7 @@ fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
             { "Expected exception of type ${e::class} and found ${value.value::class}" }
           )
         }
+
         is Either.Right -> equalityMatcher(e).test(value)
       }
   }

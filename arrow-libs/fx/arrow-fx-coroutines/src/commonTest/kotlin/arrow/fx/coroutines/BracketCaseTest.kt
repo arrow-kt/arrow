@@ -245,12 +245,13 @@ class BracketCaseTest {
     }
   }
 
-  operator fun Throwable.plus(other: Throwable): Throwable =
-    apply { addSuppressed(other) }
+  private infix fun Throwable.shouldHaveSuppressed(exception: Throwable) =
+    suppressedExceptions shouldBe listOf(exception)
 
   @Test
   fun bracketCaseMustComposeImmediateUseAndImmediateReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -258,12 +259,14 @@ class BracketCaseTest {
           release = { _, _ -> throw e2 }
         )
       } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
   @Test
   fun bracketCaseMustComposeSuspendUseAndImmediateReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -271,12 +274,14 @@ class BracketCaseTest {
           release = { _, _ -> throw e2 }
         )
       } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
   @Test
   fun bracketCaseMustComposeImmediateUseAndSuspendReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -284,12 +289,14 @@ class BracketCaseTest {
           release = { _, _ -> e2.suspend() }
         )
       } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
   @Test
   fun bracketCaseMustComposeSuspendUseAndSuspendReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
@@ -297,6 +304,7 @@ class BracketCaseTest {
           release = { _, _ -> e2.suspend() }
         )
       } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
@@ -357,7 +365,7 @@ class BracketCaseTest {
 
     val f = async {
       bracketCase(
-        acquire = {  },
+        acquire = { },
         use = { Unit.suspend() },
         release = { _, exitCase ->
           require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
