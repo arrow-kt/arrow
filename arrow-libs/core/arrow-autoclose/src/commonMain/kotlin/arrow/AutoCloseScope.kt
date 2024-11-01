@@ -3,6 +3,7 @@ package arrow
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.atomic.value
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * The [AutoCloseScope] DSL allows for elegantly working with close-ables,
@@ -68,12 +69,13 @@ public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
     block(scope)
   } catch (e: Throwable) {
     finalized = true
-    scope.close(e.throwIfFatal())
+    if (e !is CancellationException) e.throwIfFatal()
+    scope.close(e)
     throw e
   } finally {
-      if (!finalized) {
-        scope.close(null)
-      }
+    if (!finalized) {
+      scope.close(null)
+    }
   }
 }
 
