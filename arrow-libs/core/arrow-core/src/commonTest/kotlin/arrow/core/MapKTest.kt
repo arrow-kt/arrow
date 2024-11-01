@@ -690,8 +690,8 @@ class MapKTest {
       }
     }
 
-  @Test fun mapOrAccumulateEmpty() = runTest {
-      val result: Either<NonEmptyList<String>, Map<Int, String>> = emptyMap<Int, Int>().mapOrAccumulate {
+  @Test fun mapValuesOrAccumulateEmpty() = runTest {
+      val result: Either<NonEmptyList<String>, Map<Int, String>> = emptyMap<Int, Int>().mapValuesOrAccumulate {
         it.value.toString()
       }
 
@@ -699,12 +699,12 @@ class MapKTest {
       .value.shouldBeEmpty()
   }
 
-  @Test fun mapOrAccumulateMaps() = runTest {
+  @Test fun mapValuesOrAccumulateMaps() = runTest {
     checkAll(
       Arb.map(Arb.int(), Arb.int(), maxSize = 30)
     ) { xs ->
 
-      val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapOrAccumulate {
+      val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapValuesOrAccumulate {
         it.value.toString()
       }
 
@@ -714,13 +714,13 @@ class MapKTest {
     }
   }
 
-  @Test fun mapOrAccumulateAccumulates() = runTest {
+  @Test fun mapValuesOrAccumulateAccumulates() = runTest {
     checkAll(
       Arb.map(Arb.int(), Arb.int(), minSize = 1, maxSize = 30)
     ) { xs ->
-       xs.mapOrAccumulate {
-          raise(it.value)
-      }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
+       xs.mapValuesOrAccumulate {
+         raise(it.value)
+       }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
          .value.all.shouldContainAll(xs.values)
     }
   }
