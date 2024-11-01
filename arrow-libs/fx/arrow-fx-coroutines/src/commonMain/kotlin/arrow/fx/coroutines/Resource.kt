@@ -482,7 +482,6 @@ internal class ResourceScopeImpl : ResourceScope {
 }
 
 /** Platform-dependent IO [CoroutineDispatcher] **/
-@PublishedApi
 internal expect val IODispatcher: CoroutineDispatcher
 
 /**
