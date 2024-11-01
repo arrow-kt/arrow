@@ -4,6 +4,7 @@ import arrow.AutoCloseScope
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.atomic.value
+import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -11,6 +12,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 @DslMarker
 public annotation class ScopeDSL
@@ -475,10 +477,12 @@ internal class ResourceScopeImpl : ResourceScope {
     }?.let { throw it }
   }
 
-  private fun Throwable?.add(other: Throwable?): Throwable? =
-    this?.apply {
+  private fun Throwable?.add(other: Throwable?): Throwable? {
+    if (other !is CancellationException) other?.nonFatalOrThrow()
+    return this?.apply {
       other?.let { addSuppressed(it) }
     } ?: other
+  }
 }
 
 /** Platform-dependent IO [CoroutineDispatcher] **/

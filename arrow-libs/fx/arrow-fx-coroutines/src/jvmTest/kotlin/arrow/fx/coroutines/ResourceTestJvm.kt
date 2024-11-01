@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
@@ -74,11 +75,29 @@ class ResourceTestJvm {
 
   @Test
   fun blowTheScopeOnFatal() = runTest {
-    shouldThrow<LinkageError> {
+    val error = shouldThrow<LinkageError> {
       resourceScope {
         install({  }) { _, _ -> fail("Should never come here") }
         throw LinkageError("BOOM!")
       }
-    }.message shouldBe "BOOM!"
+    }
+    error.message shouldBe "BOOM!"
+    error.suppressedExceptions.shouldBeEmpty()
+  }
+
+  @Test
+  fun blowTheScopeOnFatalInRelease() = runTest {
+    var isLastClosed = false
+    val error = shouldThrow<LinkageError> {
+      resourceScope {
+        install({  }) { _, _ -> fail("Should never come here") }
+        onRelease { throw LinkageError("BOOM!") }
+        onClose { isLastClosed = true }
+        onClose { throw RuntimeException() }
+      }
+    }
+    error.message shouldBe "BOOM!"
+    error.suppressedExceptions.shouldBeEmpty()
+    isLastClosed shouldBe true
   }
 }

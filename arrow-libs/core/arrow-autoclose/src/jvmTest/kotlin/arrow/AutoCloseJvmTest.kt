@@ -26,6 +26,27 @@ class AutoCloseJvmTest {
     res.isActive() shouldBe true
   }
 
+  @Test
+  fun blowTheAutoScopeOnFatalInClose() = runTest {
+    val wasActive = CompletableDeferred<Boolean>()
+    val res = Resource()
+    val res2 = Resource()
+
+    shouldThrow<LinkageError> {
+      autoCloseScope {
+        val r = install(res)
+        wasActive.complete(r.isActive())
+        onClose { throw LinkageError("BOOM!") }
+        install(res2)
+        onClose { throw RuntimeException() }
+      }
+    }.message shouldBe "BOOM!"
+
+    wasActive.await() shouldBe true
+    res.isActive() shouldBe true
+    res2.isActive() shouldBe false
+  }
+
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
