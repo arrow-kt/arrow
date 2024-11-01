@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
-import arrow.autoClose
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
@@ -51,7 +50,7 @@ class ResourceTest {
     checkAll(10, Arb.positiveInt(), Arb.negativeInt()) { a, b ->
       val order = mutableListOf<Int>()
 
-      fun ResourceScope.scoped(n: Int): Int =
+      suspend fun ResourceScope.scoped(n: Int): Int =
         install({ n.also(order::add) }, { it, _ -> order.add(-it) })
 
       resourceScope {
@@ -79,7 +78,7 @@ class ResourceTest {
   fun errorFinishesWithError() = runTest {
     checkAll(10, Arb.throwable()) { e ->
       val p = CompletableDeferred<ExitCase>()
-      fun ResourceScope.failingScope(): Nothing =
+      suspend fun ResourceScope.failingScope(): Nothing =
         install({ throw e }, { _, ex -> require(p.complete(ex)) })
 
       Either.catch {
@@ -165,7 +164,7 @@ class ResourceTest {
 
   @Test
   fun parZipSuccess() = runTestUsingDefaultDispatcher {
-    fun ResourceScope.closeable(): CheckableAutoClose =
+    suspend fun ResourceScope.closeable(): CheckableAutoClose =
       install({ CheckableAutoClose() }) { a: CheckableAutoClose, _: ExitCase -> a.close() }
 
     resourceScope {

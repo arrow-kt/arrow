@@ -2,7 +2,6 @@
 package arrow.fx.coroutines.examples.exampleResource05
 
 import arrow.fx.coroutines.ResourceScope
-import arrow.fx.coroutines.install
 import arrow.fx.coroutines.resourceScope
 import arrow.fx.coroutines.parZip
 import kotlinx.coroutines.Dispatchers

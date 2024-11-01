@@ -1,7 +1,6 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource07
 
-import arrow.fx.coroutines.install
 import arrow.fx.coroutines.resource
 import arrow.fx.coroutines.resourceScope
 

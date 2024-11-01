@@ -173,7 +173,6 @@ public annotation class ResourceDSL
  * <!--- INCLUDE
  * import arrow.fx.coroutines.ResourceScope
  * import arrow.fx.coroutines.Resource
- * import arrow.fx.coroutines.install
  * import arrow.fx.coroutines.resource
  * import kotlinx.coroutines.Dispatchers
  * import kotlinx.coroutines.withContext
@@ -225,7 +224,6 @@ public annotation class ResourceDSL
  *
  * <!--- INCLUDE
  * import arrow.fx.coroutines.ResourceScope
- * import arrow.fx.coroutines.install
  * import arrow.fx.coroutines.resourceScope
  * import arrow.fx.coroutines.parZip
  * import kotlinx.coroutines.Dispatchers
@@ -294,6 +292,17 @@ public interface ResourceScope : AutoCloseScope {
   @ResourceDSL
   public suspend fun <A> Resource<A>.bind(): A = this()
 
+  /**
+   * Install [A] into the [ResourceScope].
+   * Its [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
+   * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
+   */
+  @ResourceDSL
+  public suspend fun <A> ResourceScope.install(
+    acquire: suspend AcquireStep.() -> A,
+    release: suspend (A, ExitCase) -> Unit,
+  ): A = acquire(AcquireStep).also { a -> onRelease { release(a, it) } }
+
   /** Composes a [release] action to a [Resource] value before binding. */
   @ResourceDSL
   public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A =
@@ -309,18 +318,6 @@ public interface ResourceScope : AutoCloseScope {
   public infix fun onRelease(release: suspend (ExitCase) -> Unit)
 }
 
-
-/**
- * Install [A] into the [ResourceScope].
- * Its [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
- * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
- */
-@ResourceDSL
-public inline fun <A> ResourceScope.install(
-  acquire: AcquireStep.() -> A,
-  crossinline release: suspend (A, ExitCase) -> Unit,
-): A = acquire(AcquireStep).also { a -> onRelease { release(a, it) } }
-
 @ScopeDSL
 public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = block
 
@@ -330,7 +327,6 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
  * upon [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] runs all the `release` finalizers.
  *
  * <!--- INCLUDE
- * import arrow.fx.coroutines.install
  * import arrow.fx.coroutines.resourceScope
  * import kotlinx.coroutines.Dispatchers
  * import kotlinx.coroutines.withContext
@@ -376,7 +372,6 @@ public suspend inline infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
  * Construct a [Resource] from an allocating function [acquire] and a release function [release].
  *
  * ```kotlin
- * import arrow.fx.coroutines.install
  * import arrow.fx.coroutines.resource
  * import arrow.fx.coroutines.resourceScope
  *

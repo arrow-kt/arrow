@@ -82,12 +82,12 @@ public interface AutoCloseScope {
 
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoCloseable.also { onClose { autoCloseable.close() } }
-}
 
-public inline fun <A> AutoCloseScope.autoClose(
-  acquire: () -> A,
-  crossinline release: (A, Throwable?) -> Unit
-): A = acquire().also { a -> onClose { release(a, it) } }
+  public fun <A> AutoCloseScope.autoClose(
+    acquire: () -> A,
+    release: (A, Throwable?) -> Unit
+  ): A = acquire().also { a -> onClose { release(a, it) } }
+}
 
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {

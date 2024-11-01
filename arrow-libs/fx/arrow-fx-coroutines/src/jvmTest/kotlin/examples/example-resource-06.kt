@@ -1,7 +1,6 @@
 // This file was automatically generated from Resource.kt by Knit tool. Do not edit.
 package arrow.fx.coroutines.examples.exampleResource06
 
-import arrow.fx.coroutines.install
 import arrow.fx.coroutines.resourceScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
