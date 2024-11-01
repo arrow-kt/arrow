@@ -20,6 +20,13 @@ public sealed class ExitCase {
   }
 }
 
+internal val ExitCase.errorOrNull
+  get() = when (this) {
+    ExitCase.Completed -> null
+    is ExitCase.Cancelled -> exception
+    is ExitCase.Failure -> failure
+  }
+
 /**
  * Registers an [onCancel] handler after [fa].
  * [onCancel] is guaranteed to be called in case of cancellation, otherwise it's ignored.

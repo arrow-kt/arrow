@@ -51,7 +51,7 @@ class ResourceTest {
     checkAll(10, Arb.positiveInt(), Arb.negativeInt()) { a, b ->
       val order = mutableListOf<Int>()
 
-      suspend fun ResourceScope.scoped(n: Int): Int =
+      fun ResourceScope.scoped(n: Int): Int =
         install({ n.also(order::add) }, { it, _ -> order.add(-it) })
 
       resourceScope {
@@ -79,7 +79,7 @@ class ResourceTest {
   fun errorFinishesWithError() = runTest {
     checkAll(10, Arb.throwable()) { e ->
       val p = CompletableDeferred<ExitCase>()
-      suspend fun ResourceScope.failingScope(): Nothing =
+      fun ResourceScope.failingScope(): Nothing =
         install({ throw e }, { _, ex -> require(p.complete(ex)) })
 
       Either.catch {
@@ -93,7 +93,7 @@ class ResourceTest {
     checkAll(10, Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
       val start = CompletableDeferred<Unit>()
-      suspend fun ResourceScope.n(): Int = install({ n }, { _, ex -> require(p.complete(ex)) })
+      fun ResourceScope.n(): Int = n.also { onRelease { ex -> require(p.complete(ex)) } }
 
       val f = async {
         resourceScope {
@@ -165,7 +165,7 @@ class ResourceTest {
 
   @Test
   fun parZipSuccess() = runTestUsingDefaultDispatcher {
-    suspend fun ResourceScope.closeable(): CheckableAutoClose =
+    fun ResourceScope.closeable(): CheckableAutoClose =
       install({ CheckableAutoClose() }) { a: CheckableAutoClose, _: ExitCase -> a.close() }
 
     resourceScope {
@@ -577,7 +577,7 @@ class ResourceTest {
 
   @OptIn(DelicateCoroutinesApi::class)
   @Test
-  fun allocatedSupressedException() = runTest {
+  fun allocatedSuppressedException() = runTest {
     checkAll(
       Arb.int(),
       Arb.string().map(::RuntimeException),
@@ -635,6 +635,41 @@ class ResourceTest {
     }
   }
 
+  @OptIn(DelicateCoroutinesApi::class)
+  @Test
+  fun allocatedSuppressedExceptions() = runTest {
+    checkAll(
+      Arb.int(),
+      Arb.string().map(::RuntimeException),
+      Arb.string().map(::IllegalStateException),
+      Arb.string().map(::IllegalStateException),
+    ) { seed, original, suppressed1, suppressed2 ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) =
+        resource {
+          onRelease { exitCase ->
+            released.complete(exitCase)
+            throw suppressed1
+          }
+          onClose { throw suppressed2 }
+          seed
+        }.allocated()
+
+      val exception = shouldThrow<RuntimeException> {
+        try {
+          allocate shouldBe seed
+          throw original
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
+      }
+
+      exception shouldBe original
+      exception.suppressedExceptions shouldBe listOf(suppressed2, suppressed1)
+      released.await() shouldBe ExitCase(original)
+    }
+  }
+
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
@@ -685,5 +720,34 @@ class ResourceTest {
     closed.receive() shouldBe res2
     closed.receive() shouldBe res1
     closed.cancel()
+  }
+
+  @Test
+  fun addsSuppressedErrors() = runTest {
+    val promise = CompletableDeferred<ExitCase>()
+    val wasActive = CompletableDeferred<Boolean>()
+    val error = RuntimeException("BOOM!")
+    val error2 = RuntimeException("BOOM 2!")
+    val error3 = RuntimeException("BOOM 3!")
+    val res = Res()
+
+    val e = shouldThrow<RuntimeException> {
+      resourceScope {
+        val r = install({ res }) { r, e ->
+          promise.complete(e)
+          r.shutdown()
+          throw error2
+        }
+        onClose { throw error3 }
+        wasActive.complete(r.isActive())
+        throw error
+      }
+    }
+
+    e shouldBe error
+    e.suppressedExceptions shouldBe listOf(error3, error2)
+    promise.await() shouldBe ExitCase(error)
+    wasActive.await() shouldBe true
+    res.isActive() shouldBe false
   }
 }
