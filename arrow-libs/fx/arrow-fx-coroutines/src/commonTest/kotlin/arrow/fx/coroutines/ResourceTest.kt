@@ -27,12 +27,15 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 class ResourceTest {
 
@@ -157,6 +160,34 @@ class ResourceTest {
     }.message shouldBe "BOOM!"
 
     exit.await()
+      .shouldBeTypeOf<ExitCase.Cancelled>()
+      .exception
+      .message shouldBe "BOOM!"
+  }
+
+  @Test
+  fun installIsNonCancellable() = runTest {
+    lateinit var exit: ExitCase
+    val waitingToBeCancelled = CompletableDeferred<Unit>()
+    val cancelled = CompletableDeferred<Unit>()
+
+    val job = launch {
+      resourceScope {
+        install({
+          waitingToBeCancelled.complete(Unit)
+          cancelled.await()
+        }) { _, ex ->
+          exit = ex
+        }
+        yield()
+      }
+    }
+    waitingToBeCancelled.await()
+    job.cancel("BOOM!")
+    cancelled.complete(Unit)
+    job.join()
+
+    exit
       .shouldBeTypeOf<ExitCase.Cancelled>()
       .exception
       .message shouldBe "BOOM!"

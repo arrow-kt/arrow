@@ -3,9 +3,14 @@ package arrow.fx.coroutines
 import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import kotlin.test.Test
 
 class ResourceAutoCloseTest {
@@ -39,5 +44,37 @@ class ResourceAutoCloseTest {
 
       t.didClose.get() shouldBe true
     }
+  }
+
+
+  @Test
+  fun autoClosableIsNonCancellable() = runTest {
+    val t = AutoCloseableTest()
+    lateinit var exit: ExitCase
+    val waitingToBeCancelled = CompletableDeferred<Unit>()
+    val cancelled = CompletableDeferred<Unit>()
+
+    val job = launch {
+      resourceScope {
+        onRelease { exit = it }
+        autoCloseable {
+          waitingToBeCancelled.complete(Unit)
+          cancelled.await()
+          t
+        }
+        yield()
+      }
+    }
+
+    waitingToBeCancelled.await()
+    job.cancel("BOOM!")
+    cancelled.complete(Unit)
+    job.join()
+
+    t.didClose.get() shouldBe true
+    exit
+      .shouldBeTypeOf<ExitCase.Cancelled>()
+      .exception
+      .message shouldBe "BOOM!"
   }
 }

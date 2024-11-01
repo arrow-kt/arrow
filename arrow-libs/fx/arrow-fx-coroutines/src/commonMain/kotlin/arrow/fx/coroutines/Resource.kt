@@ -301,7 +301,9 @@ public interface ResourceScope : AutoCloseScope {
   public suspend fun <A> install(
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
-  ): A = acquire(AcquireStep).also { a -> onRelease { release(a, it) } }
+  ): A = withContext(NonCancellable) {
+    acquire(AcquireStep).also { a -> onRelease { release(a, it) } }
+  }
 
   /** Composes a [release] action to a [Resource] value before binding. */
   @ResourceDSL
@@ -349,6 +351,7 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
  * <!--- KNIT example-resource-06.kt -->
  */
 @ScopeDSL
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
   val scope = ResourceScopeImpl()
   var finished = false
@@ -365,6 +368,7 @@ public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> 
   }
 }
 
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
   resourceScope { f(bind()) }
 
@@ -396,7 +400,7 @@ public fun <A> resource(
 }
 
 /**
- * Runs [Resource.use] and emits [A] of the resource
+ * Runs [Resource].[use] and emits [A] of the resource
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -510,14 +514,14 @@ internal expect val IODispatcher: CoroutineDispatcher
  * <!--- KNIT example-resource-10.kt -->
  */
 @ResourceDSL
-public suspend inline fun <A : AutoCloseable> ResourceScope.autoCloseable(
+public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
-): A = autoCloseable().also { s -> onRelease { withContext(closingDispatcher) { s.close() } } }
+): A = install({ autoCloseable() } ) { s: A, _ -> withContext(closingDispatcher) { s.close() } }
 
 public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
 ): Resource<A> = resource {
-  autoCloseable(closingDispatcher) { autoCloseable() }
+  autoCloseable(closingDispatcher, autoCloseable)
 }
