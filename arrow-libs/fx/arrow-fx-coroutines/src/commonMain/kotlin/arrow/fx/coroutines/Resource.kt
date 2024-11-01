@@ -298,7 +298,7 @@ public interface ResourceScope : AutoCloseScope {
    * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
    */
   @ResourceDSL
-  public suspend fun <A> ResourceScope.install(
+  public suspend fun <A> install(
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
   ): A = acquire(AcquireStep).also { a -> onRelease { release(a, it) } }

@@ -83,7 +83,7 @@ public interface AutoCloseScope {
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoCloseable.also { onClose { autoCloseable.close() } }
 
-  public fun <A> AutoCloseScope.autoClose(
+  public fun <A> autoClose(
     acquire: () -> A,
     release: (A, Throwable?) -> Unit
   ): A = acquire().also { a -> onClose { release(a, it) } }
