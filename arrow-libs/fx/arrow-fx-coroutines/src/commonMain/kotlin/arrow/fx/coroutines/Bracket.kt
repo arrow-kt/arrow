@@ -224,17 +224,14 @@ internal suspend inline fun runReleaseAndRethrow(original: Throwable?, crossinli
 
 @PublishedApi
 internal inline fun <R> finalizeCase(block: () -> R, finalizer: (ExitCase) -> Unit): R {
-  var finished = false
+  var exitCase: ExitCase = ExitCase.Completed
   return try {
     block()
   } catch (e: Throwable) {
-    finished = true
-    if (e !is CancellationException) e.nonFatalOrThrow()
-    finalizer(ExitCase.ExitCase(e))
+    exitCase = ExitCase.ExitCase(e)
     throw e
   } finally {
-    if (!finished) {
-      finalizer(ExitCase.Completed)
-    }
+    if (exitCase is ExitCase.Failure) exitCase.failure.nonFatalOrThrow()
+    finalizer(exitCase)
   }
 }
