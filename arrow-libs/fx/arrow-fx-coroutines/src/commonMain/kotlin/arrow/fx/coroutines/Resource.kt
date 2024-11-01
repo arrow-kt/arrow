@@ -510,9 +510,9 @@ internal expect val IODispatcher: CoroutineDispatcher
  * <!--- KNIT example-resource-10.kt -->
  */
 @ResourceDSL
-public inline fun <A : AutoCloseable> ResourceScope.autoCloseable(
+public suspend inline fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
-  autoCloseable: () -> A,
+  autoCloseable: suspend () -> A,
 ): A = autoCloseable().also { s -> onRelease { withContext(closingDispatcher) { s.close() } } }
 
 public fun <A : AutoCloseable> autoCloseable(
