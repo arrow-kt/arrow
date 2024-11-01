@@ -780,4 +780,33 @@ class ResourceTest {
     wasActive.await() shouldBe true
     res.isActive() shouldBe false
   }
+
+  @Test
+  fun addsSuppressedErrorsFromReleasers() = runTest {
+    val promise = CompletableDeferred<ExitCase>()
+    val wasActive = CompletableDeferred<Boolean>()
+    val error = RuntimeException("BOOM!")
+    val error2 = RuntimeException("BOOM 2!")
+    val error3 = RuntimeException("BOOM 3!")
+    val res = Res()
+
+    val e = shouldThrow<RuntimeException> {
+      resourceScope {
+        val r = install({ res }) { r, e ->
+          promise.complete(e)
+          r.shutdown()
+          throw error2
+        }
+        onClose { throw error3 }
+        wasActive.complete(r.isActive())
+        onRelease { throw error }
+      }
+    }
+
+    e shouldBe error
+    e.suppressedExceptions shouldBe listOf(error3, error2)
+    promise.await() shouldBe ExitCase.Completed
+    wasActive.await() shouldBe true
+    res.isActive() shouldBe false
+  }
 }
