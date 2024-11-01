@@ -3,7 +3,6 @@ package arrow
 import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -11,38 +10,38 @@ class AutoCloseJvmTest {
 
   @Test
   fun blowTheAutoScopeOnFatal() = runTest {
-    val wasActive = CompletableDeferred<Boolean>()
+    var wasActive = false
     val res = Resource()
 
     shouldThrow<LinkageError> {
       autoCloseScope {
         val r = install(res)
-        wasActive.complete(r.isActive())
+        wasActive = r.isActive()
         throw LinkageError("BOOM!")
       }
     }.message shouldBe "BOOM!"
 
-    wasActive.await() shouldBe true
+    wasActive shouldBe true
     res.isActive() shouldBe true
   }
 
   @Test
   fun blowTheAutoScopeOnFatalInClose() = runTest {
-    val wasActive = CompletableDeferred<Boolean>()
+    var wasActive = false
     val res = Resource()
     val res2 = Resource()
 
     shouldThrow<LinkageError> {
       autoCloseScope {
         val r = install(res)
-        wasActive.complete(r.isActive())
+        wasActive = r.isActive()
         onClose { throw LinkageError("BOOM!") }
         install(res2)
         onClose { throw RuntimeException() }
       }
     }.message shouldBe "BOOM!"
 
-    wasActive.await() shouldBe true
+    wasActive shouldBe true
     res.isActive() shouldBe true
     res2.isActive() shouldBe false
   }

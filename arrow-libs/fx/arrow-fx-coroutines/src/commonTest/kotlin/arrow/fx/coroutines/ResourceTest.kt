@@ -69,20 +69,19 @@ class ResourceTest {
   @Test
   fun resourceReleasedWithComplete() = runTest {
     checkAll(10, Arb.int()) { n ->
-      val p = CompletableDeferred<ExitCase>()
+      lateinit var p : ExitCase
       resourceScope {
-        install({ n }) { _, ex -> require(p.complete(ex)) }
+        install({ n }) { _, ex -> p = ex }
       }
-      p.await() shouldBe ExitCase.Completed
+      p shouldBe ExitCase.Completed
     }
   }
 
   @Test
   fun errorFinishesWithError() = runTest {
     checkAll(10, Arb.throwable()) { e ->
-      val p = CompletableDeferred<ExitCase>()
       suspend fun ResourceScope.failingScope(): Nothing =
-        install({ throw e }, { _, ex -> require(p.complete(ex)) })
+        install({ throw e }, { _, _ -> fail("should not get here") })
 
       Either.catch {
         resourceScope { failingScope() }
@@ -127,16 +126,16 @@ class ResourceTest {
 
   @Test
   fun resourceCloseFromEither() = runTest {
-    val exit = CompletableDeferred<ExitCase>()
+    lateinit var exit: ExitCase
     either<String, Int> {
       resourceScope {
         install({ 1 }) { _, ex ->
-          require(exit.complete(ex))
+          exit = ex
         }
         raise("error")
       }
     } shouldBe "error".left()
-    exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
+    exit.shouldBeTypeOf<ExitCase.Cancelled>()
   }
 
   private val depth = 10
@@ -150,16 +149,16 @@ class ResourceTest {
 
   @Test
   fun closeTheScopeOnCancellation() = runTest {
-    val exit = CompletableDeferred<ExitCase>()
+    var exit: ExitCase? = null
 
     shouldThrow<CancellationException> {
       resourceScope {
-        install({  }) { _, ex -> require(exit.complete(ex)) }
+        install({  }) { _, ex -> exit = ex }
         throw CancellationException("BOOM!")
       }
     }.message shouldBe "BOOM!"
 
-    exit.await()
+    exit
       .shouldBeTypeOf<ExitCase.Cancelled>()
       .exception
       .message shouldBe "BOOM!"
@@ -500,25 +499,25 @@ class ResourceTest {
   @Test
   fun parZipErrorInUse() = runTestUsingDefaultDispatcher {
     checkAll(10, Arb.int(), Arb.int(), Arb.throwable()) { a, b, throwable ->
-      val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
-      val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
+      lateinit var releasedA: Pair<Int, ExitCase>
+      lateinit var releasedB: Pair<Int, ExitCase>
 
       shouldThrow<Throwable> {
         resourceScope {
           parZip({
-            install({ a }) { aa: Int, ex: ExitCase -> require(releasedA.complete(aa to ex)) }
+            install({ a }) { aa: Int, ex: ExitCase -> releasedA = aa to ex }
           }, {
-            install({ b }) { bb: Int, ex: ExitCase -> require(releasedB.complete(bb to ex)) }
+            install({ b }) { bb: Int, ex: ExitCase -> releasedB = bb to ex }
           }) { _, _ -> }
           throw throwable
         }
       } shouldBe throwable
 
-      val (aa, exA) = releasedA.await()
+      val (aa, exA) = releasedA
       aa shouldBe a
       exA.shouldBeTypeOf<ExitCase.Failure>()
 
-      val (bb, exB) = releasedB.await()
+      val (bb, exB) = releasedB
       bb shouldBe b
       exB.shouldBeTypeOf<ExitCase.Failure>()
     }
@@ -527,25 +526,25 @@ class ResourceTest {
   @Test
   fun parZipCancellationInUse() = runTestUsingDefaultDispatcher {
     checkAll(10, Arb.int(), Arb.int()) { a, b ->
-      val releasedA = CompletableDeferred<Pair<Int, ExitCase>>()
-      val releasedB = CompletableDeferred<Pair<Int, ExitCase>>()
+      lateinit var releasedA: Pair<Int, ExitCase>
+      lateinit var releasedB: Pair<Int, ExitCase>
 
       shouldThrow<CancellationException> {
         resourceScope {
           parZip({
-            install({ a }) { aa: Int, ex: ExitCase -> require(releasedA.complete(aa to ex)) }
+            install({ a }) { aa: Int, ex: ExitCase -> releasedA = aa to ex }
           }, {
-            install({ b }) { bb: Int, ex: ExitCase -> require(releasedB.complete(bb to ex)) }
+            install({ b }) { bb: Int, ex: ExitCase -> releasedB = bb to ex }
           }) { _, _ -> }
           throw CancellationException("")
         }
       }
 
-      val (aa, exA) = releasedA.await()
+      val (aa, exA) = releasedA.shouldNotBeNull()
       aa shouldBe a
       exA.shouldBeTypeOf<ExitCase.Cancelled>()
 
-      val (bb, exB) = releasedB.await()
+      val (bb, exB) = releasedB.shouldNotBeNull()
       bb shouldBe b
       exB.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -554,40 +553,40 @@ class ResourceTest {
   @Test
   fun resourceAsFlow() = runTest {
     checkAll(10, Arb.int()) { n ->
-      val released = CompletableDeferred<ExitCase>()
-      val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
+      lateinit var released: ExitCase
+      val r = resource({ n }, { _, ex -> released = ex })
 
       r.asFlow().map { it + 1 }.toList() shouldBe listOf(n + 1)
 
-      released.await() shouldBe ExitCase.Completed
+      released shouldBe ExitCase.Completed
     }
   }
 
   @Test
   fun resourceAsFlowFail() = runTest {
     checkAll(10, Arb.int(), Arb.throwable()) { n, throwable ->
-      val released = CompletableDeferred<ExitCase>()
-      val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
+      lateinit var released: ExitCase
+      val r = resource({ n }, { _, ex -> released = ex })
 
       shouldThrow<Throwable> {
         r.asFlow().collect { throw throwable }
       } shouldBe throwable
 
-      released.await().shouldBeTypeOf<ExitCase.Failure>().failure shouldBe throwable
+      released.shouldBeTypeOf<ExitCase.Failure>().failure shouldBe throwable
     }
   }
 
   @Test
   fun resourceAsFlowCancel() = runTest {
     checkAll(10, Arb.int()) { n ->
-      val released = CompletableDeferred<ExitCase>()
-      val r = resource({ n }, { _, ex -> require(released.complete(ex)) })
+      lateinit var released: ExitCase
+      val r = resource({ n }, { _, ex -> released = ex })
 
       shouldThrow<CancellationException> {
         r.asFlow().collect { throw CancellationException("") }
       }
 
-      released.await().shouldBeTypeOf<ExitCase.Cancelled>()
+      released.shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
 
@@ -595,13 +594,13 @@ class ResourceTest {
   @Test
   fun allocatedWorks() = runTest {
     checkAll(10, Arb.int()) { seed ->
-      val released = CompletableDeferred<ExitCase>()
-      val (allocate, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
+      var released: ExitCase? = null
+      val (allocate, release) = resource({ seed }) { _, exitCase -> released = exitCase }
         .allocated()
 
       allocate shouldBe seed
       release(ExitCase.Completed)
-      released.await() shouldBe ExitCase.Completed
+      released shouldBe ExitCase.Completed
     }
   }
 
@@ -613,10 +612,10 @@ class ResourceTest {
       Arb.string().map(::RuntimeException),
       Arb.string().map(::IllegalStateException)
     ) { seed, original, suppressed ->
-      val released = CompletableDeferred<ExitCase>()
+      var released: ExitCase? = null
       val (allocate, release) =
         resource({ seed }) { _, exitCase ->
-          released.complete(exitCase)
+          released = exitCase
           throw suppressed
         }.allocated()
 
@@ -631,7 +630,7 @@ class ResourceTest {
 
       exception shouldBe original
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
-      released.await().shouldBeTypeOf<ExitCase.Failure>()
+      released.shouldBeTypeOf<ExitCase.Failure>()
     }
   }
 
@@ -643,10 +642,10 @@ class ResourceTest {
       Arb.string().map { CancellationException(it, null) },
       Arb.string().map(::IllegalStateException)
     ) { seed, cancellation, suppressed ->
-      val released = CompletableDeferred<ExitCase>()
+      var released: ExitCase? = null
       val (allocate, release) =
         resource({ seed }) { _, exitCase ->
-          released.complete(exitCase)
+          released = exitCase
           throw suppressed
         }.allocated()
 
@@ -661,7 +660,7 @@ class ResourceTest {
 
       exception shouldBe cancellation
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
-      released.await().shouldBeTypeOf<ExitCase.Cancelled>()
+      released.shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
 
@@ -674,11 +673,11 @@ class ResourceTest {
       Arb.string().map(::IllegalStateException),
       Arb.string().map(::IllegalStateException),
     ) { seed, original, suppressed1, suppressed2 ->
-      val released = CompletableDeferred<ExitCase>()
+      var released: ExitCase? = null
       val (allocate, release) =
         resource {
           onRelease { exitCase ->
-            released.complete(exitCase)
+            released = exitCase
             throw suppressed1
           }
           onClose { throw suppressed2 }
@@ -696,7 +695,7 @@ class ResourceTest {
 
       exception shouldBe original
       exception.suppressedExceptions shouldBe listOf(suppressed2, suppressed1)
-      released.await() shouldBe ExitCase(original)
+      released shouldBe ExitCase(original)
     }
   }
 
@@ -754,8 +753,8 @@ class ResourceTest {
 
   @Test
   fun addsSuppressedErrors() = runTest {
-    val promise = CompletableDeferred<ExitCase>()
-    val wasActive = CompletableDeferred<Boolean>()
+    var exitCase: ExitCase? = null
+    var wasActive = false
     val error = RuntimeException("BOOM!")
     val error2 = RuntimeException("BOOM 2!")
     val error3 = RuntimeException("BOOM 3!")
@@ -764,27 +763,27 @@ class ResourceTest {
     val e = shouldThrow<RuntimeException> {
       resourceScope {
         val r = install({ res }) { r, e ->
-          promise.complete(e)
+          exitCase = e
           r.shutdown()
           throw error2
         }
         onClose { throw error3 }
-        wasActive.complete(r.isActive())
+        wasActive = r.isActive()
         throw error
       }
     }
 
     e shouldBe error
     e.suppressedExceptions shouldBe listOf(error3, error2)
-    promise.await() shouldBe ExitCase(error)
-    wasActive.await() shouldBe true
+    exitCase shouldBe ExitCase(error)
+    wasActive shouldBe true
     res.isActive() shouldBe false
   }
 
   @Test
   fun addsSuppressedErrorsFromReleasers() = runTest {
-    val promise = CompletableDeferred<ExitCase>()
-    val wasActive = CompletableDeferred<Boolean>()
+    var exitCase: ExitCase? = null
+    var wasActive = false
     val error = RuntimeException("BOOM!")
     val error2 = RuntimeException("BOOM 2!")
     val error3 = RuntimeException("BOOM 3!")
@@ -793,20 +792,20 @@ class ResourceTest {
     val e = shouldThrow<RuntimeException> {
       resourceScope {
         val r = install({ res }) { r, e ->
-          promise.complete(e)
+          exitCase = e
           r.shutdown()
           throw error2
         }
         onClose { throw error3 }
-        wasActive.complete(r.isActive())
+        wasActive = r.isActive()
         onRelease { throw error }
       }
     }
 
     e shouldBe error
     e.suppressedExceptions shouldBe listOf(error3, error2)
-    promise.await() shouldBe ExitCase.Completed
-    wasActive.await() shouldBe true
+    exitCase shouldBe ExitCase.Completed
+    wasActive shouldBe true
     res.isActive() shouldBe false
   }
 }
