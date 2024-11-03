@@ -1,0 +1,111 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-eval>
+sealed class <#A: out kotlin/Any?> arrow.eval/Eval { // arrow.eval/Eval|null[0]
+    abstract fun memoize(): arrow.eval/Eval<#A> // arrow.eval/Eval.memoize|memoize(){}[0]
+    abstract fun value(): #A // arrow.eval/Eval.value|value(){}[0]
+    final fun <#A1: kotlin/Any?> flatMap(kotlin/Function1<#A, arrow.eval/Eval<#A1>>): arrow.eval/Eval<#A1> // arrow.eval/Eval.flatMap|flatMap(kotlin.Function1<1:0,arrow.eval.Eval<0:0>>){0§<kotlin.Any?>}[0]
+    final fun invoke(): #A // arrow.eval/Eval.invoke|invoke(){}[0]
+    final inline fun <#A1: kotlin/Any?> coflatMap(crossinline kotlin/Function1<arrow.eval/Eval<#A>, #A1>): arrow.eval/Eval<#A1> // arrow.eval/Eval.coflatMap|coflatMap(kotlin.Function1<arrow.eval.Eval<1:0>,0:0>){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: kotlin/Any?> map(crossinline kotlin/Function1<#A, #A1>): arrow.eval/Eval<#A1> // arrow.eval/Eval.map|map(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
+    open fun toString(): kotlin/String // arrow.eval/Eval.toString|toString(){}[0]
+
+    abstract class <#A1: out kotlin/Any?> FlatMap : arrow.eval/Eval<#A1> { // arrow.eval/Eval.FlatMap|null[0]
+        constructor <init>() // arrow.eval/Eval.FlatMap.<init>|<init>(){}[0]
+
+        abstract fun <#A2: kotlin/Any?> run(#A2): arrow.eval/Eval<#A1> // arrow.eval/Eval.FlatMap.run|run(0:0){0§<kotlin.Any?>}[0]
+        abstract fun <#A2: kotlin/Any?> start(): arrow.eval/Eval<#A2> // arrow.eval/Eval.FlatMap.start|start(){0§<kotlin.Any?>}[0]
+        open fun memoize(): arrow.eval/Eval<#A1> // arrow.eval/Eval.FlatMap.memoize|memoize(){}[0]
+        open fun toString(): kotlin/String // arrow.eval/Eval.FlatMap.toString|toString(){}[0]
+        open fun value(): #A1 // arrow.eval/Eval.FlatMap.value|value(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Always : arrow.eval/Eval<#A1> { // arrow.eval/Eval.Always|null[0]
+        constructor <init>(kotlin/Function0<#A1>) // arrow.eval/Eval.Always.<init>|<init>(kotlin.Function0<1:0>){}[0]
+
+        final fun copy(kotlin/Function0<#A1> = ...): arrow.eval/Eval.Always<#A1> // arrow.eval/Eval.Always.copy|copy(kotlin.Function0<1:0>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/Eval.Always.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/Eval.Always.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/Eval<#A1> // arrow.eval/Eval.Always.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/Eval.Always.toString|toString(){}[0]
+        final fun value(): #A1 // arrow.eval/Eval.Always.value|value(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Defer : arrow.eval/Eval<#A1> { // arrow.eval/Eval.Defer|null[0]
+        constructor <init>(kotlin/Function0<arrow.eval/Eval<#A1>>) // arrow.eval/Eval.Defer.<init>|<init>(kotlin.Function0<arrow.eval.Eval<1:0>>){}[0]
+
+        final val thunk // arrow.eval/Eval.Defer.thunk|{}thunk[0]
+            final fun <get-thunk>(): kotlin/Function0<arrow.eval/Eval<#A1>> // arrow.eval/Eval.Defer.thunk.<get-thunk>|<get-thunk>(){}[0]
+
+        final fun component1(): kotlin/Function0<arrow.eval/Eval<#A1>> // arrow.eval/Eval.Defer.component1|component1(){}[0]
+        final fun copy(kotlin/Function0<arrow.eval/Eval<#A1>> = ...): arrow.eval/Eval.Defer<#A1> // arrow.eval/Eval.Defer.copy|copy(kotlin.Function0<arrow.eval.Eval<1:0>>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/Eval.Defer.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/Eval.Defer.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/Eval<#A1> // arrow.eval/Eval.Defer.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/Eval.Defer.toString|toString(){}[0]
+        final fun value(): #A1 // arrow.eval/Eval.Defer.value|value(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Later : arrow.eval/Eval<#A1>, kotlin/Lazy<#A1> { // arrow.eval/Eval.Later|null[0]
+        constructor <init>(kotlin/Function0<#A1>) // arrow.eval/Eval.Later.<init>|<init>(kotlin.Function0<1:0>){}[0]
+
+        final val value // arrow.eval/Eval.Later.value|{}value[0]
+            final fun <get-value>(): #A1 // arrow.eval/Eval.Later.value.<get-value>|<get-value>(){}[0]
+
+        final fun copy(kotlin/Function0<#A1> = ...): arrow.eval/Eval.Later<#A1> // arrow.eval/Eval.Later.copy|copy(kotlin.Function0<1:0>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/Eval.Later.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/Eval.Later.hashCode|hashCode(){}[0]
+        final fun isInitialized(): kotlin/Boolean // arrow.eval/Eval.Later.isInitialized|isInitialized(){}[0]
+        final fun memoize(): arrow.eval/Eval<#A1> // arrow.eval/Eval.Later.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/Eval.Later.toString|toString(){}[0]
+        final fun value(): #A1 // arrow.eval/Eval.Later.value|value(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Now : arrow.eval/Eval<#A1>, kotlin/Lazy<#A1> { // arrow.eval/Eval.Now|null[0]
+        constructor <init>(#A1) // arrow.eval/Eval.Now.<init>|<init>(1:0){}[0]
+
+        final val value // arrow.eval/Eval.Now.value|{}value[0]
+            final fun <get-value>(): #A1 // arrow.eval/Eval.Now.value.<get-value>|<get-value>(){}[0]
+
+        final fun component1(): #A1 // arrow.eval/Eval.Now.component1|component1(){}[0]
+        final fun copy(#A1 = ...): arrow.eval/Eval.Now<#A1> // arrow.eval/Eval.Now.copy|copy(1:0){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/Eval.Now.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/Eval.Now.hashCode|hashCode(){}[0]
+        final fun isInitialized(): kotlin/Boolean // arrow.eval/Eval.Now.isInitialized|isInitialized(){}[0]
+        final fun memoize(): arrow.eval/Eval<#A1> // arrow.eval/Eval.Now.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/Eval.Now.toString|toString(){}[0]
+        final fun value(): #A1 // arrow.eval/Eval.Now.value|value(){}[0]
+
+        final object Companion { // arrow.eval/Eval.Now.Companion|null[0]
+            final val unit // arrow.eval/Eval.Now.Companion.unit|{}unit[0]
+                final fun <get-unit>(): arrow.eval/Eval<kotlin/Unit> // arrow.eval/Eval.Now.Companion.unit.<get-unit>|<get-unit>(){}[0]
+        }
+    }
+
+    final object Companion { // arrow.eval/Eval.Companion|null[0]
+        final fun <#A2: kotlin/Any?> now(#A2): arrow.eval/Eval<#A2> // arrow.eval/Eval.Companion.now|now(0:0){0§<kotlin.Any?>}[0]
+        final fun raise(kotlin/Throwable): arrow.eval/Eval<kotlin/Nothing> // arrow.eval/Eval.Companion.raise|raise(kotlin.Throwable){}[0]
+        final inline fun <#A2: kotlin/Any?> always(crossinline kotlin/Function0<#A2>): arrow.eval/Eval.Always<#A2> // arrow.eval/Eval.Companion.always|always(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> defer(crossinline kotlin/Function0<arrow.eval/Eval<#A2>>): arrow.eval/Eval<#A2> // arrow.eval/Eval.Companion.defer|defer(kotlin.Function0<arrow.eval.Eval<0:0>>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> later(crossinline kotlin/Function0<#A2>): arrow.eval/Eval.Later<#A2> // arrow.eval/Eval.Companion.later|later(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+    }
+}
+
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?, #J: kotlin/Any?, #K: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, arrow.eval/Eval<#E>, arrow.eval/Eval<#F>, arrow.eval/Eval<#G>, arrow.eval/Eval<#H>, arrow.eval/Eval<#I>, arrow.eval/Eval<#J>, kotlin/Function10<#A, #B, #C, #D, #E, #F, #G, #H, #I, #J, #K>): arrow.eval/Eval<#K> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;arrow.eval.Eval<0:4>;arrow.eval.Eval<0:5>;arrow.eval.Eval<0:6>;arrow.eval.Eval<0:7>;arrow.eval.Eval<0:8>;arrow.eval.Eval<0:9>;kotlin.Function10<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>;9§<kotlin.Any?>;10§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?, #J: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, arrow.eval/Eval<#E>, arrow.eval/Eval<#F>, arrow.eval/Eval<#G>, arrow.eval/Eval<#H>, arrow.eval/Eval<#I>, kotlin/Function9<#A, #B, #C, #D, #E, #F, #G, #H, #I, #J>): arrow.eval/Eval<#J> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;arrow.eval.Eval<0:4>;arrow.eval.Eval<0:5>;arrow.eval.Eval<0:6>;arrow.eval.Eval<0:7>;arrow.eval.Eval<0:8>;kotlin.Function9<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>;9§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, arrow.eval/Eval<#E>, arrow.eval/Eval<#F>, arrow.eval/Eval<#G>, arrow.eval/Eval<#H>, kotlin/Function8<#A, #B, #C, #D, #E, #F, #G, #H, #I>): arrow.eval/Eval<#I> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;arrow.eval.Eval<0:4>;arrow.eval.Eval<0:5>;arrow.eval.Eval<0:6>;arrow.eval.Eval<0:7>;kotlin.Function8<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, arrow.eval/Eval<#E>, arrow.eval/Eval<#F>, arrow.eval/Eval<#G>, kotlin/Function7<#A, #B, #C, #D, #E, #F, #G, #H>): arrow.eval/Eval<#H> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;arrow.eval.Eval<0:4>;arrow.eval.Eval<0:5>;arrow.eval.Eval<0:6>;kotlin.Function7<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, arrow.eval/Eval<#E>, arrow.eval/Eval<#F>, kotlin/Function6<#A, #B, #C, #D, #E, #F, #G>): arrow.eval/Eval<#G> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;arrow.eval.Eval<0:4>;arrow.eval.Eval<0:5>;kotlin.Function6<0:0,0:1,0:2,0:3,0:4,0:5,0:6>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, arrow.eval/Eval<#E>, kotlin/Function5<#A, #B, #C, #D, #E, #F>): arrow.eval/Eval<#F> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;arrow.eval.Eval<0:4>;kotlin.Function5<0:0,0:1,0:2,0:3,0:4,0:5>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, arrow.eval/Eval<#D>, kotlin/Function4<#A, #B, #C, #D, #E>): arrow.eval/Eval<#E> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;arrow.eval.Eval<0:3>;kotlin.Function4<0:0,0:1,0:2,0:3,0:4>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, arrow.eval/Eval<#C>, kotlin/Function3<#A, #B, #C, #D>): arrow.eval/Eval<#D> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;arrow.eval.Eval<0:2>;kotlin.Function3<0:0,0:1,0:2,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>, kotlin/Function2<#A, #B, #C>): arrow.eval/Eval<#C> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>;kotlin.Function2<0:0,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/replicate(kotlin/Int, kotlin/Function0<#B>, kotlin/Function2<#A, #B, #B>): arrow.eval/Eval<#B> // arrow.eval/replicate|replicate@arrow.eval.Eval<0:0>(kotlin.Int;kotlin.Function0<0:1>;kotlin.Function2<0:0,0:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/zip(arrow.eval/Eval<#B>): arrow.eval/Eval<kotlin/Pair<#A, #B>> // arrow.eval/zip|zip@arrow.eval.Eval<0:0>(arrow.eval.Eval<0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterator<#A>).arrow.eval/iterateRight(arrow.eval/Eval<#B>, kotlin/Function2<#A, arrow.eval/Eval<#B>, arrow.eval/Eval<#B>>): arrow.eval/Eval<#B> // arrow.eval/iterateRight|iterateRight@kotlin.collections.Iterator<0:0>(arrow.eval.Eval<0:1>;kotlin.Function2<0:0,arrow.eval.Eval<0:1>,arrow.eval.Eval<0:1>>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.eval/Eval<#A>).arrow.eval/replicate(kotlin/Int): arrow.eval/Eval<kotlin.collections/List<#A>> // arrow.eval/replicate|replicate@arrow.eval.Eval<0:0>(kotlin.Int){0§<kotlin.Any?>}[0]

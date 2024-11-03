@@ -36,7 +36,7 @@ class FlowTest {
 
   @Test
   fun parMapConcurrentEqualOneMinusIdentity() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.flow(Arb.int(), range = 1 .. 20)) { flow ->
+    checkAll(10, Arb.flow(Arb.int(), range = 1 .. 20)) { flow ->
       flow.parMap(1) { it }
         .toList() shouldBe flow.toList()
     }
@@ -44,7 +44,7 @@ class FlowTest {
 
   @Test
   fun parMapRunsInParallel() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int(1..2)) { i, n ->
+    checkAll(10, Arb.int(), Arb.int(1..2)) { i, n ->
       val latch = CompletableDeferred<Int>()
       flowOf(1, 2).parMap { index ->
         if (index == n) latch.await()
@@ -77,7 +77,7 @@ class FlowTest {
 
   @Test
   fun parMapExceptionInParMapCancelsAllRunningTasks() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.throwable(), Arb.int(1..2)) { i, e, n ->
+    checkAll(10, Arb.int(), Arb.throwable(), Arb.int(1..2)) { i, e, n ->
       val latch = CompletableDeferred<Unit>()
       val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -104,7 +104,7 @@ class FlowTest {
 
   @Test
   fun parMapCancellingParMapCancelsAllRunningJobs() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int()) { i, i2 ->
+    checkAll(10, Arb.int(), Arb.int()) { i, i2 ->
       val latch = CompletableDeferred<Unit>()
       val exitA = CompletableDeferred<Pair<Int, ExitCase>>()
       val exitB = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -136,7 +136,7 @@ class FlowTest {
 
   @Test
   fun parMapUnorderedConcurrentEqualOneMinusIdentity() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.flow(Arb.int(), range = 1 .. 20)) { flow ->
+    checkAll(10, Arb.flow(Arb.int(), range = 1 .. 20)) { flow ->
       flow.parMapUnordered(concurrency = 1) { it }
         .toSet() shouldBe flow.toSet()
     }
@@ -144,7 +144,7 @@ class FlowTest {
 
   @Test
   fun parMapUnorderedRunsInParallel() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int(1..2)) { i, n ->
+    checkAll(10, Arb.int(), Arb.int(1..2)) { i, n ->
       val latch = CompletableDeferred<Int>()
       flowOf(1, 2).parMapUnordered { index ->
         if (index == n) latch.await()
@@ -178,7 +178,7 @@ class FlowTest {
 
   @Test
   fun parMapUnorderedExceptionInParMapCancelsAllRunningTasks() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.throwable(), Arb.int(1..2)) { i, e, n ->
+    checkAll(10, Arb.int(), Arb.throwable(), Arb.int(1..2)) { i, e, n ->
       val latch = CompletableDeferred<Unit>()
       val exit = CompletableDeferred<Pair<Int, ExitCase>>()
 
@@ -205,7 +205,7 @@ class FlowTest {
 
   @Test
   fun parMapUnorderedCancellingParMapCancelsAllRunningJobs() = runTestUsingDefaultDispatcher {
-    checkAll(Arb.int(), Arb.int()) { i, i2 ->
+    checkAll(10, Arb.int(), Arb.int()) { i, i2 ->
       val latch = CompletableDeferred<Unit>()
       val exitA = CompletableDeferred<Pair<Int, ExitCase>>()
       val exitB = CompletableDeferred<Pair<Int, ExitCase>>()
@@ -255,7 +255,7 @@ class FlowTest {
 
   @Test @ExperimentalTime
   fun fixedDelay() = runTest {
-    checkAll(Arb.long(10L .. 50L), Arb.int(3..20)) { waitPeriodInMillis, n ->
+    checkAll(10, Arb.long(10L .. 50L), Arb.int(3..20)) { waitPeriodInMillis, n ->
       val waitPeriod = waitPeriodInMillis.milliseconds
       val emissionDuration = (waitPeriodInMillis / 10L).milliseconds
       var state: ComparableTimeMark? = null
@@ -281,7 +281,7 @@ class FlowTest {
 
   @Test @ExperimentalTime
   fun fixedRate() = runTest {
-    checkAll(Arb.long(10L..50L), Arb.int(3..20)) { waitPeriodInMillis, n ->
+    checkAll(10, Arb.long(10L..50L), Arb.int(3..20)) { waitPeriodInMillis, n ->
       val waitPeriod = waitPeriodInMillis.milliseconds
       val emissionDuration = (waitPeriodInMillis / 10L).milliseconds
       var state: ComparableTimeMark? = null

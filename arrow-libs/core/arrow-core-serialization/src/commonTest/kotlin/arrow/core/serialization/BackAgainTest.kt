@@ -12,7 +12,9 @@ import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
@@ -47,11 +49,11 @@ data class NonEmptyListInside<A>(val thing: NonEmptyList<A>)
 @Serializable
 data class NonEmptySetInside<A>(val thing: NonEmptySet<A>)
 
-inline fun <reified T> backAgain(generator: Arb<T>) =
+inline fun <reified T> backAgain(generator: Arb<T>, json: Json = Json) =
   runTest {
     checkAll(generator) { e ->
-      val result = Json.encodeToJsonElement<T>(e)
-      val back = Json.decodeFromJsonElement<T>(result)
+      val result = json.encodeToJsonElement<T>(e)
+      val back = json.decodeFromJsonElement<T>(result)
       back shouldBe e
     }
   }
@@ -71,4 +73,12 @@ class BackAgainTest {
     backAgain(Arb.nonEmptyList(Arb.int()).map(::NonEmptyListInside))
   @Test fun backAgainNonEmptySet() =
     backAgain(Arb.nonEmptySet(Arb.int()).map(::NonEmptySetInside))
+
+  // capturing the current functionality of the OptionSerializer
+  @Test fun backAgainFlattensSomeNullToNone() {
+    val container: OptionInside<String?> = OptionInside(Some(null))
+    val result = Json.encodeToJsonElement<OptionInside<String?>>(container)
+    val back = Json.decodeFromJsonElement<OptionInside<String?>>(result)
+    back shouldBe OptionInside(None) // not `container`
+  }
 }

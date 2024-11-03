@@ -11,10 +11,6 @@ public final class arrow/AutoCloseScopeKt {
 	public static final fun autoCloseScope (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
-public final class arrow/AutoCloseableExtensionsKt {
-	public static final fun install (Larrow/AutoCloseScope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
-}
-
 public final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope {
 	public fun <init> ()V
 	public fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;

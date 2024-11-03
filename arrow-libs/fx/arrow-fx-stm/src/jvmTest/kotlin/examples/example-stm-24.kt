@@ -6,9 +6,9 @@ import arrow.fx.stm.atomically
 
 suspend fun main() {
   //sampleStart
-  val tsem = TSemaphore.new(0)
+  val tsem = TSemaphore.new(5)
   val result = atomically {
-    tsem.tryAcquire(3)
+    tsem.available()
   }
   //sampleEnd
   println("Result $result")

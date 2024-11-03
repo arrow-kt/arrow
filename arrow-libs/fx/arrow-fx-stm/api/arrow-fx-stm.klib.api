@@ -1,0 +1,167 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-fx-stm>
+abstract interface arrow.fx.stm/STM { // arrow.fx.stm/STM|null[0]
+    open val value // arrow.fx.stm/STM.value|@arrow.fx.stm.TVar<0:0>{0§<kotlin.Any?>}value[0]
+        open fun <#A2: kotlin/Any?> (arrow.fx.stm/TVar<#A2>).<get-value>(): #A2 // arrow.fx.stm/STM.value.<get-value>|<get-value>@arrow.fx.stm.TVar<0:0>(){0§<kotlin.Any?>}[0]
+
+    abstract fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).read(): #A1 // arrow.fx.stm/STM.read|read@arrow.fx.stm.TVar<0:0>(){0§<kotlin.Any?>}[0]
+    abstract fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).write(#A1) // arrow.fx.stm/STM.write|write@arrow.fx.stm.TVar<0:0>(0:0){0§<kotlin.Any?>}[0]
+    abstract fun <#A1: kotlin/Any?> (kotlin/Function1<arrow.fx.stm/STM, #A1>).orElse(kotlin/Function1<arrow.fx.stm/STM, #A1>): #A1 // arrow.fx.stm/STM.orElse|orElse@kotlin.Function1<arrow.fx.stm.STM,0:0>(kotlin.Function1<arrow.fx.stm.STM,0:0>){0§<kotlin.Any?>}[0]
+    abstract fun <#A1: kotlin/Any?> catch(kotlin/Function1<arrow.fx.stm/STM, #A1>, kotlin/Function2<arrow.fx.stm/STM, kotlin/Throwable, #A1>): #A1 // arrow.fx.stm/STM.catch|catch(kotlin.Function1<arrow.fx.stm.STM,0:0>;kotlin.Function2<arrow.fx.stm.STM,kotlin.Throwable,0:0>){0§<kotlin.Any?>}[0]
+    abstract fun retry(): kotlin/Nothing // arrow.fx.stm/STM.retry|retry(){}[0]
+    open fun (arrow.fx.stm/TSemaphore).acquire() // arrow.fx.stm/STM.acquire|acquire@arrow.fx.stm.TSemaphore(){}[0]
+    open fun (arrow.fx.stm/TSemaphore).acquire(kotlin/Int) // arrow.fx.stm/STM.acquire|acquire@arrow.fx.stm.TSemaphore(kotlin.Int){}[0]
+    open fun (arrow.fx.stm/TSemaphore).available(): kotlin/Int // arrow.fx.stm/STM.available|available@arrow.fx.stm.TSemaphore(){}[0]
+    open fun (arrow.fx.stm/TSemaphore).release() // arrow.fx.stm/STM.release|release@arrow.fx.stm.TSemaphore(){}[0]
+    open fun (arrow.fx.stm/TSemaphore).release(kotlin/Int) // arrow.fx.stm/STM.release|release@arrow.fx.stm.TSemaphore(kotlin.Int){}[0]
+    open fun (arrow.fx.stm/TSemaphore).tryAcquire(): kotlin/Boolean // arrow.fx.stm/STM.tryAcquire|tryAcquire@arrow.fx.stm.TSemaphore(){}[0]
+    open fun (arrow.fx.stm/TSemaphore).tryAcquire(kotlin/Int): kotlin/Boolean // arrow.fx.stm/STM.tryAcquire|tryAcquire@arrow.fx.stm.TSemaphore(kotlin.Int){}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TArray<#A1>).fold(#B1, kotlin/Function2<#B1, #A1, #B1>): #B1 // arrow.fx.stm/STM.fold|fold@arrow.fx.stm.TArray<0:0>(0:1;kotlin.Function2<0:1,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).get(#A1): #B1? // arrow.fx.stm/STM.get|get@arrow.fx.stm.TMap<0:0,0:1>(0:0){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).insert(#A1, #B1) // arrow.fx.stm/STM.insert|insert@arrow.fx.stm.TMap<0:0,0:1>(0:0;0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).lookup(#A1): #B1? // arrow.fx.stm/STM.lookup|lookup@arrow.fx.stm.TMap<0:0,0:1>(0:0){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).member(#A1): kotlin/Boolean // arrow.fx.stm/STM.member|member@arrow.fx.stm.TMap<0:0,0:1>(0:0){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).plusAssign(kotlin/Pair<#A1, #B1>) // arrow.fx.stm/STM.plusAssign|plusAssign@arrow.fx.stm.TMap<0:0,0:1>(kotlin.Pair<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).remove(#A1) // arrow.fx.stm/STM.remove|remove@arrow.fx.stm.TMap<0:0,0:1>(0:0){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).set(#A1, #B1) // arrow.fx.stm/STM.set|set@arrow.fx.stm.TMap<0:0,0:1>(0:0;0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (arrow.fx.stm/TMap<#A1, #B1>).update(#A1, kotlin/Function1<#B1, #B1>) // arrow.fx.stm/STM.update|update@arrow.fx.stm.TMap<0:0,0:1>(0:0;kotlin.Function1<0:1,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TArray<#A1>).get(kotlin/Int): #A1 // arrow.fx.stm/STM.get|get@arrow.fx.stm.TArray<0:0>(kotlin.Int){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TArray<#A1>).set(kotlin/Int, #A1) // arrow.fx.stm/STM.set|set@arrow.fx.stm.TArray<0:0>(kotlin.Int;0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TArray<#A1>).transform(kotlin/Function1<#A1, #A1>) // arrow.fx.stm/STM.transform|transform@arrow.fx.stm.TArray<0:0>(kotlin.Function1<0:0,0:0>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).isEmpty(): kotlin/Boolean // arrow.fx.stm/STM.isEmpty|isEmpty@arrow.fx.stm.TMVar<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).isNotEmpty(): kotlin/Boolean // arrow.fx.stm/STM.isNotEmpty|isNotEmpty@arrow.fx.stm.TMVar<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).put(#A1) // arrow.fx.stm/STM.put|put@arrow.fx.stm.TMVar<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).read(): #A1 // arrow.fx.stm/STM.read|read@arrow.fx.stm.TMVar<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).swap(#A1): #A1 // arrow.fx.stm/STM.swap|swap@arrow.fx.stm.TMVar<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).take(): #A1 // arrow.fx.stm/STM.take|take@arrow.fx.stm.TMVar<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).tryPut(#A1): kotlin/Boolean // arrow.fx.stm/STM.tryPut|tryPut@arrow.fx.stm.TMVar<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).tryRead(): #A1? // arrow.fx.stm/STM.tryRead|tryRead@arrow.fx.stm.TMVar<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TMVar<#A1>).tryTake(): #A1? // arrow.fx.stm/STM.tryTake|tryTake@arrow.fx.stm.TMVar<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).flush(): kotlin.collections/List<#A1> // arrow.fx.stm/STM.flush|flush@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).isEmpty(): kotlin/Boolean // arrow.fx.stm/STM.isEmpty|isEmpty@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).isNotEmpty(): kotlin/Boolean // arrow.fx.stm/STM.isNotEmpty|isNotEmpty@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).peek(): #A1 // arrow.fx.stm/STM.peek|peek@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).plusAssign(#A1) // arrow.fx.stm/STM.plusAssign|plusAssign@arrow.fx.stm.TQueue<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).read(): #A1 // arrow.fx.stm/STM.read|read@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).removeAll(kotlin/Function1<#A1, kotlin/Boolean>) // arrow.fx.stm/STM.removeAll|removeAll@arrow.fx.stm.TQueue<0:0>(kotlin.Function1<0:0,kotlin.Boolean>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).size(): kotlin/Int // arrow.fx.stm/STM.size|size@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).tryPeek(): #A1? // arrow.fx.stm/STM.tryPeek|tryPeek@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).tryRead(): #A1? // arrow.fx.stm/STM.tryRead|tryRead@arrow.fx.stm.TQueue<0:0>(){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).write(#A1) // arrow.fx.stm/STM.write|write@arrow.fx.stm.TQueue<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TQueue<#A1>).writeFront(#A1) // arrow.fx.stm/STM.writeFront|writeFront@arrow.fx.stm.TQueue<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TSet<#A1>).insert(#A1) // arrow.fx.stm/STM.insert|insert@arrow.fx.stm.TSet<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TSet<#A1>).member(#A1): kotlin/Boolean // arrow.fx.stm/STM.member|member@arrow.fx.stm.TSet<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TSet<#A1>).plusAssign(#A1) // arrow.fx.stm/STM.plusAssign|plusAssign@arrow.fx.stm.TSet<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TSet<#A1>).remove(#A1) // arrow.fx.stm/STM.remove|remove@arrow.fx.stm.TSet<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.fx.stm/STM.getValue|getValue@arrow.fx.stm.TVar<0:0>(kotlin.Nothing?;kotlin.reflect.KProperty<*>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).modify(kotlin/Function1<#A1, #A1>) // arrow.fx.stm/STM.modify|modify@arrow.fx.stm.TVar<0:0>(kotlin.Function1<0:0,0:0>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).set(#A1) // arrow.fx.stm/STM.set|set@arrow.fx.stm.TVar<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).setValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>, #A1) // arrow.fx.stm/STM.setValue|setValue@arrow.fx.stm.TVar<0:0>(kotlin.Nothing?;kotlin.reflect.KProperty<*>;0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> (arrow.fx.stm/TVar<#A1>).swap(#A1): #A1 // arrow.fx.stm/STM.swap|swap@arrow.fx.stm.TVar<0:0>(0:0){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> newTVar(#A1): arrow.fx.stm/TVar<#A1> // arrow.fx.stm/STM.newTVar|newTVar(0:0){0§<kotlin.Any?>}[0]
+}
+
+final class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.fx.stm/TMap { // arrow.fx.stm/TMap|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TMap.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TMap.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // arrow.fx.stm/TMap.toString|toString(){}[0]
+
+    final object Companion { // arrow.fx.stm/TMap.Companion|null[0]
+        final suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> new(): arrow.fx.stm/TMap<#A2, #B2> // arrow.fx.stm/TMap.Companion.new|new(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+        final suspend fun <#A2: kotlin/Any?, #B2: kotlin/Any?> new(kotlin/Function1<#A2, kotlin/Int>): arrow.fx.stm/TMap<#A2, #B2> // arrow.fx.stm/TMap.Companion.new|new(kotlin.Function1<0:0,kotlin.Int>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    }
+}
+
+final class <#A: kotlin/Any?> arrow.fx.stm/TArray { // arrow.fx.stm/TArray|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TArray.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TArray.hashCode|hashCode(){}[0]
+    final fun size(): kotlin/Int // arrow.fx.stm/TArray.size|size(){}[0]
+    final fun toString(): kotlin/String // arrow.fx.stm/TArray.toString|toString(){}[0]
+
+    final object Companion { // arrow.fx.stm/TArray.Companion|null[0]
+        final suspend fun <#A2: kotlin/Any?> new(kotlin.collections/Iterable<#A2>): arrow.fx.stm/TArray<#A2> // arrow.fx.stm/TArray.Companion.new|new(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
+        final suspend fun <#A2: kotlin/Any?> new(kotlin/Array<out #A2>...): arrow.fx.stm/TArray<#A2> // arrow.fx.stm/TArray.Companion.new|new(kotlin.Array<out|0:0>...){0§<kotlin.Any?>}[0]
+        final suspend fun <#A2: kotlin/Any?> new(kotlin/Int, #A2): arrow.fx.stm/TArray<#A2> // arrow.fx.stm/TArray.Companion.new|new(kotlin.Int;0:0){0§<kotlin.Any?>}[0]
+        final suspend fun <#A2: kotlin/Any?> new(kotlin/Int, kotlin/Function1<kotlin/Int, #A2>): arrow.fx.stm/TArray<#A2> // arrow.fx.stm/TArray.Companion.new|new(kotlin.Int;kotlin.Function1<kotlin.Int,0:0>){0§<kotlin.Any?>}[0]
+    }
+}
+
+final class <#A: kotlin/Any?> arrow.fx.stm/TMVar { // arrow.fx.stm/TMVar|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TMVar.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TMVar.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // arrow.fx.stm/TMVar.toString|toString(){}[0]
+
+    final object Companion { // arrow.fx.stm/TMVar.Companion|null[0]
+        final suspend fun <#A2: kotlin/Any?> empty(): arrow.fx.stm/TMVar<#A2> // arrow.fx.stm/TMVar.Companion.empty|empty(){0§<kotlin.Any?>}[0]
+        final suspend fun <#A2: kotlin/Any?> new(#A2): arrow.fx.stm/TMVar<#A2> // arrow.fx.stm/TMVar.Companion.new|new(0:0){0§<kotlin.Any?>}[0]
+    }
+}
+
+final class <#A: kotlin/Any?> arrow.fx.stm/TQueue { // arrow.fx.stm/TQueue|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TQueue.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TQueue.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // arrow.fx.stm/TQueue.toString|toString(){}[0]
+
+    final object Companion { // arrow.fx.stm/TQueue.Companion|null[0]
+        final suspend fun <#A2: kotlin/Any?> new(): arrow.fx.stm/TQueue<#A2> // arrow.fx.stm/TQueue.Companion.new|new(){0§<kotlin.Any?>}[0]
+    }
+}
+
+final class <#A: kotlin/Any?> arrow.fx.stm/TSet { // arrow.fx.stm/TSet|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TSet.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TSet.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // arrow.fx.stm/TSet.toString|toString(){}[0]
+
+    final object Companion { // arrow.fx.stm/TSet.Companion|null[0]
+        final suspend fun <#A2: kotlin/Any?> new(): arrow.fx.stm/TSet<#A2> // arrow.fx.stm/TSet.Companion.new|new(){0§<kotlin.Any?>}[0]
+        final suspend fun <#A2: kotlin/Any?> new(kotlin/Function1<#A2, kotlin/Int>): arrow.fx.stm/TSet<#A2> // arrow.fx.stm/TSet.Companion.new|new(kotlin.Function1<0:0,kotlin.Int>){0§<kotlin.Any?>}[0]
+    }
+}
+
+final class <#A: kotlin/Any?> arrow.fx.stm/TVar { // arrow.fx.stm/TVar|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TVar.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TVar.hashCode|hashCode(){}[0]
+    final suspend fun unsafeRead(): #A // arrow.fx.stm/TVar.unsafeRead|unsafeRead(){}[0]
+
+    final object Companion { // arrow.fx.stm/TVar.Companion|null[0]
+        final suspend fun <#A2: kotlin/Any?> new(#A2): arrow.fx.stm/TVar<#A2> // arrow.fx.stm/TVar.Companion.new|new(0:0){0§<kotlin.Any?>}[0]
+    }
+}
+
+final class arrow.fx.stm.internal/BlockedIndefinitely : kotlin/Throwable { // arrow.fx.stm.internal/BlockedIndefinitely|null[0]
+    constructor <init>() // arrow.fx.stm.internal/BlockedIndefinitely.<init>|<init>(){}[0]
+}
+
+final class arrow.fx.stm/TSemaphore { // arrow.fx.stm/TSemaphore|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TSemaphore.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.fx.stm/TSemaphore.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // arrow.fx.stm/TSemaphore.toString|toString(){}[0]
+
+    final object Companion { // arrow.fx.stm/TSemaphore.Companion|null[0]
+        final suspend fun new(kotlin/Int): arrow.fx.stm/TSemaphore // arrow.fx.stm/TSemaphore.Companion.new|new(kotlin.Int){}[0]
+    }
+}
+
+final object arrow.fx.stm.internal/RetryException : kotlin/Throwable // arrow.fx.stm.internal/RetryException|null[0]
+
+final fun (arrow.fx.stm/STM).arrow.fx.stm/check(kotlin/Boolean) // arrow.fx.stm/check|check@arrow.fx.stm.STM(kotlin.Boolean){}[0]
+final fun (arrow.fx.stm/STM).arrow.fx.stm/newTSem(kotlin/Int): arrow.fx.stm/TSemaphore // arrow.fx.stm/newTSem|newTSem@arrow.fx.stm.STM(kotlin.Int){}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTMap(): arrow.fx.stm/TMap<#A, #B> // arrow.fx.stm/newTMap|newTMap@arrow.fx.stm.STM(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTMap(kotlin/Function1<#A, kotlin/Int>): arrow.fx.stm/TMap<#A, #B> // arrow.fx.stm/newTMap|newTMap@arrow.fx.stm.STM(kotlin.Function1<0:0,kotlin.Int>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newEmptyTMVar(): arrow.fx.stm/TMVar<#A> // arrow.fx.stm/newEmptyTMVar|newEmptyTMVar@arrow.fx.stm.STM(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTArray(kotlin.collections/Iterable<#A>): arrow.fx.stm/TArray<#A> // arrow.fx.stm/newTArray|newTArray@arrow.fx.stm.STM(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTArray(kotlin/Array<out #A>...): arrow.fx.stm/TArray<#A> // arrow.fx.stm/newTArray|newTArray@arrow.fx.stm.STM(kotlin.Array<out|0:0>...){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTArray(kotlin/Int, #A): arrow.fx.stm/TArray<#A> // arrow.fx.stm/newTArray|newTArray@arrow.fx.stm.STM(kotlin.Int;0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTArray(kotlin/Int, kotlin/Function1<kotlin/Int, #A>): arrow.fx.stm/TArray<#A> // arrow.fx.stm/newTArray|newTArray@arrow.fx.stm.STM(kotlin.Int;kotlin.Function1<kotlin.Int,0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTMVar(#A): arrow.fx.stm/TMVar<#A> // arrow.fx.stm/newTMVar|newTMVar@arrow.fx.stm.STM(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTQueue(): arrow.fx.stm/TQueue<#A> // arrow.fx.stm/newTQueue|newTQueue@arrow.fx.stm.STM(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTSet(): arrow.fx.stm/TSet<#A> // arrow.fx.stm/newTSet|newTSet@arrow.fx.stm.STM(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.fx.stm/STM).arrow.fx.stm/newTSet(kotlin/Function1<#A, kotlin/Int>): arrow.fx.stm/TSet<#A> // arrow.fx.stm/newTSet|newTSet@arrow.fx.stm.STM(kotlin.Function1<0:0,kotlin.Int>){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?> arrow.fx.stm/stm(noinline kotlin/Function1<arrow.fx.stm/STM, #A>): kotlin/Function1<arrow.fx.stm/STM, #A> // arrow.fx.stm/stm|stm(kotlin.Function1<arrow.fx.stm.STM,0:0>){0§<kotlin.Any?>}[0]
+final suspend fun <#A: kotlin/Any?> arrow.fx.stm/atomically(kotlin/Function1<arrow.fx.stm/STM, #A>): #A // arrow.fx.stm/atomically|atomically(kotlin.Function1<arrow.fx.stm.STM,0:0>){0§<kotlin.Any?>}[0]

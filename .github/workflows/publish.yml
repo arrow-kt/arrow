@@ -2,16 +2,14 @@ name: "Publish all libs, Arrow-stack and Docs"
 
 on:
   push:
-    branch:
-      - 'arrow-2'
-#on:
-#  workflow_dispatch:
-#    branches: [main]
-#    inputs:
-#      version:
-#        description: 'Version'
-#        required: true
-#        type: string
+    branches: [ main ]
+  workflow_dispatch:
+    branches: [ main ]
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        type: string
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
@@ -40,12 +38,12 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
 
       - name: Assemble
-        run: ./gradlew assemble -Pversion=${{ inputs.version }}
+        run: ./gradlew assemble -Pversion=${{ inputs.version }} -Penable_wasm=true
 
       - name: Upload reports
         if: failure()
@@ -55,4 +53,4 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Publish next major SNAPSHOT version
-        run: ./gradlew -Pversion=${{ inputs.version }}  publishToSonatype closeSonatypeStagingRepository
+        run: ./gradlew -Pversion=${{ inputs.version }} publish

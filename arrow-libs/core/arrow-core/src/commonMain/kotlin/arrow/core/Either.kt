@@ -650,10 +650,11 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
-    contract {
-      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    return when (this) {
+      is Left -> Left(f(value))
+      is Right -> Right(value)
     }
-    return fold({ Left(f(it)) }, { Right(it) })
   }
 
   /**
@@ -1291,6 +1292,21 @@ public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>):
   }
 }
 
+/**
+ * Binds the given function across [Left], that is,
+ * Map, or transform, the left value [A] of this [Either] into a new [Either] with a left value of type [C].
+ * Returns a new [Either] with either the original right value of type [B] or the newly transformed left value of type [C].
+ *
+ * @param f The function to bind across [Left].
+ */
+public fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
+  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  return when (this) {
+    is Left -> f(this.value)
+    is Right -> this
+  }
+}
+
 public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
   flatMap(::identity)
 
@@ -1312,7 +1328,10 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  */
 public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return fold(default, ::identity)
+  return when(this) {
+    is Left -> default(this.value)
+    is Right -> this.value
+  }
 }
 
 /**
@@ -1332,8 +1351,7 @@ public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  * <!--- KNIT example-either-33.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-@Suppress("NOTHING_TO_INLINE")
-public inline fun <A> Either<A, A>.merge(): A =
+public fun <A> Either<A, A>.merge(): A =
   fold(::identity, ::identity)
 
 public fun <A> A.left(): Either<A, Nothing> = Left(this)
@@ -1349,7 +1367,7 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
 /**
  * Combine two [Either] values.
  * If both are [Right] then combine both [B] values using [combineRight] or if both are [Left] then combine both [A] values using [combineLeft],
- * otherwise it returns the `this` or fallbacks to [other] in case `this` is [Left].
+ * otherwise return the sole [Left] value (either `this` or [other]).
  */
 public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> =
   when (val one = this) {

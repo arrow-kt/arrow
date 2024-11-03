@@ -1,5 +1,9 @@
 # Created by https://www.gitignore.io/api/android,intellij
 
+### Kotlin ###
+
+.kotlin
+
 ### Android ###
 # Built application files
 *.apk

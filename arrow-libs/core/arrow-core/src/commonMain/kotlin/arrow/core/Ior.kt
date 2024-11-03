@@ -404,16 +404,36 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Io
   when (this) {
     is Left -> this
     is Right -> f(value)
-    is Both -> f(rightValue).fold(
-      { a -> Left(combine(leftValue, a)) },
-      { d -> Both(leftValue, d) },
-      { ll, rr -> Both(combine(leftValue, ll), rr) }
-    )
+    is Both -> when (val r = f(rightValue)) {
+      is Left -> Left(combine(this.leftValue, r.value))
+      is Right -> Both(this.leftValue, r.value)
+      is Both -> Both(combine(this.leftValue, r.leftValue), r.rightValue)
+    }
+  }
+
+/**
+ * Binds the given function across [Ior.Left].
+ *
+ * @param f The function to bind across [Ior.Left].
+ */
+public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (A) -> Ior<D, B>): Ior<D, B> =
+  when (this) {
+    is Left -> f(value)
+    is Right -> this
+    is Both -> when (val l = f(leftValue)) {
+      is Left -> Both(l.value, this.rightValue)
+      is Right -> Right(combine(this.rightValue, l.value))
+      is Both -> Both(l.leftValue, combine(this.rightValue, l.rightValue))
+    }
   }
 
 public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return fold(default, ::identity) { _, b -> b }
+  return when (this) {
+    is Left -> default(this.value)
+    is Right -> this.value
+    is Both -> this.rightValue
+  }
 }
 
 

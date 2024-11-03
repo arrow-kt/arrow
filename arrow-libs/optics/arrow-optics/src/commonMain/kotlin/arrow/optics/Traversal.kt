@@ -88,6 +88,15 @@ public interface PTraversal<S, T, A, B> {
         this@PTraversal.modify(source) { b -> other.modify(b, map) }
     }
 
+  public infix fun <C, D> composeLazy(other: () -> PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
+    object : PTraversal<S, T, C, D> {
+      override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: S, map: (focus: C) -> R): R =
+        this@PTraversal.foldMap(initial, combine, source) { c -> other().foldMap(initial, combine, c, map) }
+
+      override fun modify(source: S, map: (focus: C) -> D): T =
+        this@PTraversal.modify(source) { b -> other().modify(b, map) }
+    }
+
   public operator fun <C, D> plus(other: PTraversal<in A, out B, out C, in D>): PTraversal<S, T, C, D> =
     this compose other
 

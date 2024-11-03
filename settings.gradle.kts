@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "3.17.2"
+  id("com.gradle.develocity") version "3.18.1"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
@@ -102,10 +102,8 @@ project(":arrow-optics").projectDir = file("arrow-libs/optics/arrow-optics")
 include("arrow-optics-reflect")
 project(":arrow-optics-reflect").projectDir = file("arrow-libs/optics/arrow-optics-reflect")
 
-if (kotlin_version.isNullOrBlank() || "2.0" !in kotlin_version!!) {
-  include("arrow-optics-compose")
-  project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-optics-compose")
-}
+include("arrow-optics-compose")
+project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-optics-compose")
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")

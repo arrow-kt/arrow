@@ -5,13 +5,9 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.EitherNel
-import arrow.core.EmptyValue
-import arrow.core.EmptyValue.combine
-import arrow.core.EmptyValue.unbox
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.collectionSizeOrDefault
-import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
@@ -22,6 +18,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSynthetic
+import kotlin.reflect.KProperty
 
 /**
  * Accumulate the errors from running both [action1] and [action2] using the given [combine] function.
@@ -255,18 +252,9 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<Error>.zipOrAccumu
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  var error: Any? = EmptyValue
-  val a = recover({ action1(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val b = recover({ action2(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val c = recover({ action3(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val d = recover({ action4(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val e = recover({ action5(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val f = recover({ action6(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val g = recover({ action7(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val h = recover({ action8(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  val i = recover({ action9(RaiseAccumulate(this)) }) { error = combine(error, it.reduce(combine), combine); EmptyValue }
-  return if (error !== EmptyValue) raise(unbox<Error>(error))
-  else block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i))
+  return withError({ it.reduce(combine) }) {
+    zipOrAccumulate(action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
+  }
 }
 
 /**
@@ -472,7 +460,7 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
-@RaiseDSL
+@RaiseDSL @OptIn(ExperimentalRaiseAccumulateApi::class)
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
@@ -486,18 +474,18 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  val error: MutableList<Error> = mutableListOf()
-  val a = recover({ action1(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val b = recover({ action2(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val c = recover({ action3(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val d = recover({ action4(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val e = recover({ action5(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val f = recover({ action6(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val g = recover({ action7(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val h = recover({ action8(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  val i = recover({ action9(RaiseAccumulate(this)) }) { error.addAll(it); EmptyValue }
-  error.toNonEmptyListOrNull()?.let { raise(it) }
-  return block(unbox(a), unbox(b), unbox(c), unbox(d), unbox(e), unbox(f), unbox(g), unbox(h), unbox(i))
+  return accumulate {
+    val a by accumulating(action1)
+    val b by accumulating(action2)
+    val c by accumulating(action3)
+    val d by accumulating(action4)
+    val e by accumulating(action5)
+    val f by accumulating(action6)
+    val g by accumulating(action7)
+    val h by accumulating(action8)
+    val i by accumulating(action9)
+    block(a, b, c, d, e, f, g, h, i)
+  }
 }
 
 @RaiseDSL
@@ -526,16 +514,8 @@ internal inline fun <Error, A> Raise<Error>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   combine: (Error, Error) -> Error,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
-) {
-  var error: Any? = EmptyValue
-  for (item in iterator) {
-    recover({
-      block(RaiseAccumulate(this), item, error != EmptyValue)
-    }) { errors ->
-      error = combine(error, errors.reduce(combine), combine)
-    }
-  }
-  return if (error === EmptyValue) Unit else raise(unbox<Error>(error))
+): Unit = withError({ it.reduce(combine) }) {
+  forEachAccumulatingImpl(iterator, block)
 }
 
 @RaiseDSL
@@ -560,20 +540,14 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
-@PublishedApi @JvmSynthetic
+@PublishedApi @JvmSynthetic @OptIn(ExperimentalRaiseAccumulateApi::class)
 internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
-) {
-  val error: MutableList<Error> = mutableListOf()
-  for (item in iterator) {
-    recover({
-      block(RaiseAccumulate(this), item, error.isNotEmpty())
-    }) {
-      error.addAll(it)
-    }
+): Unit = accumulate {
+  iterator.forEach {
+    accumulating { block(it, hasErrors()) }
   }
-  error.toNonEmptyListOrNull()?.let(::raise)
 }
 
 /**
@@ -677,7 +651,28 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 }.toNonEmptySetOrNull()!!
 
 @RaiseDSL
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(map, combine, transform)"),
+)
 public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
+  map: Map<K, A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = mapValuesOrAccumulate(map, combine, transform)
+
+@RaiseDSL
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(map, transform)")
+)
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  map: Map<K, A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = mapValuesOrAccumulate(map, transform)
+
+@RaiseDSL
+public inline fun <K, Error, A, B> Raise<Error>.mapValuesOrAccumulate(
   map: Map<K, A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
@@ -688,13 +683,38 @@ public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
 }
 
 @RaiseDSL
-public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapValuesOrAccumulate(
   map: Map<K, A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
   forEachAccumulatingImpl(map.entries.iterator()) { item, hasErrors ->
     transform(item).also { if (!hasErrors) put(item.key, it) }
   }
+}
+
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+public annotation class ExperimentalRaiseAccumulateApi
+
+@ExperimentalRaiseAccumulateApi
+public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
+  block: RaiseAccumulate<Error>.() -> A
+): A {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  val nel = RaiseAccumulate(this)
+  val result = block(nel)
+  if (nel.hasErrors()) nel.raiseErrors()
+  return result
+}
+
+@ExperimentalRaiseAccumulateApi
+public inline fun <Error, A, R> accumulate(
+  raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
+  crossinline block: RaiseAccumulate<Error>.() -> A
+): R {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return raise { accumulate(block) }
 }
 
 /**
@@ -706,12 +726,14 @@ public open class RaiseAccumulate<Error>(
   public val raise: Raise<NonEmptyList<Error>>
 ) : Raise<Error> {
 
+  internal val errors: MutableList<Error> = mutableListOf()
+
   @RaiseDSL
   public override fun raise(r: Error): Nothing =
-    raise.raise(nonEmptyListOf(r))
+    raise.raise((errors + r).toNonEmptyListOrNull()!!)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
-    raise.mapOrAccumulate(this) { it.value.bind() }
+    raise.mapValuesOrAccumulate(this) { it.value.bind() }
 
   @RaiseDSL
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
@@ -727,6 +749,16 @@ public open class RaiseAccumulate<Error>(
   public inline fun <A, B> NonEmptySet<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
   ): NonEmptySet<B> = raise.mapOrAccumulate(this, transform)
+
+  @RaiseDSL
+  public inline fun <K, A, B> Map<K, A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+  ): List<B> = raise.mapOrAccumulate(entries, transform)
+
+  @RaiseDSL
+  public inline fun <K, A, B> Map<K, A>.mapValuesOrAccumulate(
+    transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+  ): Map<K, B> = raise.mapValuesOrAccumulate(this, transform)
 
   @RaiseDSL
   @JvmName("_mapOrAccumulate")
@@ -771,5 +803,53 @@ public open class RaiseAccumulate<Error>(
       callsInPlace(block, EXACTLY_ONCE)
     }
     return block(raise)
+  }
+
+  @PublishedApi internal fun addErrors(newErrors: Iterable<Error>) { errors.addAll(newErrors) }
+  @PublishedApi internal fun hasErrors(): Boolean = errors.isNotEmpty()
+  @PublishedApi internal fun raiseErrors(): Nothing = raise.raise(errors.toNonEmptyListOrNull()!!)
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> =
+    accumulating { this@bindOrAccumulate.bind() }
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> =
+    accumulating { this@bindAllOrAccumulate.bindAll() }
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
+    accumulating { this@bindNelOrAccumulate.bindNel() }
+
+  @ExperimentalRaiseAccumulateApi
+  public fun ensureOrAccumulate(condition: Boolean, raise: () -> Error) {
+    accumulating { ensure(condition, raise) }
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
+    contract { returns() implies (value != null) }
+    ensureOrAccumulate(value != null, raise)
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> =
+    recover(inner@{
+      Ok(block(RaiseAccumulate(this@inner)))
+    }) {
+      addErrors(it)
+      Error()
+    }
+
+  public abstract inner class Value<out A> {
+    public abstract operator fun getValue(value: Nothing?, property: KProperty<*>): A
+  }
+  @PublishedApi internal inner class Error: Value<Nothing>() {
+    // WARNING: do not turn this into a property with initializer!!
+    //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
+    override fun getValue(value: Nothing?, property: KProperty<*>): Nothing = raiseErrors()
+  }
+  @PublishedApi internal inner class Ok<out A>(private val result: A): Value<A>() {
+    override fun getValue(value: Nothing?, property: KProperty<*>): A = result
   }
 }

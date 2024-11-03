@@ -6,6 +6,7 @@ import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspSourcesDir
+import com.tschuchort.compiletesting.kspWithCompilation
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
 import io.kotest.assertions.withClue
@@ -56,6 +57,8 @@ fun String.evals(thing: Pair<String, Any?>) {
 
 internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult {
   val compilation = buildCompilation(text, allWarningsAsErrors = allWarningsAsErrors)
+  return compilation.compile()
+  /* HACK NOT NEEDED ANYMORE :)
   // fix problems with double compilation and KSP
   // as stated in https://github.com/tschuchortdev/kotlin-compile-testing/issues/72
   val pass1 = compilation.compile()
@@ -65,9 +68,12 @@ internal fun compile(text: String, allWarningsAsErrors: Boolean = false): Compil
   return buildCompilation(text)
     .apply {
       sources = compilation.sources + compilation.kspGeneratedSourceFiles
-      symbolProcessorProviders = emptyList()
+      symbolProcessorProviders = mutableListOf()
+      kspWithCompilation = true
     }
     .compile()
+
+   */
 }
 
 fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = KotlinCompilation().apply {
@@ -76,10 +82,12 @@ fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = Kotli
     "arrow-core:$arrowVersion",
     "arrow-optics:$arrowVersion",
   ).map { classpathOf(it) }
-  symbolProcessorProviders = listOf(OpticsProcessorProvider())
+  symbolProcessorProviders = mutableListOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
   verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
+  languageVersion = "1.9"
+  kspWithCompilation = true
 }
 
 private fun classpathOf(dependency: String): File {

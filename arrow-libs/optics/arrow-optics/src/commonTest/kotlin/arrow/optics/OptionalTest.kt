@@ -5,6 +5,7 @@ import arrow.core.Either.Right
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.toOption
+import arrow.optics.dsl.filter
 import arrow.optics.test.functionAToB
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.testLaws
@@ -19,6 +20,7 @@ import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class OptionalTest {
@@ -185,6 +187,63 @@ class OptionalTest {
 
     checkAll(Arb.int()) { int ->
       joinedOptional.getOrNull(Left(listOf(int))) shouldBe joinedOptional.getOrNull(Right(int))
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test
+  fun filterPrismTrue() = runTest {
+    checkAll(Arb.sumType()) { sum: SumType ->
+      Prism.sumType().filter { true }.getOrNull(sum) shouldBe (sum as? SumType.A)?.string
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test
+  fun filterPrismFalse() = runTest {
+    checkAll(Arb.sumType()) { sum: SumType ->
+      Prism.sumType().filter { false }.getOrNull(sum) shouldBe null
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test
+  fun filterListBasic() = runTest {
+    checkAll(Arb.list(Arb.int(), range = 0 .. 20)) { lst: List<Int> ->
+      Every.list<Int>().filter { true }.getAll(lst) shouldBe lst
+      Every.list<Int>().filter { false }.getAll(lst) shouldBe emptyList()
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test
+  fun filterPredicate() = runTest {
+    checkAll(Arb.list(Arb.int())) { lst: List<Int> ->
+      Every.list<Int>().filter { it > 7 }.getAll(lst) shouldBe lst.filter { it > 7 }
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test
+  fun filterModify() = runTest {
+    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string(maxSize = 10)))) { lst: List<Pair<Int, String>> ->
+      Every.list<Pair<Int, String>>()
+        .filter { (n, _) -> n % 2 == 0 }
+        .compose(Lens.pairSecond())
+        .modify(lst) { it.uppercase() }
+        .shouldBe(lst.map { (n, s) -> Pair(n, if (n % 2 == 0) s.uppercase() else s) })
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test
+  fun filterSetGetFails() = runTest {
+    checkAll(Arb.int()) { n ->
+      val p = Optional.filter<Int> { it % 2 == 0 }
+      p.getOrNull(p.set(n, n)) shouldBe n.takeIf { it % 2 == 0 }
+    }
+  }
+
+  @OptIn(DelicateOptic::class) @Test @Ignore
+  // 'filter' does not satisfy the double-modification law
+  fun filterSetSetFails() = runTest {
+    checkAll(Arb.int(range = 0 .. 100)) { n ->
+      val p = Optional.filter<Int> { it % 2 == 0 }
+      p.modify(p.modify(n) { it + 1 }) { it + 1 } shouldBe p.modify(n) { it + 2 }
     }
   }
 }

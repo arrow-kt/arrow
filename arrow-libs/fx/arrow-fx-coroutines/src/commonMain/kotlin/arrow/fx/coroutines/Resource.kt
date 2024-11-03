@@ -6,11 +6,8 @@ import arrow.atomic.Atomic
 import arrow.atomic.value
 import arrow.core.identity
 import arrow.core.prependTo
-import arrow.fx.coroutines.ExitCase.Cancelled
-import arrow.fx.coroutines.ExitCase.Companion.ExitCase
-import arrow.fx.coroutines.ExitCase.Completed
-import arrow.fx.coroutines.ExitCase.Failure
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -299,7 +296,7 @@ public interface ResourceScope : AutoCloseScope {
   public suspend fun <A> Resource<A>.bind(): A
   /**
    * Install [A] into the [ResourceScope].
-   * It's [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
+   * Its [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
    * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
    */
   @ResourceDSL
@@ -414,6 +411,7 @@ public fun <A> resource(
  * import java.nio.file.Path
  * import kotlin.io.path.*
  *
+ * @OptIn(ExperimentalCoroutinesApi::class)
  * fun Flow<ByteArray>.writeAll(path: Path): Flow<Unit> =
  *   closeable { path.toFile().outputStream() }
  *     .asFlow()
@@ -452,6 +450,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  * val resource =
  *   resource({ "Acquire" }) { _, exitCase -> println("Release $exitCase") }
  *
+ * @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
  * suspend fun main(): Unit {
  *   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
  *   try {
@@ -512,20 +511,16 @@ private value class ResourceScopeImpl(
     })
 
   override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    try {
-      acquire().also { a ->
-        val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
-          val errorOrNull = when (exitCase) {
-            Completed -> null
-            is Cancelled -> exitCase.exception
-            is Failure -> exitCase.failure
-          }
-          release(a, errorOrNull)
+    acquire().also { a ->
+      val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
+        val errorOrNull = when (exitCase) {
+          ExitCase.Completed -> null
+          is ExitCase.Cancelled -> exitCase.exception
+          is ExitCase.Failure -> exitCase.failure
         }
-        finalizers.update { prev -> prev + finalizer }
+        release(a, errorOrNull)
       }
-    } catch (e: Throwable) {
-      throw e
+      finalizers.update(finalizer::prependTo)
     }
 
   suspend fun cancelAll(
@@ -537,4 +532,37 @@ private value class ResourceScopeImpl(
       acc?.apply { addSuppressed(other) } ?: other
     } ?: acc
   }
+}
+
+/** Platform-dependent IO [CoroutineDispatcher] **/
+internal expect val IODispatcher: CoroutineDispatcher
+
+/**
+ * Creates a [Resource] from an [AutoCloseable], which uses [AutoCloseable.close] for releasing.
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.resourceScope
+ * import arrow.fx.coroutines.autoCloseable
+ * import java.io.FileInputStream
+ *
+ * suspend fun copyFile(src: String, dest: String): Unit =
+ *   resourceScope {
+ *     val a: FileInputStream = autoCloseable { FileInputStream(src) }
+ *     val b: FileInputStream = autoCloseable { FileInputStream(dest) }
+ *     /** read from [a] and write to [b]. **/
+ *   } // Both resources will be closed accordingly to their #close methods
+ * ```
+ * <!--- KNIT example-resource-10.kt -->
+ */
+@ResourceDSL
+public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
+  closingDispatcher: CoroutineDispatcher = IODispatcher,
+  autoCloseable: suspend () -> A,
+): A = install({ autoCloseable() } ) { s: A, _: ExitCase -> withContext(closingDispatcher) { s.close() } }
+
+public fun <A : AutoCloseable> autoCloseable(
+  closingDispatcher: CoroutineDispatcher = IODispatcher,
+  autoCloseable: suspend () -> A,
+): Resource<A> = resource {
+  autoCloseable(closingDispatcher, autoCloseable)
 }

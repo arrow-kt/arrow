@@ -7,6 +7,8 @@ public abstract interface class arrow/fx/stm/STM {
 	public abstract fun fold (Larrow/fx/stm/TArray;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public abstract fun get (Larrow/fx/stm/TArray;I)Ljava/lang/Object;
 	public abstract fun get (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun getValue (Larrow/fx/stm/TVar;)Ljava/lang/Object;
+	public abstract fun getValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 	public abstract fun insert (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
 	public abstract fun insert (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
 	public abstract fun isEmpty (Larrow/fx/stm/TMVar;)Z
@@ -35,6 +37,8 @@ public abstract interface class arrow/fx/stm/STM {
 	public abstract fun retry ()Ljava/lang/Void;
 	public abstract fun set (Larrow/fx/stm/TArray;ILjava/lang/Object;)V
 	public abstract fun set (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public abstract fun set (Larrow/fx/stm/TVar;Ljava/lang/Object;)V
+	public abstract fun setValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;Ljava/lang/Object;)V
 	public abstract fun size (Larrow/fx/stm/TQueue;)I
 	public abstract fun swap (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun swap (Larrow/fx/stm/TVar;Ljava/lang/Object;)Ljava/lang/Object;
@@ -61,6 +65,8 @@ public final class arrow/fx/stm/STM$DefaultImpls {
 	public static fun fold (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static fun get (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;I)Ljava/lang/Object;
 	public static fun get (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun getValue (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;)Ljava/lang/Object;
+	public static fun getValue (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 	public static fun insert (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
 	public static fun insert (Larrow/fx/stm/STM;Larrow/fx/stm/TSet;Ljava/lang/Object;)V
 	public static fun isEmpty (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Z
@@ -86,6 +92,8 @@ public final class arrow/fx/stm/STM$DefaultImpls {
 	public static fun removeAll (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;Lkotlin/jvm/functions/Function1;)V
 	public static fun set (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;ILjava/lang/Object;)V
 	public static fun set (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public static fun set (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Object;)V
+	public static fun setValue (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;Ljava/lang/Object;)V
 	public static fun size (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)I
 	public static fun swap (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;Ljava/lang/Object;)Ljava/lang/Object;
 	public static fun swap (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Object;)Ljava/lang/Object;
@@ -111,8 +119,6 @@ public final class arrow/fx/stm/STMKt {
 
 public final class arrow/fx/stm/TArray {
 	public static final field Companion Larrow/fx/stm/TArray$Companion;
-	public final fun copy ([Larrow/fx/stm/TVar;)Larrow/fx/stm/TArray;
-	public static synthetic fun copy$default (Larrow/fx/stm/TArray;[Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TArray;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public final fun size ()I
@@ -135,8 +141,6 @@ public final class arrow/fx/stm/TArrayKt {
 
 public final class arrow/fx/stm/TMVar {
 	public static final field Companion Larrow/fx/stm/TMVar$Companion;
-	public final fun copy (Larrow/fx/stm/TVar;)Larrow/fx/stm/TMVar;
-	public static synthetic fun copy$default (Larrow/fx/stm/TMVar;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TMVar;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -154,8 +158,6 @@ public final class arrow/fx/stm/TMVarKt {
 
 public final class arrow/fx/stm/TMap {
 	public static final field Companion Larrow/fx/stm/TMap$Companion;
-	public final fun copy (Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;)Larrow/fx/stm/TMap;
-	public static synthetic fun copy$default (Larrow/fx/stm/TMap;Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/stm/TMap;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -173,8 +175,6 @@ public final class arrow/fx/stm/TMapKt {
 
 public final class arrow/fx/stm/TQueue {
 	public static final field Companion Larrow/fx/stm/TQueue$Companion;
-	public final fun copy (Larrow/fx/stm/TVar;Larrow/fx/stm/TVar;)Larrow/fx/stm/TQueue;
-	public static synthetic fun copy$default (Larrow/fx/stm/TQueue;Larrow/fx/stm/TVar;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TQueue;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -190,8 +190,6 @@ public final class arrow/fx/stm/TQueueKt {
 
 public final class arrow/fx/stm/TSemaphore {
 	public static final field Companion Larrow/fx/stm/TSemaphore$Companion;
-	public final fun copy (Larrow/fx/stm/TVar;)Larrow/fx/stm/TSemaphore;
-	public static synthetic fun copy$default (Larrow/fx/stm/TSemaphore;Larrow/fx/stm/TVar;ILjava/lang/Object;)Larrow/fx/stm/TSemaphore;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
@@ -207,8 +205,6 @@ public final class arrow/fx/stm/TSemaphoreKt {
 
 public final class arrow/fx/stm/TSet {
 	public static final field Companion Larrow/fx/stm/TSet$Companion;
-	public final fun copy (Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;)Larrow/fx/stm/TSet;
-	public static synthetic fun copy$default (Larrow/fx/stm/TSet;Larrow/fx/stm/internal/Hamt;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/fx/stm/TSet;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

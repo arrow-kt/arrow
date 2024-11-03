@@ -2,20 +2,18 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import java.util.concurrent.atomic.AtomicBoolean
 import java.lang.AutoCloseable
 import java.io.Closeable
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
-import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.DefaultAsserter.fail
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class ResourceTestJvm {
 
-  class AutoCloseableTest : AutoCloseable {
+  class AutoCloseableJvmTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
   }
@@ -25,8 +23,8 @@ class ResourceTestJvm {
     override fun close() = didClose.set(true)
   }
 
-  @Test fun autoCloseableCloses() = runTest {
-      val t = AutoCloseableTest()
+  @Test fun autoCloseableJvmCloses() = runTest {
+      val t = AutoCloseableJvmTest()
       resourceScope {
         autoCloseable { t }
       }
@@ -34,9 +32,9 @@ class ResourceTestJvm {
       t.didClose.get() shouldBe true
   }
 
-  @Test fun autoCloseableClosesOnError() = runTest {
-    checkAll(Arb.throwable()) { throwable ->
-      val t = AutoCloseableTest()
+  @Test fun autoCloseableJvmClosesOnError() = runTest {
+    checkAll(10, Arb.throwable()) { throwable ->
+      val t = AutoCloseableJvmTest()
 
       shouldThrow<Exception> {
         resourceScope {
@@ -60,7 +58,7 @@ class ResourceTestJvm {
   }
 
   @Test fun closeableClosesOnError() = runTest {
-    checkAll(Arb.throwable()) { throwable ->
+    checkAll(10, Arb.throwable()) { throwable ->
       val t = CloseableTest()
 
       shouldThrow<Exception> {

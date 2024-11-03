@@ -23,7 +23,7 @@ import kotlin.test.Test
 class ParZip4Test {
     @Test
     fun parZip4RunsInParallel() = runTestUsingDefaultDispatcher {
-      checkAll(Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d ->
+      checkAll(10, Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d ->
         val r = Atomic("")
         val modifyGate1 = CompletableDeferred<Unit>()
         val modifyGate2 = CompletableDeferred<Unit>()
@@ -114,7 +114,7 @@ class ParZip4Test {
     
     @Test
     fun parZipCancellationExceptionOnRightCanCancelRest() = runTestUsingDefaultDispatcher {
-      checkAll(Arb.string(), Arb.int(1..4)) { msg, cancel ->
+      checkAll(10, Arb.string(), Arb.int(1..4)) { msg, cancel ->
         val s = Channel<Unit>()
         val pa = CompletableDeferred<ExitCase>()
         val pb = CompletableDeferred<ExitCase>()

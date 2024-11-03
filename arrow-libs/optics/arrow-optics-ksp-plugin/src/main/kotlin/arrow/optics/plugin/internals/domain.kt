@@ -13,7 +13,7 @@ import java.util.Locale
 
 data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
   val sourceClassName = declaration.qualifiedNameOrSimpleName
-  val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }
+  val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }.sanitize()
   val simpleName = declaration.nameWithParentClass
   val packageName = pckg.asSanitizedString()
   val visibilityModifierName = when (declaration.companionObject?.getVisibility()) {
@@ -75,7 +75,12 @@ data class Focus(
   val refinedType: KSType?,
   val onlyOneSealedSubclass: Boolean = false,
   val subclasses: List<String> = emptyList(),
+  val classNameWithParameters: String? = className,
 ) {
+  val escapedParamName = paramName.plusIfNotBlank(
+    prefix = "`",
+    postfix = "`",
+  )
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
       it.type?.resolve()?.declaration is KSTypeParameter
