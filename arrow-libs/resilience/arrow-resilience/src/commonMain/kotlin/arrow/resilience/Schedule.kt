@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.identity
 import arrow.core.left
 import arrow.core.merge
 import arrow.core.nonFatalOrThrow
@@ -16,7 +15,6 @@ import arrow.core.raise.fold
 import arrow.core.right
 import arrow.core.some
 import arrow.resilience.Schedule.Companion.identity
-import arrow.resilience.Schedule.Decision
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.currentCoroutineContext
@@ -24,7 +22,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.retry
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmInline
 import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.reflect.KClass
@@ -34,7 +31,7 @@ import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.nanoseconds
 
 public typealias ScheduleStep<Input, Output> =
-  suspend (Input) -> Decision<Input, Output>
+  suspend (Input) -> Schedule.Decision<Input, Output>
 
 /**
  * A [Schedule] describes how a `suspend fun` should [retry] or [repeat].
@@ -44,8 +41,11 @@ public typealias ScheduleStep<Input, Output> =
 * (and if so, the `delay` until the next attempt),
  * or if the [Schedule] is [Done] retrying or repeating.
  */
-@JvmInline
-public value class Schedule<in Input, out Output>(public val step: ScheduleStep<Input, Output>) {
+public fun interface Schedule<in Input, out Output> {
+
+  public suspend operator fun invoke(input: Input): Decision<Input, Output>
+
+  public val step: ScheduleStep<Input, Output> get() = this::invoke
 
   /** Repeat the schedule, and uses [block] as [Input] for the [step] function. */
   public suspend fun repeat(block: suspend () -> Input): Output =
@@ -522,7 +522,7 @@ public suspend inline fun <Error, Result, Output> Raise<Error>.retry(
   schedule: Schedule<Error, Output>,
   @BuilderInference action: Raise<Error>.() -> Result,
 ): Result {
-  var step: ScheduleStep<Error, Output> = schedule.step
+  var step = schedule.step
 
   while (true) {
     currentCoroutineContext().ensureActive()

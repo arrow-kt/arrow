@@ -1,8 +1,10 @@
 @file:JvmName("ComposeFlowKt")
+@file:OptIn(ExperimentalCoroutinesApi::class, ExperimentalForInheritanceCoroutinesApi::class)
 
 package arrow.optics
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -66,7 +68,6 @@ public fun <T, A> MutableStateFlow<T>.optic(lens: Lens<T, A>): MutableStateFlow<
   override val replayCache: List<A>
     get() = this@optic.replayCache.map { lens.get(it) }
 
-  @ExperimentalCoroutinesApi
   override fun resetReplayCache() {
     this@optic.resetReplayCache()
   }
