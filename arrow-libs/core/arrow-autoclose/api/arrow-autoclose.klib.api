@@ -15,7 +15,7 @@ abstract interface arrow/AutoCloseScope { // arrow/AutoCloseScope|null[0]
 final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope { // arrow/DefaultAutoCloseScope|null[0]
     constructor <init>() // arrow/DefaultAutoCloseScope.<init>|<init>(){}[0]
 
-    final fun close(kotlin/Throwable?) // arrow/DefaultAutoCloseScope.close|close(kotlin.Throwable?){}[0]
+    final fun close(kotlin/Throwable?): kotlin/Nothing? // arrow/DefaultAutoCloseScope.close|close(kotlin.Throwable?){}[0]
     final fun onClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/DefaultAutoCloseScope.onClose|onClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
 }
 
