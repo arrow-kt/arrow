@@ -319,8 +319,7 @@ public interface ResourceScope : AutoCloseScope {
     return install({ a }, release)
   }
 
-  public suspend infix fun onRelease(release: suspend (ExitCase) -> Unit): Unit =
-    install({ }) { _, exitCase -> release(exitCase) }
+  public infix fun onRelease(release: suspend (ExitCase) -> Unit)
 }
 
 @ScopeDSL
@@ -491,7 +490,11 @@ private value class ResourceScopeImpl(
   private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
 ) : ResourceScope {
   override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
-  
+
+  override fun onRelease(release: suspend (ExitCase) -> Unit) {
+    finalizers.update(release::prependTo)
+  }
+
   override suspend fun <A> install(acquire: suspend AcquireStep.() -> A, release: suspend (A, ExitCase) -> Unit): A =
     bracketCase({
       val a = acquire(AcquireStep)
