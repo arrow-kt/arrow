@@ -2,8 +2,6 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-
 
 repositories {
   google()
@@ -37,7 +35,7 @@ kotlin {
     browser()
     nodejs()
   }
-  @OptIn(ExperimentalWasmDsl::class) wasmJs()
+  @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class) wasmJs()
   androidTarget()
   // Native: https://kotlinlang.org/docs/native-target-support.html
   // -- Tier 1 --

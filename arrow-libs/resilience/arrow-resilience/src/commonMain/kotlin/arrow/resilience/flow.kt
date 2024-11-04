@@ -34,9 +34,9 @@ import kotlin.time.Duration.Companion.ZERO
  * @param schedule - the [Schedule] used for retrying the collection of the flow
  */
 public fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> {
-  var step: Schedule<Throwable, B> = schedule
+  var step = schedule.step
   return retryWhen { cause, _ ->
-    when (val dec = step.step(cause)) {
+    when (val dec = step(cause)) {
       is Schedule.Decision.Continue -> {
         if (dec.delay != ZERO) delay(dec.delay)
         step = dec.step

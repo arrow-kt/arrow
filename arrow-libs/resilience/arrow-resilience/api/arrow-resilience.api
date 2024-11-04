@@ -146,6 +146,8 @@ public abstract interface class arrow/resilience/Schedule {
 	public abstract fun doUntil (Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
 	public abstract fun doWhile (Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
 	public abstract fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
+	public abstract fun getStep ()Lkotlin/jvm/functions/Function2;
+	public abstract fun invoke (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun jittered (DDLkotlin/random/Random;)Larrow/resilience/Schedule;
 	public abstract fun log (Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
 	public abstract fun map (Lkotlin/jvm/functions/Function2;)Larrow/resilience/Schedule;
@@ -154,7 +156,6 @@ public abstract interface class arrow/resilience/Schedule {
 	public abstract fun repeat (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun repeatOrElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun repeatOrElseEither (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun step (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun zipLeft (Larrow/resilience/Schedule;)Larrow/resilience/Schedule;
 	public abstract fun zipRight (Larrow/resilience/Schedule;)Larrow/resilience/Schedule;
 }
@@ -187,21 +188,21 @@ public abstract interface class arrow/resilience/Schedule$Decision {
 }
 
 public final class arrow/resilience/Schedule$Decision$Continue : arrow/resilience/Schedule$Decision {
-	public synthetic fun <init> (Ljava/lang/Object;JLarrow/resilience/Schedule;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/Object;JLkotlin/jvm/functions/Function2;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun and (Larrow/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun andThen (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun component1 ()Ljava/lang/Object;
 	public final fun component2-UwyO8pc ()J
-	public final fun component3 ()Larrow/resilience/Schedule;
+	public final fun component3 ()Lkotlin/jvm/functions/Function2;
 	public fun contramap (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun copy-8Mi8wO0 (Ljava/lang/Object;JLarrow/resilience/Schedule;)Larrow/resilience/Schedule$Decision$Continue;
-	public static synthetic fun copy-8Mi8wO0$default (Larrow/resilience/Schedule$Decision$Continue;Ljava/lang/Object;JLarrow/resilience/Schedule;ILjava/lang/Object;)Larrow/resilience/Schedule$Decision$Continue;
+	public final fun copy-8Mi8wO0 (Ljava/lang/Object;JLkotlin/jvm/functions/Function2;)Larrow/resilience/Schedule$Decision$Continue;
+	public static synthetic fun copy-8Mi8wO0$default (Larrow/resilience/Schedule$Decision$Continue;Ljava/lang/Object;JLkotlin/jvm/functions/Function2;ILjava/lang/Object;)Larrow/resilience/Schedule$Decision$Continue;
 	public fun delayed (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDelay-UwyO8pc ()J
 	public fun getOutput ()Ljava/lang/Object;
-	public final fun getStep ()Larrow/resilience/Schedule;
+	public final fun getStep ()Lkotlin/jvm/functions/Function2;
 	public fun hashCode ()I
 	public fun map (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun or (Larrow/resilience/Schedule$Decision;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -251,6 +252,7 @@ public final class arrow/resilience/Schedule$DefaultImpls {
 	public static fun doUntil (Larrow/resilience/Schedule;Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
 	public static fun doWhile (Larrow/resilience/Schedule;Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
 	public static fun fold (Larrow/resilience/Schedule;Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
+	public static fun getStep (Larrow/resilience/Schedule;)Lkotlin/jvm/functions/Function2;
 	public static fun jittered (Larrow/resilience/Schedule;DDLkotlin/random/Random;)Larrow/resilience/Schedule;
 	public static synthetic fun jittered$default (Larrow/resilience/Schedule;DDLkotlin/random/Random;ILjava/lang/Object;)Larrow/resilience/Schedule;
 	public static fun log (Larrow/resilience/Schedule;Lkotlin/jvm/functions/Function3;)Larrow/resilience/Schedule;
