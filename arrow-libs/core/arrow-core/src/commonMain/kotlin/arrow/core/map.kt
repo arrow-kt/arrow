@@ -5,6 +5,7 @@ package arrow.core
 import arrow.core.raise.either
 import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.mapValuesOrAccumulate
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
@@ -244,9 +245,9 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
  * only keeping the [Map.Entry] of the transformed map that match the input [Map.Entry].
  */
 @Suppress("UNCHECKED_CAST")
-public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
+public fun <K, A, B> Map<K, A>.flatMapValues(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K, B> =
   buildMap {
-    this@flatMap.forEach { entry ->
+    this@flatMapValues.forEach { entry ->
       val nestedMap = f(entry)
       if (nestedMap.containsKey(entry.key)) {
         put(entry.key, nestedMap[entry.key] as B)
@@ -254,22 +255,39 @@ public fun <K, A, B> Map<K, A>.flatMap(f: (Map.Entry<K, A>) -> Map<K, B>): Map<K
     }
   }
 
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(combine, transform)"),
+)
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
   @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
-): Either<E, Map<K, B>> = either {
-  mapOrAccumulate(this@mapOrAccumulate, combine, transform)
-}
+): Either<E, Map<K, B>> = mapValuesOrAccumulate(combine, transform)
 
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(transform)"),
+)
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
-): Either<NonEmptyList<E>, Map<K, B>> = either {
-  mapOrAccumulate(this@mapOrAccumulate, transform)
+): Either<NonEmptyList<E>, Map<K, B>> = mapValuesOrAccumulate(transform)
+
+public inline fun <K, E, A, B> Map<K, A>.mapValuesOrAccumulate(
+  combine: (E, E) -> E,
+  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
+): Either<E, Map<K, B>> = either {
+  mapValuesOrAccumulate(this@mapValuesOrAccumulate, combine, transform)
 }
 
-public fun <K, A, B> Map<K, A>.mapNotNull(transform: (Map.Entry<K, A>) -> B?): Map<K, B> =
+public inline fun <K, E, A, B> Map<K, A>.mapValuesOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
+): Either<NonEmptyList<E>, Map<K, B>> = either {
+  mapValuesOrAccumulate(this@mapValuesOrAccumulate, transform)
+}
+
+public inline fun <K, A, B> Map<K, A>.mapValuesNotNull(transform: (Map.Entry<K, A>) -> B?): Map<K, B> =
   buildMap {
-    this@mapNotNull.forEach { entry ->
+    this@mapValuesNotNull.forEach { entry ->
       transform(entry)?.let { put(entry.key, it) }
     }
   }
