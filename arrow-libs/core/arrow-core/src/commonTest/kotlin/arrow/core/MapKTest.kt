@@ -409,11 +409,11 @@ class MapKTest {
       }
     }
 
-  @Test fun mapNotNullOk() = runTest {
+  @Test fun mapValuesNotNullOk() = runTest {
       checkAll(
         Arb.map(Arb.int(), Arb.boolean(), maxSize = 30)
       ) { xs ->
-        val rs = xs.mapNotNull { (_, pred) -> if(pred) true else null }
+        val rs = xs.mapValuesNotNull { (_, pred) -> if(pred) true else null }
 
         xs.forAll {
           if (it.value)
@@ -678,11 +678,11 @@ class MapKTest {
       }
     }
 
-  @Test fun flatMapOk() = runTest {
+  @Test fun flatMapValuesOk() = runTest {
       checkAll(
         Arb.map2(Arb.int(), Arb.int(), Arb.int())
       ) { (a, b) ->
-        val result = a.flatMap { b }
+        val result = a.flatMapValues { b }
         val expected = a.filter { (k, _) -> b.containsKey(k) }
           .map { (k, _) -> Pair(k, b[k]!!) }
           .toMap()
@@ -690,8 +690,8 @@ class MapKTest {
       }
     }
 
-  @Test fun mapOrAccumulateEmpty() = runTest {
-      val result: Either<NonEmptyList<String>, Map<Int, String>> = emptyMap<Int, Int>().mapOrAccumulate {
+  @Test fun mapValuesOrAccumulateEmpty() = runTest {
+      val result: Either<NonEmptyList<String>, Map<Int, String>> = emptyMap<Int, Int>().mapValuesOrAccumulate {
         it.value.toString()
       }
 
@@ -699,12 +699,12 @@ class MapKTest {
       .value.shouldBeEmpty()
   }
 
-  @Test fun mapOrAccumulateMaps() = runTest {
+  @Test fun mapValuesOrAccumulateMaps() = runTest {
     checkAll(
       Arb.map(Arb.int(), Arb.int(), maxSize = 30)
     ) { xs ->
 
-      val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapOrAccumulate {
+      val result: Either<NonEmptyList<String>, Map<Int, String>> = xs.mapValuesOrAccumulate {
         it.value.toString()
       }
 
@@ -714,22 +714,22 @@ class MapKTest {
     }
   }
 
-  @Test fun mapOrAccumulateAccumulates() = runTest {
+  @Test fun mapValuesOrAccumulateAccumulates() = runTest {
     checkAll(
       Arb.map(Arb.int(), Arb.int(), minSize = 1, maxSize = 30)
     ) { xs ->
-       xs.mapOrAccumulate {
-          raise(it.value)
-      }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
+       xs.mapValuesOrAccumulate {
+         raise(it.value)
+       }.shouldBeInstanceOf<Either.Left<NonEmptyList<Int>>>()
          .value.all.shouldContainAll(xs.values)
     }
   }
 
-  @Test fun flatMapNull() = runTest {
+  @Test fun flatMapValuesNull() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull())
     ) { (mapA, mapB) ->
-      val result = mapA.flatMap { mapB }
+      val result = mapA.flatMapValues { mapB }
       val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
         .map { (k, _) -> Pair(k, mapB[k]) }
         .toMap()
