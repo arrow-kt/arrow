@@ -96,8 +96,8 @@ internal class DefaultAutoCloseScope : AutoCloseScope {
     finalizers.update { it + release }
   }
 
-  fun close(error: Throwable?) {
-    finalizers.value.asReversed().fold(error) { acc, finalizer ->
+  fun close(error: Throwable?): Nothing? {
+    return finalizers.value.asReversed().fold(error) { acc, finalizer ->
       acc.add(runCatching { finalizer(error) }.exceptionOrNull())
     }?.let { throw it }
   }
