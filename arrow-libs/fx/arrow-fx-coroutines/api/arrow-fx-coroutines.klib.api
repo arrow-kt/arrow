@@ -19,11 +19,11 @@ open annotation class arrow.fx.coroutines/ScopeDSL : kotlin/Annotation { // arro
 }
 
 abstract interface arrow.fx.coroutines/ResourceScope : arrow/AutoCloseScope { // arrow.fx.coroutines/ResourceScope|null[0]
+    abstract fun onRelease(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ExitCase, kotlin/Unit>) // arrow.fx.coroutines/ResourceScope.onRelease|onRelease(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ExitCase,kotlin.Unit>){}[0]
     abstract suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ResourceScope, #A1>).bind(): #A1 // arrow.fx.coroutines/ResourceScope.bind|bind@kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ResourceScope,0:0>(){0§<kotlin.Any?>}[0]
     abstract suspend fun <#A1: kotlin/Any?> install(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/AcquireStep, #A1>, kotlin.coroutines/SuspendFunction2<#A1, arrow.fx.coroutines/ExitCase, kotlin/Unit>): #A1 // arrow.fx.coroutines/ResourceScope.install|install(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.AcquireStep,0:0>;kotlin.coroutines.SuspendFunction2<0:0,arrow.fx.coroutines.ExitCase,kotlin.Unit>){0§<kotlin.Any?>}[0]
     open suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ResourceScope, #A1>).release(kotlin.coroutines/SuspendFunction1<#A1, kotlin/Unit>): #A1 // arrow.fx.coroutines/ResourceScope.release|release@kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ResourceScope,0:0>(kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
     open suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ResourceScope, #A1>).releaseCase(kotlin.coroutines/SuspendFunction2<#A1, arrow.fx.coroutines/ExitCase, kotlin/Unit>): #A1 // arrow.fx.coroutines/ResourceScope.releaseCase|releaseCase@kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ResourceScope,0:0>(kotlin.coroutines.SuspendFunction2<0:0,arrow.fx.coroutines.ExitCase,kotlin.Unit>){0§<kotlin.Any?>}[0]
-    open suspend fun onRelease(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ExitCase, kotlin/Unit>) // arrow.fx.coroutines/ResourceScope.onRelease|onRelease(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ExitCase,kotlin.Unit>){}[0]
 }
 
 final class <#A: kotlin/Any?> arrow.fx.coroutines/ScopedRaiseAccumulate : arrow.core.raise/RaiseAccumulate<#A>, kotlinx.coroutines/CoroutineScope { // arrow.fx.coroutines/ScopedRaiseAccumulate|null[0]
