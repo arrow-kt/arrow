@@ -5,6 +5,7 @@ import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import arrow.platform.stackSafeIteration
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.test.TestResult

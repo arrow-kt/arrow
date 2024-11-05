@@ -1,6 +1,7 @@
 package arrow.atomic
 
 import arrow.fx.coroutines.parMap
+import arrow.platform.stackSafeIteration
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import io.kotest.matchers.shouldBe

@@ -1,7 +1,7 @@
 package arrow.core
 
-import io.kotest.common.Platform
-import io.kotest.common.platform
+import arrow.platform.Platform
+import arrow.platform.platform
 import io.kotest.property.Arb
 import io.kotest.matchers.shouldBe
 import io.kotest.property.arbitrary.arbitrary

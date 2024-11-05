@@ -13,7 +13,7 @@ import kotlin.test.Test
 class ListKTest {
 
   @Test fun monoidLaws() =
-    testLaws(MonoidLaws("List", emptyList(), List<Int>::plus, Arb.list(Arb.int())))
+    testLaws(MonoidLaws("List", emptyList(), { x: List<Int>, y: List<Int> -> x + y }, Arb.list(Arb.int())))
 
   @Test fun mapNotNullOk() = runTest {
       checkAll(Arb.list(Arb.int())) { listk ->

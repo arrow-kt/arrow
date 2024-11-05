@@ -1,6 +1,7 @@
 package arrow.resilience
 
 import arrow.core.Either
+import arrow.platform.stackSafeIteration
 import arrow.resilience.CircuitBreaker.OpeningStrategy
 import arrow.resilience.CircuitBreaker.OpeningStrategy.SlidingWindow
 import kotlinx.coroutines.CompletableDeferred
