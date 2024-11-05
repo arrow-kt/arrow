@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.core.test.nonEmptySet
-import arrow.core.test.stackSafeIteration
+import arrow.platform.stackSafeIteration
 import io.kotest.assertions.withClue
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
