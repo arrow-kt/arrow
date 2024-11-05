@@ -452,7 +452,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  *
  * @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
  * suspend fun main(): Unit {
- *   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocated()
+ *   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocate()
  *   try {
  *     /** Do something with A */
  *     release(ExitCase.Completed)
@@ -463,13 +463,13 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  * ```
  * <!--- KNIT example-resource-09.kt -->
  *
- * This is a **delicate** API. It is easy to accidentally create resource or memory leaks `allocated` is used.
- * A `Resource` allocated by `allocated` is not subject to the guarantees that [Resource] makes,
+ * This is a **delicate** API. It is easy to accidentally create resource or memory leaks [allocate] is used.
+ * A [Resource] allocated by [allocate] is not subject to the guarantees that [Resource] makes,
  * instead the caller is responsible for correctly invoking the `release` handler at the appropriate time.
  * This API is useful for building inter-op APIs between [Resource] and non-suspending code, such as Java libraries.
  */
 @DelicateCoroutinesApi
-public suspend fun <A> Resource<A>.allocated(): Pair<A, suspend (ExitCase) -> Unit> {
+public suspend fun <A> Resource<A>.allocate(): Pair<A, suspend (ExitCase) -> Unit> {
   val effect = ResourceScopeImpl()
   val allocated: A = invoke(effect)
   val release: suspend (ExitCase) -> Unit = { e ->

@@ -562,13 +562,13 @@ class ResourceTest {
 
   @OptIn(DelicateCoroutinesApi::class)
   @Test
-  fun allocatedWorks() = runTest {
+  fun allocateWorks() = runTest {
     checkAll(10, Arb.int()) { seed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocate, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
-        .allocated()
+      val (allocated, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
+        .allocate()
 
-      allocate shouldBe seed
+      allocated shouldBe seed
       release(ExitCase.Completed)
       released.await() shouldBe ExitCase.Completed
     }
@@ -576,22 +576,22 @@ class ResourceTest {
 
   @OptIn(DelicateCoroutinesApi::class)
   @Test
-  fun allocatedSupressedException() = runTest {
+  fun allocateSuppressedException() = runTest {
     checkAll(
       Arb.int(),
       Arb.string().map(::RuntimeException),
       Arb.string().map(::IllegalStateException)
     ) { seed, original, suppressed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocate, release) =
+      val (allocated, release) =
         resource({ seed }) { _, exitCase ->
           released.complete(exitCase)
           throw suppressed
-        }.allocated()
+        }.allocate()
 
       val exception = shouldThrow<RuntimeException> {
         try {
-          allocate shouldBe seed
+          allocated shouldBe seed
           throw original
         } catch (e: Throwable) {
           release(ExitCase(e))
@@ -606,22 +606,22 @@ class ResourceTest {
 
   @OptIn(DelicateCoroutinesApi::class)
   @Test
-  fun allocatedCancellationException() = runTest {
+  fun allocateCancellationException() = runTest {
     checkAll(
       Arb.int(),
       Arb.string().map { CancellationException(it, null) },
       Arb.string().map(::IllegalStateException)
     ) { seed, cancellation, suppressed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocate, release) =
+      val (allocated, release) =
         resource({ seed }) { _, exitCase ->
           released.complete(exitCase)
           throw suppressed
-        }.allocated()
+        }.allocate()
 
       val exception = shouldThrow<CancellationException> {
         try {
-          allocate shouldBe seed
+          allocated shouldBe seed
           throw cancellation
         } catch (e: Throwable) {
           release(ExitCase(e))
