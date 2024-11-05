@@ -88,7 +88,18 @@ public suspend inline fun <A> guaranteeCase(
   fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
 ): A = finalizeCase({ fa() }) { ex ->
-  runReleaseAndRethrow(ex.errorOrNull) { finalizer(ex) }
+  try {
+    withContext(NonCancellable) {
+      finalizer(ex)
+    }
+  } catch (e: Throwable) {
+    e.nonFatalOrThrow()
+    when (ex) {
+      ExitCase.Completed -> throw e
+      is ExitCase.Failure -> ex.failure.addSuppressed(e)
+      is ExitCase.Cancelled -> ex.exception.addSuppressed(e)
+    }
+  }
 }
 
 /**
@@ -208,18 +219,6 @@ public suspend inline fun <A, B> bracketCase(
 ): B {
   val acquired = withContext(NonCancellable) { acquire() }
   return guaranteeCase({ use(acquired) }) { release(acquired, it) }
-}
-
-@PublishedApi
-internal suspend inline fun runReleaseAndRethrow(original: Throwable?, crossinline f: suspend () -> Unit) {
-  try {
-    withContext(NonCancellable) {
-      f()
-    }
-  } catch (e: Throwable) {
-    original?.addSuppressed(e.nonFatalOrThrow()) ?: throw e
-  }
-  original?.let { throw it }
 }
 
 @PublishedApi
