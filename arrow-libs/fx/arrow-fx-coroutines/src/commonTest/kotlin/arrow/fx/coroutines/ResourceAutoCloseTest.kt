@@ -50,13 +50,13 @@ class ResourceAutoCloseTest {
   @Test
   fun autoClosableIsNonCancellable() = runTest {
     val t = AutoCloseableTest()
-    lateinit var exit: ExitCase
+    val exit = CompletableDeferred<ExitCase>()
     val waitingToBeCancelled = CompletableDeferred<Unit>()
     val cancelled = CompletableDeferred<Unit>()
 
     val job = launch {
       resourceScope {
-        onRelease { exit = it }
+        onRelease { require(exit.complete(it)) }
         autoCloseable {
           waitingToBeCancelled.complete(Unit)
           cancelled.await()
@@ -72,7 +72,7 @@ class ResourceAutoCloseTest {
     job.join()
 
     t.didClose.get() shouldBe true
-    exit
+    exit.shouldHaveCompleted()
       .shouldBeTypeOf<ExitCase.Cancelled>()
       .exception
       .message shouldBe "BOOM!"

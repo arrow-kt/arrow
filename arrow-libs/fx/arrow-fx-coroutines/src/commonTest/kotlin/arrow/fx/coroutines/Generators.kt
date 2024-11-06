@@ -5,6 +5,7 @@ import io.kotest.assertions.fail
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.equalityMatcher
+import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.choose
@@ -153,4 +154,9 @@ inline fun <A> assertThrowable(executable: () -> A): Throwable {
   }
 
   return if (a is Throwable) a else fail("Expected an exception but found: $a")
+}
+
+suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {
+  isCompleted shouldBe true
+  return await()
 }

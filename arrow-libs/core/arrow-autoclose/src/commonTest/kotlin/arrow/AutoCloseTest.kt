@@ -3,6 +3,7 @@ package arrow
 import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.test.runTest
@@ -13,50 +14,50 @@ class AutoCloseTest {
 
   @Test
   fun canInstallResource() = runTest {
-    var throwable: Throwable? = RuntimeException("Dummy exception")
-    var wasActive = false
+    val promise = CompletableDeferred<Throwable?>()
+    val wasActive = CompletableDeferred<Boolean>()
     val res = Resource()
 
     autoCloseScope {
       val r = autoClose({ res }) { r, e ->
-        throwable = e
+        require(promise.complete(e))
         r.shutdown()
       }
-      wasActive = r.isActive()
+      require(wasActive.complete(r.isActive()))
     }
 
-    throwable shouldBe null
-    wasActive shouldBe true
+    promise.shouldHaveCompleted() shouldBe null
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
   @Test
   fun canHandleWithFailingAutoClose() = runTest {
-    var throwable: Throwable? = RuntimeException("Dummy exception")
-    var wasActive = false
+    val promise = CompletableDeferred<Throwable?>()
+    val wasActive = CompletableDeferred<Boolean>()
     val error = RuntimeException("BOOM!")
     val res = Resource()
 
     shouldThrow<RuntimeException> {
       autoCloseScope {
         val r = autoClose({ res }) { r, e ->
-          throwable = e
+          require(promise.complete(e))
           r.shutdown()
         }
-        wasActive = r.isActive()
+        require(wasActive.complete(r.isActive()))
         throw error
       }
     } shouldBe error
 
-    throwable shouldBe error
-    wasActive shouldBe true
+    promise.shouldHaveCompleted() shouldBe error
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
   @Test
   fun addsSuppressedErrors() = runTest {
-    var throwable: Throwable? = RuntimeException("Dummy exception")
-    var wasActive = false
+    val promise = CompletableDeferred<Throwable?>()
+    val wasActive = CompletableDeferred<Boolean>()
     val error = RuntimeException("BOOM!")
     val error2 = RuntimeException("BOOM 2!")
     val error3 = RuntimeException("BOOM 3!")
@@ -65,33 +66,33 @@ class AutoCloseTest {
     val e = shouldThrow<RuntimeException> {
       autoCloseScope {
         val r = autoClose({ res }) { r, e ->
-          throwable = e
+          require(promise.complete(e))
           r.shutdown()
           throw error2
         }
         autoClose({ Resource() }) { _, _ -> throw error3 }
-        wasActive = r.isActive()
+        require(wasActive.complete(r.isActive()))
         throw error
       }
     }
 
     e shouldBe error
     e.suppressedExceptions shouldBe listOf(error3, error2)
-    throwable shouldBe error
-    wasActive shouldBe true
+    promise.shouldHaveCompleted() shouldBe error
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
   @Test
   fun handlesAcquireFailure() = runTest {
-    var throwable: Throwable? = RuntimeException("Dummy exception")
+    val promise = CompletableDeferred<Throwable?>()
     val error = RuntimeException("BOOM!")
     val error2 = RuntimeException("BOOM 2!")
 
     val e = shouldThrow<RuntimeException> {
       autoCloseScope {
         autoClose({ Resource() }) { r, e ->
-          throwable = e
+          require(promise.complete(e))
           r.shutdown()
           throw error2
         }
@@ -100,54 +101,54 @@ class AutoCloseTest {
     }
     e shouldBe error
     e.suppressedExceptions shouldBe listOf(error2)
-    throwable shouldBe error
+    promise.shouldHaveCompleted() shouldBe error
   }
 
   @Test
   fun canInstallAutoCloseable() = runTest {
-    var wasActive = false
+    val wasActive = CompletableDeferred<Boolean>()
     val res = Resource()
 
     autoCloseScope {
       val r = install(res)
-      wasActive = r.isActive()
+      require(wasActive.complete(r.isActive()))
     }
 
-    wasActive shouldBe true
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
   @Test
   fun closeTheAutoScopeOnCancellation() = runTest {
-    var wasActive = false
+    val wasActive = CompletableDeferred<Boolean>()
     val res = Resource()
 
     shouldThrow<CancellationException> {
       autoCloseScope {
         val r = install(res)
-        wasActive = r.isActive()
+        require(wasActive.complete(r.isActive()))
         throw CancellationException("BOOM!")
       }
     }.message shouldBe "BOOM!"
 
-    wasActive shouldBe true
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
   @Test
   fun closeTheAutoScopeOnNonLocalReturn() = runTest {
-    var wasActive = false
+    val wasActive = CompletableDeferred<Boolean>()
     val res = Resource()
 
     run {
       autoCloseScope {
         val r = install(res)
-        wasActive = r.isActive()
+        require(wasActive.complete(r.isActive()))
         return@run
       }
     }
 
-    wasActive shouldBe true
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
@@ -201,5 +202,10 @@ class AutoCloseTest {
     override fun close() {
       shutdown()
     }
+  }
+
+  private suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {
+    isCompleted shouldBe true
+    return await()
   }
 }
