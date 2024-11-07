@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-grey.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
 [![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=blue&style=flat)](https://twitter.com/arrow_kt)
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20Arrow%20Guru-006BFF)](https://gurubase.io/g/arrow)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
