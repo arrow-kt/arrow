@@ -2,6 +2,7 @@ package arrow
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.atomic.value
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -63,50 +64,50 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   val scope = DefaultAutoCloseScope()
+  var throwable: Throwable? = null
   return try {
     block(scope)
-      .also { scope.close(null) }
-  } catch (e: CancellationException) {
-    scope.close(e) ?: throw e
   } catch (e: Throwable) {
-    scope.close(e.throwIfFatal()) ?: throw e
+    throwable = e
+    throw e
+  } finally {
+    if (throwable !is CancellationException) throwable?.throwIfFatal()
+    scope.close(throwable)
   }
 }
 
 public interface AutoCloseScope {
+  public fun onClose(release: (Throwable?) -> Unit)
+
   public fun <A> autoClose(
     acquire: () -> A,
     release: (A, Throwable?) -> Unit
-  ): A
+  ): A = acquire().also { a -> onClose { release(a, it) } }
 
-  @ExperimentalStdlibApi
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
-    autoClose({ autoCloseable }) { a, _ -> a.close() }
+    autoCloseable.also { onClose { autoCloseable.close() } }
 }
 
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {
   private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())
 
-  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    try {
-      acquire().also { a ->
-        finalizers.update { it + { e -> release(a, e) } }
-      }
-    } catch (e: Throwable) {
-      throw e
-    }
+  override fun onClose(release: (Throwable?) -> Unit) {
+    finalizers.update { it + release }
+  }
 
   fun close(error: Throwable?): Nothing? {
-    return finalizers.get().asReversed().fold(error) { acc, function ->
-      acc.add(runCatching { function.invoke(error) }.exceptionOrNull())
+    return finalizers.value.asReversed().fold(error) { acc, finalizer ->
+      acc.add(runCatching { finalizer(error) }.exceptionOrNull())
     }?.let { throw it }
   }
 
-  private fun Throwable?.add(other: Throwable?): Throwable? =
-    this?.apply {
+  private fun Throwable?.add(other: Throwable?): Throwable? {
+    if (other !is CancellationException) other?.throwIfFatal()
+    return this?.apply {
       other?.let { addSuppressed(it) }
     } ?: other
+  }
 }
 
 @PublishedApi

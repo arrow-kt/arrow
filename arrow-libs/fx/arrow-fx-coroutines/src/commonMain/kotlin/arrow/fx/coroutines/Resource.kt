@@ -1,19 +1,18 @@
 package arrow.fx.coroutines
 
 import arrow.AutoCloseScope
-import arrow.atomic.update
 import arrow.atomic.Atomic
+import arrow.atomic.update
 import arrow.atomic.value
-import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import kotlin.jvm.JvmInline
+import kotlin.coroutines.cancellation.CancellationException
 
 @DslMarker
 public annotation class ScopeDSL
@@ -293,7 +292,8 @@ public interface ResourceScope : AutoCloseScope {
    * All [release] functions [install]ed into the [Resource] lambda will be installed in this [ResourceScope] while respecting the FIFO order.
    */
   @ResourceDSL
-  public suspend fun <A> Resource<A>.bind(): A
+  public suspend fun <A> Resource<A>.bind(): A = this()
+
   /**
    * Install [A] into the [ResourceScope].
    * Its [release] function will be called with the appropriate [ExitCase] if this [ResourceScope] finishes.
@@ -303,21 +303,21 @@ public interface ResourceScope : AutoCloseScope {
   public suspend fun <A> install(
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
-  ): A
+  ): A = withContext(NonCancellable) {
+    acquire(AcquireStep).also { a -> onRelease { release(a, it) } }
+  }
 
   /** Composes a [release] action to a [Resource] value before binding. */
   @ResourceDSL
-  public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A {
-    val a = bind()
-    return install({ a }) { aa, _ -> release(aa) }
-  }
+  public suspend infix fun <A> Resource<A>.release(release: suspend (A) -> Unit): A =
+    bind().also { a -> onRelease { release(a) } }
 
   /** Composes a [releaseCase] action to a [Resource] value before binding. */
   @ResourceDSL
-  public suspend infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): A {
-    val a = bind()
-    return install({ a }, release)
-  }
+  public suspend infix fun <A> Resource<A>.releaseCase(release: suspend (A, ExitCase) -> Unit): A =
+    bind().also { a -> onRelease { release(a, it) } }
+
+  override fun onClose(release: (Throwable?) -> Unit): Unit = onRelease { release(it.errorOrNull) }
 
   public infix fun onRelease(release: suspend (ExitCase) -> Unit)
 }
@@ -353,24 +353,15 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
  * <!--- KNIT example-resource-06.kt -->
  */
 @ScopeDSL
-public suspend fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
-  val scope = ResourceScopeImpl()
-  val a: A = try {
-    action(scope)
-  } catch (e: Throwable) {
-    val ex = if (e is CancellationException) ExitCase.Cancelled(e) else ExitCase.Failure(e)
-    val ee = withContext(NonCancellable) {
-      scope.cancelAll(ex, e) ?: e
-    }
-    throw ee
-  }
-  withContext(NonCancellable) {
-    scope.cancelAll(ExitCase.Completed)?.let { throw it }
-  }
-  return a
+@OptIn(DelicateCoroutinesApi::class)
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
+  val (scope, cancelAll) = resource { this }.allocate()
+  return finalizeCase({ scope.action() }) { cancelAll(it) }
 }
 
-public suspend infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
+@Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
+public suspend inline infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
   resourceScope { f(bind()) }
 
 /**
@@ -401,7 +392,7 @@ public fun <A> resource(
 }
 
 /**
- * Runs [Resource.use] and emits [A] of the resource
+ * Runs [Resource].[use] and emits [A] of the resource
  *
  * ```kotlin
  * import arrow.fx.coroutines.*
@@ -468,72 +459,29 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  * This API is useful for building inter-op APIs between [Resource] and non-suspending code, such as Java libraries.
  */
 @DelicateCoroutinesApi
-public suspend fun <A> Resource<A>.allocate(): Pair<A, suspend (ExitCase) -> Unit> {
-  val effect = ResourceScopeImpl()
-  val allocated: A = invoke(effect)
-  val release: suspend (ExitCase) -> Unit = { e ->
-    val suppressed: Throwable? = effect.cancelAll(e)
-    val original: Throwable? = when(e) {
-      ExitCase.Completed -> null
-      is ExitCase.Cancelled -> e.exception
-      is ExitCase.Failure -> e.failure
-    }
-    original?.apply {
-      suppressed?.let(::addSuppressed)
-    }?.let { throw it }
-  }
-  return Pair(allocated, release)
+public suspend fun <A> Resource<A>.allocate(): Pair<A, suspend (ExitCase) -> Unit> = with(ResourceScopeImpl()) {
+  bind() to this::cancelAll
 }
 
-@JvmInline
-private value class ResourceScopeImpl(
-  private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList()),
-) : ResourceScope {
-  override suspend fun <A> Resource<A>.bind(): A = invoke(this@ResourceScopeImpl)
-
+internal class ResourceScopeImpl : ResourceScope {
+  private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList())
   override fun onRelease(release: suspend (ExitCase) -> Unit) {
     finalizers.update(release::prependTo)
   }
 
-  override suspend fun <A> install(acquire: suspend AcquireStep.() -> A, release: suspend (A, ExitCase) -> Unit): A =
-    bracketCase({
-      val a = acquire(AcquireStep)
-      val finalizer: suspend (ExitCase) -> Unit = { ex: ExitCase -> release(a, ex) }
-      finalizers.update(finalizer::prependTo)
-      a
-    }, ::identity, { a, ex ->
-      // Only if ExitCase.Failure, or ExitCase.Cancelled during acquire we cancel
-      // Otherwise we've saved the finalizer, and it will be called from somewhere else.
-      if (ex != ExitCase.Completed) {
-        val e = cancelAll(ex)
-        val e2 = kotlin.runCatching { release(a, ex) }.exceptionOrNull()
-        e?.apply {
-          e2?.let(::addSuppressed)
-        }?.let { throw it }
+  suspend fun cancelAll(exitCase: ExitCase) {
+    withContext(NonCancellable) {
+      finalizers.value.fold(exitCase.errorOrNull) { acc, finalizer ->
+        acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
       }
-    })
+    }?.let { throw it }
+  }
 
-  override fun <A> autoClose(acquire: () -> A, release: (A, Throwable?) -> Unit): A =
-    acquire().also { a ->
-      val finalizer: suspend (ExitCase) -> Unit = { exitCase ->
-        val errorOrNull = when (exitCase) {
-          ExitCase.Completed -> null
-          is ExitCase.Cancelled -> exitCase.exception
-          is ExitCase.Failure -> exitCase.failure
-        }
-        release(a, errorOrNull)
-      }
-      finalizers.update(finalizer::prependTo)
-    }
-
-  suspend fun cancelAll(
-    exitCase: ExitCase,
-    first: Throwable? = null,
-  ): Throwable? = finalizers.value.fold(first) { acc, finalizer ->
-    val other = kotlin.runCatching { finalizer(exitCase) }.exceptionOrNull()
-    other?.let {
-      acc?.apply { addSuppressed(other) } ?: other
-    } ?: acc
+  private fun Throwable?.add(other: Throwable?): Throwable? {
+    if (other !is CancellationException) other?.nonFatalOrThrow()
+    return this?.apply {
+      other?.let { addSuppressed(it) }
+    } ?: other
   }
 }
 
@@ -561,7 +509,7 @@ internal expect val IODispatcher: CoroutineDispatcher
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
-): A = install({ autoCloseable() } ) { s: A, _: ExitCase -> withContext(closingDispatcher) { s.close() } }
+): A = install({ autoCloseable() } ) { s: A, _ -> withContext(closingDispatcher) { s.close() } }
 
 public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,

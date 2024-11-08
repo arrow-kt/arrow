@@ -27,12 +27,15 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 class ResourceTest {
 
@@ -70,16 +73,15 @@ class ResourceTest {
       resourceScope {
         install({ n }) { _, ex -> require(p.complete(ex)) }
       }
-      p.await() shouldBe ExitCase.Completed
+      p.shouldHaveCompleted() shouldBe ExitCase.Completed
     }
   }
 
   @Test
   fun errorFinishesWithError() = runTest {
     checkAll(10, Arb.throwable()) { e ->
-      val p = CompletableDeferred<ExitCase>()
       suspend fun ResourceScope.failingScope(): Nothing =
-        install({ throw e }, { _, ex -> require(p.complete(ex)) })
+        install({ throw e }, { _, _ -> fail("should not get here") })
 
       Either.catch {
         resourceScope { failingScope() }
@@ -133,7 +135,7 @@ class ResourceTest {
         raise("error")
       }
     } shouldBe "error".left()
-    exit.await().shouldBeTypeOf<ExitCase.Cancelled>()
+    exit.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Cancelled>()
   }
 
   private val depth = 10
@@ -156,7 +158,35 @@ class ResourceTest {
       }
     }.message shouldBe "BOOM!"
 
-    exit.await()
+    exit.shouldHaveCompleted()
+      .shouldBeTypeOf<ExitCase.Cancelled>()
+      .exception
+      .message shouldBe "BOOM!"
+  }
+
+  @Test
+  fun installIsNonCancellable() = runTest {
+    val exit = CompletableDeferred<ExitCase>()
+    val waitingToBeCancelled = CompletableDeferred<Unit>()
+    val cancelled = CompletableDeferred<Unit>()
+
+    val job = launch {
+      resourceScope {
+        install({
+          waitingToBeCancelled.complete(Unit)
+          cancelled.await()
+        }) { _, ex ->
+          require(exit.complete(ex))
+        }
+        yield()
+      }
+    }
+    waitingToBeCancelled.await()
+    job.cancel("BOOM!")
+    cancelled.complete(Unit)
+    job.join()
+
+    exit.shouldHaveCompleted()
       .shouldBeTypeOf<ExitCase.Cancelled>()
       .exception
       .message shouldBe "BOOM!"
@@ -483,11 +513,11 @@ class ResourceTest {
         }
       } shouldBe throwable
 
-      val (aa, exA) = releasedA.await()
+      val (aa, exA) = releasedA.shouldHaveCompleted()
       aa shouldBe a
       exA.shouldBeTypeOf<ExitCase.Failure>()
 
-      val (bb, exB) = releasedB.await()
+      val (bb, exB) = releasedB.shouldHaveCompleted()
       bb shouldBe b
       exB.shouldBeTypeOf<ExitCase.Failure>()
     }
@@ -510,11 +540,11 @@ class ResourceTest {
         }
       }
 
-      val (aa, exA) = releasedA.await()
+      val (aa, exA) = releasedA.shouldHaveCompleted()
       aa shouldBe a
       exA.shouldBeTypeOf<ExitCase.Cancelled>()
 
-      val (bb, exB) = releasedB.await()
+      val (bb, exB) = releasedB.shouldHaveCompleted()
       bb shouldBe b
       exB.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -528,7 +558,7 @@ class ResourceTest {
 
       r.asFlow().map { it + 1 }.toList() shouldBe listOf(n + 1)
 
-      released.await() shouldBe ExitCase.Completed
+      released.shouldHaveCompleted() shouldBe ExitCase.Completed
     }
   }
 
@@ -542,7 +572,7 @@ class ResourceTest {
         r.asFlow().collect { throw throwable }
       } shouldBe throwable
 
-      released.await().shouldBeTypeOf<ExitCase.Failure>().failure shouldBe throwable
+      released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Failure>().failure shouldBe throwable
     }
   }
 
@@ -556,7 +586,7 @@ class ResourceTest {
         r.asFlow().collect { throw CancellationException("") }
       }
 
-      released.await().shouldBeTypeOf<ExitCase.Cancelled>()
+      released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
 
@@ -565,12 +595,12 @@ class ResourceTest {
   fun allocateWorks() = runTest {
     checkAll(10, Arb.int()) { seed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocated, release) = resource({ seed }) { _, exitCase -> released.complete(exitCase) }
+      val (allocated, release) = resource({ seed }) { _, exitCase -> require(released.complete(exitCase)) }
         .allocate()
 
       allocated shouldBe seed
       release(ExitCase.Completed)
-      released.await() shouldBe ExitCase.Completed
+      released.shouldHaveCompleted() shouldBe ExitCase.Completed
     }
   }
 
@@ -585,7 +615,7 @@ class ResourceTest {
       val released = CompletableDeferred<ExitCase>()
       val (allocated, release) =
         resource({ seed }) { _, exitCase ->
-          released.complete(exitCase)
+          require(released.complete(exitCase))
           throw suppressed
         }.allocate()
 
@@ -600,7 +630,7 @@ class ResourceTest {
 
       exception shouldBe original
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
-      released.await().shouldBeTypeOf<ExitCase.Failure>()
+      released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Failure>()
     }
   }
 
@@ -615,7 +645,7 @@ class ResourceTest {
       val released = CompletableDeferred<ExitCase>()
       val (allocated, release) =
         resource({ seed }) { _, exitCase ->
-          released.complete(exitCase)
+          require(released.complete(exitCase))
           throw suppressed
         }.allocate()
 
@@ -630,11 +660,45 @@ class ResourceTest {
 
       exception shouldBe cancellation
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
-      released.await().shouldBeTypeOf<ExitCase.Cancelled>()
+      released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }
 
-  @OptIn(ExperimentalStdlibApi::class)
+  @OptIn(DelicateCoroutinesApi::class)
+  @Test
+  fun allocatedSuppressedExceptions() = runTest {
+    checkAll(
+      Arb.int(),
+      Arb.string().map(::RuntimeException),
+      Arb.string().map(::IllegalStateException),
+      Arb.string().map(::IllegalStateException),
+    ) { seed, original, suppressed1, suppressed2 ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocate, release) =
+        resource {
+          onRelease { exitCase ->
+            require(released.complete(exitCase))
+            throw suppressed1
+          }
+          onClose { throw suppressed2 }
+          seed
+        }.allocate()
+
+      val exception = shouldThrow<RuntimeException> {
+        try {
+          allocate shouldBe seed
+          throw original
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
+      }
+
+      exception shouldBe original
+      exception.suppressedExceptions shouldBe listOf(suppressed2, suppressed1)
+      released.shouldHaveCompleted() shouldBe ExitCase(original)
+    }
+  }
+
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
@@ -685,5 +749,63 @@ class ResourceTest {
     closed.receive() shouldBe res2
     closed.receive() shouldBe res1
     closed.cancel()
+  }
+
+  @Test
+  fun addsSuppressedErrors() = runTest {
+    val exitCase = CompletableDeferred<ExitCase>()
+    val wasActive = CompletableDeferred<Boolean>()
+    val error = RuntimeException("BOOM!")
+    val error2 = RuntimeException("BOOM 2!")
+    val error3 = RuntimeException("BOOM 3!")
+    val res = Res()
+
+    val e = shouldThrow<RuntimeException> {
+      resourceScope {
+        val r = install({ res }) { r, e ->
+          require(exitCase.complete(e))
+          r.shutdown()
+          throw error2
+        }
+        onClose { throw error3 }
+        require(wasActive.complete(r.isActive()))
+        throw error
+      }
+    }
+
+    e shouldBe error
+    e.suppressedExceptions shouldBe listOf(error3, error2)
+    exitCase.shouldHaveCompleted() shouldBe ExitCase(error)
+    wasActive.shouldHaveCompleted() shouldBe true
+    res.isActive() shouldBe false
+  }
+
+  @Test
+  fun addsSuppressedErrorsFromReleasers() = runTest {
+    val exitCase = CompletableDeferred<ExitCase>()
+    val wasActive = CompletableDeferred<Boolean>()
+    val error = RuntimeException("BOOM!")
+    val error2 = RuntimeException("BOOM 2!")
+    val error3 = RuntimeException("BOOM 3!")
+    val res = Res()
+
+    val e = shouldThrow<RuntimeException> {
+      resourceScope {
+        val r = install({ res }) { r, e ->
+          require(exitCase.complete(e))
+          r.shutdown()
+          throw error2
+        }
+        onClose { throw error3 }
+        require(wasActive.complete(r.isActive()))
+        onRelease { throw error }
+      }
+    }
+
+    e shouldBe error
+    e.suppressedExceptions shouldBe listOf(error3, error2)
+    exitCase.shouldHaveCompleted() shouldBe ExitCase.Completed
+    wasActive.shouldHaveCompleted() shouldBe true
+    res.isActive() shouldBe false
   }
 }

@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 
-@OptIn(ExperimentalStdlibApi::class)
 class AutoCloseTest {
 
   @Test
@@ -21,14 +20,14 @@ class AutoCloseTest {
 
     autoCloseScope {
       val r = autoClose({ res }) { r, e ->
-        promise.complete(e)
+        require(promise.complete(e))
         r.shutdown()
       }
-      wasActive.complete(r.isActive())
+      require(wasActive.complete(r.isActive()))
     }
 
-    promise.await() shouldBe null
-    wasActive.await() shouldBe true
+    promise.shouldHaveCompleted() shouldBe null
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
@@ -42,16 +41,16 @@ class AutoCloseTest {
     shouldThrow<RuntimeException> {
       autoCloseScope {
         val r = autoClose({ res }) { r, e ->
-          promise.complete(e)
+          require(promise.complete(e))
           r.shutdown()
         }
-        wasActive.complete(r.isActive())
+        require(wasActive.complete(r.isActive()))
         throw error
       }
     } shouldBe error
 
-    promise.await() shouldBe error
-    wasActive.await() shouldBe true
+    promise.shouldHaveCompleted() shouldBe error
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
@@ -67,20 +66,20 @@ class AutoCloseTest {
     val e = shouldThrow<RuntimeException> {
       autoCloseScope {
         val r = autoClose({ res }) { r, e ->
-          promise.complete(e)
+          require(promise.complete(e))
           r.shutdown()
           throw error2
         }
         autoClose({ Resource() }) { _, _ -> throw error3 }
-        wasActive.complete(r.isActive())
+        require(wasActive.complete(r.isActive()))
         throw error
       }
     }
 
     e shouldBe error
     e.suppressedExceptions shouldBe listOf(error3, error2)
-    promise.await() shouldBe error
-    wasActive.await() shouldBe true
+    promise.shouldHaveCompleted() shouldBe error
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
@@ -93,7 +92,7 @@ class AutoCloseTest {
     val e = shouldThrow<RuntimeException> {
       autoCloseScope {
         autoClose({ Resource() }) { r, e ->
-          promise.complete(e)
+          require(promise.complete(e))
           r.shutdown()
           throw error2
         }
@@ -102,7 +101,7 @@ class AutoCloseTest {
     }
     e shouldBe error
     e.suppressedExceptions shouldBe listOf(error2)
-    promise.await() shouldBe error
+    promise.shouldHaveCompleted() shouldBe error
   }
 
   @Test
@@ -112,10 +111,10 @@ class AutoCloseTest {
 
     autoCloseScope {
       val r = install(res)
-      wasActive.complete(r.isActive())
+      require(wasActive.complete(r.isActive()))
     }
 
-    wasActive.await() shouldBe true
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
@@ -127,12 +126,29 @@ class AutoCloseTest {
     shouldThrow<CancellationException> {
       autoCloseScope {
         val r = install(res)
-        wasActive.complete(r.isActive())
+        require(wasActive.complete(r.isActive()))
         throw CancellationException("BOOM!")
       }
     }.message shouldBe "BOOM!"
 
-    wasActive.await() shouldBe true
+    wasActive.shouldHaveCompleted() shouldBe true
+    res.isActive() shouldBe false
+  }
+
+  @Test
+  fun closeTheAutoScopeOnNonLocalReturn() = runTest {
+    val wasActive = CompletableDeferred<Boolean>()
+    val res = Resource()
+
+    run {
+      autoCloseScope {
+        val r = install(res)
+        require(wasActive.complete(r.isActive()))
+        return@run
+      }
+    }
+
+    wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
   }
 
@@ -172,7 +188,6 @@ class AutoCloseTest {
     closed.cancel()
   }
 
-  @OptIn(ExperimentalStdlibApi::class)
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
@@ -187,5 +202,10 @@ class AutoCloseTest {
     override fun close() {
       shutdown()
     }
+  }
+
+  private suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {
+    isCompleted shouldBe true
+    return await()
   }
 }

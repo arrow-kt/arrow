@@ -11,6 +11,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.time.ExperimentalTime
@@ -54,7 +55,7 @@ class BracketCaseTest {
         bracketCase<Unit, Int>(
           acquire = { throw e },
           use = { 5 },
-          release = { _, _ -> Unit }
+          release = { _, _ -> }
         )
       } should leftException(e)
     }
@@ -67,7 +68,7 @@ class BracketCaseTest {
         bracketCase<Unit, Int>(
           acquire = { e.suspend() },
           use = { 5 },
-          release = { _, _ -> Unit }
+          release = { _, _ -> }
         )
       } should leftException(e)
     }
@@ -119,6 +120,44 @@ class BracketCaseTest {
       }
 
       promise.await() shouldBe ExitCase.Failure(e)
+    }
+  }
+
+  @Test
+  fun bracketCaseMustRunReleaseTaskOnUseEarlyReturn() = runTest {
+    checkAll(10, Arb.int()) { i ->
+      val promise = CompletableDeferred<ExitCase>()
+
+      run {
+        bracketCase(
+          acquire = { i },
+          use = { return@run it },
+          release = { _, ex ->
+            require(promise.complete(ex)) { "Release should only be called once, called again with $ex" }
+          }
+        )
+      } shouldBe i
+
+      promise.await() shouldBe ExitCase.Completed
+    }
+  }
+
+  @Test
+  fun bracketCaseMustRunReleaseTaskOnUseSuspendedEarlyReturn() = runTest {
+    checkAll(10, Arb.int()) { i ->
+      val promise = CompletableDeferred<ExitCase>()
+
+      run {
+        bracketCase(
+          acquire = { i },
+          use = { return@run it.suspend() },
+          release = { _, ex ->
+            require(promise.complete(ex)) { "Release should only be called once, called again with $ex" }
+          }
+        )
+      } shouldBe i
+
+      promise.await() shouldBe ExitCase.Completed
     }
   }
 
@@ -206,58 +245,66 @@ class BracketCaseTest {
     }
   }
 
-  operator fun Throwable.plus(other: Throwable): Throwable =
-    apply { addSuppressed(other) }
+  private infix fun Throwable.shouldHaveSuppressed(exception: Throwable) =
+    suppressedExceptions shouldBe listOf(exception)
 
   @Test
   fun bracketCaseMustComposeImmediateUseAndImmediateReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
           use = { throw e },
           release = { _, _ -> throw e2 }
         )
-      } shouldBe Either.Left(e + e2)
+      } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
   @Test
   fun bracketCaseMustComposeSuspendUseAndImmediateReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
           use = { e.suspend() },
           release = { _, _ -> throw e2 }
         )
-      } shouldBe Either.Left(e + e2)
+      } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
   @Test
   fun bracketCaseMustComposeImmediateUseAndSuspendReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
           use = { throw e },
           release = { _, _ -> e2.suspend() }
         )
-      } shouldBe Either.Left(e + e2)
+      } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
   @Test
   fun bracketCaseMustComposeSuspendUseAndSuspendReleaseError() = runTest {
-    checkAll(10, Arb.int(), Arb.throwable(), Arb.throwable()) { n, e, e2 ->
+    checkAll(10, Arb.int(), Arb.throwableConstructor(), Arb.throwable()) { n, eConstructor, e2 ->
+      val e = eConstructor()
       Either.catch {
         bracketCase<Int, Unit>(
           acquire = { n },
           use = { e.suspend() },
           release = { _, _ -> e2.suspend() }
         )
-      } shouldBe Either.Left(e + e2)
+      } shouldBe Either.Left(e)
+      e shouldHaveSuppressed e2
     }
   }
 
@@ -318,7 +365,7 @@ class BracketCaseTest {
 
     val f = async {
       bracketCase(
-        acquire = { Unit },
+        acquire = { },
         use = { Unit.suspend() },
         release = { _, exitCase ->
           require(exit.complete(exitCase)) { "Release should only be called once, called again with $exitCase" }
@@ -357,7 +404,7 @@ class BracketCaseTest {
 
       // Wait until acquire started
       latch.await()
-      async { fiber.cancel() }
+      launch { fiber.cancel() }
 
       mVar.receive() shouldBe x
       mVar.receive() shouldBe y
@@ -380,7 +427,7 @@ class BracketCaseTest {
       }
 
       latch.await()
-      async { fiber.cancel() }
+      launch { fiber.cancel() }
 
       mVar.receive() shouldBe x
       // If release was cancelled this hangs since the buffer is empty
