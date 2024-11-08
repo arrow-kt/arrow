@@ -460,7 +460,7 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
-@RaiseDSL
+@RaiseDSL @OptIn(ExperimentalRaiseAccumulateApi::class)
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
@@ -540,7 +540,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulating(
  * Allows to change what to do once the first error is raised.
  * Used to provide more performant [mapOrAccumulate].
  */
-@PublishedApi @JvmSynthetic
+@PublishedApi @JvmSynthetic @OptIn(ExperimentalRaiseAccumulateApi::class)
 internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImpl(
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
@@ -651,7 +651,28 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
 }.toNonEmptySetOrNull()!!
 
 @RaiseDSL
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(map, combine, transform)"),
+)
 public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
+  map: Map<K, A>,
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = mapValuesOrAccumulate(map, combine, transform)
+
+@RaiseDSL
+@Deprecated(
+  message = "Deprecated to allow for future alignment with stdlib Map#map returning List",
+  replaceWith = ReplaceWith("mapValuesOrAccumulate(map, transform)")
+)
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+  map: Map<K, A>,
+  @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+): Map<K, B> = mapValuesOrAccumulate(map, transform)
+
+@RaiseDSL
+public inline fun <K, Error, A, B> Raise<Error>.mapValuesOrAccumulate(
   map: Map<K, A>,
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
@@ -662,7 +683,7 @@ public inline fun <K, Error, A, B> Raise<Error>.mapOrAccumulate(
 }
 
 @RaiseDSL
-public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
+public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapValuesOrAccumulate(
   map: Map<K, A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
 ): Map<K, B> = buildMap(map.size) {
@@ -671,6 +692,12 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   }
 }
 
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+public annotation class ExperimentalRaiseAccumulateApi
+
+@ExperimentalRaiseAccumulateApi
 public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   block: RaiseAccumulate<Error>.() -> A
 ): A {
@@ -681,6 +708,7 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   return result
 }
 
+@ExperimentalRaiseAccumulateApi
 public inline fun <Error, A, R> accumulate(
   raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
   crossinline block: RaiseAccumulate<Error>.() -> A
@@ -705,7 +733,7 @@ public open class RaiseAccumulate<Error>(
     raise.raise((errors + r).toNonEmptyListOrNull()!!)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
-    raise.mapOrAccumulate(this) { it.value.bind() }
+    raise.mapValuesOrAccumulate(this) { it.value.bind() }
 
   @RaiseDSL
   public inline fun <A, B> Iterable<A>.mapOrAccumulate(
@@ -721,6 +749,16 @@ public open class RaiseAccumulate<Error>(
   public inline fun <A, B> NonEmptySet<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
   ): NonEmptySet<B> = raise.mapOrAccumulate(this, transform)
+
+  @RaiseDSL
+  public inline fun <K, A, B> Map<K, A>.mapOrAccumulate(
+    transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+  ): List<B> = raise.mapOrAccumulate(entries, transform)
+
+  @RaiseDSL
+  public inline fun <K, A, B> Map<K, A>.mapValuesOrAccumulate(
+    transform: RaiseAccumulate<Error>.(Map.Entry<K, A>) -> B
+  ): Map<K, B> = raise.mapValuesOrAccumulate(this, transform)
 
   @RaiseDSL
   @JvmName("_mapOrAccumulate")
@@ -771,24 +809,30 @@ public open class RaiseAccumulate<Error>(
   @PublishedApi internal fun hasErrors(): Boolean = errors.isNotEmpty()
   @PublishedApi internal fun raiseErrors(): Nothing = raise.raise(errors.toNonEmptyListOrNull()!!)
 
+  @ExperimentalRaiseAccumulateApi
   public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> =
     accumulating { this@bindOrAccumulate.bind() }
 
+  @ExperimentalRaiseAccumulateApi
   public fun <A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> =
     accumulating { this@bindAllOrAccumulate.bindAll() }
 
+  @ExperimentalRaiseAccumulateApi
   public fun <A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
     accumulating { this@bindNelOrAccumulate.bindNel() }
 
+  @ExperimentalRaiseAccumulateApi
   public fun ensureOrAccumulate(condition: Boolean, raise: () -> Error) {
     accumulating { ensure(condition, raise) }
   }
 
+  @ExperimentalRaiseAccumulateApi
   public fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
     contract { returns() implies (value != null) }
     ensureOrAccumulate(value != null, raise)
   }
 
+  @ExperimentalRaiseAccumulateApi
   public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> =
     recover(inner@{
       Ok(block(RaiseAccumulate(this@inner)))

@@ -55,6 +55,9 @@ dependencyResolutionManagement {
 include("arrow-annotations")
 project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotations")
 
+include("arrow-platform")
+project(":arrow-platform").projectDir = file("arrow-libs/core/arrow-platform")
+
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
 
@@ -107,9 +110,6 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
-
-include("arrow-match")
-project(":arrow-match").projectDir = file("arrow-libs/optics/arrow-match")
 
 // STACK
 include("arrow-stack")

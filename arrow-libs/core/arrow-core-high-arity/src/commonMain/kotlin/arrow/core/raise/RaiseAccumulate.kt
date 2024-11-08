@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalRaiseAccumulateApi::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseHighArityKt")
 

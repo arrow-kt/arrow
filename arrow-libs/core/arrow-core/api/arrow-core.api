@@ -309,12 +309,14 @@ public final class arrow/core/MapKt {
 	public static final fun align (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun combine (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
 	public static final fun filterOption (Ljava/util/Map;)Ljava/util/Map;
-	public static final fun flatMap (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
+	public static final fun flatMapValues (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun fold (Ljava/util/Map;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun getOrNone (Ljava/util/Map;Ljava/lang/Object;)Larrow/core/Option;
-	public static final fun mapNotNull (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
 	public static final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun mapValuesNotNull (Ljava/util/Map;Lkotlin/jvm/functions/Function1;)Ljava/util/Map;
+	public static final fun mapValuesOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
+	public static final fun mapValuesOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
 	public static final fun padZip (Ljava/util/Map;Ljava/util/Map;Lkotlin/jvm/functions/Function3;)Ljava/util/Map;
@@ -892,6 +894,9 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 public abstract interface annotation class arrow/core/raise/DelicateRaiseApi : java/lang/annotation/Annotation {
 }
 
+public abstract interface annotation class arrow/core/raise/ExperimentalRaiseAccumulateApi : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/core/raise/ExperimentalTraceApi : java/lang/annotation/Annotation {
 }
 
@@ -969,8 +974,10 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-FrVv2gs (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-nfMsDo0 (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
+	public final fun mapValuesOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun raiseErrors ()Ljava/lang/Void;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -1046,6 +1053,8 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate--YW8gn4 (Larrow/core/raise/Raise;Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
 	public static final fun mapOrAccumulate-l8IBlHg (Larrow/core/raise/Raise;Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun mapValuesOrAccumulate (Larrow/core/raise/Raise;Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
+	public static final fun mapValuesOrAccumulate (Larrow/core/raise/Raise;Ljava/util/Map;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
 	public static final fun merge (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun merge (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun nullable (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;

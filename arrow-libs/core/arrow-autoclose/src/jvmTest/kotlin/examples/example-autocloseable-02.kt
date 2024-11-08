@@ -1,5 +1,4 @@
 // This file was automatically generated from AutoCloseScope.kt by Knit tool. Do not edit.
-@file:OptIn(ExperimentalStdlibApi::class)
 package arrow.autocloseable.examples.exampleAutocloseable02
 
 import arrow.AutoCloseScope

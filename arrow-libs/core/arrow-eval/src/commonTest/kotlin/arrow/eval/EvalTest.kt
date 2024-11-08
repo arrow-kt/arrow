@@ -1,7 +1,6 @@
 package arrow.eval
 
-import io.kotest.common.Platform
-import io.kotest.common.platform
+import arrow.platform.stackSafeIteration
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
@@ -22,11 +21,6 @@ private fun recur(limit: Int, sideEffect: SideEffect): (Int) -> Eval<Int> {
       Eval.now(-1)
     }
   }
-}
-
-fun stackSafeIteration(): Int = when (platform) {
-  Platform.JVM -> 200_000
-  else -> 1000
 }
 
 class EvalTest {
