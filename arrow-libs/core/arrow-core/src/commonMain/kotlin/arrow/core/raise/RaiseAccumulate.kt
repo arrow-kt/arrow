@@ -475,16 +475,16 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
 ): J {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return accumulate {
-    val a by accumulating(action1)
-    val b by accumulating(action2)
-    val c by accumulating(action3)
-    val d by accumulating(action4)
-    val e by accumulating(action5)
-    val f by accumulating(action6)
-    val g by accumulating(action7)
-    val h by accumulating(action8)
-    val i by accumulating(action9)
-    block(a, b, c, d, e, f, g, h, i)
+    val a = accumulating(action1)
+    val b = accumulating(action2)
+    val c = accumulating(action3)
+    val d = accumulating(action4)
+    val e = accumulating(action5)
+    val f = accumulating(action6)
+    val g = accumulating(action7)
+    val h = accumulating(action8)
+    val i = accumulating(action9)
+    block(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value)
   }
 }
 
@@ -841,15 +841,17 @@ public open class RaiseAccumulate<Error>(
       Error()
     }
 
-  public abstract inner class Value<out A> {
-    public abstract operator fun getValue(value: Nothing?, property: KProperty<*>): A
+  public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
+
+  public sealed interface Value<out A> {
+    public val value: A
   }
-  @PublishedApi internal inner class Error: Value<Nothing>() {
+
+  @PublishedApi internal inner class Error: Value<Nothing> {
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-    override fun getValue(value: Nothing?, property: KProperty<*>): Nothing = raiseErrors()
+    override val value get(): Nothing = raiseErrors()
   }
-  @PublishedApi internal inner class Ok<out A>(private val result: A): Value<A>() {
-    override fun getValue(value: Nothing?, property: KProperty<*>): A = result
-  }
+
+  @PublishedApi internal class Ok<out A>(override val value: A): Value<A>
 }

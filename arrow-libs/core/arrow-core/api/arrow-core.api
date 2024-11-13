@@ -970,6 +970,7 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun ensureNotNullOrAccumulate (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)V
 	public final fun ensureOrAccumulate (ZLkotlin/jvm/functions/Function0;)V
 	public final fun getRaise ()Larrow/core/raise/Raise;
+	public final fun getValue (Larrow/core/raise/RaiseAccumulate$Value;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 	public final fun hasErrors ()Z
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -985,18 +986,17 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 
 public final class arrow/core/raise/RaiseAccumulate$Error : arrow/core/raise/RaiseAccumulate$Value {
 	public fun <init> (Larrow/core/raise/RaiseAccumulate;)V
-	public synthetic fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
-	public fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Void;
+	public synthetic fun getValue ()Ljava/lang/Object;
+	public fun getValue ()Ljava/lang/Void;
 }
 
 public final class arrow/core/raise/RaiseAccumulate$Ok : arrow/core/raise/RaiseAccumulate$Value {
-	public fun <init> (Larrow/core/raise/RaiseAccumulate;Ljava/lang/Object;)V
-	public fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+	public fun <init> (Ljava/lang/Object;)V
+	public fun getValue ()Ljava/lang/Object;
 }
 
-public abstract class arrow/core/raise/RaiseAccumulate$Value {
-	public fun <init> (Larrow/core/raise/RaiseAccumulate;)V
-	public abstract fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+public abstract interface class arrow/core/raise/RaiseAccumulate$Value {
+	public abstract fun getValue ()Ljava/lang/Object;
 }
 
 public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {
