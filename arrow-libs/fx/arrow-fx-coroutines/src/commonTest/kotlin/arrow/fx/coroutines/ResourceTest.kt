@@ -699,6 +699,21 @@ class ResourceTest {
     }
   }
 
+  @OptIn(DelicateCoroutinesApi::class)
+  @Test
+  fun allocatedRunsReleasersOnlyOnce() = runTest {
+    val released = CompletableDeferred<ExitCase>()
+    val (_, release) =
+      resource {
+        onRelease { exitCase ->
+          require(released.complete(exitCase))
+        }
+      }.allocate()
+    release(ExitCase.Completed)
+    release(ExitCase.Completed)
+    released.shouldHaveCompleted() shouldBe ExitCase.Completed
+  }
+
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
