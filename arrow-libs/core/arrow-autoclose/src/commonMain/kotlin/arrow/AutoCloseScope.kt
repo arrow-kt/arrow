@@ -2,7 +2,6 @@ package arrow
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
-import arrow.atomic.value
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -97,7 +96,7 @@ internal class DefaultAutoCloseScope : AutoCloseScope {
   }
 
   fun close(error: Throwable?): Nothing? {
-    return finalizers.value.asReversed().fold(error) { acc, finalizer ->
+    return finalizers.getAndSet(emptyList()).asReversed().fold(error) { acc, finalizer ->
       acc.add(runCatching { finalizer(error) }.exceptionOrNull())
     }?.let { throw it }
   }

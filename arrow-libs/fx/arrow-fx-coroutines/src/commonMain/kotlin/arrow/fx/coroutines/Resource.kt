@@ -3,7 +3,6 @@ package arrow.fx.coroutines
 import arrow.AutoCloseScope
 import arrow.atomic.Atomic
 import arrow.atomic.update
-import arrow.atomic.value
 import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
 import kotlinx.coroutines.CoroutineDispatcher
@@ -471,7 +470,7 @@ internal class ResourceScopeImpl : ResourceScope {
 
   suspend fun cancelAll(exitCase: ExitCase) {
     withContext(NonCancellable) {
-      finalizers.value.fold(exitCase.errorOrNull) { acc, finalizer ->
+      finalizers.getAndSet(emptyList()).fold(exitCase.errorOrNull) { acc, finalizer ->
         acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
       }
     }?.let { throw it }
