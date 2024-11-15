@@ -1,12 +1,13 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalRaiseAccumulateApi::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseHighArityKt")
+@file:Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
 
 package arrow.core.raise
 
 import arrow.core.NonEmptyList
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -26,7 +27,19 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> Raise<NonE
   @BuilderInference action10: RaiseAccumulate<Error>.() -> T10,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -57,7 +70,20 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> Raise
   @BuilderInference action11: RaiseAccumulate<Error>.() -> T11,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -90,7 +116,21 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> 
   @BuilderInference action12: RaiseAccumulate<Error>.() -> T12,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -125,7 +165,22 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action13: RaiseAccumulate<Error>.() -> T13,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -162,7 +217,23 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action14: RaiseAccumulate<Error>.() -> T14,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -201,7 +272,24 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action15: RaiseAccumulate<Error>.() -> T15,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action15, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -242,7 +330,25 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action16: RaiseAccumulate<Error>.() -> T16,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action15, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action16, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -285,7 +391,26 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action17: RaiseAccumulate<Error>.() -> T17,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action15, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action16, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action17, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -330,7 +455,27 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action18: RaiseAccumulate<Error>.() -> T18,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action15, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action16, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action17, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action18, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -377,7 +522,28 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action19: RaiseAccumulate<Error>.() -> T19,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action15, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action16, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action17, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action18, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action19, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
@@ -426,7 +592,29 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   @BuilderInference action20: RaiseAccumulate<Error>.() -> T20,
   block: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) -> R,
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action2, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action3, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action4, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action5, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action6, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action7, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action8, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action9, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action10, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action11, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action12, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action13, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action14, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action15, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action16, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action17, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action18, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action19, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(action20, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
   return accumulate {
     val a = accumulating(action1)
     val b = accumulating(action2)
