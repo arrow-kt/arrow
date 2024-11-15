@@ -1,6 +1,5 @@
 @file:JvmName("NonEmptyListHighArityKt")
 @file:OptIn(ExperimentalContracts::class)
-@file:Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
 
 package arrow.core
 

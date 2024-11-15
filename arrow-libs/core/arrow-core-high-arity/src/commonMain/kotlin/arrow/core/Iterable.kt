@@ -1,7 +1,11 @@
 @file:JvmName("IterableHighArityKt")
+@file:OptIn(ExperimentalContracts::class)
 
 package arrow.core
 
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.jvm.JvmName
 
 public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> Iterable<T1>.zip(
@@ -17,6 +21,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> Iterable<T1>
   t11: Iterable<T11>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -88,6 +93,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> Iterabl
   t12: Iterable<T12>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -164,6 +170,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R> It
   t13: Iterable<T13>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -245,6 +252,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t14: Iterable<T14>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -331,6 +339,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t15: Iterable<T15>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -422,6 +431,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t16: Iterable<T16>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -518,6 +528,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t17: Iterable<T17>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -619,6 +630,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t18: Iterable<T18>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -725,6 +737,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t19: Iterable<T19>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -836,6 +849,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t20: Iterable<T20>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
@@ -952,6 +966,7 @@ public inline fun <T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, 
   t21: Iterable<T21>,
   transform: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) -> R,
 ): List<R> {
+  contract { callsInPlace(transform, InvocationKind.UNKNOWN) }
   val tt1 = iterator()
   val tt2 = t2.iterator()
   val tt3 = t3.iterator()
