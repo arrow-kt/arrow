@@ -24,7 +24,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> NonEmptyList<A
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)
+    }
   )
 }
 
@@ -45,7 +47,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> NonEmptyL
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
+    }
   )
 }
 
@@ -67,7 +71,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> NonE
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
+    }
   )
 }
 
@@ -90,7 +96,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R>
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)
+    }
   )
 }
 
@@ -114,7 +122,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)
+    }
   )
 }
 
@@ -139,7 +149,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)
+    }
   )
 }
 
@@ -165,7 +177,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)
+    }
   )
 }
 
@@ -192,7 +206,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)
+    }
   )
 }
 
@@ -220,7 +236,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head, t18.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)
+    }
   )
 }
 
@@ -249,7 +267,9 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head, t18.head, t19.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, t19.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, t19.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)
+    }
   )
 }
 
@@ -279,6 +299,8 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
   return NonEmptyList(
     map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head, t18.head, t19.head, t20.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, t19.tail, t20.tail, map)
+    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, t19.tail, t20.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20 ->
+      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)
+    }
   )
 }
