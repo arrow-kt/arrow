@@ -339,6 +339,7 @@ public sealed class Ior<out A, out B> {
     contract {
       returns(true) implies (this@Ior is Left<A>)
       returns(false) implies (this@Ior is Right<B> || this@Ior is Both<A, B>)
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Ior is Left<A> && predicate(value)
   }
@@ -364,6 +365,7 @@ public sealed class Ior<out A, out B> {
     contract {
       returns(true) implies (this@Ior is Right<B>)
       returns(false) implies (this@Ior is Left<A> || this@Ior is Both<A, B>)
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Ior is Right<B> && predicate(value)
   }
@@ -390,6 +392,8 @@ public sealed class Ior<out A, out B> {
     contract {
       returns(true) implies (this@Ior is Both<A, B>)
       returns(false) implies (this@Ior is Left<A> || this@Ior is Right<B>)
+      callsInPlace(leftPredicate, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(rightPredicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Ior is Both<A, B> && leftPredicate(leftValue) && rightPredicate(rightValue)
   }
@@ -400,8 +404,12 @@ public sealed class Ior<out A, out B> {
  *
  * @param f The function to bind across [Ior.Right].
  */
-public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Ior<A, D>): Ior<A, D> =
-  when (this) {
+public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Ior<A, D>): Ior<A, D> {
+  contract {
+    callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+  }
+  return when (this) {
     is Left -> this
     is Right -> f(value)
     is Both -> when (val r = f(rightValue)) {
@@ -410,14 +418,19 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Io
       is Both -> Both(combine(this.leftValue, r.leftValue), r.rightValue)
     }
   }
+}
 
 /**
  * Binds the given function across [Ior.Left].
  *
  * @param f The function to bind across [Ior.Left].
  */
-public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (A) -> Ior<D, B>): Ior<D, B> =
-  when (this) {
+public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (A) -> Ior<D, B>): Ior<D, B> {
+  contract {
+    callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+  }
+  return when (this) {
     is Left -> f(value)
     is Right -> this
     is Both -> when (val l = f(leftValue)) {
@@ -426,6 +439,7 @@ public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (
       is Both -> Both(l.leftValue, combine(this.rightValue, l.rightValue))
     }
   }
+}
 
 public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
@@ -443,8 +457,12 @@ public fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 public fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
 
-public fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) -> A, combineB: (B, B) -> B): Ior<A, B> =
-  when (this) {
+public inline fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) -> A, combineB: (B, B) -> B): Ior<A, B> {
+  contract {
+    callsInPlace(combineA, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(combineB, InvocationKind.AT_MOST_ONCE)
+  }
+  return when (this) {
     is Ior.Left -> when (other) {
       is Ior.Left -> Ior.Left(combineA(value, other.value))
       is Ior.Right -> Ior.Both(value, other.value)
@@ -463,9 +481,12 @@ public fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) -> A, com
       is Ior.Both -> Ior.Both(combineA(leftValue, other.leftValue), combineB(rightValue, other.rightValue))
     }
   }
+}
 
-public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A, B> =
-  flatMap(combine, ::identity)
+public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A, B> {
+  contract { callsInPlace(combine, InvocationKind.AT_MOST_ONCE) }
+  return flatMap(combine, ::identity)
+}
 
 /**
  * Given an [Ior] with an error type [A], returns an [IorNel] with the same

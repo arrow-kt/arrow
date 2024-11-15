@@ -14,6 +14,7 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -654,13 +655,16 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
  * <!--- TEST lines.isEmpty() -->
  */
 @RaiseDSL
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, OtherError, A> Raise<Error>.withError(
   transform: (OtherError) -> Error,
   @BuilderInference block: Raise<OtherError>.() -> A
 ): A {
   contract {
     callsInPlace(transform, AT_MOST_ONCE)
-    callsInPlace(block, AT_MOST_ONCE)
+    // This is correct, despite compiler complaining, because we don't actually "handle" any errors from `block`,
+    // we just transform them and re-raise them.
+    callsInPlace(block, EXACTLY_ONCE)
   }
   return recover(block) { raise(transform(it)) }
 }

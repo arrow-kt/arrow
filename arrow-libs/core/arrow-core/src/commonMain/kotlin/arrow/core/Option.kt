@@ -585,14 +585,17 @@ public fun <A> Option<Option<A>>.flatten(): Option<A> =
 
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
-public fun <A> Option<A>.combine(other: Option<A>, combine: (A, A) -> A): Option<A> =
-  when (this) {
+public inline fun <A> Option<A>.combine(other: Option<A>, combine: (A, A) -> A): Option<A> {
+  contract { callsInPlace(combine, InvocationKind.AT_MOST_ONCE) }
+  return when (this) {
     is Some -> when (other) {
       is Some -> Some(combine(value, other.value))
       None -> this
     }
+
     None -> other
   }
+}
 
 public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },
@@ -645,8 +648,10 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- KNIT example-option-21.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-public inline fun <A> Option<A>.recover(recover: SingletonRaise<None>.() -> A): Option<A> =
-  when (this@recover) {
+public inline fun <A> Option<A>.recover(recover: SingletonRaise<None>.() -> A): Option<A> {
+  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
+  return when (this@recover) {
     is None -> option { recover() }
     is Some -> this@recover
   }
+}
