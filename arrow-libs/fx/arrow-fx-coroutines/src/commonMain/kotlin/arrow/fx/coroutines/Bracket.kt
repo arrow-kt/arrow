@@ -1,9 +1,14 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.coroutines
 
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 public sealed class ExitCase {
   public object Completed : ExitCase() {
@@ -43,10 +48,16 @@ internal val ExitCase.errorOrNull: Throwable?
 public suspend inline fun <A> onCancel(
   fa: suspend () -> A,
   crossinline onCancel: suspend () -> Unit
-): A = guaranteeCase(fa) { case ->
-  when (case) {
-    is ExitCase.Cancelled -> onCancel.invoke()
-    else -> Unit
+): A {
+  contract {
+    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(onCancel, InvocationKind.AT_MOST_ONCE)
+  }
+  return guaranteeCase(fa) { case ->
+    when (case) {
+      is ExitCase.Cancelled -> onCancel()
+      else -> Unit
+    }
   }
 }
 
@@ -67,7 +78,13 @@ public suspend inline fun <A> onCancel(
 public suspend inline fun <A> guarantee(
   fa: suspend () -> A,
   crossinline finalizer: suspend () -> Unit
-): A = guaranteeCase(fa) { finalizer() }
+): A {
+  contract {
+    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+  }
+  return guaranteeCase(fa) { finalizer() }
+}
 
 /**
  * Guarantees execution of a given [finalizer] after [fa] regardless of success, error or cancellation, allowing
@@ -87,17 +104,19 @@ public suspend inline fun <A> guarantee(
 public suspend inline fun <A> guaranteeCase(
   fa: suspend () -> A,
   crossinline finalizer: suspend (ExitCase) -> Unit
-): A = finalizeCase({ fa() }) { ex ->
-  try {
-    withContext(NonCancellable) {
-      finalizer(ex)
-    }
-  } catch (e: Throwable) {
-    e.nonFatalOrThrow()
-    when (ex) {
-      ExitCase.Completed -> throw e
-      is ExitCase.Failure -> ex.failure.addSuppressed(e)
-      is ExitCase.Cancelled -> ex.exception.addSuppressed(e)
+): A {
+  contract {
+    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+  }
+  return finalizeCase({ fa() }) { ex ->
+    try {
+      withContext(NonCancellable) {
+        finalizer(ex)
+      }
+    } catch (e: Throwable) {
+      e.nonFatalOrThrow()
+      throw ex.errorOrNull?.also { it.addSuppressed(e) } ?: e
     }
   }
 }
@@ -147,7 +166,14 @@ public suspend inline fun <A, B> bracket(
   crossinline acquire: suspend () -> A,
   use: suspend (A) -> B,
   crossinline release: suspend (A) -> Unit
-): B = bracketCase(acquire, use) { acquired, _ -> release(acquired) }
+): B {
+  contract {
+    callsInPlace(acquire, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(use, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(release, InvocationKind.EXACTLY_ONCE)
+  }
+  return bracketCase(acquire, use) { acquired, _ -> release(acquired) }
+}
 
 /**
  * A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -217,12 +243,21 @@ public suspend inline fun <A, B> bracketCase(
   use: suspend (A) -> B,
   crossinline release: suspend (A, ExitCase) -> Unit
 ): B {
+  contract {
+    callsInPlace(acquire, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(use, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(release, InvocationKind.EXACTLY_ONCE)
+  }
   val acquired = withContext(NonCancellable) { acquire() }
   return guaranteeCase({ use(acquired) }) { release(acquired, it) }
 }
 
 @PublishedApi
 internal inline fun <R> finalizeCase(block: () -> R, finalizer: (ExitCase) -> Unit): R {
+  contract {
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+  }
   var exitCase: ExitCase = ExitCase.Completed
   return try {
     block()

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.coroutines
 
 import arrow.core.nonFatalOrThrow
@@ -8,6 +10,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.selects.select
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -21,10 +26,17 @@ public sealed class Race3<out A, out B, out C> {
     ifA: (A) -> D,
     ifB: (B) -> D,
     ifC: (C) -> D
-  ): D = when (this) {
-    is First -> ifA(winner)
-    is Second -> ifB(winner)
-    is Third -> ifC(winner)
+  ): D {
+    contract {
+      callsInPlace(ifA, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(ifB, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(ifC, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (this) {
+      is First -> ifA(winner)
+      is Second -> ifB(winner)
+      is Third -> ifC(winner)
+    }
   }
 }
 
@@ -39,7 +51,14 @@ public suspend inline fun <A, B, C> raceN(
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C
-): Race3<A, B, C> = raceN(Dispatchers.Default, fa, fb, fc)
+): Race3<A, B, C> {
+  contract {
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+  }
+  return raceN(Dispatchers.Default, fa, fb, fc)
+}
 
 /**
  * Races the participants [fa], [fb] & [fc] on the provided [CoroutineContext].
@@ -52,13 +71,19 @@ public suspend inline fun <A, B, C> raceN(
  *
  * @see raceN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C> raceN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B,
   crossinline fc: suspend CoroutineScope.() -> C
-): Race3<A, B, C> =
-  coroutineScope {
+): Race3<A, B, C> {
+  contract {
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+  }
+  return coroutineScope {
     val a = async(ctx) { fa() }
     val b = async(ctx) { fb() }
     val c = async(ctx) { fc() }
@@ -74,6 +99,7 @@ public suspend inline fun <A, B, C> raceN(
       }
     }
   }
+}
 
 @PublishedApi
 internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>): Unit {
