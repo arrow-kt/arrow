@@ -828,7 +828,6 @@ public open class RaiseAccumulate<Error>(
 
   @ExperimentalRaiseAccumulateApi
   public fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
-    contract { returns() implies (value != null) }
     ensureOrAccumulate(value != null, raise)
   }
 
