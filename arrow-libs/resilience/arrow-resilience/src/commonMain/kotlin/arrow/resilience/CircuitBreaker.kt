@@ -1,8 +1,13 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.resilience
 
 import arrow.atomic.Atomic
 import arrow.core.Either
 import arrow.core.identity
+import arrow.core.left
+import arrow.core.nonFatalOrThrow
+import arrow.core.right
 import arrow.resilience.CircuitBreaker.State.Closed
 import arrow.resilience.CircuitBreaker.State.HalfOpen
 import arrow.resilience.CircuitBreaker.State.Open
@@ -10,6 +15,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.TimeMark
@@ -158,20 +166,34 @@ private constructor(
    * Returns a new task that upon execution will execute the given task, but with the protection of this circuit breaker.
    * If an exception in [fa] occurs, other than an [ExecutionRejected] exception, it will be rethrown.
    */
-  public suspend fun <A> protectEither(fa: suspend () -> A): Either<ExecutionRejected, A> =
-    try {
+  public suspend fun <A> protectEither(fa: suspend () -> A): Either<ExecutionRejected, A> {
+    contract {
+      callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    }
+    return try {
       Either.Right(protectOrThrow(fa))
     } catch (e: ExecutionRejected) {
       Either.Left(e)
     }
+  }
 
   /**
    * Returns a new task that upon execution will execute the given task, but with the protection of this circuit breaker.
    * If an exception in [fa] occurs it will be rethrown
    */
-  public tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
-    when (val curr = state.get()) {
-      is Closed -> markOrResetFailures(Either.catch { fa() })
+  public tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A {
+    contract {
+      callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
+    }
+    return when (val curr = state.get()) {
+      is Closed -> {
+        // This is markOrResetFailures(Either.catch { fa() }), but inlined to make the compiler happy with the contract
+        try {
+          markOrResetFailures(fa().right())
+        } catch (e: Throwable) {
+          markOrResetFailures(e.nonFatalOrThrow().left())
+        }
+      }
       is Open -> {
         if (curr.expiresAt.hasPassedNow()) {
           // The Open state has expired, so we are transition to HalfOpen and attempt to close the CircuitBreaker
@@ -194,6 +216,7 @@ private constructor(
         throw ExecutionRejected("Rejected because the CircuitBreaker is in the HalfOpen state", curr)
       }
     }
+  }
 
   /** Function for counting failures in the `Closed` state, triggering the `Open` state if necessary.*/
   private tailrec suspend fun <A> markOrResetFailures(result: Either<Throwable, A>): A =
@@ -245,24 +268,29 @@ private constructor(
     resetTimeout: Duration,
     awaitClose: CompletableDeferred<Unit>,
     lastStartedAt: TimeMark
-  ): A = try {
-    onHalfOpen.invoke()
-    task.invoke()
-  } catch (e: CancellationException) {
-    // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
-    state.set(Open(state.get().openingStrategy ,lastStartedAt, resetTimeout, awaitClose))
-    onOpenAndThrow(e)
-  } catch (e: Throwable) {
-    // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
-    val value: Duration = (resetTimeout * exponentialBackoffFactor)
-    val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
-    state.set(Open(state.get().openingStrategy, timeSource.markNow(), nextTimeout, awaitClose))
-    onOpenAndThrow(e)
-  }.also {
-    // While in HalfOpen only a reset attempt is allowed to update the state, so setting this directly is safe
-    state.set(Closed(state.get().openingStrategy.resetFailuresCount()))
-    awaitClose.complete(Unit)
-    onClosed.invoke()
+  ): A {
+    contract {
+      callsInPlace(task, InvocationKind.EXACTLY_ONCE)
+    }
+    return try {
+      onHalfOpen.invoke()
+      task.invoke()
+    } catch (e: CancellationException) {
+      // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
+      state.set(Open(state.get().openingStrategy, lastStartedAt, resetTimeout, awaitClose))
+      onOpenAndThrow(e)
+    } catch (e: Throwable) {
+      // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
+      val value: Duration = (resetTimeout * exponentialBackoffFactor)
+      val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
+      state.set(Open(state.get().openingStrategy, timeSource.markNow(), nextTimeout, awaitClose))
+      onOpenAndThrow(e)
+    }.also {
+      // While in HalfOpen only a reset attempt is allowed to update the state, so setting this directly is safe
+      state.set(Closed(state.get().openingStrategy.resetFailuresCount()))
+      awaitClose.complete(Unit)
+      onClosed.invoke()
+    }
   }
 
   private suspend fun onOpenAndThrow(original: Throwable): Nothing {

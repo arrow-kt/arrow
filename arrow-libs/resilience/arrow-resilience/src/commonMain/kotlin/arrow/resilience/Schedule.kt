@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 
 package arrow.resilience
 
@@ -11,7 +11,7 @@ import arrow.core.merge
 import arrow.core.nonFatalOrThrow
 import arrow.core.raise.Raise
 import arrow.core.raise.either
-import arrow.core.raise.fold
+import arrow.core.raise.recover
 import arrow.core.right
 import arrow.core.some
 import arrow.resilience.Schedule.Companion.identity
@@ -21,6 +21,9 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.retry
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.math.pow
 import kotlin.random.Random
@@ -413,17 +416,28 @@ public fun interface Schedule<in Input, out Output> {
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
 public suspend inline fun <reified E: Throwable, A> Schedule<E, *>.retry(
-  noinline action: suspend () -> A
-): A = retry(E::class, action)
+  action: suspend () -> A
+): A {
+  contract {
+    callsInPlace(action, InvocationKind.AT_LEAST_ONCE)
+  }
+  return retry(E::class, action)
+}
 
 /**
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
-public suspend fun <E: Throwable, A> Schedule<E, *>.retry(
+@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+public suspend inline fun <E: Throwable, A> Schedule<E, *>.retry(
   exceptionClass: KClass<E>,
   action: suspend () -> A
-): A = retryOrElse(exceptionClass, action) { e, _ -> throw e }
+): A {
+  contract {
+    callsInPlace(action, InvocationKind.AT_LEAST_ONCE) // because if the schedule is exhausted, it will throw
+  }
+  return retryOrElse(exceptionClass, action) { e, _ -> throw e }
+}
 
 /**
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
@@ -431,8 +445,8 @@ public suspend fun <E: Throwable, A> Schedule<E, *>.retry(
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback [Input] value.
  */
 public suspend inline fun <reified E: Throwable, Input, Output> Schedule<E, Output>.retryOrElse(
-  noinline action: suspend () -> Input,
-  noinline orElse: suspend (Throwable, Output) -> Input
+  action: suspend () -> Input,
+  orElse: suspend (Throwable, Output) -> Input
 ): Input = retryOrElse(E::class, action, orElse)
 
 /**
@@ -440,7 +454,7 @@ public suspend inline fun <reified E: Throwable, Input, Output> Schedule<E, Outp
  * If the [Schedule] is exhausted,
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback [Input] value.
  */
-public suspend fun <E: Throwable, Input, Output> Schedule<E, Output>.retryOrElse(
+public suspend inline fun <E: Throwable, Input, Output> Schedule<E, Output>.retryOrElse(
   exceptionClass: KClass<E>,
   action: suspend () -> Input,
   orElse: suspend (E, Output) -> Input
@@ -453,8 +467,8 @@ public suspend fun <E: Throwable, Input, Output> Schedule<E, Output>.retryOrElse
  * Returns [Either] with the fallback value if the [Schedule] is exhausted, or the successful result of [action].
  */
 public suspend inline fun <reified E: Throwable, Input, Output, A> Schedule<E, Output>.retryOrElseEither(
-  noinline action: suspend () -> Input,
-  noinline orElse: suspend (E, Output) -> A
+  action: suspend () -> Input,
+  orElse: suspend (E, Output) -> A
 ): Either<A, Input> = retryOrElseEither(E::class, action, orElse)
 
 /**
@@ -463,7 +477,7 @@ public suspend inline fun <reified E: Throwable, Input, Output, A> Schedule<E, O
  * it will invoke [orElse] with the last exception and the output of the [Schedule] to produce a fallback value of [A].
  * Returns [Either] with the fallback value if the [Schedule] is exhausted, or the successful result of [action].
  */
-public suspend fun <E: Throwable, Input, Output, A> Schedule<E, Output>.retryOrElseEither(
+public suspend inline fun <E: Throwable, Input, Output, A> Schedule<E, Output>.retryOrElseEither(
   exceptionClass: KClass<E>,
   action: suspend () -> Input,
   orElse: suspend (E, Output) -> A
@@ -522,25 +536,22 @@ public suspend inline fun <Error, Result, Output> Raise<Error>.retry(
   schedule: Schedule<Error, Output>,
   @BuilderInference action: Raise<Error>.() -> Result,
 ): Result {
+  contract {
+    callsInPlace(action, InvocationKind.AT_LEAST_ONCE)
+  }
   var step = schedule.step
 
   while (true) {
     currentCoroutineContext().ensureActive()
-    fold(
-      action,
-      recover = { error ->
-        when (val decision = step(error)) {
-          is Continue -> {
-            if (decision.delay != ZERO) delay(decision.delay)
-            step = decision.step
-          }
-
-          is Done -> raise(error)
+    recover({ return action(this) }) { error ->
+      when (val decision = step(error)) {
+        is Continue -> {
+          if (decision.delay != ZERO) delay(decision.delay)
+          step = decision.step
         }
-      },
-      transform = { result ->
-        return result
-      },
-    )
+
+        is Done -> raise(error)
+      }
+    }
   }
 }
