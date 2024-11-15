@@ -8,7 +8,6 @@ import arrow.core.EitherNel
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.collectionSizeOrDefault
-import arrow.core.identity
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
@@ -572,6 +571,7 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL @OptIn(ExperimentalRaiseAccumulateApi::class)
+@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
@@ -596,106 +596,17 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
     callsInPlace(action9, EXACTLY_ONCE)
     callsInPlace(block, EXACTLY_ONCE)
   }
-  val a: A
-  val b: B
-  val c: C
-  val d: D
-  val e: E
-  val f: F
-  val g: G
-  val h: H
-  val i: I
-  unitZipOrAccumulate(
-    { a = action1(this) },
-    { b = action2(this) },
-    { c = action3(this) },
-    { d = action4(this) },
-    { e = action5(this) },
-    { f = action6(this) },
-    { g = action7(this) },
-    { h = action8(this) },
-    { i = action9(this) },
-    )
-  return block(a, b, c, d, e, f, g, h, i)
-}
-
-@PublishedApi internal inline fun <Error> Raise<NonEmptyList<Error>>.unitZipOrAccumulate(
-  action1: RaiseAccumulate<Error>.() -> Unit,
-  action2: RaiseAccumulate<Error>.() -> Unit,
-  action3: RaiseAccumulate<Error>.() -> Unit,
-  action4: RaiseAccumulate<Error>.() -> Unit,
-  action5: RaiseAccumulate<Error>.() -> Unit,
-  action6: RaiseAccumulate<Error>.() -> Unit,
-  action7: RaiseAccumulate<Error>.() -> Unit,
-  action8: RaiseAccumulate<Error>.() -> Unit,
-  action9: RaiseAccumulate<Error>.() -> Unit,
-) {
-  contract {
-    callsInPlace(action1, EXACTLY_ONCE)
-    callsInPlace(action2, EXACTLY_ONCE)
-    callsInPlace(action3, EXACTLY_ONCE)
-    callsInPlace(action4, EXACTLY_ONCE)
-    callsInPlace(action5, EXACTLY_ONCE)
-    callsInPlace(action6, EXACTLY_ONCE)
-    callsInPlace(action7, EXACTLY_ONCE)
-    callsInPlace(action8, EXACTLY_ONCE)
-    callsInPlace(action9, EXACTLY_ONCE)
-  }
-  var list: NonEmptyList<Error>? = null
-  // Ensure that we're using our implementation of Raise, so that if we raise in finally, it's fine that we
-  // had already raised and ignored action1's exception.
-  withError(::identity) {
-    try {
-      withError({ e: NonEmptyList<Error> -> e.also { list = it } }) {
-        action1(RaiseAccumulate(this))
-      }
-    } finally {
-      try {
-        withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-          action2(RaiseAccumulate(this))
-        }
-      } finally {
-        try {
-          withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-            action3(RaiseAccumulate(this))
-          }
-        } finally {
-          try {
-            withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-              action4(RaiseAccumulate(this))
-            }
-          } finally {
-            try {
-              withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-                action5(RaiseAccumulate(this))
-              }
-            } finally {
-              try {
-                withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-                  action6(RaiseAccumulate(this))
-                }
-              } finally {
-                try {
-                  withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-                    action7(RaiseAccumulate(this))
-                  }
-                } finally {
-                  try {
-                    withError({ e: NonEmptyList<Error> -> (list?.let { it + e } ?: e).also { list = it }}) {
-                      action8(RaiseAccumulate(this))
-                    }
-                  } finally {
-                    withError({ e: NonEmptyList<Error> -> list?.let { it + e } ?: e }) {
-                      action9(RaiseAccumulate(this))
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  return accumulate {
+    val a = accumulating(action1)
+    val b = accumulating(action2)
+    val c = accumulating(action3)
+    val d = accumulating(action4)
+    val e = accumulating(action5)
+    val f = accumulating(action6)
+    val g = accumulating(action7)
+    val h = accumulating(action8)
+    val i = accumulating(action9)
+    block(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value)
   }
 }
 
