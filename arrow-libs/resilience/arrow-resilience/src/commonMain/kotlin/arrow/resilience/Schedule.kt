@@ -428,15 +428,14 @@ public suspend inline fun <reified E: Throwable, A> Schedule<E, *>.retry(
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("WRONG_INVOCATION_KIND")
 public suspend inline fun <E: Throwable, A> Schedule<E, *>.retry(
   exceptionClass: KClass<E>,
   action: suspend () -> A
 ): A {
-  contract {
-    callsInPlace(action, InvocationKind.AT_LEAST_ONCE) // because if the schedule is exhausted, it will throw
-  }
-  return retryOrElse(exceptionClass, action) { e, _ -> throw e }
+  // For an A to be returned, action must be called.
+  contract { callsInPlace(action, InvocationKind.AT_LEAST_ONCE) }
+  return retryOrElse(exceptionClass, { action() }) { e, _ -> throw e }
 }
 
 /**

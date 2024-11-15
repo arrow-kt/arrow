@@ -664,6 +664,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
     callsInPlace(transform, AT_MOST_ONCE)
     // This is correct, despite compiler complaining, because we don't actually "handle" any errors from `block`,
     // we just transform them and re-raise them.
+    // This can be proven by inlining `recover` and subsequently `fold` and observing that the compiler is happy
     callsInPlace(block, EXACTLY_ONCE)
   }
   return recover(block) { raise(transform(it)) }

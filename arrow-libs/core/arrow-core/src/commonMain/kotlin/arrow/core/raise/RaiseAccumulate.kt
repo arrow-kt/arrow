@@ -571,7 +571,7 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL @OptIn(ExperimentalRaiseAccumulateApi::class)
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
@@ -597,15 +597,15 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
     callsInPlace(block, EXACTLY_ONCE)
   }
   return accumulate {
-    val a = accumulating(action1)
-    val b = accumulating(action2)
-    val c = accumulating(action3)
-    val d = accumulating(action4)
-    val e = accumulating(action5)
-    val f = accumulating(action6)
-    val g = accumulating(action7)
-    val h = accumulating(action8)
-    val i = accumulating(action9)
+    val a = accumulating { action1() }
+    val b = accumulating { action2() }
+    val c = accumulating { action3() }
+    val d = accumulating { action4() }
+    val e = accumulating { action5() }
+    val f = accumulating { action6() }
+    val g = accumulating { action7() }
+    val h = accumulating { action8() }
+    val i = accumulating { action9() }
     block(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value)
   }
 }
@@ -750,13 +750,15 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
-@Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptyList: NonEmptyList<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): NonEmptyList<B> {
+  // For a NonEmptyList to be returned, there must be a B, which can only be produced by transform
+  // thus transform must be called at least once (or alternatively an error is raised or an exception is thrown etc)
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
-  return requireNotNull(mapOrAccumulate(nonEmptyList.all, transform).toNonEmptyListOrNull())
+  return requireNotNull(mapOrAccumulate(nonEmptyList.all) { transform(it) }.toNonEmptyListOrNull())
 }
 
 /**
@@ -767,7 +769,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
-@Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptySet: NonEmptySet<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
@@ -839,15 +841,12 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
 }
 
 @ExperimentalRaiseAccumulateApi
-@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public inline fun <Error, A, R> accumulate(
   raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
   crossinline block: RaiseAccumulate<Error>.() -> A
 ): R {
   contract {
     callsInPlace(raise, EXACTLY_ONCE)
-    // Technically wrong, but left here out of convenience since most values for `raise` only uses `block` once
-    callsInPlace(block, AT_MOST_ONCE)
   }
   return raise { accumulate(block) }
 }

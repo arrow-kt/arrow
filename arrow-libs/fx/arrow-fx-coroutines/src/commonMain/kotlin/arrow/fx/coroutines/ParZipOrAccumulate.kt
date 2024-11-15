@@ -113,6 +113,8 @@ public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
   crossinline transform: suspend CoroutineScope.(A, B, C) -> D
 ): D {
   contract {
+    // Contract is valid because for D to be returned, transform must be called
+    // with A, B, C, and hence fa, fb, fc must be called.
     callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
     callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
     callsInPlace(fc, InvocationKind.EXACTLY_ONCE)

@@ -517,16 +517,18 @@ internal expect val IODispatcher: CoroutineDispatcher
  * <!--- KNIT example-resource-10.kt -->
  */
 @ResourceDSL
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
 ): A {
   contract {
-    // Complaining because `install` has no contract because it's a member of an interface
     callsInPlace(autoCloseable, InvocationKind.EXACTLY_ONCE)
   }
-  return install({ autoCloseable() }) { s: A, _ -> withContext(closingDispatcher) { s.close() } }
+  return withContext(NonCancellable) {
+    val s = autoCloseable()
+    onRelease { withContext(closingDispatcher) { s.close() } }
+    s
+  }
 }
 
 public fun <A : AutoCloseable> autoCloseable(
