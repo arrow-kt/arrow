@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
  * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
  * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
  */
-public suspend inline fun <Error, A, B> Effect<Error, A>.fold(
+public suspend fun <Error, A, B> Effect<Error, A>.fold(
   catch: suspend (throwable: Throwable) -> B,
   recover: suspend (error: Error) -> B,
   transform: suspend (value: A) -> B,
@@ -44,7 +44,7 @@ public suspend inline fun <Error, A, B> Effect<Error, A>.fold(
  *
  * This function re-throws any exceptions thrown within the [Effect].
  */
-public suspend inline fun <Error, A, B> Effect<Error, A>.fold(
+public suspend fun <Error, A, B> Effect<Error, A>.fold(
   recover: suspend (error: Error) -> B,
   transform: suspend (value: A) -> B,
 ): B {
