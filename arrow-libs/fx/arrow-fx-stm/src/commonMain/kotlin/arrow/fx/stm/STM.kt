@@ -1,8 +1,13 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.stm
 
 import arrow.fx.stm.internal.STMTransaction
 import arrow.fx.stm.internal.alterHamtWithHash
 import arrow.fx.stm.internal.lookupHamtWithHash
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KProperty
 
 /**
@@ -1692,4 +1697,9 @@ public fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
  * Rethrows all exceptions not caught by inside [f]. Remember to use [STM.catch] to handle exceptions as `try {} catch` will not handle transaction
  *  state properly!
  */
-public suspend fun <A> atomically(f: STM.() -> A): A = STMTransaction(f).commit()
+public suspend fun <A> atomically(f: STM.() -> A): A {
+  contract {
+    callsInPlace(f, InvocationKind.AT_LEAST_ONCE)
+  }
+  return STMTransaction().commit(f)
+}
