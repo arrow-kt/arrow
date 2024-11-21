@@ -47,8 +47,8 @@ public suspend inline fun <A, B, C> parZip(
   crossinline f: suspend CoroutineScope.(A, B) -> C
 ): C {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, f)
@@ -86,7 +86,7 @@ public suspend inline fun <A, B, C> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -94,8 +94,8 @@ public suspend inline fun <A, B, C> parZip(
   crossinline f: suspend CoroutineScope.(A, B) -> C
 ): C {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -141,9 +141,9 @@ public suspend inline fun <A, B, C, D> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C) -> D
 ): D {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, f)
@@ -183,7 +183,7 @@ public suspend inline fun <A, B, C, D> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -192,9 +192,9 @@ public suspend inline fun <A, B, C, D> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C) -> D
 ): D {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -244,10 +244,10 @@ public suspend inline fun <A, B, C, D, E> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D) -> E
 ): E {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, fd, f)
@@ -290,7 +290,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D, E> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -300,10 +300,10 @@ public suspend inline fun <A, B, C, D, E> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D) -> E
 ): E {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -358,11 +358,11 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E) -> F
 ): F {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, fd, fe, f)
@@ -407,7 +407,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D, E, F> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -418,11 +418,11 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E) -> F
 ): F {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -481,12 +481,12 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F) -> G
 ): G {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, f)
@@ -533,7 +533,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D, E, F, G> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -545,12 +545,12 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F) -> G
 ): G {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -613,13 +613,13 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G) -> H
 ): H {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fg, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fg, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, f)
@@ -668,7 +668,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -681,13 +681,13 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G) -> H
 ): H {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fg, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fg, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -754,14 +754,14 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H) -> I
 ): I {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fg, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fh, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fg, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fh, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, fh, f)
@@ -812,7 +812,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -826,14 +826,14 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H) -> I
 ): I {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fg, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fh, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fg, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fh, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {
@@ -904,15 +904,15 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H, I) -> J
 ): J {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fg, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fh, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fi, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fg, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fh, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fi, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return parZip(Dispatchers.Default, fa, fb, fc, fd, fe, ff, fg, fh, fi, f)
@@ -965,7 +965,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
  *
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
-@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -980,15 +980,15 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
   crossinline f: suspend CoroutineScope.(A, B, C, D, E, F, G, H, I) -> J
 ): J {
   contract {
-    callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fb, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fc, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fd, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fe, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(ff, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fg, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fh, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(fi, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fc, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fd, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fe, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(ff, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fg, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fh, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fi, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.EXACTLY_ONCE)
   }
   return coroutineScope {

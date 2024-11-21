@@ -524,6 +524,8 @@ public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   contract {
     callsInPlace(autoCloseable, InvocationKind.EXACTLY_ONCE)
   }
+  // This is install({ autoCloseable() } ) { s: A, _ -> withContext(closingDispatcher) { s.close() } }
+  // but inlined because `install` can't have a contract (since it's a member)
   return withContext(NonCancellable) {
     val s = autoCloseable()
     onRelease { withContext(closingDispatcher) { s.close() } }
