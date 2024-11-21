@@ -79,11 +79,6 @@ kotlin {
   }
 }
 
-// enables context receivers for Jvm Tests
-tasks.named<KotlinCompile>("compileTestKotlinJvm") {
-  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
-}
-
 tasks.withType<Test>().configureEach {
   useJUnitPlatform()
 }
