@@ -15,6 +15,7 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.validate
 
 class OpticsProcessor(
   private val codegen: CodeGenerator,
@@ -23,15 +24,16 @@ class OpticsProcessor(
 ) :
   SymbolProcessor {
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    resolver
+    val (resolved, deferred) = resolver
       .getSymbolsWithAnnotation("arrow.optics.optics")
       .filterIsInstance<KSClassDeclaration>()
-      .forEach(::processClass)
+      .partition { it.validate() }
+    resolved.forEach(::processClass)
 
-    // the docs say that [process] should return
-    // "deferred symbols that the processor can't process"
-    // and in theory we have none
-    return emptyList()
+    // If types used by the annotated class are by other processors,
+    // such class will fail the validation. In that case, we need to
+    // defer the code generation for the class to the next round
+    return deferred
   }
 
   private fun processClass(klass: KSClassDeclaration) {
