@@ -164,17 +164,17 @@ import kotlin.jvm.JvmName
  * ```
  * <!--- KNIT example-raise-03.kt -->
  *
- * Adding your own syntax to `Raise<R>` is not advised, yet, but will be easy once "Multiple Receivers" become available.
+ * Adding your own syntax to `Raise<R>` is not advised, yet, but will be easy once context parameters become available.
  *
  * ```
- * context(Raise<R>)
+ * context(_: Raise<R>)
  * suspend fun <R, A> Either<R, A>.bind(): A =
  *   when (this) {
  *     is Either.Left -> raise(value)
  *     is Either.Right -> value
  *   }
  *
- * context(Raise<None>)
+ * context(_: Raise<None>)
  * fun <A> Option<A>.bind(): A =
  *   fold({ raise(it) }, ::identity)
  * ```

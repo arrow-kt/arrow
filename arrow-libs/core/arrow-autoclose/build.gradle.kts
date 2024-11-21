@@ -51,8 +51,3 @@ kotlin {
     (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
   }
 }
-
-// enables context receivers for Jvm Tests
-tasks.named<KotlinCompile>("compileTestKotlinJvm") {
-  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
-}
