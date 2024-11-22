@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.coroutines.await
 
 import arrow.atomic.Atomic
@@ -9,6 +11,9 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.InternalForInheritanceCoroutinesApi
 import kotlinx.coroutines.awaitAll as coroutinesAwaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -20,12 +25,22 @@ public annotation class ExperimentalAwaitAllApi
 @ExperimentalAwaitAllApi
 public suspend fun <A> awaitAll(
   block: suspend AwaitAllScope.() -> A
-): A = coroutineScope { block(AwaitAllScope(this)) }
+): A {
+  contract {
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
+  return coroutineScope { block(AwaitAllScope(this)) }
+}
 
 @ExperimentalAwaitAllApi
 public suspend fun <A> CoroutineScope.awaitAll(
   block: suspend AwaitAllScope.() -> A
-): A = block(AwaitAllScope(this))
+): A {
+  contract {
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
+  return block(AwaitAllScope(this))
+}
 
 /**
  * Within an [AwaitAllScope], any call to [kotlinx.coroutines.Deferred.await]

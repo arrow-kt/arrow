@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 
 package arrow.resilience
 
@@ -11,7 +11,7 @@ import arrow.core.merge
 import arrow.core.nonFatalOrThrow
 import arrow.core.raise.Raise
 import arrow.core.raise.either
-import arrow.core.raise.fold
+import arrow.core.raise.recover
 import arrow.core.right
 import arrow.core.some
 import arrow.resilience.Schedule.Companion.identity
@@ -21,6 +21,9 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.retry
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.math.pow
 import kotlin.random.Random
@@ -414,16 +417,26 @@ public fun interface Schedule<in Input, out Output> {
  */
 public suspend inline fun <reified E: Throwable, A> Schedule<E, *>.retry(
   noinline action: suspend () -> A
-): A = retry(E::class, action)
+): A {
+  contract {
+    callsInPlace(action, InvocationKind.AT_LEAST_ONCE)
+  }
+  return retry(E::class, action)
+}
 
 /**
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
  * It will throw the last exception if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
+@Suppress("LEAKED_IN_PLACE_LAMBDA", "WRONG_INVOCATION_KIND")
 public suspend fun <E: Throwable, A> Schedule<E, *>.retry(
   exceptionClass: KClass<E>,
   action: suspend () -> A
-): A = retryOrElse(exceptionClass, action) { e, _ -> throw e }
+): A {
+  // For an A to be returned, action must be called.
+  contract { callsInPlace(action, InvocationKind.AT_LEAST_ONCE) }
+  return retryOrElse(exceptionClass, { action() }) { e, _ -> throw e }
+}
 
 /**
  * Retries [action] using any [E] that occurred as the input to the [Schedule].
@@ -522,25 +535,22 @@ public suspend inline fun <Error, Result, Output> Raise<Error>.retry(
   schedule: Schedule<Error, Output>,
   @BuilderInference action: Raise<Error>.() -> Result,
 ): Result {
+  contract {
+    callsInPlace(action, InvocationKind.AT_LEAST_ONCE)
+  }
   var step = schedule.step
 
   while (true) {
     currentCoroutineContext().ensureActive()
-    fold(
-      action,
-      recover = { error ->
-        when (val decision = step(error)) {
-          is Continue -> {
-            if (decision.delay != ZERO) delay(decision.delay)
-            step = decision.step
-          }
-
-          is Done -> raise(error)
+    recover({ return action(this) }) { error ->
+      when (val decision = step(error)) {
+        is Continue -> {
+          if (decision.delay != ZERO) delay(decision.delay)
+          step = decision.step
         }
-      },
-      transform = { result ->
-        return result
-      },
-    )
+
+        is Done -> raise(error)
+      }
+    }
   }
 }

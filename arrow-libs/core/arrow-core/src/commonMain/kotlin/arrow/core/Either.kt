@@ -528,7 +528,10 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
-    contract { returns(true) implies (this@Either is Left<A>) }
+    contract {
+      returns(true) implies (this@Either is Left<A>)
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+    }
     return this@Either is Left<A> && predicate(value)
   }
 
@@ -554,7 +557,10 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun isRight(predicate: (B) -> Boolean): Boolean {
-    contract { returns(true) implies (this@Either is Right<B>) }
+    contract {
+      returns(true) implies (this@Either is Right<B>)
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+    }
     return this@Either is Right<B> && predicate(value)
   }
 
@@ -799,12 +805,16 @@ public sealed class Either<out A, out B> {
 
   public companion object {
     @JvmStatic
-    public inline fun <R> catch(f: () -> R): Either<Throwable, R> =
-      arrow.core.raise.catch({ f().right() }) { it.left() }
+    public inline fun <R> catch(f: () -> R): Either<Throwable, R> {
+      contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+      return arrow.core.raise.catch({ f().right() }) { it.left() }
+    }
 
     @JvmStatic
-    public inline fun <reified T : Throwable, R> catchOrThrow(f: () -> R): Either<T, R> =
-      arrow.core.raise.catch<T, Either<T, R>>({ f().right() }) { it.left() }
+    public inline fun <reified T : Throwable, R> catchOrThrow(f: () -> R): Either<T, R> {
+      contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+      return arrow.core.raise.catch<T, Either<T, R>>({ f().right() }) { it.left() }
+    }
 
     public inline fun <E, A, B, Z> zipOrAccumulate(
       combine: (E, E) -> E,
@@ -1369,8 +1379,12 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareT
  * If both are [Right] then combine both [B] values using [combineRight] or if both are [Left] then combine both [A] values using [combineLeft],
  * otherwise return the sole [Left] value (either `this` or [other]).
  */
-public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> =
-  when (val one = this) {
+public inline fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) -> A, combineRight: (B, B) -> B): Either<A, B> {
+  contract {
+    callsInPlace(combineLeft, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(combineRight, InvocationKind.AT_MOST_ONCE)
+  }
+  return when (val one = this) {
     is Left -> when (other) {
       is Left -> Left(combineLeft(one.value, other.value))
       is Right -> one
@@ -1381,6 +1395,7 @@ public fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: (A, A) 
       is Right -> Right(combineRight(one.value, other.value))
     }
   }
+}
 
 public const val NicheAPI: String =
   "This API is niche and will be removed in the future. If this method is crucial for you, please let us know on the Arrow Github. Thanks!\n https://github.com/arrow-kt/arrow/issues\n"

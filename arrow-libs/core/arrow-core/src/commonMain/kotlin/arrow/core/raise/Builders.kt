@@ -246,7 +246,7 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
   public inline fun <A> ignoreErrors(
     block: SingletonRaise<Any?>.() -> A,
   ): A {
-    contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
     // This is safe because SingletonRaise never leaks the e from `raise(e: E)`, instead always calling `raise()`.
     // and hence the type parameter of SingletonRaise merely states what errors it accepts and ignores.
     @Suppress("UNCHECKED_CAST")
@@ -285,10 +285,16 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   public inline fun <A> recover(
     @BuilderInference block: ResultRaise.() -> A,
     recover: (Throwable) -> A,
-  ): A = result(block).fold(
-    onSuccess = { it },
-    onFailure = { recover(it) }
-  )
+  ): A {
+    contract {
+      callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+      callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+    }
+    return result(block).fold(
+      onSuccess = { it },
+      onFailure = { recover(it) }
+    )
+  }
 }
 
 /**

@@ -11,6 +11,7 @@ import arrow.core.collectionSizeOrDefault
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptySetOrNull
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -34,7 +35,11 @@ public inline fun <Error, A, B, C> Raise<Error>.zipOrAccumulate(
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
   block: (A, B) -> C
 ): C {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -59,7 +64,12 @@ public inline fun <Error, A, B, C, D> Raise<Error>.zipOrAccumulate(
   @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
   block: (A, B, C) -> D
 ): D {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -86,7 +96,13 @@ public inline fun <Error, A, B, C, D, E> Raise<Error>.zipOrAccumulate(
   @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
   block: (A, B, C, D) -> E
 ): E {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -115,7 +131,14 @@ public inline fun <Error, A, B, C, D, E, F> Raise<Error>.zipOrAccumulate(
   @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
   block: (A, B, C, D, E) -> F
 ): F {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -146,7 +169,15 @@ public inline fun <Error, A, B, C, D, E, F, G> Raise<Error>.zipOrAccumulate(
   @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
   block: (A, B, C, D, E, F) -> G
 ): G {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -179,7 +210,16 @@ public inline fun <Error, A, B, C, D, E, F, G, H> Raise<Error>.zipOrAccumulate(
   @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
   block: (A, B, C, D, E, F, G) -> H
 ): H {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -214,7 +254,17 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<Error>.zipOrAccumulat
   @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
   block: (A, B, C, D, E, F, G, H) -> I
 ): I {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(action8, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     combine,
     action1,
@@ -251,7 +301,18 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<Error>.zipOrAccumu
   @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(action8, EXACTLY_ONCE)
+    callsInPlace(action9, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return withError({ it.reduce(combine) }) {
     zipOrAccumulate(action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
   }
@@ -270,7 +331,11 @@ public inline fun <Error, A, B, C> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
   block: (A, B) -> C
 ): C {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -293,7 +358,12 @@ public inline fun <Error, A, B, C, D> Raise<NonEmptyList<Error>>.zipOrAccumulate
   @BuilderInference action3: RaiseAccumulate<Error>.() -> C,
   block: (A, B, C) -> D
 ): D {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -318,7 +388,13 @@ public inline fun <Error, A, B, C, D, E> Raise<NonEmptyList<Error>>.zipOrAccumul
   @BuilderInference action4: RaiseAccumulate<Error>.() -> D,
   block: (A, B, C, D) -> E
 ): E {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -345,7 +421,14 @@ public inline fun <Error, A, B, C, D, E, F> Raise<NonEmptyList<Error>>.zipOrAccu
   @BuilderInference action5: RaiseAccumulate<Error>.() -> E,
   block: (A, B, C, D, E) -> F
 ): F {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -374,7 +457,15 @@ public inline fun <Error, A, B, C, D, E, F, G> Raise<NonEmptyList<Error>>.zipOrA
   @BuilderInference action6: RaiseAccumulate<Error>.() -> F,
   block: (A, B, C, D, E, F) -> G
 ): G {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -405,7 +496,16 @@ public inline fun <Error, A, B, C, D, E, F, G, H> Raise<NonEmptyList<Error>>.zip
   @BuilderInference action7: RaiseAccumulate<Error>.() -> G,
   block: (A, B, C, D, E, F, G) -> H
 ): H {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -438,7 +538,17 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
   @BuilderInference action8: RaiseAccumulate<Error>.() -> H,
   block: (A, B, C, D, E, F, G, H) -> I
 ): I {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(action8, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return zipOrAccumulate(
     action1,
     action2,
@@ -461,6 +571,7 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I> Raise<NonEmptyList<Error>>.
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL @OptIn(ExperimentalRaiseAccumulateApi::class)
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error>>.zipOrAccumulate(
   @BuilderInference action1: RaiseAccumulate<Error>.() -> A,
   @BuilderInference action2: RaiseAccumulate<Error>.() -> B,
@@ -473,17 +584,28 @@ public inline fun <Error, A, B, C, D, E, F, G, H, I, J> Raise<NonEmptyList<Error
   @BuilderInference action9: RaiseAccumulate<Error>.() -> I,
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(action8, EXACTLY_ONCE)
+    callsInPlace(action9, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
   return accumulate {
-    val a = accumulating(action1)
-    val b = accumulating(action2)
-    val c = accumulating(action3)
-    val d = accumulating(action4)
-    val e = accumulating(action5)
-    val f = accumulating(action6)
-    val g = accumulating(action7)
-    val h = accumulating(action8)
-    val i = accumulating(action9)
+    val a = accumulating { action1() }
+    val b = accumulating { action2() }
+    val c = accumulating { action3() }
+    val d = accumulating { action4() }
+    val e = accumulating { action5() }
+    val f = accumulating { action6() }
+    val g = accumulating { action7() }
+    val h = accumulating { action8() }
+    val i = accumulating { action9() }
     block(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value)
   }
 }
@@ -628,10 +750,16 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptyList: NonEmptyList<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): NonEmptyList<B> = requireNotNull(mapOrAccumulate(nonEmptyList.all, transform).toNonEmptyListOrNull())
+): NonEmptyList<B> {
+  // For a NonEmptyList to be returned, there must be a B, which can only be produced by transform
+  // thus transform must be called at least once (or alternatively an error is raised or an exception is thrown etc)
+  contract { callsInPlace(transform, AT_LEAST_ONCE) }
+  return requireNotNull(mapOrAccumulate(nonEmptyList.all) { transform(it) }.toNonEmptyListOrNull())
+}
 
 /**
  * Accumulate the errors obtained by executing the [transform] over every element of [NonEmptySet].
@@ -641,14 +769,18 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
 @RaiseDSL
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   nonEmptySet: NonEmptySet<A>,
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
-): NonEmptySet<B> = buildSet(nonEmptySet.size) {
-  forEachAccumulatingImpl(nonEmptySet.iterator()) { item, hasErrors ->
-    transform(item).also { if (!hasErrors) add(it) }
-  }
-}.toNonEmptySetOrNull()!!
+): NonEmptySet<B> {
+  contract { callsInPlace(transform, AT_LEAST_ONCE) }
+  return buildSet(nonEmptySet.size) {
+    forEachAccumulatingImpl(nonEmptySet.iterator()) { item, hasErrors ->
+      transform(item).also { if (!hasErrors) add(it) }
+    }
+  }.toNonEmptySetOrNull()!!
+}
 
 @RaiseDSL
 @Deprecated(
@@ -713,7 +845,9 @@ public inline fun <Error, A, R> accumulate(
   raise: (Raise<NonEmptyList<Error>>.() -> A) -> R,
   crossinline block: RaiseAccumulate<Error>.() -> A
 ): R {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract {
+    callsInPlace(raise, EXACTLY_ONCE)
+  }
   return raise { accumulate(block) }
 }
 
@@ -743,12 +877,18 @@ public open class RaiseAccumulate<Error>(
   @RaiseDSL
   public inline fun <A, B> NonEmptyList<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
-  ): NonEmptyList<B> = raise.mapOrAccumulate(this, transform)
+  ): NonEmptyList<B> {
+    contract { callsInPlace(transform, AT_LEAST_ONCE) }
+    return raise.mapOrAccumulate(this, transform)
+  }
 
   @RaiseDSL
   public inline fun <A, B> NonEmptySet<A>.mapOrAccumulate(
     transform: RaiseAccumulate<Error>.(A) -> B
-  ): NonEmptySet<B> = raise.mapOrAccumulate(this, transform)
+  ): NonEmptySet<B> {
+    contract { callsInPlace(transform, AT_LEAST_ONCE) }
+    return raise.mapOrAccumulate(this, transform)
+  }
 
   @RaiseDSL
   public inline fun <K, A, B> Map<K, A>.mapOrAccumulate(
@@ -772,14 +912,20 @@ public open class RaiseAccumulate<Error>(
   public inline fun <A, B> mapOrAccumulate(
     list: NonEmptyList<A>,
     transform: RaiseAccumulate<Error>.(A) -> B
-  ): NonEmptyList<B> = raise.mapOrAccumulate(list, transform)
+  ): NonEmptyList<B> {
+    contract { callsInPlace(transform, AT_LEAST_ONCE) }
+    return raise.mapOrAccumulate(list, transform)
+  }
 
   @RaiseDSL
   @JvmName("_mapOrAccumulate")
   public inline fun <A, B> mapOrAccumulate(
     set: NonEmptySet<A>,
     transform: RaiseAccumulate<Error>.(A) -> B
-  ): NonEmptySet<B> = raise.mapOrAccumulate(set, transform)
+  ): NonEmptySet<B> {
+    contract { callsInPlace(transform, AT_LEAST_ONCE) }
+    return raise.mapOrAccumulate(set, transform)
+  }
 
   @RaiseDSL
   override fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
@@ -822,24 +968,27 @@ public open class RaiseAccumulate<Error>(
     accumulating { this@bindNelOrAccumulate.bindNel() }
 
   @ExperimentalRaiseAccumulateApi
-  public fun ensureOrAccumulate(condition: Boolean, raise: () -> Error) {
+  public inline fun ensureOrAccumulate(condition: Boolean, raise: () -> Error) {
+    contract { callsInPlace(raise, AT_MOST_ONCE) }
     accumulating { ensure(condition, raise) }
   }
 
   @ExperimentalRaiseAccumulateApi
-  public fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
-    contract { returns() implies (value != null) }
+  public inline fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
+    contract { callsInPlace(raise, AT_MOST_ONCE) }
     ensureOrAccumulate(value != null, raise)
   }
 
   @ExperimentalRaiseAccumulateApi
-  public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> =
-    recover(inner@{
+  public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    return recover(inner@{
       Ok(block(RaiseAccumulate(this@inner)))
     }) {
       addErrors(it)
       Error()
     }
+  }
 
   public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 

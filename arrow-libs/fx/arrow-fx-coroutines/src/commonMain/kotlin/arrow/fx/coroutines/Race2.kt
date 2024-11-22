@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.coroutines
 
 import arrow.core.Either
@@ -7,6 +9,9 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.selects.select
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -46,8 +51,13 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @see racePair for a version that does not automatically cancel the loser.
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
-public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.() -> A, crossinline fb: suspend CoroutineScope.() -> B): Either<A, B> =
-  raceN(Dispatchers.Default, fa, fb)
+public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.() -> A, crossinline fb: suspend CoroutineScope.() -> B): Either<A, B> {
+  contract {
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+  }
+  return raceN(Dispatchers.Default, fa, fb)
+}
 
 /**
  * Races the participants [fa], [fb] on the provided [CoroutineContext].
@@ -87,12 +97,17 @@ public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.()
  * @return either [Either.Left] if [fa] won the race, or [Either.Right] if [fb] won the race.
  * @see raceN for a function that ensures it runs in parallel on the [Dispatchers.Default].
  */
+@Suppress("LEAKED_IN_PLACE_LAMBDA")
 public suspend inline fun <A, B> raceN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
   crossinline fb: suspend CoroutineScope.() -> B
-): Either<A, B> =
-  coroutineScope {
+): Either<A, B> {
+  contract {
+    callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+    callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
+  }
+  return coroutineScope {
     val a = async(ctx) { fa() }
     val b = async(ctx) { fb() }
     select<Either<A, B>> {
@@ -105,3 +120,4 @@ public suspend inline fun <A, B> raceN(
       }
     }
   }
+}

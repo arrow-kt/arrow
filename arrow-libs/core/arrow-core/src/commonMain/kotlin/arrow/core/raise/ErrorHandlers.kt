@@ -1,9 +1,12 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
-@file:OptIn(ExperimentalTypeInference::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 package arrow.core.raise
 
 import arrow.core.nonFatalOrThrow
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
@@ -93,8 +96,10 @@ public fun <Error, A> Effect<Error, A>.catch(): Effect<Error, Result<A>> =
     catch({ Result.success(invoke()) }, Result.Companion::failure)
   }
 
-public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: (error: Error) -> A): A =
-  recover({ invoke() }) { recover(it) }
+public suspend inline infix fun <Error, A> Effect<Error, A>.getOrElse(recover: (error: Error) -> A): A {
+  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
+  return recover({ invoke() }) { recover(it) }
+}
 
 /**
  * Transform the raised value [Error] of the `Effect` into [OtherError],
@@ -131,8 +136,10 @@ public inline infix fun <reified T : Throwable, Error, A> EagerEffect<Error, A>.
 ): EagerEffect<Error, A> =
   eagerEffect { catch({ invoke() }) { t: T -> catch(t) } }
 
-public inline infix fun <Error, A> EagerEffect<Error, A>.getOrElse(recover: (error: Error) -> A): A =
-  recover({ invoke() }, recover)
+public inline infix fun <Error, A> EagerEffect<Error, A>.getOrElse(recover: (error: Error) -> A): A {
+  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
+  return recover({ invoke() }, recover)
+}
 
 /**
  * Transform the raised value [Error] of the `EagerEffect` into [OtherError].

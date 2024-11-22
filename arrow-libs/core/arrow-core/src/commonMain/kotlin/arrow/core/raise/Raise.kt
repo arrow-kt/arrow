@@ -14,6 +14,7 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -656,10 +657,9 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   @BuilderInference block: Raise<OtherError>.() -> A
 ): A {
   contract {
-    callsInPlace(transform, AT_MOST_ONCE)
-    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
   }
-  return recover(block) { raise(transform(it)) }
+  recover({ return block(this) }) { raise(transform(it)) }
 }
 
 /**

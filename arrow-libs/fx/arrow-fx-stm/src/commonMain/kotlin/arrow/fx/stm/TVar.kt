@@ -148,7 +148,7 @@ public class TVar<A> internal constructor(a: A) {
    * Changes are pushed to waiting transactions via [notify]
    */
   // TODO Use a set here, and preferably something that uses sharing to avoid gc pressure from copying...
-  private val waiting = Atomic<List<STMTransaction<*>>>(emptyList())
+  private val waiting = Atomic<List<STMTransaction>>(emptyList())
 
   override fun hashCode(): Int = id.hashCode()
 
@@ -196,7 +196,7 @@ public class TVar<A> internal constructor(a: A) {
    * This does not happen implicitly on [release] because release may also write the same value back on
    *  normal lock release.
    */
-  internal fun registerWaiting(trans: STMTransaction<*>, expected: A): Boolean {
+  internal fun registerWaiting(trans: STMTransaction, expected: A): Boolean {
     if (value !== expected) {
       trans.getCont()?.resume(Unit)
       return false
@@ -212,7 +212,7 @@ public class TVar<A> internal constructor(a: A) {
   /**
    * A transaction resumed so remove it from the [TVar]
    */
-  internal fun removeWaiting(trans: STMTransaction<*>): Unit {
+  internal fun removeWaiting(trans: STMTransaction): Unit {
     waiting.update { it.filter { it !== trans } }
   }
 

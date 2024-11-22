@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.fx.coroutines
 
 import arrow.AutoCloseScope
@@ -11,6 +13,9 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 
 @DslMarker
@@ -355,13 +360,20 @@ public fun <A> resource(block: suspend ResourceScope.() -> A): Resource<A> = blo
 @OptIn(DelicateCoroutinesApi::class)
 @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
 public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> A): A {
+  contract {
+    callsInPlace(action, InvocationKind.EXACTLY_ONCE)
+  }
   val (scope, cancelAll) = resource { this }.allocate()
   return finalizeCase({ scope.action() }) { cancelAll(it) }
 }
 
 @Suppress("REDUNDANT_INLINE_SUSPEND_FUNCTION_TYPE")
-public suspend inline infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B =
-  resourceScope { f(bind()) }
+public suspend inline infix fun <A, B> Resource<A>.use(f: suspend (A) -> B): B {
+  contract {
+    callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+  }
+  return resourceScope { f(bind()) }
+}
 
 /**
  * Construct a [Resource] from an allocating function [acquire] and a release function [release].
@@ -508,7 +520,18 @@ internal expect val IODispatcher: CoroutineDispatcher
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
-): A = install({ autoCloseable() } ) { s: A, _ -> withContext(closingDispatcher) { s.close() } }
+): A {
+  contract {
+    callsInPlace(autoCloseable, InvocationKind.EXACTLY_ONCE)
+  }
+  // This is install({ autoCloseable() } ) { s: A, _ -> withContext(closingDispatcher) { s.close() } }
+  // but inlined because `install` can't have a contract (since it's a member)
+  return withContext(NonCancellable) {
+    val s = autoCloseable()
+    onRelease { withContext(closingDispatcher) { s.close() } }
+    s
+  }
+}
 
 public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,

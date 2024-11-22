@@ -1,4 +1,5 @@
 @file:Suppress("UNCHECKED_CAST")
+@file:OptIn(ExperimentalContracts::class)
 
 package arrow.fx.stm.internal
 
@@ -7,6 +8,9 @@ import arrow.atomic.value
 import arrow.fx.stm.STM
 import arrow.fx.stm.TVar
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.Continuation
 
 /**
@@ -168,7 +172,7 @@ public expect object RetryException : Throwable
  *
  * Keeps the continuation that [TVar]'s use to resume this transaction.
  */
-internal class STMTransaction<A>(val f: STM.() -> A) {
+internal class STMTransaction {
   private val cont = Atomic<Continuation<Unit>?>(null)
 
   /**
@@ -183,7 +187,10 @@ internal class STMTransaction<A>(val f: STM.() -> A) {
   //  If they both pass a threshold we should probably kill the transaction and throw
   //  "live-locked" transactions are those that are continuously retry due to accessing variables with high contention and
   //   taking longer than the transactions updating those variables.
-  suspend fun commit(): A {
+  suspend fun <A> commit(f: STM.() -> A): A {
+    contract {
+      callsInPlace(f, InvocationKind.AT_LEAST_ONCE)
+    }
     loop@ while (true) {
       val frame = STMFrame()
       try {

@@ -1,7 +1,12 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -61,6 +66,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * <!--- KNIT example-autocloseable-02.kt -->
  */
 public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
+  contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
   val scope = DefaultAutoCloseScope()
   var throwable: Throwable? = null
   return try {

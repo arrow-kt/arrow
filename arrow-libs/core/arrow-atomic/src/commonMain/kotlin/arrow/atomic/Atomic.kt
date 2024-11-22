@@ -1,4 +1,10 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package arrow.atomic
+
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * [Atomic] value of [V].
@@ -44,31 +50,55 @@ public var <T> Atomic<T>.value: T
 /**
  * Infinite loop that reads this atomic variable and performs the specified [action] on its value.
  */
-public inline fun <V> Atomic<V>.loop(action: (V) -> Unit): Nothing { while(true) { action(value) } }
+public inline fun <V> Atomic<V>.loop(action: (V) -> Unit): Nothing {
+  contract { callsInPlace(action, InvocationKind.AT_LEAST_ONCE) }
+  do { action(value) } while(true)
+}
 
-public inline fun <V> Atomic<V>.tryUpdate(function: (V) -> V): Boolean = tryUpdate(function) { _, _ -> }
+public inline fun <V> Atomic<V>.tryUpdate(function: (V) -> V): Boolean {
+  contract { callsInPlace(function, InvocationKind.EXACTLY_ONCE) }
+  return tryUpdate(function) { _, _ -> }
+}
 
-public inline fun <V> Atomic<V>.update(function: (V) -> V): Unit = update(function) { _, _ -> }
+public inline fun <V> Atomic<V>.update(function: (V) -> V) {
+  contract { callsInPlace(function, InvocationKind.AT_LEAST_ONCE) }
+  update(function) { _, _ -> }
+}
 
 /**
  * Updates variable atomically using the specified [function] of its value and returns its old value.
  */
-public inline fun <V> Atomic<V>.getAndUpdate(function: (V) -> V): V = update(function) { old, _ -> old }
+public inline fun <V> Atomic<V>.getAndUpdate(function: (V) -> V): V {
+  contract { callsInPlace(function, InvocationKind.AT_LEAST_ONCE) }
+  return update(function) { old, _ -> old }
+}
 
 /**
  * Updates variable atomically using the specified [function] of its value and returns its new value.
  */
-public inline fun <V> Atomic<V>.updateAndGet(function: (V) -> V): V = update(function) { _, new -> new }
+public inline fun <V> Atomic<V>.updateAndGet(function: (V) -> V): V {
+  contract { callsInPlace(function, InvocationKind.AT_LEAST_ONCE) }
+  return update(function) { _, new -> new }
+}
 
 @PublishedApi
 internal inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform: (old: V, new: U) -> R): R {
-  while (true) {
-    tryUpdate(function) { old, new -> return transform(old, new) }
+  contract {
+    callsInPlace(function, InvocationKind.AT_LEAST_ONCE)
+    callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+  }
+  loop { cur ->
+    val upd = function(value)
+    if(compareAndSet(cur, upd)) return transform(cur, upd)
   }
 }
 
 @PublishedApi
 internal inline fun <V, U: V> Atomic<V>.tryUpdate(function: (V) -> U, onUpdated: (old: V, new: U) -> Unit): Boolean {
+  contract {
+    callsInPlace(function, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(onUpdated, InvocationKind.AT_MOST_ONCE)
+  }
   val cur = value
   val upd = function(cur)
   return compareAndSet(cur, upd).also { if (it) onUpdated(cur, upd) }
