@@ -169,8 +169,7 @@ public interface Raise<in Error> {
    *
    * data class Config(val mode: Int, val role: String, val serviceType: ServiceType)
    *
-   * context(Raise<String>)
-   * fun readConfig(): Config {
+   * fun Raise<String>.readConfig(): Config {
    *     val mode = ensureNotNull(readln().toIntOrNull()) {
    *         "Mode should be a valid integer"
    *     }
@@ -531,8 +530,7 @@ public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T)
  *     object ContainsInvalidChars : CountryCodeError
  * }
  *
- * context(Raise<CountryCodeError>)
- * fun countryCode(rawCode: String): CountryCode {
+ * fun Raise<CountryCodeError>.countryCode(rawCode: String): CountryCode {
  *     ensure(rawCode.length == 2) { CountryCodeError.InvalidLength(rawCode.length) }
  *     ensure(rawCode.any { !it.isLetter() }) { CountryCodeError.ContainsInvalidChars }
  *     return CountryCode(rawCode)
@@ -601,8 +599,7 @@ public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> E
  *     object NullValue : NameError
  * }
  *
- * context(Raise<NameError>)
- * fun fullName(name: String?): FullName {
+ * fun Raise<NameError>.fullName(name: String?): FullName {
  *     val nonNullName = ensureNotNull(name) { NameError.NullValue }
  *     return FullName(nonNullName)
  * }
