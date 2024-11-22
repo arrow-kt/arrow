@@ -45,7 +45,7 @@ kotlin {
   jvm {
     tasks.jvmJar {
       manifest {
-        attributes["Automatic-Module-Name"] = "arrow.continuations"
+        attributes["Automatic-Module-Name"] = "arrow.functions"
       }
     }
   }

@@ -2,7 +2,7 @@ name: githubpages
 
 on:
   release:
-    types: [published]
+    types: [ released ]
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"

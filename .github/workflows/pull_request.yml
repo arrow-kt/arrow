@@ -29,7 +29,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Knit and API checks
         run: ./gradlew knitCheck apiCheck --scan
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: iOS and watchOS tests
         run: ./gradlew iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
@@ -89,7 +89,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Update API files
         run: ./gradlew apiDump
@@ -118,7 +118,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Apply Spotless rules
         run: ./gradlew spotlessApply
@@ -147,7 +147,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: macOS and tvOS tests
         run: ./gradlew macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
@@ -177,7 +177,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Windows (MinGW-w64) tests
         run: ./gradlew mingwX64Test --scan
@@ -207,7 +207,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: JVM tests
         run: ./gradlew jvmTest --scan
@@ -251,7 +251,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Upgrade yarn.lock
         run: ./gradlew kotlinUpgradeYarnLock
@@ -285,7 +285,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Linux (x64) tests
         run: ./gradlew linuxX64Test  --scan
@@ -315,7 +315,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Compile WebAssembly
         run: ./gradlew wasmJsApiBuild wasmJsJar wasmJsTest -Penable_wasm=true --scan
