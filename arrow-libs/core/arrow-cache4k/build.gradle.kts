@@ -83,8 +83,3 @@ tasks.named<Jar>("jvmJar").configure {
     attributes["Automatic-Module-Name"] = "arrow.cache4k"
   }
 }
-
-// enables context receivers for Jvm Tests
-tasks.named<KotlinCompile>("compileTestKotlinJvm") {
-  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
-}

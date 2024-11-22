@@ -47,11 +47,10 @@ import kotlin.coroutines.cancellation.CancellationException
  * So both [AutoCloseScope], and `ResourceScope` behave correctly when encountering cancellation, by closing the source,
  * but `ResourceScope` allows inspecting _complete_, _failure_, **and** _cancellation_ in the finalizer.
  *
- * This DSL works very well with Kotlin's experimental feature context receivers, soon called context parameters.
- * We can write the same code from above as a function:
+ * We can write the same code from above as a function by adding the scope as receiver:
+ *
  * ```kotlin
- * context(AutoCloseScope)
- * fun copyFiles(input: String, output: String) {
+ * fun AutoCloseScope.copyFiles(input: String, output: String) {
  *   val scanner = install(Scanner(input))
  *   val printer = install(Printer(output))
  *   for(line in scanner) {
