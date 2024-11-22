@@ -1,15 +1,8 @@
 name: "Publish all libs, Arrow-stack and Docs"
 
 on:
-  push:
-    branches: [ publish-2.0.0-alpha.1 ]
-  workflow_dispatch:
-    branches: [ main ]
-    inputs:
-      version:
-        description: 'Version'
-        required: true
-        type: string
+  release:
+    types: [ published ]
 
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
@@ -38,10 +31,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'publish-2.0.0-alpha.1' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Assemble
-        run: ./gradlew assemble -Pversion=2.0.0-beta.2 -Penable_wasm=true
+        run: ./gradlew assemble -Pversion=${{ github.event.release.name }} -Penable_wasm=true
 
       - name: Publish artifacts
-        run: ./gradlew -Pversion=2.0.0-beta.2 publish -Penable_wasm=true
+        run: ./gradlew -Pversion=${{ github.event.release.name }} publish -Penable_wasm=true
