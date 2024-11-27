@@ -42,9 +42,13 @@ public abstract interface class arrow/collectors/CollectorI {
 }
 
 public final class arrow/collectors/CollectorI$Companion {
+	public final fun nonSuspendOf (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Ljava/util/Set;)Larrow/collectors/NonSuspendCollectorI;
 	public final fun nonSuspendOf (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Ljava/util/Set;)Larrow/collectors/NonSuspendCollectorI;
+	public static synthetic fun nonSuspendOf$default (Larrow/collectors/CollectorI$Companion;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Ljava/util/Set;ILjava/lang/Object;)Larrow/collectors/NonSuspendCollectorI;
 	public static synthetic fun nonSuspendOf$default (Larrow/collectors/CollectorI$Companion;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Ljava/util/Set;ILjava/lang/Object;)Larrow/collectors/NonSuspendCollectorI;
+	public final fun of (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Ljava/util/Set;)Larrow/collectors/CollectorI;
 	public final fun of (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Ljava/util/Set;)Larrow/collectors/CollectorI;
+	public static synthetic fun of$default (Larrow/collectors/CollectorI$Companion;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Ljava/util/Set;ILjava/lang/Object;)Larrow/collectors/CollectorI;
 	public static synthetic fun of$default (Larrow/collectors/CollectorI$Companion;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Ljava/util/Set;ILjava/lang/Object;)Larrow/collectors/CollectorI;
 }
 
@@ -111,8 +115,12 @@ public final class arrow/collectors/NonSuspendCollectorI$DefaultImpls {
 }
 
 public final class arrow/collectors/ZipKt {
+	public static final fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function6;)Larrow/collectors/CollectorI;
+	public static final fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function5;)Larrow/collectors/CollectorI;
 	public static final fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function4;)Larrow/collectors/CollectorI;
 	public static final fun zip (Larrow/collectors/CollectorI;Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function3;)Larrow/collectors/CollectorI;
+	public static final fun zip (Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function5;)Larrow/collectors/NonSuspendCollectorI;
+	public static final fun zip (Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function4;)Larrow/collectors/NonSuspendCollectorI;
 	public static final fun zip (Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function3;)Larrow/collectors/NonSuspendCollectorI;
 	public static final fun zip (Larrow/collectors/NonSuspendCollectorI;Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/NonSuspendCollectorI;
 }
