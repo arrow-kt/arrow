@@ -72,6 +72,18 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
     }
 
     /**
+     * Constructs a new [Collector] from its components,
+     * where the accumulated value is directly its result
+     */
+    public fun <Value, Result> of(
+      supply: suspend () -> Result,
+      accumulate: suspend (current: Result, value: Value) -> Unit,
+      characteristics: Set<Characteristics> = setOf(),
+    ): Collector<Value, Result> = of(
+      supply, accumulate, { it }, characteristics + Characteristics.IDENTITY_FINISH
+    )
+
+    /**
      * Constructs a new [Collector] from its components
      */
     public fun <InternalAccumulator, Value, Result> nonSuspendOf(
@@ -88,6 +100,18 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
 
       override fun finishNonSuspend(current: InternalAccumulator): Result = finish(current)
     }
+
+    /**
+     * Constructs a new [Collector] from its components,
+     * where the accumulated value is directly its result
+     */
+    public fun <Value, Result> nonSuspendOf(
+      supply: () -> Result,
+      accumulate: (current: Result, value: Value) -> Unit,
+      characteristics: Set<Characteristics> = setOf(),
+    ): NonSuspendCollector<Value, Result> = nonSuspendOf(
+      supply, accumulate, { it }, characteristics + Characteristics.IDENTITY_FINISH
+    )
   }
 
   /**
