@@ -3,6 +3,9 @@ name: githubpages
 on:
   release:
     types: [ released ]
+  push:
+    branches:
+      - 'serras/fix-docs-build'
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
@@ -29,7 +32,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: assemble
-        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true --max-workers 1
+        run: ./gradlew -Pversion=2.0.0 dokkaHtmlMultiModule -Pgithubpages=true --max-workers 1
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
