@@ -41,12 +41,11 @@
 <a class="library-name--link" href="../../../index.html">
                             Arrow
                     </a>            </div>
-            <div class="library-version">1.2.4
+            <div class="library-version">2.0.0
             </div>
         </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-autoclose:dokkaHtmlPartial/commonMain">common</button>
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-autoclose:dokkaHtmlPartial/jvmMain">jvm</button>
         </div>
     </div>
     <div class="navigation-controls">
@@ -63,10 +62,10 @@
   <div class="breadcrumbs"><a href="../../index.html">arrow-autoclose</a><span class="delimiter">/</span><a href="../index.html">arrow</a><span class="delimiter">/</span><span class="current">AutoCloseScope</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Auto</span><wbr><span>Close</span><wbr><span><span>Scope</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">AutoCloseScope</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/core/arrow-autoclose/src/commonMain/kotlin/arrow/AutoCloseScope.kt#L76">source</a>)</span></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">AutoCloseScope</a></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
@@ -80,7 +79,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="auto-close.html">A</a><span class="token operator">&gt; </span><a href="auto-close.html"><span class="token function">autoClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acquire<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="auto-close.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="auto-close.html">A</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="auto-close.html">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="auto-close.html">A</a><span class="token operator">&gt; </span><a href="auto-close.html"><span class="token function">autoClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acquire<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="auto-close.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="auto-close.html">A</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="auto-close.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -95,24 +94,22 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-experimental-stdlib-api/index.html"><span class="token annotation builtin">ExperimentalStdlibApi</span></a></div></div><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="install.html">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="install.html"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">autoCloseable<span class="token operator">: </span><a href="install.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="install.html">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="install.html">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="install.html"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">autoCloseable<span class="token operator">: </span><a href="install.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="install.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1012168940%2FFunctions%2F-621684650" anchor-label="install" id="-1012168940%2FFunctions%2F-621684650" data-filterable-set=":arrow-autoclose:dokkaHtmlPartial/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-autoclose:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-autoclose:dokkaHtmlPartial/jvmMain">
+<a data-name="117361509%2FFunctions%2F675384992" anchor-label="onClose" id="117361509%2FFunctions%2F675384992" data-filterable-set=":arrow-autoclose:dokkaHtmlPartial/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-autoclose:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-autoclose:dokkaHtmlPartial/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="../install.html"><span><span>install</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1012168940%2FFunctions%2F-621684650"></span>
+                  <div><a href="on-close.html"><span>on</span><wbr><span><span>Close</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="117361509%2FFunctions%2F675384992"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-autoclose:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-autoclose:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-autoclose:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../install.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/AutoCloseable.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="index.html">AutoCloseScope</a><span class="token punctuation">.</span><a href="../install.html"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">autoCloseable<span class="token operator">: </span><a href="../install.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../install.html">A</a></div></div>                  </div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-autoclose:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="on-close.html"><span class="token function">onClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>

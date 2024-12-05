@@ -41,7 +41,7 @@
 <a class="library-name--link" href="../../index.html">
                             Arrow
                     </a>            </div>
-            <div class="library-version">1.2.4
+            <div class="library-version">2.0.0
             </div>
         </div>
         <div class="filter-section" id="filter-section">
@@ -58,12 +58,22 @@
                 <div class="sidebar--inner" id="sideMenu"></div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="member" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines//resourceScope/#kotlin.coroutines.SuspendFunction1[arrow.fx.coroutines.continuations.ResourceScope,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//-245591949">
+<div class="main-content" data-page-type="member" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines//resourceScope/#kotlin.coroutines.SuspendFunction1[arrow.fx.coroutines.ResourceScope,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//-245591949">
   <div class="breadcrumbs"><a href="../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">resourceScope</span></div>
   <div class="cover ">
     <h1 class="cover"><span>resource</span><wbr><span><span>Scope</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="resource-scope.html">A</a><span class="token operator">&gt; </span><a href="resource-scope.html"><span class="token function">resourceScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token keyword">suspend </span><a href="-resource-scope/index.html">ResourceScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="resource-scope.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="resource-scope.html">A</a><span class="clearfix"><span class="floating-right">(<a href="https://github.com/arrow-kt/arrow//blob/main/arrow-libs/fx/arrow-fx-coroutines/src/commonMain/kotlin/arrow/fx/coroutines/Resource.kt#L895">source</a>)</span></span></div></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="resource-scope.html">A</a><span class="token operator">&gt; </span><a href="resource-scope.html"><span class="token function">resourceScope</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">action<span class="token operator">: </span><span class="token keyword">suspend </span><a href="-resource-scope/index.html">ResourceScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="resource-scope.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="resource-scope.html">A</a></div><p class="paragraph">The <a href="resource-scope.html">resourceScope</a> function creates the <a href="-resource-scope/index.html">ResourceScope</a> instances, runs the user <a href="resource-scope.html">action</a> while allocating the <i>installed</i> resources. upon <a href="-exit-case/-completed/index.html">ExitCase.Completed</a>, <a href="-exit-case/-cancelled/index.html">ExitCase.Cancelled</a> or <a href="-exit-case/-failure/index.html">ExitCase.Failure</a> runs all the <code class="lang-kotlin">release</code> finalizers.</p><!-- INCLUDE
+import arrow.fx.coroutines.resourceScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class DataSource {
+suspend fun connect(): Unit = withContext(Dispatchers.IO) { println("Connecting dataSource") }
+suspend fun close(): Unit = withContext(Dispatchers.IO) { println("Closed dataSource") }
+suspend fun users(): List<String> = listOf("User-1", "User-2", "User-3")
+}
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main(): Unit = resourceScope {<br>  val dataSource = install({<br>    DataSource().also { it.connect() }<br>  }) { ds, _ -&gt; ds.close() }<br><br>  println("Using data source: ${dataSource.users()}")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-resource-06.kt --></div></div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
