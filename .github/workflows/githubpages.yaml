@@ -26,10 +26,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/arrow-2' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: assemble
-        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true --max-workers 1
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4

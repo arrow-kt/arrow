@@ -98,6 +98,8 @@ private val kotlinXUpstream =
   )
 
 subprojects {
+  plugins.apply("org.jetbrains.dokka")
+
   tasks.withType<DokkaTaskPartial>().configureEach {
     extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
       dokkaSourceSets.named(kotlinSourceSet.name) {
