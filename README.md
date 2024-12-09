@@ -25,20 +25,6 @@ blocks to empower users to write pure FP apps and libraries built atop higher or
 
 The documentation is hosted in a [separate repository](https://github.com/arrow-kt/arrow-website).
 
-## Arrow 2.0
-
-⚠️ _**Every new API has been backported to Arrow 1.2**. We strongly discourage from using Arrow 2.0
-at this point, except for testing purposes, and use Arrow 1.2 instead._
-
-The next version of Arrow is [in active development](https://github.com/arrow-kt/arrow/pull/2778).
-If you want to try it, you need to add the following repository in your build file:
-
-```
-maven("https://oss.sonatype.org/content/repositories/snapshots")
-```
-
-and depend on the `2.0.0-SNAPSHOT` version of the desired library.
-
 ## Join Us
 
 Arrow is an inclusive community powered by awesome individuals like you. As an actively growing
