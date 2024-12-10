@@ -1309,7 +1309,7 @@ public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>):
  *
  * @param f The function to bind across [Left].
  */
-public fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
+public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
   contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
   return when (this) {
     is Left -> f(this.value)
@@ -1338,7 +1338,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  */
 public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
   contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
-  return when(this) {
+  return when (this) {
     is Left -> default(this.value)
     is Right -> this.value
   }
