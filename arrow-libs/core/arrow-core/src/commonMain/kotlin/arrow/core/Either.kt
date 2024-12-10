@@ -457,7 +457,7 @@ public typealias EitherNel<E, A> = Either<NonEmptyList<E>, A>
  * ```
  * <!--- KNIT example-either-19.kt -->
  *
- * The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
+ * The `getOrElse()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
  * the value of [Left]. This can be useful when mapping to a single result type is required like `fold()`, but without
  * the need to handle `Either.Right` case.
  *
