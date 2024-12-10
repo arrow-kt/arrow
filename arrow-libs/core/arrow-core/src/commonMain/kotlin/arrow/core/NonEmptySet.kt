@@ -7,23 +7,23 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
 
 @JvmInline
-public value class NonEmptySet<out A> private constructor(
-  @PublishedApi internal val elements: Set<A>
-) : Set<A> by elements, NonEmptyCollection<A> {
+public value class NonEmptySet<out E> private constructor(
+  @PublishedApi internal val elements: Set<E>
+) : Set<E> by elements, NonEmptyCollection<E> {
 
-  public constructor(first: A, rest: Iterable<A>) : this(setOf(first) + rest)
+  public constructor(first: E, rest: Iterable<E>) : this(setOf(first) + rest)
 
-  public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptySet<A> =
+  public override operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptySet<E> =
     NonEmptySet(this.elements + elements)
 
-  public override operator fun plus(element: @UnsafeVariance A): NonEmptySet<A> =
+  public override operator fun plus(element: @UnsafeVariance E): NonEmptySet<E> =
     NonEmptySet(this.elements + element)
 
   override fun isEmpty(): Boolean = false
 
-  override val head: A get() = elements.first()
+  override val head: E get() = elements.first()
 
-  override fun lastOrNull(): A = elements.last()
+  override fun lastOrNull(): E = elements.last()
 
   override fun toString(): String = "NonEmptySet(${this.joinToString()})"
 
@@ -35,52 +35,52 @@ public value class NonEmptySet<out A> private constructor(
   override fun hashCode(): Int =
     elements.hashCode()
 
-  public override fun distinct(): NonEmptyList<A> =
+  public override fun distinct(): NonEmptyList<E> =
     NonEmptyList(elements.distinct())
 
-  public override fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
+  public override fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> =
     NonEmptyList(elements.distinctBy(selector))
 
-  public override fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+  public override fun <T> map(transform: (E) -> T): NonEmptyList<T> =
     NonEmptyList(elements.map(transform))
 
-  public override fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+  public override fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> =
     NonEmptyList(elements.flatMap(transform))
 
-  public override fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
+  public override fun <T> mapIndexed(transform: (index: Int, E) -> T): NonEmptyList<T> =
     NonEmptyList(elements.mapIndexed(transform))
 
-  override fun <B> zip(other: NonEmptyCollection<B>): NonEmptyList<Pair<A, B>> =
+  override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> =
     NonEmptyList(elements.zip(other))
 }
 
-public inline fun <E, A, B> NonEmptySet<A>.mapOrAccumulate(
-  combine: (E, E) -> E,
-  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
-): Either<E, NonEmptySet<B>> =
+public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+): Either<Error, NonEmptySet<T>> =
   elements.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptySetOrNull()) }
 
-public inline fun <E, A, B> NonEmptySet<A>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
-): Either<NonEmptyList<E>, NonEmptySet<B>> =
+public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+): Either<NonEmptyList<Error>, NonEmptySet<T>> =
   elements.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptySetOrNull()) }
 
-public fun <A> nonEmptySetOf(first: A, vararg rest: A): NonEmptySet<A> =
+public fun <E> nonEmptySetOf(first: E, vararg rest: E): NonEmptySet<E> =
   NonEmptySet(first, rest.asIterable())
 
-public fun <A> Iterable<A>.toNonEmptySetOrNull(): NonEmptySet<A>? {
+public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? {
   val iter = iterator()
   if (!iter.hasNext()) return null
   return NonEmptySet(iter.next(), Iterable { iter })
 }
 
-public fun <A> Iterable<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
+public fun <T> Iterable<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
   toNonEmptySetOrNull().toOption()
 
 @Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
-public fun <A> Set<A>.toNonEmptySetOrNull(): NonEmptySet<A>? =
-  (this as Iterable<A>).toNonEmptySetOrNull()
+public fun <E> Set<E>.toNonEmptySetOrNull(): NonEmptySet<E>? =
+  (this as Iterable<E>).toNonEmptySetOrNull()
 
 @Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
-public fun <A> Set<A>.toNonEmptySetOrNone(): Option<NonEmptySet<A>> =
+public fun <E> Set<E>.toNonEmptySetOrNone(): Option<NonEmptySet<E>> =
   toNonEmptySetOrNull().toOption()

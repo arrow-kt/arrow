@@ -4,39 +4,39 @@ package arrow.core
  * Common interface for collections that always have
  * at least one element (available from [head]).
  */
-public interface NonEmptyCollection<out A> : Collection<A> {
+public interface NonEmptyCollection<out E> : Collection<E> {
   override fun isEmpty(): Boolean = false
-  public val head: A
+  public val head: E
 
-  public operator fun plus(element: @UnsafeVariance A): NonEmptyCollection<A>
-  public operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptyCollection<A>
+  public operator fun plus(element: @UnsafeVariance E): NonEmptyCollection<E>
+  public operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptyCollection<E>
 
-  public fun toNonEmptySet(): NonEmptySet<A> = toNonEmptySetOrNull()!!
-  public fun toNonEmptyList(): NonEmptyList<A> = toNonEmptyListOrNull()!!
+  public fun toNonEmptySet(): NonEmptySet<E> = toNonEmptySetOrNull()!!
+  public fun toNonEmptyList(): NonEmptyList<E> = toNonEmptyListOrNull()!!
 
   // These functions take precedence over the extensions in [Collection].
   // This way non-emptiness is tracked by the type system.
 
-  public fun firstOrNull(): A = head
-  public fun lastOrNull(): A
+  public fun firstOrNull(): E = head
+  public fun lastOrNull(): E
 
-  public fun distinct(): NonEmptyList<A> =
+  public fun distinct(): NonEmptyList<E> =
     delegate { it.distinct() }
-  public fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
+  public fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> =
     delegate { it.distinctBy(selector) }
-  public fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+  public fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> =
     delegate { it.flatMap(transform) }
-  public fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+  public fun <T> map(transform: (E) -> T): NonEmptyList<T> =
     delegate { it.map(transform) }
-  public fun <B> mapIndexed(transform: (index:Int, A) -> B): NonEmptyList<B> =
+  public fun <T> mapIndexed(transform: (index:Int, E) -> T): NonEmptyList<T> =
     delegate { it.mapIndexed(transform) }
-  public fun <B> zip(other: NonEmptyCollection<B>): NonEmptyCollection<Pair<A, B>> =
+  public fun <T> zip(other: NonEmptyCollection<T>): NonEmptyCollection<Pair<E, T>> =
     delegate { it.zip(other) }
 
   /**
    * Convenience method which delegates the implementation to [Collection],
    * and wraps the resulting [List] as a non-empty one.
    */
-  private inline fun <R> delegate(crossinline f: (Collection<A>) -> List<R>): NonEmptyList<R> =
-    f(this as Collection<A>).toNonEmptyListOrNull()!!
+  private inline fun <T> delegate(crossinline f: (Collection<E>) -> List<T>): NonEmptyList<T> =
+    f(this as Collection<E>).toNonEmptyListOrNull()!!
 }
