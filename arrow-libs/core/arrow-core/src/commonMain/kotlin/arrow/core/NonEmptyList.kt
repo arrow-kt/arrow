@@ -153,11 +153,11 @@ public typealias Nel<A> = NonEmptyList<A>
  *
  */
 @JvmInline
-public value class NonEmptyList<out A> @PublishedApi internal constructor(
-  public val all: List<A>
-) : List<A> by all, NonEmptyCollection<A> {
+public value class NonEmptyList<out E> @PublishedApi internal constructor(
+  public val all: List<E>
+) : List<E> by all, NonEmptyCollection<E> {
 
-  public constructor(head: A, tail: List<A>): this(listOf(head) + tail)
+  public constructor(head: E, tail: List<E>): this(listOf(head) + tail)
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun equals(other: Any?): Boolean = when (other) {
@@ -170,56 +170,56 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
 
   override fun isEmpty(): Boolean = false
 
-  public fun toList(): List<A> = all
+  public fun toList(): List<E> = all
 
-  public override val head: A
+  public override val head: E
     get() = all.first()
 
-  public val tail: List<A>
+  public val tail: List<E>
     get() = all.drop(1)
 
-  override fun lastOrNull(): A = when {
+  override fun lastOrNull(): E = when {
     tail.isNotEmpty() -> tail.last()
     else -> head
   }
 
   @Suppress("OVERRIDE_BY_INLINE", "NOTHING_TO_INLINE")
-  public override inline fun distinct(): NonEmptyList<A> =
+  public override inline fun distinct(): NonEmptyList<E> =
     NonEmptyList(all.distinct())
 
   @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <K> distinctBy(selector: (A) -> K): NonEmptyList<A> =
+  public override inline fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> =
     NonEmptyList(all.distinctBy(selector))
 
   @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> map(transform: (A) -> B): NonEmptyList<B> =
+  public override inline fun <T> map(transform: (E) -> T): NonEmptyList<T> =
     NonEmptyList(all.map(transform))
 
   @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> flatMap(transform: (A) -> NonEmptyCollection<B>): NonEmptyList<B> =
+  public override inline fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> =
     NonEmptyList(all.flatMap(transform))
 
   @Suppress("OVERRIDE_BY_INLINE")
-  public override inline fun <B> mapIndexed(transform: (index: Int, A) -> B): NonEmptyList<B> =
+  public override inline fun <T> mapIndexed(transform: (index: Int, E) -> T): NonEmptyList<T> =
     NonEmptyList(transform(0, head), tail.mapIndexed { ix, e -> transform(ix + 1, e) })
 
-  public operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
+  public operator fun plus(l: NonEmptyList<@UnsafeVariance E>): NonEmptyList<E> =
     this + l.all
 
-  public override operator fun plus(elements: Iterable<@UnsafeVariance A>): NonEmptyList<A> =
+  public override operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptyList<E> =
     NonEmptyList(all + elements)
 
-  public override operator fun plus(element: @UnsafeVariance A): NonEmptyList<A> =
+  public override operator fun plus(element: @UnsafeVariance E): NonEmptyList<E> =
     NonEmptyList(all + element)
 
-  public inline fun <B> foldLeft(b: B, f: (B, A) -> B): B {
+  public inline fun <Acc> foldLeft(b: Acc, f: (Acc, E) -> Acc): Acc {
     contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
     var accumulator = f(b, head)
     for (element in tail) accumulator = f(accumulator, element)
     return accumulator
   }
 
-  public inline fun <B> coflatMap(f: (NonEmptyList<A>) -> B): NonEmptyList<B> {
+  public inline fun <T> coflatMap(f: (NonEmptyList<E>) -> T): NonEmptyList<T> {
     contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
     var current = this
     return buildList {
@@ -230,19 +230,19 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
     }.let(::NonEmptyList)
   }
 
-  public fun extract(): A =
+  public fun extract(): E =
     this.head
 
   override fun toString(): String =
     "NonEmptyList(${all.joinToString()})"
 
-  public fun <B> align(b: NonEmptyList<B>): NonEmptyList<Ior<A, B>> =
-    NonEmptyList(all.align(b))
+  public fun <T> align(other: NonEmptyList<T>): NonEmptyList<Ior<E, T>> =
+    NonEmptyList(all.align(other))
 
-  public fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
+  public fun <T> padZip(other: NonEmptyList<T>): NonEmptyList<Pair<E?, T?>> =
     padZip(other, { it to null }, { null to it }, { a, b -> a to b })
 
-  public inline fun <B, C> padZip(other: NonEmptyList<B>, left: (A) -> C, right: (B) -> C, both: (A, B) -> C): NonEmptyList<C> {
+  public inline fun <B, C> padZip(other: NonEmptyList<B>, left: (E) -> C, right: (B) -> C, both: (E, B) -> C): NonEmptyList<C> {
     contract { callsInPlace(both, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(both(head, other.head), tail.padZip(other.tail, left, right) { a, b -> both(a, b) })
   }
@@ -253,12 +253,12 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
       nonEmptyListOf(Unit)
   }
 
-  public fun <B> zip(fb: NonEmptyList<B>): NonEmptyList<Pair<A, B>> =
-    zip(fb, ::Pair)
+  public fun <T> zip(other: NonEmptyList<T>): NonEmptyList<Pair<E, T>> =
+    zip(other, ::Pair)
 
   public inline fun <B, Z> zip(
     b: NonEmptyList<B>,
-    map: (A, B) -> Z
+    map: (E, B) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head), tail.zip(b.tail) { a, bb -> map(a, bb) })
@@ -267,7 +267,7 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
   public inline fun <B, C, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
-    map: (A, B, C) -> Z
+    map: (E, B, C) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head), tail.zip(b.tail, c.tail) { a, bb, cc -> map(a, bb, cc) })
@@ -277,88 +277,88 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    map: (A, B, C, D) -> Z
+    map: (E, B, C, D) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head), tail.zip(b.tail, c.tail, d.tail) { a, bb, cc, dd -> map(a, bb, cc, dd) })
   }
 
-  public inline fun <B, C, D, E, Z> zip(
+  public inline fun <B, C, D, F, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    e: NonEmptyList<E>,
-    map: (A, B, C, D, E) -> Z
+    e: NonEmptyList<F>,
+    map: (E, B, C, D, F) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head, e.head), tail.zip(b.tail, c.tail, d.tail, e.tail) { a, bb, cc, dd, ee -> map(a, bb, cc, dd, ee) })
   }
 
-  public inline fun <B, C, D, E, F, Z> zip(
+  public inline fun <B, C, D, F, G, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    e: NonEmptyList<E>,
-    f: NonEmptyList<F>,
-    map: (A, B, C, D, E, F) -> Z
+    e: NonEmptyList<F>,
+    f: NonEmptyList<G>,
+    map: (E, B, C, D, F, G) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail) { a, bb, cc, dd, ee, ff -> map(a, bb, cc, dd, ee, ff) })
   }
 
-  public inline fun <B, C, D, E, F, G, Z> zip(
+  public inline fun <B, C, D, F, G, H, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    e: NonEmptyList<E>,
-    f: NonEmptyList<F>,
-    g: NonEmptyList<G>,
-    map: (A, B, C, D, E, F, G) -> Z
+    e: NonEmptyList<F>,
+    f: NonEmptyList<G>,
+    g: NonEmptyList<H>,
+    map: (E, B, C, D, F, G, H) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail) { a, bb, cc, dd, ee, ff, gg -> map(a, bb, cc, dd, ee, ff, gg) })
   }
 
-  public inline fun <B, C, D, E, F, G, H, Z> zip(
+  public inline fun <B, C, D, F, G, H, I, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    e: NonEmptyList<E>,
-    f: NonEmptyList<F>,
-    g: NonEmptyList<G>,
-    h: NonEmptyList<H>,
-    map: (A, B, C, D, E, F, G, H) -> Z
+    e: NonEmptyList<F>,
+    f: NonEmptyList<G>,
+    g: NonEmptyList<H>,
+    h: NonEmptyList<I>,
+    map: (E, B, C, D, F, G, H, I) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail) { a, bb, cc, dd, ee, ff, gg, hh -> map(a, bb, cc, dd, ee, ff, gg, hh) })
   }
 
-  public inline fun <B, C, D, E, F, G, H, I, Z> zip(
+  public inline fun <B, C, D, F, G, H, I, J, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    e: NonEmptyList<E>,
-    f: NonEmptyList<F>,
-    g: NonEmptyList<G>,
-    h: NonEmptyList<H>,
-    i: NonEmptyList<I>,
-    map: (A, B, C, D, E, F, G, H, I) -> Z
+    e: NonEmptyList<F>,
+    f: NonEmptyList<G>,
+    g: NonEmptyList<H>,
+    h: NonEmptyList<I>,
+    i: NonEmptyList<J>,
+    map: (E, B, C, D, F, G, H, I, J) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail) { a, bb, cc, dd, ee, ff, gg, hh, ii -> map(a, bb, cc, dd, ee, ff, gg, hh, ii) })
   }
 
-  public inline fun <B, C, D, E, F, G, H, I, J, Z> zip(
+  public inline fun <B, C, D, F, G, H, I, J, K, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     d: NonEmptyList<D>,
-    e: NonEmptyList<E>,
-    f: NonEmptyList<F>,
-    g: NonEmptyList<G>,
-    h: NonEmptyList<H>,
-    i: NonEmptyList<I>,
-    j: NonEmptyList<J>,
-    map: (A, B, C, D, E, F, G, H, I, J) -> Z
+    e: NonEmptyList<F>,
+    f: NonEmptyList<G>,
+    g: NonEmptyList<H>,
+    h: NonEmptyList<I>,
+    i: NonEmptyList<J>,
+    j: NonEmptyList<K>,
+    map: (E, B, C, D, F, G, H, I, J, K) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
     return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail) { a, bb, cc, dd, ee, ff, gg, hh, ii, jj -> map(a, bb, cc, dd, ee, ff, gg, hh, ii, jj) })
@@ -366,63 +366,63 @@ public value class NonEmptyList<out A> @PublishedApi internal constructor(
 }
 
 @JvmName("nonEmptyListOf")
-public fun <A> nonEmptyListOf(head: A, vararg t: A): NonEmptyList<A> =
+public fun <E> nonEmptyListOf(head: E, vararg t: E): NonEmptyList<E> =
   NonEmptyList(listOf(head) + t)
 
 @JvmName("nel")
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <A> A.nel(): NonEmptyList<A> =
+public inline fun <E> E.nel(): NonEmptyList<E> =
   NonEmptyList(listOf(this))
 
-public operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmptyList<A>): Int =
+public operator fun <E : Comparable<E>> NonEmptyList<E>.compareTo(other: NonEmptyList<E>): Int =
   all.compareTo(other.all)
 
-public fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
+public fun <E> NonEmptyList<NonEmptyList<E>>.flatten(): NonEmptyList<E> =
   this.flatMap(::identity)
 
-public inline fun <A, B : Comparable<B>> NonEmptyList<A>.minBy(selector: (A) -> B): A =
+public inline fun <E, T : Comparable<T>> NonEmptyList<E>.minBy(selector: (E) -> T): E =
   minByOrNull(selector)!!
 
-public inline fun <A, B : Comparable<B>> NonEmptyList<A>.maxBy(selector: (A) -> B): A =
+public inline fun <E, T : Comparable<T>> NonEmptyList<E>.maxBy(selector: (E) -> T): E =
   maxByOrNull(selector)!!
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T : Comparable<T>> NonEmptyList<T>.min(): T =
+public inline fun <E : Comparable<E>> NonEmptyList<E>.min(): E =
   minOrNull()!!
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <T : Comparable<T>> NonEmptyList<T>.max(): T =
+public inline fun <E : Comparable<E>> NonEmptyList<E>.max(): E =
   maxOrNull()!!
 
 public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.unzip(::identity)
 
 @Suppress("WRONG_INVOCATION_KIND")
-public inline fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> {
+public inline fun <A, B, E> NonEmptyList<E>.unzip(f: (E) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> {
   contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
   return map { f(it) }.stdlibUnzip().let { (l1, l2) ->
     l1.toNonEmptyListOrNull()!! to l2.toNonEmptyListOrNull()!!
   }
 }
 
-public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
-  combine: (E, E) -> E,
-  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
-): Either<E, NonEmptyList<B>> =
+public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
+  combine: (Error, Error) -> Error,
+  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+): Either<Error, NonEmptyList<T>> =
   all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
-public inline fun <E, A, B> NonEmptyList<A>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<E>.(A) -> B
-): Either<NonEmptyList<E>, NonEmptyList<B>> =
+public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
+  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+): Either<NonEmptyList<Error>, NonEmptyList<T>> =
   all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
 @JvmName("toNonEmptyListOrNull")
-public fun <A> Iterable<A>.toNonEmptyListOrNull(): NonEmptyList<A>? {
+public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? {
   val iter = iterator()
   if (!iter.hasNext()) return null
   return NonEmptyList(iter.next(), Iterable { iter }.toList())
 }
 
 @JvmName("toNonEmptyListOrNone")
-public fun <A> Iterable<A>.toNonEmptyListOrNone(): Option<NonEmptyList<A>> =
+public fun <T> Iterable<T>.toNonEmptyListOrNone(): Option<NonEmptyList<T>> =
   toNonEmptyListOrNull().toOption()
