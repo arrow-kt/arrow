@@ -2,14 +2,9 @@
 
 import kotlinx.knit.KnitPluginExtension
 import kotlinx.validation.ExperimentalBCVApi
-import org.jetbrains.dokka.base.DokkaBase
-import org.jetbrains.dokka.base.DokkaBaseConfiguration
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import java.net.URL
 
 allprojects {
   if (property("version") == "unspecified") {
@@ -138,7 +133,7 @@ subprojects {
         kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
           sourceLink {
             localDirectory.set(srcDir)
-            remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
+            remoteUrl.set(URL("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}"))
             remoteLineSuffix.set("#L")
           }
         }
