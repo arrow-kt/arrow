@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
   alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.dokka)
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))

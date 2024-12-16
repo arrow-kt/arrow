@@ -17,6 +17,7 @@ plugins {
   alias(libs.plugins.compose.jetbrains)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.android.library)
+  alias(libs.plugins.dokka)
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))

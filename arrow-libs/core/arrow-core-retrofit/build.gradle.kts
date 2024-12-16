@@ -11,6 +11,7 @@ plugins {
   alias(libs.plugins.kotlinx.serialization) // Needed for testing only
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.dokka)
 }
 
 spotless {

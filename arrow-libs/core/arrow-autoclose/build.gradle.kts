@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.publish)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.dokka)
 }
 
 spotless {
