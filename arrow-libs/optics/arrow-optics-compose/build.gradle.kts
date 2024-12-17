@@ -13,6 +13,7 @@ plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   // alias(libs.plugins.arrowGradleConfig.kotlin)
   alias(libs.plugins.publish)
+  alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
   alias(libs.plugins.compose.jetbrains)
   alias(libs.plugins.compose.compiler)
