@@ -163,7 +163,7 @@ tasks.dokkaGenerate {
 }
 
 tasks.getByName("knitPrepare") {
-  dependsOn(tasks.dokkaGenerate, true)
+  dependsOn(tasks.dokkaGenerate)
 }
 
 apiValidation {
