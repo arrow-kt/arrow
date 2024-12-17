@@ -149,6 +149,7 @@ dokka {
   moduleName.set("Arrow")
   pluginsConfiguration.html {
     customAssets.from("static/img/logo/logo-icon.svg")
+    footerMessage.set("© Arrow Contributors")
   }
 }
 
