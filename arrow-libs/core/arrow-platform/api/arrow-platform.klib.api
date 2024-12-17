@@ -6,6 +6,10 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-platform>
+open annotation class arrow.platform.test/NonFlakyOnThisPlatform : kotlin/Annotation { // arrow.platform.test/NonFlakyOnThisPlatform|null[0]
+    constructor <init>() // arrow.platform.test/NonFlakyOnThisPlatform.<init>|<init>(){}[0]
+}
+
 final enum class arrow.platform/Platform : kotlin/Enum<arrow.platform/Platform> { // arrow.platform/Platform|null[0]
     enum entry JS // arrow.platform/Platform.JS|null[0]
     enum entry JVM // arrow.platform/Platform.JVM|null[0]
