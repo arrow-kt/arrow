@@ -44,12 +44,15 @@ kotlin {
   jvm {
     withJava()
   }
-
   js(IR) {
     browser()
     nodejs()
   }
-
+  // @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class) wasmJs {
+  //   browser()
+  //   nodejs()
+  //   d8()
+  // }
   // Native: https://kotlinlang.org/docs/native-target-support.html
   // -- Tier 1 --
   linuxX64()

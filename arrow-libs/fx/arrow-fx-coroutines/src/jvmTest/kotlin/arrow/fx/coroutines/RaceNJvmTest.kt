@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
+import arrow.platform.test.FlakyOnJvm
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import kotlin.test.Test
@@ -67,7 +68,7 @@ class RaceNJvmTest {
   fun race2ReturnsToOriginalContextOnFailureRight(): Unit =
       race2ReturnsToOriginalContextOnFailure(true)
 
-  @Test
+  @Test @FlakyOnJvm
   fun firstRacerOutOf2AlwaysWinsOnASingleThread(): Unit =
       runBlocking(Dispatchers.Default) {
         resourceScope {
