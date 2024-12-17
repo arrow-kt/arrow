@@ -29,7 +29,10 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: assemble
-        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} dokkaHtmlMultiModule -Pgithubpages=true --max-workers 1
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} :dokkaGenerate -Pgithubpages=true
+
+      - name: copy CNAME
+        run: cp static/CNAME docs
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4

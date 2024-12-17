@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.dokka)
   id(libs.plugins.kotlinx.serialization.get().pluginId)
 }
 

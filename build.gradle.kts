@@ -2,12 +2,9 @@
 
 import kotlinx.knit.KnitPluginExtension
 import kotlinx.validation.ExperimentalBCVApi
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import java.net.URL
 
 allprojects {
   if (property("version") == "unspecified") {
@@ -89,6 +86,28 @@ allprojects {
   group = property("projects.group").toString()
 }
 
+dependencies {
+  dokka(projects.arrowAnnotations)
+  dokka(projects.arrowAtomic)
+  dokka(projects.arrowAutoclose)
+  dokka(projects.arrowCore)
+  dokka(projects.arrowCoreHighArity)
+  dokka(projects.arrowCoreRetrofit)
+  dokka(projects.arrowCoreSerialization)
+  dokka(projects.arrowCache4k)
+  dokka(projects.arrowEval)
+  dokka(projects.arrowFunctions)
+  dokka(projects.arrowPlatform)
+  dokka(projects.arrowFxCoroutines)
+  dokka(projects.arrowFxStm)
+  dokka(projects.arrowCollectors)
+  dokka(projects.arrowOptics)
+  dokka(projects.arrowOpticsReflect)
+  dokka(projects.arrowOpticsCompose)
+  dokka(projects.arrowResilience)
+}
+
+
 private val kotlinXUpstream =
   setOf(
     "arrow-fx-coroutines",
@@ -114,7 +133,7 @@ subprojects {
         kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
           sourceLink {
             localDirectory.set(srcDir)
-remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
+            remoteUrl.set(URL("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}"))
             remoteLineSuffix.set("#L")
           }
         }
@@ -123,26 +142,19 @@ remoteUrl.set(uri("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relative
   }
 }
 
-tasks {
-  val undocumentedProjects =
-    listOf(project(":arrow-optics-ksp-plugin"))
-
-  val copyCNameFile = register<Copy>("copyCNameFile") {
-    from(layout.projectDirectory.dir("static").file("CNAME"))
-    into(layout.projectDirectory.dir("docs"))
+dokka {
+  dokkaPublications.html {
+    outputDirectory.set(layout.projectDirectory.dir("docs"))
   }
-
-  dokkaHtmlMultiModule {
-    dependsOn(copyCNameFile)
-    removeChildTasks(undocumentedProjects)
+  moduleName.set("Arrow")
+  pluginsConfiguration.html {
+    customAssets.from("static/img/logo/logo-icon.svg")
+    footerMessage.set("© Arrow Contributors")
   }
+}
 
-  getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
-
-  withType<DokkaMultiModuleTask>().configureEach {
-    outputDirectory.set(file("docs"))
-    moduleName.set("Arrow")
-  }
+tasks.getByName("knitPrepare") {
+  dependsOn(tasks.dokkaGenerate)
 }
 
 apiValidation {
