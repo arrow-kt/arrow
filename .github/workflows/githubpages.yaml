@@ -32,7 +32,10 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: assemble
-        run: ./gradlew -Pversion=2.0.0 :dokkaGenerate copyCNameFile -Pgithubpages=true
+        run: ./gradlew -Pversion=2.0.0 :dokkaGenerate -Pgithubpages=true
+
+      - name: copy CNAME
+        run: cp static/CNAME docs
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4

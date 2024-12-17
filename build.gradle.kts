@@ -153,15 +153,6 @@ dokka {
   }
 }
 
-val copyCNameFile = tasks.register<Copy>("copyCNameFile") {
-  from(layout.projectDirectory.dir("static").file("CNAME"))
-  into(layout.projectDirectory.dir("docs"))
-}
-
-tasks.dokkaGenerate {
-  dependsOn(copyCNameFile)
-}
-
 tasks.getByName("knitPrepare") {
   dependsOn(tasks.dokkaGenerate)
 }
