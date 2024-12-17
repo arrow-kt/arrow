@@ -9,6 +9,7 @@ plugins {
   // `java-library`
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.publish)
+  alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
 }
 
