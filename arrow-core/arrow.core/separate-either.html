@@ -25,55 +25,93 @@
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../index.html">
-                            Arrow
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core/commonMain" data-filter=":arrow-core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="member" id="content" pageids="arrow-core::arrow.core//separateEither/kotlin.collections.Iterable[arrow.core.Either[TypeParam(bounds=[kotlin.Any?]),TypeParam(bounds=[kotlin.Any?])]]#/PointingToDeclaration//601698448">
+<div class="main-content" data-page-type="member" id="content" pageids="arrow-core::arrow.core//separateEither/kotlin.collections.Iterable[arrow.core.Either[TypeParam(bounds=[kotlin.Any?]),TypeParam(bounds=[kotlin.Any?])]]#/PointingToDeclaration//1759373422">
   <div class="breadcrumbs"><a href="../index.html">arrow-core</a><span class="delimiter">/</span><a href="index.html">arrow.core</a><span class="delimiter">/</span><span class="current">separateEither</span></div>
   <div class="cover ">
     <h1 class="cover"><span>separate</span><wbr><span><span>Either</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="-either/index.html">Either</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="separate-either.html"><span class="token function">separateEither</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">Separate the inner <a href="-either/index.html">Either</a> values into the <a href="-either/-left/index.html">Either.Left</a> and <a href="-either/-right/index.html">Either.Right</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.*<br>import io.kotest.matchers.shouldBe<br><br>fun test() {<br>  listOf("A".left(), 2.right(), "C".left(), 4.right())<br>    .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-iterable-16.kt --><!-- TEST lines.isEmpty() --><hr><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="separate-either.html">T</a><span class="token punctuation">, </span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="separate-either.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="separate-either.html"><span class="token function">separateEither</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><a href="separate-either.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-either/index.html">Either</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">Applies a function <a href="separate-either.html">f</a> to each element and returns a pair of arrays: the first one made of those values returned by <a href="separate-either.html">f</a> that were wrapped in <a href="-either/-left/index.html">Either.Left</a>, and the second one made of those wrapped in <a href="-either/-right/index.html">Either.Right</a>.</p><!-- INCLUDE
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="-either/index.html">Either</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="separate-either.html"><span class="token function">separateEither</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">Separate the inner <a href="-either/index.html">Either</a> values into the <a href="-either/-left/index.html">Either.Left</a> and <a href="-either/-right/index.html">Either.Right</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.*<br>import io.kotest.matchers.shouldBe<br><br>fun test() {<br>  listOf("A".left(), 2.right(), "C".left(), 4.right())<br>    .separateEither() shouldBe Pair(listOf("A", "C"), listOf(2, 4))<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-iterable-16.kt --><!-- TEST lines.isEmpty() --><hr><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="separate-either.html">T</a><span class="token punctuation">, </span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="separate-either.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="separate-either.html"><span class="token function">separateEither</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><a href="separate-either.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-either/index.html">Either</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">Applies a function <a href="separate-either.html">f</a> to each element and returns a pair of arrays: the first one made of those values returned by <a href="separate-either.html">f</a> that were wrapped in <a href="-either/-left/index.html">Either.Left</a>, and the second one made of those wrapped in <a href="-either/-right/index.html">Either.Right</a>.</p><!-- INCLUDE
 import arrow.core.*
 import io.kotest.matchers.shouldBe
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun test() {<br>  listOf(1, 2, 3, 4)<br>    .separateEither {<br>      if (it % 2 == 0) "even: $it".right() else "odd: $it".left()<br>    } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-iterable-17.kt --><!-- TEST lines.isEmpty() --><hr><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html">Sequence</a><span class="token operator">&lt;</span><a href="-either/index.html">Either</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="separate-either.html"><span class="token function">separateEither</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">Separate the inner <a href="-either/index.html">Either</a> values into the <a href="-either/-left/index.html">Either.Left</a> and <a href="-either/-right/index.html">Either.Right</a>.</p><span class="kdoc-tag"><h4 class="">Receiver</h4><p class="paragraph">Iterable of <a href="-either/index.html">Either</a></p></span><span class="kdoc-tag"><h4 class="">Return</h4><p class="paragraph">a tuple containing Sequence with <a href="-either/-left/index.html">Either.Left</a> and another Sequence with its <a href="-either/-right/index.html">Either.Right</a> values.</p></span></div></div>
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun test() {<br>  listOf(1, 2, 3, 4)<br>    .separateEither {<br>      if (it % 2 == 0) "even: $it".right() else "odd: $it".left()<br>    } shouldBe Pair(listOf("odd: 1", "odd: 3"), listOf("even: 2", "even: 4"))<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-iterable-17.kt --><!-- TEST lines.isEmpty() --><hr><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.sequences/-sequence/index.html">Sequence</a><span class="token operator">&lt;</span><a href="-either/index.html">Either</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token punctuation">, </span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="separate-either.html"><span class="token function">separateEither</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="separate-either.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><p class="paragraph">Separate the inner <a href="-either/index.html">Either</a> values into the <a href="-either/-left/index.html">Either.Left</a> and <a href="-either/-right/index.html">Either.Right</a>.</p><span class="kdoc-tag"><h4 class="">Receiver</h4><p class="paragraph">Iterable of <a href="-either/index.html">Either</a></p></span><span class="kdoc-tag"><h4 class="">Return</h4><p class="paragraph">a tuple containing Sequence with <a href="-either/-left/index.html">Either.Left</a> and another Sequence with its <a href="-either/-right/index.html">Either.Right</a> values.</p></span></div></div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

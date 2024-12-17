@@ -25,40 +25,72 @@
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../index.html">
-                            Arrow
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core-serialization/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core-serialization/commonMain" data-filter=":arrow-core-serialization/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core-serialization:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="package" id="content" pageids="arrow-core-serialization::arrow.core.serialization////PointingToDeclaration//-543758451">
+<div class="main-content" data-page-type="package" id="content" pageids="arrow-core-serialization::arrow.core.serialization////PointingToDeclaration//-2119695407">
   <div class="breadcrumbs"><a href="../index.html">arrow-core-serialization</a><span class="delimiter">/</span><span class="current">arrow.core.serialization</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
@@ -68,77 +100,77 @@
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="85279953%2FClasslikes%2F-543758451" anchor-label="EitherSerializer" id="85279953%2FClasslikes%2F-543758451" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-serialization:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="85279953%2FClasslikes%2F-2119695407" anchor-label="EitherSerializer" id="85279953%2FClasslikes%2F-2119695407" data-filterable-set=":arrow-core-serialization/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-serialization/commonMain" data-filterable-set=":arrow-core-serialization/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either-serializer/index.html"><span>Either</span><wbr><span><span>Serializer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="85279953%2FClasslikes%2F-543758451"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="85279953%2FClasslikes%2F-2119695407"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-either-serializer/index.html">EitherSerializer</a><span class="token operator">&lt;</span><a href="-either-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-either-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">errorSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-either-serializer/index.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-either-serializer/index.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="-either-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-either-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-either-serializer/index.html">EitherSerializer</a><span class="token operator">&lt;</span><a href="-either-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-either-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">errorSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-either-serializer/index.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-either-serializer/index.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="-either-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-either-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="380525980%2FClasslikes%2F-543758451" anchor-label="IorSerializer" id="380525980%2FClasslikes%2F-543758451" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-serialization:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain">
+<a data-name="380525980%2FClasslikes%2F-2119695407" anchor-label="IorSerializer" id="380525980%2FClasslikes%2F-2119695407" data-filterable-set=":arrow-core-serialization/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-serialization/commonMain" data-filterable-set=":arrow-core-serialization/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-serializer/index.html"><span>Ior</span><wbr><span><span>Serializer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="380525980%2FClasslikes%2F-543758451"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="380525980%2FClasslikes%2F-2119695407"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-ior-serializer/index.html">IorSerializer</a><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-ior-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">errorSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-ior-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-ior-serializer/index.html">IorSerializer</a><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-ior-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">errorSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="-ior-serializer/index.html">A</a><span class="token punctuation">, </span><a href="-ior-serializer/index.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="514373240%2FClasslikes%2F-543758451" anchor-label="NonEmptyListSerializer" id="514373240%2FClasslikes%2F-543758451" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-serialization:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain">
+<a data-name="514373240%2FClasslikes%2F-2119695407" anchor-label="NonEmptyListSerializer" id="514373240%2FClasslikes%2F-2119695407" data-filterable-set=":arrow-core-serialization/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-serialization/commonMain" data-filterable-set=":arrow-core-serialization/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-list-serializer/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span><span>Serializer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="514373240%2FClasslikes%2F-543758451"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="514373240%2FClasslikes%2F-2119695407"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-non-empty-list-serializer/index.html">NonEmptyListSerializer</a><span class="token operator">&lt;</span><a href="-non-empty-list-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-non-empty-list-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="-non-empty-list-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-non-empty-list-serializer/index.html">NonEmptyListSerializer</a><span class="token operator">&lt;</span><a href="-non-empty-list-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-non-empty-list-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="-non-empty-list-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="229793574%2FClasslikes%2F-543758451" anchor-label="NonEmptySetSerializer" id="229793574%2FClasslikes%2F-543758451" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-serialization:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain">
+<a data-name="229793574%2FClasslikes%2F-2119695407" anchor-label="NonEmptySetSerializer" id="229793574%2FClasslikes%2F-2119695407" data-filterable-set=":arrow-core-serialization/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-serialization/commonMain" data-filterable-set=":arrow-core-serialization/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-set-serializer/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span><span>Serializer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="229793574%2FClasslikes%2F-543758451"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="229793574%2FClasslikes%2F-2119695407"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-non-empty-set-serializer/index.html">NonEmptySetSerializer</a><span class="token operator">&lt;</span><a href="-non-empty-set-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-non-empty-set-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="-non-empty-set-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-non-empty-set-serializer/index.html">NonEmptySetSerializer</a><span class="token operator">&lt;</span><a href="-non-empty-set-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-non-empty-set-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="-non-empty-set-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="973899553%2FClasslikes%2F-543758451" anchor-label="OptionSerializer" id="973899553%2FClasslikes%2F-543758451" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-serialization:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain">
+<a data-name="973899553%2FClasslikes%2F-2119695407" anchor-label="OptionSerializer" id="973899553%2FClasslikes%2F-2119695407" data-filterable-set=":arrow-core-serialization/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-serialization/commonMain" data-filterable-set=":arrow-core-serialization/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-serializer/index.html"><span>Option</span><wbr><span><span>Serializer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="973899553%2FClasslikes%2F-543758451"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="973899553%2FClasslikes%2F-2119695407"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-option-serializer/index.html">OptionSerializer</a><span class="token operator">&lt;</span><a href="-option-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-option-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><a href="-option-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-option-serializer/index.html">OptionSerializer</a><span class="token operator">&lt;</span><a href="-option-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">elementSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-option-serializer/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="../../arrow-core/arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><a href="-option-serializer/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
                 </div>
               </div>
             </div>
@@ -147,17 +179,17 @@
       </div>
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-1690912530%2FProperties%2F-543758451" anchor-label="ArrowModule" id="-1690912530%2FProperties%2F-543758451" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-serialization:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core-serialization:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="-1690912530%2FProperties%2F-2119695407" anchor-label="ArrowModule" id="-1690912530%2FProperties%2F-2119695407" data-filterable-set=":arrow-core-serialization/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-serialization/commonMain" data-filterable-set=":arrow-core-serialization/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-arrow-module.html"><span>Arrow</span><wbr><span><span>Module</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1690912530%2FProperties%2F-543758451"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1690912530%2FProperties%2F-2119695407"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-arrow-module.html">ArrowModule</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.modules/SerializersModule///PointingToDeclaration/">SerializersModule</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-serialization/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-arrow-module.html">ArrowModule</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization.modules/SerializersModule///PointingToDeclaration/">SerializersModule</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -167,12 +199,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

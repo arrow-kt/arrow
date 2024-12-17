@@ -25,235 +25,274 @@
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../index.html">
-                            Arrow
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-coroutines/commonMain">common</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-fx-coroutines/jvmMain">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-fx-coroutines/commonMain" data-filter=":arrow-fx-coroutines/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-fx-coroutines/jvmMain" data-filter=":arrow-fx-coroutines/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">common</button>
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/ResourceScope///PointingToDeclaration//-245591949">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/ResourceScope///PointingToDeclaration//1374329387">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">ResourceScope</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Resource</span><wbr><span><span>Scope</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">ResourceScope</a> : <a href="../../../arrow-autoclose/arrow/-auto-close-scope/index.html">AutoCloseScope</a></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">ResourceScope</a> : <a href="../../../arrow-autoclose/arrow/-auto-close-scope/index.html">AutoCloseScope</a></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="670482984%2FFunctions%2F-245591949" anchor-label="autoClose" id="670482984%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="670482984%2FFunctions%2F1374329387" anchor-label="autoClose" id="670482984%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#670482984%2FFunctions%2F-245591949"><span>auto</span><wbr><span><span>Close</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="670482984%2FFunctions%2F-245591949"></span>
+                  <div><a href="index.html#670482984%2FFunctions%2F1374329387"><span>auto</span><wbr><span><span>Close</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="670482984%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#670482984%2FFunctions%2F-245591949">A</a><span class="token operator">&gt; </span><a href="index.html#670482984%2FFunctions%2F-245591949"><span class="token function">autoClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acquire<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="index.html#670482984%2FFunctions%2F-245591949">A</a><span class="token punctuation">, </span></span><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html#670482984%2FFunctions%2F-245591949">A</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#670482984%2FFunctions%2F-245591949">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#670482984%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="index.html#670482984%2FFunctions%2F1374329387"><span class="token function">autoClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acquire<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="index.html#670482984%2FFunctions%2F1374329387">A</a><span class="token punctuation">, </span></span><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html#670482984%2FFunctions%2F1374329387">A</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#670482984%2FFunctions%2F1374329387">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1022598994%2FFunctions%2F-245591949" anchor-label="autoCloseable" id="-1022598994%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="-1022598994%2FFunctions%2F1374329387" anchor-label="autoCloseable" id="-1022598994%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../auto-closeable.html"><span>auto</span><wbr><span><span>Closeable</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1022598994%2FFunctions%2F-245591949"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1022598994%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../auto-closeable.html">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../auto-closeable.html"><span class="token function">autoCloseable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span><span class="token operator"> = </span>IODispatcher<span class="token punctuation">, </span></span><span class="parameter ">autoCloseable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../auto-closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../auto-closeable.html">A</a></div><div class="brief "><p class="paragraph">Creates a <a href="../-resource/index.html">Resource</a> from an <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a>, which uses <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-auto-closeable/close.html">AutoCloseable.close</a> for releasing.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../auto-closeable.html">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../auto-closeable.html"><span class="token function">autoCloseable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span><span class="token operator"> = </span>IODispatcher<span class="token punctuation">, </span></span><span class="parameter ">autoCloseable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../auto-closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../auto-closeable.html">A</a></div><div class="brief "><p class="paragraph">Creates a <a href="../-resource/index.html">Resource</a> from an <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a>, which uses <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-auto-closeable/close.html">AutoCloseable.close</a> for releasing.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1173796021%2FFunctions%2F-245591949" anchor-label="bind" id="1173796021%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="1173796021%2FFunctions%2F1374329387" anchor-label="bind" id="1173796021%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bind.html"><span><span>bind</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1173796021%2FFunctions%2F-245591949"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1173796021%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind.html">A</a><span class="token operator">&gt; </span><a href="../-resource/index.html">Resource</a><span class="token operator">&lt;</span><a href="bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="bind.html">A</a></div><div class="brief "><p class="paragraph">Compose another <a href="../-resource/index.html">Resource</a> program into this <a href="index.html">ResourceScope</a>. All <a href="release.html">release</a> functions <a href="install.html">install</a>ed into the <a href="../-resource/index.html">Resource</a> lambda will be installed in this <a href="index.html">ResourceScope</a> while respecting the FIFO order.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind.html">A</a><span class="token operator">&gt; </span><a href="../-resource/index.html">Resource</a><span class="token operator">&lt;</span><a href="bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="bind.html">A</a></div><div class="brief "><p class="paragraph">Compose another <a href="../-resource/index.html">Resource</a> program into this <a href="index.html">ResourceScope</a>. All <a href="release.html">release</a> functions <a href="install.html">install</a>ed into the <a href="../-resource/index.html">Resource</a> lambda will be installed in this <a href="index.html">ResourceScope</a> while respecting the FIFO order.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1432541619%2FFunctions%2F-2049118941" anchor-label="closeable" id="-1432541619%2FFunctions%2F-2049118941" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">
+<a data-name="-1432541619%2FFunctions%2F-933063573" anchor-label="closeable" id="-1432541619%2FFunctions%2F-933063573" data-filterable-set=":arrow-fx-coroutines/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../closeable.html"><span><span>closeable</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1432541619%2FFunctions%2F-2049118941"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1432541619%2FFunctions%2F-933063573"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../closeable.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a><span class="token operator">&gt; </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../closeable.html"><span class="token function">closeable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">closeable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../closeable.html">A</a></div><div class="brief "><p class="paragraph">Creates a <a href="../-resource/index.html">Resource</a> from an <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a>, which uses <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html#close--">Closeable.close</a> for releasing.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../closeable.html">A</a><span class="token operator"> : </span><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a><span class="token operator">&gt; </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../closeable.html"><span class="token function">closeable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">closingDispatcher<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">closeable<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../closeable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../closeable.html">A</a></div><div class="brief "><p class="paragraph">Creates a <a href="../-resource/index.html">Resource</a> from an <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html">Closeable</a>, which uses <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html#close--">Closeable.close</a> for releasing.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="586256144%2FFunctions%2F-2049118941" anchor-label="executor" id="586256144%2FFunctions%2F-2049118941" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">
+<a data-name="586256144%2FFunctions%2F-933063573" anchor-label="executor" id="586256144%2FFunctions%2F-933063573" data-filterable-set=":arrow-fx-coroutines/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../executor.html"><span><span>executor</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="586256144%2FFunctions%2F-2049118941"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="586256144%2FFunctions%2F-933063573"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../executor.html"><span class="token function">executor</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>Duration.INFINITE<span class="token punctuation">, </span></span><span class="parameter ">closingDispatcher<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">create<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/ExecutorCoroutineDispatcher///PointingToDeclaration/">ExecutorCoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Creates a single threaded <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> as a <a href="../-resource/index.html">Resource</a>. Upon release an orderly shutdown of the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a> takes place in which previously submitted tasks are executed, but no new tasks will be accepted.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../executor.html"><span class="token function">executor</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>Duration.INFINITE<span class="token punctuation">, </span></span><span class="parameter ">closingDispatcher<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/CoroutineDispatcher///PointingToDeclaration/">CoroutineDispatcher</span><span class="token operator"> = </span>Dispatchers.IO<span class="token punctuation">, </span></span><span class="parameter ">create<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/ExecutorCoroutineDispatcher///PointingToDeclaration/">ExecutorCoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Creates a single threaded <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> as a <a href="../-resource/index.html">Resource</a>. Upon release an orderly shutdown of the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a> takes place in which previously submitted tasks are executed, but no new tasks will be accepted.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1571317459%2FFunctions%2F-2049118941" anchor-label="fixedThreadPoolContext" id="1571317459%2FFunctions%2F-2049118941" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">
+<a data-name="1571317459%2FFunctions%2F-933063573" anchor-label="fixedThreadPoolContext" id="1571317459%2FFunctions%2F-933063573" data-filterable-set=":arrow-fx-coroutines/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../fixed-thread-pool-context.html"><span>fixed</span><wbr><span>Thread</span><wbr><span>Pool</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1571317459%2FFunctions%2F-2049118941"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1571317459%2FFunctions%2F-933063573"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../fixed-thread-pool-context.html"><span class="token function">fixedThreadPoolContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">nThreads<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/ExecutorCoroutineDispatcher///PointingToDeclaration/">ExecutorCoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Creates a single threaded <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> as a <a href="../-resource/index.html">Resource</a>. Upon release an orderly shutdown of the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a> takes place in which previously submitted tasks are executed, but no new tasks will be accepted.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../fixed-thread-pool-context.html"><span class="token function">fixedThreadPoolContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">nThreads<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/ExecutorCoroutineDispatcher///PointingToDeclaration/">ExecutorCoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Creates a single threaded <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> as a <a href="../-resource/index.html">Resource</a>. Upon release an orderly shutdown of the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a> takes place in which previously submitted tasks are executed, but no new tasks will be accepted.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1644425845%2FFunctions%2F-245591949" anchor-label="install" id="1644425845%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="1644425845%2FFunctions%2F1374329387" anchor-label="install" id="1644425845%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#53762038%2FFunctions%2F-245591949"><span><span>install</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1644425845%2FFunctions%2F-245591949"></span>
+                  <div><a href="index.html#53762038%2FFunctions%2F1374329387"><span><span>install</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1644425845%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#53762038%2FFunctions%2F-245591949">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="index.html#53762038%2FFunctions%2F-245591949"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">autoCloseable<span class="token operator">: </span><a href="index.html#53762038%2FFunctions%2F-245591949">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#53762038%2FFunctions%2F-245591949">A</a></div><br><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="install.html">A</a><span class="token operator">&gt; </span><a href="install.html"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acquire<span class="token operator">: </span><span class="token keyword">suspend </span><a href="../-acquire-step/index.html">AcquireStep</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="install.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="install.html">A</a><span class="token punctuation">, </span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="install.html">A</a></div><div class="brief "><p class="paragraph">Install <a href="install.html">A</a> into the <a href="index.html">ResourceScope</a>. Its <a href="install.html">release</a> function will be called with the appropriate <a href="../-exit-case/index.html">ExitCase</a> if this <a href="index.html">ResourceScope</a> finishes. It results either in <a href="../-exit-case/-completed/index.html">ExitCase.Completed</a>, <a href="../-exit-case/-cancelled/index.html">ExitCase.Cancelled</a> or <a href="../-exit-case/-failure/index.html">ExitCase.Failure</a> depending on the terminal state of <a href="../-resource/index.html">Resource</a> lambda.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#53762038%2FFunctions%2F1374329387">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a><span class="token operator">&gt; </span><a href="index.html#53762038%2FFunctions%2F1374329387"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">autoCloseable<span class="token operator">: </span><a href="index.html#53762038%2FFunctions%2F1374329387">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#53762038%2FFunctions%2F1374329387">A</a></div><br><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="install.html">A</a><span class="token operator">&gt; </span><a href="install.html"><span class="token function">install</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">acquire<span class="token operator">: </span><span class="token keyword">suspend </span><a href="../-acquire-step/index.html">AcquireStep</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="install.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="install.html">A</a><span class="token punctuation">, </span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="install.html">A</a></div><div class="brief "><p class="paragraph">Install <a href="install.html">A</a> into the <a href="index.html">ResourceScope</a>. Its <a href="install.html">release</a> function will be called with the appropriate <a href="../-exit-case/index.html">ExitCase</a> if this <a href="index.html">ResourceScope</a> finishes. It results either in <a href="../-exit-case/-completed/index.html">ExitCase.Completed</a>, <a href="../-exit-case/-cancelled/index.html">ExitCase.Cancelled</a> or <a href="../-exit-case/-failure/index.html">ExitCase.Failure</a> depending on the terminal state of <a href="../-resource/index.html">Resource</a> lambda.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1870500931%2FFunctions%2F-245591949" anchor-label="onClose" id="-1870500931%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="-1870500931%2FFunctions%2F1374329387" anchor-label="onClose" id="-1870500931%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-close.html"><span>on</span><wbr><span><span>Close</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1870500931%2FFunctions%2F-245591949"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1870500931%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="on-close.html"><span class="token function">onClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="on-close.html"><span class="token function">onClose</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-917942491%2FFunctions%2F-245591949" anchor-label="onRelease" id="-917942491%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="-917942491%2FFunctions%2F1374329387" anchor-label="onRelease" id="-917942491%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-release.html"><span>on</span><wbr><span><span>Release</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-917942491%2FFunctions%2F-245591949"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-917942491%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">infix </span><span class="token keyword">fun </span><a href="on-release.html"><span class="token function">onRelease</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">infix </span><span class="token keyword">fun </span><a href="on-release.html"><span class="token function">onRelease</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1014583331%2FFunctions%2F-245591949" anchor-label="release" id="1014583331%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="1014583331%2FFunctions%2F1374329387" anchor-label="release" id="1014583331%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="release.html"><span><span>release</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1014583331%2FFunctions%2F-245591949"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1014583331%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">infix suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="release.html">A</a><span class="token operator">&gt; </span><a href="../-resource/index.html">Resource</a><span class="token operator">&lt;</span><a href="release.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="release.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="release.html">A</a></div><div class="brief "><p class="paragraph">Composes a <a href="release.html">release</a> action to a <a href="../-resource/index.html">Resource</a> value before binding.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">infix suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="release.html">A</a><span class="token operator">&gt; </span><a href="../-resource/index.html">Resource</a><span class="token operator">&lt;</span><a href="release.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="release.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="release.html">A</a></div><div class="brief "><p class="paragraph">Composes a <a href="release.html">release</a> action to a <a href="../-resource/index.html">Resource</a> value before binding.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-74118700%2FFunctions%2F-245591949" anchor-label="releaseCase" id="-74118700%2FFunctions%2F-245591949" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain">
+<a data-name="-74118700%2FFunctions%2F1374329387" anchor-label="releaseCase" id="-74118700%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="release-case.html"><span>release</span><wbr><span><span>Case</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-74118700%2FFunctions%2F-245591949"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-74118700%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">infix suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="release-case.html">A</a><span class="token operator">&gt; </span><a href="../-resource/index.html">Resource</a><span class="token operator">&lt;</span><a href="release-case.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="release-case.html"><span class="token function">releaseCase</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="release-case.html">A</a><span class="token punctuation">, </span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="release-case.html">A</a></div><div class="brief "><p class="paragraph">Composes a <a href="release-case.html">releaseCase</a> action to a <a href="../-resource/index.html">Resource</a> value before binding.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">infix suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="release-case.html">A</a><span class="token operator">&gt; </span><a href="../-resource/index.html">Resource</a><span class="token operator">&lt;</span><a href="release-case.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="release-case.html"><span class="token function">releaseCase</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">release<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="release-case.html">A</a><span class="token punctuation">, </span><a href="../-exit-case/index.html">ExitCase</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="release-case.html">A</a></div><div class="brief "><p class="paragraph">Composes a <a href="release-case.html">releaseCase</a> action to a <a href="../-resource/index.html">Resource</a> value before binding.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2046392336%2FFunctions%2F-2049118941" anchor-label="singleThreadContext" id="-2046392336%2FFunctions%2F-2049118941" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">
+<a data-name="-2046392336%2FFunctions%2F-933063573" anchor-label="singleThreadContext" id="-2046392336%2FFunctions%2F-933063573" data-filterable-set=":arrow-fx-coroutines/jvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../single-thread-context.html"><span>single</span><wbr><span>Thread</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2046392336%2FFunctions%2F-2049118941"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2046392336%2FFunctions%2F-933063573"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-filterable-set=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines:dokkaHtmlPartial/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../single-thread-context.html"><span class="token function">singleThreadContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/ExecutorCoroutineDispatcher///PointingToDeclaration/">ExecutorCoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Creates a single threaded <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> as a <a href="../-resource/index.html">Resource</a>. Upon release an orderly shutdown of the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a> takes place in which previously submitted tasks are executed, but no new tasks will be accepted.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-fx-coroutines/jvmMain" data-filterable-set=":arrow-fx-coroutines/jvmMain" data-active="" data-toggle=":arrow-fx-coroutines/jvmMain">jvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/jvmMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html">ResourceScope</a><span class="token punctuation">.</span><a href="../single-thread-context.html"><span class="token function">singleThreadContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines/ExecutorCoroutineDispatcher///PointingToDeclaration/">ExecutorCoroutineDispatcher</span></div><div class="brief "><p class="paragraph">Creates a single threaded <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a> as a <a href="../-resource/index.html">Resource</a>. Upon release an orderly shutdown of the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html">ExecutorService</a> takes place in which previously submitted tasks are executed, but no new tasks will be accepted.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -263,12 +302,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

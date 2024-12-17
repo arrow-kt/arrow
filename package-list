@@ -1,6 +1,11 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-
+$dokka.location:arrow.core//sort/#TypeParam(bounds=[kotlin.Any?])#TypeParam(bounds=[kotlin.Any?])#kotlin.Comparator[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/arrow-core/arrow.core/[common]sort.html
+$dokka.location:arrow.core//sort/#TypeParam(bounds=[kotlin.Comparable[^]])#TypeParam(bounds=[kotlin.Comparable[^]])/PointingToDeclaration/arrow-core/arrow.core/[common]sort.html
+$dokka.location:arrow.core//sort/#kotlin.Byte#kotlin.Byte/PointingToDeclaration/arrow-core/arrow.core/[common]sort.html
+$dokka.location:arrow.core//sort/#kotlin.Int#kotlin.Int/PointingToDeclaration/arrow-core/arrow.core/[common]sort.html
+$dokka.location:arrow.core//sort/#kotlin.Long#kotlin.Long/PointingToDeclaration/arrow-core/arrow.core/[common]sort.html
+$dokka.location:arrow.core//sort/#kotlin.Short#kotlin.Short/PointingToDeclaration/arrow-core/arrow.core/[common]sort.html
 module:arrow-annotations
 arrow
 arrow.optics

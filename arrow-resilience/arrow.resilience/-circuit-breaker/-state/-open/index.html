@@ -25,106 +25,138 @@
 <link href="../../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../../index.html">
-                            Arrow
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-resilience/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-resilience/commonMain" data-filter=":arrow-resilience/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-resilience:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-resilience::arrow.resilience/CircuitBreaker.State.Open///PointingToDeclaration//-1537784738">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-resilience::arrow.resilience/CircuitBreaker.State.Open///PointingToDeclaration//-891140384">
   <div class="breadcrumbs"><a href="../../../../index.html">arrow-resilience</a><span class="delimiter">/</span><a href="../../../index.html">arrow.resilience</a><span class="delimiter">/</span><a href="../../index.html">CircuitBreaker</a><span class="delimiter">/</span><a href="../index.html">State</a><span class="delimiter">/</span><span class="current">Open</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Open</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Open</a> : <a href="../index.html">CircuitBreaker.State</a></div><p class="paragraph">When the <a href="../../index.html">CircuitBreaker</a> is in the <a href="index.html">Open</a> state it will short-circuit/fail-fast all requests     - All requests short-circuit/fail-fast with <a href="../../-execution-rejected/index.html">ExecutionRejected</a>     - If a request is made after the configured <a href="reset-timeout.html">resetTimeout</a> passes, the <a href="../../index.html">CircuitBreaker</a> is tripped into the a <a href="../-half-open/index.html">HalfOpen</a> state, allowing one request to go through as a test.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>opening</span><wbr><span><span>Strategy</span></span></u></div></span></div><div><div class="title"><p class="paragraph">is the strategy that will decide if the circuit breaker should open after some failures.</p></div></div></div></div><div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>started</span><wbr><span><span>At</span></span></u></div></span></div><div><div class="title"><p class="paragraph">is the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a> when the transition to <a href="index.html">Open</a> happened.</p></div></div></div></div><div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>reset</span><wbr><span><span>Timeout</span></span></u></div></span></div><div><div class="title"><p class="paragraph">is the current <code class="lang-kotlin">resetTimeout</code> that is applied to this <a href="index.html">Open</a> state, to be multiplied by the     exponential backoff factor for the next transition from <a href="../-half-open/index.html">HalfOpen</a> to <a href="index.html">Open</a>.</p></div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Open</a> : <a href="../index.html">CircuitBreaker.State</a></div><p class="paragraph">When the <a href="../../index.html">CircuitBreaker</a> is in the <a href="index.html">Open</a> state it will short-circuit/fail-fast all requests     - All requests short-circuit/fail-fast with ExecutionRejected     - If a request is made after the configured <a href="../../../../../arrow-resilience/arrow.resilience/-circuit-breaker/-state/-open/--root--.html">resetTimeout</a> passes, the <a href="../../index.html">CircuitBreaker</a> is tripped into the a HalfOpen state, allowing one request to go through as a test.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>opening</span><wbr><span><span>Strategy</span></span></u></div></span></div><div><div class="title"><p class="paragraph">is the strategy that will decide if the circuit breaker should open after some failures.</p></div></div></div></div><div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>started</span><wbr><span><span>At</span></span></u></div></span></div><div><div class="title"><p class="paragraph">is the <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-time-mark/index.html">TimeMark</a> when the transition to <a href="index.html">Open</a> happened.</p></div></div></div></div><div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>reset</span><wbr><span><span>Timeout</span></span></u></div></span></div><div><div class="title"><p class="paragraph">is the current <code class="lang-kotlin">resetTimeout</code> that is applied to this <a href="index.html">Open</a> state, to be multiplied by the     exponential backoff factor for the next transition from HalfOpen to <a href="index.html">Open</a>.</p></div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-1597792980%2FProperties%2F-1537784738" anchor-label="expiresAt" id="-1597792980%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="-1597792980%2FProperties%2F-891140384" anchor-label="expiresAt" id="-1597792980%2FProperties%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="expires-at.html"><span>expires</span><wbr><span><span>At</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1597792980%2FProperties%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1597792980%2FProperties%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="expires-at.html">expiresAt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a></div><div class="brief "><p class="paragraph">The timestamp in milliseconds since the epoch, specifying when the <a href="index.html">Open</a> state is to transition to <a href="../-half-open/index.html">HalfOpen</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="expires-at.html">expiresAt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-time-mark/index.html">TimeMark</a></div><div class="brief "><p class="paragraph">The timestamp in milliseconds since the epoch, specifying when the <a href="index.html">Open</a> state is to transition to <a href="../-half-open/index.html">HalfOpen</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1963072200%2FProperties%2F-1537784738" anchor-label="openingStrategy" id="1963072200%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+<a data-name="1963072200%2FProperties%2F-891140384" anchor-label="openingStrategy" id="1963072200%2FProperties%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="opening-strategy.html"><span>opening</span><wbr><span><span>Strategy</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1963072200%2FProperties%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1963072200%2FProperties%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="opening-strategy.html">openingStrategy</a><span class="token operator">: </span><a href="../../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="opening-strategy.html">openingStrategy</a><span class="token operator">: </span><a href="../../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1948629739%2FProperties%2F-1537784738" anchor-label="resetTimeout" id="-1948629739%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+<a data-name="-1948629739%2FProperties%2F-891140384" anchor-label="resetTimeout" id="-1948629739%2FProperties%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="reset-timeout.html"><span>reset</span><wbr><span><span>Timeout</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1948629739%2FProperties%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1948629739%2FProperties%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="reset-timeout.html">resetTimeout</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-duration/index.html">Duration</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="reset-timeout.html">resetTimeout</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1483301953%2FProperties%2F-1537784738" anchor-label="startedAt" id="-1483301953%2FProperties%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+<a data-name="-1483301953%2FProperties%2F-891140384" anchor-label="startedAt" id="-1483301953%2FProperties%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="started-at.html"><span>started</span><wbr><span><span>At</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1483301953%2FProperties%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1483301953%2FProperties%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="started-at.html">startedAt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.time/-time-mark/index.html">TimeMark</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="started-at.html">startedAt</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-time-mark/index.html">TimeMark</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -133,47 +165,47 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="770493562%2FFunctions%2F-1537784738" anchor-label="equals" id="770493562%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="770493562%2FFunctions%2F-891140384" anchor-label="equals" id="770493562%2FFunctions%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="equals.html"><span><span>equals</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="770493562%2FFunctions%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="770493562%2FFunctions%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1299543252%2FFunctions%2F-1537784738" anchor-label="hashCode" id="-1299543252%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+<a data-name="-1299543252%2FFunctions%2F-891140384" anchor-label="hashCode" id="-1299543252%2FFunctions%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1299543252%2FFunctions%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1299543252%2FFunctions%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1477709317%2FFunctions%2F-1537784738" anchor-label="toString" id="-1477709317%2FFunctions%2F-1537784738" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-resilience:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-resilience:dokkaHtmlPartial/commonMain">
+<a data-name="-1477709317%2FFunctions%2F-891140384" anchor-label="toString" id="-1477709317%2FFunctions%2F-891140384" data-filterable-set=":arrow-resilience/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-resilience/commonMain" data-filterable-set=":arrow-resilience/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1477709317%2FFunctions%2F-1537784738"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1477709317%2FFunctions%2F-891140384"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -183,12 +215,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

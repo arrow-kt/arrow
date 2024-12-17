@@ -25,61 +25,93 @@
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../index.html">
-                            Arrow
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-stm/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-fx-stm/commonMain" data-filter=":arrow-fx-stm/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-stm:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-stm::arrow.fx.stm/TVar///PointingToDeclaration//-2117640706">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-stm::arrow.fx.stm/TVar///PointingToDeclaration//279525696">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-stm</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.stm</a><span class="delimiter">/</span><span class="current">TVar</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>TVar</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">TVar</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div><p class="paragraph">A <a href="index.html">TVar</a> is a mutable reference that can only be (safely) accessed inside a <a href="../-s-t-m/index.html">STM</a> transaction.</p><h2 class="">Creating a <a href="index.html">TVar</a></h2><p class="paragraph">There are two ways of creating <a href="index.html">TVar</a>'s:</p><ul><li><p class="paragraph"><a href="../-s-t-m/new-t-var.html">STM.newTVar</a> to create a <a href="index.html">TVar</a> inside a transaction</p></li><li><p class="paragraph"><a href="-companion/new.html">TVar.new</a> to create a top-level <a href="index.html">TVar</a> outside of a transaction</p></li></ul><p class="paragraph">Strictly speaking <a href="-companion/new.html">TVar.new</a> is not necessary as it can be defined as <code class="lang-kotlin">atomically { newTVar(v) }</code> however <a href="-companion/new.html">TVar.new</a> is much faster because it avoids creating a (pointless) transaction. <a href="../-s-t-m/new-t-var.html">STM.newTVar</a> should be used inside transactions because it is not possible to use <a href="-companion/new.html">TVar.new</a> inside <a href="../-s-t-m/index.html">STM</a> due to <code class="lang-kotlin">suspend</code>.</p><h2 class="">Reading a value from a <a href="index.html">TVar</a></h2><p class="paragraph">One-off reading from a <a href="index.html">TVar</a> outside of a transaction can be done by using <a href="unsafe-read.html">TVar.unsafeRead</a>. Despite the name using this method is only unsafe if the read value (or a derivative) is then used inside another transaction which may cause race conditions again. However the benefit of using this over <code class="lang-kotlin">atomically { tvar.read() }</code> is that it avoids creating a transaction and is thus much faster.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = tvar.unsafeRead()<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-01.kt --><p class="paragraph">Reading from a <a href="index.html">TVar</a> inside a transaction is done by using <a href="../-s-t-m/read.html">STM.read</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.read()<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-02.kt --><blockquote class="quotation"><p class="paragraph">Checking the validity of a transaction is done by checking the contents of all accessed <a href="index.html">TVar</a>'s before locking the <a href="index.html">TVar</a>'s that have been written to and then checking only the <a href="index.html">TVar</a>'s that have only been read not modified again. To keep transactions as fast as possible it is key to keep the number of accessed <a href="index.html">TVar</a>'s small.</p></blockquote><blockquote class="quotation"><p class="paragraph">Another important thing to remember is that only writes will ever lock a <a href="index.html">TVar</a> and only those that need to be changed. This means that so long as transactions access disjoint sets of variables or a transaction is read only, they may run in parallel.</p></blockquote><h2 class="">Modifying the value inside the <a href="index.html">TVar</a></h2><p class="paragraph">Writing a new value to the <a href="index.html">TVar</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.write(20)<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-03.kt --><p class="paragraph">Modifying the value based on the initial value:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.modify { it * 2 }<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-04.kt --><p class="paragraph">Writing a new value to the <a href="index.html">TVar</a> and returning the initial value:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.swap(20)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${tvar.unsafeRead()}")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-05.kt --></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">TVar</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div><p class="paragraph">A <a href="index.html">TVar</a> is a mutable reference that can only be (safely) accessed inside a <a href="../-s-t-m/index.html">STM</a> transaction.</p><h2 class="">Creating a <a href="index.html">TVar</a></h2><p class="paragraph">There are two ways of creating <a href="index.html">TVar</a>'s:</p><ul><li><p class="paragraph"><a href="../-s-t-m/new-t-var.html">STM.newTVar</a> to create a <a href="index.html">TVar</a> inside a transaction</p></li><li><p class="paragraph"><a href="-companion/new.html">TVar.new</a> to create a top-level <a href="index.html">TVar</a> outside of a transaction</p></li></ul><p class="paragraph">Strictly speaking <a href="-companion/new.html">TVar.new</a> is not necessary as it can be defined as <code class="lang-kotlin">atomically { newTVar(v) }</code> however <a href="-companion/new.html">TVar.new</a> is much faster because it avoids creating a (pointless) transaction. <a href="../-s-t-m/new-t-var.html">STM.newTVar</a> should be used inside transactions because it is not possible to use <a href="-companion/new.html">TVar.new</a> inside <a href="../-s-t-m/index.html">STM</a> due to <code class="lang-kotlin">suspend</code>.</p><h2 class="">Reading a value from a <a href="index.html">TVar</a></h2><p class="paragraph">One-off reading from a <a href="index.html">TVar</a> outside of a transaction can be done by using <a href="unsafe-read.html">TVar.unsafeRead</a>. Despite the name using this method is only unsafe if the read value (or a derivative) is then used inside another transaction which may cause race conditions again. However the benefit of using this over <code class="lang-kotlin">atomically { tvar.read() }</code> is that it avoids creating a transaction and is thus much faster.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = tvar.unsafeRead()<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-01.kt --><p class="paragraph">Reading from a <a href="index.html">TVar</a> inside a transaction is done by using <a href="../-s-t-m/read.html">STM.read</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.read()<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-02.kt --><blockquote class="quotation"><p class="paragraph">Checking the validity of a transaction is done by checking the contents of all accessed <a href="index.html">TVar</a>'s before locking the <a href="index.html">TVar</a>'s that have been written to and then checking only the <a href="index.html">TVar</a>'s that have only been read not modified again. To keep transactions as fast as possible it is key to keep the number of accessed <a href="index.html">TVar</a>'s small.</p></blockquote><blockquote class="quotation"><p class="paragraph">Another important thing to remember is that only writes will ever lock a <a href="index.html">TVar</a> and only those that need to be changed. This means that so long as transactions access disjoint sets of variables or a transaction is read only, they may run in parallel.</p></blockquote><h2 class="">Modifying the value inside the <a href="index.html">TVar</a></h2><p class="paragraph">Writing a new value to the <a href="index.html">TVar</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.write(20)<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-03.kt --><p class="paragraph">Modifying the value based on the initial value:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.modify { it * 2 }<br>  }<br>  //sampleEnd<br>  println(result)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-04.kt --><p class="paragraph">Writing a new value to the <a href="index.html">TVar</a> and returning the initial value:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tvar = TVar.new(10)<br>  val result = atomically {<br>    tvar.swap(20)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${tvar.unsafeRead()}")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tvar-05.kt --></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="465184486%2FClasslikes%2F-2117640706" anchor-label="Companion" id="465184486%2FClasslikes%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="465184486%2FClasslikes%2F279525696" anchor-label="Companion" id="465184486%2FClasslikes%2F279525696" data-filterable-set=":arrow-fx-stm/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="465184486%2FClasslikes%2F-2117640706"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="465184486%2FClasslikes%2F279525696"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -88,47 +120,47 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="-431924154%2FFunctions%2F-2117640706" anchor-label="equals" id="-431924154%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="-431924154%2FFunctions%2F279525696" anchor-label="equals" id="-431924154%2FFunctions%2F279525696" data-filterable-set=":arrow-fx-stm/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="equals.html"><span><span>equals</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-431924154%2FFunctions%2F-2117640706"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-431924154%2FFunctions%2F279525696"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-277166624%2FFunctions%2F-2117640706" anchor-label="hashCode" id="-277166624%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+<a data-name="-277166624%2FFunctions%2F279525696" anchor-label="hashCode" id="-277166624%2FFunctions%2F279525696" data-filterable-set=":arrow-fx-stm/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-277166624%2FFunctions%2F-2117640706"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-277166624%2FFunctions%2F279525696"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="194652479%2FFunctions%2F-2117640706" anchor-label="unsafeRead" id="194652479%2FFunctions%2F-2117640706" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-stm:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-fx-stm:dokkaHtmlPartial/commonMain">
+<a data-name="194652479%2FFunctions%2F279525696" anchor-label="unsafeRead" id="194652479%2FFunctions%2F279525696" data-filterable-set=":arrow-fx-stm/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="unsafe-read.html"><span>unsafe</span><wbr><span><span>Read</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="194652479%2FFunctions%2F-2117640706"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="194652479%2FFunctions%2F279525696"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="unsafe-read.html"><span class="token function">unsafeRead</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Read the value of a <a href="index.html">TVar</a>. This has no consistency guarantees for subsequent reads and writes since it is outside of a stm transaction.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="unsafe-read.html"><span class="token function">unsafeRead</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="brief "><p class="paragraph">Read the value of a <a href="index.html">TVar</a>. This has no consistency guarantees for subsequent reads and writes since it is outside of a stm transaction.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -138,12 +170,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

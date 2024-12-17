@@ -25,61 +25,93 @@
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../index.html">
-                            Arrow
-                    </a>            </div>
-            <div class="library-version">2.0.0
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core/commonMain" data-filter=":arrow-core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core:dokkaHtmlPartial/commonMain">common</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core/Tuple9///PointingToDeclaration//601698448">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core/Tuple9///PointingToDeclaration//1759373422">
   <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core</a><span class="delimiter">/</span><span class="current">Tuple9</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Tuple9</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">Tuple9</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">B</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">C</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">D</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">E</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">F</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">G</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">H</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">I</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>first<span class="token operator">: </span><a href="index.html">A</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>second<span class="token operator">: </span><a href="index.html">B</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>third<span class="token operator">: </span><a href="index.html">C</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fourth<span class="token operator">: </span><a href="index.html">D</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fifth<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>sixth<span class="token operator">: </span><a href="index.html">F</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>seventh<span class="token operator">: </span><a href="index.html">G</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>eighth<span class="token operator">: </span><a href="index.html">H</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>ninth<span class="token operator">: </span><a href="index.html">I</a></span></span><span class="token punctuation">)</span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">Tuple9</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">B</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">C</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">D</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">E</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">F</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">G</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">H</a><span class="token punctuation">, </span><span class="token keyword">out </span><a href="index.html">I</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>first<span class="token operator">: </span><a href="index.html">A</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>second<span class="token operator">: </span><a href="index.html">B</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>third<span class="token operator">: </span><a href="index.html">C</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fourth<span class="token operator">: </span><a href="index.html">D</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fifth<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>sixth<span class="token operator">: </span><a href="index.html">F</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>seventh<span class="token operator">: </span><a href="index.html">G</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>eighth<span class="token operator">: </span><a href="index.html">H</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>ninth<span class="token operator">: </span><a href="index.html">I</a></span></span><span class="token punctuation">)</span></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="">Constructors</h2>
-        <div class="table"><a data-name="1185912573%2FConstructors%2F601698448" anchor-label="Tuple9" id="1185912573%2FConstructors%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="1185912573%2FConstructors%2F1759373422" anchor-label="Tuple9" id="1185912573%2FConstructors%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple9.html"><span><span>Tuple9</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1185912573%2FConstructors%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1185912573%2FConstructors%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">first<span class="token operator">: </span><a href="index.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">second<span class="token operator">: </span><a href="index.html">B</a><span class="token punctuation">, </span></span><span class="parameter ">third<span class="token operator">: </span><a href="index.html">C</a><span class="token punctuation">, </span></span><span class="parameter ">fourth<span class="token operator">: </span><a href="index.html">D</a><span class="token punctuation">, </span></span><span class="parameter ">fifth<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">, </span></span><span class="parameter ">sixth<span class="token operator">: </span><a href="index.html">F</a><span class="token punctuation">, </span></span><span class="parameter ">seventh<span class="token operator">: </span><a href="index.html">G</a><span class="token punctuation">, </span></span><span class="parameter ">eighth<span class="token operator">: </span><a href="index.html">H</a><span class="token punctuation">, </span></span><span class="parameter ">ninth<span class="token operator">: </span><a href="index.html">I</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">first<span class="token operator">: </span><a href="index.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">second<span class="token operator">: </span><a href="index.html">B</a><span class="token punctuation">, </span></span><span class="parameter ">third<span class="token operator">: </span><a href="index.html">C</a><span class="token punctuation">, </span></span><span class="parameter ">fourth<span class="token operator">: </span><a href="index.html">D</a><span class="token punctuation">, </span></span><span class="parameter ">fifth<span class="token operator">: </span><a href="index.html">E</a><span class="token punctuation">, </span></span><span class="parameter ">sixth<span class="token operator">: </span><a href="index.html">F</a><span class="token punctuation">, </span></span><span class="parameter ">seventh<span class="token operator">: </span><a href="index.html">G</a><span class="token punctuation">, </span></span><span class="parameter ">eighth<span class="token operator">: </span><a href="index.html">H</a><span class="token punctuation">, </span></span><span class="parameter ">ninth<span class="token operator">: </span><a href="index.html">I</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -88,17 +120,17 @@
       </div>
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="-1695993769%2FClasslikes%2F601698448" anchor-label="Companion" id="-1695993769%2FClasslikes%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="-1695993769%2FClasslikes%2F1759373422" anchor-label="Companion" id="-1695993769%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1695993769%2FClasslikes%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1695993769%2FClasslikes%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -107,137 +139,137 @@
       </div>
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="1463587249%2FProperties%2F601698448" anchor-label="eighth" id="1463587249%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="1463587249%2FProperties%2F1759373422" anchor-label="eighth" id="1463587249%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="eighth.html"><span><span>eighth</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1463587249%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1463587249%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="eighth.html">eighth</a><span class="token operator">: </span><a href="index.html">H</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="eighth.html">eighth</a><span class="token operator">: </span><a href="index.html">H</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-474192199%2FProperties%2F601698448" anchor-label="fifth" id="-474192199%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="-474192199%2FProperties%2F1759373422" anchor-label="fifth" id="-474192199%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fifth.html"><span><span>fifth</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-474192199%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-474192199%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="fifth.html">fifth</a><span class="token operator">: </span><a href="index.html">E</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="fifth.html">fifth</a><span class="token operator">: </span><a href="index.html">E</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="174560224%2FProperties%2F601698448" anchor-label="first" id="174560224%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="174560224%2FProperties%2F1759373422" anchor-label="first" id="174560224%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="first.html"><span><span>first</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="174560224%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="174560224%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="first.html">first</a><span class="token operator">: </span><a href="index.html">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="first.html">first</a><span class="token operator">: </span><a href="index.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="448407664%2FProperties%2F601698448" anchor-label="fourth" id="448407664%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="448407664%2FProperties%2F1759373422" anchor-label="fourth" id="448407664%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fourth.html"><span><span>fourth</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="448407664%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="448407664%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="fourth.html">fourth</a><span class="token operator">: </span><a href="index.html">D</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="fourth.html">fourth</a><span class="token operator">: </span><a href="index.html">D</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1873411753%2FProperties%2F601698448" anchor-label="ninth" id="1873411753%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="1873411753%2FProperties%2F1759373422" anchor-label="ninth" id="1873411753%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="ninth.html"><span><span>ninth</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1873411753%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1873411753%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="ninth.html">ninth</a><span class="token operator">: </span><a href="index.html">I</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="ninth.html">ninth</a><span class="token operator">: </span><a href="index.html">I</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="175163222%2FProperties%2F601698448" anchor-label="second" id="175163222%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="175163222%2FProperties%2F1759373422" anchor-label="second" id="175163222%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="second.html"><span><span>second</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="175163222%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="175163222%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="second.html">second</a><span class="token operator">: </span><a href="index.html">B</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="second.html">second</a><span class="token operator">: </span><a href="index.html">B</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1854958673%2FProperties%2F601698448" anchor-label="seventh" id="-1854958673%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="-1854958673%2FProperties%2F1759373422" anchor-label="seventh" id="-1854958673%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="seventh.html"><span><span>seventh</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1854958673%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1854958673%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="seventh.html">seventh</a><span class="token operator">: </span><a href="index.html">G</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="seventh.html">seventh</a><span class="token operator">: </span><a href="index.html">G</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-617373062%2FProperties%2F601698448" anchor-label="sixth" id="-617373062%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="-617373062%2FProperties%2F1759373422" anchor-label="sixth" id="-617373062%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="sixth.html"><span><span>sixth</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-617373062%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-617373062%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="sixth.html">sixth</a><span class="token operator">: </span><a href="index.html">F</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="sixth.html">sixth</a><span class="token operator">: </span><a href="index.html">F</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="474582281%2FProperties%2F601698448" anchor-label="third" id="474582281%2FProperties%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="474582281%2FProperties%2F1759373422" anchor-label="third" id="474582281%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="third.html"><span><span>third</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="474582281%2FProperties%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="474582281%2FProperties%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="third.html">third</a><span class="token operator">: </span><a href="index.html">C</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="third.html">third</a><span class="token operator">: </span><a href="index.html">C</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -246,32 +278,32 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1340739131%2FFunctions%2F601698448" anchor-label="compareTo" id="1340739131%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+        <div class="table"><a data-name="1340739131%2FFunctions%2F1759373422" anchor-label="compareTo" id="1340739131%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../compare-to.html"><span>compare</span><wbr><span><span>To</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1340739131%2FFunctions%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1340739131%2FFunctions%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">B</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">C</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">D</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">D</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">E</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">F</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">F</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">G</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">G</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">H</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">H</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">I</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">I</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="index.html">Tuple9</a><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token punctuation">, </span><a href="../compare-to.html">B</a><span class="token punctuation">, </span><a href="../compare-to.html">C</a><span class="token punctuation">, </span><a href="../compare-to.html">D</a><span class="token punctuation">, </span><a href="../compare-to.html">E</a><span class="token punctuation">, </span><a href="../compare-to.html">F</a><span class="token punctuation">, </span><a href="../compare-to.html">G</a><span class="token punctuation">, </span><a href="../compare-to.html">H</a><span class="token punctuation">, </span><a href="../compare-to.html">I</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../compare-to.html"><span class="token function">compareTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="index.html">Tuple9</a><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token punctuation">, </span><a href="../compare-to.html">B</a><span class="token punctuation">, </span><a href="../compare-to.html">C</a><span class="token punctuation">, </span><a href="../compare-to.html">D</a><span class="token punctuation">, </span><a href="../compare-to.html">E</a><span class="token punctuation">, </span><a href="../compare-to.html">F</a><span class="token punctuation">, </span><a href="../compare-to.html">G</a><span class="token punctuation">, </span><a href="../compare-to.html">H</a><span class="token punctuation">, </span><a href="../compare-to.html">I</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">B</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">C</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">D</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">D</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">E</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">F</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">F</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">G</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">G</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">H</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">H</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../compare-to.html">I</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/index.html">Comparable</a><span class="token operator">&lt;</span><a href="../compare-to.html">I</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="index.html">Tuple9</a><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token punctuation">, </span><a href="../compare-to.html">B</a><span class="token punctuation">, </span><a href="../compare-to.html">C</a><span class="token punctuation">, </span><a href="../compare-to.html">D</a><span class="token punctuation">, </span><a href="../compare-to.html">E</a><span class="token punctuation">, </span><a href="../compare-to.html">F</a><span class="token punctuation">, </span><a href="../compare-to.html">G</a><span class="token punctuation">, </span><a href="../compare-to.html">H</a><span class="token punctuation">, </span><a href="../compare-to.html">I</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../compare-to.html"><span class="token function">compareTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="index.html">Tuple9</a><span class="token operator">&lt;</span><a href="../compare-to.html">A</a><span class="token punctuation">, </span><a href="../compare-to.html">B</a><span class="token punctuation">, </span><a href="../compare-to.html">C</a><span class="token punctuation">, </span><a href="../compare-to.html">D</a><span class="token punctuation">, </span><a href="../compare-to.html">E</a><span class="token punctuation">, </span><a href="../compare-to.html">F</a><span class="token punctuation">, </span><a href="../compare-to.html">G</a><span class="token punctuation">, </span><a href="../compare-to.html">H</a><span class="token punctuation">, </span><a href="../compare-to.html">I</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2049068770%2FFunctions%2F601698448" anchor-label="toString" id="-2049068770%2FFunctions%2F601698448" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core:dokkaHtmlPartial/commonMain" data-filterable-set=":arrow-core:dokkaHtmlPartial/commonMain">
+<a data-name="-2049068770%2FFunctions%2F1759373422" anchor-label="toString" id="-2049068770%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2049068770%2FFunctions%2F601698448"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2049068770%2FFunctions%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core:dokkaHtmlPartial/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -281,12 +313,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2024 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-
