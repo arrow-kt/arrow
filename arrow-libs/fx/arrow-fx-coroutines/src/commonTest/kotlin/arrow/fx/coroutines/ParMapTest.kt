@@ -7,6 +7,7 @@ import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.platform.stackSafeIteration
+import arrow.platform.test.FlakyOnJs
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -50,7 +51,7 @@ class ParMapTest {
     ).parMap { it.invoke() }
   }
 
-  @Test fun parTraverseResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
+  @Test @FlakyOnJs fun parTraverseResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),

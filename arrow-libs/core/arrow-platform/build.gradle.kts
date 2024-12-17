@@ -25,6 +25,17 @@ kotlin {
     commonMain {
       dependencies {
         implementation(libs.kotlin.stdlib)
+        implementation(libs.kotlin.testAnnotations)
+      }
+    }
+    jvmMain {
+      dependencies {
+        implementation(libs.kotlin.testJUnit5)
+      }
+    }
+    jsMain {
+      dependencies {
+        implementation(libs.kotlin.test)
       }
     }
   }
@@ -41,5 +52,6 @@ kotlin {
   compilerOptions {
     (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
     (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
+    freeCompilerArgs.add("-Xexpect-actual-classes")
   }
 }

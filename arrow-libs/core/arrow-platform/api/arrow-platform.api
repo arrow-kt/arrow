@@ -16,3 +16,6 @@ public final class arrow/platform/PlatformKt {
 	public static final fun stackSafeIteration ()I
 }
 
+public abstract interface annotation class arrow/platform/test/NonFlakyOnThisPlatform : java/lang/annotation/Annotation {
+}
+

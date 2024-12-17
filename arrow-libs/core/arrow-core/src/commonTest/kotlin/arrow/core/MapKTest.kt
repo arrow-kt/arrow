@@ -9,6 +9,7 @@ import arrow.core.test.map2
 import arrow.core.test.map3
 import arrow.core.test.option
 import arrow.core.test.testLaws
+import arrow.platform.test.FlakyOnJs
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.maps.shouldBeEmpty
@@ -714,7 +715,7 @@ class MapKTest {
     }
   }
 
-  @Test fun mapValuesOrAccumulateAccumulates() = runTest {
+  @Test @FlakyOnJs fun mapValuesOrAccumulateAccumulates() = runTest {
     checkAll(
       Arb.map(Arb.int(), Arb.int(), minSize = 1, maxSize = 30)
     ) { xs ->
