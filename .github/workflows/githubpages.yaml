@@ -3,9 +3,6 @@ name: githubpages
 on:
   release:
     types: [ released ]
-  push:
-    branches:
-      - "serras/dokka-plugin-2"
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
@@ -32,7 +29,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: assemble
-        run: ./gradlew -Pversion=2.0.0 :dokkaGenerate -Pgithubpages=true
+        run: ./gradlew -Pversion=${{ github.event.release.tag_name }} :dokkaGenerate -Pgithubpages=true
 
       - name: copy CNAME
         run: cp static/CNAME docs
