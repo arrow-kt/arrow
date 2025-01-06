@@ -21,8 +21,7 @@ class OpticsProcessor(
   private val codegen: CodeGenerator,
   private val logger: KSPLogger,
   private val options: OpticsProcessorOptions,
-) :
-  SymbolProcessor {
+) : SymbolProcessor {
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val (resolved, deferred) = resolver
       .getSymbolsWithAnnotation("arrow.optics.optics")

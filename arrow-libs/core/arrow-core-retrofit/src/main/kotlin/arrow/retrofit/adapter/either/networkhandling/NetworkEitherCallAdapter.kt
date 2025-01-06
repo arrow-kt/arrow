@@ -84,8 +84,7 @@ private class EitherCall<R>(
 
   override fun cancel() = delegate.cancel()
 
-  override fun execute(): Response<Either<CallError, R>> =
-    throw UnsupportedOperationException("This adapter does not support sync execution")
+  override fun execute(): Response<Either<CallError, R>> = throw UnsupportedOperationException("This adapter does not support sync execution")
 
   override fun request(): Request = delegate.request()
 }

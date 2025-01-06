@@ -108,20 +108,19 @@ private fun dependenciesMatch(classpath: File, dependency: String): Boolean {
   return testdep == dependencyName
 }
 
-private fun sanitizeClassPathFileName(dep: String): String =
-  buildList {
-    var skip = false
-    add(dep.first())
-    dep.reduce { a, b ->
-      if (a == '-' && b.isDigit()) skip = true
-      if (!skip) add(b)
-      b
-    }
-    if (skip) removeLast()
+private fun sanitizeClassPathFileName(dep: String): String = buildList {
+  var skip = false
+  add(dep.first())
+  dep.reduce { a, b ->
+    if (a == '-' && b.isDigit()) skip = true
+    if (!skip) add(b)
+    b
   }
-    .joinToString("")
-    .replace("-jvm.jar", "")
-    .replace("-jvm", "")
+  if (skip) removeLast()
+}
+  .joinToString("")
+  .replace("-jvm.jar", "")
+  .replace("-jvm", "")
 
 private val KotlinCompilation.kspGeneratedSourceFiles: List<SourceFile>
   get() =
@@ -140,11 +139,10 @@ private fun eval(expression: String, classesDirectory: File): Any? {
   return field.get(Object())
 }
 
-private fun getFullClassName(classesDirectory: File, className: String): String =
-  Files.walk(Paths.get(classesDirectory.toURI()))
-    .filter { it.toFile().name == "$className.class" }
-    .toArray()[0]
-    .toString()
-    .removePrefix(classesDirectory.absolutePath + File.separator)
-    .removeSuffix(".class")
-    .replace(File.separator, ".")
+private fun getFullClassName(classesDirectory: File, className: String): String = Files.walk(Paths.get(classesDirectory.toURI()))
+  .filter { it.toFile().name == "$className.class" }
+  .toArray()[0]
+  .toString()
+  .removePrefix(classesDirectory.absolutePath + File.separator)
+  .removeSuffix(".class")
+  .replace(File.separator, ".")

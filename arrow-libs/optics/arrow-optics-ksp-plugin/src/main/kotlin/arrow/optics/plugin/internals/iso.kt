@@ -2,8 +2,7 @@ package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.OpticsProcessorOptions
 
-internal fun OpticsProcessorOptions.generateIsos(ele: ADT, target: IsoTarget) =
-  Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target.foci.first()))
+internal fun OpticsProcessorOptions.generateIsos(ele: ADT, target: IsoTarget) = Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target.foci.first()))
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, focus: Focus): String {
   val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"
