@@ -60,6 +60,34 @@ class LensTests {
   }
 
   @Test
+  fun `Lenses are generated for data class referencing its own lenses for type inference`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class UsingLens(val field: String) {
+      |  fun getLens() = UsingLens.field
+      |  companion object
+      |}
+      |
+      |val i: Lens<UsingLens, String> = UsingLens.field
+      |val r = i != null
+    """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses are not generated for unresolved types`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class InvalidType(val field: Foo) {
+      |  companion object
+      |}
+    """.compilationFails()
+  }
+
+  @Test
   fun `Lenses which mentions imported elements`() {
     """
       |$`package`
