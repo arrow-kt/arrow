@@ -124,7 +124,6 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
   }
 }
 
-private fun parseTypeName(type: Type) =
-  type.toString()
-    .split(".")
-    .last()
+private fun parseTypeName(type: Type) = type.toString()
+  .split(".")
+  .last()
