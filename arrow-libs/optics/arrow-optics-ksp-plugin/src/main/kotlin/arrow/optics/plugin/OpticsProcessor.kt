@@ -14,7 +14,9 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 
 class OpticsProcessor(
@@ -26,7 +28,15 @@ class OpticsProcessor(
     val (resolved, deferred) = resolver
       .getSymbolsWithAnnotation("arrow.optics.optics")
       .filterIsInstance<KSClassDeclaration>()
-      .partition { it.validate() }
+      .partition {
+        it.validate { _, element ->
+          when (element) {
+            is KSAnnotation -> false
+            is KSFunctionDeclaration -> false
+            else -> true
+          }
+        }
+      }
     resolved.forEach(::processClass)
 
     // If types used by the annotated class are by other processors,
