@@ -26,8 +26,7 @@ data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val target
     else -> "<${typeParameters.joinToString(separator = ",")}>"
   }
 
-  operator fun Snippet.plus(snippet: Snippet): Snippet =
-    copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")
+  operator fun Snippet.plus(snippet: Snippet): Snippet = copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")
 }
 
 @Suppress("RecursivePropertyAccessor")
@@ -87,8 +86,7 @@ data class Focus(
     }?.map { it.qualifiedString() }.orEmpty()
 
   companion object {
-    operator fun invoke(fullName: String, paramName: String, subclasses: List<String> = emptyList()): Focus =
-      Focus(fullName, paramName, null, subclasses = subclasses)
+    operator fun invoke(fullName: String, paramName: String, subclasses: List<String> = emptyList()): Focus = Focus(fullName, paramName, null, subclasses = subclasses)
   }
 }
 

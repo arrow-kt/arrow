@@ -2,12 +2,11 @@ package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.OpticsProcessorOptions
 
-internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget) =
-  Snippet(
-    `package` = ele.packageName,
-    name = ele.simpleName,
-    content = processElement(ele, target.foci),
-  )
+internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.simpleName,
+  content = processElement(ele, target.foci),
+)
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): String {
   val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"

@@ -68,8 +68,7 @@ internal class ArrowEitherCallAdapter<E, R>(
 
     override fun cancel() = original.cancel()
 
-    override fun execute(): Response<Either<E, R>> =
-      throw UnsupportedOperationException("This adapter does not support sync execution")
+    override fun execute(): Response<Either<E, R>> = throw UnsupportedOperationException("This adapter does not support sync execution")
 
     override fun request(): Request = original.request()
   }

@@ -6,20 +6,17 @@ import com.google.devtools.ksp.symbol.KSName
  * From Eugenio's https://github.com/Takhion/kotlin-metadata If this [isNotBlank] then it adds the
  * optional [prefix] and [postfix].
  */
-fun String.plusIfNotBlank(prefix: String = "", postfix: String = "") =
-  if (isNotBlank()) "$prefix${this}$postfix" else this
+fun String.plusIfNotBlank(prefix: String = "", postfix: String = "") = if (isNotBlank()) "$prefix${this}$postfix" else this
 
 /**
  * Sanitizes each delimited section if it matches with Kotlin reserved keywords.
  */
-fun KSName.asSanitizedString(delimiter: String = ".", prefix: String = "") =
-  asString().sanitize(delimiter, prefix)
+fun KSName.asSanitizedString(delimiter: String = ".", prefix: String = "") = asString().sanitize(delimiter, prefix)
 
 /**
  * Sanitizes each delimited section if it matches with Kotlin reserved keywords.
  */
-fun String.sanitize(delimiter: String = ".", prefix: String = "") =
-  splitToSequence(delimiter).joinToString(delimiter, prefix) { if (it in KOTLIN_KEYWORDS) "`$it`" else it }
+fun String.sanitize(delimiter: String = ".", prefix: String = "") = splitToSequence(delimiter).joinToString(delimiter, prefix) { if (it in KOTLIN_KEYWORDS) "`$it`" else it }
 
 private val KOTLIN_KEYWORDS = setOf(
   // Hard keywords

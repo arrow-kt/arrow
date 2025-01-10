@@ -12,20 +12,16 @@ import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.safeCast
 
 /** Focuses on those elements of the specified [klass] */
-public fun <S : Any, A : S> instance(klass: KClass<A>): Prism<S, A> =
-  object : Prism<S, A> {
-    override fun getOrModify(source: S): Either<S, A> =
-      klass.safeCast(source)?.right() ?: source.left()
-    override fun reverseGet(focus: A): S = focus
-  }
+public fun <S : Any, A : S> instance(klass: KClass<A>): Prism<S, A> = object : Prism<S, A> {
+  override fun getOrModify(source: S): Either<S, A> = klass.safeCast(source)?.right() ?: source.left()
+  override fun reverseGet(focus: A): S = focus
+}
 
 /** Focuses on those elements of the specified class */
-public inline fun <S : Any, reified A : S> instance(): Prism<S, A> =
-  object : Prism<S, A> {
-    override fun getOrModify(source: S): Either<S, A> =
-      (source as? A)?.right() ?: source.left()
-    override fun reverseGet(focus: A): S = focus
-  }
+public inline fun <S : Any, reified A : S> instance(): Prism<S, A> = object : Prism<S, A> {
+  override fun getOrModify(source: S): Either<S, A> = (source as? A)?.right() ?: source.left()
+  override fun reverseGet(focus: A): S = focus
+}
 
 /**
  * [Lens] that focuses on a field in a data class
