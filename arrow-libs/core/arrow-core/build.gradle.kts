@@ -55,24 +55,6 @@ kotlin {
     }
   }
 
-  js {
-    nodejs {
-      testTask {
-        useMocha {
-          timeout = "300s"
-        }
-      }
-    }
-    browser {
-      testTask {
-        useKarma {
-          useChromeHeadless()
-          timeout.set(Duration.ofMinutes(5))
-        }
-      }
-    }
-  }
-
   @OptIn(ExperimentalKotlinGradlePluginApi::class)
   compilerOptions {
     (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }

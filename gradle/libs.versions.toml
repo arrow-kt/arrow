@@ -1,6 +1,6 @@
 [versions]
 animalSniffer = "1.7.2"
-arrowGradleConfig = "0.12.0-rc.25"
+arrowGradleConfig = "0.12.0-rc.26"
 coroutines = "1.10.1"
 classgraph = "4.8.179"
 dokka = "2.0.0"
