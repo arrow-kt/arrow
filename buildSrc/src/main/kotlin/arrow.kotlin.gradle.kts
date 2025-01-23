@@ -9,8 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.XmlProvider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.getByName
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 group = property("projects.group").toString()
 
@@ -33,15 +32,16 @@ configure<KotlinProjectExtension> {
 
 configure<JavaPluginExtension> {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
+    languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
 
 if (isKotlinMultiplatform) {
   configure<KotlinMultiplatformExtension> {
     jvm {
-      // Fix JVM target ignores Java sources and compiles only Kotlin source files.
-      // withJava()
+      compilerOptions {
+        jvmTarget = JvmTarget.JVM_1_8
+      }
     }
     js(IR) {
       browser()
@@ -130,7 +130,7 @@ if (isKotlinMultiplatform) {
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
-      (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion(it) }
+      (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
       (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
     }
   }
