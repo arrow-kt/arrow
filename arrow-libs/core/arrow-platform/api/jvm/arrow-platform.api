@@ -1,0 +1,22 @@
+public final class arrow/platform/CurrentPlatform {
+	public static final fun getPlatform ()Larrow/platform/Platform;
+}
+
+public final class arrow/platform/Platform : java/lang/Enum {
+	public static final field Android Larrow/platform/Platform;
+	public static final field JS Larrow/platform/Platform;
+	public static final field JVM Larrow/platform/Platform;
+	public static final field Native Larrow/platform/Platform;
+	public static final field WebAssembly Larrow/platform/Platform;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Larrow/platform/Platform;
+	public static fun values ()[Larrow/platform/Platform;
+}
+
+public final class arrow/platform/PlatformKt {
+	public static final fun stackSafeIteration ()I
+}
+
+public abstract interface annotation class arrow/platform/test/NonFlakyOnThisPlatform : java/lang/annotation/Annotation {
+}
+

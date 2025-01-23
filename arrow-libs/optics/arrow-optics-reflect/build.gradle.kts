@@ -3,10 +3,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
-
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
-  alias(libs.plugins.arrowGradleConfig.kotlin)
+  id("arrow.kotlin")
   alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)

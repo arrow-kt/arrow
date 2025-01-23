@@ -1,9 +1,7 @@
 package arrow.platform
 
-import kotlin.jvm.JvmName
-
 public enum class Platform {
-  JVM, JS, Native, WebAssembly
+  JVM, JS, Native, WebAssembly, Android
 }
 
 public expect val platform: Platform

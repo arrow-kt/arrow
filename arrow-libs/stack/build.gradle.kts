@@ -3,7 +3,6 @@
 plugins {
   `java-platform`
   alias(libs.plugins.publish)
-  
 }
 
 group = property("projects.group").toString()

@@ -32,6 +32,7 @@ dependencyResolutionManagement {
     gradlePluginPortal()
     mavenLocal()
     kotlin_repo_url?.also { maven(it) }
+    google()
   }
   versionCatalogs {
     create("libs") {

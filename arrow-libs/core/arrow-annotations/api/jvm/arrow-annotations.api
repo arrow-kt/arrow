@@ -1,0 +1,18 @@
+public final class arrow/optics/OpticsTarget : java/lang/Enum {
+	public static final field DSL Larrow/optics/OpticsTarget;
+	public static final field ISO Larrow/optics/OpticsTarget;
+	public static final field LENS Larrow/optics/OpticsTarget;
+	public static final field OPTIONAL Larrow/optics/OpticsTarget;
+	public static final field PRISM Larrow/optics/OpticsTarget;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Larrow/optics/OpticsTarget;
+	public static fun values ()[Larrow/optics/OpticsTarget;
+}
+
+public abstract interface annotation class arrow/optics/optics : java/lang/annotation/Annotation {
+	public abstract fun targets ()[Larrow/optics/OpticsTarget;
+}
+
+public abstract interface annotation class arrow/synthetic : java/lang/annotation/Annotation {
+}
+

@@ -11,6 +11,7 @@ open annotation class arrow.platform.test/NonFlakyOnThisPlatform : kotlin/Annota
 }
 
 final enum class arrow.platform/Platform : kotlin/Enum<arrow.platform/Platform> { // arrow.platform/Platform|null[0]
+    enum entry Android // arrow.platform/Platform.Android|null[0]
     enum entry JS // arrow.platform/Platform.JS|null[0]
     enum entry JVM // arrow.platform/Platform.JVM|null[0]
     enum entry Native // arrow.platform/Platform.Native|null[0]

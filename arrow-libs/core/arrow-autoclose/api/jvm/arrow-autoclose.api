@@ -1,0 +1,27 @@
+public abstract interface class arrow/AutoCloseScope {
+	public abstract fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+	public abstract fun onClose (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/AutoCloseScope$DefaultImpls {
+	public static fun autoClose (Larrow/AutoCloseScope;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun install (Larrow/AutoCloseScope;Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+}
+
+public final class arrow/AutoCloseScopeKt {
+	public static final fun autoCloseScope (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope {
+	public fun <init> ()V
+	public fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public final fun close (Ljava/lang/Throwable;)Ljava/lang/Void;
+	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+	public fun onClose (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class arrow/ThrowIfFatalKt {
+	public static final fun throwIfFatal (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+}
+

@@ -11,57 +11,19 @@ repositories {
 
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
-  // alias(libs.plugins.arrowGradleConfig.kotlin)
+  id(libs.plugins.android.library.get().pluginId)
+  id("arrow.kotlin")
   alias(libs.plugins.publish)
-  alias(libs.plugins.kotlinx.kover)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.dokka)
   alias(libs.plugins.compose.jetbrains)
   alias(libs.plugins.compose.compiler)
-  alias(libs.plugins.android.library)
-  alias(libs.plugins.dokka)
 }
 
 apply(from = property("ANIMALSNIFFER_MPP"))
 
-java {
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
-  }
-}
-
 kotlin {
-  explicitApi()
-
-  jvm()
-  js(IR) {
-    browser()
-    nodejs()
-  }
-  @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class) wasmJs {
-    browser()
-    nodejs()
-    d8()
-  }
-  androidTarget()
-  // Native: https://kotlinlang.org/docs/native-target-support.html
-  // -- Tier 1 --
-  linuxX64()
-  macosX64()
-  macosArm64()
-  iosSimulatorArm64()
-  iosX64()
-  // -- Tier 2 --
-  // linuxArm64()
-  watchosSimulatorArm64()
-  watchosX64()
-  watchosArm64()
-  tvosSimulatorArm64()
-  tvosX64()
-  tvosArm64()
-  iosArm64()
-  // -- Tier 3 --
-  mingwX64()
-
   sourceSets {
     commonMain {
       dependencies {
@@ -80,16 +42,6 @@ kotlin {
       }
     }
   }
-
-  @OptIn(ExperimentalKotlinGradlePluginApi::class)
-  compilerOptions {
-    (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
-    (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
-  }
-}
-
-tasks.withType<Test>().configureEach {
-  useJUnitPlatform()
 }
 
 composeCompiler {

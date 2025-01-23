@@ -10,19 +10,6 @@ open annotation class arrow.resilience/SagaDSLMarker : kotlin/Annotation { // ar
     constructor <init>() // arrow.resilience/SagaDSLMarker.<init>|<init>(){}[0]
 }
 
-final enum class arrow.resilience.common/Platform : kotlin/Enum<arrow.resilience.common/Platform> { // arrow.resilience.common/Platform|null[0]
-    enum entry JS // arrow.resilience.common/Platform.JS|null[0]
-    enum entry JVM // arrow.resilience.common/Platform.JVM|null[0]
-    enum entry Native // arrow.resilience.common/Platform.Native|null[0]
-    enum entry Wasm // arrow.resilience.common/Platform.Wasm|null[0]
-
-    final val entries // arrow.resilience.common/Platform.entries|#static{}entries[0]
-        final fun <get-entries>(): kotlin.enums/EnumEntries<arrow.resilience.common/Platform> // arrow.resilience.common/Platform.entries.<get-entries>|<get-entries>#static(){}[0]
-
-    final fun valueOf(kotlin/String): arrow.resilience.common/Platform // arrow.resilience.common/Platform.valueOf|valueOf#static(kotlin.String){}[0]
-    final fun values(): kotlin/Array<arrow.resilience.common/Platform> // arrow.resilience.common/Platform.values|values#static(){}[0]
-}
-
 abstract fun interface <#A: in kotlin/Any?, #B: out kotlin/Any?> arrow.resilience/Schedule { // arrow.resilience/Schedule|null[0]
     open val step // arrow.resilience/Schedule.step|{}step[0]
         open fun <get-step>(): kotlin.coroutines/SuspendFunction1<#A, arrow.resilience/Schedule.Decision<#A, #B>> // arrow.resilience/Schedule.step.<get-step>|<get-step>(){}[0]
@@ -238,9 +225,6 @@ final class arrow.resilience/SagaBuilder : arrow.resilience/SagaScope { // arrow
 }
 
 final object arrow.resilience/SagaActionStep // arrow.resilience/SagaActionStep|null[0]
-
-final val arrow.resilience.common/platform // arrow.resilience.common/platform|{}platform[0]
-    final fun <get-platform>(): arrow.resilience.common/Platform // arrow.resilience.common/platform.<get-platform>|<get-platform>(){}[0]
 
 final fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlinx.coroutines.flow/Flow<#A>).arrow.resilience/retry(arrow.resilience/Schedule<kotlin/Throwable, #B>): kotlinx.coroutines.flow/Flow<#A> // arrow.resilience/retry|retry@kotlinx.coroutines.flow.Flow<0:0>(arrow.resilience.Schedule<kotlin.Throwable,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> arrow.resilience/saga(kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaActionStep, #A>, kotlin.coroutines/SuspendFunction1<#A, kotlin/Unit>): kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaScope, #A> // arrow.resilience/saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaActionStep,0:0>;kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
