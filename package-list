@@ -50,6 +50,6 @@ module:arrow-optics-reflect
 arrow.optics
 module:arrow-platform
 arrow.platform
+arrow.platform.test
 module:arrow-resilience
 arrow.resilience
-arrow.resilience.common

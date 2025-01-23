@@ -41,12 +41,12 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.0.0
+        <div class="library-version" id="library-version">2.0.1
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-collectors/androidAndJvmMain">androidAndJvm</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-collectors/commonMain">common</button>
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-collectors/jvmMain">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -57,16 +57,16 @@
                     </div>
                         <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-collectors/androidAndJvmMain" data-filter=":arrow-collectors/androidAndJvmMain">
+                                <span class="checkbox--icon"></span>
+                                androidAndJvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
                                 <input type="checkbox" class="checkbox--input" id=":arrow-collectors/commonMain" data-filter=":arrow-collectors/commonMain">
                                 <span class="checkbox--icon"></span>
                                 common
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":arrow-collectors/jvmMain" data-filter=":arrow-collectors/jvmMain">
-                                <span class="checkbox--icon"></span>
-                                jvm
                             </label>
                         </li>
                 </ul>
@@ -158,53 +158,53 @@
               </div>
             </div>
           </div>
-<a data-name="-1220496062%2FFunctions%2F1277290817" anchor-label="concurrentMap" id="-1220496062%2FFunctions%2F1277290817" data-filterable-set=":arrow-collectors/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain">
+<a data-name="-1220496062%2FFunctions%2F-1110430379" anchor-label="concurrentMap" id="-1220496062%2FFunctions%2F-1110430379" data-filterable-set=":arrow-collectors/androidAndJvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../concurrent-map.html"><span>concurrent</span><wbr><span><span>Map</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1220496062%2FFunctions%2F1277290817"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1220496062%2FFunctions%2F-1110430379"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain" data-active="" data-toggle=":arrow-collectors/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map.html">V</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-map.html"><span class="token function">concurrentMap</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html">ConcurrentMap</a><span class="token operator">&lt;</span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain" data-active="" data-toggle=":arrow-collectors/androidAndJvmMain">androidAndJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map.html">V</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-map.html"><span class="token function">concurrentMap</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="../concurrent-map.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span>ERROR CLASS: Symbol not found for ConcurrentMap<span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="27627700%2FFunctions%2F1277290817" anchor-label="concurrentMapFromEntries" id="27627700%2FFunctions%2F1277290817" data-filterable-set=":arrow-collectors/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain">
+<a data-name="27627700%2FFunctions%2F-1110430379" anchor-label="concurrentMapFromEntries" id="27627700%2FFunctions%2F-1110430379" data-filterable-set=":arrow-collectors/androidAndJvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../concurrent-map-from-entries.html"><span>concurrent</span><wbr><span>Map</span><wbr><span>From</span><wbr><span><span>Entries</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="27627700%2FFunctions%2F1277290817"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="27627700%2FFunctions%2F-1110430379"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain" data-active="" data-toggle=":arrow-collectors/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-map-from-entries.html"><span class="token function">concurrentMapFromEntries</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html">ConcurrentMap</a><span class="token operator">&lt;</span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain" data-active="" data-toggle=":arrow-collectors/androidAndJvmMain">androidAndJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-map-from-entries.html"><span class="token function">concurrentMapFromEntries</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><a href="../concurrent-map-from-entries.html">K</a><span class="token punctuation">, </span><a href="../concurrent-map-from-entries.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span>ERROR CLASS: Symbol not found for ConcurrentMap<span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a map.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1284732232%2FFunctions%2F1277290817" anchor-label="concurrentSet" id="1284732232%2FFunctions%2F1277290817" data-filterable-set=":arrow-collectors/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain">
+<a data-name="1284732232%2FFunctions%2F-1110430379" anchor-label="concurrentSet" id="1284732232%2FFunctions%2F-1110430379" data-filterable-set=":arrow-collectors/androidAndJvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../concurrent-set.html"><span>concurrent</span><wbr><span><span>Set</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1284732232%2FFunctions%2F1277290817"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1284732232%2FFunctions%2F-1110430379"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain" data-active="" data-toggle=":arrow-collectors/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../concurrent-set.html">T</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-set.html"><span class="token function">concurrentSet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="../concurrent-set.html">T</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../concurrent-set.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a set.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain" data-active="" data-toggle=":arrow-collectors/androidAndJvmMain">androidAndJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../concurrent-set.html">T</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../concurrent-set.html"><span class="token function">concurrentSet</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="../concurrent-set.html">T</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../concurrent-set.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Collects all the values in a set.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -239,19 +239,19 @@
               </div>
             </div>
           </div>
-<a data-name="-2008309499%2FFunctions%2F1277290817" anchor-label="jvm" id="-2008309499%2FFunctions%2F1277290817" data-filterable-set=":arrow-collectors/jvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain">
+<a data-name="-458816043%2FFunctions%2F-1110430379" anchor-label="jvm" id="-458816043%2FFunctions%2F-1110430379" data-filterable-set=":arrow-collectors/androidAndJvmMain"></a>
+          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../jvm.html"><span><span>jvm</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2008309499%2FFunctions%2F1277290817"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-458816043%2FFunctions%2F-1110430379"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/jvmMain" data-filterable-set=":arrow-collectors/jvmMain" data-active="" data-toggle=":arrow-collectors/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../jvm.html">T</a><span class="token punctuation">, </span><a href="../jvm.html">R</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../jvm.html"><span class="token function">jvm</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">collector<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html">Collector</a><span class="token operator">&lt;</span><a href="../jvm.html">T</a><span class="token punctuation">, </span><span class="token operator">*</span><span class="token punctuation">, </span><a href="../jvm.html">R</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="../jvm.html">T</a><span class="token punctuation">, </span><a href="../jvm.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Wraps a <a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collector.html">java.util.stream.Collector</a> to use with <a href="../collect.html">collect</a>.</p></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-collectors/androidAndJvmMain" data-filterable-set=":arrow-collectors/androidAndJvmMain" data-active="" data-toggle=":arrow-collectors/androidAndJvmMain">androidAndJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-collectors/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../jvm.html">T</a><span class="token punctuation">, </span><a href="../jvm.html">R</a><span class="token operator">&gt; </span><a href="index.html">Collectors</a><span class="token punctuation">.</span><a href="../jvm.html"><span class="token function">jvm</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">collector<span class="token operator">: </span>ERROR CLASS: Symbol not found for java.util.stream.Collector</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-non-suspend-collector/index.html">NonSuspendCollector</a><span class="token operator">&lt;</span><a href="../jvm.html">T</a><span class="token punctuation">, </span><a href="../jvm.html">R</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Wraps a java.util.stream.Collector to use with <a href="../collect.html">collect</a>.</p></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -338,7 +338,7 @@
 </div>
     <div class="footer">
         <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2024 Copyright</span>
+        <span>© 2025 Copyright</span>
         <span class="pull-right">
             <span>Generated by </span>
             <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
