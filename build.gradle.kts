@@ -35,11 +35,11 @@ allprojects {
 
 plugins {
   base
-  alias(libs.plugins.android.library) apply false
+  id(libs.plugins.kotlin.multiplatform.get().pluginId) apply false
+  id(libs.plugins.android.library.get().pluginId) apply false
   alias(libs.plugins.dokka)
   alias(libs.plugins.animalSniffer) apply false
   alias(libs.plugins.kotlinx.kover)
-  alias(libs.plugins.kotlin.multiplatform) apply false
   alias(libs.plugins.kotlinx.serialization) apply false
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
   alias(libs.plugins.spotless) apply false

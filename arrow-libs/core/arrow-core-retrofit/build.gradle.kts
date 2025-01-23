@@ -1,12 +1,8 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-
-
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
-  alias(libs.plugins.arrowGradleConfig.kotlin)
+  id("arrow.kotlin")
   alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.serialization) // Needed for testing only
   alias(libs.plugins.kotlinx.kover)
@@ -41,19 +37,8 @@ dependencies {
   testImplementation(libs.squareup.moshi.kotlin)
 }
 
-kotlin {
-  compilerOptions {
-    (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
-    (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
-  }
-}
-
 tasks.jar {
   manifest {
     attributes["Automatic-Module-Name"] = "arrow.core.retrofit"
   }
-}
-
-tasks.withType<Test>().configureEach {
-  useJUnitPlatform()
 }

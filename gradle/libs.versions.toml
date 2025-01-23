@@ -1,6 +1,5 @@
 [versions]
 animalSniffer = "1.7.2"
-arrowGradleConfig = "0.12.0-rc.26"
 coroutines = "1.10.1"
 classgraph = "4.8.179"
 dokka = "2.0.0"
@@ -18,7 +17,7 @@ moshi = "1.15.2"
 spotlessVersion = "7.0.2"
 compose = "1.7.6"
 composePlugin = "1.7.3"
-agp = "8.8.0"
+agp = "8.7.3"
 android-compileSdk = "34"
 cache4k = "0.14.0"
 publish="0.30.0"
@@ -43,18 +42,18 @@ squareup-retrofit-converter-moshi = { module = "com.squareup.retrofit2:converter
 squareup-retrofit-converter-kotlinxSerialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
-kspGradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
+# required for the convention plugin
+gradlePlugin-kotlin-base = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin"}
+gradlePlugin-android-library = { module = "com.android.library:com.android.library.gradle.plugin", version.ref = "agp" }
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
-arrowGradleConfig-formatter = { id = "io.arrow-kt.arrow-gradle-config-formatter", version.ref = "arrowGradleConfig" }
-arrowGradleConfig-kotlin = { id = "io.arrow-kt.arrow-gradle-config-kotlin", version.ref = "arrowGradleConfig" }
-arrowGradleConfig-publish = { id = "io.arrow-kt.arrow-gradle-config-publish", version.ref = "arrowGradleConfig" }
 publish = { id = "com.vanniktech.maven.publish", version.ref="publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

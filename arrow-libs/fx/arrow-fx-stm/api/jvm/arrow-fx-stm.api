@@ -1,0 +1,242 @@
+public abstract interface class arrow/fx/stm/STM {
+	public abstract fun acquire (Larrow/fx/stm/TSemaphore;)V
+	public abstract fun acquire (Larrow/fx/stm/TSemaphore;I)V
+	public abstract fun available (Larrow/fx/stm/TSemaphore;)I
+	public abstract fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun flush (Larrow/fx/stm/TQueue;)Ljava/util/List;
+	public abstract fun fold (Larrow/fx/stm/TArray;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public abstract fun get (Larrow/fx/stm/TArray;I)Ljava/lang/Object;
+	public abstract fun get (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun getValue (Larrow/fx/stm/TVar;)Ljava/lang/Object;
+	public abstract fun getValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+	public abstract fun insert (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public abstract fun insert (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public abstract fun isEmpty (Larrow/fx/stm/TMVar;)Z
+	public abstract fun isEmpty (Larrow/fx/stm/TQueue;)Z
+	public abstract fun isNotEmpty (Larrow/fx/stm/TMVar;)Z
+	public abstract fun isNotEmpty (Larrow/fx/stm/TQueue;)Z
+	public abstract fun lookup (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun member (Larrow/fx/stm/TMap;Ljava/lang/Object;)Z
+	public abstract fun member (Larrow/fx/stm/TSet;Ljava/lang/Object;)Z
+	public abstract fun modify (Larrow/fx/stm/TVar;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun newTVar (Ljava/lang/Object;)Larrow/fx/stm/TVar;
+	public abstract fun orElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public abstract fun peek (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public abstract fun plusAssign (Larrow/fx/stm/TMap;Lkotlin/Pair;)V
+	public abstract fun plusAssign (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public abstract fun plusAssign (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public abstract fun put (Larrow/fx/stm/TMVar;Ljava/lang/Object;)V
+	public abstract fun read (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public abstract fun read (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public abstract fun read (Larrow/fx/stm/TVar;)Ljava/lang/Object;
+	public abstract fun release (Larrow/fx/stm/TSemaphore;)V
+	public abstract fun release (Larrow/fx/stm/TSemaphore;I)V
+	public abstract fun remove (Larrow/fx/stm/TMap;Ljava/lang/Object;)V
+	public abstract fun remove (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public abstract fun removeAll (Larrow/fx/stm/TQueue;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun retry ()Ljava/lang/Void;
+	public abstract fun set (Larrow/fx/stm/TArray;ILjava/lang/Object;)V
+	public abstract fun set (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public abstract fun set (Larrow/fx/stm/TVar;Ljava/lang/Object;)V
+	public abstract fun setValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;Ljava/lang/Object;)V
+	public abstract fun size (Larrow/fx/stm/TQueue;)I
+	public abstract fun swap (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun swap (Larrow/fx/stm/TVar;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun take (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public abstract fun transform (Larrow/fx/stm/TArray;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun tryAcquire (Larrow/fx/stm/TSemaphore;)Z
+	public abstract fun tryAcquire (Larrow/fx/stm/TSemaphore;I)Z
+	public abstract fun tryPeek (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public abstract fun tryPut (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Z
+	public abstract fun tryRead (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public abstract fun tryRead (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public abstract fun tryTake (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public abstract fun update (Larrow/fx/stm/TMap;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun write (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public abstract fun write (Larrow/fx/stm/TVar;Ljava/lang/Object;)V
+	public abstract fun writeFront (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+}
+
+public final class arrow/fx/stm/STM$DefaultImpls {
+	public static fun acquire (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;)V
+	public static fun acquire (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;I)V
+	public static fun available (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;)I
+	public static fun flush (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Ljava/util/List;
+	public static fun fold (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public static fun get (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;I)Ljava/lang/Object;
+	public static fun get (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun getValue (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;)Ljava/lang/Object;
+	public static fun getValue (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+	public static fun insert (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public static fun insert (Larrow/fx/stm/STM;Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public static fun isEmpty (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Z
+	public static fun isEmpty (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Z
+	public static fun isNotEmpty (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Z
+	public static fun isNotEmpty (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Z
+	public static fun lookup (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun member (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;)Z
+	public static fun member (Larrow/fx/stm/STM;Larrow/fx/stm/TSet;Ljava/lang/Object;)Z
+	public static fun modify (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Lkotlin/jvm/functions/Function1;)V
+	public static fun newTVar (Larrow/fx/stm/STM;Ljava/lang/Object;)Larrow/fx/stm/TVar;
+	public static fun peek (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public static fun plusAssign (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Lkotlin/Pair;)V
+	public static fun plusAssign (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public static fun plusAssign (Larrow/fx/stm/STM;Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public static fun put (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;Ljava/lang/Object;)V
+	public static fun read (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public static fun read (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public static fun release (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;)V
+	public static fun release (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;I)V
+	public static fun remove (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;)V
+	public static fun remove (Larrow/fx/stm/STM;Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public static fun removeAll (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;Lkotlin/jvm/functions/Function1;)V
+	public static fun set (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;ILjava/lang/Object;)V
+	public static fun set (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public static fun set (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Object;)V
+	public static fun setValue (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;Ljava/lang/Object;)V
+	public static fun size (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)I
+	public static fun swap (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun swap (Larrow/fx/stm/STM;Larrow/fx/stm/TVar;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun take (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public static fun transform (Larrow/fx/stm/STM;Larrow/fx/stm/TArray;Lkotlin/jvm/functions/Function1;)V
+	public static fun tryAcquire (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;)Z
+	public static fun tryAcquire (Larrow/fx/stm/STM;Larrow/fx/stm/TSemaphore;I)Z
+	public static fun tryPeek (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public static fun tryPut (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;Ljava/lang/Object;)Z
+	public static fun tryRead (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public static fun tryRead (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public static fun tryTake (Larrow/fx/stm/STM;Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public static fun update (Larrow/fx/stm/STM;Larrow/fx/stm/TMap;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
+	public static fun write (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public static fun writeFront (Larrow/fx/stm/STM;Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+}
+
+public final class arrow/fx/stm/STMKt {
+	public static final fun atomically (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun check (Larrow/fx/stm/STM;Z)V
+	public static final fun stm (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/fx/stm/TArray {
+	public static final field Companion Larrow/fx/stm/TArray$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public final fun size ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/stm/TArray$Companion {
+	public final fun new (ILjava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun new (ILkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun new (Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun new ([Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TArrayKt {
+	public static final fun newTArray (Larrow/fx/stm/STM;ILjava/lang/Object;)Larrow/fx/stm/TArray;
+	public static final fun newTArray (Larrow/fx/stm/STM;ILkotlin/jvm/functions/Function1;)Larrow/fx/stm/TArray;
+	public static final fun newTArray (Larrow/fx/stm/STM;Ljava/lang/Iterable;)Larrow/fx/stm/TArray;
+	public static final fun newTArray (Larrow/fx/stm/STM;[Ljava/lang/Object;)Larrow/fx/stm/TArray;
+}
+
+public final class arrow/fx/stm/TMVar {
+	public static final field Companion Larrow/fx/stm/TMVar$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/stm/TMVar$Companion {
+	public final fun empty (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun new (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TMVarKt {
+	public static final fun newEmptyTMVar (Larrow/fx/stm/STM;)Larrow/fx/stm/TMVar;
+	public static final fun newTMVar (Larrow/fx/stm/STM;Ljava/lang/Object;)Larrow/fx/stm/TMVar;
+}
+
+public final class arrow/fx/stm/TMap {
+	public static final field Companion Larrow/fx/stm/TMap$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/stm/TMap$Companion {
+	public final fun new (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun new (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TMapKt {
+	public static final fun newTMap (Larrow/fx/stm/STM;)Larrow/fx/stm/TMap;
+	public static final fun newTMap (Larrow/fx/stm/STM;Lkotlin/jvm/functions/Function1;)Larrow/fx/stm/TMap;
+}
+
+public final class arrow/fx/stm/TQueue {
+	public static final field Companion Larrow/fx/stm/TQueue$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/stm/TQueue$Companion {
+	public final fun new (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TQueueKt {
+	public static final fun newTQueue (Larrow/fx/stm/STM;)Larrow/fx/stm/TQueue;
+}
+
+public final class arrow/fx/stm/TSemaphore {
+	public static final field Companion Larrow/fx/stm/TSemaphore$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/stm/TSemaphore$Companion {
+	public final fun new (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TSemaphoreKt {
+	public static final fun newTSem (Larrow/fx/stm/STM;I)Larrow/fx/stm/TSemaphore;
+}
+
+public final class arrow/fx/stm/TSet {
+	public static final field Companion Larrow/fx/stm/TSet$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/stm/TSet$Companion {
+	public final fun new (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun new (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TSetKt {
+	public static final fun newTSet (Larrow/fx/stm/STM;)Larrow/fx/stm/TSet;
+	public static final fun newTSet (Larrow/fx/stm/STM;Lkotlin/jvm/functions/Function1;)Larrow/fx/stm/TSet;
+}
+
+public final class arrow/fx/stm/TVar {
+	public static final field Companion Larrow/fx/stm/TVar$Companion;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public final fun unsafeRead (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/TVar$Companion {
+	public final fun new (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/stm/internal/BlockedIndefinitely : java/lang/Throwable {
+	public fun <init> ()V
+}
+
+public final class arrow/fx/stm/internal/RetryException : java/lang/Throwable {
+	public static final field INSTANCE Larrow/fx/stm/internal/RetryException;
+	public fun fillInStackTrace ()Ljava/lang/Throwable;
+}
+

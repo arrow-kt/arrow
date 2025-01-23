@@ -2,11 +2,8 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 
 plugins {
-  // `java-library`
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   alias(libs.plugins.publish)
   alias(libs.plugins.kotlinx.kover)
@@ -41,18 +38,16 @@ kotlin {
     }
   }
 
-  jvm {
-    withJava()
-  }
+  jvm()
   js(IR) {
     browser()
     nodejs()
   }
-  // @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class) wasmJs {
-  //   browser()
-  //   nodejs()
-  //   d8()
-  // }
+  @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class) wasmJs {
+    browser()
+    nodejs()
+    d8()
+  }
   // Native: https://kotlinlang.org/docs/native-target-support.html
   // -- Tier 1 --
   linuxX64()
