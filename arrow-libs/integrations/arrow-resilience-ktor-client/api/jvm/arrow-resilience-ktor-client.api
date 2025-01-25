@@ -1,0 +1,12 @@
+public final class arrow/resilience/ktor/client/ArrowResilienceConfig {
+	public fun <init> ()V
+	public final fun getCircuitBreaker ()Larrow/resilience/CircuitBreaker;
+	public final fun getSchedule ()Larrow/resilience/Schedule;
+	public final fun setCircuitBreaker (Larrow/resilience/CircuitBreaker;)V
+	public final fun setSchedule (Larrow/resilience/Schedule;)V
+}
+
+public final class arrow/resilience/ktor/client/ArrowResilienceKt {
+	public static final fun getArrowResilience ()Lio/ktor/client/plugins/api/ClientPlugin;
+}
+

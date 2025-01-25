@@ -1,0 +1,21 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-resilience-ktor-client>
+final class arrow.resilience.ktor.client/ArrowResilienceConfig { // arrow.resilience.ktor.client/ArrowResilienceConfig|null[0]
+    constructor <init>() // arrow.resilience.ktor.client/ArrowResilienceConfig.<init>|<init>(){}[0]
+
+    final var circuitBreaker // arrow.resilience.ktor.client/ArrowResilienceConfig.circuitBreaker|{}circuitBreaker[0]
+        final fun <get-circuitBreaker>(): arrow.resilience/CircuitBreaker? // arrow.resilience.ktor.client/ArrowResilienceConfig.circuitBreaker.<get-circuitBreaker>|<get-circuitBreaker>(){}[0]
+        final fun <set-circuitBreaker>(arrow.resilience/CircuitBreaker?) // arrow.resilience.ktor.client/ArrowResilienceConfig.circuitBreaker.<set-circuitBreaker>|<set-circuitBreaker>(arrow.resilience.CircuitBreaker?){}[0]
+    final var schedule // arrow.resilience.ktor.client/ArrowResilienceConfig.schedule|{}schedule[0]
+        final fun <get-schedule>(): arrow.resilience/Schedule<kotlin/Throwable, *> // arrow.resilience.ktor.client/ArrowResilienceConfig.schedule.<get-schedule>|<get-schedule>(){}[0]
+        final fun <set-schedule>(arrow.resilience/Schedule<kotlin/Throwable, *>) // arrow.resilience.ktor.client/ArrowResilienceConfig.schedule.<set-schedule>|<set-schedule>(arrow.resilience.Schedule<kotlin.Throwable,*>){}[0]
+}
+
+final val arrow.resilience.ktor.client/ArrowResilience // arrow.resilience.ktor.client/ArrowResilience|{}ArrowResilience[0]
+    final fun <get-ArrowResilience>(): io.ktor.client.plugins.api/ClientPlugin<arrow.resilience.ktor.client/ArrowResilienceConfig> // arrow.resilience.ktor.client/ArrowResilience.<get-ArrowResilience>|<get-ArrowResilience>(){}[0]

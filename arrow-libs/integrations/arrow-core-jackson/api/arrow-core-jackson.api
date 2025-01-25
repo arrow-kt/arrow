@@ -1,0 +1,163 @@
+public final class arrow/integrations/jackson/module/ArrowModuleKt {
+	public static final fun registerArrowModule (Lcom/fasterxml/jackson/databind/ObjectMapper;Larrow/integrations/jackson/module/EitherModuleConfig;Larrow/integrations/jackson/module/IorModuleConfig;)Lcom/fasterxml/jackson/databind/ObjectMapper;
+	public static synthetic fun registerArrowModule$default (Lcom/fasterxml/jackson/databind/ObjectMapper;Larrow/integrations/jackson/module/EitherModuleConfig;Larrow/integrations/jackson/module/IorModuleConfig;ILjava/lang/Object;)Lcom/fasterxml/jackson/databind/ObjectMapper;
+}
+
+public final class arrow/integrations/jackson/module/EitherDeserializerResolver : com/fasterxml/jackson/databind/deser/Deserializers$Base {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun findBeanDeserializer (Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/databind/DeserializationConfig;Lcom/fasterxml/jackson/databind/BeanDescription;)Lcom/fasterxml/jackson/databind/JsonDeserializer;
+}
+
+public final class arrow/integrations/jackson/module/EitherModule : com/fasterxml/jackson/databind/module/SimpleModule {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun setupModule (Lcom/fasterxml/jackson/databind/Module$SetupContext;)V
+}
+
+public final class arrow/integrations/jackson/module/EitherModuleConfig {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Larrow/integrations/jackson/module/EitherModuleConfig;
+	public static synthetic fun copy$default (Larrow/integrations/jackson/module/EitherModuleConfig;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/integrations/jackson/module/EitherModuleConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLeftFieldName ()Ljava/lang/String;
+	public final fun getRightFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/integrations/jackson/module/EitherSerializerResolver : com/fasterxml/jackson/databind/ser/Serializers$Base {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun findSerializer (Lcom/fasterxml/jackson/databind/SerializationConfig;Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/databind/BeanDescription;)Lcom/fasterxml/jackson/databind/JsonSerializer;
+}
+
+public final class arrow/integrations/jackson/module/IorDeserializerResolver : com/fasterxml/jackson/databind/deser/Deserializers$Base {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun findBeanDeserializer (Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/databind/DeserializationConfig;Lcom/fasterxml/jackson/databind/BeanDescription;)Lcom/fasterxml/jackson/databind/JsonDeserializer;
+}
+
+public final class arrow/integrations/jackson/module/IorModule : com/fasterxml/jackson/databind/module/SimpleModule {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun setupModule (Lcom/fasterxml/jackson/databind/Module$SetupContext;)V
+}
+
+public final class arrow/integrations/jackson/module/IorModuleConfig {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Larrow/integrations/jackson/module/IorModuleConfig;
+	public static synthetic fun copy$default (Larrow/integrations/jackson/module/IorModuleConfig;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Larrow/integrations/jackson/module/IorModuleConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLeftFieldName ()Ljava/lang/String;
+	public final fun getRightFieldName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/integrations/jackson/module/IorSerializerResolver : com/fasterxml/jackson/databind/ser/Serializers$Base {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public fun findSerializer (Lcom/fasterxml/jackson/databind/SerializationConfig;Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/databind/BeanDescription;)Lcom/fasterxml/jackson/databind/JsonSerializer;
+}
+
+public final class arrow/integrations/jackson/module/OptionDeserializer : com/fasterxml/jackson/databind/JsonDeserializer, com/fasterxml/jackson/databind/deser/ContextualDeserializer {
+	public fun <init> ()V
+	public fun createContextual (Lcom/fasterxml/jackson/databind/DeserializationContext;Lcom/fasterxml/jackson/databind/BeanProperty;)Lcom/fasterxml/jackson/databind/JsonDeserializer;
+	public fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Larrow/core/Option;
+	public synthetic fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun getEmptyAccessPattern ()Lcom/fasterxml/jackson/databind/util/AccessPattern;
+	public fun getEmptyValue (Lcom/fasterxml/jackson/databind/DeserializationContext;)Larrow/core/Option;
+	public synthetic fun getEmptyValue (Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun getNullAccessPattern ()Lcom/fasterxml/jackson/databind/util/AccessPattern;
+	public fun getNullValue (Lcom/fasterxml/jackson/databind/DeserializationContext;)Larrow/core/Option;
+	public synthetic fun getNullValue (Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+}
+
+public final class arrow/integrations/jackson/module/OptionModule : com/fasterxml/jackson/databind/module/SimpleModule {
+	public static final field INSTANCE Larrow/integrations/jackson/module/OptionModule;
+	public fun setupModule (Lcom/fasterxml/jackson/databind/Module$SetupContext;)V
+}
+
+public final class arrow/integrations/jackson/module/OptionSerializer : com/fasterxml/jackson/databind/ser/std/ReferenceTypeSerializer {
+	public fun <init> (Larrow/integrations/jackson/module/OptionSerializer;Lcom/fasterxml/jackson/databind/BeanProperty;Lcom/fasterxml/jackson/databind/jsontype/TypeSerializer;Lcom/fasterxml/jackson/databind/JsonSerializer;Lcom/fasterxml/jackson/databind/util/NameTransformer;Ljava/lang/Object;Z)V
+	public fun <init> (Lcom/fasterxml/jackson/databind/type/ReferenceType;ZLcom/fasterxml/jackson/databind/jsontype/TypeSerializer;Lcom/fasterxml/jackson/databind/JsonSerializer;)V
+	public synthetic fun _getReferenced (Ljava/lang/Object;)Ljava/lang/Object;
+	public synthetic fun _getReferencedIfPresent (Ljava/lang/Object;)Ljava/lang/Object;
+	public synthetic fun _isValuePresent (Ljava/lang/Object;)Z
+	public fun withContentInclusion (Ljava/lang/Object;Z)Lcom/fasterxml/jackson/databind/ser/std/ReferenceTypeSerializer;
+}
+
+public final class arrow/integrations/jackson/module/OptionSerializerResolver : com/fasterxml/jackson/databind/ser/Serializers$Base {
+	public static final field INSTANCE Larrow/integrations/jackson/module/OptionSerializerResolver;
+	public fun findReferenceSerializer (Lcom/fasterxml/jackson/databind/SerializationConfig;Lcom/fasterxml/jackson/databind/type/ReferenceType;Lcom/fasterxml/jackson/databind/BeanDescription;Lcom/fasterxml/jackson/databind/jsontype/TypeSerializer;Lcom/fasterxml/jackson/databind/JsonSerializer;)Lcom/fasterxml/jackson/databind/JsonSerializer;
+}
+
+public final class arrow/integrations/jackson/module/OptionTypeModifier : com/fasterxml/jackson/databind/type/TypeModifier {
+	public static final field INSTANCE Larrow/integrations/jackson/module/OptionTypeModifier;
+	public fun modifyType (Lcom/fasterxml/jackson/databind/JavaType;Ljava/lang/reflect/Type;Lcom/fasterxml/jackson/databind/type/TypeBindings;Lcom/fasterxml/jackson/databind/type/TypeFactory;)Lcom/fasterxml/jackson/databind/JavaType;
+}
+
+public final class arrow/integrations/jackson/module/internal/ElementDeserializer {
+	public static final field Companion Larrow/integrations/jackson/module/internal/ElementDeserializer$Companion;
+	public fun <init> (Larrow/core/Option;Larrow/core/Option;)V
+	public final fun component1 ()Larrow/core/Option;
+	public final fun component2 ()Larrow/core/Option;
+	public final fun copy (Larrow/core/Option;Larrow/core/Option;)Larrow/integrations/jackson/module/internal/ElementDeserializer;
+	public static synthetic fun copy$default (Larrow/integrations/jackson/module/internal/ElementDeserializer;Larrow/core/Option;Larrow/core/Option;ILjava/lang/Object;)Larrow/integrations/jackson/module/internal/ElementDeserializer;
+	public final fun deserialize (Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/core/JsonToken;Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDeserializer ()Larrow/core/Option;
+	public final fun getTypeDeserializer ()Larrow/core/Option;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/integrations/jackson/module/internal/ElementDeserializer$Companion {
+	public final fun resolve (Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/databind/DeserializationContext;Lcom/fasterxml/jackson/databind/BeanProperty;)Larrow/integrations/jackson/module/internal/ElementDeserializer;
+}
+
+public final class arrow/integrations/jackson/module/internal/ProductTypeDeserializer : com/fasterxml/jackson/databind/deser/std/StdDeserializer, com/fasterxml/jackson/databind/deser/ContextualDeserializer {
+	public fun <init> (Ljava/lang/Class;Lcom/fasterxml/jackson/databind/JavaType;Ljava/util/List;Lkotlin/jvm/functions/Function1;)V
+	public fun createContextual (Lcom/fasterxml/jackson/databind/DeserializationContext;Lcom/fasterxml/jackson/databind/BeanProperty;)Lcom/fasterxml/jackson/databind/JsonDeserializer;
+	public fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+}
+
+public final class arrow/integrations/jackson/module/internal/ProductTypeDeserializer$InjectField {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getPoint ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/integrations/jackson/module/internal/ProductTypeSerializer : com/fasterxml/jackson/databind/ser/std/StdSerializer {
+	public fun <init> (Ljava/lang/Class;Ljava/util/List;)V
+	public fun serialize (Ljava/lang/Object;Lcom/fasterxml/jackson/core/JsonGenerator;Lcom/fasterxml/jackson/databind/SerializerProvider;)V
+}
+
+public final class arrow/integrations/jackson/module/internal/ProductTypeSerializer$ProjectField {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getGetOption ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/integrations/jackson/module/internal/UnionTypeDeserializer : com/fasterxml/jackson/databind/deser/std/StdDeserializer, com/fasterxml/jackson/databind/deser/ContextualDeserializer {
+	public fun <init> (Ljava/lang/Class;Lcom/fasterxml/jackson/databind/JavaType;Ljava/util/List;)V
+	public fun createContextual (Lcom/fasterxml/jackson/databind/DeserializationContext;Lcom/fasterxml/jackson/databind/BeanProperty;)Lcom/fasterxml/jackson/databind/JsonDeserializer;
+	public fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+}
+
+public final class arrow/integrations/jackson/module/internal/UnionTypeDeserializer$InjectField {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getPoint ()Lkotlin/jvm/functions/Function1;
+}
+
+public final class arrow/integrations/jackson/module/internal/UnionTypeSerializer : com/fasterxml/jackson/databind/ser/std/StdSerializer {
+	public fun <init> (Ljava/lang/Class;Ljava/util/List;)V
+	public fun serialize (Ljava/lang/Object;Lcom/fasterxml/jackson/core/JsonGenerator;Lcom/fasterxml/jackson/databind/SerializerProvider;)V
+}
+
+public final class arrow/integrations/jackson/module/internal/UnionTypeSerializer$ProjectField {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun getFieldName ()Ljava/lang/String;
+	public final fun getGetOption ()Lkotlin/jvm/functions/Function1;
+}
+
