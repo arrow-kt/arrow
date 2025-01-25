@@ -7,5 +7,4 @@ import io.kotest.property.arbitrary.string
 
 data class SomeObject(val someString: String, val someInt: Int)
 
-fun Arb.Companion.someObject(): Arb<SomeObject> =
-  Arb.bind(Arb.string(), Arb.int()) { str, int -> SomeObject(str, int) }
+fun Arb.Companion.someObject(): Arb<SomeObject> = Arb.bind(Arb.string(), Arb.int()) { str, int -> SomeObject(str, int) }

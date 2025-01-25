@@ -19,8 +19,7 @@ import com.fasterxml.jackson.databind.deser.Deserializers
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.Serializers
 
-public class IorModule(private val leftFieldName: String, private val rightFieldName: String) :
-  SimpleModule(IorModule::class.java.canonicalName, PackageVersion.VERSION) {
+public class IorModule(private val leftFieldName: String, private val rightFieldName: String) : SimpleModule(IorModule::class.java.canonicalName, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
     super.setupModule(context)
     context.addDeserializers(IorDeserializerResolver(leftFieldName, rightFieldName))
@@ -28,8 +27,7 @@ public class IorModule(private val leftFieldName: String, private val rightField
   }
 }
 
-public class IorSerializerResolver(leftFieldName: String, rightFieldName: String) :
-  Serializers.Base() {
+public class IorSerializerResolver(leftFieldName: String, rightFieldName: String) : Serializers.Base() {
   private val serializer =
     ProductTypeSerializer(
       Ior::class.java,
@@ -47,11 +45,10 @@ public class IorSerializerResolver(leftFieldName: String, rightFieldName: String
     config: SerializationConfig,
     type: JavaType,
     beanDesc: BeanDescription?,
-  ): JsonSerializer<*>? =
-    when {
-      Ior::class.java.isAssignableFrom(type.rawClass) -> serializer
-      else -> null
-    }
+  ): JsonSerializer<*>? = when {
+    Ior::class.java.isAssignableFrom(type.rawClass) -> serializer
+    else -> null
+  }
 }
 
 public class IorDeserializerResolver(
@@ -63,26 +60,25 @@ public class IorDeserializerResolver(
     javaType: JavaType,
     config: DeserializationConfig,
     beanDesc: BeanDescription?,
-  ): JsonDeserializer<*>? =
-    when {
-      Ior::class.java.isAssignableFrom(javaType.rawClass) ->
-        ProductTypeDeserializer(
-          Ior::class.java,
-          javaType,
-          listOf(
-            ProductTypeDeserializer.InjectField(leftFieldName) { firstValue ->
-              firstValue.leftIor()
-            },
-            ProductTypeDeserializer.InjectField(rightFieldName) { secondValue ->
-              secondValue.rightIor()
-            },
-          ),
-        ) { iors ->
-          // this reduce is safe because an Ior will always have either a left or a right
-          iors.reduce { first, second ->
-            first.combine(second, { x, y -> y ?: x }, { x, y -> x ?: y })
-          }
+  ): JsonDeserializer<*>? = when {
+    Ior::class.java.isAssignableFrom(javaType.rawClass) ->
+      ProductTypeDeserializer(
+        Ior::class.java,
+        javaType,
+        listOf(
+          ProductTypeDeserializer.InjectField(leftFieldName) { firstValue ->
+            firstValue.leftIor()
+          },
+          ProductTypeDeserializer.InjectField(rightFieldName) { secondValue ->
+            secondValue.rightIor()
+          },
+        ),
+      ) { iors ->
+        // this reduce is safe because an Ior will always have either a left or a right
+        iors.reduce { first, second ->
+          first.combine(second, { x, y -> y ?: x }, { x, y -> x ?: y })
         }
-      else -> null
-    }
+      }
+    else -> null
+  }
 }

@@ -23,18 +23,17 @@ public data class ElementDeserializer(
       containedType: JavaType,
       context: DeserializationContext,
       property: BeanProperty?,
-    ): ElementDeserializer =
-      ElementDeserializer(
-        deserializer = context.findContextualValueDeserializer(containedType, property).toOption(),
-        typeDeserializer =
-          option {
-            val prop = property.toOption().bind()
-            BeanDeserializerFactory.instance
-              .findPropertyTypeDeserializer(context.config, containedType, prop.member)
-              .toOption()
-              .bind()
-          },
-      )
+    ): ElementDeserializer = ElementDeserializer(
+      deserializer = context.findContextualValueDeserializer(containedType, property).toOption(),
+      typeDeserializer =
+      option {
+        val prop = property.toOption().bind()
+        BeanDeserializerFactory.instance
+          .findPropertyTypeDeserializer(context.config, containedType, prop.member)
+          .toOption()
+          .bind()
+      },
+    )
   }
 
   public fun deserialize(
@@ -42,19 +41,18 @@ public data class ElementDeserializer(
     token: JsonToken,
     parser: JsonParser,
     context: DeserializationContext,
-  ): Any? =
-    when {
-      token == JsonToken.VALUE_NULL -> null
-      deserializer is Some && typeDeserializer is Some ->
-        deserializer.value.deserializeWithType(parser, context, typeDeserializer.value)
-      deserializer is Some && typeDeserializer is None ->
-        deserializer.value.deserialize(parser, context)
-      else ->
-        context.handleUnexpectedToken(
-          javaType.rawClass,
-          token,
-          parser,
-          "no deserializer was found for given type",
-        )
-    }
+  ): Any? = when {
+    token == JsonToken.VALUE_NULL -> null
+    deserializer is Some && typeDeserializer is Some ->
+      deserializer.value.deserializeWithType(parser, context, typeDeserializer.value)
+    deserializer is Some && typeDeserializer is None ->
+      deserializer.value.deserialize(parser, context)
+    else ->
+      context.handleUnexpectedToken(
+        javaType.rawClass,
+        token,
+        parser,
+        "no deserializer was found for given type",
+      )
+  }
 }

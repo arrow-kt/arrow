@@ -13,9 +13,9 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
-import kotlinx.coroutines.test.runTest
 
 @Ignore
 class NonEmptySetModuleTest {
@@ -24,7 +24,7 @@ class NonEmptySetModuleTest {
   @Test
   fun `serializing NonEmptySet should be the same as serializing the underlying set`() = runTest {
     checkAll(
-      Arb.nonEmptySet(Arb.choice(Arb.someObject(), Arb.int(), Arb.string(), Arb.boolean()))
+      Arb.nonEmptySet(Arb.choice(Arb.someObject(), Arb.int(), Arb.string(), Arb.boolean())),
     ) { set ->
       val actual = mapper.writeValueAsString(set)
       val expected = mapper.writeValueAsString(set.toSet())
@@ -34,28 +34,27 @@ class NonEmptySetModuleTest {
   }
 
   @Test
-  fun `serializing NonEmptySet and then deserialize it should be the same as before the deserialization`() =
-    runTest {
-      checkAll(
-        Arb.choice(
-          arbitrary {
-            Arb.nonEmptySet(Arb.someObject()).bind() to jacksonTypeRef<NonEmptySet<SomeObject>>()
-          },
-          arbitrary { Arb.nonEmptySet(Arb.int()).bind() to jacksonTypeRef<NonEmptySet<Int>>() },
-          arbitrary {
-            Arb.nonEmptySet(Arb.string()).bind() to jacksonTypeRef<NonEmptySet<String>>()
-          },
-          arbitrary {
-            Arb.nonEmptySet(Arb.boolean()).bind() to jacksonTypeRef<NonEmptySet<Boolean>>()
-          },
-        )
-      ) { (set, typeReference) ->
-        val encoded: String = mapper.writeValueAsString(set)
-        val decoded: NonEmptySet<Any> = mapper.readValue(encoded, typeReference)
+  fun `serializing NonEmptySet and then deserialize it should be the same as before the deserialization`() = runTest {
+    checkAll(
+      Arb.choice(
+        arbitrary {
+          Arb.nonEmptySet(Arb.someObject()).bind() to jacksonTypeRef<NonEmptySet<SomeObject>>()
+        },
+        arbitrary { Arb.nonEmptySet(Arb.int()).bind() to jacksonTypeRef<NonEmptySet<Int>>() },
+        arbitrary {
+          Arb.nonEmptySet(Arb.string()).bind() to jacksonTypeRef<NonEmptySet<String>>()
+        },
+        arbitrary {
+          Arb.nonEmptySet(Arb.boolean()).bind() to jacksonTypeRef<NonEmptySet<Boolean>>()
+        },
+      ),
+    ) { (set, typeReference) ->
+      val encoded: String = mapper.writeValueAsString(set)
+      val decoded: NonEmptySet<Any> = mapper.readValue(encoded, typeReference)
 
-        decoded shouldBe set
-      }
+      decoded shouldBe set
     }
+  }
 
   @Test
   fun `serializing NonEmptySet in an object should round trip`() = runTest {

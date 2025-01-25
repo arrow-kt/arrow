@@ -48,14 +48,13 @@ public object OptionSerializerResolver : Serializers.Base() {
     beanDesc: BeanDescription?,
     contentTypeSerializer: TypeSerializer?,
     contentValueSerializer: JsonSerializer<Any>?,
-  ): JsonSerializer<*>? =
-    if (Option::class.java.isAssignableFrom(type.rawClass)) {
-      val staticTyping =
-        (contentTypeSerializer == null && config.isEnabled(MapperFeature.USE_STATIC_TYPING))
-      OptionSerializer(type, staticTyping, contentTypeSerializer, contentValueSerializer)
-    } else {
-      null
-    }
+  ): JsonSerializer<*>? = if (Option::class.java.isAssignableFrom(type.rawClass)) {
+    val staticTyping =
+      (contentTypeSerializer == null && config.isEnabled(MapperFeature.USE_STATIC_TYPING))
+    OptionSerializer(type, staticTyping, contentTypeSerializer, contentValueSerializer)
+  } else {
+    null
+  }
 }
 
 public object OptionTypeModifier : TypeModifier() {
@@ -64,13 +63,12 @@ public object OptionTypeModifier : TypeModifier() {
     jdkType: Type,
     context: TypeBindings?,
     typeFactory: TypeFactory?,
-  ): JavaType =
-    when {
-      type.isReferenceType || type.isContainerType -> type
-      type.rawClass == Option::class.java ->
-        ReferenceType.upgradeFrom(type, type.containedTypeOrUnknown(0))
-      else -> type
-    }
+  ): JavaType = when {
+    type.isReferenceType || type.isContainerType -> type
+    type.rawClass == Option::class.java ->
+      ReferenceType.upgradeFrom(type, type.containedTypeOrUnknown(0))
+    else -> type
+  }
 }
 
 public class OptionSerializer : ReferenceTypeSerializer<Option<*>> {
@@ -94,16 +92,15 @@ public class OptionSerializer : ReferenceTypeSerializer<Option<*>> {
   override fun withContentInclusion(
     suppressableValue: Any?,
     suppressNulls: Boolean,
-  ): ReferenceTypeSerializer<Option<*>> =
-    OptionSerializer(
-      this,
-      _property,
-      _valueTypeSerializer,
-      _valueSerializer,
-      _unwrapper,
-      suppressableValue,
-      suppressNulls,
-    )
+  ): ReferenceTypeSerializer<Option<*>> = OptionSerializer(
+    this,
+    _property,
+    _valueTypeSerializer,
+    _valueSerializer,
+    _unwrapper,
+    suppressableValue,
+    suppressNulls,
+  )
 
   override fun _isValuePresent(value: Option<*>): Boolean = value.isSome()
 
@@ -116,15 +113,15 @@ public class OptionSerializer : ReferenceTypeSerializer<Option<*>> {
     vts: TypeSerializer?,
     valueSer: JsonSerializer<*>?,
     unwrapper: NameTransformer?,
-  ): ReferenceTypeSerializer<Option<*>> =
-    OptionSerializer(this, prop, vts, valueSer, unwrapper, _suppressableValue, _suppressNulls)
+  ): ReferenceTypeSerializer<Option<*>> = OptionSerializer(this, prop, vts, valueSer, unwrapper, _suppressableValue, _suppressNulls)
 }
 
-public class OptionDeserializer : JsonDeserializer<Option<*>>(), ContextualDeserializer {
+public class OptionDeserializer :
+  JsonDeserializer<Option<*>>(),
+  ContextualDeserializer {
   private lateinit var valueType: JavaType
 
-  override fun deserialize(p: JsonParser?, ctxt: DeserializationContext): Option<*> =
-    Option.fromNullable(p).map { ctxt.readValue<Any>(it, valueType) }
+  override fun deserialize(p: JsonParser?, ctxt: DeserializationContext): Option<*> = Option.fromNullable(p).map { ctxt.readValue<Any>(it, valueType) }
 
   override fun createContextual(
     ctxt: DeserializationContext,
@@ -141,11 +138,10 @@ public class OptionDeserializer : JsonDeserializer<Option<*>>(), ContextualDeser
     return deserializer
   }
 
-  private fun <A> Option<A>.or(other: Option<A>) =
-    when (this) {
-      is Some<A> -> this
-      else -> other
-    }
+  private fun <A> Option<A>.or(other: Option<A>) = when (this) {
+    is Some<A> -> this
+    else -> other
+  }
 
   override fun getNullValue(ctxt: DeserializationContext): Option<*> = None
 

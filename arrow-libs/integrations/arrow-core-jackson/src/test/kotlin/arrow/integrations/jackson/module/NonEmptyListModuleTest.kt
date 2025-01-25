@@ -14,9 +14,9 @@ import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.test.Ignore
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
+import kotlin.test.Ignore
 
 @Ignore
 class NonEmptyListModuleTest {
@@ -25,7 +25,7 @@ class NonEmptyListModuleTest {
   @Test
   fun `serializing NonEmptyList should be the same as serializing the underlying list`() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.choice(Arb.someObject(), Arb.int(), Arb.string(), Arb.boolean()))
+      Arb.nonEmptyList(Arb.choice(Arb.someObject(), Arb.int(), Arb.string(), Arb.boolean())),
     ) { list ->
       val actual = mapper.writeValueAsString(list)
       val expected = mapper.writeValueAsString(list.toList())
@@ -35,24 +35,23 @@ class NonEmptyListModuleTest {
   }
 
   @Test
-  fun `serializing NonEmptyList and then deserialize it should be the same as before the deserialization`() =
-    runTest {
-      checkAll(
-        Arb.choice(
-          arbitrary {
-            Arb.nonEmptyList(Arb.someObject()).bind() to jacksonTypeRef<Nel<SomeObject>>()
-          },
-          arbitrary { Arb.nonEmptyList(Arb.int()).bind() to jacksonTypeRef<Nel<Int>>() },
-          arbitrary { Arb.nonEmptyList(Arb.string()).bind() to jacksonTypeRef<Nel<String>>() },
-          arbitrary { Arb.nonEmptyList(Arb.boolean()).bind() to jacksonTypeRef<Nel<Boolean>>() },
-        )
-      ) { (list, typeReference) ->
-        val encoded: String = mapper.writeValueAsString(list)
-        val decoded: Nel<Any> = mapper.readValue(encoded, typeReference)
+  fun `serializing NonEmptyList and then deserialize it should be the same as before the deserialization`() = runTest {
+    checkAll(
+      Arb.choice(
+        arbitrary {
+          Arb.nonEmptyList(Arb.someObject()).bind() to jacksonTypeRef<Nel<SomeObject>>()
+        },
+        arbitrary { Arb.nonEmptyList(Arb.int()).bind() to jacksonTypeRef<Nel<Int>>() },
+        arbitrary { Arb.nonEmptyList(Arb.string()).bind() to jacksonTypeRef<Nel<String>>() },
+        arbitrary { Arb.nonEmptyList(Arb.boolean()).bind() to jacksonTypeRef<Nel<Boolean>>() },
+      ),
+    ) { (list, typeReference) ->
+      val encoded: String = mapper.writeValueAsString(list)
+      val decoded: Nel<Any> = mapper.readValue(encoded, typeReference)
 
-        decoded shouldBe list
-      }
+      decoded shouldBe list
     }
+  }
 
   @Test
   fun `serializing NonEmptyList in an object should round trip`() = runTest {

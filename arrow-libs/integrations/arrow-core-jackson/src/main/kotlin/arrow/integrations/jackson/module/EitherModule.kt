@@ -19,8 +19,7 @@ import com.fasterxml.jackson.databind.deser.Deserializers
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.Serializers
 
-public class EitherModule(private val leftFieldName: String, private val rightFieldName: String) :
-  SimpleModule(EitherModule::class.java.canonicalName, PackageVersion.VERSION) {
+public class EitherModule(private val leftFieldName: String, private val rightFieldName: String) : SimpleModule(EitherModule::class.java.canonicalName, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
     super.setupModule(context)
     context.addDeserializers(EitherDeserializerResolver(leftFieldName, rightFieldName))
@@ -28,8 +27,7 @@ public class EitherModule(private val leftFieldName: String, private val rightFi
   }
 }
 
-public class EitherSerializerResolver(leftFieldName: String, rightFieldName: String) :
-  Serializers.Base() {
+public class EitherSerializerResolver(leftFieldName: String, rightFieldName: String) : Serializers.Base() {
   private val serializer =
     UnionTypeSerializer(
       Either::class.java,
@@ -43,11 +41,10 @@ public class EitherSerializerResolver(leftFieldName: String, rightFieldName: Str
     config: SerializationConfig,
     javaType: JavaType,
     beanDesc: BeanDescription?,
-  ): JsonSerializer<*>? =
-    when {
-      Either::class.java.isAssignableFrom(javaType.rawClass) -> serializer
-      else -> null
-    }
+  ): JsonSerializer<*>? = when {
+    Either::class.java.isAssignableFrom(javaType.rawClass) -> serializer
+    else -> null
+  }
 }
 
 private fun <E, A> Either<E, A>.orNone(): Option<A> = fold({ None }, ::Some)
@@ -60,17 +57,16 @@ public class EitherDeserializerResolver(
     type: JavaType,
     config: DeserializationConfig,
     beanDesc: BeanDescription?,
-  ): JsonDeserializer<*>? =
-    when {
-      Either::class.java.isAssignableFrom(type.rawClass) ->
-        UnionTypeDeserializer(
-          Either::class.java,
-          type,
-          listOf(
-            UnionTypeDeserializer.InjectField(leftFieldName) { leftValue -> leftValue.left() },
-            UnionTypeDeserializer.InjectField(rightFieldName) { rightValue -> rightValue.right() },
-          ),
-        )
-      else -> null
-    }
+  ): JsonDeserializer<*>? = when {
+    Either::class.java.isAssignableFrom(type.rawClass) ->
+      UnionTypeDeserializer(
+        Either::class.java,
+        type,
+        listOf(
+          UnionTypeDeserializer.InjectField(leftFieldName) { leftValue -> leftValue.left() },
+          UnionTypeDeserializer.InjectField(rightFieldName) { rightValue -> rightValue.right() },
+        ),
+      )
+    else -> null
+  }
 }

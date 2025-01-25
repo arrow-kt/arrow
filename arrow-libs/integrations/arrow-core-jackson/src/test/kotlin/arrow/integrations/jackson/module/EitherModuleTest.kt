@@ -23,8 +23,8 @@ import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
 class EitherModuleTest {
   @Test
@@ -47,7 +47,7 @@ class EitherModuleTest {
   @Test
   fun `should round-trip nested either types`() = runTest {
     checkAll(
-      Arb.either(Arb.either(arbFoo, Arb.int()).orNull(), Arb.either(Arb.string(), arbBar.orNull()))
+      Arb.either(Arb.either(arbFoo, Arb.int()).orNull(), Arb.either(Arb.string(), arbBar.orNull())),
     ) { either: Either<Either<Foo, Int>?, Either<String, Bar?>> ->
       either.shouldRoundTrip(mapper)
     }
@@ -58,7 +58,7 @@ class EitherModuleTest {
     checkAll(
       Arb.pair(Arb.string(10, Codepoint.az()), Arb.string(10, Codepoint.az())).filter {
         it.first != it.second
-      }
+      },
     ) { (leftFieldName, rightFieldName) ->
       val mapper =
         ObjectMapper()
@@ -82,7 +82,7 @@ class EitherModuleTest {
         ObjectMapper()
           .registerKotlinModule()
           .registerArrowModule(
-            eitherModuleConfig = EitherModuleConfig(leftFieldName, rightFieldName)
+            eitherModuleConfig = EitherModuleConfig(leftFieldName, rightFieldName),
           )
 
       testClass.shouldRoundTrip(mapper)
@@ -102,8 +102,7 @@ class EitherModuleTest {
   @Test
   fun `should round-trip when inside a collection`() = runTest {
     val mapper = ObjectMapper().registerArrowModule()
-    checkAll(Arb.list(Arb.either(Arb.int(1..10), Arb.string(5)))) {
-      original: List<Either<Int, String>> ->
+    checkAll(Arb.list(Arb.either(Arb.int(1..10), Arb.string(5)))) { original: List<Either<Int, String>> ->
       val serialized: String = mapper.writeValueAsString(original)
       val deserialized = shouldNotThrowAny {
         mapper.readValue<List<Either<Int, String>>>(serialized)

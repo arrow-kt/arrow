@@ -13,7 +13,8 @@ public class UnionTypeDeserializer<T>(
   private val clazz: Class<T>,
   private val javaType: JavaType,
   private val fields: List<InjectField<T>>,
-) : StdDeserializer<T>(clazz), ContextualDeserializer {
+) : StdDeserializer<T>(clazz),
+  ContextualDeserializer {
   public class InjectField<T>(public val fieldName: String, public val point: (Any?) -> T)
 
   private val deserializers: MutableMap<String, ElementDeserializer> = mutableMapOf()
@@ -43,15 +44,14 @@ public class UnionTypeDeserializer<T>(
   override fun createContextual(
     ctxt: DeserializationContext,
     property: BeanProperty?,
-  ): JsonDeserializer<*> =
-    UnionTypeDeserializer(clazz, javaType, fields).also { deserializer ->
-      fields.forEachIndexed { index, field ->
-        deserializer.deserializers[field.fieldName] =
-          ElementDeserializer.resolve(
-            ctxt.contextualType.containedTypeOrUnknown(index),
-            ctxt,
-            property,
-          )
-      }
+  ): JsonDeserializer<*> = UnionTypeDeserializer(clazz, javaType, fields).also { deserializer ->
+    fields.forEachIndexed { index, field ->
+      deserializer.deserializers[field.fieldName] =
+        ElementDeserializer.resolve(
+          ctxt.contextualType.containedTypeOrUnknown(index),
+          ctxt,
+          property,
+        )
     }
+  }
 }

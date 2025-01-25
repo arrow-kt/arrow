@@ -31,11 +31,8 @@ inline fun <reified T> String.shouldRoundTripOtherWay(mapper: ObjectMapper) {
 
 fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> = arb.orNull().map { it.toOption() }
 
-fun <A, B> Arb.Companion.either(left: Arb<A>, right: Arb<B>): Arb<Either<A, B>> =
-  choice(left.map { Either.Left(it) }, right.map { Either.Right(it) })
+fun <A, B> Arb.Companion.either(left: Arb<A>, right: Arb<B>): Arb<Either<A, B>> = choice(left.map { Either.Left(it) }, right.map { Either.Right(it) })
 
-fun <A> Arb.Companion.nonEmptyList(a: Arb<A>): Arb<NonEmptyList<A>> =
-  list(a).filter(List<A>::isNotEmpty).map { it.toNonEmptyListOrNull()!! }
+fun <A> Arb.Companion.nonEmptyList(a: Arb<A>): Arb<NonEmptyList<A>> = list(a).filter(List<A>::isNotEmpty).map { it.toNonEmptyListOrNull()!! }
 
-fun <A> Arb.Companion.nonEmptySet(a: Arb<A>): Arb<NonEmptySet<A>> =
-  list(a).filter(List<A>::isNotEmpty).map { it.toNonEmptySetOrNull()!! }
+fun <A> Arb.Companion.nonEmptySet(a: Arb<A>): Arb<NonEmptySet<A>> = list(a).filter(List<A>::isNotEmpty).map { it.toNonEmptySetOrNull()!! }

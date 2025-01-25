@@ -15,7 +15,8 @@ public class ProductTypeDeserializer<T>(
   private val javaType: JavaType,
   private val fields: List<InjectField<T>>,
   private val fold: (List<T>) -> T,
-) : StdDeserializer<T>(clazz), ContextualDeserializer {
+) : StdDeserializer<T>(clazz),
+  ContextualDeserializer {
   public class InjectField<T>(public val fieldName: String, public val point: (Any?) -> T)
 
   private val deserializers: MutableMap<String, ElementDeserializer> = mutableMapOf()

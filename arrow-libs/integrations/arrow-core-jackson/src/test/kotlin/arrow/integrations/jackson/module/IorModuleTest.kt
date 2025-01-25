@@ -24,8 +24,8 @@ import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
 class IorModuleTest {
   @Test
@@ -48,7 +48,7 @@ class IorModuleTest {
   @Test
   fun `should round-trip nested ior types`() = runTest {
     checkAll(
-      Arb.ior(Arb.ior(arbFoo, Arb.int()).orNull(), Arb.ior(Arb.string(), arbBar.orNull()))
+      Arb.ior(Arb.ior(arbFoo, Arb.int()).orNull(), Arb.ior(Arb.string(), arbBar.orNull())),
     ) { ior: Ior<Ior<Foo, Int>?, Ior<String, Bar?>> ->
       ior.shouldRoundTrip(mapper)
     }
@@ -59,7 +59,7 @@ class IorModuleTest {
     checkAll(
       Arb.pair(Arb.string(10, Codepoint.az()), Arb.string(10, Codepoint.az())).filter {
         it.first != it.second
-      }
+      },
     ) { (leftFieldName, rightFieldName) ->
       val mapper =
         ObjectMapper()
@@ -85,7 +85,7 @@ class IorModuleTest {
         ObjectMapper()
           .registerKotlinModule()
           .registerArrowModule(
-            eitherModuleConfig = EitherModuleConfig(leftFieldName, rightFieldName)
+            eitherModuleConfig = EitherModuleConfig(leftFieldName, rightFieldName),
           )
 
       testClass.shouldRoundTrip(mapper)
@@ -183,12 +183,11 @@ class IorModuleTest {
 
   private val arbTestClass: Arb<TestClass> = arbitrary { TestClass(Arb.ior(arbFoo, arbBar).bind()) }
 
-  private fun <L, R> Arb.Companion.ior(arbL: Arb<L>, arbR: Arb<R>): Arb<Ior<L, R>> =
-    Arb.choice(
-      arbitrary { arbL.bind().leftIor() },
-      arbitrary { arbR.bind().rightIor() },
-      arbitrary { (arbL.bind() to arbR.bind()).bothIor() },
-    )
+  private fun <L, R> Arb.Companion.ior(arbL: Arb<L>, arbR: Arb<R>): Arb<Ior<L, R>> = Arb.choice(
+    arbitrary { arbL.bind().leftIor() },
+    arbitrary { arbR.bind().rightIor() },
+    arbitrary { (arbL.bind() to arbR.bind()).bothIor() },
+  )
 
   private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
 }
