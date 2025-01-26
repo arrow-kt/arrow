@@ -14,7 +14,6 @@ import arrow.core.recover
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -627,39 +626,6 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
     returns() implies (value != null)
   }
   return value ?: raise(raise())
-}
-
-/**
- * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [OtherError],
- * and transform any raised [OtherError] into [Error], which is raised to the outer [Raise].
- *
- * <!--- INCLUDE
- * import arrow.core.Either
- * import arrow.core.raise.either
- * import arrow.core.raise.withError
- * import io.kotest.matchers.shouldBe
- * -->
- * ```kotlin
- * fun test() {
- *   either<Int, String> {
- *     withError(String::length) {
- *       raise("failed")
- *     }
- *   } shouldBe Either.Left(6)
- * }
- * ```
- * <!--- KNIT example-raise-dsl-11.kt -->
- * <!--- TEST lines.isEmpty() -->
- */
-@RaiseDSL
-public inline fun <Error, OtherError, A> Raise<Error>.withError(
-  transform: (OtherError) -> Error,
-  @BuilderInference block: Raise<OtherError>.() -> A
-): A {
-  contract {
-    callsInPlace(block, EXACTLY_ONCE)
-  }
-  recover({ return block(this) }) { raise(transform(it)) }
 }
 
 /**

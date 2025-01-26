@@ -875,6 +875,10 @@ public final class arrow/core/UtilsKt {
 	public static final fun mapNullable (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
 }
 
+public final class arrow/core/raise/CancellationExceptionNoTraceKt {
+	public static final fun copyStacktrace (Ljava/lang/Throwable;Ljava/lang/Throwable;)V
+}
+
 public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public fun <init> (Z)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
@@ -922,6 +926,11 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class arrow/core/raise/NoTrace : arrow/core/raise/RaiseCancellationException {
+	public fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;)V
+	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
 public abstract interface class arrow/core/raise/Raise {
@@ -1161,5 +1170,12 @@ public final class arrow/core/raise/Trace {
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (Ljava/util/concurrent/CancellationException;)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()Ljava/util/concurrent/CancellationException;
+}
+
+public final class arrow/core/raise/Traced : arrow/core/raise/RaiseCancellationException {
+	public fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Larrow/core/raise/Traced;)V
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Larrow/core/raise/Traced;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getCause ()Larrow/core/raise/Traced;
+	public synthetic fun getCause ()Ljava/lang/Throwable;
 }
 

@@ -321,6 +321,10 @@ final class arrow.core.raise/DefaultRaise : arrow.core.raise/Raise<kotlin/Any?> 
     final fun raise(kotlin/Any?): kotlin/Nothing // arrow.core.raise/DefaultRaise.raise|raise(kotlin.Any?){}[0]
 }
 
+final class arrow.core.raise/NoTrace : arrow.core.raise/RaiseCancellationException { // arrow.core.raise/NoTrace|null[0]
+    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>) // arrow.core.raise/NoTrace.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]
+}
+
 final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwable> { // arrow.core.raise/ResultRaise|null[0]
     constructor <init>(arrow.core.raise/Raise<kotlin/Throwable>) // arrow.core.raise/ResultRaise.<init>|<init>(arrow.core.raise.Raise<kotlin.Throwable>){}[0]
 
@@ -340,6 +344,13 @@ final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwab
     final inline fun <#A1: kotlin/Any?> recover(kotlin/Function1<arrow.core.raise/ResultRaise, #A1>, kotlin/Function1<kotlin/Throwable, #A1>): #A1 // arrow.core.raise/ResultRaise.recover|recover(kotlin.Function1<arrow.core.raise.ResultRaise,0:0>;kotlin.Function1<kotlin.Throwable,0:0>){0§<kotlin.Any?>}[0]
     final suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Throwable>, #A1>).bind(): #A1 // arrow.core.raise/ResultRaise.bind|bind@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Throwable>,0:0>(){0§<kotlin.Any?>}[0]
     final suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Throwable>, #A1>).invoke(): #A1 // arrow.core.raise/ResultRaise.invoke|invoke@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Throwable>,0:0>(){0§<kotlin.Any?>}[0]
+}
+
+final class arrow.core.raise/Traced : arrow.core.raise/RaiseCancellationException { // arrow.core.raise/Traced|null[0]
+    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>, arrow.core.raise/Traced? = ...) // arrow.core.raise/Traced.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;arrow.core.raise.Traced?){}[0]
+
+    final val cause // arrow.core.raise/Traced.cause|{}cause[0]
+        final fun <get-cause>(): arrow.core.raise/Traced? // arrow.core.raise/Traced.cause.<get-cause>|<get-cause>(){}[0]
 }
 
 final value class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/AtomicMemoizationCache : arrow.core/MemoizationCache<#A, #B> { // arrow.core/AtomicMemoizationCache|null[0]
@@ -711,6 +722,7 @@ final const val arrow.core/RedundantAPI // arrow.core/RedundantAPI|{}RedundantAP
 
 final fun (arrow.core.raise/Traced).arrow.core.raise/withCause(arrow.core.raise/Traced): arrow.core.raise/Traced // arrow.core.raise/withCause|withCause@arrow.core.raise.Traced(arrow.core.raise.Traced){}[0]
 final fun (kotlin/String).arrow.core/escaped(): kotlin/String // arrow.core/escaped|escaped@kotlin.String(){}[0]
+final fun (kotlin/Throwable).arrow.core.raise/copyStacktrace(kotlin/Throwable) // arrow.core.raise/copyStacktrace|copyStacktrace@kotlin.Throwable(kotlin.Throwable){}[0]
 final fun (kotlin/Throwable).arrow.core/nonFatalOrThrow(): kotlin/Throwable // arrow.core/nonFatalOrThrow|nonFatalOrThrow@kotlin.Throwable(){}[0]
 final fun <#A: kotlin/Any> (kotlin/Function1<#A, kotlin/Boolean>).arrow.core/mapNullable(): kotlin/Function1<#A?, kotlin/Boolean> // arrow.core/mapNullable|mapNullable@kotlin.Function1<0:0,kotlin.Boolean>(){0§<kotlin.Any>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?, #J: kotlin/Any?, #K: kotlin/Any?> (kotlin.sequences/Sequence<#A>).arrow.core/zip(kotlin.sequences/Sequence<#B>, kotlin.sequences/Sequence<#C>, kotlin.sequences/Sequence<#D>, kotlin.sequences/Sequence<#E>, kotlin.sequences/Sequence<#F>, kotlin.sequences/Sequence<#G>, kotlin.sequences/Sequence<#H>, kotlin.sequences/Sequence<#I>, kotlin.sequences/Sequence<#J>, kotlin/Function10<#A, #B, #C, #D, #E, #F, #G, #H, #I, #J, #K>): kotlin.sequences/Sequence<#K> // arrow.core/zip|zip@kotlin.sequences.Sequence<0:0>(kotlin.sequences.Sequence<0:1>;kotlin.sequences.Sequence<0:2>;kotlin.sequences.Sequence<0:3>;kotlin.sequences.Sequence<0:4>;kotlin.sequences.Sequence<0:5>;kotlin.sequences.Sequence<0:6>;kotlin.sequences.Sequence<0:7>;kotlin.sequences.Sequence<0:8>;kotlin.sequences.Sequence<0:9>;kotlin.Function10<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>;9§<kotlin.Any?>;10§<kotlin.Any?>}[0]

@@ -9,6 +9,7 @@ import arrow.core.nonFatalOrThrow
 import arrow.core.Either
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
@@ -153,6 +154,59 @@ public inline fun <Error, A, B> fold(
 }
 
 /**
+ * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [OtherError],
+ * and transform any raised [OtherError] into [Error], which is raised to the outer [Raise].
+ *
+ * <!--- INCLUDE
+ * import arrow.core.Either
+ * import arrow.core.raise.either
+ * import arrow.core.raise.withError
+ * import io.kotest.matchers.shouldBe
+ * -->
+ * ```kotlin
+ * fun test() {
+ *   either<Int, String> {
+ *     withError(String::length) {
+ *       raise("failed")
+ *     }
+ *   } shouldBe Either.Left(6)
+ * }
+ * ```
+ * <!--- KNIT example-raise-dsl-11.kt -->
+ * <!--- TEST lines.isEmpty() -->
+ */
+@RaiseDSL
+@OptIn(DelicateRaiseApi::class)
+@Suppress("UNCHECKED_CAST")
+public inline fun <Error, OtherError, A> Raise<Error>.withError(
+  transform: (OtherError) -> Error,
+  @BuilderInference block: Raise<OtherError>.() -> A
+): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  // recover({ return block(this) }) { raise(transform(it)) }
+  val raise = DefaultRaise(false)
+  return try {
+    block(raise).also { raise.complete() }
+  } catch (e: RaiseCancellationException) {
+    raise.complete()
+    val error = transform(e.raisedOrRethrow(raise))
+    when {
+      this is RaiseAccumulate -> raise(error)
+      e is Traced -> throw Traced(error, this as Raise<Any?>, e.cause).also {
+        it.copyStacktrace(e)
+      }
+      else -> throw NoTrace(error, this as Raise<Any?>)
+    }
+  } catch (e: Throwable) {
+    raise.complete()
+    throw e.nonFatalOrThrow()
+  }
+}
+
+/**
  * Inspect a [Trace] value of [Error].
  *
  * Tracing [Error] can be useful to know where certain errors, or failures are coming from.
@@ -264,10 +318,15 @@ public sealed class RaiseCancellationException(
 
 @DelicateRaiseApi
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@PublishedApi
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
 @DelicateRaiseApi
+@PublishedApi
 internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
+
+@PublishedApi
+internal expect fun Throwable.copyStacktrace(from: Throwable)
 
 private class RaiseLeakedException : IllegalStateException(
   """
