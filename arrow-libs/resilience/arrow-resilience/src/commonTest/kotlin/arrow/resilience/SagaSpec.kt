@@ -1,10 +1,10 @@
 package arrow.resilience
 
+import arrow.core.raise.either
 import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
@@ -12,6 +12,7 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 @Suppress("unused")
@@ -172,5 +173,60 @@ class SagaSpec {
 
     assertFailsWith<SagaFailed> { saga.transact() }
     assertEquals(value, compensationB.await())
+  }
+
+  @Test @Suppress("UNREACHABLE_CODE")
+  fun sagaRollbacksOnRaise1() = runTest {
+    var actionAStarted = false
+    var actionAFinished = false
+    var actionARolled = false
+    val result = either {
+      saga {
+        saga({
+          actionAStarted = true
+          raise("failed")
+          actionAFinished = true
+        }) {
+          actionARolled = true
+        }
+      }.transact()
+    }
+
+    assertTrue(result.isLeft(), "action was rolled back")
+    assertEquals(actionAStarted, true, "main block executes")
+    assertEquals(actionAFinished, false, "main block does not pass raise")
+    assertEquals(actionARolled, false, "rollback block does not execute")
+  }
+
+  @Test @Suppress("UNREACHABLE_CODE")
+  fun sagaRollbacksOnRaise2() = runTest {
+    var actionAStarted = false
+    var actionARolled = false
+    var actionBStarted = false
+    var actionBFinished = false
+    var actionBRolled = false
+    val result = either {
+      saga {
+        saga({
+          actionAStarted = true
+        }) {
+          actionARolled = true
+        }
+        saga({
+          actionBStarted = true
+          raise("failed")
+          actionBFinished = true
+        }) {
+          actionBRolled = true
+        }
+      }.transact()
+    }
+
+    assertTrue(result.isLeft(), "action was rolled back")
+    assertEquals(actionAStarted, true, "main block A executes")
+    assertEquals(actionARolled, true, "rollback block B executes")
+    assertEquals(actionBStarted, true, "main block B executes")
+    assertEquals(actionBFinished, false, "main block B does not pass raise")
+    assertEquals(actionBRolled, false, "rollback block does not execute")
   }
 }
