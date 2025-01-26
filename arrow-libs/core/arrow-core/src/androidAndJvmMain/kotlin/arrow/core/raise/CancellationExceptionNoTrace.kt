@@ -9,7 +9,6 @@ package arrow.core.raise
   "EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING",
   "SEALED_INHERITOR_IN_DIFFERENT_MODULE"
 )
-@PublishedApi
 internal actual class NoTrace actual constructor(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException(raised, raise) {
   override fun fillInStackTrace(): Throwable {
     // Prevent Android <= 6.0 bug.

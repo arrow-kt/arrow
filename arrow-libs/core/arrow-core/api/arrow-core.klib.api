@@ -321,10 +321,6 @@ final class arrow.core.raise/DefaultRaise : arrow.core.raise/Raise<kotlin/Any?> 
     final fun raise(kotlin/Any?): kotlin/Nothing // arrow.core.raise/DefaultRaise.raise|raise(kotlin.Any?){}[0]
 }
 
-final class arrow.core.raise/NoTrace : arrow.core.raise/RaiseCancellationException { // arrow.core.raise/NoTrace|null[0]
-    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>) // arrow.core.raise/NoTrace.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]
-}
-
 final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwable> { // arrow.core.raise/ResultRaise|null[0]
     constructor <init>(arrow.core.raise/Raise<kotlin/Throwable>) // arrow.core.raise/ResultRaise.<init>|<init>(arrow.core.raise.Raise<kotlin.Throwable>){}[0]
 
@@ -344,13 +340,6 @@ final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwab
     final inline fun <#A1: kotlin/Any?> recover(kotlin/Function1<arrow.core.raise/ResultRaise, #A1>, kotlin/Function1<kotlin/Throwable, #A1>): #A1 // arrow.core.raise/ResultRaise.recover|recover(kotlin.Function1<arrow.core.raise.ResultRaise,0:0>;kotlin.Function1<kotlin.Throwable,0:0>){0§<kotlin.Any?>}[0]
     final suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Throwable>, #A1>).bind(): #A1 // arrow.core.raise/ResultRaise.bind|bind@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Throwable>,0:0>(){0§<kotlin.Any?>}[0]
     final suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Throwable>, #A1>).invoke(): #A1 // arrow.core.raise/ResultRaise.invoke|invoke@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Throwable>,0:0>(){0§<kotlin.Any?>}[0]
-}
-
-final class arrow.core.raise/Traced : arrow.core.raise/RaiseCancellationException { // arrow.core.raise/Traced|null[0]
-    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>, arrow.core.raise/Traced? = ...) // arrow.core.raise/Traced.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;arrow.core.raise.Traced?){}[0]
-
-    final val cause // arrow.core.raise/Traced.cause|{}cause[0]
-        final fun <get-cause>(): arrow.core.raise/Traced? // arrow.core.raise/Traced.cause.<get-cause>|<get-cause>(){}[0]
 }
 
 final value class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/AtomicMemoizationCache : arrow.core/MemoizationCache<#A, #B> { // arrow.core/AtomicMemoizationCache|null[0]

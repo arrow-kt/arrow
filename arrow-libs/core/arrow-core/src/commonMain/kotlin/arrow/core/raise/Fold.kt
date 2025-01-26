@@ -190,15 +190,16 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
   val raise = DefaultRaise(false)
   return try {
     block(raise).also { raise.complete() }
-  } catch (e: RaiseCancellationException) {
+  } catch (innerException: RaiseCancellationException) {
     raise.complete()
-    val error = transform(e.raisedOrRethrow(raise))
-    when {
-      this is RaiseAccumulate -> raise(error)
-      e is Traced -> throw Traced(error, this as Raise<Any?>, e.cause).also {
-        it.copyStacktrace(e)
+    val error = transform(innerException.raisedOrRethrow(raise))
+    try {
+      raise(error)
+    } catch (outerException: RaiseCancellationException) {
+      throw when (outerException) {
+        is Traced -> outerException.apply { copyStacktrace(innerException) }
+        else -> outerException
       }
-      else -> throw NoTrace(error, this as Raise<Any?>)
     }
   } catch (e: Throwable) {
     raise.complete()
@@ -318,11 +319,9 @@ public sealed class RaiseCancellationException(
 
 @DelicateRaiseApi
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-@PublishedApi
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
 @DelicateRaiseApi
-@PublishedApi
 internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
 
 @PublishedApi
