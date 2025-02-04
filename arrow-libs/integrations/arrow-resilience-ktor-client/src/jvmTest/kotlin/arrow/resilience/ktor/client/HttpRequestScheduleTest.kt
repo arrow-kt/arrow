@@ -17,14 +17,8 @@ import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestResult
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlin.test.Test
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 class HttpRequestScheduleTest {
 
@@ -45,9 +39,9 @@ class HttpRequestScheduleTest {
     configure: HttpRequestSchedule.Configuration.() -> Unit
   ): HttpClient = createClient { install(HttpRequestSchedule, configure) }
 
-  val MAX_CHECKS = 10L
+  val MAX_CHECKS = 19L
 
-  @Test fun recurs() = runTestUsingDefaultDispatcher {
+  @Test fun recurs() = runTest {
     checkAll(Arb.long(0, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { }
@@ -63,7 +57,7 @@ class HttpRequestScheduleTest {
     }
   }
 
-  @Test fun doWhile() = runTestUsingDefaultDispatcher {
+  @Test fun doWhile() = runTest {
     checkAll(Arb.long(0, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { c ->
@@ -83,7 +77,7 @@ class HttpRequestScheduleTest {
 
   class NetworkError : Throwable()
 
-  @Test fun retry() = runTestUsingDefaultDispatcher {
+  @Test fun retry() = runTest {
     checkAll(Arb.long(0, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { c ->
@@ -101,7 +95,7 @@ class HttpRequestScheduleTest {
     }
   }
 
-  @Test fun schedule() = runTestUsingDefaultDispatcher {
+  @Test fun schedule() = runTest {
     checkAll(Arb.long(1, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { c ->
@@ -125,15 +119,3 @@ class HttpRequestScheduleTest {
     }
   }
 }
-
-// The normal dispatcher with 'runTest' does some magic
-// which doesn't go well in some platforms
-fun runTestUsingDefaultDispatcher(
-  timeout: Duration = 40.seconds,
-  testBody: suspend TestScope.() -> Unit
-): TestResult = runTest(timeout = timeout) {
-  withContext(Dispatchers.Default) {
-    testBody()
-  }
-}
-
