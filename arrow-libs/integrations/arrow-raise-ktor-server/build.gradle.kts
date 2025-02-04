@@ -25,9 +25,8 @@ kotlin {
     commonMain {
       dependencies {
         implementation(libs.kotlin.stdlib)
-        api(libs.ktor.client.core)
-        api(projects.arrowResilience)
-        implementation(projects.arrowAtomic)
+        api(libs.ktor.server.core)
+        api(projects.arrowCore)
       }
     }
 
@@ -45,13 +44,16 @@ kotlin {
   jvm {
     tasks.jvmJar {
       manifest {
-        attributes["Automatic-Module-Name"] = "arrow.resilience.ktor.client"
+        attributes["Automatic-Module-Name"] = "arrow.raise.ktor.server"
       }
     }
   }
+
+  @OptIn(ExperimentalKotlinGradlePluginApi::class)
+  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
 }
 
 android {
-  namespace = "arrow.resilience.ktor.client"
+  namespace = "arrow.raise.ktor.server"
   compileSdk = libs.versions.android.compileSdk.get().toInt()
 }

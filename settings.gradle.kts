@@ -119,6 +119,9 @@ project(":arrow-core-serialization").projectDir = file("arrow-libs/integrations/
 include("arrow-resilience-ktor-client")
 project(":arrow-resilience-ktor-client").projectDir = file("arrow-libs/integrations/arrow-resilience-ktor-client")
 
+include("arrow-raise-ktor-server")
+project(":arrow-raise-ktor-server").projectDir = file("arrow-libs/integrations/arrow-raise-ktor-server")
+
 // STACK
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
