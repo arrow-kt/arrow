@@ -12,6 +12,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.RoutingContext
 import io.ktor.util.reflect.*
+import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 
 context(Raise<OutgoingContent>)
@@ -35,6 +36,7 @@ public fun defaultBadRequest(errors: NonEmptyList<String>): TextContent =
  * or raise a [HttpStatusCode.BadRequest] in case the path parameter is missing.
  */
 context(RoutingContext)
+@JvmName("pathOrRaiseString")
 public inline fun <A> Raise<String>.pathOrRaise(name: String, transform: Raise<String>.(String) -> A): A {
   val value = pathOrRaise(name)
   val resultOrNull = transform(value)
@@ -44,22 +46,26 @@ public inline fun <A> Raise<String>.pathOrRaise(name: String, transform: Raise<S
 }
 
 context(RoutingContext)
+@JvmName("pathOrRaiseString")
 public fun Raise<String>.pathOrRaise(name: String): String =
   pathOrRaise(name) { it }
 
 context(RoutingContext)
+@JvmName("pathOrRaiseOutgoingContent")
 public inline fun <A> Raise<OutgoingContent>.pathOrRaise(name: String, transform: Raise<String>.(String) -> A): A =
   withError({ s: String -> TextContent(s, ContentType.Text.Plain, BadRequest) }) {
     pathOrRaise(name, transform)
   }
 
 context(RoutingContext)
+@JvmName("pathOrRaiseOutgoingContent")
 public fun Raise<OutgoingContent>.pathOrRaise(name: String): String =
   pathOrRaise(name) { it }
 //</editor-fold>
 
 //<editor-fold desc="Query Parameters">
 context(RoutingContext)
+@JvmName("queryOrRaiseString")
 public inline fun <A> Raise<String>.queryOrRaise(
   name: String,
   transform: Raise<String>.(String) -> A
@@ -77,17 +83,20 @@ public fun Raise<String>.queryIntOrRaise(name: String): Int =
   }
 
 context(RoutingContext)
+@JvmName("queryOrRaiseString")
 public fun Raise<String>.queryOrRaise(name: String): String =
   queryOrRaise(name) { it }
 
 context(RoutingContext)
+@JvmName("queryOrRaiseStringOutgoingContent")
 public inline fun <A : Any> Raise<OutgoingContent>.queryOrRaise(name: String, transform: Raise<String>.(String) -> A): A =
   withError({ s: String -> TextContent(s, ContentType.Text.Plain, BadRequest) }) {
     queryOrRaise(name, transform)
   }
 
 context(RoutingContext)
-public fun <A> Raise<OutgoingContent>.queryOrRaise(name: String): String =
+@JvmName("queryOrRaiseOutgoingContent")
+public fun Raise<OutgoingContent>.queryOrRaise(name: String): String =
   queryOrRaise(name) { it }
 //</editor-fold>
 

@@ -1,12 +1,109 @@
-public final class arrow/resilience/ktor/client/ArrowResilienceConfig {
-	public fun <init> ()V
-	public final fun getCircuitBreaker ()Larrow/resilience/CircuitBreaker;
-	public final fun getSchedule ()Larrow/resilience/Schedule;
-	public final fun setCircuitBreaker (Larrow/resilience/CircuitBreaker;)V
-	public final fun setSchedule (Larrow/resilience/Schedule;)V
+public final class arrow/resilience/ktor/client/HttpCircuitBreaker {
+	public static final field Plugin Larrow/resilience/ktor/client/HttpCircuitBreaker$Plugin;
 }
 
-public final class arrow/resilience/ktor/client/ArrowResilienceKt {
-	public static final fun getArrowResilience ()Lio/ktor/client/plugins/api/ClientPlugin;
+public final class arrow/resilience/ktor/client/HttpCircuitBreaker$Configuration {
+	public fun <init> ()V
+	public final fun circuitBreaker-NqJ4yvY (JJI)V
+	public final fun circuitBreaker-VtjQ1oo (JI)V
+}
+
+public final class arrow/resilience/ktor/client/HttpCircuitBreaker$Plugin : io/ktor/client/plugins/HttpClientPlugin {
+	public fun getKey ()Lio/ktor/util/AttributeKey;
+	public fun install (Larrow/resilience/ktor/client/HttpCircuitBreaker;Lio/ktor/client/HttpClient;)V
+	public synthetic fun install (Ljava/lang/Object;Lio/ktor/client/HttpClient;)V
+	public fun prepare (Lkotlin/jvm/functions/Function1;)Larrow/resilience/ktor/client/HttpCircuitBreaker;
+	public synthetic fun prepare (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule {
+	public static final field Plugin Larrow/resilience/ktor/client/HttpRequestSchedule$Plugin;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule$Configuration {
+	public fun <init> ()V
+	public final fun modifyRequest (Lkotlin/jvm/functions/Function3;)V
+	public final fun repeat (Larrow/resilience/Schedule;)V
+	public final fun retry (Larrow/resilience/Schedule;)V
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule$ModifyRequestContext {
+	public fun <init> (Lio/ktor/client/request/HttpRequestBuilder;Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;)V
+	public final fun component1 ()Lio/ktor/client/request/HttpRequestBuilder;
+	public final fun component2 ()Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;
+	public final fun copy (Lio/ktor/client/request/HttpRequestBuilder;Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;)Larrow/resilience/ktor/client/HttpRequestSchedule$ModifyRequestContext;
+	public static synthetic fun copy$default (Larrow/resilience/ktor/client/HttpRequestSchedule$ModifyRequestContext;Lio/ktor/client/request/HttpRequestBuilder;Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;ILjava/lang/Object;)Larrow/resilience/ktor/client/HttpRequestSchedule$ModifyRequestContext;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun exceptionOrNull ()Ljava/lang/Throwable;
+	public final fun getLastRetryEventData ()Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;
+	public final fun getOriginal ()Lio/ktor/client/request/HttpRequestBuilder;
+	public final fun getRequest ()Lio/ktor/client/request/HttpRequestBuilder;
+	public final fun getRetryCount ()I
+	public fun hashCode ()I
+	public final fun responseOrNull ()Lio/ktor/client/statement/HttpResponse;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/resilience/ktor/client/HttpRequestSchedule$ModifyRequestPerRequest {
+	public abstract fun invoke (Larrow/resilience/ktor/client/HttpRequestSchedule$ModifyRequestContext;Lio/ktor/client/request/HttpRequestBuilder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule$Plugin : io/ktor/client/plugins/HttpClientPlugin {
+	public final fun getHttpRequestScheduleEvent ()Lio/ktor/events/EventDefinition;
+	public fun getKey ()Lio/ktor/util/AttributeKey;
+	public fun install (Larrow/resilience/ktor/client/HttpRequestSchedule;Lio/ktor/client/HttpClient;)V
+	public synthetic fun install (Ljava/lang/Object;Lio/ktor/client/HttpClient;)V
+	public fun prepare (Lkotlin/jvm/functions/Function1;)Larrow/resilience/ktor/client/HttpRequestSchedule;
+	public synthetic fun prepare (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData {
+	public abstract fun exceptionOrNull ()Ljava/lang/Throwable;
+	public abstract fun getRequest ()Lio/ktor/client/request/HttpRequestBuilder;
+	public abstract fun getRetryCount ()I
+	public abstract fun responseOrNull ()Lio/ktor/client/statement/HttpResponse;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$DefaultImpls {
+	public static fun exceptionOrNull (Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;)Ljava/lang/Throwable;
+	public static fun responseOrNull (Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData;)Lio/ktor/client/statement/HttpResponse;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$Failure : arrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData {
+	public fun <init> (Lio/ktor/client/request/HttpRequestBuilder;ILjava/lang/Throwable;)V
+	public final fun component1 ()Lio/ktor/client/request/HttpRequestBuilder;
+	public final fun component2 ()I
+	public final fun component3 ()Ljava/lang/Throwable;
+	public final fun copy (Lio/ktor/client/request/HttpRequestBuilder;ILjava/lang/Throwable;)Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$Failure;
+	public static synthetic fun copy$default (Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$Failure;Lio/ktor/client/request/HttpRequestBuilder;ILjava/lang/Throwable;ILjava/lang/Object;)Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun exceptionOrNull ()Ljava/lang/Throwable;
+	public final fun getException ()Ljava/lang/Throwable;
+	public fun getRequest ()Lio/ktor/client/request/HttpRequestBuilder;
+	public fun getRetryCount ()I
+	public fun hashCode ()I
+	public fun responseOrNull ()Lio/ktor/client/statement/HttpResponse;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$HttpResponse : arrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData {
+	public fun <init> (Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;)V
+	public final fun component1 ()Lio/ktor/client/request/HttpRequestBuilder;
+	public final fun component2 ()I
+	public final fun component3 ()Lio/ktor/client/statement/HttpResponse;
+	public final fun copy (Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;)Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$HttpResponse;
+	public static synthetic fun copy$default (Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$HttpResponse;Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;ILjava/lang/Object;)Larrow/resilience/ktor/client/HttpRequestSchedule$RetryEventData$HttpResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun exceptionOrNull ()Ljava/lang/Throwable;
+	public fun getRequest ()Lio/ktor/client/request/HttpRequestBuilder;
+	public final fun getResponse ()Lio/ktor/client/statement/HttpResponse;
+	public fun getRetryCount ()I
+	public fun hashCode ()I
+	public fun responseOrNull ()Lio/ktor/client/statement/HttpResponse;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/resilience/ktor/client/HttpRequestScheduleKt {
+	public static final fun schedule (Lio/ktor/client/request/HttpRequestBuilder;Lkotlin/jvm/functions/Function1;)V
 }
 
