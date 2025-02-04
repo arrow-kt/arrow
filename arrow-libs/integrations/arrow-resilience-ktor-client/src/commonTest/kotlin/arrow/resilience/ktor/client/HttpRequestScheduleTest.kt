@@ -1,42 +1,55 @@
 package arrow.resilience.ktor.client
 
+import arrow.atomic.AtomicLong
 import arrow.resilience.Schedule
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.long
 import io.kotest.property.checkAll
+import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.isSuccess
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
+import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class HttpRequestScheduleTest {
+
+  fun ApplicationTestBuilder.configureServer(
+    check:  suspend RoutingContext.(counter: Long) -> Unit
+  ): AtomicLong {
+    val counter = AtomicLong(0)
+    routing {
+      get("/do") {
+        check(counter.incrementAndGet())
+        call.respond(OK)
+      }
+    }
+    return counter
+  }
+
+  fun ApplicationTestBuilder.configureClient(
+    configure: HttpRequestSchedule.Configuration.() -> Unit
+  ): HttpClient = createClient { install(HttpRequestSchedule, configure) }
+
   @Test fun recurs() = runTest {
     checkAll(Arb.long(0, 19)) { l ->
       testApplication {
-        var counter = 0
-        routing {
-          get("/") {
-            counter++
-            call.respond(OK)
-          }
+        val counter = configureServer { }
+        val client = configureClient {
+          repeat(Schedule.recurs(l))
         }
 
-        val client = createClient {
-          install(HttpRequestSchedule) {
-            repeat(Schedule.recurs(l))
-          }
-        }
+        val response = client.get("/do")
 
-        val response = client.get("/")
-
-        counter shouldBe l + 1
+        counter.get() shouldBe l + 1
         response.status shouldBe OK
       }
     }
@@ -45,24 +58,16 @@ class HttpRequestScheduleTest {
   @Test fun doWhile() = runTest {
     checkAll(Arb.long(0, 19)) { l ->
       testApplication {
-        var counter = 0
-        routing {
-          get("/") {
-            counter++
-            if (counter <= l) call.respond(NotFound)
-            else call.respond(OK)
-          }
+        val counter = configureServer { c ->
+          if (c <= l) call.respond(NotFound)
+        }
+        val client = configureClient {
+          repeat(Schedule.doWhile { request, _ -> !request.status.isSuccess() })
         }
 
-        val client = createClient {
-          install(HttpRequestSchedule) {
-            repeat(Schedule.doWhile { request, _ -> !request.status.isSuccess() })
-          }
-        }
+        val response = client.get("/do")
 
-        val response = client.get("/")
-
-        counter shouldBe l + 1
+        counter.get() shouldBe l + 1
         response.status shouldBe OK
       }
     }
@@ -73,24 +78,16 @@ class HttpRequestScheduleTest {
   @Test fun retry() = runTest {
     checkAll(Arb.long(0, 19)) { l ->
       testApplication {
-        var counter = 0
-        routing {
-          get("/") {
-            counter++
-            if (counter <= l) throw NetworkError()
-            else call.respond(OK)
-          }
+        val counter = configureServer { c ->
+          if (c <= l) throw NetworkError()
+        }
+        val client = configureClient {
+          retry(Schedule.doWhile { throwable, _ -> throwable is NetworkError })
         }
 
-        val client = createClient {
-          install(HttpRequestSchedule) {
-            retry(Schedule.doWhile { throwable, _ -> throwable is NetworkError })
-          }
-        }
+        val response = client.get("/do")
 
-        val response = client.get("/")
-
-        counter shouldBe l + 1
+        counter.get() shouldBe l + 1
         response.status shouldBe OK
       }
     }
@@ -99,30 +96,22 @@ class HttpRequestScheduleTest {
   @Test fun schedule() = runTest {
     checkAll(Arb.long(1, 19)) { l ->
       testApplication {
-        var counter = 0
-        routing {
-          get("/") {
-            counter++
-            if (counter <= l) throw NetworkError()
-            else call.respond(OK)
-          }
+        val counter = configureServer { c ->
+          if (c <= l) throw NetworkError()
+        }
+        val client = configureClient {
+          retry(Schedule.recurs(0))
         }
 
-        val client = createClient {
-          install(HttpRequestSchedule) {
-            retry(Schedule.recurs(0))
-          }
-        }
+        shouldThrow<NetworkError> { client.get("/do") }
 
-        shouldThrow<NetworkError> { client.get("/") }
-
-        val response = client.get("/") {
+        val response = client.get("/do") {
           schedule {
             retry(Schedule.doWhile { throwable, _ -> throwable is NetworkError })
           }
         }
 
-        counter shouldBe l + 1
+        counter.get() shouldBe l + 1
         response.status shouldBe OK
       }
     }

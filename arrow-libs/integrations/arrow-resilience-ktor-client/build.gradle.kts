@@ -1,7 +1,5 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
   id(libs.plugins.android.library.get().pluginId)
@@ -35,6 +33,7 @@ kotlin {
       dependencies {
         implementation(libs.kotlin.test)
         implementation(libs.ktor.test)
+        implementation(projects.arrowAtomic)
         implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
         implementation(libs.kotest.property)
