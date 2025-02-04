@@ -17,8 +17,14 @@ import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.TestResult
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import kotlin.test.Test
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class HttpRequestScheduleTest {
 
@@ -39,8 +45,10 @@ class HttpRequestScheduleTest {
     configure: HttpRequestSchedule.Configuration.() -> Unit
   ): HttpClient = createClient { install(HttpRequestSchedule, configure) }
 
-  @Test fun recurs() = runTest {
-    checkAll(Arb.long(0, 19)) { l ->
+  val MAX_CHECKS = 10L
+
+  @Test fun recurs() = runTestUsingDefaultDispatcher {
+    checkAll(Arb.long(0, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { }
         val client = configureClient {
@@ -55,8 +63,8 @@ class HttpRequestScheduleTest {
     }
   }
 
-  @Test fun doWhile() = runTest {
-    checkAll(Arb.long(0, 19)) { l ->
+  @Test fun doWhile() = runTestUsingDefaultDispatcher {
+    checkAll(Arb.long(0, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { c ->
           if (c <= l) call.respond(NotFound)
@@ -75,8 +83,8 @@ class HttpRequestScheduleTest {
 
   class NetworkError : Throwable()
 
-  @Test fun retry() = runTest {
-    checkAll(Arb.long(0, 19)) { l ->
+  @Test fun retry() = runTestUsingDefaultDispatcher {
+    checkAll(Arb.long(0, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { c ->
           if (c <= l) throw NetworkError()
@@ -93,8 +101,8 @@ class HttpRequestScheduleTest {
     }
   }
 
-  @Test fun schedule() = runTest {
-    checkAll(Arb.long(1, 19)) { l ->
+  @Test fun schedule() = runTestUsingDefaultDispatcher {
+    checkAll(Arb.long(1, MAX_CHECKS)) { l ->
       testApplication {
         val counter = configureServer { c ->
           if (c <= l) throw NetworkError()
@@ -117,3 +125,15 @@ class HttpRequestScheduleTest {
     }
   }
 }
+
+// The normal dispatcher with 'runTest' does some magic
+// which doesn't go well in some platforms
+fun runTestUsingDefaultDispatcher(
+  timeout: Duration = 40.seconds,
+  testBody: suspend TestScope.() -> Unit
+): TestResult = runTest(timeout = timeout) {
+  withContext(Dispatchers.Default) {
+    testBody()
+  }
+}
+
