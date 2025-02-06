@@ -74,12 +74,6 @@ project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 include("arrow-eval")
 project(":arrow-eval").projectDir = file("arrow-libs/core/arrow-eval")
 
-include("arrow-core-retrofit")
-project(":arrow-core-retrofit").projectDir = file("arrow-libs/core/arrow-core-retrofit")
-
-include("arrow-core-serialization")
-project(":arrow-core-serialization").projectDir = file("arrow-libs/core/arrow-core-serialization")
-
 include("arrow-cache4k")
 project(":arrow-cache4k").projectDir = file("arrow-libs/core/arrow-cache4k")
 
@@ -111,6 +105,22 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
+
+// INTEGRATIONS
+include("arrow-core-retrofit")
+project(":arrow-core-retrofit").projectDir = file("arrow-libs/integrations/arrow-core-retrofit")
+
+include("arrow-core-jackson")
+project(":arrow-core-jackson").projectDir = file("arrow-libs/integrations/arrow-core-jackson")
+
+include("arrow-core-serialization")
+project(":arrow-core-serialization").projectDir = file("arrow-libs/integrations/arrow-core-serialization")
+
+include("arrow-resilience-ktor-client")
+project(":arrow-resilience-ktor-client").projectDir = file("arrow-libs/integrations/arrow-resilience-ktor-client")
+
+include("arrow-raise-ktor-server")
+project(":arrow-raise-ktor-server").projectDir = file("arrow-libs/integrations/arrow-raise-ktor-server")
 
 // STACK
 include("arrow-stack")

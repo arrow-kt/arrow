@@ -15,8 +15,6 @@ dependencies {
     api("io.arrow-kt:arrow-cache4k:$version")
     api("io.arrow-kt:arrow-core:$version")
     api("io.arrow-kt:arrow-core-high-arity:$version")
-    api("io.arrow-kt:arrow-core-retrofit:$version")
-    api("io.arrow-kt:arrow-core-serialization:$version")
     api("io.arrow-kt:arrow-eval:$version")
     api("io.arrow-kt:arrow-functions:$version")
     api("io.arrow-kt:arrow-collectors:$version")
@@ -27,6 +25,8 @@ dependencies {
     api("io.arrow-kt:arrow-optics-compose:$version")
     api("io.arrow-kt:arrow-optics-reflect:$version")
     api("io.arrow-kt:arrow-optics-ksp-plugin:$version")
-    api("io.arrow-kt:arrow-match:$version")
+    api("io.arrow-kt:arrow-core-jackson:$version")
+    api("io.arrow-kt:arrow-core-retrofit:$version")
+    api("io.arrow-kt:arrow-core-serialization:$version")
   }
 }

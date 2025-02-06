@@ -67,8 +67,6 @@ dependencies {
   kover(projects.arrowAutoclose)
   kover(projects.arrowCore)
   kover(projects.arrowCoreHighArity)
-  kover(projects.arrowCoreRetrofit)
-  kover(projects.arrowCoreSerialization)
   kover(projects.arrowCache4k)
   kover(projects.arrowFunctions)
   kover(projects.arrowFxCoroutines)
@@ -80,6 +78,11 @@ dependencies {
   kover(projects.arrowResilience)
   kover(projects.arrowCollectors)
   kover(projects.arrowEval)
+  kover(projects.arrowCoreJackson)
+  kover(projects.arrowCoreRetrofit)
+  kover(projects.arrowCoreSerialization)
+  kover(projects.arrowResilienceKtorClient)
+  kover(projects.arrowRaiseKtorServer)
 }
 
 allprojects {
@@ -92,8 +95,6 @@ dependencies {
   dokka(projects.arrowAutoclose)
   dokka(projects.arrowCore)
   dokka(projects.arrowCoreHighArity)
-  dokka(projects.arrowCoreRetrofit)
-  dokka(projects.arrowCoreSerialization)
   dokka(projects.arrowCache4k)
   dokka(projects.arrowEval)
   dokka(projects.arrowFunctions)
@@ -105,16 +106,12 @@ dependencies {
   dokka(projects.arrowOpticsReflect)
   dokka(projects.arrowOpticsCompose)
   dokka(projects.arrowResilience)
+  dokka(projects.arrowCoreJackson)
+  dokka(projects.arrowCoreRetrofit)
+  dokka(projects.arrowCoreSerialization)
+  dokka(projects.arrowResilienceKtorClient)
+  dokka(projects.arrowRaiseKtorServer)
 }
-
-
-private val kotlinXUpstream =
-  setOf(
-    "arrow-fx-coroutines",
-    "arrow-resilience",
-    "arrow-fx-stm",
-    "arrow-collectors"
-  )
 
 subprojects {
   plugins.apply("org.jetbrains.dokka")
@@ -126,7 +123,12 @@ subprojects {
           matchingRegex.set(".*\\.internal.*")
           suppress.set(true)
         }
-        if (project.name in kotlinXUpstream) externalDocumentationLink("https://kotlinlang.org/api/kotlinx.coroutines/")
+        externalDocumentationLink {
+          url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
+        }
+        externalDocumentationLink {
+          url.set(URL("https://kotlinlang.org/api/kotlinx.coroutines/"))
+        }
         skipDeprecated.set(true)
         reportUndocumented.set(false)
 

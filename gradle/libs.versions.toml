@@ -11,6 +11,7 @@ kotlinCompileTesting = "0.7.0"
 knit = "0.5.0"
 kspVersion = "2.1.10-1.0.29"
 kotlinxSerialization = "1.8.0"
+ktor = "3.0.3"
 mockWebServer = "4.12.0"
 retrofit = "2.11.0"
 moshi = "1.15.2"
@@ -21,6 +22,7 @@ agp = "8.8.0"
 android-compileSdk = "34"
 cache4k = "0.14.0"
 publish="0.30.0"
+jacksonModuleKotlin = "2.18.2"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -47,6 +49,10 @@ compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
+jacksonModuleKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonModuleKotlin" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-test = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 # required for the convention plugin
 gradlePlugin-kotlin-base = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin"}
