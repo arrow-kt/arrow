@@ -1,6 +1,7 @@
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   id("arrow.kotlin")
+  alias(libs.plugins.kotlinx.serialization) // Needed for testing only
 }
 
 dependencies {
