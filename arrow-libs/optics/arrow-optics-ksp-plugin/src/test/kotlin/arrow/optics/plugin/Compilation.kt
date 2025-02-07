@@ -19,7 +19,7 @@ import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Paths
 
-val arrowVersion: String = System.getProperty("arrowVersion")
+val arrowVersion = System.getProperty("arrowVersion")
 const val SOURCE_FILENAME = "Source.kt"
 const val CLASS_FILENAME = "SourceKt"
 

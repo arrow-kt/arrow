@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-  explicitApiWarning()
+  explicitApi = null
 }
 
 dependencies {

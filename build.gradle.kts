@@ -1,10 +1,14 @@
 import kotlinx.knit.KnitPluginExtension
 import kotlinx.validation.ExperimentalBCVApi
+import org.gradle.internal.classpath.Instrumented.systemProperty
 
 allprojects {
-  if (property("version") == "unspecified") {
-    setProperty("version", "2.0.0-SNAPSHOT")
+  val version = (property("version") as? String).let { version ->
+    if (version == null || version == "unspecified") "2.1.0-SNAPSHOT"
+    else version
   }
+  setProperty("version", version)
+  systemProperty("arrowVersion", version)
 }
 
 buildscript {
