@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -68,12 +69,12 @@ class NonEmptyListModuleTest {
   @Test
   fun `should round trip on NonEmptyList with wildcard type`() = runTest {
     checkAll(Arb.nonEmptyList(Arb.string())) { original: NonEmptyList<*> ->
-      val deserialized: NonEmptyList<*> = shouldNotThrowAny {
+      val deserialized: NonEmptyList<*>? = shouldNotThrowAny {
         val serialized: String = mapper.writeValueAsString(original)
         mapper.readValue(serialized, NonEmptyList::class.java)
       }
 
-      deserialized shouldBe original
+      deserialized.shouldNotBeNull() shouldBe original
     }
   }
 }
