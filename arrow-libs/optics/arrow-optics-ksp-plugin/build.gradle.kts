@@ -3,9 +3,14 @@ plugins {
   id("arrow.kotlin")
 }
 
+kotlin {
+  explicitApiWarning()
+}
+
 dependencies {
   implementation(libs.ksp)
 
+  testImplementation(kotlin("test"))
   testImplementation(libs.kotest.assertionsCore)
   testImplementation(libs.classgraph)
   testImplementation(libs.kotlinCompileTesting) {

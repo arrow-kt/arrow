@@ -5,7 +5,6 @@ package arrow.optics.plugin
 import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.kspWithCompilation
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
@@ -20,7 +19,7 @@ import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Paths
 
-val arrowVersion = System.getProperty("arrowVersion")
+val arrowVersion: String = System.getProperty("arrowVersion")
 const val SOURCE_FILENAME = "Source.kt"
 const val CLASS_FILENAME = "SourceKt"
 
@@ -58,22 +57,6 @@ fun String.evals(thing: Pair<String, Any?>) {
 internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult {
   val compilation = buildCompilation(text, allWarningsAsErrors = allWarningsAsErrors)
   return compilation.compile()
-  /* HACK NOT NEEDED ANYMORE :)
-  // fix problems with double compilation and KSP
-  // as stated in https://github.com/tschuchortdev/kotlin-compile-testing/issues/72
-  val pass1 = compilation.compile()
-  // if the first pass was unsuccessful, return it
-  if (pass1.exitCode != KotlinCompilation.ExitCode.OK) return pass1
-  // return the results of second pass
-  return buildCompilation(text)
-    .apply {
-      sources = compilation.sources + compilation.kspGeneratedSourceFiles
-      symbolProcessorProviders = mutableListOf()
-      kspWithCompilation = true
-    }
-    .compile()
-
-   */
 }
 
 fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = KotlinCompilation().apply {
@@ -122,25 +105,16 @@ private fun sanitizeClassPathFileName(dep: String): String = buildList {
   .replace("-jvm.jar", "")
   .replace("-jvm", "")
 
-private val KotlinCompilation.kspGeneratedSourceFiles: List<SourceFile>
-  get() =
-    kspSourcesDir
-      .resolve("kotlin")
-      .walk()
-      .filter { it.isFile }
-      .map { SourceFile.fromPath(it.absoluteFile) }
-      .toList()
-
 private fun eval(expression: String, classesDirectory: File): Any? {
   val classLoader = URLClassLoader(arrayOf(classesDirectory.toURI().toURL()))
-  val fullClassName = getFullClassName(classesDirectory, CLASS_FILENAME)
+  val fullClassName = getFullClassName(classesDirectory)
   val field = classLoader.loadClass(fullClassName).getDeclaredField(expression)
   field.isAccessible = true
   return field.get(Object())
 }
 
-private fun getFullClassName(classesDirectory: File, className: String): String = Files.walk(Paths.get(classesDirectory.toURI()))
-  .filter { it.toFile().name == "$className.class" }
+private fun getFullClassName(classesDirectory: File): String = Files.walk(Paths.get(classesDirectory.toURI()))
+  .filter { it.toFile().name == "$CLASS_FILENAME.class" }
   .toArray()[0]
   .toString()
   .removePrefix(classesDirectory.absolutePath + File.separator)
