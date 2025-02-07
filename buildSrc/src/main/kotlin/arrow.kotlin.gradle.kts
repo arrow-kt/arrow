@@ -19,6 +19,9 @@ repositories {
   maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+val Project.withoutAndroid
+  get() = project.name == "suspendapp"
+
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
@@ -27,7 +30,7 @@ internal val Project.isKotlinMultiplatform: Boolean
 
 if (!isKotlinJvm) {
   plugins.apply("org.jetbrains.kotlin.multiplatform")
-  plugins.apply("com.android.library")
+  if (!withoutAndroid) plugins.apply("com.android.library")
 }
 plugins.apply("com.diffplug.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
@@ -68,19 +71,37 @@ if (isKotlinMultiplatform) {
         jvmTarget = JvmTarget.JVM_1_8
       }
     }
+
     js(IR) {
-      browser()
-      nodejs()
+      nodejs {
+        testTask {
+          useMocha {
+            timeout = "300s"
+          }
+        }
+      }
+      browser {
+        testTask {
+          useKarma {
+            useChromeHeadless()
+            timeout.set(Duration.ofMinutes(5))
+          }
+        }
+      }
     }
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
       browser()
       nodejs()
-      d8()
+      d8 {
+        testTask {
+          timeout.set(Duration.ofMinutes(5))
+        }
+      }
     }
 
-    androidTarget()
+    if (!withoutAndroid) androidTarget()
 
     // Native: https://kotlinlang.org/docs/native-target-support.html
     // -- Tier 1 --
@@ -118,9 +139,11 @@ if (isKotlinMultiplatform) {
       wasmJsMain.get().dependsOn(nonJvmMain)
       wasmJsTest.get().dependsOn(nonJvmTest)
 
-      val androidAndJvmMain by creating { dependsOn(commonMain.get()) }
-      jvmMain.get().dependsOn(androidAndJvmMain)
-      androidMain.get().dependsOn(androidAndJvmMain)
+      if (!withoutAndroid) {
+        val androidAndJvmMain by creating { dependsOn(commonMain.get()) }
+        jvmMain.get().dependsOn(androidAndJvmMain)
+        androidMain.get().dependsOn(androidAndJvmMain)
+      }
     }
 
     sourceSets {
@@ -141,33 +164,6 @@ if (isKotlinMultiplatform) {
       tasks.named<Jar>("jvmJar") {
         manifest {
           attributes["Automatic-Module-Name"] = projectNameWithDots
-        }
-      }
-    }
-
-    js {
-      nodejs {
-        testTask {
-          useMocha {
-            timeout = "300s"
-          }
-        }
-      }
-      browser {
-        testTask {
-          useKarma {
-            useChromeHeadless()
-            timeout.set(Duration.ofMinutes(5))
-          }
-        }
-      }
-    }
-
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-    wasmJs {
-      d8 {
-        testTask {
-          timeout.set(Duration.ofMinutes(5))
         }
       }
     }
