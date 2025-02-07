@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -71,12 +72,12 @@ class NonEmptySetModuleTest {
   @Test
   fun `should round trip on NonEmptySet with wildcard type`() = runTest {
     checkAll(Arb.nonEmptySet(Arb.string())) { original: NonEmptySet<*> ->
-      val deserialized: NonEmptySet<*> = shouldNotThrowAny {
+      val deserialized: NonEmptySet<*>? = shouldNotThrowAny {
         val serialized: String = mapper.writeValueAsString(original)
         mapper.readValue(serialized, NonEmptySet::class.java)
       }
 
-      deserialized shouldBe original
+      deserialized.shouldNotBeNull() shouldBe original
     }
   }
 }

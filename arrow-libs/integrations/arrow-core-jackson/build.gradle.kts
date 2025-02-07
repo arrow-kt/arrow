@@ -24,6 +24,7 @@ dependencies {
   testImplementation(libs.kotlin.test)
   testImplementation(libs.coroutines.test)
   testImplementation(libs.kotest.property)
+  testImplementation(libs.kotest.assertionsCore)
 }
 
 tasks.jar {
