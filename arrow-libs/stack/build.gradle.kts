@@ -1,5 +1,3 @@
-@file:Suppress("DSL_SCOPE_VIOLATION")
-
 plugins {
   `java-platform`
   alias(libs.plugins.publish)
@@ -28,5 +26,7 @@ dependencies {
     api("io.arrow-kt:arrow-core-jackson:$version")
     api("io.arrow-kt:arrow-core-retrofit:$version")
     api("io.arrow-kt:arrow-core-serialization:$version")
+    api("io.arrow-kt:arrow-raise-ktor-server:${version}")
+    api("io.arrow-kt:arrow-resilience-ktor-client:${version}")
   }
 }

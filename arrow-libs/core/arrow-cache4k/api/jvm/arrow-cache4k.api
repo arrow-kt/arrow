@@ -1,0 +1,21 @@
+public final class arrow/core/Cache4kKt {
+	public static final fun buildCache4K (Lkotlin/jvm/functions/Function1;)Lio/github/reactivecircus/cache4k/Cache;
+}
+
+public final class arrow/core/Cache4kMemoizationCache : arrow/core/MemoizationCache {
+	public static final synthetic fun box-impl (Lio/github/reactivecircus/cache4k/Cache;)Larrow/core/Cache4kMemoizationCache;
+	public static fun constructor-impl (Lio/github/reactivecircus/cache4k/Cache;)Lio/github/reactivecircus/cache4k/Cache;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/reactivecircus/cache4k/Cache;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/reactivecircus/cache4k/Cache;Lio/github/reactivecircus/cache4k/Cache;)Z
+	public fun get (Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun get-impl (Lio/github/reactivecircus/cache4k/Cache;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/reactivecircus/cache4k/Cache;)I
+	public fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public static fun set-impl (Lio/github/reactivecircus/cache4k/Cache;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/reactivecircus/cache4k/Cache;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/reactivecircus/cache4k/Cache;
+}
+

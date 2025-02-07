@@ -16,12 +16,10 @@ mockWebServer = "4.12.0"
 retrofit = "2.11.0"
 moshi = "1.15.2"
 spotlessVersion = "7.0.2"
-compose = "1.7.7"
 composePlugin = "1.7.3"
-agp = "8.8.0"
-android-compileSdk = "34"
+agp = "8.7.3"
 cache4k = "0.14.0"
-publish="0.30.0"
+publish = "0.30.0"
 jacksonModuleKotlin = "2.18.2"
 
 [libraries]
@@ -29,11 +27,6 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotest-assertionsCore = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
-kotlin-testAnnotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common" }
-kotlin-testJUnit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
@@ -45,7 +38,6 @@ squareup-retrofit-converter-kotlinxSerialization = { module = "com.squareup.retr
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kspVersion" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
@@ -57,6 +49,12 @@ ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 gradlePlugin-kotlin-base = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin"}
 gradlePlugin-android-library = { module = "com.android.library:com.android.library.gradle.plugin", version.ref = "agp" }
+gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessVersion" }
+gradlePlugin-animalSniffer = { module = "ru.vyarus.animalsniffer:ru.vyarus.animalsniffer.gradle.plugin", version.ref = "animalSniffer" }
+gradlePlugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+
+[bundles]
+testing = [ "coroutines-test", "kotest-assertionsCore", "kotest-property" ]
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
@@ -68,7 +66,6 @@ kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compa
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 compose-jetbrains = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
