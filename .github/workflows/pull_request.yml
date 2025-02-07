@@ -41,36 +41,6 @@ jobs:
           name: 'reports-check'
           path: '**/build/reports/**'
 
-  ios_watchos:
-    runs-on: macos-14
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-
-      - name: iOS and watchOS tests
-        run: ./gradlew iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'reports-ios_watchos'
-          path: '**/build/reports/**'
-
   update_api:
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -128,6 +98,36 @@ jobs:
         with:
           commit_message: Auto-apply Spotless rules
           file_pattern: arrow-libs/**/*.kt
+
+  ios_watchos:
+    runs-on: macos-14
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: iOS and watchOS tests
+        run: ./gradlew iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test --parallel --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'reports-ios_watchos'
+          path: '**/build/reports/**'
 
   macos_tvos:
     runs-on: macos-14
@@ -319,6 +319,36 @@ jobs:
 
       - name: Compile WebAssembly
         run: ./gradlew wasmJsApiBuild wasmJsJar -Penable_wasm=true --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'reports-wasm'
+          path: '**/build/reports/**'
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Android (release) tests
+        run: ./gradlew testReleaseUnitTest
 
       - name: Upload reports
         if: failure()

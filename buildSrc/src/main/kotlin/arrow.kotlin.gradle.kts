@@ -1,7 +1,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import java.net.URL
 import java.time.Duration
 import groovy.util.Node
 import groovy.util.NodeList
@@ -9,9 +11,32 @@ import org.gradle.api.Project
 import org.gradle.api.XmlProvider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+repositories {
+  mavenCentral()
+  (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
+  google()
+  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
+val Project.isKotlinJvm: Boolean
+  get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
+
+internal val Project.isKotlinMultiplatform: Boolean
+  get() = pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
+
+if (!isKotlinJvm) {
+  plugins.apply("org.jetbrains.kotlin.multiplatform")
+  plugins.apply("com.android.library")
+}
+plugins.apply("com.diffplug.spotless")
+plugins.apply("ru.vyarus.animalsniffer")
+plugins.apply("org.jetbrains.dokka")
+plugins.apply("com.vanniktech.maven.publish")
+plugins.apply("org.jetbrains.kotlinx.kover")
 
 group = property("projects.group").toString()
+val projectNameWithDots = project.name.replace('-', '.')
 
 tasks {
   withType<Test>().configureEach {
@@ -68,7 +93,7 @@ if (isKotlinMultiplatform) {
     linuxArm64()
     watchosSimulatorArm64()
     watchosX64()
-    watchosArm32()
+    if (project.name != "arrow-cache4k") watchosArm32()
     watchosArm64()
     tvosSimulatorArm64()
     tvosX64()
@@ -76,10 +101,7 @@ if (isKotlinMultiplatform) {
     iosArm64()
     // -- Tier 3 --
     mingwX64()
-    // Android and watchOS not included
-    // -- Deprecated as of 1.8.20 --
-    // iosArm32() // deprecated as of 1.8.20
-    // watchosX86()
+    // Android Native and watchOS not included
 
     applyDefaultHierarchyTemplate()
 
@@ -99,6 +121,28 @@ if (isKotlinMultiplatform) {
       val androidAndJvmMain by creating { dependsOn(commonMain.get()) }
       jvmMain.get().dependsOn(androidAndJvmMain)
       androidMain.get().dependsOn(androidAndJvmMain)
+    }
+
+    sourceSets {
+      commonMain {
+        dependencies {
+          implementation(kotlin("stdlib"))
+        }
+      }
+
+      commonTest {
+        dependencies {
+          implementation(kotlin("test"))
+        }
+      }
+    }
+
+    jvm {
+      tasks.named<Jar>("jvmJar") {
+        manifest {
+          attributes["Automatic-Module-Name"] = projectNameWithDots
+        }
+      }
     }
 
     js {
@@ -138,6 +182,76 @@ if (isKotlinMultiplatform) {
 
 if (isKotlinJvm) {
   configurations.all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
+
+  tasks.named<Jar>("jar") {
+    manifest {
+      attributes["Automatic-Module-Name"] = projectNameWithDots
+    }
+  }
+}
+
+if (pluginManager.hasPlugin("com.android.library")) {
+  configure<com.android.build.gradle.LibraryExtension> {
+    namespace = projectNameWithDots
+    compileSdk = 35
+    defaultConfig {
+      minSdk = 21
+    }
+  }
+}
+
+configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+  kotlin {
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+  }
+}
+
+tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+  extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
+    dokkaSourceSets.named(kotlinSourceSet.name) {
+      perPackageOption {
+        matchingRegex.set(".*\\.internal.*")
+        suppress.set(true)
+      }
+      externalDocumentationLink {
+        url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
+      }
+      externalDocumentationLink {
+        url.set(URL("https://kotlinlang.org/api/kotlinx.coroutines/"))
+      }
+      skipDeprecated.set(true)
+      reportUndocumented.set(false)
+
+      kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
+        sourceLink {
+          localDirectory.set(srcDir)
+          remoteUrl.set(URL("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}"))
+          remoteLineSuffix.set("#L")
+        }
+      }
+    }
+  }
+}
+
+configure<ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension> {
+  ignore("java.lang.*")
+}
+
+if (isKotlinMultiplatform) {
+  configure<KotlinMultiplatformExtension> {
+    sourceSets {
+      commonMain {
+        dependencies {
+          implementation("org.codehaus.mojo:animal-sniffer-annotations:1.24")
+        }
+      }
+      jvmMain {
+        dependencies {
+          implementation("org.codehaus.mojo:animal-sniffer-annotations:1.24")
+        }
+      }
+    }
+  }
 }
 
 afterEvaluate {
@@ -184,9 +298,3 @@ afterEvaluate {
       }
   }
 }
-
-internal val Project.isKotlinJvm: Boolean
-  get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
-
-internal val Project.isKotlinMultiplatform: Boolean
-  get() = pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
