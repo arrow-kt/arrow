@@ -39,7 +39,7 @@ public object NonEmptyCollectionSerializerResolver : Serializers.Base() {
     type: CollectionType,
     beanDesc: BeanDescription?,
     elementTypeSerializer: TypeSerializer?,
-    elementValueSerializer: JsonSerializer<Any>?
+    elementValueSerializer: JsonSerializer<Any>?,
   ): JsonSerializer<*>? = when {
     NonEmptyCollection::class.java.isAssignableFrom(type.rawClass) -> NonEmptyCollectionSerializer
     else -> null
@@ -52,7 +52,7 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
     config: DeserializationConfig,
     beanDesc: BeanDescription?,
     elementTypeDeserializer: TypeDeserializer?,
-    elementDeserializer: JsonDeserializer<*>?
+    elementDeserializer: JsonDeserializer<*>?,
   ): JsonDeserializer<*>? = when {
     NonEmptyList::class.java.isAssignableFrom(type.rawClass) ->
       NonEmptyCollectionDeserializer(type.contentType, NonEmptyList::class.java) { it.toNonEmptyListOrNull() }
@@ -62,16 +62,16 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
   }
 }
 
-public object NonEmptyCollectionSerializer: StdSerializer<NonEmptyCollection<*>>(NonEmptyCollection::class.java) {
+public object NonEmptyCollectionSerializer : StdSerializer<NonEmptyCollection<*>>(NonEmptyCollection::class.java) {
   override fun serialize(value: NonEmptyCollection<*>, gen: JsonGenerator, provider: SerializerProvider) {
     provider.defaultSerializeValue(value.toList(), gen)
   }
 }
 
-public class NonEmptyCollectionDeserializer<T: NonEmptyCollection<*>>(
+public class NonEmptyCollectionDeserializer<T : NonEmptyCollection<*>>(
   private val contentType: JavaType,
   klass: Class<T>,
-  private val converter: (List<*>) -> T?
+  private val converter: (List<*>) -> T?,
 ) : StdDeserializer<T>(klass) {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T? {
     val collection = CollectionType.construct(ArrayList::class.java, contentType)
