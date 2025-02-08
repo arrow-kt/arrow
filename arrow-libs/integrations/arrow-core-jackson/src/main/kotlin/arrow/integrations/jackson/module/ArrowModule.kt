@@ -6,9 +6,7 @@ public fun ObjectMapper.registerArrowModule(
   eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),
   iorModuleConfig: IorModuleConfig = IorModuleConfig("left", "right"),
 ): ObjectMapper = registerModules(
-  // no longer required, as they are value classes
-  // NonEmptyListModule,
-  // NonEmptySetModule,
+  NonEmptyCollectionsModule(),
   OptionModule,
   EitherModule(eitherModuleConfig.leftFieldName, eitherModuleConfig.rightFieldName),
   IorModule(iorModuleConfig.leftFieldName, iorModuleConfig.rightFieldName),
