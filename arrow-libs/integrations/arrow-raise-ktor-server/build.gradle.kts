@@ -33,6 +33,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(libs.kotlin.test)
+        implementation(libs.ktor.server.contentNegotiation)
         implementation(libs.ktor.test)
         implementation(libs.coroutines.test)
         implementation(libs.kotest.assertionsCore)
@@ -49,7 +50,6 @@ kotlin {
     }
   }
 
-  @OptIn(ExperimentalKotlinGradlePluginApi::class)
   compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
 }
 
