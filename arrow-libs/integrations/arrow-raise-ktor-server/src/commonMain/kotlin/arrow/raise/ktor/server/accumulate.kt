@@ -2,6 +2,7 @@ package arrow.raise.ktor.server
 
 import arrow.core.NonEmptyList
 import arrow.core.raise.Raise
+import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.ensureNotNull
 import arrow.core.raise.recover
 import arrow.core.raise.withError
