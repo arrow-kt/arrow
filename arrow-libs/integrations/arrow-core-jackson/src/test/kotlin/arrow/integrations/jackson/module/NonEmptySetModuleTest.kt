@@ -18,9 +18,8 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 
-@Ignore
 class NonEmptySetModuleTest {
-  private val mapper = ObjectMapper().registerKotlinModule()
+  private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
 
   @Test
   fun `serializing NonEmptySet should be the same as serializing the underlying set`() = runTest {
@@ -57,13 +56,11 @@ class NonEmptySetModuleTest {
     }
   }
 
-  @Test
+  @Test @Ignore
   fun `serializing NonEmptySet in an object should round trip`() = runTest {
-    data class Wrapper(val nel: NonEmptySet<SomeObject>)
-
-    checkAll(arbitrary { Wrapper(Arb.nonEmptySet(Arb.someObject()).bind()) }) { wrapper ->
+    checkAll(arbitrary { WrapperWithSet(Arb.nonEmptySet(Arb.someObject()).bind()) }) { wrapper ->
       val encoded: String = mapper.writeValueAsString(wrapper)
-      val decoded: Wrapper = mapper.readValue(encoded, Wrapper::class.java)
+      val decoded: WrapperWithSet = mapper.readValue(encoded, WrapperWithSet::class.java)
 
       decoded shouldBe wrapper
     }
@@ -81,3 +78,5 @@ class NonEmptySetModuleTest {
     }
   }
 }
+
+data class WrapperWithSet(val nel: NonEmptySet<SomeObject>)
