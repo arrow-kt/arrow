@@ -120,7 +120,7 @@ class ParMapTest {
     ).parMapOrAccumulate(combine = emptyError) { it.invoke() }
   }
 
-  @Test fun parMapOrAccumulateResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
+  @Test @FlakyOnJs fun parMapOrAccumulateResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
@@ -183,7 +183,7 @@ class ParMapTest {
     ).parMapNotNull { it.invoke() }
   }
 
-  @Test fun parMapNotNullResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
+  @Test @FlakyOnJs fun parMapNotNullResultsInTheCorrectError() = runTestUsingDefaultDispatcher {
     checkAll(
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),

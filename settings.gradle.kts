@@ -106,6 +106,13 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
 
+// SUSPENDAPP
+include("suspendapp")
+project(":suspendapp").projectDir = file("arrow-libs/suspendapp/suspendapp")
+
+include("suspendapp-ktor")
+project(":suspendapp-ktor").projectDir = file("arrow-libs/suspendapp/suspendapp-ktor")
+
 // INTEGRATIONS
 include("arrow-core-retrofit")
 project(":arrow-core-retrofit").projectDir = file("arrow-libs/integrations/arrow-core-retrofit")
