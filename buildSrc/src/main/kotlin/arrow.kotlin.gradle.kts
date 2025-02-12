@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -11,10 +10,12 @@ import org.gradle.api.Project
 import org.gradle.api.XmlProvider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 repositories {
   mavenCentral()
-  (project.rootProject.properties["kotlin_repo_url"] as? String)?.also { maven(it) }
+  providers.gradleProperty("kotlin_repo_url").orNull?.also { maven(it) }
   google()
   maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -64,11 +65,31 @@ configure<JavaPluginExtension> {
   }
 }
 
+fun KotlinCommonCompilerOptions.commonCompilerOptions() {
+  // required to be part of the Kotlin User Projects repository
+  providers.gradleProperty("kotlin_language_version").orNull?.also { languageVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_api_version").orNull?.also { apiVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_additional_cli_options").orNull?.also { freeCompilerArgs.addAll(it.split(" "))}
+  freeCompilerArgs.addAll(
+    "-Xreport-all-warnings",
+    "-Xrender-internal-diagnostic-names",
+    "-Wextra",
+    "-Xuse-fir-experimental-checkers",
+  )
+}
+
 if (isKotlinMultiplatform) {
   configure<KotlinMultiplatformExtension> {
+    compilerOptions { commonCompilerOptions() }
+
     jvm {
       compilerOptions {
         jvmTarget = JvmTarget.JVM_1_8
+      }
+      tasks.named<Jar>("jvmJar") {
+        manifest {
+          attributes["Automatic-Module-Name"] = projectNameWithDots
+        }
       }
     }
 
@@ -144,9 +165,7 @@ if (isKotlinMultiplatform) {
         jvmMain.get().dependsOn(androidAndJvmMain)
         androidMain.get().dependsOn(androidAndJvmMain)
       }
-    }
 
-    sourceSets {
       commonMain {
         dependencies {
           implementation(kotlin("stdlib"))
@@ -159,20 +178,6 @@ if (isKotlinMultiplatform) {
         }
       }
     }
-
-    jvm {
-      tasks.named<Jar>("jvmJar") {
-        manifest {
-          attributes["Automatic-Module-Name"] = projectNameWithDots
-        }
-      }
-    }
-
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    compilerOptions {
-      (project.rootProject.properties["kotlin_language_version"] as? String)?.also { languageVersion = KotlinVersion.fromVersion(it) }
-      (project.rootProject.properties["kotlin_api_version"] as? String)?.also { apiVersion = KotlinVersion.fromVersion(it) }
-    }
   }
 }
 
@@ -182,6 +187,13 @@ if (isKotlinJvm) {
   tasks.named<Jar>("jar") {
     manifest {
       attributes["Automatic-Module-Name"] = projectNameWithDots
+    }
+  }
+
+  configure<KotlinJvmExtension> {
+    compilerOptions {
+      jvmTarget = JvmTarget.JVM_1_8
+      commonCompilerOptions()
     }
   }
 }
