@@ -19,9 +19,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
 
-@Ignore
 class NonEmptyListModuleTest {
-  private val mapper = ObjectMapper().registerKotlinModule()
+  private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
 
   @Test
   fun `serializing NonEmptyList should be the same as serializing the underlying list`() = runTest {
@@ -54,13 +53,11 @@ class NonEmptyListModuleTest {
     }
   }
 
-  @Test
+  @Test @Ignore
   fun `serializing NonEmptyList in an object should round trip`() = runTest {
-    data class Wrapper(val nel: Nel<SomeObject>)
-
-    checkAll(arbitrary { Wrapper(Arb.nonEmptyList(Arb.someObject()).bind()) }) { wrapper ->
+    checkAll(arbitrary { WrapperWithList(Arb.nonEmptyList(Arb.someObject()).bind()) }) { wrapper ->
       val encoded: String = mapper.writeValueAsString(wrapper)
-      val decoded: Wrapper = mapper.readValue(encoded, Wrapper::class.java)
+      val decoded: WrapperWithList = mapper.readValue(encoded, WrapperWithList::class.java)
 
       decoded shouldBe wrapper
     }
@@ -78,3 +75,5 @@ class NonEmptyListModuleTest {
     }
   }
 }
+
+data class WrapperWithList(val nel: Nel<SomeObject>)
