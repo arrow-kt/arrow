@@ -84,7 +84,7 @@ if (isKotlinMultiplatform) {
 
     jvm {
       compilerOptions {
-        jvmTarget = JvmTarget.JVM_1_8
+        jvmTarget = JvmTarget.JVM_11
       }
       tasks.named<Jar>("jvmJar") {
         manifest {
@@ -192,7 +192,7 @@ if (isKotlinJvm) {
 
   configure<KotlinJvmExtension> {
     compilerOptions {
-      jvmTarget = JvmTarget.JVM_1_8
+      jvmTarget = JvmTarget.JVM_11
       commonCompilerOptions()
     }
   }
