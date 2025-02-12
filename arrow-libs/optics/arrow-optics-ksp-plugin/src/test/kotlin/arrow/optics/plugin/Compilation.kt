@@ -60,17 +60,18 @@ internal fun compile(text: String, allWarningsAsErrors: Boolean = false): Compil
 }
 
 fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = KotlinCompilation().apply {
+  jvmTarget = "11"
   classpaths = listOf(
     "arrow-annotations:$arrowVersion",
     "arrow-core:$arrowVersion",
     "arrow-optics:$arrowVersion",
   ).map { classpathOf(it) }
-  symbolProcessorProviders = mutableListOf(OpticsProcessorProvider())
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
   verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
   languageVersion = "1.9"
   kspWithCompilation = true
+  symbolProcessorProviders = mutableListOf(OpticsProcessorProvider())
 }
 
 private fun classpathOf(dependency: String): File {
@@ -110,7 +111,7 @@ private fun eval(expression: String, classesDirectory: File): Any? {
   val fullClassName = getFullClassName(classesDirectory)
   val field = classLoader.loadClass(fullClassName).getDeclaredField(expression)
   field.isAccessible = true
-  return field.get(Object())
+  return field.get(Any())
 }
 
 private fun getFullClassName(classesDirectory: File): String = Files.walk(Paths.get(classesDirectory.toURI()))
