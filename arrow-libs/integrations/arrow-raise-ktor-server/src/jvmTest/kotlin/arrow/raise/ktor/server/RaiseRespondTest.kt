@@ -1,13 +1,23 @@
 package arrow.raise.ktor.server
 
+import arrow.core.raise.Raise
 import arrow.core.raise.ensureNotNull
+import arrow.core.raise.withError
 import arrow.raise.ktor.server.RoutingResponse.Companion.RoutingResponse
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.content.TextContent
 import io.ktor.http.*
+import io.ktor.http.content.OutgoingContent
+import io.ktor.serialization.ContentConverter
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.testing.*
+import io.ktor.util.reflect.TypeInfo
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.charsets.Charset
+import kotlinx.serialization.Serializable
 import kotlin.test.Test
 
 class RaiseRespondTest {
@@ -73,6 +83,79 @@ class RaiseRespondTest {
     }
   }
 
+  @Test
+  fun `custom domain error handling`() = testApplication {
+    // example domain errors/service
+    abstract class DomainError
+    data class UserBanned(val userId: String) : DomainError()
+    data class ServerError(val code: String, val message: String) : DomainError()
+
+    data class User(val id: String)
+
+    val userService = object {
+      context(Raise<DomainError>)
+      fun lookupUser(userId: String): User? = when (userId) {
+        "bob" -> raise(UserBanned(userId))
+        "alice" -> User(userId)
+        else -> null
+      }
+    }
+
+    // http error representation and handler
+    data class ErrorPayload(val code: String, val message: String)
+
+    fun Raise<RoutingResponse>.handleError(domainError: DomainError): Nothing = when (domainError) {
+      is UserBanned -> raise(HttpStatusCode.Unauthorized, ErrorPayload("Banned", domainError.userId))
+      is ServerError -> raise(HttpStatusCode.InternalServerError, ErrorPayload("ServerError:${domainError.code}", domainError.message))
+      else -> error("no local sealed class ;)")
+    }
+
+    // install basic `toString` content converter
+    install(ContentNegotiation) {
+      register(ContentType.Text.Plain, object : ContentConverter {
+        override suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: ByteReadChannel): Nothing = TODO()
+        override suspend fun serialize(contentType: ContentType, charset: Charset, typeInfo: TypeInfo, value: Any?) =
+          TextContent(value.toString(), contentType)
+      })
+    }
+
+    routing {
+      getOrRaise("/users/{userId?}") {
+        val userId = call.pathParameters["userId"] ?: raiseBadRequest("userId not specified")
+        withError(::handleError) {
+          userService.lookupUser(userId) ?: raise(HttpStatusCode.NotFound)
+        }
+      }
+    }
+
+    client.get("/users/").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.BadRequest
+        it.bodyAsText() shouldBe "userId not specified"
+      }
+    }
+
+    client.get("/users/alice").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.OK
+        it.bodyAsText() shouldBe "User(id=alice)"
+      }
+    }
+
+    client.get("/users/bob").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.Unauthorized
+        it.bodyAsText() shouldBe "ErrorPayload(code=Banned, message=bob)"
+      }
+    }
+
+    client.get("/users/carol").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.NotFound
+        it.bodyAsText() shouldBe ""
+      }
+    }
+  }
 
   @Test
   fun `receive and respond typed with raise`() = testApplication {

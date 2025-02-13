@@ -17,7 +17,7 @@ public final class arrow/raise/ktor/server/AccumulateKt {
 
 public final class arrow/raise/ktor/server/HandleOrRaiseKt {
 	public static final fun handleOrRaise (Lio/ktor/server/routing/Route;Lkotlin/jvm/functions/Function2;)V
-	public static final fun perform (Lio/ktor/server/routing/RoutingContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun handleOrRaise (Lio/ktor/server/routing/RoutingContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun raise (Larrow/core/raise/Raise;Lio/ktor/http/HttpStatusCode;)Ljava/lang/Void;
 	public static final fun raise (Larrow/core/raise/Raise;Lio/ktor/http/content/OutgoingContent;)Ljava/lang/Void;
 	public static final fun raiseBadRequest (Larrow/core/raise/Raise;)Ljava/lang/Void;
@@ -43,13 +43,6 @@ public final class arrow/raise/ktor/server/RaiseRoutingContext : arrow/core/rais
 
 public final class arrow/raise/ktor/server/RespondOrRaiseKt {
 	public static final fun respondSafely (Lio/ktor/server/routing/RoutingCall;Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class arrow/raise/ktor/server/RoutingKt {
-	public static final fun getOrRaiseRegex (Lio/ktor/server/routing/Route;Lkotlin/text/Regex;Lkotlin/jvm/functions/Function4;)Lio/ktor/server/routing/Route;
-	public static final fun getOrRaiseString (Lio/ktor/server/routing/Route;Ljava/lang/String;Lkotlin/jvm/functions/Function4;)Lio/ktor/server/routing/Route;
-	public static final fun putOrRaiseRegex (Lio/ktor/server/routing/Route;Lkotlin/text/Regex;Lkotlin/jvm/functions/Function4;)Lio/ktor/server/routing/Route;
-	public static final fun putOrRaiseString (Lio/ktor/server/routing/Route;Ljava/lang/String;Lkotlin/jvm/functions/Function4;)Lio/ktor/server/routing/Route;
 }
 
 public abstract interface class arrow/raise/ktor/server/RoutingResponse {

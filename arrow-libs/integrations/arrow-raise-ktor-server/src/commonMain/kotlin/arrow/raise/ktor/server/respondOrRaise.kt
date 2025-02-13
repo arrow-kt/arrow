@@ -15,7 +15,7 @@ public suspend inline fun <reified T> RoutingContext.respondOrRaise(
 }
 
 @PublishedApi
-internal suspend fun <T> RoutingCall.respondSafely(statusCode: HttpStatusCode?, result: T, typeInfo: TypeInfo) {
+internal suspend fun RoutingCall.respondSafely(statusCode: HttpStatusCode?, result: Any?, typeInfo: TypeInfo) {
   when (result) {
     is Unit -> respond(HttpStatusCodeContent(statusCode ?: HttpStatusCode.OK))
     is HttpStatusCode -> respond(HttpStatusCodeContent(result))
