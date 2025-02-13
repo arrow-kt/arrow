@@ -12,9 +12,9 @@ import kotlin.test.Test
 
 class RaiseRespondTest {
   @Test
-  fun `respond result of raisingGet`() = testApplication {
+  fun `respond result of getOrRaise`() = testApplication {
     routing {
-      raisingGet("/foo", statusCode = HttpStatusCode.Created) { "bar" }
+      getOrRaise("/foo", HttpStatusCode.Created) { "bar" }
     }
 
     client.get("/foo").let {
@@ -26,9 +26,9 @@ class RaiseRespondTest {
   }
 
   @Test
-  fun `respond with empty when raisingGet returns status code`() = testApplication {
+  fun `respond with empty when getOrRaise returns status code`() = testApplication {
     routing {
-      raisingGet("/foo") {
+      getOrRaise("/foo") {
         HttpStatusCode.Created
       }
     }
@@ -42,9 +42,9 @@ class RaiseRespondTest {
   }
 
   @Test
-  fun `respond with empty when raisingGet returns unit`() = testApplication {
+  fun `respond with empty when getOrRaise returns unit`() = testApplication {
     routing {
-      raisingGet("/foo", statusCode = HttpStatusCode.Created) {
+      getOrRaise("/foo", statusCode = HttpStatusCode.Created) {
 
       }
     }
@@ -58,9 +58,9 @@ class RaiseRespondTest {
   }
 
   @Test
-  fun `respond with raised statusCode when raisingGet returns status code`() = testApplication {
+  fun `respond with raised statusCode when getOrRaise returns status code`() = testApplication {
     routing {
-      raisingGet<Unit>("/foo", statusCode = HttpStatusCode.Created) {
+      getOrRaise<Unit>("/foo", statusCode = HttpStatusCode.Created) {
         ensureNotNull(emptyList<Unit>().firstOrNull()) { RoutingResponse(HttpStatusCode.Conflict) }
       }
     }
@@ -69,6 +69,23 @@ class RaiseRespondTest {
       assertSoftly {
         it.status shouldBe HttpStatusCode.Conflict
         it.bodyAsText() shouldBe ""
+      }
+    }
+  }
+
+
+  @Test
+  fun `receive and respond typed with raise`() = testApplication {
+    routing {
+      postOrRaise<String, _>("/upper") { body: String -> body.uppercase() }
+    }
+
+    client.post("/upper") {
+      setBody("hello")
+    }.let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.OK
+        it.bodyAsText() shouldBe "HELLO"
       }
     }
   }

@@ -67,11 +67,11 @@ public typealias RaiseRoutingHandler = suspend RaiseRoutingContext.() -> Unit
 @KtorDsl
 @RaiseDSL
 public fun Route.handleOrRaise(body: RaiseRoutingHandler): Unit =
-  handle { perform { body() } }
+  handle { handleOrRaise { body() } }
 
 @PublishedApi
-internal suspend inline fun RoutingContext.perform(body: RaiseRoutingContext.() -> Unit): Unit = recover(
-  block = { RaiseRoutingContext(this@recover, this@perform).body() },
+internal suspend inline fun RoutingContext.handleOrRaise(body: RaiseRoutingContext.() -> Unit): Unit = recover(
+  block = { RaiseRoutingContext(this@recover, this@handleOrRaise).body() },
   recover = { call.respond(it) },
 )
 
