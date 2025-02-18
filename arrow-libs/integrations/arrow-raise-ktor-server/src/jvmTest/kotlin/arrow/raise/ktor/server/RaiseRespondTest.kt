@@ -8,16 +8,15 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.content.TextContent
+import io.ktor.content.*
 import io.ktor.http.*
-import io.ktor.http.content.OutgoingContent
-import io.ktor.serialization.ContentConverter
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
 import io.ktor.server.testing.*
-import io.ktor.util.reflect.TypeInfo
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.charsets.Charset
-import kotlinx.serialization.Serializable
+import io.ktor.util.reflect.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.charsets.*
 import kotlin.test.Test
 
 class RaiseRespondTest {
@@ -54,14 +53,26 @@ class RaiseRespondTest {
   @Test
   fun `respond with empty when getOrRaise returns unit`() = testApplication {
     routing {
-      getOrRaise("/foo", statusCode = HttpStatusCode.Created) {
-
-      }
+      getOrRaise("/foo", statusCode = HttpStatusCode.Created) {}
     }
 
     client.get("/foo").let {
       assertSoftly {
         it.status shouldBe HttpStatusCode.Created
+        it.bodyAsText() shouldBe ""
+      }
+    }
+  }
+
+  @Test
+  fun `respond with NoContent when getOrRaise returns unit and no explicit status code`() = testApplication {
+    routing {
+      getOrRaise("/foo") {}
+    }
+
+    client.get("/foo").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.NoContent
         it.bodyAsText() shouldBe ""
       }
     }
@@ -79,6 +90,41 @@ class RaiseRespondTest {
       assertSoftly {
         it.status shouldBe HttpStatusCode.Conflict
         it.bodyAsText() shouldBe ""
+      }
+    }
+  }
+
+  @Test
+  fun `receive and respond with raise`() = testApplication {
+    routing {
+      postOrRaise("/upper") {
+        val body = call.receive<String>()
+        body.uppercase()
+      }
+    }
+
+    client.post("/upper") {
+      setBody("hello")
+    }.let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.OK
+        it.bodyAsText() shouldBe "HELLO"
+      }
+    }
+  }
+
+  @Test
+  fun `receive and respond typed with raise`() = testApplication {
+    routing {
+      postOrRaise<String, _>("/upper") { it.uppercase() }
+    }
+
+    client.post("/upper") {
+      setBody("hello")
+    }.let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.OK
+        it.bodyAsText() shouldBe "HELLO"
       }
     }
   }
@@ -153,22 +199,6 @@ class RaiseRespondTest {
       assertSoftly {
         it.status shouldBe HttpStatusCode.NotFound
         it.bodyAsText() shouldBe ""
-      }
-    }
-  }
-
-  @Test
-  fun `receive and respond typed with raise`() = testApplication {
-    routing {
-      postOrRaise<String, _>("/upper") { body: String -> body.uppercase() }
-    }
-
-    client.post("/upper") {
-      setBody("hello")
-    }.let {
-      assertSoftly {
-        it.status shouldBe HttpStatusCode.OK
-        it.bodyAsText() shouldBe "HELLO"
       }
     }
   }

@@ -14,6 +14,8 @@ import me.alllex.parsus.token.literalToken
 import me.alllex.parsus.token.regexToken
 import java.io.File
 import java.net.URI
+import java.nio.file.Paths
+import kotlin.io.path.writer
 
 sealed interface KtorExtension {
   val extensionName: String
@@ -30,13 +32,13 @@ object KtorExtensionAbiGrammer : Grammar<KtorExtension>() {
 
   val funName by regexToken("[a-zA-Z_][a-zA-Z0-9_]*") map { it.text }
 
-  val pathParamType by regexToken("[^,]+") * -literalToken(", ") map { it.text.split("/").last() }
+  val pathParamType by regexToken("[^,]+") map { it.text.split("/").last() }
 
   val bodyParamStandard by literalToken("kotlin.coroutines/SuspendFunction1<io.ktor.server.routing/RoutingContext, kotlin/Unit>")
   val bodyParamReceiving by literalToken("crossinline kotlin.coroutines/SuspendFunction2<io.ktor.server.routing/RoutingContext, #A, kotlin/Unit>")
   val bodyParamType by bodyParamStandard or bodyParamReceiving map { it.text }
 
-  val pathAndBody by pathParamType * bodyParamType map { (path, body) -> path to body }
+  val pathAndBody by pathParamType * -literalToken(", ") * bodyParamType map { (path, body) -> path to body }
   val bodyOnly by bodyParamType map { null to it }
 
   val params by (pathAndBody or bodyOnly)
@@ -76,10 +78,10 @@ val KtorExtension.jvmNameSuffix
 
 val KtorExtension.jvmName get() = "${extensionName}OrRaise${jvmNameSuffix}"
 
-val KtorExtension.bodyParameterType
+val KtorExtension.bodyParameter
   get() = when (this) {
-    is StandardKtorExtension -> "suspend RaiseRoutingContext.() -> R"
-    is ReceivingKtorExtension -> "suspend RaiseRoutingContext.(B) -> R"
+    is StandardKtorExtension -> "crossinline body: suspend RaiseRoutingContext.() -> R"
+    is ReceivingKtorExtension -> "handler: TypedRaiseRoutingHandler<B, R>"
   }
 
 val KtorExtension.typeParameters
@@ -91,7 +93,7 @@ val KtorExtension.typeParameters
 val KtorExtension.invocation
   get() = when (this) {
     is StandardKtorExtension -> "$extensionName$invocationParams { respondOrRaise<R>(statusCode, body) }"
-    is ReceivingKtorExtension -> "$extensionName<B>$invocationParams { respondOrRaise(statusCode) { body(it) } }"
+    is ReceivingKtorExtension -> "$extensionName<B>$invocationParams { handler(this, statusCode, it) }"
   }
 
 val KtorExtension.invocationParams
@@ -99,17 +101,6 @@ val KtorExtension.invocationParams
     null -> ""
     else -> "(path)"
   }
-
-fun KtorExtension.generate() = buildString {
-  appendLine("@KtorDsl")
-  appendLine("@RaiseDSL")
-  appendLine("@JvmName(\"$jvmName\")")
-  appendLine("public inline fun $typeParameters Route.${extensionName}OrRaise(")
-  if (pathType != null) appendLine("  path: $pathType,")
-  appendLine("  statusCode: HttpStatusCode? = null,")
-  appendLine("  crossinline body: $bodyParameterType,")
-  appendLine("): Route = $invocation")
-}
 //endregion
 
 val dumpFile = File("../build/ktor-server-core.klib.api")
@@ -120,14 +111,12 @@ val dumpString = when {
 
 KtorExtensionAbiGrammer.parseDump(dumpString)
   .sortedBy(KtorExtension::jvmName)
-  .groupBy { it::class.simpleName }
-  .forEach { (extensionType, extensionFunctions) ->
-    val destination = File(
-      "../arrow-libs/integrations/arrow-raise-ktor-server/src/commonMain/kotlin/arrow/raise/ktor/server/" + when (extensionType) {
-        "StandardKtorExtension" -> "routing.kt"
-        "ReceivingKtorExtension" -> "routingReceiving.kt"
-        else -> return@forEach
-      }
+  .groupBy { it is ReceivingKtorExtension }
+  .forEach { (receiving, extensionFunctions) ->
+    val destination = Paths.get(
+      "../arrow-libs/integrations/arrow-raise-ktor-server",
+      "src/commonMain/kotlin/arrow/raise/ktor/server",
+      if (receiving) "routingReceiving.kt" else "routing.kt",
     )
     destination.writer().use {
       it.appendLine(
@@ -143,9 +132,36 @@ KtorExtensionAbiGrammer.parseDump(dumpString)
         import kotlin.jvm.JvmName
       """.trimIndent()
       )
-      extensionFunctions.forEach {  extensionFunction ->
-        it.appendLine()
-        it.append(extensionFunction.generate())
+      if (receiving) it.appendLine(
+        """
+          
+          public fun interface TypedRaiseRoutingHandler<B, R> {
+            public suspend fun RaiseRoutingContext.handle(payload: B): R
+          }
+          
+          @PublishedApi
+          internal suspend inline operator fun <reified B : Any, reified R> TypedRaiseRoutingHandler<B, R>.invoke(routingContext: RoutingContext, statusCode: HttpStatusCode?, b: B) =
+            routingContext.respondOrRaise(statusCode) { handle(b) }
+        """.trimIndent()
+      )
+      extensionFunctions.forEach { extensionFunction ->
+        it.appendLine(
+          """
+            
+            @KtorDsl
+            @RaiseDSL
+            @JvmName("${extensionFunction.jvmName}")
+            public inline fun ${extensionFunction.typeParameters} Route.${extensionFunction.extensionName}OrRaise(
+          """.trimIndent()
+        )
+        if (extensionFunction.pathType != null) it.appendLine("  path: ${extensionFunction.pathType},")
+        it.appendLine(
+          """
+              statusCode: HttpStatusCode? = null,
+              ${extensionFunction.bodyParameter},
+            ): Route = ${extensionFunction.invocation}
+          """.trimIndent()
+        )
       }
     }
   }

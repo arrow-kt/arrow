@@ -8,13 +8,21 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlin.jvm.JvmName
 
+public fun interface TypedRaiseRoutingHandler<B, R> {
+  public suspend fun RaiseRoutingContext.handle(payload: B): R
+}
+
+@PublishedApi
+internal suspend inline operator fun <reified B : Any, reified R> TypedRaiseRoutingHandler<B, R>.invoke(routingContext: RoutingContext, statusCode: HttpStatusCode?, b: B) =
+  routingContext.respondOrRaise(statusCode) { handle(b) }
+
 @KtorDsl
 @RaiseDSL
 @JvmName("patchOrRaiseTyped")
 public inline fun <reified B : Any, reified R> Route.patchOrRaise(
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = patch<B> { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = patch<B> { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
@@ -22,8 +30,8 @@ public inline fun <reified B : Any, reified R> Route.patchOrRaise(
 public inline fun <reified B : Any, reified R> Route.patchOrRaise(
   path: String,
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = patch<B>(path) { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = patch<B>(path) { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
@@ -31,16 +39,16 @@ public inline fun <reified B : Any, reified R> Route.patchOrRaise(
 public inline fun <reified B : Any, reified R> Route.patchOrRaise(
   path: Regex,
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = patch<B>(path) { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = patch<B>(path) { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("postOrRaiseTyped")
 public inline fun <reified B : Any, reified R> Route.postOrRaise(
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = post<B> { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = post<B> { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
@@ -48,8 +56,8 @@ public inline fun <reified B : Any, reified R> Route.postOrRaise(
 public inline fun <reified B : Any, reified R> Route.postOrRaise(
   path: String,
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = post<B>(path) { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = post<B>(path) { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
@@ -57,16 +65,16 @@ public inline fun <reified B : Any, reified R> Route.postOrRaise(
 public inline fun <reified B : Any, reified R> Route.postOrRaise(
   path: Regex,
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = post<B>(path) { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = post<B>(path) { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("putOrRaiseTyped")
 public inline fun <reified B : Any, reified R> Route.putOrRaise(
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = put<B> { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = put<B> { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
@@ -74,8 +82,8 @@ public inline fun <reified B : Any, reified R> Route.putOrRaise(
 public inline fun <reified B : Any, reified R> Route.putOrRaise(
   path: String,
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = put<B>(path) { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = put<B>(path) { handler(this, statusCode, it) }
 
 @KtorDsl
 @RaiseDSL
@@ -83,5 +91,5 @@ public inline fun <reified B : Any, reified R> Route.putOrRaise(
 public inline fun <reified B : Any, reified R> Route.putOrRaise(
   path: Regex,
   statusCode: HttpStatusCode? = null,
-  crossinline body: suspend RaiseRoutingContext.(B) -> R,
-): Route = put<B>(path) { respondOrRaise(statusCode) { body(it) } }
+  handler: TypedRaiseRoutingHandler<B, R>,
+): Route = put<B>(path) { handler(this, statusCode, it) }

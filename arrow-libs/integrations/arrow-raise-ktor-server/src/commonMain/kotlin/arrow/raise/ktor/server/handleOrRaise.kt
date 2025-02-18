@@ -24,6 +24,8 @@ public sealed interface RoutingResponse {
     public fun RoutingResponse(statusCode: HttpStatusCode): RoutingResponse = EmptyResponse(statusCode)
 
     public fun RoutingResponse(outgoingContent: OutgoingContent): RoutingResponse = RawResponse(outgoingContent)
+
+    public inline operator fun <reified T: Any> HttpStatusCode.invoke(payload: T) = RoutingResponse(this, payload, typeInfo<T>())
   }
 }
 
