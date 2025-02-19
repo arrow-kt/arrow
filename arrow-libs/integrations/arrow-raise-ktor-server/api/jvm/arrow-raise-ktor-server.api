@@ -55,6 +55,10 @@ public final class arrow/raise/ktor/server/RoutingResponse$Companion {
 	public final fun RoutingResponse (Lio/ktor/http/content/OutgoingContent;)Larrow/raise/ktor/server/RoutingResponse;
 }
 
+public abstract interface class arrow/raise/ktor/server/TypedRaiseRoutingHandler {
+	public abstract fun handle (Larrow/raise/ktor/server/RaiseRoutingContext;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class arrow/raise/ktor/server/TypedResponse : arrow/raise/ktor/server/RoutingResponse {
 	public fun <init> (Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;)V
 	public synthetic fun <init> (Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
