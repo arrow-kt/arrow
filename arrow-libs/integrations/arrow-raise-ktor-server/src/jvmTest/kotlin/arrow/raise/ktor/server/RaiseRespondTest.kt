@@ -3,7 +3,7 @@ package arrow.raise.ktor.server
 import arrow.core.raise.Raise
 import arrow.core.raise.ensureNotNull
 import arrow.core.raise.withError
-import arrow.raise.ktor.server.RoutingResponse.Companion.RoutingResponse
+import arrow.raise.ktor.server.Response.Companion.Response
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
@@ -82,7 +82,7 @@ class RaiseRespondTest {
   fun `respond with raised statusCode when getOrRaise returns status code`() = testApplication {
     routing {
       getOrRaise<Unit>("/foo", statusCode = HttpStatusCode.Created) {
-        ensureNotNull(emptyList<Unit>().firstOrNull()) { RoutingResponse(HttpStatusCode.Conflict) }
+        ensureNotNull(emptyList<Unit>().firstOrNull()) { Response(HttpStatusCode.Conflict) }
       }
     }
 
@@ -150,7 +150,7 @@ class RaiseRespondTest {
     // http error representation and handler
     data class ErrorPayload(val code: String, val message: String)
 
-    fun Raise<RoutingResponse>.handleError(domainError: DomainError): Nothing = when (domainError) {
+    fun Raise<Response>.handleError(domainError: DomainError): Nothing = when (domainError) {
       is UserBanned -> raise(HttpStatusCode.Unauthorized, ErrorPayload("Banned", domainError.userId))
       is ServerError -> raise(HttpStatusCode.InternalServerError, ErrorPayload("ServerError:${domainError.code}", domainError.message))
       else -> error("no local sealed class ;)")
