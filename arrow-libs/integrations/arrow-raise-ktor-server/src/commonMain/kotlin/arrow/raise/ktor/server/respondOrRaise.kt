@@ -9,9 +9,16 @@ import io.ktor.util.reflect.*
 public suspend inline fun <reified T> RoutingContext.respondOrRaise(
   statusCode: HttpStatusCode? = null,
   body: suspend RaiseRoutingContext.() -> T,
+): Unit = respondOrRaise(statusCode, typeInfo<T>(), body)
+
+@PublishedApi
+internal suspend inline fun <T> RoutingContext.respondOrRaise(
+  statusCode: HttpStatusCode? = null,
+  typeInfo: TypeInfo,
+  body: suspend RaiseRoutingContext.() -> T,
 ): Unit = handleOrRaise {
   val result = body()
-  call.respondSafely(statusCode, result, typeInfo<T>())
+  call.respondSafely(statusCode, result, typeInfo)
 }
 
 @PublishedApi

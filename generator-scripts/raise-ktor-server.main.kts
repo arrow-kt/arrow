@@ -80,26 +80,26 @@ val KtorExtension.jvmName get() = "${extensionName}OrRaise${jvmNameSuffix}"
 
 val KtorExtension.bodyParameter
   get() = when (this) {
-    is StandardKtorExtension -> "crossinline body: suspend RaiseRoutingContext.() -> R"
-    is ReceivingKtorExtension -> "handler: TypedRaiseRoutingHandler<B, R>"
+    is StandardKtorExtension -> "noinline body: RespondOrRaiseHandler<Response>"
+    is ReceivingKtorExtension -> "body: ReceivingRespondOrRaiseHandler<Request, Response>"
   }
 
 val KtorExtension.typeParameters
   get() = when (this) {
-    is StandardKtorExtension -> "<reified R>"
-    is ReceivingKtorExtension -> "<reified B : Any, reified R>"
+    is StandardKtorExtension -> "<reified Response>"
+    is ReceivingKtorExtension -> "<reified Request : Any, reified Response>"
   }
 
 val KtorExtension.invocation
   get() = when (this) {
-    is StandardKtorExtension -> "$extensionName$invocationParams { respondOrRaise<R>(statusCode, body) }"
-    is ReceivingKtorExtension -> "$extensionName<B>$invocationParams { handler(this, statusCode, it) }"
+    is StandardKtorExtension -> "$extensionName$invocationParams"
+    is ReceivingKtorExtension -> "$extensionName<Request>$invocationParams"
   }
 
 val KtorExtension.invocationParams
   get() = when (pathType) {
-    null -> ""
-    else -> "(path)"
+    null -> "(body.asKtorHandler(statusCode))"
+    else -> "(path, body.asKtorHandler(statusCode))"
   }
 //endregion
 
@@ -131,18 +131,6 @@ KtorExtensionAbiGrammer.parseDump(dumpString)
         import io.ktor.utils.io.*
         import kotlin.jvm.JvmName
       """.trimIndent()
-      )
-      if (receiving) it.appendLine(
-        """
-          
-          public fun interface TypedRaiseRoutingHandler<B, R> {
-            public suspend fun RaiseRoutingContext.handle(payload: B): R
-          }
-          
-          @PublishedApi
-          internal suspend inline operator fun <reified B : Any, reified R> TypedRaiseRoutingHandler<B, R>.invoke(routingContext: RoutingContext, statusCode: HttpStatusCode?, b: B) =
-            routingContext.respondOrRaise(statusCode) { handle(b) }
-        """.trimIndent()
       )
       extensionFunctions.forEach { extensionFunction ->
         it.appendLine(

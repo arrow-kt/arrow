@@ -25,6 +25,11 @@ public final class arrow/raise/ktor/server/HandleOrRaiseKt {
 	public static final fun respond (Lio/ktor/server/routing/RoutingCall;Larrow/raise/ktor/server/RoutingResponse;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class arrow/raise/ktor/server/RaiseRouteHandlersKt {
+	public static final fun asKtorHandler (Larrow/raise/ktor/server/ReceivingRespondOrRaiseHandler;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;)Lkotlin/jvm/functions/Function3;
+	public static final fun asKtorHandler (Lkotlin/jvm/functions/Function2;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;)Lkotlin/jvm/functions/Function2;
+}
+
 public final class arrow/raise/ktor/server/RaiseRoutingContext : arrow/core/raise/Raise {
 	public fun <init> (Larrow/core/raise/Raise;Lio/ktor/server/routing/RoutingContext;)V
 	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
@@ -41,7 +46,13 @@ public final class arrow/raise/ktor/server/RaiseRoutingContext : arrow/core/rais
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 }
 
+public abstract interface class arrow/raise/ktor/server/ReceivingRespondOrRaiseHandler {
+	public abstract fun handle (Larrow/raise/ktor/server/RaiseRoutingContext;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class arrow/raise/ktor/server/RespondOrRaiseKt {
+	public static final fun respondOrRaise (Lio/ktor/server/routing/RoutingContext;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun respondOrRaise$default (Lio/ktor/server/routing/RoutingContext;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun respondSafely (Lio/ktor/server/routing/RoutingCall;Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -53,10 +64,6 @@ public final class arrow/raise/ktor/server/RoutingResponse$Companion {
 	public final fun RoutingResponse (Lio/ktor/http/HttpStatusCode;)Larrow/raise/ktor/server/RoutingResponse;
 	public final fun RoutingResponse (Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;)Larrow/raise/ktor/server/RoutingResponse;
 	public final fun RoutingResponse (Lio/ktor/http/content/OutgoingContent;)Larrow/raise/ktor/server/RoutingResponse;
-}
-
-public abstract interface class arrow/raise/ktor/server/TypedRaiseRoutingHandler {
-	public abstract fun handle (Larrow/raise/ktor/server/RaiseRoutingContext;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/raise/ktor/server/TypedResponse : arrow/raise/ktor/server/RoutingResponse {
