@@ -26,7 +26,7 @@ val Project.withoutAndroid
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
-internal val Project.isKotlinMultiplatform: Boolean
+val Project.isKotlinMultiplatform: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")
 
 if (!isKotlinJvm) {
@@ -51,8 +51,6 @@ tasks {
       setEvents(listOf("passed", "skipped", "failed", "standardOut", "standardError"))
     }
   }
-
-  named("clean") { doFirst { delete("$projectDir/../../../arrow-site/docs/apidocs") } }
 }
 
 configure<KotlinProjectExtension> {
@@ -65,11 +63,14 @@ configure<JavaPluginExtension> {
   }
 }
 
+fun Provider<String>.ifAvailable(block: (String) -> Unit) =
+  orNull?.takeIf(String::isNotBlank)?.also(block)
+
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
   // required to be part of the Kotlin User Projects repository
-  providers.gradleProperty("kotlin_language_version").orNull?.also { languageVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_api_version").orNull?.also { apiVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_additional_cli_options").orNull?.also { freeCompilerArgs.addAll(it.split(" "))}
+  providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_api_version").ifAvailable { apiVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
@@ -203,7 +204,7 @@ if (pluginManager.hasPlugin("com.android.library")) {
     namespace = projectNameWithDots
     compileSdk = 35
     defaultConfig {
-      minSdk = 21
+      minSdk = 24
     }
   }
 }
@@ -242,23 +243,14 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
 }
 
 configure<ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension> {
-  ignore("java.lang.*")
+  // ignore("java.lang.*")
 }
 
-if (isKotlinMultiplatform) {
-  configure<KotlinMultiplatformExtension> {
-    sourceSets {
-      commonMain {
-        dependencies {
-          implementation("org.codehaus.mojo:animal-sniffer-annotations:1.24")
-        }
-      }
-      jvmMain {
-        dependencies {
-          implementation("org.codehaus.mojo:animal-sniffer-annotations:1.24")
-        }
-      }
-    }
+val signature by configurations.getting
+dependencies {
+  signature("org.codehaus.mojo.signature:java18:1.0@signature")
+  if (isKotlinMultiplatform && !withoutAndroid) {
+    signature("net.sf.androidscents.signature:android-api-level-24:7.0_r2@signature")
   }
 }
 
