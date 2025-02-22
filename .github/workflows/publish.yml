@@ -7,11 +7,11 @@ on:
 env:
   BASEDIR: ${{github.workspace}}/arrow-libs
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
-  ORG_GRADLE_PROJECT_mavenCentralUsername: '${{ secrets.OSS_USER }}'
-  ORG_GRADLE_PROJECT_mavenCentralPassword: '${{ secrets.OSS_TOKEN }}'
-  ORG_GRADLE_PROJECT_signingInMemoryKeyId: '${{ secrets.SIGNING_KEY_ID }}'
-  ORG_GRADLE_PROJECT_signingInMemoryKey: '${{ secrets.SIGNING_KEY }}'
-  ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: '${{ secrets.SIGNING_KEY_PASSPHRASE }}'
+  ORG_GRADLE_PROJECT_mavenCentralUsername: '${{ secrets.SONATYPE_TOKENIZED_USER }}'
+  ORG_GRADLE_PROJECT_mavenCentralPassword: '${{ secrets.SONATYPE_TOKENIZED_PASSWORD }}'
+  ORG_GRADLE_PROJECT_signingInMemoryKeyId: '${{ secrets.SONATYPE_SIGNING_KEY_ID }}'
+  ORG_GRADLE_PROJECT_signingInMemoryKey: '${{ secrets.SONATYPE_SIGNING_KEY }}'
+  ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: '${{ secrets.SONATYPE_SIGNING_KEY_PASSPHRASE }}'
 
 jobs:
   publish:
