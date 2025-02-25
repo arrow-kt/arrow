@@ -2,9 +2,9 @@ package arrow.raise.ktor.server
 
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.ktor.util.reflect.*
 
 public sealed interface Response {
@@ -20,20 +20,26 @@ public sealed interface Response {
     // TODO: not sure if we want these three or not - allows for `Response.empty(OK)` and `Response.of(myPayload)` etc
     public fun empty(statusCode: HttpStatusCode = HttpStatusCode.Companion.NoContent): Response = Response(statusCode)
     public fun raw(outgoingContent: OutgoingContent): Response = Response(outgoingContent)
-    public inline fun <reified T> of(value: T, statusCode: HttpStatusCode = HttpStatusCode.Companion.OK): Response = Response(statusCode, value, typeInfo<T>())
+    public inline fun <reified T> payload(value: T, statusCode: HttpStatusCode = HttpStatusCode.Companion.OK): Response = Response(statusCode, value, typeInfo<T>())
 
     // allows using a HttpStatusCode as a "constructor" of a response, i.e. `NotFound("user was missing")`
     public inline operator fun <reified T : Any> HttpStatusCode.invoke(payload: T) = Response(this, payload, typeInfo<T>())
   }
 }
 
-private data class Typed(val statusCode: HttpStatusCode, val content: Any?, val typeInfo: TypeInfo) : Response
-private data class Raw(val outgoingContent: OutgoingContent) : Response
-
 @PublishedApi
-internal suspend fun RoutingCall.respond(routingResponse: Response) {
-  when (routingResponse) {
-    is Typed -> respond(routingResponse.statusCode, routingResponse.content, routingResponse.typeInfo)
-    is Raw -> respond(routingResponse.outgoingContent, null)
-  }
+internal suspend fun Response.respondTo(call: ApplicationCall) = when (this) {
+  is Respondable -> respondTo(call)
+}
+
+private sealed interface Respondable : Response {
+  suspend fun respondTo(call: ApplicationCall)
+}
+
+private data class Typed(val statusCode: HttpStatusCode, val content: Any?, val typeInfo: TypeInfo) : Respondable {
+  override suspend fun respondTo(call: ApplicationCall) = call.respond(statusCode, content, typeInfo)
+}
+
+private data class Raw(val outgoingContent: OutgoingContent) : Respondable {
+  override suspend fun respondTo(call: ApplicationCall) = call.respond(outgoingContent, null)
 }

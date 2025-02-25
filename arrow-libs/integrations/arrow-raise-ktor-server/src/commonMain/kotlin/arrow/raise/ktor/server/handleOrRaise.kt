@@ -20,7 +20,7 @@ public fun Route.handleOrRaise(body: RaiseRoutingHandler): Unit = handle { handl
 @PublishedApi
 internal suspend inline fun RoutingContext.handleOrRaise(body: RaiseRoutingContext.() -> Unit): Unit = recover(
   block = raise@{ RaiseRoutingContext(this@raise, this@handleOrRaise).body() },
-  recover = { call.respond(routingResponse = it) },
+  recover = { it.respondTo(call) },
 )
 
 @RaiseDSL

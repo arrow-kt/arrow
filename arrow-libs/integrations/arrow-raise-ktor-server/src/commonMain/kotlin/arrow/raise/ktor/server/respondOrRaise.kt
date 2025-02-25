@@ -26,7 +26,7 @@ internal suspend fun RoutingCall.respondSafely(statusCode: HttpStatusCode?, resu
   when (result) {
     is Unit -> respond(HttpStatusCodeContent(statusCode ?: HttpStatusCode.NoContent))
     is HttpStatusCode -> respond(HttpStatusCodeContent(result))
-    is Response -> respond(routingResponse = result)
+    is Response -> result.respondTo(this)
     else -> when (statusCode) {
       null -> respond(result, typeInfo)
       else -> respond(statusCode, result, typeInfo)
