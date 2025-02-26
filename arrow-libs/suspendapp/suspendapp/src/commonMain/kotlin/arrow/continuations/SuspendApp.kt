@@ -4,6 +4,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlinx.coroutines.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.startCoroutine
 
 /**
  * An unsafe blocking edge that wires the [CoroutineScope] (and structured concurrency) to the
@@ -19,7 +21,6 @@ import kotlinx.coroutines.*
  *   regardless of finalizers.
  * @param block the lambda of the actual application.
  */
-@OptIn(ExperimentalStdlibApi::class)
 public fun SuspendApp(
   context: CoroutineContext = Dispatchers.Default,
   uncaught: (Throwable) -> Unit = Throwable::printStackTrace,
@@ -28,15 +29,14 @@ public fun SuspendApp(
   block: suspend CoroutineScope.() -> Unit,
 ): Unit =
   process.use { env ->
-    env.runScope(context) {
+    val jobCause = CompletableDeferred<Throwable?>()
+    env.runScope(context, { jobCause.complete(it.exceptionOrNull()) }) {
       val job =
         launch(start = CoroutineStart.LAZY) {
           try {
             block()
-            env.exit(0)
           } catch (_: SuspendAppShutdown) {} catch (e: Throwable) {
-            uncaught(e)
-            env.exit(-1)
+            throw e
           }
         }
       val unregister =
@@ -50,6 +50,19 @@ public fun SuspendApp(
       job.join()
       unregister()
     }
+
+    suspend { jobCause.join() }
+      .startCoroutine(Continuation(EmptyCoroutineContext) {
+      check(jobCause.isCompleted)
+      @OptIn(ExperimentalCoroutinesApi::class)
+      when (val cause = jobCause.getCompleted()) {
+        is SuspendAppShutdown, null -> env.exit(0)
+        else -> {
+          uncaught(cause)
+          env.exit(-1)
+        }
+      }
+    })
   }
 
 /** Marker type so track shutdown signal */

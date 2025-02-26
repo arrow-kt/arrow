@@ -11,7 +11,7 @@ import sun.misc.SignalHandler
 public actual fun process(): Process = JvmProcess
 
 public object JvmProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): suspend () -> Unit {
+  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
     val isShutdown = AtomicBoolean(false)
     fun shutdown() {
       if (!isShutdown.getAndSet(true))
@@ -54,8 +54,8 @@ public object JvmProcess : Process {
       /* Ignore */
     }
 
-  override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit): Unit =
-    runBlocking(context, block)
+  override fun runScope(context: CoroutineContext, callback: (Result<Unit>) -> Unit, block: suspend CoroutineScope.() -> Unit): Unit =
+    callback(runCatching { runBlocking(context, block) })
 
   override fun exit(code: Int): Nothing = exitProcess(code)
 
