@@ -19,7 +19,7 @@ import kotlinx.coroutines.promise
 public actual fun process(): Process = JsProcess
 
 public object JsProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): suspend () -> Unit {
+  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
     onSigTerm { code -> exitAfter(128 + code) { block() } }
     onSigInt { code -> exitAfter(128 + code) { block() } }
     return { /* Nothing to unregister */ }
@@ -60,8 +60,9 @@ public object JsProcess : Process {
       .startCoroutine(Continuation(EmptyCoroutineContext) {})
   }
 
-  override fun exit(code: Int) {
-    runCatching { js("process.exit(code)") }
+  override fun exit(code: Int): Nothing {
+    js("process.exit(code)")
+    error("process.exit() should have exited...")
   }
 
   override fun close() {
