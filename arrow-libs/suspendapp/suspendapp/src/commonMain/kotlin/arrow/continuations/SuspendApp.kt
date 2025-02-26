@@ -17,8 +17,6 @@ import kotlinx.coroutines.*
  * @param timeout the maximum backpressure time that can be applied to the process. This emulates a
  *   `SIGKILL` command, and after the [timeout] is passed the App will forcefully shut down
  *   regardless of finalizers.
- * @param forceExit whether to force-exit the process after this SuspendApp
- *   finishes (code 0 on success or 255 on failure)
  * @param block the lambda of the actual application.
  */
 public fun SuspendApp(
@@ -26,7 +24,6 @@ public fun SuspendApp(
   uncaught: (Throwable) -> Unit = Throwable::printStackTrace,
   timeout: Duration = Duration.INFINITE,
   process: Process = process(),
-  forceExit: Boolean = true,
   block: suspend CoroutineScope.() -> Unit,
 ): Unit =
   process.use { env ->
@@ -58,13 +55,11 @@ public fun SuspendApp(
         uncaught(e)
         throw e
     } finally {
-      if(forceExit) {
-        check(jobCause.isCompleted)
-        @OptIn(ExperimentalCoroutinesApi::class)
-        when(val cause = jobCause.getCompleted()) {
-          is SuspendAppShutdown, null -> env.exit(0)
-          else -> env.exit(-1)
-        }
+      check(jobCause.isCompleted)
+      @OptIn(ExperimentalCoroutinesApi::class)
+      when(val cause = jobCause.getCompleted()) {
+        is SuspendAppShutdown, null -> env.exit(0)
+        else -> env.exit(-1)
       }
     }
   }
