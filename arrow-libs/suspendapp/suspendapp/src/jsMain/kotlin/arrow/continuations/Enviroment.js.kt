@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
+import kotlinx.coroutines.withContext
 
 public actual fun process(): Process = JsProcess
 
@@ -39,7 +40,7 @@ public object JsProcess : Process {
 
   private val jobs: MutableList<Job> = mutableListOf()
 
-  override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit) {
+  override fun runScope(context: CoroutineContext, callback: (Result<Unit>) -> Unit, block: suspend CoroutineScope.() -> Unit) {
     val innerJob = Job()
     val innerScope = CoroutineScope(innerJob)
     suspend {
@@ -55,9 +56,11 @@ public object JsProcess : Process {
               delay(1.hours)
             }
           }
-        runCatching { block(innerScope) }.also { keepAlive.cancelAndJoin() }.getOrThrow()
+        runCatching { withContext(context + innerJob, block) }
+          .also { keepAlive.cancelAndJoin() }
+          .getOrThrow()
       }
-      .startCoroutine(Continuation(EmptyCoroutineContext) {})
+      .startCoroutine(Continuation(EmptyCoroutineContext, callback))
   }
 
   override fun exit(code: Int): Nothing {

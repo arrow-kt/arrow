@@ -4,6 +4,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlinx.coroutines.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.startCoroutine
 
 /**
  * An unsafe blocking edge that wires the [CoroutineScope] (and structured concurrency) to the
@@ -28,40 +30,39 @@ public fun SuspendApp(
 ): Unit =
   process.use { env ->
     val jobCause = CompletableDeferred<Throwable?>()
-    try {
-      env.runScope(context) {
-        val job =
-          launch(start = CoroutineStart.LAZY) {
-            try {
-              block()
-            } catch (_: SuspendAppShutdown) {} catch (e: Throwable) {
-              throw e
-            }
+    env.runScope(context, { jobCause.complete(it.exceptionOrNull()) }) {
+      val job =
+        launch(start = CoroutineStart.LAZY) {
+          try {
+            block()
+          } catch (_: SuspendAppShutdown) {} catch (e: Throwable) {
+            throw e
           }
-        val unregister =
-          env.onShutdown {
-            withTimeout(timeout) {
-              job.cancel(SuspendAppShutdown)
-              job.join()
-            }
-          }
-        job.invokeOnCompletion {
-          unregister()
-          jobCause.complete(it)
         }
-        job.start()
-      }
-    } catch(e: Throwable) {
-        uncaught(e)
-        throw e
-    } finally {
+      val unregister =
+        env.onShutdown {
+          withTimeout(timeout) {
+            job.cancel(SuspendAppShutdown)
+            job.join()
+          }
+        }
+      job.start()
+      job.join()
+      unregister()
+    }
+
+    suspend { jobCause.join() }
+      .startCoroutine(Continuation(EmptyCoroutineContext) {
       check(jobCause.isCompleted)
       @OptIn(ExperimentalCoroutinesApi::class)
-      when(val cause = jobCause.getCompleted()) {
+      when (val cause = jobCause.getCompleted()) {
         is SuspendAppShutdown, null -> env.exit(0)
-        else -> env.exit(-1)
+        else -> {
+          uncaught(cause)
+          env.exit(-1)
+        }
       }
-    }
+    })
   }
 
 /** Marker type so track shutdown signal */
