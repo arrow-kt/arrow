@@ -16,7 +16,7 @@ import kotlin.jvm.JvmName
 context(Raise<RequestError>) public fun RoutingCall.pathOrRaise(name: String) = parameterOrRaise(pathParameters, Parameter.Path(name)) { it }
 context(Raise<RequestError>) public inline fun <reified A : Any> RoutingCall.pathOrRaise(name: String): A = parameterOrRaise(pathParameters, Parameter.Path(name), typeInfo<A>())
 context(Raise<RequestError>) public inline fun <A : Any> RoutingCall.pathOrRaise(name: String, transform: Raise<String>.(String) -> A): A = parameterOrRaise(pathParameters, Parameter.Path(name), transform)
-context(Raise<RequestError>) public fun RoutingCall.pathIntOrRaise(name: String): Int = parameterOrRaise(pathParameters, Parameter.Path(name)) { value -> ensureNotNull(value.toIntOrNull()) { "Expected $value to be a valid Int." } }
+context(Raise<RequestError>) public fun RoutingCall.pathIntOrRaise(name: String): Int = parameterOrRaise(pathParameters, Parameter.Path(name)) { value -> ensureNotNull(value.toIntOrNull()) { "expected $value to be a valid Int." } }
 
 // Raise+RaiseRoutingContext
 context(RaiseRoutingContext) public fun Raise<RequestError>.pathOrRaise(name: String) = call.pathOrRaise(name)

@@ -1,5 +1,4 @@
 public final class arrow/raise/ktor/server/ErrorResponseKt {
-	public static final fun errorResponse (Lio/ktor/server/application/ApplicationCall;Larrow/raise/ktor/server/request/RequestError;)Larrow/raise/ktor/server/Response;
 	public static final fun errorResponse-EgRvm48 (Lio/ktor/server/application/ApplicationCall;Ljava/util/List;)Larrow/raise/ktor/server/Response;
 	public static final fun getRaiseErrorResponse ()Lio/ktor/server/application/RouteScopedPlugin;
 }
@@ -15,12 +14,11 @@ public final class arrow/raise/ktor/server/HandleOrRaiseKt {
 
 public final class arrow/raise/ktor/server/RaiseErrorResponseConfig {
 	public fun <init> ()V
-	public fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
-	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getErrorResponse ()Lkotlin/jvm/functions/Function1;
-	public final fun getErrorsResponse ()Lkotlin/jvm/functions/Function1;
+	public final fun onErrorRespond (Lkotlin/jvm/functions/Function1;)V
 	public final fun setErrorResponse (Lkotlin/jvm/functions/Function1;)V
-	public final fun setErrorsResponse (Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class arrow/raise/ktor/server/RaiseRoutingContext : arrow/core/raise/Raise {
@@ -122,7 +120,6 @@ public final class arrow/raise/ktor/server/request/Parameter$Query : arrow/raise
 public abstract class arrow/raise/ktor/server/request/ParameterDelegateProvider {
 	public synthetic fun <init> (Lio/ktor/http/Parameters;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	protected final fun getParameters ()Lio/ktor/http/Parameters;
-	public final fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Larrow/raise/ktor/server/request/DelegatedParameter;
 	public final fun invoke (Ljava/lang/String;)Larrow/raise/ktor/server/request/DelegatedParameter;
 	public final fun invoke (Ljava/lang/String;Lkotlin/jvm/functions/Function2;)Larrow/raise/ktor/server/request/DelegatedParameter;
 	public final fun invoke (Lkotlin/jvm/functions/Function2;)Larrow/raise/ktor/server/request/ParameterDelegateProvider$WithTransform;

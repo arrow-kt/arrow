@@ -21,8 +21,10 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Created
+import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.routing.route
 import io.ktor.server.testing.*
 import io.ktor.util.reflect.*
 import kotlinx.serialization.Serializable
@@ -240,8 +242,7 @@ class ValidateTest {
     install(ContentNegotiation) { json() }
     routing {
       install(RaiseErrorResponse) {
-        errorResponse = { validationError(it.nel()) }
-        errorsResponse = { validationError(it) }
+        onErrorRespond { validationError(it) }
       }
       putOrRaise("/user/{id}") {
         val person = validate {
@@ -269,6 +270,49 @@ class ValidateTest {
           }
         }
       }
+    }
+  }
+
+  @Test
+  fun `nested route-specific error handling`() = testApplication {
+    routing {
+      install(RaiseErrorResponse) {
+        onErrorRespond {
+          BadRequest("root handler: ${it.joinToString { it.toSimpleMessage() }}")
+        }
+      }
+
+      getOrRaise("/fail") {
+        pathOrRaise("nothing")
+      }
+
+      route("/user") {
+        install(RaiseErrorResponse) {
+          onErrorRespond {
+            BadRequest("user handler: ${it.joinToString { it.toSimpleMessage() }}")
+          }
+        }
+
+        getOrRaise("/{name?}") {
+          val name: String by pathRaising
+          name
+        }
+      }
+    }
+
+    assertSoftly(client.get("/fail")) {
+      it.status shouldBe BadRequest
+      it.bodyAsText() shouldBe "root handler: Missing path parameter 'nothing'."
+    }
+
+    assertSoftly(client.get("/user/")) {
+      it.status shouldBe BadRequest
+      it.bodyAsText() shouldBe "user handler: Missing path parameter 'name'."
+    }
+
+    assertSoftly(client.get("/user/bob")) {
+      it.status shouldBe OK
+      it.bodyAsText() shouldBe "bob"
     }
   }
 }

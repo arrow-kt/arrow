@@ -13,6 +13,7 @@ import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
+import io.ktor.server.routing.get
 import io.ktor.server.testing.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.*
@@ -20,6 +21,38 @@ import io.ktor.utils.io.charsets.*
 import kotlin.test.Test
 
 class RaiseRespondTest {
+  @Test
+  fun `respondOrRaise nested in get`() = testApplication {
+    routing {
+      get("/foo") {
+        respondOrRaise { "bar" }
+      }
+    }
+
+    client.get("/foo").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.OK
+        it.bodyAsText() shouldBe "bar"
+      }
+    }
+  }
+
+  @Test
+  fun `respondOrRaise Unit is NoContent`() = testApplication {
+    routing {
+      get("/foo") {
+        respondOrRaise { }
+      }
+    }
+
+    client.get("/foo").let {
+      assertSoftly {
+        it.status shouldBe HttpStatusCode.NoContent
+        it.bodyAsText() shouldBe ""
+      }
+    }
+  }
+
   @Test
   fun `respond result of getOrRaise`() = testApplication {
     routing {
@@ -126,6 +159,26 @@ class RaiseRespondTest {
         it.status shouldBe HttpStatusCode.OK
         it.bodyAsText() shouldBe "HELLO"
       }
+    }
+  }
+
+  @Test
+  fun `pathRaising raises on missing`() = testApplication {
+    routing {
+      getOrRaise("/upper/{text?}") {
+        val text: String by pathRaising
+        text.uppercase()
+      }
+    }
+
+    assertSoftly(client.get("/upper/hello")) {
+      it.status shouldBe HttpStatusCode.OK
+      it.bodyAsText() shouldBe "HELLO"
+    }
+
+    assertSoftly(client.get("/upper")) {
+      it.status shouldBe HttpStatusCode.BadRequest
+      it.bodyAsText() shouldBe "Missing path parameter 'text'."
     }
   }
 

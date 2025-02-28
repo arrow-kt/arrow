@@ -1,5 +1,6 @@
 package arrow.raise.ktor.server
 
+import arrow.core.nel
 import arrow.core.raise.Raise
 import arrow.raise.ktor.server.request.Parameter
 import arrow.raise.ktor.server.request.ParameterDelegateProvider
@@ -15,7 +16,7 @@ public class RaiseRoutingContext(
   @PublishedApi
   internal val errorRaise: Raise<RequestError> =
     object : Raise<RequestError> {
-      override fun raise(r: RequestError): Nothing = raise(call.errorResponse(r))
+      override fun raise(requestError: RequestError): Nothing = raise(call.errorResponse(requestError.nel()))
     }
 
   public val call: RoutingCall get() = routingContext.call

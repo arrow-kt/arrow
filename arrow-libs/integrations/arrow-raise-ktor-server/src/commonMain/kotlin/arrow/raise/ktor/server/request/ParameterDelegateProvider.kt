@@ -43,11 +43,6 @@ public sealed class ParameterDelegateProvider protected constructor(
   public operator fun <O : Any> invoke(transform: Raise<String>.(String) -> O): WithTransform<O> =
     WithTransformFn { provideDelegate(parameter(it), transform) }
 
-  public operator fun getValue(
-    thisRef: Nothing?,
-    property: KProperty<*>,
-  ): DelegatedParameter<String> = provideDelegate(parameter(property.name)) { it }
-
   @PublishedApi
   internal fun <O : Any> provideDelegateImpl(
     parameterName: String,

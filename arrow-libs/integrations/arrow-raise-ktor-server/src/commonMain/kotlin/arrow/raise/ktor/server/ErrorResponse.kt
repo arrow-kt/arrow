@@ -12,34 +12,26 @@ import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.util.AttributeKey
 import io.ktor.util.Attributes
 
-private typealias ErrorResponse = (RequestError) -> Response
-private typealias ErrorsResponse = (NonEmptyList<RequestError>) -> Response
+private typealias ErrorResponse = (NonEmptyList<RequestError>) -> Response
 
 private val errorResponseKey = AttributeKey<ErrorResponse>("ktor-raise-error-response")
-private val errorsResponseKey = AttributeKey<ErrorsResponse>("ktor-raise-errors-response")
 
 internal var Attributes.errorResponse: ErrorResponse
-  get() = getOrNull(errorResponseKey) ?: ::defaultErrorResponse
+  get() = getOrNull(errorResponseKey) ?: ::defaultErrorsResponse
   private set(value) {
     put(errorResponseKey, value)
   }
 
-internal var Attributes.errorsResponse: ErrorsResponse
-  get() = getOrNull(errorsResponseKey) ?: ::defaultErrorsResponse
-  private set(value) {
-    put(errorsResponseKey, value)
-  }
-
 @PublishedApi
-internal fun ApplicationCall.errorResponse(errors: NonEmptyList<RequestError>): Response = attributes.errorsResponse(errors)
-
-@PublishedApi
-internal fun ApplicationCall.errorResponse(error: RequestError): Response = attributes.errorResponse(error)
+internal fun ApplicationCall.errorResponse(errors: NonEmptyList<RequestError>): Response = attributes.errorResponse(errors)
 
 public class RaiseErrorResponseConfig(
-  public var errorResponse: ErrorResponse = ::defaultErrorResponse,
-  public var errorsResponse: ErrorsResponse = ::defaultErrorsResponse,
-)
+  public var errorResponse: ErrorResponse = ::defaultErrorsResponse,
+) {
+  public fun onErrorRespond(response: (NonEmptyList<RequestError>) -> Response) {
+    errorResponse = response
+  }
+}
 
 public val RaiseErrorResponse: RouteScopedPlugin<RaiseErrorResponseConfig> = createRouteScopedPlugin(
   name = "RequestLoggingPlugin",
@@ -47,7 +39,6 @@ public val RaiseErrorResponse: RouteScopedPlugin<RaiseErrorResponseConfig> = cre
 ) {
   onCall { call ->
     call.attributes.errorResponse = pluginConfig.errorResponse
-    call.attributes.errorsResponse = pluginConfig.errorsResponse
   }
 }
 
@@ -56,15 +47,6 @@ private fun defaultErrorsResponse(errors: NonEmptyList<RequestError>): Response 
   Response.Companion.raw(
     TextContent(
       text = errors.joinToString("\n") { it.toSimpleMessage() },
-      contentType = ContentType.Text.Plain,
-      status = BadRequest,
-    ),
-  )
-
-private fun defaultErrorResponse(error: RequestError): Response =
-  Response.Companion.raw(
-    TextContent(
-      text = error.toSimpleMessage(),
       contentType = ContentType.Text.Plain,
       status = BadRequest,
     ),
