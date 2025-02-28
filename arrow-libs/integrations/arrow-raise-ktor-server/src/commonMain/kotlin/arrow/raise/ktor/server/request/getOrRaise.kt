@@ -43,7 +43,7 @@ internal fun <A : Any> Raise<RequestError>.parameterOrRaise(
     raise(
       Malformed(
         component = parameter,
-        message = it.message ?: "couldn't be parsed/converted to ${typeInfo.simpleName}",
+        message = "couldn't be parsed/converted to ${typeInfo.simpleName}",
         cause = it,
       ),
     )
@@ -72,7 +72,7 @@ private inline fun <A> Raise<Malformed<ReceiveBody>>.receiveOrRaise(
     is BadRequestException -> it.cause ?: it // TODO: do we want to unwrap this?
     else -> throw it
   }
-  raise(Malformed(ReceiveBody, cause.message ?: "Could not deserialize ${typeInfo.simpleName} from request body", cause))
+  raise(Malformed(ReceiveBody, "could not be deserialized to ${typeInfo.simpleName}", cause))
 }
 
 private inline val TypeInfo.simpleName get(): String = type.simpleName ?: type.toString()

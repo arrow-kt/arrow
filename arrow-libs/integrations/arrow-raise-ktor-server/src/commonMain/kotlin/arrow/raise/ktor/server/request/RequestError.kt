@@ -19,7 +19,7 @@ public interface UnhandledError : RequestError {
 public fun RequestError.toSimpleMessage(): String =
   when (this) {
     is Missing<*> -> "Missing ${parameter.describe()}."
-    is Malformed<*> -> "Malformed ${component.describe()}: $message"
+    is Malformed<*> -> "Malformed ${component.describe()} $message${cause?.message?.let { ": $it" } ?: ""}"
     is UnhandledError -> message
   }
 

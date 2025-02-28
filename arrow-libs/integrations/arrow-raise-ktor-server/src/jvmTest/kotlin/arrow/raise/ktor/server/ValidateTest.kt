@@ -71,7 +71,7 @@ class ValidateTest {
           """
           Missing path parameter 'name'.
           Missing query parameter 'age'.
-          Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}
+          Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info
           """.trimIndent()
       }
     }
@@ -107,8 +107,8 @@ class ValidateTest {
         it.bodyAsText() shouldBe
           """
           Missing path parameter 'name'.
-          Malformed query parameter 'age': too young
-          Malformed body: Illegal input: Encountered an unknown key 'emule' at offset 2 at path: $
+          Malformed query parameter 'age' too young
+          Malformed body could not be deserialized to Info: Illegal input: Encountered an unknown key 'emule' at offset 2 at path: $
           Use 'ignoreUnknownKeys = true' in 'Json {}' builder or '@JsonIgnoreUnknownKeys' annotation to ignore unknown keys.
           JSON input: {"emule":"donkey"}
           """.trimIndent()
@@ -123,7 +123,7 @@ class ValidateTest {
     routing {
       putOrRaise("/user/{name}") {
         val person = validate {
-          val name: String by pathAccumulating
+          val name: String by pathAccumulating("user-name")
           val age: Int by queryAccumulating
           val info: Info by receiveAccumulating()
           Person(name, age, info)
@@ -141,8 +141,8 @@ class ValidateTest {
         it.bodyAsText() shouldBe
           """
           Missing path parameter 'user-name'.
-          Malformed query parameter 'age': nope
-          Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}
+          Malformed query parameter 'age' couldn't be parsed/converted to Int: For input string: "old"
+          Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info
           """.trimIndent()
       }
     }
@@ -173,8 +173,8 @@ class ValidateTest {
         it.bodyAsText() shouldBe
           """
           Missing path parameter 'user-name'.
-          Malformed query parameter 'age': nope
-          Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}
+          Malformed query parameter 'age' nope
+          Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info
           """.trimIndent()
       }
     }
@@ -216,8 +216,8 @@ class ValidateTest {
         Json.parseToJsonElement(it.bodyAsText()) shouldBe buildJsonObject {
           putJsonArray("errors") {
             add("Missing path parameter 'name'.")
-            add("Malformed query parameter 'age': Expected old to be a valid Int.")
-            add("Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}")
+            add("Malformed query parameter 'age' expected old to be a valid Int.")
+            add("Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info")
           }
         }
       }
@@ -264,8 +264,8 @@ class ValidateTest {
         Json.parseToJsonElement(it.bodyAsText()) shouldBe buildJsonObject {
           putJsonArray("errors") {
             add("Missing path parameter 'name'.")
-            add("Malformed query parameter 'age': Expected old to be a valid Int.")
-            add("Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}")
+            add("Malformed query parameter 'age' expected old to be a valid Int.")
+            add("Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info")
           }
         }
       }
