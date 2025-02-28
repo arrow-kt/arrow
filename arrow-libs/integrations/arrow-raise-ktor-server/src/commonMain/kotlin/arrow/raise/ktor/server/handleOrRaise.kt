@@ -43,11 +43,3 @@ public fun Raise<Response>.raiseBadRequest(): Nothing = raise(BadRequest)
 
 @RaiseDSL
 public inline fun <reified T> Raise<Response>.raiseBadRequest(content: T): Nothing = raise(BadRequest, content)
-
-public class RaiseRoutingContext(
-  private val raise: Raise<Response>,
-  private val routingContext: RoutingContext,
-) : Raise<Response> by raise {
-  public val call: RoutingCall get() = routingContext.call // TODO: custom wrapped RoutingCall-alike that requires opt-in for direct response calls (as they're non-terminal)
-}
-

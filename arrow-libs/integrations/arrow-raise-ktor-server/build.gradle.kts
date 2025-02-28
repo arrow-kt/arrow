@@ -1,5 +1,6 @@
 plugins {
   id("arrow.kotlin")
+  alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
@@ -16,6 +17,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(libs.ktor.server.contentNegotiation)
+        implementation(libs.ktor.serialization.kotlinxJson)
         implementation(libs.ktor.test)
         implementation(libs.bundles.testing)
       }

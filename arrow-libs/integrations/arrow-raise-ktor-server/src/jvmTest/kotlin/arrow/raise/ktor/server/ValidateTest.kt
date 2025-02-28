@@ -1,0 +1,274 @@
+package arrow.raise.ktor.server
+
+import arrow.core.NonEmptyList
+import arrow.core.nel
+import arrow.core.raise.ExperimentalRaiseAccumulateApi
+import arrow.core.raise.accumulate
+import arrow.core.raise.ensure
+import arrow.core.raise.ensureNotNull
+import arrow.core.raise.withError
+import arrow.raise.ktor.server.Response.Companion.invoke
+import arrow.raise.ktor.server.request.RequestError
+import arrow.raise.ktor.server.request.pathOrRaise
+import arrow.raise.ktor.server.request.queryIntOrRaise
+import arrow.raise.ktor.server.request.receiveOrRaise
+import arrow.raise.ktor.server.request.toSimpleMessage
+import arrow.raise.ktor.server.request.validate
+import io.kotest.assertions.assertSoftly
+import io.kotest.matchers.shouldBe
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.http.HttpStatusCode.Companion.BadRequest
+import io.ktor.http.HttpStatusCode.Companion.Created
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.testing.*
+import io.ktor.util.reflect.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.putJsonArray
+import kotlin.test.Test
+
+@OptIn(ExperimentalRaiseAccumulateApi::class)
+class ValidateTest {
+  @Serializable
+  data class Info(val email: String)
+
+  @Serializable
+  data class Person(
+    val name: String,
+    val age: Int,
+    val info: Info
+  )
+
+  @Test
+  fun `validate with multiple errors`() = testApplication {
+    install(ContentNegotiation) { json() }
+    routing {
+      putOrRaise("/user/{id}") {
+        val person = withError({ raise(call.errorResponse(it)) }) {
+          accumulate {
+            val name by accumulating { pathOrRaise("name") }
+            val age by accumulating { queryIntOrRaise("age") }
+            val info by accumulating { receiveOrRaise<Info>() }
+            Person(name, age, info)
+          }
+        }
+        Created(person)
+      }
+    }
+
+    client.put("/user/hello") {
+      parameter("age", null)
+      setBody("""{"emule":"donkey"}""")
+    }.let {
+      assertSoftly {
+        it.status shouldBe BadRequest
+        it.bodyAsText() shouldBe
+          """
+          Missing path parameter 'name'.
+          Missing query parameter 'age'.
+          Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}
+          """.trimIndent()
+      }
+    }
+  }
+
+  @Test
+  fun `validate by delegation multiple errors`() = testApplication {
+    install(ContentNegotiation) { json() }
+    routing {
+      putOrRaise("/user/{id}") {
+        val person = validate {
+          val name: String by pathAccumulating
+          val age: Int by queryAccumulating {
+            val age = ensureNotNull(it.toIntOrNull()) { "not a valid number" }
+            ensure(age >= 21) { "too young" }
+            age
+          }
+          val info: Info by receiveAccumulating()
+          Person(name, age, info)
+        }
+
+        Created(person)
+      }
+    }
+
+    client.put("/user/hello") {
+      parameter("age", "12")
+      contentType(ContentType.Application.Json)
+      setBody("""{"emule":"donkey"}""")
+    }.let {
+      assertSoftly {
+        it.status shouldBe BadRequest
+        it.bodyAsText() shouldBe
+          """
+          Missing path parameter 'name'.
+          Malformed query parameter 'age': too young
+          Malformed body: Illegal input: Encountered an unknown key 'emule' at offset 2 at path: $
+          Use 'ignoreUnknownKeys = true' in 'Json {}' builder or '@JsonIgnoreUnknownKeys' annotation to ignore unknown keys.
+          JSON input: {"emule":"donkey"}
+          """.trimIndent()
+      }
+    }
+  }
+
+
+  @Test
+  fun `validate by named delegation conversion`() = testApplication {
+    install(ContentNegotiation) { json() }
+    routing {
+      putOrRaise("/user/{name}") {
+        val person = validate {
+          val name: String by pathAccumulating
+          val age: Int by queryAccumulating
+          val info: Info by receiveAccumulating()
+          Person(name, age, info)
+        }
+        Created(person)
+      }
+    }
+
+    client.put("/user/hello") {
+      parameter("age", "old")
+      setBody("""{"emule":"donkey"}""")
+    }.let {
+      assertSoftly {
+        it.status shouldBe BadRequest
+        it.bodyAsText() shouldBe
+          """
+          Missing path parameter 'user-name'.
+          Malformed query parameter 'age': nope
+          Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}
+          """.trimIndent()
+      }
+    }
+  }
+
+  @Test
+  fun `validate by named delegation multiple errors`() = testApplication {
+    install(ContentNegotiation) { json() }
+    routing {
+      putOrRaise("/user/{id}") {
+        val person = validate {
+          val name by pathAccumulating("user-name") { it }
+          val age: Int by queryAccumulating("age") { it.toIntOrNull() ?: raise("nope") }
+          val info: Info by receiveAccumulating()
+          Person(name, age, info)
+        }
+
+        Created(person)
+      }
+    }
+
+    client.put("/user/hello") {
+      parameter("age", "old")
+      setBody("""{"emule":"donkey"}""")
+    }.let {
+      assertSoftly {
+        it.status shouldBe BadRequest
+        it.bodyAsText() shouldBe
+          """
+          Missing path parameter 'user-name'.
+          Malformed query parameter 'age': nope
+          Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}
+          """.trimIndent()
+      }
+    }
+  }
+
+  @Test
+  fun `validate with multiple errors with custom response`() = testApplication {
+    fun validationError(errors: NonEmptyList<RequestError>): Response {
+      @Serializable
+      data class ErrorResponse(val errors: List<String>)
+
+      return BadRequest(
+        ErrorResponse(
+          errors = errors.map(RequestError::toSimpleMessage)
+        )
+      )
+    }
+
+    install(ContentNegotiation) { json() }
+    routing {
+      putOrRaise("/user/{id}") {
+        val person = validate(::validationError) {
+          call.queryParameters
+          val name by accumulating { pathOrRaise("name") }
+          val age by accumulating { queryIntOrRaise("age") }
+          val info by accumulating { receiveOrRaise<Info>() }
+          Person(name, age, info)
+        }
+        Created(person)
+      }
+    }
+
+    client.put("/user/hello") {
+      parameter("age", "old")
+      setBody("""{"emule":"donkey"}""")
+    }.let {
+      assertSoftly {
+        it.status shouldBe BadRequest
+        Json.parseToJsonElement(it.bodyAsText()) shouldBe buildJsonObject {
+          putJsonArray("errors") {
+            add("Missing path parameter 'name'.")
+            add("Malformed query parameter 'age': Expected old to be a valid Int.")
+            add("Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}")
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  fun `validate with multiple errors with custom response via plugin`() = testApplication {
+    fun validationError(errors: NonEmptyList<RequestError>): Response {
+      @Serializable
+      data class ErrorResponse(val errors: List<String>)
+
+      return BadRequest(
+        ErrorResponse(
+          errors = errors.map(RequestError::toSimpleMessage)
+        )
+      )
+    }
+
+    install(ContentNegotiation) { json() }
+    routing {
+      install(RaiseErrorResponse) {
+        errorResponse = { validationError(it.nel()) }
+        errorsResponse = { validationError(it) }
+      }
+      putOrRaise("/user/{id}") {
+        val person = validate {
+          call.queryParameters
+          val name by accumulating { pathOrRaise("name") }
+          val age by accumulating { queryIntOrRaise("age") }
+          val info by accumulating { receiveOrRaise<Info>() }
+          Person(name, age, info)
+        }
+        Created(person)
+      }
+    }
+
+    client.put("/user/hello") {
+      parameter("age", "old")
+      setBody("""{"emule":"donkey"}""")
+    }.let {
+      assertSoftly {
+        it.status shouldBe BadRequest
+        Json.parseToJsonElement(it.bodyAsText()) shouldBe buildJsonObject {
+          putJsonArray("errors") {
+            add("Missing path parameter 'name'.")
+            add("Malformed query parameter 'age': Expected old to be a valid Int.")
+            add("Malformed body: Cannot transform this request's content to ${typeInfo<Info>().kotlinType}")
+          }
+        }
+      }
+    }
+  }
+}

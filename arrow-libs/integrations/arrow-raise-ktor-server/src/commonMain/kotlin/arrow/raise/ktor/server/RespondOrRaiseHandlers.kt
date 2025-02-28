@@ -26,11 +26,10 @@ internal fun <Response> RespondOrRaiseHandler<Response>.asKtorHandler(
 ): KtorRoutingHandler = { respondOrRaise(statusCode, typeInfo, ::invoke) }
 
 @PublishedApi
-internal  inline fun <Request, reified Response> ReceivingRespondOrRaiseHandler<Request, Response>.asKtorHandler(statusCode: HttpStatusCode?) =
+internal inline fun <Request, reified Response> ReceivingRespondOrRaiseHandler<Request, Response>.asKtorHandler(statusCode: HttpStatusCode?) =
   asKtorHandler(statusCode, typeInfo<Response>())
 
 @PublishedApi
 internal fun <Request, Response> ReceivingRespondOrRaiseHandler<Request, Response>.asKtorHandler(
   statusCode: HttpStatusCode?, typeInfo: TypeInfo
 ): KtorReceivingRoutingHandler<Request> = { respondOrRaise(statusCode, typeInfo) { handle(it) } }
-
