@@ -31,7 +31,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 import kotlin.test.Test
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
@@ -179,6 +181,40 @@ class ValidateTest {
           Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info
           """.trimIndent()
       }
+    }
+  }
+
+  @Test
+  fun `validate success`() = testApplication {
+    install(ContentNegotiation) { json() }
+    routing {
+      putOrRaise("/user/{name}") {
+        val person = validate {
+          val name: String by pathAccumulating
+          val age: Int by queryAccumulating
+          val info: Info by receiveAccumulating()
+          Person(name, age, info)
+        }
+
+        Created(person)
+      }
+    }
+
+    assertSoftly(client.put("/user/bob") {
+      parameter("age", "31")
+      contentType(ContentType.Application.Json)
+      setBody("""{"email":"don@key.io"}""")
+    }) {
+      it.status shouldBe Created
+      Json.parseToJsonElement(it.bodyAsText()) shouldBe
+        buildJsonObject {
+          put("name", "bob")
+          put("age", 31)
+          putJsonObject("info") {
+            put("email", "don@key.io")
+          }
+        }
+
     }
   }
 
