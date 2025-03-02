@@ -42,10 +42,10 @@ class MapKTest {
       )
     )
 
-  // In addition to verifying monoid laws, we need to test the property of order-preservation
-  // when delegating to the nested monoid. Since the nested monoid is not necessarily
-  // commutative, preserving the order of parameters is essential.
-  @Test fun nestingMonoids() = runTest {
+  // In addition to verifying monoid laws, we must test the property of order-preservation
+  // when delegating to the nested monoid operation. Since a monoid's associative operation
+  // is not necessarily commutative, preserving the order of parameters is essential.
+  @Test fun orderPreservationInNestedCombine() = runTest {
     checkAll(
       // The range of keys and map sizes are chosen to allow for varying maps sizes, while ensuring key conflicts.
       // Consider that minSize is inclusive while maxSize is exclusive.
@@ -53,7 +53,7 @@ class MapKTest {
       Arb.map(Arb.int(1, 2), Arb.string(), minSize = 1, maxSize = 3),
     ) { map1, map2 ->
 
-      // Note using string concatenation which is not-commutative
+      // Notice that string concatenation is non-commutative.
       val result = map1.combine(map2, String::plus)
       map1.keys.intersect(map2.keys).forEach { key ->
         val expectedValue = map1[key].plus(map2[key])
