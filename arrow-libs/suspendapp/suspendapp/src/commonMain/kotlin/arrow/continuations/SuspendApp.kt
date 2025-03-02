@@ -29,40 +29,27 @@ public fun SuspendApp(
   block: suspend CoroutineScope.() -> Unit,
 ): Unit =
   process.use { env ->
-    val jobCause = CompletableDeferred<Throwable?>()
-    env.runScope(context, { jobCause.complete(it.exceptionOrNull()) }) {
-      val job =
-        launch(start = CoroutineStart.LAZY) {
-          try {
-            block()
-          } catch (_: SuspendAppShutdown) {} catch (e: Throwable) {
-            throw e
+    env.runScope(context) {
+      val result = supervisorScope {
+        val app =
+          async(start = CoroutineStart.LAZY, block = block)
+        val unregister =
+          env.onShutdown {
+            withTimeout(timeout) {
+              app.cancel(SuspendAppShutdown)
+              app.join()
+            }
           }
-        }
-      val unregister =
-        env.onShutdown {
-          withTimeout(timeout) {
-            job.cancel(SuspendAppShutdown)
-            job.join()
-          }
-        }
-      job.start()
-      job.join()
-      unregister()
-    }
-
-    suspend { jobCause.join() }
-      .startCoroutine(Continuation(EmptyCoroutineContext) {
-      check(jobCause.isCompleted)
-      @OptIn(ExperimentalCoroutinesApi::class)
-      when (val cause = jobCause.getCompleted()) {
-        is SuspendAppShutdown, null -> env.exit(0)
-        else -> {
-          uncaught(cause)
+        runCatching { app.await() }
+          .also { unregister() }
+      }
+      result.fold({ env.exit(0) }) { e ->
+        if (e !is SuspendAppShutdown) {
+          uncaught(e)
           env.exit(-1)
         }
       }
-    })
+    }
   }
 
 /** Marker type so track shutdown signal */

@@ -40,7 +40,7 @@ public object JsProcess : Process {
 
   private val jobs: MutableList<Job> = mutableListOf()
 
-  override fun runScope(context: CoroutineContext, callback: (Result<Unit>) -> Unit, block: suspend CoroutineScope.() -> Unit) {
+  override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit) {
     val innerJob = Job()
     val innerScope = CoroutineScope(innerJob)
     suspend {
@@ -56,11 +56,11 @@ public object JsProcess : Process {
               delay(1.hours)
             }
           }
-        runCatching { withContext(context + innerJob, block) }
+        runCatching { withContext(context, block) }
           .also { keepAlive.cancelAndJoin() }
           .getOrThrow()
     }
-      .startCoroutine(Continuation(EmptyCoroutineContext, callback))
+      .startCoroutine(Continuation(EmptyCoroutineContext) {})
   }
 
   override fun exit(code: Int): Nothing {

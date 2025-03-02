@@ -65,8 +65,8 @@ private class NativeProcess : Process, AutoCloseable {
       .getOrThrow()
   }
 
-  override fun runScope(context: CoroutineContext, callback: (Result<Unit>) -> Unit, block: suspend CoroutineScope.() -> Unit): Unit =
-    callback(runCatching { runBlocking(context, block) })
+  override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit): Unit =
+    runBlocking(context, block)
 }
 
 private fun List<Result<Unit>>.getOrThrow() =
