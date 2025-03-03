@@ -11,7 +11,7 @@ import sun.misc.SignalHandler
 public actual fun process(): Process = JvmProcess
 
 public object JvmProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): suspend () -> Unit {
+  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
     val isShutdown = AtomicBoolean(false)
     fun shutdown() {
       if (!isShutdown.getAndSet(true))

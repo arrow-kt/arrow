@@ -16,7 +16,7 @@ public interface Process : AutoCloseable {
 
   public fun onSigInt(block: suspend (code: Int) -> Unit)
 
-  public fun onShutdown(block: suspend () -> Unit): suspend () -> Unit
+  public fun onShutdown(block: suspend () -> Unit): () -> Unit
 
   /**
    * On JVM, and Native this will use kotlinx.coroutines.runBlocking, On NodeJS we need an infinite
@@ -26,7 +26,7 @@ public interface Process : AutoCloseable {
    */
   public fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit)
 
-  public fun exit(code: Int)
+  public fun exit(code: Int): Nothing
 
   override fun close()
 }

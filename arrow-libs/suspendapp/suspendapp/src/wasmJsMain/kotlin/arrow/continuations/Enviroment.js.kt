@@ -15,11 +15,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
+import kotlinx.coroutines.withContext
 
 public actual fun process(): Process = JsProcess
 
 public object JsProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): suspend () -> Unit {
+  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
     onSigTerm { code -> exitAfter(128 + code) { block() } }
     onSigInt { code -> exitAfter(128 + code) { block() } }
     return { /* Nothing to unregister */ }
@@ -55,13 +56,16 @@ public object JsProcess : Process {
               delay(1.hours)
             }
           }
-        runCatching { block(innerScope) }.also { keepAlive.cancelAndJoin() }.getOrThrow()
-      }
+        runCatching { withContext(context, block) }
+          .also { keepAlive.cancelAndJoin() }
+          .getOrThrow()
+    }
       .startCoroutine(Continuation(EmptyCoroutineContext) {})
   }
 
-  override fun exit(code: Int) {
-    runCatching { jsExit(code) }
+  override fun exit(code: Int): Nothing {
+    jsExit(code)
+    error("process.exit() should have exited...")
   }
 
   override fun close() {
