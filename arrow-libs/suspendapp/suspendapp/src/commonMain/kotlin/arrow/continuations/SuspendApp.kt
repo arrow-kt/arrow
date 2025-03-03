@@ -4,8 +4,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlinx.coroutines.*
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.startCoroutine
 
 /**
  * An unsafe blocking edge that wires the [CoroutineScope] (and structured concurrency) to the
