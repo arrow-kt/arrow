@@ -192,8 +192,7 @@ class RaiseRespondTest {
     data class User(val id: String)
 
     val userService = object {
-      context(Raise<DomainError>)
-      fun lookupUser(userId: String): User? = when (userId) {
+      fun Raise<DomainError>.lookupUser(userId: String): User? = when (userId) {
         "bob" -> raise(UserBanned(userId))
         "alice" -> User(userId)
         else -> null
@@ -222,7 +221,9 @@ class RaiseRespondTest {
       getOrRaise("/users/{userId?}") {
         val userId = call.pathParameters["userId"] ?: raiseBadRequest("userId not specified")
         withError(::handleError) {
-          userService.lookupUser(userId) ?: raise(HttpStatusCode.NotFound)
+          with(userService) {
+            lookupUser(userId) ?: raise(HttpStatusCode.NotFound)
+          }
         }
       }
     }

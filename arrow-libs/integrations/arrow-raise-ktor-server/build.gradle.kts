@@ -4,8 +4,6 @@ plugins {
 }
 
 kotlin {
-  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
-
   sourceSets {
     commonMain {
       dependencies {

@@ -29,6 +29,12 @@ internal inline fun <A : Any> Raise<RequestError>.parameterOrRaise(
 }
 
 @PublishedApi
+internal fun Raise<RequestError>.parameterOrRaise(
+  parameters: Parameters,
+  parameter: Parameter,
+): String = ensureNotNull(parameters[parameter.name]) { Missing(parameter) }
+
+@PublishedApi
 internal fun <A : Any> Raise<RequestError>.parameterOrRaise(
   parameters: Parameters,
   parameter: Parameter,

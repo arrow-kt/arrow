@@ -1,7 +1,6 @@
 package arrow.raise.ktor.server
 
 import arrow.core.NonEmptyList
-import arrow.core.nel
 import arrow.core.raise.ExperimentalRaiseAccumulateApi
 import arrow.core.raise.accumulate
 import arrow.core.raise.ensure
@@ -9,8 +8,9 @@ import arrow.core.raise.ensureNotNull
 import arrow.core.raise.withError
 import arrow.raise.ktor.server.Response.Companion.invoke
 import arrow.raise.ktor.server.request.RequestError
+import arrow.raise.ktor.server.request.parameterOrRaise
 import arrow.raise.ktor.server.request.pathOrRaise
-import arrow.raise.ktor.server.request.queryIntOrRaise
+import arrow.raise.ktor.server.request.queryOrRaise
 import arrow.raise.ktor.server.request.receiveOrRaise
 import arrow.raise.ktor.server.request.toSimpleMessage
 import arrow.raise.ktor.server.request.validate
@@ -24,7 +24,7 @@ import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.routing.route
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.ktor.util.reflect.*
 import kotlinx.serialization.Serializable
@@ -55,9 +55,9 @@ class ValidateTest {
       putOrRaise("/user/{id}") {
         val person = withError({ raise(call.errorResponse(it)) }) {
           accumulate {
-            val name by accumulating { pathOrRaise("name") }
-            val age by accumulating { queryIntOrRaise("age") }
-            val info by accumulating { receiveOrRaise<Info>() }
+            val name by accumulating { pathOrRaise("name", ::raise) }
+            val age by accumulating { queryOrRaise<Int>("age", ::raise) }
+            val info by accumulating { receiveOrRaise<Info>(::raise) }
             Person(name, age, info)
           }
         }
@@ -237,7 +237,7 @@ class ValidateTest {
         val person = validate(::validationError) {
           call.queryParameters
           val name by accumulating { pathOrRaise("name") }
-          val age by accumulating { queryIntOrRaise("age") }
+          val age by accumulating { queryOrRaise<Int>("age") }
           val info by accumulating { receiveOrRaise<Info>() }
           Person(name, age, info)
         }
@@ -254,7 +254,7 @@ class ValidateTest {
         Json.parseToJsonElement(it.bodyAsText()) shouldBe buildJsonObject {
           putJsonArray("errors") {
             add("Missing path parameter 'name'.")
-            add("Malformed query parameter 'age' expected old to be a valid Int.")
+            add("Malformed query parameter 'age' couldn't be parsed/converted to Int: For input string: \"old\"")
             add("Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info")
           }
         }
@@ -282,9 +282,8 @@ class ValidateTest {
       }
       putOrRaise("/user/{id}") {
         val person = validate {
-          call.queryParameters
           val name by accumulating { pathOrRaise("name") }
-          val age by accumulating { queryIntOrRaise("age") }
+          val age by accumulating { queryOrRaise<Int>("age") }
           val info by accumulating { receiveOrRaise<Info>() }
           Person(name, age, info)
         }
@@ -301,7 +300,7 @@ class ValidateTest {
         Json.parseToJsonElement(it.bodyAsText()) shouldBe buildJsonObject {
           putJsonArray("errors") {
             add("Missing path parameter 'name'.")
-            add("Malformed query parameter 'age' expected old to be a valid Int.")
+            add("Malformed query parameter 'age' couldn't be parsed/converted to Int: For input string: \"old\"")
             add("Malformed body could not be deserialized to Info: Cannot transform this request's content to arrow.raise.ktor.server.ValidateTest.Info")
           }
         }
