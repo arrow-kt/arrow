@@ -12,17 +12,7 @@ import platform.posix.SIGINT
 import platform.posix.SIGTERM
 import platform.posix.signal
 
-public actual fun process(): Process = NativeProcess()
-
-public const val SIGINFO: Int = 29
-
-@OptIn(ExperimentalNativeApi::class)
-public val SIGUSR1: Int? =
-  when (Platform.osFamily) {
-    OsFamily.LINUX -> 10
-    OsFamily.MACOSX -> 30
-    else -> null
-  }
+internal actual fun process(): Process = NativeProcess()
 
 @OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
 private class NativeProcess : Process, AutoCloseable {

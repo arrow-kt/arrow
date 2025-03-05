@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
 import kotlinx.coroutines.withContext
 
-public actual fun process(): Process = JsProcess
+internal actual fun process(): Process = JsProcess
 
-public object JsProcess : Process {
+private object JsProcess : Process {
   override fun onShutdown(block: suspend () -> Unit): () -> Unit {
     onSigTerm { code -> exitAfter(128 + code) { block() } }
     onSigInt { code -> exitAfter(128 + code) { block() } }
@@ -37,8 +37,6 @@ public object JsProcess : Process {
     val provide: () -> Promise<Unit> = { GlobalScope.promise { block() } }
     js("process.on(signal, function() {\n" + "  provide()\n" + "});")
   }
-
-  private val jobs: MutableList<Job> = mutableListOf()
 
   override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit) {
     val innerJob = Job()
@@ -59,7 +57,7 @@ public object JsProcess : Process {
         runCatching { withContext(context, block) }
           .also { keepAlive.cancelAndJoin() }
           .getOrThrow()
-      }
+    }
       .startCoroutine(Continuation(EmptyCoroutineContext) {})
   }
 
@@ -68,10 +66,7 @@ public object JsProcess : Process {
     error("process.exit() should have exited...")
   }
 
-  override fun close() {
-    suspend { jobs.forEach { it.cancelAndJoin() } }
-      .startCoroutine(Continuation(EmptyCoroutineContext) {})
-  }
+  override fun close(): Unit = Unit
 }
 
 private inline fun Process.exitAfter(code: Int, block: () -> Unit): Unit =

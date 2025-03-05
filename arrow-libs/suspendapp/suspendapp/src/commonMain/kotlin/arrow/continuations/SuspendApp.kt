@@ -23,10 +23,9 @@ public fun SuspendApp(
   context: CoroutineContext = Dispatchers.Default,
   uncaught: (Throwable) -> Unit = Throwable::printStackTrace,
   timeout: Duration = Duration.INFINITE,
-  process: Process = process(),
   block: suspend CoroutineScope.() -> Unit,
 ): Unit =
-  process.use { env ->
+  process().use { env ->
     env.runScope(context) {
       val result = supervisorScope {
         val app =
