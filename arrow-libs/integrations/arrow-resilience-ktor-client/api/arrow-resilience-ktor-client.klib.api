@@ -6,6 +6,58 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-resilience-ktor-client>
+abstract fun interface arrow.resilience.ktor.client/ModifyRequestPerRequest { // arrow.resilience.ktor.client/ModifyRequestPerRequest|null[0]
+    abstract suspend fun invoke(arrow.resilience.ktor.client/ModifyRequestContext, io.ktor.client.request/HttpRequestBuilder) // arrow.resilience.ktor.client/ModifyRequestPerRequest.invoke|invoke(arrow.resilience.ktor.client.ModifyRequestContext;io.ktor.client.request.HttpRequestBuilder){}[0]
+}
+
+sealed interface arrow.resilience.ktor.client/RetryEventData { // arrow.resilience.ktor.client/RetryEventData|null[0]
+    abstract val request // arrow.resilience.ktor.client/RetryEventData.request|{}request[0]
+        abstract fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.request.<get-request>|<get-request>(){}[0]
+    abstract val retryCount // arrow.resilience.ktor.client/RetryEventData.retryCount|{}retryCount[0]
+        abstract fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
+
+    open fun exceptionOrNull(): kotlin/Throwable? // arrow.resilience.ktor.client/RetryEventData.exceptionOrNull|exceptionOrNull(){}[0]
+    open fun responseOrNull(): io.ktor.client.statement/HttpResponse? // arrow.resilience.ktor.client/RetryEventData.responseOrNull|responseOrNull(){}[0]
+
+    final class Failure : arrow.resilience.ktor.client/RetryEventData { // arrow.resilience.ktor.client/RetryEventData.Failure|null[0]
+        constructor <init>(io.ktor.client.request/HttpRequestBuilder, kotlin/Int, kotlin/Throwable) // arrow.resilience.ktor.client/RetryEventData.Failure.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;kotlin.Throwable){}[0]
+
+        final val exception // arrow.resilience.ktor.client/RetryEventData.Failure.exception|{}exception[0]
+            final fun <get-exception>(): kotlin/Throwable // arrow.resilience.ktor.client/RetryEventData.Failure.exception.<get-exception>|<get-exception>(){}[0]
+        final val request // arrow.resilience.ktor.client/RetryEventData.Failure.request|{}request[0]
+            final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.Failure.request.<get-request>|<get-request>(){}[0]
+        final val retryCount // arrow.resilience.ktor.client/RetryEventData.Failure.retryCount|{}retryCount[0]
+            final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.Failure.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
+
+        final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.Failure.component1|component1(){}[0]
+        final fun component2(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.Failure.component2|component2(){}[0]
+        final fun component3(): kotlin/Throwable // arrow.resilience.ktor.client/RetryEventData.Failure.component3|component3(){}[0]
+        final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., kotlin/Int = ..., kotlin/Throwable = ...): arrow.resilience.ktor.client/RetryEventData.Failure // arrow.resilience.ktor.client/RetryEventData.Failure.copy|copy(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;kotlin.Throwable){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/RetryEventData.Failure.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.Failure.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // arrow.resilience.ktor.client/RetryEventData.Failure.toString|toString(){}[0]
+    }
+
+    final class HttpResponse : arrow.resilience.ktor.client/RetryEventData { // arrow.resilience.ktor.client/RetryEventData.HttpResponse|null[0]
+        constructor <init>(io.ktor.client.request/HttpRequestBuilder, kotlin/Int, io.ktor.client.statement/HttpResponse) // arrow.resilience.ktor.client/RetryEventData.HttpResponse.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
+
+        final val request // arrow.resilience.ktor.client/RetryEventData.HttpResponse.request|{}request[0]
+            final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.HttpResponse.request.<get-request>|<get-request>(){}[0]
+        final val response // arrow.resilience.ktor.client/RetryEventData.HttpResponse.response|{}response[0]
+            final fun <get-response>(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/RetryEventData.HttpResponse.response.<get-response>|<get-response>(){}[0]
+        final val retryCount // arrow.resilience.ktor.client/RetryEventData.HttpResponse.retryCount|{}retryCount[0]
+            final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.HttpResponse.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
+
+        final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.HttpResponse.component1|component1(){}[0]
+        final fun component2(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.HttpResponse.component2|component2(){}[0]
+        final fun component3(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/RetryEventData.HttpResponse.component3|component3(){}[0]
+        final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., kotlin/Int = ..., io.ktor.client.statement/HttpResponse = ...): arrow.resilience.ktor.client/RetryEventData.HttpResponse // arrow.resilience.ktor.client/RetryEventData.HttpResponse.copy|copy(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/RetryEventData.HttpResponse.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.HttpResponse.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // arrow.resilience.ktor.client/RetryEventData.HttpResponse.toString|toString(){}[0]
+    }
+}
+
 final class arrow.resilience.ktor.client/HttpCircuitBreaker { // arrow.resilience.ktor.client/HttpCircuitBreaker|null[0]
     final class Configuration { // arrow.resilience.ktor.client/HttpCircuitBreaker.Configuration|null[0]
         constructor <init>() // arrow.resilience.ktor.client/HttpCircuitBreaker.Configuration.<init>|<init>(){}[0]
@@ -23,98 +75,39 @@ final class arrow.resilience.ktor.client/HttpCircuitBreaker { // arrow.resilienc
     }
 }
 
-final class arrow.resilience.ktor.client/HttpRequestSchedule { // arrow.resilience.ktor.client/HttpRequestSchedule|null[0]
-    abstract fun interface ModifyRequestPerRequest { // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestPerRequest|null[0]
-        abstract suspend fun invoke(arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext, io.ktor.client.request/HttpRequestBuilder) // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestPerRequest.invoke|invoke(arrow.resilience.ktor.client.HttpRequestSchedule.ModifyRequestContext;io.ktor.client.request.HttpRequestBuilder){}[0]
-    }
+final class arrow.resilience.ktor.client/HttpRequestScheduleConfiguration { // arrow.resilience.ktor.client/HttpRequestScheduleConfiguration|null[0]
+    constructor <init>() // arrow.resilience.ktor.client/HttpRequestScheduleConfiguration.<init>|<init>(){}[0]
 
-    sealed interface RetryEventData { // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData|null[0]
-        abstract val request // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.request|{}request[0]
-            abstract fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.request.<get-request>|<get-request>(){}[0]
-        abstract val retryCount // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.retryCount|{}retryCount[0]
-            abstract fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
-
-        open fun exceptionOrNull(): kotlin/Throwable? // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.exceptionOrNull|exceptionOrNull(){}[0]
-        open fun responseOrNull(): io.ktor.client.statement/HttpResponse? // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.responseOrNull|responseOrNull(){}[0]
-
-        final class Failure : arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData { // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure|null[0]
-            constructor <init>(io.ktor.client.request/HttpRequestBuilder, kotlin/Int, kotlin/Throwable) // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;kotlin.Throwable){}[0]
-
-            final val exception // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.exception|{}exception[0]
-                final fun <get-exception>(): kotlin/Throwable // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.exception.<get-exception>|<get-exception>(){}[0]
-            final val request // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.request|{}request[0]
-                final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.request.<get-request>|<get-request>(){}[0]
-            final val retryCount // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.retryCount|{}retryCount[0]
-                final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
-
-            final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.component1|component1(){}[0]
-            final fun component2(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.component2|component2(){}[0]
-            final fun component3(): kotlin/Throwable // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.component3|component3(){}[0]
-            final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., kotlin/Int = ..., kotlin/Throwable = ...): arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.copy|copy(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;kotlin.Throwable){}[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.Failure.toString|toString(){}[0]
-        }
-
-        final class HttpResponse : arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData { // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse|null[0]
-            constructor <init>(io.ktor.client.request/HttpRequestBuilder, kotlin/Int, io.ktor.client.statement/HttpResponse) // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
-
-            final val request // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.request|{}request[0]
-                final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.request.<get-request>|<get-request>(){}[0]
-            final val response // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.response|{}response[0]
-                final fun <get-response>(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.response.<get-response>|<get-response>(){}[0]
-            final val retryCount // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.retryCount|{}retryCount[0]
-                final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
-
-            final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.component1|component1(){}[0]
-            final fun component2(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.component2|component2(){}[0]
-            final fun component3(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.component3|component3(){}[0]
-            final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., kotlin/Int = ..., io.ktor.client.statement/HttpResponse = ...): arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.copy|copy(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.hashCode|hashCode(){}[0]
-            final fun toString(): kotlin/String // arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData.HttpResponse.toString|toString(){}[0]
-        }
-    }
-
-    final class Configuration { // arrow.resilience.ktor.client/HttpRequestSchedule.Configuration|null[0]
-        constructor <init>() // arrow.resilience.ktor.client/HttpRequestSchedule.Configuration.<init>|<init>(){}[0]
-
-        final fun <#A2: kotlin/Any?> repeat(arrow.resilience/Schedule<io.ktor.client.statement/HttpResponse, #A2>) // arrow.resilience.ktor.client/HttpRequestSchedule.Configuration.repeat|repeat(arrow.resilience.Schedule<io.ktor.client.statement.HttpResponse,0:0>){0§<kotlin.Any?>}[0]
-        final fun <#A2: kotlin/Any?> retry(arrow.resilience/Schedule<kotlin/Throwable, #A2>) // arrow.resilience.ktor.client/HttpRequestSchedule.Configuration.retry|retry(arrow.resilience.Schedule<kotlin.Throwable,0:0>){0§<kotlin.Any?>}[0]
-        final fun modifyRequest(kotlin.coroutines/SuspendFunction2<arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext, io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>) // arrow.resilience.ktor.client/HttpRequestSchedule.Configuration.modifyRequest|modifyRequest(kotlin.coroutines.SuspendFunction2<arrow.resilience.ktor.client.HttpRequestSchedule.ModifyRequestContext,io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
-    }
-
-    final class ModifyRequestContext { // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext|null[0]
-        constructor <init>(io.ktor.client.request/HttpRequestBuilder, arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData) // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;arrow.resilience.ktor.client.HttpRequestSchedule.RetryEventData){}[0]
-
-        final val lastRetryEventData // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.lastRetryEventData|{}lastRetryEventData[0]
-            final fun <get-lastRetryEventData>(): arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.lastRetryEventData.<get-lastRetryEventData>|<get-lastRetryEventData>(){}[0]
-        final val original // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.original|{}original[0]
-            final fun <get-original>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.original.<get-original>|<get-original>(){}[0]
-        final val request // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.request|{}request[0]
-            final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.request.<get-request>|<get-request>(){}[0]
-        final val retryCount // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.retryCount|{}retryCount[0]
-            final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
-
-        final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.component1|component1(){}[0]
-        final fun component2(): arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.component2|component2(){}[0]
-        final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData = ...): arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.copy|copy(io.ktor.client.request.HttpRequestBuilder;arrow.resilience.ktor.client.HttpRequestSchedule.RetryEventData){}[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.equals|equals(kotlin.Any?){}[0]
-        final fun exceptionOrNull(): kotlin/Throwable? // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.exceptionOrNull|exceptionOrNull(){}[0]
-        final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.hashCode|hashCode(){}[0]
-        final fun responseOrNull(): io.ktor.client.statement/HttpResponse? // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.responseOrNull|responseOrNull(){}[0]
-        final fun toString(): kotlin/String // arrow.resilience.ktor.client/HttpRequestSchedule.ModifyRequestContext.toString|toString(){}[0]
-    }
-
-    final object Plugin : io.ktor.client.plugins/HttpClientPlugin<arrow.resilience.ktor.client/HttpRequestSchedule.Configuration, arrow.resilience.ktor.client/HttpRequestSchedule> { // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin|null[0]
-        final val HttpRequestScheduleEvent // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin.HttpRequestScheduleEvent|{}HttpRequestScheduleEvent[0]
-            final fun <get-HttpRequestScheduleEvent>(): io.ktor.events/EventDefinition<arrow.resilience.ktor.client/HttpRequestSchedule.RetryEventData> // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin.HttpRequestScheduleEvent.<get-HttpRequestScheduleEvent>|<get-HttpRequestScheduleEvent>(){}[0]
-        final val key // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin.key|{}key[0]
-            final fun <get-key>(): io.ktor.util/AttributeKey<arrow.resilience.ktor.client/HttpRequestSchedule> // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin.key.<get-key>|<get-key>(){}[0]
-
-        final fun install(arrow.resilience.ktor.client/HttpRequestSchedule, io.ktor.client/HttpClient) // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin.install|install(arrow.resilience.ktor.client.HttpRequestSchedule;io.ktor.client.HttpClient){}[0]
-        final fun prepare(kotlin/Function1<arrow.resilience.ktor.client/HttpRequestSchedule.Configuration, kotlin/Unit>): arrow.resilience.ktor.client/HttpRequestSchedule // arrow.resilience.ktor.client/HttpRequestSchedule.Plugin.prepare|prepare(kotlin.Function1<arrow.resilience.ktor.client.HttpRequestSchedule.Configuration,kotlin.Unit>){}[0]
-    }
+    final fun <#A1: kotlin/Any?> repeat(arrow.resilience/Schedule<io.ktor.client.statement/HttpResponse, #A1>) // arrow.resilience.ktor.client/HttpRequestScheduleConfiguration.repeat|repeat(arrow.resilience.Schedule<io.ktor.client.statement.HttpResponse,0:0>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> retry(arrow.resilience/Schedule<kotlin/Throwable, #A1>) // arrow.resilience.ktor.client/HttpRequestScheduleConfiguration.retry|retry(arrow.resilience.Schedule<kotlin.Throwable,0:0>){0§<kotlin.Any?>}[0]
+    final fun modifyRequest(kotlin.coroutines/SuspendFunction2<arrow.resilience.ktor.client/ModifyRequestContext, io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>) // arrow.resilience.ktor.client/HttpRequestScheduleConfiguration.modifyRequest|modifyRequest(kotlin.coroutines.SuspendFunction2<arrow.resilience.ktor.client.ModifyRequestContext,io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
 }
 
-final fun (io.ktor.client.request/HttpRequestBuilder).arrow.resilience.ktor.client/schedule(kotlin/Function1<arrow.resilience.ktor.client/HttpRequestSchedule.Configuration, kotlin/Unit>) // arrow.resilience.ktor.client/schedule|schedule@io.ktor.client.request.HttpRequestBuilder(kotlin.Function1<arrow.resilience.ktor.client.HttpRequestSchedule.Configuration,kotlin.Unit>){}[0]
+final class arrow.resilience.ktor.client/ModifyRequestContext { // arrow.resilience.ktor.client/ModifyRequestContext|null[0]
+    constructor <init>(io.ktor.client.request/HttpRequestBuilder, arrow.resilience.ktor.client/RetryEventData) // arrow.resilience.ktor.client/ModifyRequestContext.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;arrow.resilience.ktor.client.RetryEventData){}[0]
+
+    final val lastRetryEventData // arrow.resilience.ktor.client/ModifyRequestContext.lastRetryEventData|{}lastRetryEventData[0]
+        final fun <get-lastRetryEventData>(): arrow.resilience.ktor.client/RetryEventData // arrow.resilience.ktor.client/ModifyRequestContext.lastRetryEventData.<get-lastRetryEventData>|<get-lastRetryEventData>(){}[0]
+    final val original // arrow.resilience.ktor.client/ModifyRequestContext.original|{}original[0]
+        final fun <get-original>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/ModifyRequestContext.original.<get-original>|<get-original>(){}[0]
+    final val request // arrow.resilience.ktor.client/ModifyRequestContext.request|{}request[0]
+        final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/ModifyRequestContext.request.<get-request>|<get-request>(){}[0]
+    final val retryCount // arrow.resilience.ktor.client/ModifyRequestContext.retryCount|{}retryCount[0]
+        final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/ModifyRequestContext.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
+
+    final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/ModifyRequestContext.component1|component1(){}[0]
+    final fun component2(): arrow.resilience.ktor.client/RetryEventData // arrow.resilience.ktor.client/ModifyRequestContext.component2|component2(){}[0]
+    final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., arrow.resilience.ktor.client/RetryEventData = ...): arrow.resilience.ktor.client/ModifyRequestContext // arrow.resilience.ktor.client/ModifyRequestContext.copy|copy(io.ktor.client.request.HttpRequestBuilder;arrow.resilience.ktor.client.RetryEventData){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/ModifyRequestContext.equals|equals(kotlin.Any?){}[0]
+    final fun exceptionOrNull(): kotlin/Throwable? // arrow.resilience.ktor.client/ModifyRequestContext.exceptionOrNull|exceptionOrNull(){}[0]
+    final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/ModifyRequestContext.hashCode|hashCode(){}[0]
+    final fun responseOrNull(): io.ktor.client.statement/HttpResponse? // arrow.resilience.ktor.client/ModifyRequestContext.responseOrNull|responseOrNull(){}[0]
+    final fun toString(): kotlin/String // arrow.resilience.ktor.client/ModifyRequestContext.toString|toString(){}[0]
+}
+
+final val arrow.resilience.ktor.client/HttpRequestSchedule // arrow.resilience.ktor.client/HttpRequestSchedule|{}HttpRequestSchedule[0]
+    final fun <get-HttpRequestSchedule>(): io.ktor.client.plugins.api/ClientPlugin<arrow.resilience.ktor.client/HttpRequestScheduleConfiguration> // arrow.resilience.ktor.client/HttpRequestSchedule.<get-HttpRequestSchedule>|<get-HttpRequestSchedule>(){}[0]
+final val arrow.resilience.ktor.client/HttpRequestScheduleEvent // arrow.resilience.ktor.client/HttpRequestScheduleEvent|{}HttpRequestScheduleEvent[0]
+    final fun <get-HttpRequestScheduleEvent>(): io.ktor.events/EventDefinition<arrow.resilience.ktor.client/RetryEventData> // arrow.resilience.ktor.client/HttpRequestScheduleEvent.<get-HttpRequestScheduleEvent>|<get-HttpRequestScheduleEvent>(){}[0]
+
+final fun (io.ktor.client.request/HttpRequestBuilder).arrow.resilience.ktor.client/schedule(kotlin/Function1<arrow.resilience.ktor.client/HttpRequestScheduleConfiguration, kotlin/Unit>) // arrow.resilience.ktor.client/schedule|schedule@io.ktor.client.request.HttpRequestBuilder(kotlin.Function1<arrow.resilience.ktor.client.HttpRequestScheduleConfiguration,kotlin.Unit>){}[0]
