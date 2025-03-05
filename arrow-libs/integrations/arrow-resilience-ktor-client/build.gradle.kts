@@ -15,6 +15,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(libs.ktor.test)
+        implementation(libs.ktor.mock)
         implementation(projects.arrowAtomic)
         implementation(libs.bundles.testing)
       }
