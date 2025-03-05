@@ -35,7 +35,7 @@ private object JsProcess : Process {
   private fun onSignal(signal: String, block: suspend () -> Unit) {
     @Suppress("UNUSED_VARIABLE")
     val provide: () -> Promise<JsAny?> = { GlobalScope.promise { block() } }
-    processOn(provide)
+    processOn(signal, provide)
   }
 
   override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit) {
@@ -78,7 +78,7 @@ private inline fun Process.exitAfter(code: Int, block: () -> Unit): Unit =
     exit(-1)
   }
 
-public fun processOn(provide: () -> Promise<JsAny?>) {
+private fun processOn(signal: String, provide: () -> Promise<JsAny?>) {
   js(
     """
     process.on(signal, function() {
@@ -87,6 +87,6 @@ public fun processOn(provide: () -> Promise<JsAny?>) {
   )
 }
 
-public fun jsExit(code: Int) {
+private fun jsExit(code: Int) {
   js("process.exit(code);")
 }
