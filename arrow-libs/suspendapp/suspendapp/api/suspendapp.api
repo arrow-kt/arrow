@@ -1,28 +1,5 @@
-public final class arrow/continuations/Enviroment_jvmKt {
-	public static final fun process ()Larrow/continuations/Process;
-}
-
-public final class arrow/continuations/JvmProcess : arrow/continuations/Process {
-	public static final field INSTANCE Larrow/continuations/JvmProcess;
-	public fun close ()V
-	public fun exit (I)Ljava/lang/Void;
-	public fun onShutdown (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function0;
-	public fun onSigInt (Lkotlin/jvm/functions/Function2;)V
-	public fun onSigTerm (Lkotlin/jvm/functions/Function2;)V
-	public fun runScope (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
-}
-
-public abstract interface class arrow/continuations/Process : java/lang/AutoCloseable {
-	public abstract fun close ()V
-	public abstract fun exit (I)Ljava/lang/Void;
-	public abstract fun onShutdown (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function0;
-	public abstract fun onSigInt (Lkotlin/jvm/functions/Function2;)V
-	public abstract fun onSigTerm (Lkotlin/jvm/functions/Function2;)V
-	public abstract fun runScope (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
-}
-
 public final class arrow/continuations/SuspendAppKt {
-	public static final fun SuspendApp-1Y68eR8 (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;JLarrow/continuations/Process;Lkotlin/jvm/functions/Function2;)V
-	public static synthetic fun SuspendApp-1Y68eR8$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;JLarrow/continuations/Process;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static final fun SuspendApp-exY8QGI (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;JLkotlin/jvm/functions/Function2;)V
+	public static synthetic fun SuspendApp-exY8QGI$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;JLkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 }
 
