@@ -502,7 +502,7 @@ public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> =
 /** Combines two maps using [combine] to combine values for the same key. */
 public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
   if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
-  else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(a, it) } ?: a) }
+  else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(it, a) } ?: a) }
 
 public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
   var accumulator = initial

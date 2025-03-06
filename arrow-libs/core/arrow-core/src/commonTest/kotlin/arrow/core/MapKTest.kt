@@ -26,6 +26,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -40,6 +41,27 @@ class MapKTest {
         Arb.map(Arb.int(), Arb.intSmall(), maxSize = 10)
       )
     )
+
+  // In addition to verifying monoid laws, we must test the property of order-preservation
+  // when delegating to the nested monoid operation. Since a monoid's associative operation
+  // is not necessarily commutative, preserving the order of parameters is essential.
+  @Test fun orderPreservationInNestedCombine() = runTest {
+    checkAll(
+      // The range of keys and map sizes are chosen to allow for varying maps sizes, while ensuring key conflicts.
+      // Consider that minSize is inclusive while maxSize is exclusive.
+      Arb.map(Arb.int(1, 2), Arb.string(), minSize = 1, maxSize = 3),
+      Arb.map(Arb.int(1, 2), Arb.string(), minSize = 1, maxSize = 3),
+    ) { map1, map2 ->
+
+      // Notice that string concatenation is non-commutative.
+      val result = map1.combine(map2, String::plus)
+      map1.keys.intersect(map2.keys).forEach { key ->
+        val expectedValue = map1[key].plus(map2[key])
+        result[key] shouldBe expectedValue
+      }
+    }
+  }
+
 
   @Test fun alignMaps() = runTest {
       checkAll(
