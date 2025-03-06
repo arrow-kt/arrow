@@ -10,10 +10,12 @@ class NativeSpec : SuspendAppTest() {
 
   companion object {
     val name = System.getProperties().stringPropertyNames()
-      .first { it.startsWith("runReleaseExecutable") && it.endsWith(".executable") }
-      .substringBeforeLast('.')
-    val executable = System.getProperty("$name.executable")?.let(::Path)
-    val workdir = System.getProperty("$name.workdir")?.let(::Path)
+      .firstOrNull { it.startsWith("runReleaseExecutable") && it.endsWith(".executable") }
+      ?.substringBeforeLast('.')
+    val executable = name?.let { System.getProperty("$it.executable") }?.let(::Path)
+    val workdir = name?.let { System.getProperty("$it.workdir") }?.let(::Path)
+
+    init { println("Running native tests... $executable in $workdir...") }
 
     @JvmStatic
     fun enabled() = (executable?.exists() ?: false) && (workdir?.exists() ?: false)
