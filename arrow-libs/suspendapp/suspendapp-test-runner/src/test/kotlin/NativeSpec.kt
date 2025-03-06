@@ -15,7 +15,9 @@ class NativeSpec : SuspendAppTest() {
     val executable = name?.let { System.getProperty("$it.executable") }?.let(::Path)
     val workdir = name?.let { System.getProperty("$it.workdir") }?.let(::Path)
 
-    init { println("Running native tests... $executable in $workdir...") }
+    init {
+      println("Running native tests... $executable in $workdir...")
+    }
 
     @JvmStatic
     fun enabled() = (executable?.exists() ?: false) && (workdir?.exists() ?: false)
