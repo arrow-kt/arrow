@@ -60,7 +60,7 @@ import kotlin.jvm.JvmStatic
  * <!--- KNIT example-eval-01.kt -->
  *
  */
-public sealed class Eval<out A> {
+public sealed class Eval<out A>: SuspendEval<A> {
 
   public companion object {
 
@@ -230,10 +230,10 @@ public sealed class Eval<out A> {
 
   @JsName("evalValue")
   public abstract fun value(): A
-
+  public override suspend fun run(): A = value()
   public operator fun invoke(): A = value()
 
-  public abstract fun memoize(): Eval<A>
+  public abstract override fun memoize(): Eval<A>
 
   public inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
@@ -347,9 +347,11 @@ public sealed class Eval<out A> {
    * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
    * more efficient implementation of the .value method.
    */
-  public abstract class FlatMap<out A> : Eval<A>() {
+  public abstract class FlatMap<out A> : Eval<A>(), SuspendEval.AbstractFlatMap<A> {
     public abstract fun <S> start(): Eval<S>
+    public override suspend fun <S> startSuspend(): Eval<S> = start()
     public abstract fun <S> run(s: S): Eval<A>
+    public override suspend fun <S> runSuspend(s: S): Eval<A> = run(s)
     override fun memoize(): Eval<A> = Memoize(this)
     override fun value(): A = evaluate(this)
 
@@ -364,8 +366,8 @@ public sealed class Eval<out A> {
    * Users should not instantiate Memoize instances themselves. Instead, they will be automatically created when
    * needed.
    */
-  internal data class Memoize<A>(val eval: Eval<A>) : Eval<A>() {
-    var result: Option<A> = None
+  internal data class Memoize<A>(override val eval: Eval<A>) : Eval<A>(), SuspendEval.AbstractMemoize<A> {
+    override var result: Option<A> = None
     override fun memoize() = this
     override fun value(): A = result.getOrElse {
       evaluate(eval).also { result = Some(it) }
