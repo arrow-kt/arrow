@@ -38,23 +38,23 @@ sealed interface arrow.resilience.ktor.client/RetryEventData { // arrow.resilien
         final fun toString(): kotlin/String // arrow.resilience.ktor.client/RetryEventData.Failure.toString|toString(){}[0]
     }
 
-    final class HttpResponse : arrow.resilience.ktor.client/RetryEventData { // arrow.resilience.ktor.client/RetryEventData.HttpResponse|null[0]
-        constructor <init>(io.ktor.client.request/HttpRequestBuilder, kotlin/Int, io.ktor.client.statement/HttpResponse) // arrow.resilience.ktor.client/RetryEventData.HttpResponse.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
+    final class Response : arrow.resilience.ktor.client/RetryEventData { // arrow.resilience.ktor.client/RetryEventData.Response|null[0]
+        constructor <init>(io.ktor.client.request/HttpRequestBuilder, kotlin/Int, io.ktor.client.statement/HttpResponse) // arrow.resilience.ktor.client/RetryEventData.Response.<init>|<init>(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
 
-        final val request // arrow.resilience.ktor.client/RetryEventData.HttpResponse.request|{}request[0]
-            final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.HttpResponse.request.<get-request>|<get-request>(){}[0]
-        final val response // arrow.resilience.ktor.client/RetryEventData.HttpResponse.response|{}response[0]
-            final fun <get-response>(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/RetryEventData.HttpResponse.response.<get-response>|<get-response>(){}[0]
-        final val retryCount // arrow.resilience.ktor.client/RetryEventData.HttpResponse.retryCount|{}retryCount[0]
-            final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.HttpResponse.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
+        final val request // arrow.resilience.ktor.client/RetryEventData.Response.request|{}request[0]
+            final fun <get-request>(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.Response.request.<get-request>|<get-request>(){}[0]
+        final val response // arrow.resilience.ktor.client/RetryEventData.Response.response|{}response[0]
+            final fun <get-response>(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/RetryEventData.Response.response.<get-response>|<get-response>(){}[0]
+        final val retryCount // arrow.resilience.ktor.client/RetryEventData.Response.retryCount|{}retryCount[0]
+            final fun <get-retryCount>(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.Response.retryCount.<get-retryCount>|<get-retryCount>(){}[0]
 
-        final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.HttpResponse.component1|component1(){}[0]
-        final fun component2(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.HttpResponse.component2|component2(){}[0]
-        final fun component3(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/RetryEventData.HttpResponse.component3|component3(){}[0]
-        final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., kotlin/Int = ..., io.ktor.client.statement/HttpResponse = ...): arrow.resilience.ktor.client/RetryEventData.HttpResponse // arrow.resilience.ktor.client/RetryEventData.HttpResponse.copy|copy(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
-        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/RetryEventData.HttpResponse.equals|equals(kotlin.Any?){}[0]
-        final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.HttpResponse.hashCode|hashCode(){}[0]
-        final fun toString(): kotlin/String // arrow.resilience.ktor.client/RetryEventData.HttpResponse.toString|toString(){}[0]
+        final fun component1(): io.ktor.client.request/HttpRequestBuilder // arrow.resilience.ktor.client/RetryEventData.Response.component1|component1(){}[0]
+        final fun component2(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.Response.component2|component2(){}[0]
+        final fun component3(): io.ktor.client.statement/HttpResponse // arrow.resilience.ktor.client/RetryEventData.Response.component3|component3(){}[0]
+        final fun copy(io.ktor.client.request/HttpRequestBuilder = ..., kotlin/Int = ..., io.ktor.client.statement/HttpResponse = ...): arrow.resilience.ktor.client/RetryEventData.Response // arrow.resilience.ktor.client/RetryEventData.Response.copy|copy(io.ktor.client.request.HttpRequestBuilder;kotlin.Int;io.ktor.client.statement.HttpResponse){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience.ktor.client/RetryEventData.Response.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.resilience.ktor.client/RetryEventData.Response.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // arrow.resilience.ktor.client/RetryEventData.Response.toString|toString(){}[0]
     }
 }
 

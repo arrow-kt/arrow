@@ -79,13 +79,13 @@ public final class arrow/resilience/ktor/client/RetryEventData$Failure : arrow/r
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class arrow/resilience/ktor/client/RetryEventData$HttpResponse : arrow/resilience/ktor/client/RetryEventData {
+public final class arrow/resilience/ktor/client/RetryEventData$Response : arrow/resilience/ktor/client/RetryEventData {
 	public fun <init> (Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;)V
 	public final fun component1 ()Lio/ktor/client/request/HttpRequestBuilder;
 	public final fun component2 ()I
 	public final fun component3 ()Lio/ktor/client/statement/HttpResponse;
-	public final fun copy (Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;)Larrow/resilience/ktor/client/RetryEventData$HttpResponse;
-	public static synthetic fun copy$default (Larrow/resilience/ktor/client/RetryEventData$HttpResponse;Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;ILjava/lang/Object;)Larrow/resilience/ktor/client/RetryEventData$HttpResponse;
+	public final fun copy (Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;)Larrow/resilience/ktor/client/RetryEventData$Response;
+	public static synthetic fun copy$default (Larrow/resilience/ktor/client/RetryEventData$Response;Lio/ktor/client/request/HttpRequestBuilder;ILio/ktor/client/statement/HttpResponse;ILjava/lang/Object;)Larrow/resilience/ktor/client/RetryEventData$Response;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun exceptionOrNull ()Ljava/lang/Throwable;
 	public fun getRequest ()Lio/ktor/client/request/HttpRequestBuilder;
