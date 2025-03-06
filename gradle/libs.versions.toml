@@ -21,6 +21,7 @@ agp = "8.7.3"
 cache4k = "0.14.0"
 publish = "0.30.0"
 jacksonModuleKotlin = "2.18.2"
+shadow = "9.0.0-beta10"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -70,3 +71,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 compose-jetbrains = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
