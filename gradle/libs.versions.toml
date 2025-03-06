@@ -11,7 +11,7 @@ kotlinCompileTesting = "0.7.0"
 knit = "0.5.0"
 kspVersion = "2.1.10-1.0.30"
 kotlinxSerialization = "1.8.0"
-ktor = "3.1.0"
+ktor = "3.1.1"
 mockWebServer = "4.12.0"
 retrofit = "2.11.0"
 moshi = "1.15.2"
@@ -44,6 +44,7 @@ cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "
 jacksonModuleKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonModuleKotlin" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-test = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+ktor-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 # required for the convention plugin
 gradlePlugin-kotlin-base = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
