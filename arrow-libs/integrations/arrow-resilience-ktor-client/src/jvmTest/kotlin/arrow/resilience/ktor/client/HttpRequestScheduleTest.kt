@@ -13,7 +13,6 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
-import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.test.runTest
 import java.net.ConnectException
 import kotlin.test.Test
@@ -43,66 +42,58 @@ class HttpRequestScheduleTest {
 
   @Test fun recurs() = runTest {
     checkAll(Arb.long(0, MAX_CHECKS)) { l ->
-      testApplication {
-        val (counter, client) = setup(check = { }) { repeat(Schedule.recurs(l)) }
-        val response = client.get("/do")
+      val (counter, client) = setup(check = { }) { repeat(Schedule.recurs(l)) }
+      val response = client.get("/do")
 
-        counter.get() shouldBe l + 1
-        response.status shouldBe HttpStatusCode.OK
-      }
+      counter.get() shouldBe l + 1
+      response.status shouldBe HttpStatusCode.OK
     }
   }
 
   @Test fun doWhile() = runTest {
     checkAll(Arb.long(0, MAX_CHECKS)) { l ->
-      testApplication {
-        val (counter, client) = setup(check = { c ->
-          if (c <= l) throw NotFoundExceptionForMocking()
-        }) { repeat(Schedule.doWhile { request, _ ->
-          !request.status.isSuccess()
-        }) }
+      val (counter, client) = setup(check = { c ->
+        if (c <= l) throw NotFoundExceptionForMocking()
+      }) { repeat(Schedule.doWhile { request, _ ->
+        !request.status.isSuccess()
+      }) }
 
-        val response = client.get("/do")
+      val response = client.get("/do")
 
-        counter.get() shouldBe l + 1
-        response.status shouldBe HttpStatusCode.OK
-      }
+      counter.get() shouldBe l + 1
+      response.status shouldBe HttpStatusCode.OK
     }
   }
 
   @Test fun retry() = runTest {
     checkAll(Arb.long(0, MAX_CHECKS)) { l ->
-      testApplication {
-        val (counter, client) = setup(check = { c ->
-          if (c <= l) throw ConnectException()
-        }) { retry(Schedule.doWhile { throwable, _ -> throwable is ConnectException }) }
+      val (counter, client) = setup(check = { c ->
+        if (c <= l) throw ConnectException()
+      }) { retry(Schedule.doWhile { throwable, _ -> throwable is ConnectException }) }
 
-        val response = client.get("/do")
+      val response = client.get("/do")
 
-        counter.get() shouldBe l + 1
-        response.status shouldBe HttpStatusCode.OK
-      }
+      counter.get() shouldBe l + 1
+      response.status shouldBe HttpStatusCode.OK
     }
   }
 
   @Test fun schedule() = runTest {
     checkAll(Arb.long(1, MAX_CHECKS)) { l ->
-      testApplication {
-        val (counter, client) = setup(check = { c ->
-          if (c <= l) throw ConnectException()
-        }) { retry(Schedule.recurs(0)) }
+      val (counter, client) = setup(check = { c ->
+        if (c <= l) throw ConnectException()
+      }) { retry(Schedule.recurs(0)) }
 
-        shouldThrow<ConnectException> { client.get("/do") }
+      shouldThrow<ConnectException> { client.get("/do") }
 
-        val response = client.get("/do") {
-          schedule {
-            retry(Schedule.doWhile { throwable, _ -> throwable is ConnectException })
-          }
+      val response = client.get("/do") {
+        schedule {
+          retry(Schedule.doWhile { throwable, _ -> throwable is ConnectException })
         }
-
-        counter.get() shouldBe l + 1
-        response.status shouldBe HttpStatusCode.OK
       }
+
+      counter.get() shouldBe l + 1
+      response.status shouldBe HttpStatusCode.OK
     }
   }
 }

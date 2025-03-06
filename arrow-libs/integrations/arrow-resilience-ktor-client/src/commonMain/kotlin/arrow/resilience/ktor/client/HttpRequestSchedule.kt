@@ -84,7 +84,7 @@ public val HttpRequestSchedule: ClientPlugin<HttpRequestScheduleConfiguration> =
 
             is Schedule.Decision.Done -> break
           }
-          RetryEventData.HttpResponse(subRequest, ++retryCount, call.response)
+          RetryEventData.Response(subRequest, ++retryCount, call.response)
         } catch (cause: Throwable) {
           when (val decision = retryStep(cause)) {
             is Schedule.Decision.Continue -> {
@@ -148,11 +148,11 @@ public data class ModifyRequestContext(val original: HttpRequestBuilder, val las
 
   public fun responseOrNull(): HttpResponse? = when (lastRetryEventData) {
     is RetryEventData.Failure -> null
-    is RetryEventData.HttpResponse -> lastRetryEventData.response
+    is RetryEventData.Response -> lastRetryEventData.response
   }
 
   public fun exceptionOrNull(): Throwable? = when (lastRetryEventData) {
-    is RetryEventData.HttpResponse -> null
+    is RetryEventData.Response -> null
     is RetryEventData.Failure -> lastRetryEventData.exception
   }
 }
@@ -164,20 +164,13 @@ public sealed interface RetryEventData {
   public val request: HttpRequestBuilder
   public val retryCount: Int
 
-  public fun responseOrNull(): io.ktor.client.statement.HttpResponse? = when (this) {
-    is Failure -> null
-    is HttpResponse -> response
-  }
+  public fun responseOrNull(): HttpResponse? = (this as? Response)?.response
+  public fun exceptionOrNull(): Throwable? = (this as? Failure)?.exception
 
-  public fun exceptionOrNull(): Throwable? = when (this) {
-    is HttpResponse -> null
-    is Failure -> exception
-  }
-
-  public data class HttpResponse(
+  public data class Response(
     public override val request: HttpRequestBuilder,
     public override val retryCount: Int,
-    public val response: io.ktor.client.statement.HttpResponse
+    public val response: HttpResponse
   ) : RetryEventData
 
   public data class Failure(
