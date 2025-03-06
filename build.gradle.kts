@@ -118,7 +118,11 @@ dokka {
 }
 
 apiValidation {
-  ignoredProjects.add("arrow-optics-ksp-plugin")
+  ignoredProjects.addAll(listOf(
+    "arrow-optics-ksp-plugin",
+    "suspendapp-test-app",
+    "suspendapp-test-runner",
+  ))
   @OptIn(ExperimentalBCVApi::class)
   klib.enabled = true
 }
