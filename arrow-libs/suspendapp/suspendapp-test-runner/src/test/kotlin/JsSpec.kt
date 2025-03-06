@@ -4,16 +4,16 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 
 @EnabledIf("enabled")
-open class JsSpec() : SuspendAppTest() {
+open class JsSpec : SuspendAppTest() {
   open val config: JsTestConfig get() = Companion.config
 
-  override fun prepareProcess(mode: String): ProcessBuilder =
-    ProcessBuilder(config.executable!!.absolutePathString(), config.entrypoint!!.absolutePathString())
-      .directory(config.workdir?.toFile())
-      .apply { environment()["TASK"] = mode }
+  override fun prepareProcess(mode: String): ProcessBuilder = ProcessBuilder(config.executable!!.absolutePathString(), config.entrypoint!!.absolutePathString())
+    .directory(config.workdir?.toFile())
+    .apply { environment()["TASK"] = mode }
 
   companion object {
     val config = JsTestConfig("jsNodeRun")
+
     @JvmStatic
     fun enabled() = config.validConfig()
   }

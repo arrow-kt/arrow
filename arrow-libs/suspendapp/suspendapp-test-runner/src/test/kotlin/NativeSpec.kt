@@ -5,9 +5,8 @@ import kotlin.io.path.pathString
 
 @EnabledIf("enabled")
 class NativeSpec : SuspendAppTest() {
-  override fun prepareProcess(mode: String): ProcessBuilder =
-    ProcessBuilder(executable!!.pathString, mode)
-      .directory(workdir?.toFile())
+  override fun prepareProcess(mode: String): ProcessBuilder = ProcessBuilder(executable!!.pathString, mode)
+    .directory(workdir?.toFile())
 
   companion object {
     val name = System.getProperties().stringPropertyNames()

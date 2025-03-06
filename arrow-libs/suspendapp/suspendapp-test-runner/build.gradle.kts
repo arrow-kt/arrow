@@ -2,10 +2,13 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
+  id(libs.plugins.spotless.get().pluginId)
 }
 
-repositories {
-  mavenCentral()
+spotless {
+  kotlin {
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+  }
 }
 
 dependencies {
