@@ -19,7 +19,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 public annotation class ExperimentalAwaitAllApi
 
 @ExperimentalAwaitAllApi
@@ -69,6 +69,7 @@ public suspend fun <A> CoroutineScope.awaitAll(
  * }
  * ```
  */
+@ExperimentalAwaitAllApi
 public class AwaitAllScope(
   private val scope: CoroutineScope
 ): CoroutineScope by scope {
