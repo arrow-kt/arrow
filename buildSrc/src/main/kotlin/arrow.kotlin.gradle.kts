@@ -20,6 +20,9 @@ repositories {
   maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+group = property("projects.group").toString()
+val projectNameWithDots = project.name.replace('-', '.')
+
 val Project.withoutAndroid
   get() = project.name == "suspendapp"
 
@@ -36,11 +39,11 @@ if (!isKotlinJvm) {
 plugins.apply("com.diffplug.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
-plugins.apply("com.vanniktech.maven.publish")
 plugins.apply("org.jetbrains.kotlinx.kover")
 
-group = property("projects.group").toString()
-val projectNameWithDots = project.name.replace('-', '.')
+val doNotPublish = listOf("arrow-raise-ktor-server")
+if (project.name !in doNotPublish)
+  plugins.apply("com.vanniktech.maven.publish")
 
 tasks {
   withType<Test>().configureEach {
@@ -293,7 +296,7 @@ afterEvaluate {
       .matching { it.name == "generatePomFileForKotlinMultiplatformPublication" }
       .configureEach {
         dependsOn(
-          "generatePomFileFor${platformPublication.name.toString().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Publication"
+          "generatePomFileFor${platformPublication.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Publication"
         )
       }
   }
