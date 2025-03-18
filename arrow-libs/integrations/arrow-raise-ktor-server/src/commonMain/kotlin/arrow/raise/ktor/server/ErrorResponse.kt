@@ -28,7 +28,7 @@ internal fun ApplicationCall.errorResponse(errors: NonEmptyList<RequestError>): 
 public class RaiseErrorResponseConfig(
   public var errorResponse: ErrorResponse = ::defaultErrorsResponse,
 ) {
-  public fun onErrorRespond(response: (NonEmptyList<RequestError>) -> Response) {
+  public fun errorResponse(response: (NonEmptyList<RequestError>) -> Response) {
     errorResponse = response
   }
 }
@@ -42,7 +42,6 @@ public val RaiseErrorResponse: RouteScopedPlugin<RaiseErrorResponseConfig> = cre
   }
 }
 
-// <editor-fold desc="Default Response">
 private fun defaultErrorsResponse(errors: NonEmptyList<RequestError>): Response =
   Response.Companion.raw(
     TextContent(
@@ -51,4 +50,3 @@ private fun defaultErrorsResponse(errors: NonEmptyList<RequestError>): Response 
       status = BadRequest,
     ),
   )
-// </editor-fold>

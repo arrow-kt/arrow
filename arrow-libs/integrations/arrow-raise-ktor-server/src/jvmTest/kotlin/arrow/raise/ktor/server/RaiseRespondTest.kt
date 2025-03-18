@@ -2,6 +2,7 @@ package arrow.raise.ktor.server
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensureNotNull
+import arrow.core.raise.recover
 import arrow.core.raise.withError
 import arrow.raise.ktor.server.Response.Companion.Response
 import io.kotest.assertions.assertSoftly

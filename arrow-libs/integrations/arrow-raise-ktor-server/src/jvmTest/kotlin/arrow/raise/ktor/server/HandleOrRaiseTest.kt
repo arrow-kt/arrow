@@ -1,6 +1,7 @@
 package arrow.raise.ktor.server
 
 import arrow.core.raise.ensure
+import arrow.core.raise.recover
 import arrow.core.raise.withError
 import io.kotest.assertions.asClue
 import io.kotest.assertions.assertSoftly
