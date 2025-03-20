@@ -6,7 +6,111 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-eval>
-sealed class <#A: out kotlin/Any?> arrow.eval/Eval { // arrow.eval/Eval|null[0]
+sealed interface <#A: out kotlin/Any?> arrow.eval/SuspendEval { // arrow.eval/SuspendEval|null[0]
+    abstract fun memoize(): arrow.eval/SuspendEval<#A> // arrow.eval/SuspendEval.memoize|memoize(){}[0]
+    abstract suspend fun run(): #A // arrow.eval/SuspendEval.run|run(){}[0]
+    open fun <#A1: kotlin/Any?> flatMapSuspend(kotlin.coroutines/SuspendFunction1<#A, arrow.eval/SuspendEval<#A1>>): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.flatMapSuspend|flatMapSuspend(kotlin.coroutines.SuspendFunction1<1:0,arrow.eval.SuspendEval<0:0>>){0§<kotlin.Any?>}[0]
+    open fun <#A1: kotlin/Any?> mapSuspend(kotlin.coroutines/SuspendFunction1<#A, #A1>): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.mapSuspend|mapSuspend(kotlin.coroutines.SuspendFunction1<1:0,0:0>){0§<kotlin.Any?>}[0]
+
+    abstract interface <#A1: kotlin/Any?> AbstractMemoize : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.AbstractMemoize|null[0]
+        abstract val eval // arrow.eval/SuspendEval.AbstractMemoize.eval|{}eval[0]
+            abstract fun <get-eval>(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.AbstractMemoize.eval.<get-eval>|<get-eval>(){}[0]
+
+        abstract var result // arrow.eval/SuspendEval.AbstractMemoize.result|{}result[0]
+            abstract fun <get-result>(): arrow.core/Option<#A1> // arrow.eval/SuspendEval.AbstractMemoize.result.<get-result>|<get-result>(){}[0]
+            abstract fun <set-result>(arrow.core/Option<#A1>) // arrow.eval/SuspendEval.AbstractMemoize.result.<set-result>|<set-result>(arrow.core.Option<1:0>){}[0]
+    }
+
+    abstract interface <#A1: out kotlin/Any?> AbstractDefer : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.AbstractDefer|null[0]
+        abstract val thunk // arrow.eval/SuspendEval.AbstractDefer.thunk|{}thunk[0]
+            abstract fun <get-thunk>(): kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A1>> // arrow.eval/SuspendEval.AbstractDefer.thunk.<get-thunk>|<get-thunk>(){}[0]
+    }
+
+    abstract interface <#A1: out kotlin/Any?> AbstractFlatMap : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.AbstractFlatMap|null[0]
+        abstract suspend fun <#A2: kotlin/Any?> runSuspend(#A2): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.AbstractFlatMap.runSuspend|runSuspend(0:0){0§<kotlin.Any?>}[0]
+        abstract suspend fun <#A2: kotlin/Any?> startSuspend(): arrow.eval/SuspendEval<#A2> // arrow.eval/SuspendEval.AbstractFlatMap.startSuspend|startSuspend(){0§<kotlin.Any?>}[0]
+    }
+
+    abstract class <#A1: out kotlin/Any?> FlatMap : arrow.eval/SuspendEval.AbstractFlatMap<#A1> { // arrow.eval/SuspendEval.FlatMap|null[0]
+        constructor <init>() // arrow.eval/SuspendEval.FlatMap.<init>|<init>(){}[0]
+
+        abstract suspend fun <#A2: kotlin/Any?> runSuspend(#A2): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.FlatMap.runSuspend|runSuspend(0:0){0§<kotlin.Any?>}[0]
+        abstract suspend fun <#A2: kotlin/Any?> startSuspend(): arrow.eval/SuspendEval<#A2> // arrow.eval/SuspendEval.FlatMap.startSuspend|startSuspend(){0§<kotlin.Any?>}[0]
+        open fun memoize(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.FlatMap.memoize|memoize(){}[0]
+        open fun toString(): kotlin/String // arrow.eval/SuspendEval.FlatMap.toString|toString(){}[0]
+        open suspend fun run(): #A1 // arrow.eval/SuspendEval.FlatMap.run|run(){}[0]
+    }
+
+    final class <#A1: kotlin/Any?> Memoize : arrow.eval/SuspendEval.AbstractMemoize<#A1> { // arrow.eval/SuspendEval.Memoize|null[0]
+        constructor <init>(arrow.eval/SuspendEval<#A1>) // arrow.eval/SuspendEval.Memoize.<init>|<init>(arrow.eval.SuspendEval<1:0>){}[0]
+
+        final val eval // arrow.eval/SuspendEval.Memoize.eval|{}eval[0]
+            final fun <get-eval>(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.Memoize.eval.<get-eval>|<get-eval>(){}[0]
+
+        final var result // arrow.eval/SuspendEval.Memoize.result|{}result[0]
+            final fun <get-result>(): arrow.core/Option<#A1> // arrow.eval/SuspendEval.Memoize.result.<get-result>|<get-result>(){}[0]
+            final fun <set-result>(arrow.core/Option<#A1>) // arrow.eval/SuspendEval.Memoize.result.<set-result>|<set-result>(arrow.core.Option<1:0>){}[0]
+
+        final fun component1(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.Memoize.component1|component1(){}[0]
+        final fun copy(arrow.eval/SuspendEval<#A1> = ...): arrow.eval/SuspendEval.Memoize<#A1> // arrow.eval/SuspendEval.Memoize.copy|copy(arrow.eval.SuspendEval<1:0>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.Memoize.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/SuspendEval.Memoize.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.Memoize.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/SuspendEval.Memoize.toString|toString(){}[0]
+        final suspend fun run(): #A1 // arrow.eval/SuspendEval.Memoize.run|run(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Always : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.Always|null[0]
+        constructor <init>(kotlin.coroutines/SuspendFunction0<#A1>) // arrow.eval/SuspendEval.Always.<init>|<init>(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+
+        final fun copy(kotlin.coroutines/SuspendFunction0<#A1> = ...): arrow.eval/SuspendEval.Always<#A1> // arrow.eval/SuspendEval.Always.copy|copy(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.Always.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/SuspendEval.Always.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.Always.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/SuspendEval.Always.toString|toString(){}[0]
+        final suspend fun run(): #A1 // arrow.eval/SuspendEval.Always.run|run(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Defer : arrow.eval/SuspendEval.AbstractDefer<#A1> { // arrow.eval/SuspendEval.Defer|null[0]
+        constructor <init>(kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A1>>) // arrow.eval/SuspendEval.Defer.<init>|<init>(kotlin.coroutines.SuspendFunction0<arrow.eval.SuspendEval<1:0>>){}[0]
+
+        final val thunk // arrow.eval/SuspendEval.Defer.thunk|{}thunk[0]
+            final fun <get-thunk>(): kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A1>> // arrow.eval/SuspendEval.Defer.thunk.<get-thunk>|<get-thunk>(){}[0]
+
+        final fun component1(): kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A1>> // arrow.eval/SuspendEval.Defer.component1|component1(){}[0]
+        final fun copy(kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A1>> = ...): arrow.eval/SuspendEval.Defer<#A1> // arrow.eval/SuspendEval.Defer.copy|copy(kotlin.coroutines.SuspendFunction0<arrow.eval.SuspendEval<1:0>>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.Defer.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/SuspendEval.Defer.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.Defer.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/SuspendEval.Defer.toString|toString(){}[0]
+        final suspend fun run(): #A1 // arrow.eval/SuspendEval.Defer.run|run(){}[0]
+    }
+
+    final class <#A1: out kotlin/Any?> Later : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.Later|null[0]
+        constructor <init>(kotlin.coroutines/SuspendFunction0<#A1>) // arrow.eval/SuspendEval.Later.<init>|<init>(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+
+        final var result // arrow.eval/SuspendEval.Later.result|{}result[0]
+            final fun <get-result>(): arrow.core/Option<#A1> // arrow.eval/SuspendEval.Later.result.<get-result>|<get-result>(){}[0]
+            final fun <set-result>(arrow.core/Option<#A1>) // arrow.eval/SuspendEval.Later.result.<set-result>|<set-result>(arrow.core.Option<1:0>){}[0]
+
+        final fun copy(kotlin.coroutines/SuspendFunction0<#A1> = ...): arrow.eval/SuspendEval.Later<#A1> // arrow.eval/SuspendEval.Later.copy|copy(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.Later.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/SuspendEval.Later.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.Later.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/SuspendEval.Later.toString|toString(){}[0]
+        final suspend fun run(): #A1 // arrow.eval/SuspendEval.Later.run|run(){}[0]
+    }
+
+    final object Companion { // arrow.eval/SuspendEval.Companion|null[0]
+        final fun <#A2: kotlin/Any?> now(#A2): arrow.eval/SuspendEval<#A2> // arrow.eval/SuspendEval.Companion.now|now(0:0){0§<kotlin.Any?>}[0]
+        final fun raise(kotlin/Throwable): arrow.eval/SuspendEval<kotlin/Nothing> // arrow.eval/SuspendEval.Companion.raise|raise(kotlin.Throwable){}[0]
+        final inline fun <#A2: kotlin/Any?> always(crossinline kotlin.coroutines/SuspendFunction0<#A2>): arrow.eval/SuspendEval.Always<#A2> // arrow.eval/SuspendEval.Companion.always|always(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> defer(crossinline kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A2>>): arrow.eval/SuspendEval<#A2> // arrow.eval/SuspendEval.Companion.defer|defer(kotlin.coroutines.SuspendFunction0<arrow.eval.SuspendEval<0:0>>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> later(crossinline kotlin.coroutines/SuspendFunction0<#A2>): arrow.eval/SuspendEval.Later<#A2> // arrow.eval/SuspendEval.Companion.later|later(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
+    }
+}
+
+sealed class <#A: out kotlin/Any?> arrow.eval/Eval : arrow.eval/SuspendEval<#A> { // arrow.eval/Eval|null[0]
     abstract fun memoize(): arrow.eval/Eval<#A> // arrow.eval/Eval.memoize|memoize(){}[0]
     abstract fun value(): #A // arrow.eval/Eval.value|value(){}[0]
     final fun <#A1: kotlin/Any?> flatMap(kotlin/Function1<#A, arrow.eval/Eval<#A1>>): arrow.eval/Eval<#A1> // arrow.eval/Eval.flatMap|flatMap(kotlin.Function1<1:0,arrow.eval.Eval<0:0>>){0§<kotlin.Any?>}[0]
@@ -14,8 +118,9 @@ sealed class <#A: out kotlin/Any?> arrow.eval/Eval { // arrow.eval/Eval|null[0]
     final inline fun <#A1: kotlin/Any?> coflatMap(crossinline kotlin/Function1<arrow.eval/Eval<#A>, #A1>): arrow.eval/Eval<#A1> // arrow.eval/Eval.coflatMap|coflatMap(kotlin.Function1<arrow.eval.Eval<1:0>,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> map(crossinline kotlin/Function1<#A, #A1>): arrow.eval/Eval<#A1> // arrow.eval/Eval.map|map(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
     open fun toString(): kotlin/String // arrow.eval/Eval.toString|toString(){}[0]
+    open suspend fun run(): #A // arrow.eval/Eval.run|run(){}[0]
 
-    abstract class <#A1: out kotlin/Any?> FlatMap : arrow.eval/Eval<#A1> { // arrow.eval/Eval.FlatMap|null[0]
+    abstract class <#A1: out kotlin/Any?> FlatMap : arrow.eval/Eval<#A1>, arrow.eval/SuspendEval.AbstractFlatMap<#A1> { // arrow.eval/Eval.FlatMap|null[0]
         constructor <init>() // arrow.eval/Eval.FlatMap.<init>|<init>(){}[0]
 
         abstract fun <#A2: kotlin/Any?> run(#A2): arrow.eval/Eval<#A1> // arrow.eval/Eval.FlatMap.run|run(0:0){0§<kotlin.Any?>}[0]
@@ -23,6 +128,8 @@ sealed class <#A: out kotlin/Any?> arrow.eval/Eval { // arrow.eval/Eval|null[0]
         open fun memoize(): arrow.eval/Eval<#A1> // arrow.eval/Eval.FlatMap.memoize|memoize(){}[0]
         open fun toString(): kotlin/String // arrow.eval/Eval.FlatMap.toString|toString(){}[0]
         open fun value(): #A1 // arrow.eval/Eval.FlatMap.value|value(){}[0]
+        open suspend fun <#A2: kotlin/Any?> runSuspend(#A2): arrow.eval/Eval<#A1> // arrow.eval/Eval.FlatMap.runSuspend|runSuspend(0:0){0§<kotlin.Any?>}[0]
+        open suspend fun <#A2: kotlin/Any?> startSuspend(): arrow.eval/Eval<#A2> // arrow.eval/Eval.FlatMap.startSuspend|startSuspend(){0§<kotlin.Any?>}[0]
     }
 
     final class <#A1: out kotlin/Any?> Always : arrow.eval/Eval<#A1> { // arrow.eval/Eval.Always|null[0]

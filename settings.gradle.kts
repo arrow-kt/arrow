@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "3.19.1"
+  id("com.gradle.develocity") version "3.19.2"
   id("org.gradle.toolchains.foojay-resolver-convention") version("0.9.0")
 }
 
@@ -112,6 +112,12 @@ project(":suspendapp").projectDir = file("arrow-libs/suspendapp/suspendapp")
 
 include("suspendapp-ktor")
 project(":suspendapp-ktor").projectDir = file("arrow-libs/suspendapp/suspendapp-ktor")
+
+include("suspendapp-test-app")
+project(":suspendapp-test-app").projectDir = file("arrow-libs/suspendapp/suspendapp-test-app")
+
+include("suspendapp-test-runner")
+project(":suspendapp-test-runner").projectDir = file("arrow-libs/suspendapp/suspendapp-test-runner")
 
 // INTEGRATIONS
 include("arrow-core-retrofit")

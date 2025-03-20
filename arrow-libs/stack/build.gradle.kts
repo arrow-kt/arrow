@@ -15,6 +15,7 @@ dependencies {
     api("io.arrow-kt:arrow-core-high-arity:$version")
     api("io.arrow-kt:arrow-eval:$version")
     api("io.arrow-kt:arrow-functions:$version")
+    api("io.arrow-kt:arrow-platform:${version}")
     api("io.arrow-kt:arrow-collectors:$version")
     api("io.arrow-kt:arrow-fx-coroutines:$version")
     api("io.arrow-kt:arrow-fx-stm:$version")
@@ -26,7 +27,9 @@ dependencies {
     api("io.arrow-kt:arrow-core-jackson:$version")
     api("io.arrow-kt:arrow-core-retrofit:$version")
     api("io.arrow-kt:arrow-core-serialization:$version")
-    api("io.arrow-kt:arrow-raise-ktor-server:${version}")
+    // api("io.arrow-kt:arrow-raise-ktor-server:${version}")
     api("io.arrow-kt:arrow-resilience-ktor-client:${version}")
+    api("io.arrow-kt:suspendapp:${version}")
+    api("io.arrow-kt:suspendapp-ktor:${version}")
   }
 }

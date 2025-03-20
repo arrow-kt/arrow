@@ -15,11 +15,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
+import kotlinx.coroutines.withContext
 
-public actual fun process(): Process = JsProcess
+internal actual fun process(): Process = JsProcess
 
-public object JsProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): suspend () -> Unit {
+private object JsProcess : Process {
+  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
     onSigTerm { code -> exitAfter(128 + code) { block() } }
     onSigInt { code -> exitAfter(128 + code) { block() } }
     return { /* Nothing to unregister */ }
@@ -37,8 +38,6 @@ public object JsProcess : Process {
     js("process.on(signal, function() {\n" + "  provide()\n" + "});")
   }
 
-  private val jobs: MutableList<Job> = mutableListOf()
-
   override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit) {
     val innerJob = Job()
     val innerScope = CoroutineScope(innerJob)
@@ -55,19 +54,19 @@ public object JsProcess : Process {
               delay(1.hours)
             }
           }
-        runCatching { block(innerScope) }.also { keepAlive.cancelAndJoin() }.getOrThrow()
-      }
+        runCatching { withContext(context, block) }
+          .also { keepAlive.cancelAndJoin() }
+          .getOrThrow()
+    }
       .startCoroutine(Continuation(EmptyCoroutineContext) {})
   }
 
-  override fun exit(code: Int) {
-    runCatching { js("process.exit(code)") }
+  override fun exit(code: Int): Nothing {
+    js("process.exit(code)")
+    error("process.exit() should have exited...")
   }
 
-  override fun close() {
-    suspend { jobs.forEach { it.cancelAndJoin() } }
-      .startCoroutine(Continuation(EmptyCoroutineContext) {})
-  }
+  override fun close(): Unit = Unit
 }
 
 private inline fun Process.exitAfter(code: Int, block: () -> Unit): Unit =
