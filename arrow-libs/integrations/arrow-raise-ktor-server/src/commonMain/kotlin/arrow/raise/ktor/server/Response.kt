@@ -8,6 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.util.reflect.*
 
 public sealed interface Response {
+  public suspend fun respondTo(call: ApplicationCall)
+
   public companion object {
     @PublishedApi
     internal fun Response(statusCode: HttpStatusCode, value: Any?, typeInfo: TypeInfo): Response = Typed(statusCode, value, typeInfo)
@@ -27,19 +29,10 @@ public sealed interface Response {
   }
 }
 
-@PublishedApi
-internal suspend fun Response.respondTo(call: ApplicationCall) = when (this) {
-  is Respondable -> respondTo(call)
-}
-
-private sealed interface Respondable : Response {
-  suspend fun respondTo(call: ApplicationCall)
-}
-
-private data class Typed(val statusCode: HttpStatusCode, val content: Any?, val typeInfo: TypeInfo) : Respondable {
+private data class Typed(val statusCode: HttpStatusCode, val content: Any?, val typeInfo: TypeInfo) : Response {
   override suspend fun respondTo(call: ApplicationCall) = call.respond(statusCode, content, typeInfo)
 }
 
-private data class Raw(val outgoingContent: OutgoingContent) : Respondable {
+private data class Raw(val outgoingContent: OutgoingContent) : Response {
   override suspend fun respondTo(call: ApplicationCall) = call.respond(outgoingContent, null)
 }

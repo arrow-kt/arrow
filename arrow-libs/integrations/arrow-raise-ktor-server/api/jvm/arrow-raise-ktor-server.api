@@ -70,6 +70,7 @@ public final class arrow/raise/ktor/server/RespondOrRaiseKt {
 
 public abstract interface class arrow/raise/ktor/server/Response {
 	public static final field Companion Larrow/raise/ktor/server/Response$Companion;
+	public abstract fun respondTo (Lio/ktor/server/application/ApplicationCall;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class arrow/raise/ktor/server/Response$Companion {
@@ -79,10 +80,6 @@ public final class arrow/raise/ktor/server/Response$Companion {
 	public final fun empty (Lio/ktor/http/HttpStatusCode;)Larrow/raise/ktor/server/Response;
 	public static synthetic fun empty$default (Larrow/raise/ktor/server/Response$Companion;Lio/ktor/http/HttpStatusCode;ILjava/lang/Object;)Larrow/raise/ktor/server/Response;
 	public final fun raw (Lio/ktor/http/content/OutgoingContent;)Larrow/raise/ktor/server/Response;
-}
-
-public final class arrow/raise/ktor/server/ResponseKt {
-	public static final fun respondTo (Larrow/raise/ktor/server/Response;Lio/ktor/server/application/ApplicationCall;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract class arrow/raise/ktor/server/request/AccumulatingParameterProvider {
