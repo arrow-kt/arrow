@@ -1,10 +1,10 @@
 @file:JvmName("Memoization")
+@file:OptIn(ExperimentalAtomicApi::class)
 
 package arrow.core
 
-import arrow.atomic.Atomic
-import arrow.atomic.loop
-import arrow.atomic.value
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.jvm.JvmName
 
 /**
@@ -114,22 +114,15 @@ private data class MemoizeKey5<out P1, out P2, out P3, out P4, out P5, R>(
 }
 
 private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
-  private val cache = Atomic(emptyMap<K, R>())
+  private val cache = AtomicReference(emptyMap<K, R>())
 
-  operator fun invoke(k: K): R = when (k) {
-    in cache.value -> cache.value.getValue(k)
-    else -> {
+  operator fun invoke(k: K): R {
+    while (true) {
+      val old = cache.load()
+      if (k in old) return old.getValue(k)
       val b = k(f)
-      cache.loop { old ->
-        when (k) {
-          in old ->
-            return@invoke old.getValue(k)
-          else -> {
-            if (cache.compareAndSet(old, old + Pair(k, b)))
-              return@invoke b
-          }
-        }
-      }
+      if (cache.compareAndSet(old, old + Pair(k, b)))
+        return b
     }
   }
 }

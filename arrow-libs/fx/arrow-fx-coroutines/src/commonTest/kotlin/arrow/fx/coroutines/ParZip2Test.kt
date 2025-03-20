@@ -1,8 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.AtomicInt
-import arrow.atomic.update
-import arrow.atomic.value
 import arrow.core.Either
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -18,6 +17,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class ParZip2Test {
@@ -29,17 +30,17 @@ class ParZip2Test {
       parZip(
         {
           modifyGate.await()
-          r.update { i -> i + a }
+          r.addAndFetch(a)
         },
         {
-          r.value = b
+          r.store(b)
           modifyGate.complete(0)
         }
       ) { _a, _b ->
         Pair(_a, _b)
       }
 
-      r.value shouldBe b + a
+      r.load() shouldBe b + a
     }
   }
 

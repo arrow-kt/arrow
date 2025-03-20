@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.collectors
 
-import arrow.atomic.Atomic
-import arrow.atomic.AtomicInt
-import arrow.atomic.update
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.incrementAndFetch
 
 /**
  * Library of [Collector]s.
@@ -26,8 +29,8 @@ public object Collectors {
    */
   public val length: NonSuspendCollector<Any?, Int> = Collector.nonSuspendOf(
     supply = { AtomicInt(0) },
-    accumulate = { current, _ -> current.incrementAndGet() },
-    finish = AtomicInt::get,
+    accumulate = { current, _ -> current.incrementAndFetch() },
+    finish = AtomicInt::load,
     characteristics = Characteristics.CONCURRENT_UNORDERED
   )
 
@@ -42,15 +45,15 @@ public object Collectors {
   ): NonSuspendCollector<Int, Int> = Collector.nonSuspendOf(
     supply = { AtomicInt(initial()) },
     accumulate = { current, value -> current.update { combine(it, value) } },
-    finish = AtomicInt::get,
+    finish = AtomicInt::load,
   )
 
   public fun <M> reducer(
     initial: () -> M, combine: (M, M) -> M, unordered: Boolean = false,
   ): NonSuspendCollector<M, M> = Collector.nonSuspendOf(
-    supply = { Atomic(initial()) },
+    supply = { AtomicReference(initial()) },
     accumulate = { current, value -> current.update { combine(it, value) } },
-    finish = Atomic<M>::get,
+    finish = AtomicReference<M>::load,
     characteristics = if (unordered) Characteristics.CONCURRENT_UNORDERED else emptySet()
   )
 
@@ -64,8 +67,8 @@ public object Collectors {
   @Suppress("UNCHECKED_CAST")
   public fun <M> bestBy(
     selectNew: (old: M, new: M) -> Boolean,
-  ): NonSuspendCollector<M, M?> = Collector.nonSuspendOf<Atomic<Any?>, M, M?>(
-    supply = { Atomic(BestByNotInitialized) },
+  ): NonSuspendCollector<M, M?> = Collector.nonSuspendOf<AtomicReference<Any?>, M, M?>(
+    supply = { AtomicReference(BestByNotInitialized) },
     accumulate = { current, value ->
       current.update { old ->
         if (old == BestByNotInitialized) {
@@ -77,7 +80,7 @@ public object Collectors {
       }
     },
     finish = { current ->
-      when (val result = current.get()) {
+      when (val result = current.load()) {
         BestByNotInitialized -> null
         else -> result as M
       }
@@ -134,4 +137,20 @@ public object Collectors {
     finish = { it },
     characteristics = Characteristics.IDENTITY_UNORDERED
   )
+}
+
+internal inline fun AtomicInt.update(block: (Int) -> Int) {
+  while (true) {
+    val old = load()
+    val new = block(old)
+    if (compareAndSet(old, new)) return
+  }
+}
+
+internal inline fun <T> AtomicReference<T>.update(block: (T) -> T) {
+  while (true) {
+    val old = load()
+    val new = block(old)
+    if (compareAndSet(old, new)) return
+  }
 }

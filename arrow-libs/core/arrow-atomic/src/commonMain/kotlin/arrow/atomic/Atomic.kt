@@ -1,7 +1,9 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.atomic
 
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.AtomicReference as KtAtomicReference
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -29,16 +31,18 @@ import kotlin.contracts.contract
  *
  * **WARNING**: Use [AtomicInt] and [AtomicLong] for [Int] and [Long] on Kotlin Native!
  */
-public expect class Atomic<V>(initialValue: V) {
-  public fun get(): V
-  public fun set(value: V)
-  public fun getAndSet(value: V): V
+public class Atomic<V>(initialValue: V) {
+  private val inner = KtAtomicReference(initialValue)
+
+  public fun get(): V = inner.load()
+  public fun set(value: V) { inner.store(value) }
+  public fun getAndSet(value: V): V = inner.exchange(value)
 
   /**
    * Compare current value with expected and set to new if they're the same. Note, 'compare' is checking
    * the actual object id, not 'equals'.
    */
-  public fun compareAndSet(expected: V, new: V): Boolean
+  public fun compareAndSet(expected: V, new: V): Boolean = inner.compareAndSet(expected, new)
 }
 
 public var <T> Atomic<T>.value: T

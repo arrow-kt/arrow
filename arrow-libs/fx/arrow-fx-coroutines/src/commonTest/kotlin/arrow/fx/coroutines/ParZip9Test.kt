@@ -1,7 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.Tuple9
 import io.kotest.matchers.should
@@ -17,6 +17,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class ParZip9Test {
@@ -24,7 +26,7 @@ class ParZip9Test {
     @Test
     fun parZip9RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(10, Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g, h, i ->
-        val r = Atomic("")
+        val r = AtomicReference("")
         val modifyGate1 = CompletableDeferred<Unit>()
         val modifyGate2 = CompletableDeferred<Unit>()
         val modifyGate3 = CompletableDeferred<Unit>()
@@ -75,14 +77,14 @@ class ParZip9Test {
             modifyGate8.complete(Unit)
           },
           {
-            r.set("$i")
+            r.store("$i")
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e, _f, _g, _h, _i ->
           Tuple9(_a, _b, _c, _d, _e, _f, _g, _h, _i)
         }
 
-        r.get() shouldBe "$i$h$g$f$e$d$c$b$a"
+        r.load() shouldBe "$i$h$g$f$e$d$c$b$a"
       }
     }
     

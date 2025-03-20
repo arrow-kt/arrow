@@ -1,12 +1,15 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow
 
-import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.test.runTest
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 
@@ -191,10 +194,10 @@ class AutoCloseTest {
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
-    fun isActive(): Boolean = isActive.get()
+    fun isActive(): Boolean = isActive.load()
 
     fun shutdown() {
-      require(isActive.compareAndSet(expected = true, new = false)) {
+      require(isActive.compareAndSet(expectedValue = true, newValue = false)) {
         "Already shut down"
       }
     }

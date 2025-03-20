@@ -1,8 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
-import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple7
 import io.kotest.matchers.should
@@ -18,13 +17,15 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class ParZip7Test {
     @Test
     fun parZip7RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(10, Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e, f, g ->
-        val r = Atomic("")
+        val r = AtomicReference("")
         val modifyGate1 = CompletableDeferred<Unit>()
         val modifyGate2 = CompletableDeferred<Unit>()
         val modifyGate3 = CompletableDeferred<Unit>()
@@ -63,14 +64,14 @@ class ParZip7Test {
             modifyGate6.complete(Unit)
           },
           {
-            r.value = "$g"
+            r.store("$g")
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e, _f, _g ->
           Tuple7(_a, _b, _c, _d, _e, _f, _g)
         }
 
-        r.value shouldBe "$g$f$e$d$c$b$a"
+        r.load() shouldBe "$g$f$e$d$c$b$a"
       }
     }
     
