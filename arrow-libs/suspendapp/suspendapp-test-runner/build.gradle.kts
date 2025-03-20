@@ -19,7 +19,7 @@ dependencies {
 val testAppTasks = project(projects.suspendappTestApp.path).tasks
 val jvmTask = testAppTasks.named<Jar>("shadowJar").orNull?.takeIf { it.enabled }
 val nonJvmTasks = testAppTasks.withType<AbstractExecTask<*>>()
-  .matching { it.enabled && (it.name.startsWith("runReleaseExecutable") || it.name.endsWith("NodeRun")) }
+  .matching { it.enabled && (it.name.startsWith("runReleaseExecutable") || it.name.endsWith("NodeProductionRun")) }
 
 fun Jar.addToTestTask(test: Test) {
   test.dependsOn(this)
@@ -55,7 +55,7 @@ if (jvmTask != null) {
 nonJvmTasks.all {
   val target = name
     .removePrefix("runReleaseExecutable")
-    .removeSuffix("NodeRun")
+    .removeSuffix("NodeProductionRun")
     .let { it.first().lowercase() + it.drop(1) }
   val testTask = "${target}Test"
   tasks.register<Test>(testTask) {
