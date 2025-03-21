@@ -1,10 +1,11 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.stm
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
-import arrow.atomic.value
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.resume
 import kotlin.random.Random
 
@@ -129,10 +130,10 @@ public class TVar<A> internal constructor(a: A) {
    * This is used to implement locking. Reading threads have to loop until the value is released by a
    *  transaction.
    */
-  private val ref = Atomic(a as Any?)
+  private val ref = AtomicReference(a as Any?)
 
   internal val value
-    get() = ref.value
+    get() = ref.load()
 
   /**
    * Each TVar has a unique id which is used to get a total ordering of variables to ensure that locks
@@ -148,7 +149,7 @@ public class TVar<A> internal constructor(a: A) {
    * Changes are pushed to waiting transactions via [notify]
    */
   // TODO Use a set here, and preferably something that uses sharing to avoid gc pressure from copying...
-  private val waiting = Atomic<List<STMTransaction>>(emptyList())
+  private val waiting = AtomicReference<List<STMTransaction>>(emptyList())
 
   override fun hashCode(): Int = id.hashCode()
 
@@ -169,7 +170,7 @@ public class TVar<A> internal constructor(a: A) {
   @Suppress("UNCHECKED_CAST")
   internal fun readI(): A {
     while (true) {
-      ref.value.let { a ->
+      ref.load().let { a ->
         if (a !is STMFrame) return@readI a as A
       }
     }
@@ -181,7 +182,7 @@ public class TVar<A> internal constructor(a: A) {
    * If [frame] no longer has the lock (a write happened and now read
    *  tries to unlock) it is ignored
    */
-  internal fun release(frame: STMFrame, a: A): Unit {
+  internal fun release(frame: STMFrame, a: A) {
     ref.compareAndSet(frame, a as Any?)
   }
 
@@ -212,15 +213,15 @@ public class TVar<A> internal constructor(a: A) {
   /**
    * A transaction resumed so remove it from the [TVar]
    */
-  internal fun removeWaiting(trans: STMTransaction): Unit {
+  internal fun removeWaiting(trans: STMTransaction) {
     waiting.update { it.filter { it !== trans } }
   }
 
   /**
    * Resume execution of all transactions waiting for this [TVar] to change.
    */
-  internal fun notify(): Unit {
-    waiting.getAndSet(emptyList()).forEach { it.getCont()?.resume(Unit) }
+  internal fun notify() {
+    waiting.exchange(emptyList()).forEach { it.getCont()?.resume(Unit) }
   }
 
   public companion object {
@@ -230,5 +231,13 @@ public class TVar<A> internal constructor(a: A) {
      * More efficient than `atomically { newVar(a) }` because it skips creating a transaction.
      */
     public suspend fun <A> new(a: A): TVar<A> = TVar(a)
+  }
+}
+
+private inline fun <T> AtomicReference<T>.update(block: (T) -> T) {
+  while (true) {
+    val old = load()
+    val new = block(old)
+    if (compareAndSet(old, new)) return
   }
 }

@@ -218,7 +218,7 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
 }
 
 final class arrow.resilience/SagaBuilder : arrow.resilience/SagaScope { // arrow.resilience/SagaBuilder|null[0]
-    constructor <init>(arrow.atomic/Atomic<kotlin.collections/List<kotlin.coroutines/SuspendFunction0<kotlin/Unit>>> = ...) // arrow.resilience/SagaBuilder.<init>|<init>(arrow.atomic.Atomic<kotlin.collections.List<kotlin.coroutines.SuspendFunction0<kotlin.Unit>>>){}[0]
+    constructor <init>(kotlin.concurrent.atomics/AtomicReference<kotlin.collections/List<kotlin.coroutines/SuspendFunction0<kotlin/Unit>>> = ...) // arrow.resilience/SagaBuilder.<init>|<init>(kotlin.concurrent.atomics.AtomicReference<kotlin.collections.List<kotlin.coroutines.SuspendFunction0<kotlin.Unit>>>){}[0]
 
     final suspend fun <#A1: kotlin/Any?> saga(kotlin.coroutines/SuspendFunction1<arrow.resilience/SagaActionStep, #A1>, kotlin.coroutines/SuspendFunction1<#A1, kotlin/Unit>): #A1 // arrow.resilience/SagaBuilder.saga|saga(kotlin.coroutines.SuspendFunction1<arrow.resilience.SagaActionStep,0:0>;kotlin.coroutines.SuspendFunction1<0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
     final suspend fun totalCompensation() // arrow.resilience/SagaBuilder.totalCompensation|totalCompensation(){}[0]

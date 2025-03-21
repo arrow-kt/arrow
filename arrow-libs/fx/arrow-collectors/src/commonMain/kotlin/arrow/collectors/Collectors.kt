@@ -138,19 +138,3 @@ public object Collectors {
     characteristics = Characteristics.IDENTITY_UNORDERED
   )
 }
-
-internal inline fun AtomicInt.update(block: (Int) -> Int) {
-  while (true) {
-    val old = load()
-    val new = block(old)
-    if (compareAndSet(old, new)) return
-  }
-}
-
-internal inline fun <T> AtomicReference<T>.update(block: (T) -> T) {
-  while (true) {
-    val old = load()
-    val new = block(old)
-    if (compareAndSet(old, new)) return
-  }
-}
