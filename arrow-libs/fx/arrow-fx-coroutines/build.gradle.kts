@@ -15,7 +15,7 @@ kotlin {
     commonTest {
       dependencies {
         implementation(projects.arrowCore)
-        implementation(projects.arrowAtomic)
+        // implementation(projects.arrowAtomic)
         implementation(projects.arrowPlatform)
         implementation(libs.bundles.testing)
       }

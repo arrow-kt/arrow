@@ -81,7 +81,7 @@ final class <#A: in kotlin/Any?> arrow.core.raise/SingletonRaise : arrow.core.ra
 }
 
 final class <#A: kotlin/Any?> arrow.core.raise/IorRaise : arrow.core.raise/Raise<#A> { // arrow.core.raise/IorRaise|null[0]
-    constructor <init>(kotlin/Function2<#A, #A, #A>, arrow.atomic/Atomic<kotlin/Any?>, arrow.core.raise/Raise<#A>) // arrow.core.raise/IorRaise.<init>|<init>(kotlin.Function2<1:0,1:0,1:0>;arrow.atomic.Atomic<kotlin.Any?>;arrow.core.raise.Raise<1:0>){}[0]
+    constructor <init>(kotlin/Function2<#A, #A, #A>, kotlin.concurrent.atomics/AtomicReference<kotlin/Any?>, arrow.core.raise/Raise<#A>) // arrow.core.raise/IorRaise.<init>|<init>(kotlin.Function2<1:0,1:0,1:0>;kotlin.concurrent.atomics.AtomicReference<kotlin.Any?>;arrow.core.raise.Raise<1:0>){}[0]
 
     final val combineError // arrow.core.raise/IorRaise.combineError|{}combineError[0]
         final fun <get-combineError>(): kotlin/Function2<#A, #A, #A> // arrow.core.raise/IorRaise.combineError.<get-combineError>|<get-combineError>(){}[0]
@@ -343,7 +343,7 @@ final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwab
 }
 
 final value class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/AtomicMemoizationCache : arrow.core/MemoizationCache<#A, #B> { // arrow.core/AtomicMemoizationCache|null[0]
-    constructor <init>(arrow.atomic/Atomic<kotlin.collections/Map<#A, #B>> = ...) // arrow.core/AtomicMemoizationCache.<init>|<init>(arrow.atomic.Atomic<kotlin.collections.Map<1:0,1:1>>){}[0]
+    constructor <init>(kotlin.concurrent.atomics/AtomicReference<kotlin.collections/Map<#A, #B>> = ...) // arrow.core/AtomicMemoizationCache.<init>|<init>(kotlin.concurrent.atomics.AtomicReference<kotlin.collections.Map<1:0,1:1>>){}[0]
 
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.core/AtomicMemoizationCache.equals|equals(kotlin.Any?){}[0]
     final fun get(#A): #B? // arrow.core/AtomicMemoizationCache.get|get(1:0){}[0]

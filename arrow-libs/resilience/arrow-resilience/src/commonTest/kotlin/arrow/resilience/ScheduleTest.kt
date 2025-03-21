@@ -1,7 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.resilience
 
-import arrow.atomic.AtomicLong
-import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -10,6 +10,9 @@ import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
+import kotlin.concurrent.atomics.AtomicLong
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.math.pow
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -237,13 +240,13 @@ class ScheduleTest {
     val iterations = 20_000L
     val l = Either.catch {
       Schedule.recurs<Throwable>(iterations).retry {
-        count.updateAndGet { it + 1 }
+        count.incrementAndFetch()
         throw exception
       }
     }
 
     assertTrue { l is Either.Left && l.value is MyException }
-    assertEquals(iterations + 1, count.get())
+    assertEquals(iterations + 1, count.load())
   }
 
   @Test
@@ -368,7 +371,7 @@ class ScheduleTest {
     val iterations = stackSafeIteration().toLong()
 
     suspend fun increment() {
-      count.incrementAndGet()
+      count.incrementAndFetch()
     }
 
     val result = Schedule.recurs<CustomError>(iterations).retryRaise {
@@ -377,7 +380,7 @@ class ScheduleTest {
     }
 
     assertTrue { result is Either.Left }
-    assertEquals(iterations + 1, count.get())
+    assertEquals(iterations + 1, count.load())
   }
 
   @Test
@@ -393,7 +396,7 @@ class ScheduleTest {
     val iterations = stackSafeIteration().toLong()
 
     suspend fun increment() {
-      count.incrementAndGet()
+      count.incrementAndFetch()
     }
 
     val result = Schedule.recurs<CustomError>(iterations).retryEither {
@@ -402,7 +405,7 @@ class ScheduleTest {
     }
 
     assertTrue { result is Either.Left }
-    assertEquals(iterations + 1, count.get())
+    assertEquals(iterations + 1, count.load())
   }
 
   @Test
@@ -469,7 +472,7 @@ private suspend fun <I, A> Schedule<I, A>.calculateDelay(input: I, n: Long): Lis
 private suspend fun <B> checkRepeat(schedule: Schedule<Long, B>, expected: B) {
   val count = AtomicLong(0)
   val result = schedule.repeat {
-    count.updateAndGet { it + 1 }
+    count.incrementAndFetch()
   }
 
   assertEquals(expected, result)
@@ -478,7 +481,7 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Long, B>, expected: B) {
 private suspend fun <B> checkRepeat(schedule: Schedule<Long, List<B>>, expected: List<B>) {
   val count = AtomicLong(0)
   val result = schedule.repeat {
-    count.updateAndGet { it + 1 }
+    count.incrementAndFetch()
   }
 
   assertContentEquals(expected, result)

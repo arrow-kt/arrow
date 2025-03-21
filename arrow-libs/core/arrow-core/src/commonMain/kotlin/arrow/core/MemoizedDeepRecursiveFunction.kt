@@ -1,7 +1,9 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.core
 
-import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmOverloads
 
@@ -12,9 +14,9 @@ public interface MemoizationCache<K, V> {
 
 @JvmInline
 public value class AtomicMemoizationCache<K, V>(
-  private val cache: Atomic<Map<K, V>> = Atomic(emptyMap())
+  private val cache: AtomicReference<Map<K, V>> = AtomicReference(emptyMap())
 ): MemoizationCache<K, V> {
-  override fun get(key: K): V? = cache.get()[key]
+  override fun get(key: K): V? = cache.load()[key]
   override fun set(key: K, value: V): V = cache.updateAndGet { old ->
     if (key in old) old else old + (key to value)
   }.getValue(key)

@@ -1,8 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
-import arrow.atomic.value
 import arrow.core.Either
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -17,12 +16,14 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class ParZip3Test {
   @Test fun parZip3RunsInParallel() = runTestUsingDefaultDispatcher {
     checkAll(10, Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
-      val r = Atomic("")
+      val r = AtomicReference("")
       val modifyGate1 = CompletableDeferred<Unit>()
       val modifyGate2 = CompletableDeferred<Unit>()
 
@@ -37,14 +38,14 @@ class ParZip3Test {
           modifyGate2.complete(Unit)
         },
         {
-          r.value ="$c"
+          r.store("$c")
           modifyGate1.complete(Unit)
         }
       ) { _a, _b, _c ->
         Triple(_a, _b, _c)
       }
 
-      r.value shouldBe "$c$b$a"
+      r.load() shouldBe "$c$b$a"
     }
   }
 

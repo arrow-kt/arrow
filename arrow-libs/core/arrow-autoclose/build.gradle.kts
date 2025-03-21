@@ -6,7 +6,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        implementation(projects.arrowAtomic)
+        // implementation(projects.arrowAtomic)
       }
     }
     commonTest {
