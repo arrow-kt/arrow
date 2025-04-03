@@ -17,10 +17,10 @@ import kotlin.coroutines.EmptyCoroutineContext
  * The winner of the race cancels the other participants.
  * Cancelling the operation cancels all participants.
  */
-public suspend inline fun <A, B> raceN(
+public suspend inline fun <A, B> raceNUtil(
   crossinline condition: (A) -> Boolean,
   vararg tasks: suspend CoroutineScope.() -> A
-): A = raceN(Dispatchers.Default, condition, *tasks)
+): A = raceNUtil(Dispatchers.Default, condition, *tasks)
 
 /**
  * Races the participants [tasks] in parallel on the provided [ctx],
@@ -28,7 +28,7 @@ public suspend inline fun <A, B> raceN(
  * The winner of the race cancels the other participants.
  * Cancelling the operation cancels all participants.
  */
-public suspend inline fun <A> raceN(
+public suspend inline fun <A> raceNUtil(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline condition: (A) -> Boolean,
   vararg tasks: suspend CoroutineScope.() -> A
