@@ -1,10 +1,12 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.resilience
 
-import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.cancellation.CancellationException
 
 
@@ -120,7 +122,7 @@ public object SagaActionStep
 // Internal implementation of the `saga { }` builder.
 @PublishedApi
 internal class SagaBuilder(
-  private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
+  private val stack: AtomicReference<List<suspend () -> Unit>> = AtomicReference(emptyList())
 ) : SagaScope {
 
   @SagaDSLMarker
@@ -140,7 +142,7 @@ internal class SagaBuilder(
   @PublishedApi
   internal suspend fun totalCompensation() {
     stack
-      .get()
+      .load()
       .fold<suspend () -> Unit, Throwable?>(null) { acc, finalizer ->
         try {
           finalizer()
@@ -177,4 +179,12 @@ private suspend fun runReleaseAndRethrow(original: Throwable, f: suspend () -> U
     original.addSuppressed(e.nonFatalOrThrow())
   }
   throw original
+}
+
+private inline fun <T> AtomicReference<T>.updateAndGet(block: (T) -> T): T {
+  while (true) {
+    val old = load()
+    val new = block(old)
+    if (compareAndSet(old, new)) return new
+  }
 }

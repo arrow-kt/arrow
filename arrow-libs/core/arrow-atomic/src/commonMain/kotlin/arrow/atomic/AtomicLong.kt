@@ -1,23 +1,28 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.atomic
 
+import kotlin.concurrent.atomics.AtomicLong as KtAtomicLong
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.decrementAndFetch
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-public expect class AtomicLong(initialValue: Long) {
+public class AtomicLong(initialValue: Long) {
+  private val inner = KtAtomicLong(initialValue)
 
-  public fun get(): Long
-  public fun set(newValue: Long)
-  public fun getAndSet(value: Long): Long
+  public fun get(): Long = inner.load()
+  public fun set(newValue: Long) { inner.store(newValue) }
+  public fun getAndSet(value: Long): Long = inner.exchange(value)
 
-  public fun incrementAndGet(): Long
-  public fun decrementAndGet(): Long
+  public fun incrementAndGet(): Long = inner.incrementAndFetch()
+  public fun decrementAndGet(): Long = inner.decrementAndFetch()
 
-  public fun addAndGet(delta: Long): Long
+  public fun addAndGet(delta: Long): Long = inner.addAndFetch(delta)
 
-  public fun compareAndSet(expected: Long, new: Long): Boolean
+  public fun compareAndSet(expected: Long, new: Long): Boolean = inner.compareAndSet(expected, new)
 }
 
 public var AtomicLong.value: Long

@@ -1,13 +1,12 @@
-@file:Suppress("UNCHECKED_CAST")
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.fx.stm.internal
 
-import arrow.atomic.Atomic
-import arrow.atomic.value
 import arrow.fx.stm.STM
 import arrow.fx.stm.TVar
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -83,6 +82,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
   /**
    * First checks if we have already read this variable, if not it reads it and stores the result
    */
+  @Suppress("UNCHECKED_CAST")
   override fun <A> TVar<A>.read(): A =
     when (val r = readVar(this as TVar<Any?>)) {
       Entry.NotPresent -> readI().also { accessMap[this] = Entry(it, Entry.NoChange) }
@@ -173,12 +173,12 @@ public expect object RetryException : Throwable
  * Keeps the continuation that [TVar]'s use to resume this transaction.
  */
 internal class STMTransaction {
-  private val cont = Atomic<Continuation<Unit>?>(null)
+  private val cont = AtomicReference<Continuation<Unit>?>(null)
 
   /**
    * Any one resumptions is enough, because we enqueue on all read variables this might be called multiple times.
    */
-  fun getCont(): Continuation<Unit>? = cont.getAndSet(null)
+  fun getCont(): Continuation<Unit>? = cont.exchange(null)
 
   // TODO should we abort after retrying x times to help a user notice "live-locked" transactions?
   //  This could be implemented by checking two values when retrying:
@@ -202,7 +202,7 @@ internal class STMTransaction {
 
         val registered = mutableListOf<TVar<Any?>>()
         suspendCancellableCoroutine susp@{ k ->
-          cont.value = k
+          cont.store(k)
 
           frame.accessMap
             .forEach { (tv, entry) ->

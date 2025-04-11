@@ -1,7 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.AtomicInt
-import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.left
@@ -18,6 +18,9 @@ import kotlin.test.Test
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.test.runTest
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.time.Duration.Companion.milliseconds
 
 class ParMapTest {
@@ -25,9 +28,9 @@ class ParMapTest {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMap { _: Int ->
-      ref.update { it + 1 }
+      ref.incrementAndFetch()
     }
-    ref.get() shouldBe count
+    ref.load() shouldBe count
   }
 
   @Test fun parMapRunsInParallel() = runTestUsingDefaultDispatcher {
@@ -94,9 +97,9 @@ class ParMapTest {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
-      ref.update { it + 1 }
+      ref.incrementAndFetch()
     }
-    ref.get() shouldBe count
+    ref.load() shouldBe count
   }
 
   @Test fun parMapOrAccumulateRunsInParallel() = runTest {
@@ -157,9 +160,9 @@ class ParMapTest {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
     (0 until count).parMapNotNull { _: Int ->
-      ref.update { it + 1 }
+      ref.incrementAndFetch()
     }
-    ref.get() shouldBe count
+    ref.load() shouldBe count
   }
 
   @Test fun parMapNotNullRunsInParallel() = runTestUsingDefaultDispatcher {

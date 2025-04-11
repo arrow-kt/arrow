@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.AtomicBoolean
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
@@ -36,6 +37,8 @@ import kotlin.test.Test
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 class ResourceTest {
 
@@ -717,10 +720,10 @@ class ResourceTest {
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
-    fun isActive(): Boolean = isActive.get()
+    fun isActive(): Boolean = isActive.load()
 
     fun shutdown() {
-      require(isActive.compareAndSet(expected = true, new = false)) {
+      require(isActive.compareAndSet(expectedValue = true, newValue = false)) {
         "Already shut down"
       }
     }

@@ -1,22 +1,24 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.atomic
 
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.AtomicBoolean as KtAtomicBoolean
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 public class AtomicBoolean(value: Boolean) {
-  private val inner = AtomicInt(value.toInt())
+  private val inner = KtAtomicBoolean(value)
 
   public var value: Boolean
-    get() = inner.value != 0
+    get() = inner.load()
     set(value) {
-      inner.value = value.toInt()
+      inner.store(value)
     }
 
   public fun compareAndSet(expected: Boolean, new: Boolean): Boolean =
-    inner.compareAndSet(expected.toInt(), new.toInt())
+    inner.compareAndSet(expected, new)
 
   public fun get(): Boolean = value
   public fun set(value: Boolean) {
@@ -24,10 +26,7 @@ public class AtomicBoolean(value: Boolean) {
   }
 
   public fun getAndSet(value: Boolean): Boolean =
-    inner.getAndSet(value.toInt()) == 1
-
-  private fun Boolean.toInt(): Int =
-    if (this) 1 else 0
+    inner.exchange(value)
 }
 
 

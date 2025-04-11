@@ -1,11 +1,9 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.core.raise
 
-import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.EmptyValue
 import arrow.core.Ior
@@ -19,6 +17,9 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
+import arrow.core.updateAndGet
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -114,11 +115,11 @@ public inline fun <A> option(block: SingletonRaise<None>.() -> A): Option<A> {
  */
 public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
-  val state: Atomic<Any?> = Atomic(EmptyValue)
+  val state: AtomicReference<Any?> = AtomicReference(EmptyValue)
   return fold(
     { block(IorRaise(combineError, state, this)) },
-    { e -> Ior.Left(EmptyValue.combine(state.get(), e, combineError)) },
-    { a -> EmptyValue.fold(state.get(), { Ior.Right(a) }, { e: Error -> Ior.Both(e, a) }) }
+    { e -> Ior.Left(EmptyValue.combine(state.load(), e, combineError)) },
+    { a -> EmptyValue.fold(state.load(), { Ior.Right(a) }, { e: Error -> Ior.Both(e, a) }) }
   )
 }
 
@@ -303,7 +304,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
  */
 public class IorRaise<Error> @PublishedApi internal constructor(
   @PublishedApi internal val combineError: (Error, Error) -> Error,
-  private val state: Atomic<Any?>,
+  private val state: AtomicReference<Any?>,
   private val raise: Raise<Error>,
 ) : Raise<Error> by raise {
   @Suppress("UNCHECKED_CAST")
@@ -356,12 +357,12 @@ public class IorRaise<Error> @PublishedApi internal constructor(
       callsInPlace(block, InvocationKind.AT_MOST_ONCE)
       callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
     }
-    val state: Atomic<Any?> = Atomic(EmptyValue)
+    val state: AtomicReference<Any?> = AtomicReference(EmptyValue)
     return recover<Error, A>({
       try {
         block(IorRaise(combineError, state, this))
       } finally {
-        val accumulated = state.get()
+        val accumulated = state.load()
         if (accumulated != EmptyValue) {
           @Suppress("UNCHECKED_CAST")
           combine(accumulated as Error)

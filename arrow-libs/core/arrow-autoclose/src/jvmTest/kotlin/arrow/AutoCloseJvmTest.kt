@@ -1,14 +1,17 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow
 
-import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class AutoCloseJvmTest {
 
-  @Test
+  @Test @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
   fun blowTheAutoScopeOnFatal() = runTest {
     var wasActive = false
     val res = Resource()
@@ -49,10 +52,10 @@ class AutoCloseJvmTest {
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
-    fun isActive(): Boolean = isActive.get()
+    fun isActive(): Boolean = isActive.load()
 
     fun shutdown() {
-      require(isActive.compareAndSet(expected = true, new = false)) {
+      require(isActive.compareAndSet(expectedValue = true, newValue = false)) {
         "Already shut down"
       }
     }

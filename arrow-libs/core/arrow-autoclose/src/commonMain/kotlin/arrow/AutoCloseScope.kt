@@ -1,9 +1,9 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -94,14 +94,18 @@ public interface AutoCloseScope {
 
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {
-  private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())
+  private val finalizers = AtomicReference(emptyList<(Throwable?) -> Unit>())
 
   override fun onClose(release: (Throwable?) -> Unit) {
-    finalizers.update { it + release }
+    while (true) {
+      val old = finalizers.load()
+      val new = old + release
+      if (finalizers.compareAndSet(old, new)) return
+    }
   }
 
   fun close(error: Throwable?): Nothing? {
-    return finalizers.getAndSet(emptyList()).asReversed().fold(error) { acc, finalizer ->
+    return finalizers.exchange(emptyList()).asReversed().fold(error) { acc, finalizer ->
       acc.add(runCatching { finalizer(error) }.exceptionOrNull())
     }?.let { throw it }
   }

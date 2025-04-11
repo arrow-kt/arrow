@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.fx.coroutines.await
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
+import arrow.fx.coroutines.update
 import kotlinx.coroutines.async as coroutinesAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -11,6 +10,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.InternalForInheritanceCoroutinesApi
 import kotlinx.coroutines.awaitAll as coroutinesAwaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -73,7 +74,7 @@ public suspend fun <A> CoroutineScope.awaitAll(
 public class AwaitAllScope(
   private val scope: CoroutineScope
 ): CoroutineScope by scope {
-  private val tasks: Atomic<List<Deferred<*>>> = Atomic(emptyList())
+  private val tasks: AtomicReference<List<Deferred<*>>> = AtomicReference(emptyList())
 
   public fun <T> async(
     context: CoroutineContext = EmptyCoroutineContext,
@@ -90,7 +91,7 @@ public class AwaitAllScope(
     private val deferred: Deferred<T>
   ): Deferred<T> by deferred {
     override suspend fun await(): T {
-      tasks.getAndSet(emptyList()).coroutinesAwaitAll()
+      tasks.exchange(emptyList()).coroutinesAwaitAll()
       return deferred.await()
     }
   }

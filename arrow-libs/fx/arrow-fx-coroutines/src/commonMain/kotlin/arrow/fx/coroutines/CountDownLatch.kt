@@ -1,9 +1,10 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.loop
-import arrow.atomic.value
+import kotlin.concurrent.atomics.AtomicLong
 import kotlinx.coroutines.CompletableDeferred
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /**
  * [CountDownLatch] allows for awaiting a given number of countdown signals.
@@ -14,7 +15,7 @@ import kotlinx.coroutines.CompletableDeferred
  */
 public class CountDownLatch(private val initial: Long) {
   private val signal = CompletableDeferred<Unit>()
-  private val count = Atomic(initial)
+  private val count = AtomicLong(initial)
   
   init {
     require(initial > 0) {
@@ -23,17 +24,18 @@ public class CountDownLatch(private val initial: Long) {
   }
   
   /** Remaining count */
-  public fun count(): Long = count.value
+  public fun count(): Long = count.load()
   
   /** Await [count] to reach zero */
   public suspend fun await() {
-    if (count.value > 0L) signal.await()
+    if (count.load() > 0L) signal.await()
   }
   
   /** Decrement [count] by one */
   @Suppress("ReturnCount")
   public fun countDown() {
-    count.loop { current ->
+    while (true) {
+      val current = count.load()
       when {
         current == 0L -> return
         current == 1L && count.compareAndSet(1L, 0L) -> {
