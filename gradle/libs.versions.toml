@@ -15,13 +15,13 @@ ktor = "3.1.2"
 mockWebServer = "4.12.0"
 retrofit = "2.11.0"
 moshi = "1.15.2"
-spotlessVersion = "7.0.2"
+spotlessVersion = "7.0.3"
 composePlugin = "1.8.0-beta02"
 agp = "8.9.1"
 cache4k = "0.14.0"
 publish = "0.31.0"
 jacksonModuleKotlin = "2.18.3"
-shadow = "9.0.0-beta11"
+shadow = "9.0.0-beta12"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
