@@ -3,18 +3,20 @@ package arrow.integrations.jackson.module
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.getOrElse
-import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.json.PackageVersion
 import com.fasterxml.jackson.databind.BeanDescription
 import com.fasterxml.jackson.databind.BeanProperty
+import com.fasterxml.jackson.databind.DeserializationConfig
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.SerializationConfig
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer
+import com.fasterxml.jackson.databind.deser.Deserializers
+import com.fasterxml.jackson.databind.deser.ValueInstantiator
+import com.fasterxml.jackson.databind.deser.std.ReferenceTypeDeserializer
+import com.fasterxml.jackson.databind.jsontype.TypeDeserializer
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.Serializers
@@ -23,20 +25,16 @@ import com.fasterxml.jackson.databind.type.ReferenceType
 import com.fasterxml.jackson.databind.type.TypeBindings
 import com.fasterxml.jackson.databind.type.TypeFactory
 import com.fasterxml.jackson.databind.type.TypeModifier
-import com.fasterxml.jackson.databind.util.AccessPattern
 import com.fasterxml.jackson.databind.util.NameTransformer
 import java.lang.reflect.Type
 
 public object OptionModule :
   SimpleModule(OptionModule::class.java.canonicalName, PackageVersion.VERSION) {
 
-  init {
-    addDeserializer(Option::class.java, OptionDeserializer())
-  }
-
   override fun setupModule(context: SetupContext) {
     super.setupModule(context)
     context.addSerializers(OptionSerializerResolver)
+    context.addDeserializers(OptionDeserializerResolver)
     context.addTypeModifier(OptionTypeModifier)
   }
 }
@@ -48,12 +46,23 @@ public object OptionSerializerResolver : Serializers.Base() {
     beanDesc: BeanDescription?,
     contentTypeSerializer: TypeSerializer?,
     contentValueSerializer: JsonSerializer<Any>?,
-  ): JsonSerializer<*>? = if (Option::class.java.isAssignableFrom(type.rawClass)) {
-    val staticTyping =
-      (contentTypeSerializer == null && config.isEnabled(MapperFeature.USE_STATIC_TYPING))
-    OptionSerializer(type, staticTyping, contentTypeSerializer, contentValueSerializer)
-  } else {
-    null
+  ): JsonSerializer<*>? {
+    if (!Option::class.java.isAssignableFrom(type.rawClass)) return null
+    val staticTyping = contentTypeSerializer == null && config.isEnabled(MapperFeature.USE_STATIC_TYPING)
+    return OptionSerializer(type, staticTyping, contentTypeSerializer, contentValueSerializer)
+  }
+}
+
+public object OptionDeserializerResolver : Deserializers.Base() {
+  override fun findReferenceDeserializer(
+    type: ReferenceType,
+    config: DeserializationConfig,
+    beanDesc: BeanDescription?,
+    contentTypeDeserializer: TypeDeserializer?,
+    contentDeserializer: JsonDeserializer<*>?
+  ): JsonDeserializer<*>? {
+    if (!Option::class.java.isAssignableFrom(type.rawClass)) return null
+    return OptionDeserializer(type, null, contentTypeDeserializer, contentDeserializer)
   }
 }
 
@@ -113,41 +122,23 @@ public class OptionSerializer : ReferenceTypeSerializer<Option<*>> {
     vts: TypeSerializer?,
     valueSer: JsonSerializer<*>?,
     unwrapper: NameTransformer?,
-  ): ReferenceTypeSerializer<Option<*>> = OptionSerializer(this, prop, vts, valueSer, unwrapper, _suppressableValue, _suppressNulls)
+  ): ReferenceTypeSerializer<Option<*>> =
+    OptionSerializer(this, prop, vts, valueSer, unwrapper, _suppressableValue, _suppressNulls)
 }
 
-public class OptionDeserializer :
-  JsonDeserializer<Option<*>>(),
-  ContextualDeserializer {
-  private lateinit var valueType: JavaType
+public class OptionDeserializer : ReferenceTypeDeserializer<Option<*>> {
+  public constructor(
+    fullType: JavaType,
+    valueInstantiator: ValueInstantiator?,
+    typeDeserializer: TypeDeserializer?,
+    jsonDeserializer: JsonDeserializer<*>?
+  ) : super(fullType, valueInstantiator, typeDeserializer, jsonDeserializer)
 
-  override fun deserialize(p: JsonParser?, ctxt: DeserializationContext): Option<*> = Option.fromNullable(p).map { ctxt.readValue<Any>(it, valueType) }
+  override fun withResolved(typeDeser: TypeDeserializer?, valueDeser: JsonDeserializer<*>?): ReferenceTypeDeserializer<Option<*>> =
+    OptionDeserializer(valueType, null, typeDeser, valueDeser)
 
-  override fun createContextual(
-    ctxt: DeserializationContext,
-    property: BeanProperty?,
-  ): JsonDeserializer<*> {
-    val valueType =
-      Option.fromNullable(property)
-        .map { it.type.containedTypeOrUnknown(0) }
-        .or(Option.fromNullable(ctxt.contextualType?.containedTypeOrUnknown(0)))
-        .getOrElse { ctxt.constructType(Any::class.java) }
-
-    val deserializer = OptionDeserializer()
-    deserializer.valueType = valueType
-    return deserializer
-  }
-
-  private fun <A> Option<A>.or(other: Option<A>) = when (this) {
-    is Some<A> -> this
-    else -> other
-  }
-
-  override fun getNullValue(ctxt: DeserializationContext): Option<*> = None
-
-  override fun getEmptyValue(ctxt: DeserializationContext?): Option<*> = None
-
-  override fun getNullAccessPattern(): AccessPattern = AccessPattern.CONSTANT
-
-  override fun getEmptyAccessPattern(): AccessPattern = AccessPattern.CONSTANT
+  override fun getNullValue(ctxt: DeserializationContext?): Option<*> = None
+  override fun referenceValue(contents: Any): Option<*> = Some(contents)
+  override fun updateReference(reference: Option<*>, contents: Any): Option<*> = Some(contents)
+  override fun getReferenced(reference: Option<*>): Any? = reference.getOrNull()
 }
