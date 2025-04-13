@@ -16,8 +16,8 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
 import kotlin.test.Ignore
+import kotlin.test.Test
 
 class NonEmptyListModuleTest {
   private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()

@@ -5,7 +5,6 @@ import arrow.core.some
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.shouldBe
@@ -17,7 +16,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class OptionModuleTest {
   private val mapper = ObjectMapper().registerModule(OptionModule).registerKotlinModule()
@@ -77,25 +76,25 @@ class OptionModuleTest {
     }
   }
 
-  data class Foo(val value: Map<Key, Option<String>>) {
-    enum class Key { BAR, BAZ }
+  @Test
+  fun `works with Map, issue #131, part 1`() = runTest {
+    checkAll(arbMapContainer(Arb.option(Arb.someObject()))) { original ->
+      val serialized = mapper.writeValueAsString(original)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<MapContainer<Option<SomeObject>>>())
+      }
+      deserialized shouldBe original
+    }
   }
 
   @Test
-  fun `works with Map, issue #131, part 1`() {
-    val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
-    val original = Foo(mapOf(Foo.Key.BAR to "Hello".some()))
-    val json = mapper.writeValueAsString(original)
-    val deserialized = mapper.readValue<Foo>(json)
-    deserialized shouldBe original
-  }
-
-  @Test
-  fun `works with Map, issue #131, part 2`() {
-    val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
-    val original: Map<String, Option<Foo.Key>> = mapOf("foo" to Foo.Key.BAR.some())
-    val json = mapper.writeValueAsString(original)
-    val deserialized = mapper.readValue<Map<String, Option<Foo.Key>>>(json)
-    deserialized shouldBe original
+  fun `works with Map, issue #131, part 2`() = runTest {
+    checkAll(arbMapContainer(Arb.option(Arb.someObject()))) { original ->
+      val serialized = mapper.writeValueAsString(original.value)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<Map<MapContainer.Key, Option<SomeObject>>>())
+      }
+      deserialized shouldBe original.value
+    }
   }
 }
