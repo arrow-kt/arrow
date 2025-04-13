@@ -59,7 +59,7 @@ public object OptionDeserializerResolver : Deserializers.Base() {
     config: DeserializationConfig,
     beanDesc: BeanDescription?,
     contentTypeDeserializer: TypeDeserializer?,
-    contentDeserializer: JsonDeserializer<*>?
+    contentDeserializer: JsonDeserializer<*>?,
   ): JsonDeserializer<*>? {
     if (!Option::class.java.isAssignableFrom(type.rawClass)) return null
     return OptionDeserializer(type, null, contentTypeDeserializer, contentDeserializer)
@@ -122,8 +122,7 @@ public class OptionSerializer : ReferenceTypeSerializer<Option<*>> {
     vts: TypeSerializer?,
     valueSer: JsonSerializer<*>?,
     unwrapper: NameTransformer?,
-  ): ReferenceTypeSerializer<Option<*>> =
-    OptionSerializer(this, prop, vts, valueSer, unwrapper, _suppressableValue, _suppressNulls)
+  ): ReferenceTypeSerializer<Option<*>> = OptionSerializer(this, prop, vts, valueSer, unwrapper, _suppressableValue, _suppressNulls)
 }
 
 public class OptionDeserializer : ReferenceTypeDeserializer<Option<*>> {
@@ -131,11 +130,10 @@ public class OptionDeserializer : ReferenceTypeDeserializer<Option<*>> {
     fullType: JavaType,
     valueInstantiator: ValueInstantiator?,
     typeDeserializer: TypeDeserializer?,
-    jsonDeserializer: JsonDeserializer<*>?
+    jsonDeserializer: JsonDeserializer<*>?,
   ) : super(fullType, valueInstantiator, typeDeserializer, jsonDeserializer)
 
-  override fun withResolved(typeDeser: TypeDeserializer?, valueDeser: JsonDeserializer<*>?): ReferenceTypeDeserializer<Option<*>> =
-    OptionDeserializer(valueType, null, typeDeser, valueDeser)
+  override fun withResolved(typeDeser: TypeDeserializer?, valueDeser: JsonDeserializer<*>?): ReferenceTypeDeserializer<Option<*>> = OptionDeserializer(valueType, null, typeDeser, valueDeser)
 
   override fun getNullValue(ctxt: DeserializationContext?): Option<*> = None
   override fun referenceValue(contents: Any): Option<*> = Some(contents)
