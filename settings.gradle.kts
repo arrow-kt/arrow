@@ -68,6 +68,9 @@ project(":arrow-functions").projectDir = file("arrow-libs/core/arrow-functions")
 include("arrow-core-high-arity")
 project(":arrow-core-high-arity").projectDir = file("arrow-libs/core/arrow-core-high-arity")
 
+include("arrow-raise-contextual")
+project(":arrow-raise-contextual").projectDir = file("arrow-libs/core/arrow-raise-contextual")
+
 include("arrow-atomic")
 project(":arrow-atomic").projectDir = file("arrow-libs/core/arrow-atomic")
 
