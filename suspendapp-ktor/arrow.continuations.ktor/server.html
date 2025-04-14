@@ -1,0 +1,114 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>server</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../index.html">
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":suspendapp-ktor/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":suspendapp-ktor/commonMain" data-filter=":suspendapp-ktor/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="member" id="content" pageids="suspendapp-ktor::arrow.continuations.ktor//server/arrow.fx.coroutines.ResourceScope#io.ktor.server.engine.ApplicationEngineFactory[TypeParam(bounds=[io.ktor.server.engine.ApplicationEngine]),TypeParam(bounds=[io.ktor.server.engine.ApplicationEngine.Configuration])]#kotlin.Int#kotlin.String#kotlin.collections.List[kotlin.String]#kotlin.time.Duration#kotlin.time.Duration#kotlin.time.Duration#kotlin.Function1[io.ktor.server.application.Application,kotlin.Unit]/PointingToDeclaration//-191818131">
+  <div class="breadcrumbs"><a href="../index.html">suspendapp-ktor</a><span class="delimiter">/</span><a href="index.html">arrow.continuations.ktor</a><span class="delimiter">/</span><span class="current">server</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>server</span></span></h1>
+  </div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":suspendapp-ktor/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="server.html">TEngine</a><span class="token operator"> : </span><span data-unresolved-link="io.ktor.server.engine/ApplicationEngine///PointingToDeclaration/">ApplicationEngine</span><span class="token punctuation">, </span><a href="server.html">TConfiguration</a><span class="token operator"> : </span><span data-unresolved-link="io.ktor.server.engine/ApplicationEngine.Configuration///PointingToDeclaration/">ApplicationEngine.Configuration</span><span class="token operator">&gt; </span><a href="../../arrow-fx-coroutines/arrow.fx.coroutines/-resource-scope/index.html">ResourceScope</a><span class="token punctuation">.</span><a href="server.html"><span class="token function">server</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">factory<span class="token operator">: </span><span data-unresolved-link="io.ktor.server.engine/ApplicationEngineFactory///PointingToDeclaration/">ApplicationEngineFactory</span><span class="token operator">&lt;</span><a href="server.html">TEngine</a><span class="token punctuation">, </span><a href="server.html">TConfiguration</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">port<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">80</span><span class="token punctuation">, </span></span><span class="parameter ">host<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">"0.0.0.0"</span><span class="token punctuation">, </span></span><span class="parameter ">watchPaths<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator"> = </span>listOf(WORKING_DIRECTORY_PATH)<span class="token punctuation">, </span></span><span class="parameter ">preWait<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>30.seconds<span class="token punctuation">, </span></span><span class="parameter ">grace<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>500.milliseconds<span class="token punctuation">, </span></span><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>500.milliseconds<span class="token punctuation">, </span></span><span class="parameter ">module<span class="token operator">: </span><span data-unresolved-link="io.ktor.server.application/Application///PointingToDeclaration/">Application</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.ktor.server.engine/EmbeddedServer///PointingToDeclaration/">EmbeddedServer</span><span class="token operator">&lt;</span><a href="server.html">TEngine</a><span class="token punctuation">, </span><a href="server.html">TConfiguration</a><span class="token operator">&gt;</span></div><p class="paragraph">Ktor <span data-unresolved-link="io.ktor.server.engine/ApplicationEngine///PointingToDeclaration/">ApplicationEngine</span> as a <a href="../../arrow-fx-coroutines/arrow.fx.coroutines/-resource/index.html">Resource</a>. This <a href="../../arrow-fx-coroutines/arrow.fx.coroutines/-resource/index.html">Resource</a> will gracefully shut down the server When we need to shut down a Ktor service we need to properly take into account a <i>grace</i> period where we still handle requests instead of immediately cancelling any in-flight requests.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>factory</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Application engine for processing the requests</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>port</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Server listening port. Default is set to 80</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>host</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Host address. Default is set to "0.0.0.0"</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>watch</span><wbr><span><span>Paths</span></span></u></div></span></div><div><div class="title"><p class="paragraph">specifies path substrings that will be watched for automatic reloading</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>pre</span><wbr><span><span>Wait</span></span></u></div></span></div><div><div class="title"><p class="paragraph">preWait a duration to wait before beginning the stop process. During this time, requests will continue to be accepted. This setting is useful to allow time for the container to be removed from the load balancer. This is disabled when <code class="lang-kotlin">io.ktor.development=true</code>.</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>grace</span></span></u></div></span></div><div><div class="title"><p class="paragraph">grace a duration during which already inflight requests are allowed to continue before the shutdown process begins.</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>timeout</span></span></u></div></span></div><div><div class="title"><p class="paragraph">timeout a duration after which the server will be forcibly shutdown.</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>module</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Represents configured and running web application, capable of handling requests.</p></div></div></div></div></div><hr><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="server.html">TEngine</a><span class="token operator"> : </span><span data-unresolved-link="io.ktor.server.engine/ApplicationEngine///PointingToDeclaration/">ApplicationEngine</span><span class="token punctuation">, </span><a href="server.html">TConfiguration</a><span class="token operator"> : </span><span data-unresolved-link="io.ktor.server.engine/ApplicationEngine.Configuration///PointingToDeclaration/">ApplicationEngine.Configuration</span><span class="token operator">&gt; </span><a href="../../arrow-fx-coroutines/arrow.fx.coroutines/-resource-scope/index.html">ResourceScope</a><span class="token punctuation">.</span><a href="server.html"><span class="token function">server</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">factory<span class="token operator">: </span><span data-unresolved-link="io.ktor.server.engine/ApplicationEngineFactory///PointingToDeclaration/">ApplicationEngineFactory</span><span class="token operator">&lt;</span><a href="server.html">TEngine</a><span class="token punctuation">, </span><a href="server.html">TConfiguration</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">rootConfig<span class="token operator">: </span><span data-unresolved-link="io.ktor.server.application/ServerConfig///PointingToDeclaration/">ServerConfig</span><span class="token punctuation">, </span></span><span class="parameter ">configure<span class="token operator">: </span><a href="server.html">TConfiguration</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">preWait<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>30.seconds<span class="token punctuation">, </span></span><span class="parameter ">grace<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>500.milliseconds<span class="token punctuation">, </span></span><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>500.milliseconds</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.ktor.server.engine/EmbeddedServer///PointingToDeclaration/">EmbeddedServer</span><span class="token operator">&lt;</span><a href="server.html">TEngine</a><span class="token punctuation">, </span><a href="server.html">TConfiguration</a><span class="token operator">&gt;</span></div><p class="paragraph">Ktor <span data-unresolved-link="io.ktor.server.engine/ApplicationEngine///PointingToDeclaration/">ApplicationEngine</span> as a <a href="../../arrow-fx-coroutines/arrow.fx.coroutines/-resource/index.html">Resource</a>. This <a href="../../arrow-fx-coroutines/arrow.fx.coroutines/-resource/index.html">Resource</a> will gracefully shut down the server When we need to shut down a Ktor service we need to properly take into account a <i>grace</i> period where we still handle requests instead of immediately cancelling any in-flight requests.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>factory</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Application engine for processing the requests</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>root</span><wbr><span><span>Config</span></span></u></div></span></div><div><div class="title"><p class="paragraph">definition of the core configuration of the server, including modules, paths, and environment details.</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>pre</span><wbr><span><span>Wait</span></span></u></div></span></div><div><div class="title"><p class="paragraph">preWait a duration to wait before beginning the stop process. During this time, requests will continue to be accepted. This setting is useful to allow time for the container to be removed from the load balancer. This is disabled when <code class="lang-kotlin">io.ktor.development=true</code>.</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>grace</span></span></u></div></span></div><div><div class="title"><p class="paragraph">grace a duration during which already inflight requests are allowed to continue before the shutdown process begins.</p></div></div></div></div><div class="table-row" data-filterable-current=":suspendapp-ktor/commonMain" data-filterable-set=":suspendapp-ktor/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>timeout</span></span></u></div></span></div><div><div class="title"><p class="paragraph">timeout a duration after which the server will be forcibly shutdown.</p></div></div></div></div></div></div></div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

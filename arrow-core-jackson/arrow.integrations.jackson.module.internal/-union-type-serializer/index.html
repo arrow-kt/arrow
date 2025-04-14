@@ -1,0 +1,390 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>UnionTypeSerializer</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../index.html">
+                    Arrow
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">2.1.0
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-core-jackson/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core-jackson/main" data-filter=":arrow-core-jackson/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    Arrow
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core-jackson::arrow.integrations.jackson.module.internal/UnionTypeSerializer///PointingToDeclaration//-1167666519">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-core-jackson</a><span class="delimiter">/</span><a href="../index.html">arrow.integrations.jackson.module.internal</a><span class="delimiter">/</span><span class="current">UnionTypeSerializer</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Union</span><wbr><span>Type</span><wbr><span><span>Serializer</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">UnionTypeSerializer</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">clazz<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">fields<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-project-field/index.html">UnionTypeSerializer.ProjectField</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="com.fasterxml.jackson.databind.ser.std/StdSerializer///PointingToDeclaration/">StdSerializer</span><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-1378843900%2FConstructors%2F-1167666519" anchor-label="UnionTypeSerializer" id="-1378843900%2FConstructors%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-union-type-serializer.html"><span>Union</span><wbr><span>Type</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1378843900%2FConstructors%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">clazz<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">fields<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-project-field/index.html">UnionTypeSerializer.ProjectField</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="">Types</h2>
+        <div class="table"><a data-name="291349416%2FClasslikes%2F-1167666519" anchor-label="ProjectField" id="291349416%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-project-field/index.html"><span>Project</span><wbr><span><span>Field</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="291349416%2FClasslikes%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-project-field/index.html">ProjectField</a><span class="token operator">&lt;</span><a href="-project-field/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>fieldName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>getOption<span class="token operator">: </span><span class="token punctuation">(</span><a href="-project-field/index.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../arrow-core/arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="210996690%2FProperties%2F-1167666519" anchor-label="delegatee" id="210996690%2FProperties%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#210996690%2FProperties%2F-1167666519"><span><span>delegatee</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="210996690%2FProperties%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#210996690%2FProperties%2F-1167666519">delegatee</a><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonSerializer///PointingToDeclaration/">JsonSerializer</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2117148841%2FProperties%2F-1167666519" anchor-label="isUnwrappingSerializer" id="-2117148841%2FProperties%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-2117148841%2FProperties%2F-1167666519"><span>is</span><wbr><span>Unwrapping</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2117148841%2FProperties%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-2117148841%2FProperties%2F-1167666519">isUnwrappingSerializer</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="499670500%2FFunctions%2F-1167666519" anchor-label="acceptJsonFormatVisitor" id="499670500%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#499670500%2FFunctions%2F-1167666519"><span>accept</span><wbr><span>Json</span><wbr><span>Format</span><wbr><span><span>Visitor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="499670500%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#499670500%2FFunctions%2F-1167666519"><span class="token function">acceptJsonFormatVisitor</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind.jsonFormatVisitors/JsonFormatVisitorWrapper///PointingToDeclaration/">JsonFormatVisitorWrapper</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JavaType///PointingToDeclaration/">JavaType</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1069308456%2FFunctions%2F-1167666519" anchor-label="getSchema" id="-1069308456%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1341349473%2FFunctions%2F-1167666519"><span>get</span><wbr><span><span>Schema</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1069308456%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1341349473%2FFunctions%2F-1167666519"><span class="token function"><strike>getSchema</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/reflect/Type.html">Type</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonNode///PointingToDeclaration/">JsonNode</span><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1844617221%2FFunctions%2F-1167666519"><span class="token function"><strike>getSchema</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/reflect/Type.html">Type</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p2<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonNode///PointingToDeclaration/">JsonNode</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1363687484%2FFunctions%2F-1167666519" anchor-label="handledType" id="1363687484%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1363687484%2FFunctions%2F-1167666519"><span>handled</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1363687484%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1363687484%2FFunctions%2F-1167666519"><span class="token function">handledType</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1598015541%2FFunctions%2F-1167666519" anchor-label="isEmpty" id="-1598015541%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1758993244%2FFunctions%2F-1167666519"><span>is</span><wbr><span><span>Empty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1598015541%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1758993244%2FFunctions%2F-1167666519"><span class="token function"><strike>isEmpty</strike></span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="index.html">T</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-187332101%2FFunctions%2F-1167666519"><span class="token function">isEmpty</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="index.html">T</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-930927883%2FFunctions%2F-1167666519" anchor-label="properties" id="-930927883%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-930927883%2FFunctions%2F-1167666519"><span><span>properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-930927883%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-930927883%2FFunctions%2F-1167666519"><span class="token function">properties</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterator/index.html">Iterator</a><span class="token operator">&lt;</span><span data-unresolved-link="com.fasterxml.jackson.databind.ser/PropertyWriter///PointingToDeclaration/">PropertyWriter</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1411538727%2FFunctions%2F-1167666519" anchor-label="replaceDelegatee" id="1411538727%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1411538727%2FFunctions%2F-1167666519"><span>replace</span><wbr><span><span>Delegatee</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1411538727%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1411538727%2FFunctions%2F-1167666519"><span class="token function">replaceDelegatee</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonSerializer///PointingToDeclaration/">JsonSerializer</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonSerializer///PointingToDeclaration/">JsonSerializer</span><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="942171172%2FFunctions%2F-1167666519" anchor-label="serialize" id="942171172%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="serialize.html"><span><span>serialize</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="942171172%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="serialize.html"><span class="token function">serialize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="index.html">T</a><span class="token punctuation">, </span></span><span class="parameter ">gen<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.core/JsonGenerator///PointingToDeclaration/">JsonGenerator</span><span class="token punctuation">, </span></span><span class="parameter ">provider<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1791535223%2FFunctions%2F-1167666519" anchor-label="serializeWithType" id="-1791535223%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1791535223%2FFunctions%2F-1167666519"><span>serialize</span><wbr><span>With</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1791535223%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1791535223%2FFunctions%2F-1167666519"><span class="token function">serializeWithType</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="index.html">T</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.core/JsonGenerator///PointingToDeclaration/">JsonGenerator</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p2<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p3<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind.jsontype/TypeSerializer///PointingToDeclaration/">TypeSerializer</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="40759296%2FFunctions%2F-1167666519" anchor-label="unwrappingSerializer" id="40759296%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#40759296%2FFunctions%2F-1167666519"><span>unwrapping</span><wbr><span><span>Serializer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="40759296%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#40759296%2FFunctions%2F-1167666519"><span class="token function">unwrappingSerializer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind.util/NameTransformer///PointingToDeclaration/">NameTransformer</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonSerializer///PointingToDeclaration/">JsonSerializer</span><span class="token operator">&lt;</span><a href="index.html">T</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-586728414%2FFunctions%2F-1167666519" anchor-label="usesObjectId" id="-586728414%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-586728414%2FFunctions%2F-1167666519"><span>uses</span><wbr><span>Object</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-586728414%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-586728414%2FFunctions%2F-1167666519"><span class="token function">usesObjectId</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="5275344%2FFunctions%2F-1167666519" anchor-label="withFilterId" id="5275344%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#5275344%2FFunctions%2F-1167666519"><span>with</span><wbr><span>Filter</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="5275344%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#5275344%2FFunctions%2F-1167666519"><span class="token function">withFilterId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonSerializer///PointingToDeclaration/">JsonSerializer</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="510314235%2FFunctions%2F-1167666519" anchor-label="withIgnoredProperties" id="510314235%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#510314235%2FFunctions%2F-1167666519"><span>with</span><wbr><span>Ignored</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="510314235%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#510314235%2FFunctions%2F-1167666519"><span class="token function">withIgnoredProperties</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/JsonSerializer///PointingToDeclaration/">JsonSerializer</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="768586362%2FFunctions%2F-1167666519" anchor-label="wrapAndThrow" id="768586362%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#548672058%2FFunctions%2F-1167666519"><span>wrap</span><wbr><span>And</span><wbr><span><span>Throw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="768586362%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#548672058%2FFunctions%2F-1167666519"><span class="token function">wrapAndThrow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p2<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p3<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#771613416%2FFunctions%2F-1167666519"><span class="token function">wrapAndThrow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p0<span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/SerializerProvider///PointingToDeclaration/">SerializerProvider</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p1<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p2<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">p3<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -23,6 +23,9 @@ arrow.core.raise
 module:arrow-core-high-arity
 arrow.core
 arrow.core.raise
+module:arrow-core-jackson
+arrow.integrations.jackson.module
+arrow.integrations.jackson.module.internal
 module:arrow-core-retrofit
 arrow.retrofit.adapter.either
 arrow.retrofit.adapter.either.networkhandling
@@ -51,5 +54,13 @@ arrow.optics
 module:arrow-platform
 arrow.platform
 arrow.platform.test
+module:arrow-raise-ktor-server
+arrow.raise.ktor.server
 module:arrow-resilience
 arrow.resilience
+module:arrow-resilience-ktor-client
+arrow.resilience.ktor.client
+module:suspendapp
+arrow.continuations
+module:suspendapp-ktor
+arrow.continuations.ktor

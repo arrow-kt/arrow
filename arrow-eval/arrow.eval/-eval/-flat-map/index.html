@@ -41,7 +41,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.0.1
+        <div class="library-version" id="library-version">2.1.0
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
@@ -94,7 +94,7 @@
   <div class="breadcrumbs"><a href="../../../index.html">arrow-eval</a><span class="delimiter">/</span><a href="../../index.html">arrow.eval</a><span class="delimiter">/</span><a href="../index.html">Eval</a><span class="delimiter">/</span><span class="current">FlatMap</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Flat</span><wbr><span><span>Map</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">FlatMap</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span> : <a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt; </span></div><p class="paragraph">FlatMap is a type of Eval<a> that is used to chain computations involving .map and .flatMap. Along with Eval#flatMap. It implements the trampoline that guarantees stack-safety.</a></p><p class="paragraph"><a>Users should not instantiate FlatMap instances themselves. Instead, they will be automatically created when needed.</a></p><p class="paragraph"><a>Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly more efficient implementation of the .value method.</a></p></div></div><a>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">FlatMap</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span> : <a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt; </span>, <a href="../../-suspend-eval/-abstract-flat-map/index.html">SuspendEval.AbstractFlatMap</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt; </span></div><p class="paragraph">FlatMap is a type of Eval<a> that is used to chain computations involving .map and .flatMap. Along with Eval#flatMap. It implements the trampoline that guarantees stack-safety.</a></p><p class="paragraph"><a>Users should not instantiate FlatMap instances themselves. Instead, they will be automatically created when needed.</a></p><p class="paragraph"><a>Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly more efficient implementation of the .value method.</a></p></div></div><a>
   </a></div><a>
   </a><div class="tabbedcontent"><a>
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
@@ -150,6 +150,21 @@
               </div>
             </div>
           </div>
+<a data-name="-1071408497%2FFunctions%2F-62971413" anchor-label="flatMapSuspend" id="-1071408497%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval/commonMain" data-filterable-set=":arrow-eval/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-suspend-eval/flat-map-suspend.html"><span>flat</span><wbr><span>Map</span><wbr><span><span>Suspend</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1071408497%2FFunctions%2F-62971413"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../-suspend-eval/flat-map-suspend.html">B</a><span class="token operator">&gt; </span><a href="../../-suspend-eval/flat-map-suspend.html"><span class="token function">flatMapSuspend</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../-suspend-eval/index.html">SuspendEval</a><span class="token operator">&lt;</span><a href="../../../../arrow-eval/arrow.eval/-eval/-flat-map/flat-map-suspend.html">B</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../-suspend-eval/index.html">SuspendEval</a><span class="token operator">&lt;</span><a href="../../../../arrow-eval/arrow.eval/-eval/-flat-map/flat-map-suspend.html">B</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="967917280%2FFunctions%2F-62971413" anchor-label="invoke" id="967917280%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
           <div class="table-row" data-filterable-current=":arrow-eval/commonMain" data-filterable-set=":arrow-eval/commonMain">
             <div class="main-subrow keyValue ">
@@ -176,6 +191,21 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map.html">B</a><span class="token operator">&gt; </span><a href="../map.html"><span class="token function">map</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">crossinline </span>f<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../../arrow-eval/arrow.eval/-eval/-flat-map/map.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="../../../../arrow-eval/arrow.eval/-eval/-flat-map/map.html">B</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1535677967%2FFunctions%2F-62971413" anchor-label="mapSuspend" id="-1535677967%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval/commonMain" data-filterable-set=":arrow-eval/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../-suspend-eval/map-suspend.html"><span>map</span><wbr><span><span>Suspend</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1535677967%2FFunctions%2F-62971413"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../-suspend-eval/map-suspend.html">B</a><span class="token operator">&gt; </span><a href="../../-suspend-eval/map-suspend.html"><span class="token function">mapSuspend</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../../arrow-eval/arrow.eval/-eval/-flat-map/map-suspend.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../-suspend-eval/index.html">SuspendEval</a><span class="token operator">&lt;</span><a href="../../../../arrow-eval/arrow.eval/-eval/-flat-map/map-suspend.html">B</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -210,17 +240,32 @@
               </div>
             </div>
           </div>
-<a data-name="-944277028%2FFunctions%2F-62971413" anchor-label="run" id="-944277028%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
+<a data-name="-820027097%2FFunctions%2F-62971413" anchor-label="run" id="-820027097%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
           <div class="table-row" data-filterable-current=":arrow-eval/commonMain" data-filterable-set=":arrow-eval/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="run.html"><span><span>run</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-944277028%2FFunctions%2F-62971413"></span>
+                  <div><a href="../run.html"><span><span>run</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-820027097%2FFunctions%2F-62971413"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="run.html">S</a><span class="token operator">&gt; </span><a href="run.html"><span class="token function">run</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><a href="run.html">S</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../run.html"><span class="token function">run</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">A</a></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="run.html">S</a><span class="token operator">&gt; </span><a href="run.html"><span class="token function">run</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><a href="run.html">S</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="481867554%2FFunctions%2F-62971413" anchor-label="runSuspend" id="481867554%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval/commonMain" data-filterable-set=":arrow-eval/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="run-suspend.html"><span>run</span><wbr><span><span>Suspend</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="481867554%2FFunctions%2F-62971413"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="run-suspend.html">S</a><span class="token operator">&gt; </span><a href="run-suspend.html"><span class="token function">runSuspend</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><a href="run-suspend.html">S</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -236,6 +281,21 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="start.html">S</a><span class="token operator">&gt; </span><a href="start.html"><span class="token function">start</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="start.html">S</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1086340403%2FFunctions%2F-62971413" anchor-label="startSuspend" id="1086340403%2FFunctions%2F-62971413" data-filterable-set=":arrow-eval/commonMain"></a>
+          <div class="table-row" data-filterable-current=":arrow-eval/commonMain" data-filterable-set=":arrow-eval/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="start-suspend.html"><span>start</span><wbr><span><span>Suspend</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1086340403%2FFunctions%2F-62971413"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-eval/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="start-suspend.html">S</a><span class="token operator">&gt; </span><a href="start-suspend.html"><span class="token function">startSuspend</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">Eval</a><span class="token operator">&lt;</span><a href="start-suspend.html">S</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
