@@ -6,6 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -164,4 +165,26 @@ class EitherModuleTest {
   }
 
   private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
+
+  @Test
+  fun `works with Map, issue #131, part 1`() = runTest {
+    checkAll(arbMapContainer(Arb.either(arbFoo, arbBar))) { original ->
+      val serialized = mapper.writeValueAsString(original)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<MapContainer<Either<Foo, Bar>>>())
+      }
+      deserialized shouldBe original
+    }
+  }
+
+  @Test
+  fun `works with Map, issue #131, part 2`() = runTest {
+    checkAll(arbMapContainer(Arb.either(arbFoo, arbBar))) { original ->
+      val serialized = mapper.writeValueAsString(original.value)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<Map<MapContainer.Key, Either<Foo, Bar>>>())
+      }
+      deserialized shouldBe original.value
+    }
+  }
 }

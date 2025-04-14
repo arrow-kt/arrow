@@ -16,7 +16,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class OptionModuleTest {
   private val mapper = ObjectMapper().registerModule(OptionModule).registerKotlinModule()
@@ -73,6 +73,28 @@ class OptionModuleTest {
       val serialized = mapper.writeValueAsString(original)
       val deserialized = shouldNotThrowAny { mapper.readValue(serialized, Option::class.java) }
       deserialized shouldBe original
+    }
+  }
+
+  @Test
+  fun `works with Map, issue #131, part 1`() = runTest {
+    checkAll(arbMapContainer(Arb.option(Arb.someObject()))) { original ->
+      val serialized = mapper.writeValueAsString(original)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<MapContainer<Option<SomeObject>>>())
+      }
+      deserialized shouldBe original
+    }
+  }
+
+  @Test
+  fun `works with Map, issue #131, part 2`() = runTest {
+    checkAll(arbMapContainer(Arb.option(Arb.someObject()))) { original ->
+      val serialized = mapper.writeValueAsString(original.value)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<Map<MapContainer.Key, Option<SomeObject>>>())
+      }
+      deserialized shouldBe original.value
     }
   }
 }
