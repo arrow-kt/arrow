@@ -6,7 +6,7 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        api(projects.arrowAtomic)
+        // api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
       }
     }

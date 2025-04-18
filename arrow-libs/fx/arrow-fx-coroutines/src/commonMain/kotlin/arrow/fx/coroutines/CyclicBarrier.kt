@@ -1,11 +1,12 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.loop
-import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
+import kotlin.concurrent.atomics.AtomicReference
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /**
  * A [CyclicBarrier] is a synchronization mechanism that allows a set of coroutines to wait for each other
@@ -46,14 +47,14 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     val unblock: CompletableDeferred<Unit>
   ) : State
 
-  private val state: Atomic<State> = Atomic(Awaiting(capacity, 0, CompletableDeferred()))
+  private val state: AtomicReference<State> = AtomicReference(Awaiting(capacity, 0, CompletableDeferred()))
 
   /**
    * When called, all waiting coroutines will be cancelled with [CancellationException].
    * When all coroutines have been cancelled the barrier will cycle.
    */
   public suspend fun reset() {
-    when (val original = state.get()) {
+    when (val original = state.load()) {
       is Awaiting -> {
         val resetBarrier = CompletableDeferred<Unit>()
         if (state.compareAndSet(original, Resetting(original.awaitingNow, original.epoch, resetBarrier))) {
@@ -83,7 +84,8 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
    * Once the [capacity] of the barrier has been reached, the coroutine will be released and continue execution.
    */
   public suspend fun await() {
-    state.loop { state ->
+    while(true) {
+      val state = state.load()
       when (state) {
         is Awaiting -> {
           val (awaiting, epoch, unblock) = state
@@ -126,7 +128,8 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
   }
 
   private fun countdown(original: Awaiting, ex: CyclicBarrierCancellationException): Boolean {
-    state.loop { state ->
+    while (true) {
+      val state = state.load()
       when (state) {
         is Resetting -> {
           val awaitingNow = state.awaitingNow + 1

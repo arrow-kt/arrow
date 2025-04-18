@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.resilience
 
-import arrow.atomic.Atomic
 import arrow.core.Either
 import arrow.core.identity
 import arrow.core.left
@@ -15,6 +14,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -135,7 +136,7 @@ import kotlin.time.TimeSource
 
 public class CircuitBreaker
 private constructor(
-  private val state: Atomic<State>,
+  private val state: AtomicReference<State>,
   private val resetTimeout: Duration,
   private val exponentialBackoffFactor: Double,
   private val maxResetTimeout: Duration,
@@ -147,7 +148,7 @@ private constructor(
 ) {
 
   /** Returns the current [State], meant for debugging purposes.*/
-  public suspend fun state(): State = state.get()
+  public suspend fun state(): State = state.load()
 
   /**
    * Awaits for this `CircuitBreaker` to be [Closed].
@@ -156,7 +157,7 @@ private constructor(
    * otherwise it will wait (asynchronously) until the `CircuitBreaker` switches to the [Closed] state again.
    */
   public suspend fun awaitClose(): Unit =
-    when (val curr = state.get()) {
+    when (val curr = state.load()) {
       is Closed -> Unit
       is Open -> curr.awaitClose.await()
       is HalfOpen -> curr.awaitClose.await()
@@ -185,7 +186,7 @@ private constructor(
     contract {
       callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
     }
-    return when (val curr = state.get()) {
+    return when (val curr = state.load()) {
       is Closed -> {
         // This is markOrResetFailures(Either.catch { fa() }), but inlined to make the compiler happy with the contract
         try {
@@ -220,11 +221,11 @@ private constructor(
 
   /** Function for counting failures in the `Closed` state, triggering the `Open` state if necessary.*/
   private tailrec suspend fun <A> markOrResetFailures(result: Either<Throwable, A>): A =
-    when (val curr = state.get()) {
+    when (val curr = state.load()) {
       is Closed -> {
         when (result) {
           is Either.Right -> {
-            val openingStrategy = state.get().openingStrategy
+            val openingStrategy = state.load().openingStrategy
             if (openingStrategy is OpeningStrategy.Count && openingStrategy.failuresCount == 0)
               result.value
             else {
@@ -277,17 +278,17 @@ private constructor(
       task.invoke()
     } catch (e: CancellationException) {
       // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
-      state.set(Open(state.get().openingStrategy, lastStartedAt, resetTimeout, awaitClose))
+      state.store(Open(state.load().openingStrategy, lastStartedAt, resetTimeout, awaitClose))
       onOpenAndThrow(e)
     } catch (e: Throwable) {
       // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
       val value: Duration = (resetTimeout * exponentialBackoffFactor)
       val nextTimeout = if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout else value
-      state.set(Open(state.get().openingStrategy, timeSource.markNow(), nextTimeout, awaitClose))
+      state.store(Open(state.load().openingStrategy, timeSource.markNow(), nextTimeout, awaitClose))
       onOpenAndThrow(e)
     }.also {
       // While in HalfOpen only a reset attempt is allowed to update the state, so setting this directly is safe
-      state.set(Closed(state.get().openingStrategy.resetFailuresCount()))
+      state.store(Closed(state.load().openingStrategy.resetFailuresCount()))
       awaitClose.complete(Unit)
       onClosed.invoke()
     }
@@ -552,7 +553,7 @@ private constructor(
         "maxResetTimeout expected to be greater than ${Duration.ZERO}, but was $maxResetTimeout"
       }
       return CircuitBreaker(
-        state = Atomic(Closed(openingStrategy)),
+        state = AtomicReference(Closed(openingStrategy)),
         resetTimeout = resetTimeout,
         exponentialBackoffFactor = exponentialBackoffFactor,
         maxResetTimeout = maxResetTimeout,

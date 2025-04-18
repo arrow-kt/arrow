@@ -1,10 +1,8 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.fx.coroutines
 
 import arrow.AutoCloseScope
-import arrow.atomic.Atomic
-import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,6 +11,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -475,14 +475,14 @@ public suspend fun <A> Resource<A>.allocate(): Pair<A, suspend (ExitCase) -> Uni
 }
 
 internal class ResourceScopeImpl : ResourceScope {
-  private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList())
+  private val finalizers: AtomicReference<List<suspend (ExitCase) -> Unit>> = AtomicReference(emptyList())
   override fun onRelease(release: suspend (ExitCase) -> Unit) {
     finalizers.update(release::prependTo)
   }
 
   suspend fun cancelAll(exitCase: ExitCase) {
     withContext(NonCancellable) {
-      finalizers.getAndSet(emptyList()).fold(exitCase.errorOrNull) { acc, finalizer ->
+      finalizers.exchange(emptyList()).fold(exitCase.errorOrNull) { acc, finalizer ->
         acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
       }
     }?.let { throw it }

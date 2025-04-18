@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
@@ -11,13 +12,15 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class ResourceAutoCloseTest {
 
   class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
-    override fun close() = didClose.set(true)
+    override fun close() = didClose.store(true)
   }
 
   @Test
@@ -27,7 +30,7 @@ class ResourceAutoCloseTest {
       autoCloseable { t }
     }
 
-    t.didClose.get() shouldBe true
+    t.didClose.load() shouldBe true
   }
 
   @Test
@@ -42,7 +45,7 @@ class ResourceAutoCloseTest {
         }
       } shouldBe throwable
 
-      t.didClose.get() shouldBe true
+      t.didClose.load() shouldBe true
     }
   }
 
@@ -71,7 +74,7 @@ class ResourceAutoCloseTest {
     cancelled.complete(Unit)
     job.join()
 
-    t.didClose.get() shouldBe true
+    t.didClose.load() shouldBe true
     exit.shouldHaveCompleted()
       .shouldBeTypeOf<ExitCase.Cancelled>()
       .exception

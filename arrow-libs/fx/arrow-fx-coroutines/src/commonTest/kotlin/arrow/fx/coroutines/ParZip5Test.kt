@@ -1,8 +1,7 @@
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package arrow.fx.coroutines
 
-import arrow.atomic.Atomic
-import arrow.atomic.update
-import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple5
 import io.kotest.matchers.should
@@ -18,13 +17,15 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineScope
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.test.Test
 
 class ParZip5Test {
     @Test
     fun parZip5RunsInParallel() = runTestUsingDefaultDispatcher {
       checkAll(10, Arb.int(), Arb.int(), Arb.int(), Arb.int(), Arb.int()) { a, b, c, d, e ->
-        val r = Atomic("")
+        val r = AtomicReference("")
         val modifyGate1 = CompletableDeferred<Unit>()
         val modifyGate2 = CompletableDeferred<Unit>()
         val modifyGate3 = CompletableDeferred<Unit>()
@@ -51,14 +52,14 @@ class ParZip5Test {
             modifyGate4.complete(Unit)
           },
           {
-            r.value = "$e"
+            r.store("$e")
             modifyGate1.complete(Unit)
           }
         ) { _a, _b, _c, _d, _e ->
           Tuple5(_a, _b, _c, _d, _e)
         }
 
-        r.value shouldBe "$e$d$c$b$a"
+        r.load() shouldBe "$e$d$c$b$a"
       }
     }
     

@@ -1,10 +1,9 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalAtomicApi::class)
 
 package arrow.core.raise
 
-import arrow.atomic.AtomicBoolean
 import arrow.core.nonFatalOrThrow
 import arrow.core.Either
 import kotlin.contracts.ExperimentalContracts
@@ -12,6 +11,8 @@ import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -239,10 +240,10 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
   private val isActive = AtomicBoolean(true)
 
   @PublishedApi
-  internal fun complete(): Boolean = isActive.getAndSet(false)
+  internal fun complete(): Boolean = isActive.exchange(false)
   @OptIn(DelicateRaiseApi::class)
   override fun raise(r: Any?): Nothing = when {
-    isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
+    isActive.load() -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
   }
 }
