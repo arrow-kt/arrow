@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import java.net.URL
+import java.net.URI
 import java.time.Duration
 import groovy.util.Node
 import groovy.util.NodeList
@@ -40,6 +40,8 @@ plugins.apply("com.diffplug.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
 plugins.apply("org.jetbrains.kotlinx.kover")
+plugins.apply("signing")
+plugins.apply("maven-publish")
 
 val doNotPublish = listOf("arrow-raise-ktor-server")
 if (project.name !in doNotPublish)
@@ -85,6 +87,8 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
 if (isKotlinMultiplatform) {
   configure<KotlinMultiplatformExtension> {
     compilerOptions { commonCompilerOptions() }
+
+    jvmToolchain { languageVersion.set(JavaLanguageVersion.of(11)) }
 
     jvm {
       compilerOptions {
@@ -226,10 +230,10 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
         suppress.set(true)
       }
       externalDocumentationLink {
-        url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
+        url.set(URI("https://kotlinlang.org/api/kotlinx.serialization/").toURL())
       }
       externalDocumentationLink {
-        url.set(URL("https://kotlinlang.org/api/kotlinx.coroutines/"))
+        url.set(URI("https://kotlinlang.org/api/kotlinx.coroutines/").toURL())
       }
       skipDeprecated.set(true)
       reportUndocumented.set(false)
@@ -237,7 +241,7 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
       kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
         sourceLink {
           localDirectory.set(srcDir)
-          remoteUrl.set(URL("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}"))
+          remoteUrl.set(URI("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
           remoteLineSuffix.set("#L")
         }
       }
@@ -257,8 +261,18 @@ dependencies {
   }
 }
 
+val publications = extensions.findByType(PublishingExtension::class.java)?.publications
+
+configure<SigningExtension> {
+  val signingKeyId = project.getVariable("signingInMemoryKeyId", "SONATYPE_SIGNING_KEY_ID")
+  val signingKey = project.getVariable("signingInMemoryKey", "SONATYPE_SIGNING_KEY")
+  val signingPassword = project.getVariable("signingInMemoryKeyPassword", "SONATYPE_SIGNING_KEY_PASSPHRASE")
+  useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+  sign(publications)
+}
+
 afterEvaluate {
-  val publications = extensions.findByType(PublishingExtension::class.java)?.publications ?: return@afterEvaluate
+  val publications = publications ?: return@afterEvaluate
   val platformPublication: MavenPublication? = publications.findByName("jvm") as? MavenPublication
 
   if (platformPublication != null && isKotlinMultiplatform) {
@@ -301,3 +315,12 @@ afterEvaluate {
       }
   }
 }
+
+internal fun Project.getVariable(propertyName: String, environmentVariableName: String): String? {
+  val property: String? = project.properties[propertyName]?.toString()
+  val environmentVariable: String? = System.getenv(environmentVariableName)
+  val isPublish: Boolean = gradle.startParameter.taskNames.any { it.startsWith("publish") }
+  require(!property.isNullOrBlank() || !environmentVariable.isNullOrBlank() || !isPublish)
+  return property ?: environmentVariable
+}
+
