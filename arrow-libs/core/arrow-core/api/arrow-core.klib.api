@@ -22,6 +22,10 @@ open annotation class arrow.core.raise/RaiseDSL : kotlin/Annotation { // arrow.c
     constructor <init>() // arrow.core.raise/RaiseDSL.<init>|<init>(){}[0]
 }
 
+open annotation class arrow.core/PotentiallyUnsafeNonEmptyOperation : kotlin/Annotation { // arrow.core/PotentiallyUnsafeNonEmptyOperation|null[0]
+    constructor <init>() // arrow.core/PotentiallyUnsafeNonEmptyOperation.<init>|<init>(){}[0]
+}
+
 abstract interface <#A: in kotlin/Any?> arrow.core.raise/Raise { // arrow.core.raise/Raise|null[0]
     abstract fun raise(#A): kotlin/Nothing // arrow.core.raise/Raise.raise|raise(1:0){}[0]
     open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Either<#A, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/Raise.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Either<1:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
@@ -820,6 +824,10 @@ final fun <#A: kotlin/Any?> (kotlin.collections/Iterable<arrow.core/Option<#A>>)
 final fun <#A: kotlin/Any?> (kotlin.collections/Iterable<kotlin.collections/Iterable<#A>>).arrow.core/flatten(): kotlin.collections/List<#A> // arrow.core/flatten|flatten@kotlin.collections.Iterable<kotlin.collections.Iterable<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (kotlin.collections/List<#A>).arrow.core/wrapAsNonEmptyListOrNull(): arrow.core/NonEmptyList<#A>? // arrow.core/wrapAsNonEmptyListOrNull|wrapAsNonEmptyListOrNull@kotlin.collections.List<0:0>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (kotlin.collections/List<#A>).arrow.core/wrapAsNonEmptyListOrThrow(): arrow.core/NonEmptyList<#A> // arrow.core/wrapAsNonEmptyListOrThrow|wrapAsNonEmptyListOrThrow@kotlin.collections.List<0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/MutableList<#A>).arrow.core/wrapAsNonEmptyListOrNull(): arrow.core/NonEmptyList<#A>? // arrow.core/wrapAsNonEmptyListOrNull|wrapAsNonEmptyListOrNull@kotlin.collections.MutableList<0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/MutableList<#A>).arrow.core/wrapAsNonEmptyListOrThrow(): arrow.core/NonEmptyList<#A> // arrow.core/wrapAsNonEmptyListOrThrow|wrapAsNonEmptyListOrThrow@kotlin.collections.MutableList<0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/MutableSet<#A>).arrow.core/wrapAsNonEmptySetOrNull(): arrow.core/NonEmptySet<#A>? // arrow.core/wrapAsNonEmptySetOrNull|wrapAsNonEmptySetOrNull@kotlin.collections.MutableSet<0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/MutableSet<#A>).arrow.core/wrapAsNonEmptySetOrThrow(): arrow.core/NonEmptySet<#A> // arrow.core/wrapAsNonEmptySetOrThrow|wrapAsNonEmptySetOrThrow@kotlin.collections.MutableSet<0:0>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (kotlin.collections/Set<#A>).arrow.core/toNonEmptySetOrNone(): arrow.core/Option<arrow.core/NonEmptySet<#A>> // arrow.core/toNonEmptySetOrNone|toNonEmptySetOrNone@kotlin.collections.Set<0:0>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (kotlin.collections/Set<#A>).arrow.core/toNonEmptySetOrNull(): arrow.core/NonEmptySet<#A>? // arrow.core/toNonEmptySetOrNull|toNonEmptySetOrNull@kotlin.collections.Set<0:0>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (kotlin.collections/Set<#A>).arrow.core/wrapAsNonEmptySetOrNull(): arrow.core/NonEmptySet<#A>? // arrow.core/wrapAsNonEmptySetOrNull|wrapAsNonEmptySetOrNull@kotlin.collections.Set<0:0>(){0§<kotlin.Any?>}[0]

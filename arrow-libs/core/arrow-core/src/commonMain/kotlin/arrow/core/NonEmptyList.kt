@@ -423,7 +423,7 @@ public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
 public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? {
   val iter = iterator()
   if (!iter.hasNext()) return null
-  return NonEmptyList(iter.next(), Iterable { iter }.toList())
+  return NonEmptyList(Iterable { iter }.toList())
 }
 
 /**
@@ -461,6 +461,32 @@ public fun <T> List<T>.wrapAsNonEmptyListOrThrow(): NonEmptyList<T> {
  * You are responsible for keeping the non-emptiness invariant at all times.
  */
 public fun <T> List<T>.wrapAsNonEmptyListOrNull(): NonEmptyList<T>? = when {
+  isEmpty() -> null
+  else -> NonEmptyList(this)
+}
+
+/**
+ * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.
+ *
+ * Any modification made to [this] will also be visible through the returned [NonEmptyList].
+ * You are responsible for keeping the non-emptiness invariant at all times.
+ */
+@PotentiallyUnsafeNonEmptyOperation
+@JvmName("wrapAsNonEmptyListOrThrowMutable")
+public fun <T> MutableList<T>.wrapAsNonEmptyListOrThrow(): NonEmptyList<T> {
+  require(isNotEmpty())
+  return NonEmptyList(this)
+}
+
+/**
+ * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.
+ *
+ * Any modification made to [this] will also be visible through the returned [NonEmptyList].
+ * You are responsible for keeping the non-emptiness invariant at all times.
+ */
+@PotentiallyUnsafeNonEmptyOperation
+@JvmName("wrapAsNonEmptyListOrNullMutable")
+public fun <T> MutableList<T>.wrapAsNonEmptyListOrNull(): NonEmptyList<T>? = when {
   isEmpty() -> null
   else -> NonEmptyList(this)
 }
