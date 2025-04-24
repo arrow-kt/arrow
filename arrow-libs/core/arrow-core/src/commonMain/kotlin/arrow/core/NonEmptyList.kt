@@ -416,6 +416,9 @@ public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
 ): Either<NonEmptyList<Error>, NonEmptyList<T>> =
   all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
 
+/**
+ * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
+ */
 @JvmName("toNonEmptyListOrNull")
 public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? {
   val iter = iterator()
@@ -423,6 +426,41 @@ public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? {
   return NonEmptyList(iter.next(), Iterable { iter }.toList())
 }
 
+/**
+ * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
+ */
 @JvmName("toNonEmptyListOrNone")
 public fun <T> Iterable<T>.toNonEmptyListOrNone(): Option<NonEmptyList<T>> =
   toNonEmptyListOrNull().toOption()
+
+/**
+ * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
+ */
+@JvmName("toNonEmptyListOrThrow")
+public fun <T> Iterable<T>.toNonEmptyListOrThrow(): NonEmptyList<T>? {
+  val iter = iterator()
+  require(iter.hasNext())
+  return NonEmptyList(Iterable { iter }.toList())
+}
+
+/**
+ * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.
+ *
+ * Any modification made to [this] will also be visible through the returned [NonEmptyList].
+ * You are responsible for keeping the non-emptiness invariant at all times.
+ */
+public fun <T> List<T>.wrapAsNonEmptyListOrThrow(): NonEmptyList<T> {
+  require(isNotEmpty())
+  return NonEmptyList(this)
+}
+
+/**
+ * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.
+ *
+ * Any modification made to [this] will also be visible through the returned [NonEmptyList].
+ * You are responsible for keeping the non-emptiness invariant at all times.
+ */
+public fun <T> List<T>.wrapAsNonEmptyListOrNull(): NonEmptyList<T>? = when {
+  isEmpty() -> null
+  else -> NonEmptyList(this)
+}
