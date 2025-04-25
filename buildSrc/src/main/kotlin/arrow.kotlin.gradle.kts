@@ -22,6 +22,9 @@ val projectNameWithDots = project.name.replace('-', '.')
 val Project.withoutAndroid
   get() = project.name == "suspendapp"
 
+val Project.requiresAndroidCoreLibraryDesugaring
+  get() = project.name == "arrow-collectors"
+
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
@@ -252,8 +255,13 @@ configure<ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension> {
 val signature by configurations.getting
 dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
-  if (isKotlinMultiplatform && !withoutAndroid) {
-    signature("com.toasttab.android:gummy-bears-api-21:0.12.0:coreLib2@signature")
+  when {
+    !isKotlinMultiplatform -> { }
+    withoutAndroid -> { }
+    requiresAndroidCoreLibraryDesugaring ->
+      signature("com.toasttab.android:gummy-bears-api-21:0.12.0:coreLib2@signature")
+    else ->
+      signature("com.toasttab.android:gummy-bears-api-21:0.12.0@signature")
   }
 }
 
