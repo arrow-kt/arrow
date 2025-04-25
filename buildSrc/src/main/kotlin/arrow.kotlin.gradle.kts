@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import java.net.URL
+import java.net.URI
 import java.time.Duration
 import groovy.util.Node
 import groovy.util.NodeList
@@ -25,6 +25,9 @@ val projectNameWithDots = project.name.replace('-', '.')
 
 val Project.withoutAndroid
   get() = project.name == "suspendapp"
+
+val Project.requiresAndroid24
+  get() = project.name == "arrow-collectors"
 
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
@@ -62,7 +65,7 @@ configure<KotlinProjectExtension> {
 
 configure<JavaPluginExtension> {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
+    languageVersion.set(JavaLanguageVersion.of(8))
   }
 }
 
@@ -88,7 +91,7 @@ if (isKotlinMultiplatform) {
 
     jvm {
       compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
+        jvmTarget = JvmTarget.JVM_1_8
       }
       tasks.named<Jar>("jvmJar") {
         manifest {
@@ -196,7 +199,7 @@ if (isKotlinJvm) {
 
   configure<KotlinJvmExtension> {
     compilerOptions {
-      jvmTarget = JvmTarget.JVM_11
+      jvmTarget = JvmTarget.JVM_1_8
       commonCompilerOptions()
     }
   }
@@ -207,7 +210,11 @@ if (pluginManager.hasPlugin("com.android.library")) {
     namespace = projectNameWithDots
     compileSdk = 35
     defaultConfig {
-      minSdk = 24
+      minSdk = if (requiresAndroid24) 24 else 21
+    }
+    compileOptions {
+      sourceCompatibility = JavaVersion.VERSION_1_8
+      targetCompatibility = JavaVersion.VERSION_1_8
     }
   }
 }
@@ -226,10 +233,10 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
         suppress.set(true)
       }
       externalDocumentationLink {
-        url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
+        url.set(URI("https://kotlinlang.org/api/kotlinx.serialization/").toURL())
       }
       externalDocumentationLink {
-        url.set(URL("https://kotlinlang.org/api/kotlinx.coroutines/"))
+        url.set(URI("https://kotlinlang.org/api/kotlinx.coroutines/").toURL())
       }
       skipDeprecated.set(true)
       reportUndocumented.set(false)
@@ -237,7 +244,7 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
       kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
         sourceLink {
           localDirectory.set(srcDir)
-          remoteUrl.set(URL("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}"))
+          remoteUrl.set(URI("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
           remoteLineSuffix.set("#L")
         }
       }
@@ -253,7 +260,10 @@ val signature by configurations.getting
 dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
   if (isKotlinMultiplatform && !withoutAndroid) {
-    signature("net.sf.androidscents.signature:android-api-level-24:7.0_r2@signature")
+    when {
+      requiresAndroid24 -> signature("net.sf.androidscents.signature:android-api-level-24:7.0_r2@signature")
+      else -> signature("net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature")
+    }
   }
 }
 

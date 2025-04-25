@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
+import arrow.atomic.update
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmOverloads
 
@@ -15,9 +15,10 @@ public value class AtomicMemoizationCache<K, V>(
   private val cache: Atomic<Map<K, V>> = Atomic(emptyMap())
 ): MemoizationCache<K, V> {
   override fun get(key: K): V? = cache.get()[key]
-  override fun set(key: K, value: V): V = cache.updateAndGet { old ->
-    if (key in old) old else old + (key to value)
-  }.getValue(key)
+  override fun set(key: K, value: V): V = cache.update(
+    function = { old -> if (key in old) old else old + (key to value) },
+    transform = { _, new -> new.getValue(key) }
+  )
 }
 
 /**

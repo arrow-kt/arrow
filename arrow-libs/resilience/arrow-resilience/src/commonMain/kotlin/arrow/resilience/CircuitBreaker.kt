@@ -20,6 +20,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.DurationUnit
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -457,9 +458,10 @@ private constructor(
         "CircuitBreaker.State.Open(startedAt=$startedAt, resetTimeoutNanos=$resetTimeout, expiresAt=$expiresAt)"
 
       override fun hashCode(): Int {
-        var result = startedAt.hashCode()
-        result = 31 * result + resetTimeout.hashCode()
-        result = 31 * result + expiresAt.hashCode()
+        var result = openingStrategy.hashCode()
+        result = 31 * result + startedAt.hashCode()
+        result = 31 * result + resetTimeout.toInt(DurationUnit.NANOSECONDS)
+        result = 31 * result + awaitClose.hashCode()
         return result
       }
     }
@@ -484,8 +486,12 @@ private constructor(
 
       public constructor(openingStrategy: OpeningStrategy, resetTimeoutNanos: Double) : this(openingStrategy, resetTimeoutNanos.nanoseconds, CompletableDeferred())
 
-      override fun hashCode(): Int =
-        resetTimeout.hashCode()
+      override fun hashCode(): Int {
+        var result = openingStrategy.hashCode()
+        result = 31 * result + resetTimeout.toInt(DurationUnit.NANOSECONDS)
+        result = 31 * result + awaitClose.hashCode()
+        return result
+      }
 
       override fun equals(other: Any?): Boolean =
         if (other is HalfOpen) resetTimeout == other.resetTimeout
@@ -593,6 +599,18 @@ private constructor(
         public operator fun invoke(maxFailures: Int): Count =
           Count(maxFailures = maxFailures, failuresCount = 0)
       }
+
+      override fun hashCode(): Int {
+        var result = maxFailures
+        result = 31 * result + failuresCount
+        return result
+      }
+
+      override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Count) return false
+        return failuresCount == other.failuresCount && maxFailures == other.maxFailures
+      }
     }
 
     public data class SlidingWindow(
@@ -617,6 +635,21 @@ private constructor(
       public companion object {
         public operator fun invoke(timeSource: TimeSource, windowDuration: Duration, maxFailures: Int): SlidingWindow =
           SlidingWindow(timeSource = timeSource, failures = emptyList(), windowDuration = windowDuration, maxFailures = maxFailures)
+      }
+
+      override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SlidingWindow) return false
+
+        return maxFailures == other.maxFailures && timeSource == other.timeSource && failures == other.failures && windowDuration == other.windowDuration
+      }
+
+      override fun hashCode(): Int {
+        var result = timeSource.hashCode()
+        result = 31 * result + failures.hashCode()
+        result = 31 * result + windowDuration.toInt(DurationUnit.NANOSECONDS)
+        result = 31 * result + maxFailures
+        return result
       }
     }
   }

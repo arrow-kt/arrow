@@ -150,7 +150,7 @@ public class TVar<A> internal constructor(a: A) {
   // TODO Use a set here, and preferably something that uses sharing to avoid gc pressure from copying...
   private val waiting = Atomic<List<STMTransaction>>(emptyList())
 
-  override fun hashCode(): Int = id.hashCode()
+  override fun hashCode(): Int = id.toInt()
 
   override fun equals(other: Any?): Boolean = this === other
 

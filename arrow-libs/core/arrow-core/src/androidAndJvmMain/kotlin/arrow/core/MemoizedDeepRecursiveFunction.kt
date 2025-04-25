@@ -5,8 +5,11 @@ import java.util.concurrent.ConcurrentMap
 
 @JvmInline
 public value class ConcurrentMapMemoizationCache<K, V>(
-  private val cache: ConcurrentMap<K, V> = ConcurrentHashMap()
+  private val cache: ConcurrentMap<K, V> = ConcurrentHashMap(),
 ): MemoizationCache<K, V> {
   override fun get(key: K): V? = cache.get(key)
-  override fun set(key: K, value: V): V = cache.computeIfAbsent(key) { value }
+  override fun set(key: K, value: V): V = when (key) {
+    null -> value
+    else -> cache.putIfAbsent(key, value) ?: value
+  }
 }

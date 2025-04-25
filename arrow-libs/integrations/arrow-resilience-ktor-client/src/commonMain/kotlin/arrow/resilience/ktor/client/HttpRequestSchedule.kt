@@ -171,13 +171,39 @@ public sealed interface RetryEventData {
     public override val request: HttpRequestBuilder,
     public override val retryCount: Int,
     public val response: HttpResponse
-  ) : RetryEventData
+  ) : RetryEventData {
+    override fun hashCode(): Int {
+      var result = request.hashCode()
+      result = 31 * result + retryCount
+      result = 31 * result + response.hashCode()
+      return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is Response) return false
+      return request == other.request && retryCount == other.retryCount && response == other.response
+    }
+  }
 
   public data class Failure(
     public override val request: HttpRequestBuilder,
     public override val retryCount: Int,
     public val exception: Throwable
-  ) : RetryEventData
+  ) : RetryEventData {
+    override fun hashCode(): Int {
+      var result = request.hashCode()
+      result = 31 * result + retryCount
+      result = 31 * result + exception.hashCode()
+      return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is Failure) return false
+      return request == other.request && retryCount == other.retryCount && exception == other.exception
+    }
+  }
 }
 
 public fun interface ModifyRequestPerRequest {

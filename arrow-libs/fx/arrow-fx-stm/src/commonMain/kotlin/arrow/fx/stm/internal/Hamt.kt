@@ -124,8 +124,22 @@ internal fun <A> STM.alterHamtWithHash(
 internal fun <A> STM.newHamt(): Hamt<A> = Hamt(newTVar(arrayOfNulls(ARR_SIZE)))
 
 internal sealed class Branch<A> {
-  data class Branches<A>(val sub: Hamt<A>) : Branch<A>()
-  data class Leaf<A>(val hash: Int, val value: Array<A>) : Branch<A>()
+  data class Branches<A>(val sub: Hamt<A>) : Branch<A>() {
+    override fun hashCode(): Int = sub.hashCode()
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is Branches<A>) return false
+      return this.sub == other.sub
+    }
+  }
+  data class Leaf<A>(val hash: Int, val value: Array<A>) : Branch<A>() {
+    override fun hashCode(): Int = 31 * hash + value.contentHashCode()
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is Leaf<A>) return false
+      return this.hash == other.hash && value.contentEquals(other.value)
+    }
+  }
 
   companion object {
     fun <A> leaf(hash: Int, vararg value: A): Leaf<A> = Leaf(hash, value) as Leaf<A>
