@@ -191,8 +191,6 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
             final val resetTimeout // arrow.resilience/CircuitBreaker.State.HalfOpen.resetTimeout|{}resetTimeout[0]
                 final fun <get-resetTimeout>(): kotlin.time/Duration // arrow.resilience/CircuitBreaker.State.HalfOpen.resetTimeout.<get-resetTimeout>|<get-resetTimeout>(){}[0]
 
-            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.State.HalfOpen.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.State.HalfOpen.hashCode|hashCode(){}[0]
             final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.State.HalfOpen.toString|toString(){}[0]
         }
 
@@ -207,7 +205,6 @@ final class arrow.resilience/CircuitBreaker { // arrow.resilience/CircuitBreaker
                 final fun <get-startedAt>(): kotlin.time/TimeMark // arrow.resilience/CircuitBreaker.State.Open.startedAt.<get-startedAt>|<get-startedAt>(){}[0]
 
             final fun equals(kotlin/Any?): kotlin/Boolean // arrow.resilience/CircuitBreaker.State.Open.equals|equals(kotlin.Any?){}[0]
-            final fun hashCode(): kotlin/Int // arrow.resilience/CircuitBreaker.State.Open.hashCode|hashCode(){}[0]
             final fun toString(): kotlin/String // arrow.resilience/CircuitBreaker.State.Open.toString|toString(){}[0]
         }
     }

@@ -83,12 +83,6 @@ private interface MemoizedCall<in F, out R> {
 
 private data class MemoizeKey0<R>(val p1: Byte) : MemoizedCall<() -> R, R> {
   override fun invoke(f: () -> R): R = f()
-  override fun hashCode(): Int = p1.toInt()
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is MemoizeKey0<*>) return false
-    return p1 == other.p1
-  }
 }
 
 private data class MemoizeKey1<out P1, R>(val p1: P1) : MemoizedCall<(P1) -> R, R> {

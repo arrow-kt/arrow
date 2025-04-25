@@ -34,19 +34,7 @@ private const val maxStackDepthSize = 127
 
 private sealed class AndThen0<A> : () -> A {
 
-  private data class Single<A>(val f: () -> A, val index: Int) : AndThen0<A>() {
-    override fun hashCode(): Int {
-      var result = index
-      result = 31 * result + f.hashCode()
-      return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is Single<*>) return false
-      return index == other.index && f == other.f
-    }
-  }
+  private data class Single<A>(val f: () -> A, val index: Int) : AndThen0<A>()
 
   private data class Concat<A, B>(val left: AndThen0<A>, val right: AndThen1<A, B>) : AndThen0<B>() {
     override fun toString(): String = "AndThen.Concat(...)"
@@ -114,19 +102,7 @@ private sealed class AndThen0<A> : () -> A {
 
 private sealed class AndThen1<A, B> : (A) -> B {
 
-  private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen1<A, B>() {
-    override fun hashCode(): Int {
-      var result = index
-      result = 31 * result + f.hashCode()
-      return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is Single<*, *>) return false
-      return index == other.index && f == other.f
-    }
-  }
+  private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen1<A, B>()
 
   private data class Concat<A, E, B>(val left: AndThen1<A, E>, val right: AndThen1<E, B>) : AndThen1<A, B>() {
     override fun toString(): String = "AndThen.Concat(...)"
@@ -208,19 +184,7 @@ private sealed class AndThen1<A, B> : (A) -> B {
 
 private sealed class AndThen2<A, B, C> : (A, B) -> C {
 
-  private data class Single<A, B, C>(val f: (A, B) -> C, val index: Int) : AndThen2<A, B, C>() {
-    override fun hashCode(): Int {
-      var result = index
-      result = 31 * result + f.hashCode()
-      return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is Single<*, *, *>) return false
-      return index == other.index && f == other.f
-    }
-  }
+  private data class Single<A, B, C>(val f: (A, B) -> C, val index: Int) : AndThen2<A, B, C>()
 
   private data class Concat<A, E, B, C>(val left: AndThen2<A, E, B>, val right: AndThen1<B, C>) : AndThen2<A, E, C>() {
     override fun toString(): String = "AndThen.Concat(...)"

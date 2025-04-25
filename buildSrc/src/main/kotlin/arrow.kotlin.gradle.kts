@@ -1,17 +1,13 @@
+import groovy.util.Node
+import groovy.util.NodeList
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import java.net.URI
 import java.time.Duration
-import groovy.util.Node
-import groovy.util.NodeList
-import org.gradle.api.Project
-import org.gradle.api.XmlProvider
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 repositories {
   mavenCentral()
@@ -25,9 +21,6 @@ val projectNameWithDots = project.name.replace('-', '.')
 
 val Project.withoutAndroid
   get() = project.name == "suspendapp"
-
-val Project.requiresAndroid24
-  get() = project.name == "arrow-collectors"
 
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
@@ -65,7 +58,7 @@ configure<KotlinProjectExtension> {
 
 configure<JavaPluginExtension> {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(8))
+    languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
 
@@ -91,7 +84,7 @@ if (isKotlinMultiplatform) {
 
     jvm {
       compilerOptions {
-        jvmTarget = JvmTarget.JVM_1_8
+        jvmTarget = JvmTarget.JVM_11
       }
       tasks.named<Jar>("jvmJar") {
         manifest {
@@ -199,7 +192,7 @@ if (isKotlinJvm) {
 
   configure<KotlinJvmExtension> {
     compilerOptions {
-      jvmTarget = JvmTarget.JVM_1_8
+      jvmTarget = JvmTarget.JVM_11
       commonCompilerOptions()
     }
   }
@@ -210,7 +203,7 @@ if (pluginManager.hasPlugin("com.android.library")) {
     namespace = projectNameWithDots
     compileSdk = 35
     defaultConfig {
-      minSdk = if (requiresAndroid24) 24 else 21
+      minSdk = 21
     }
     compileOptions {
       sourceCompatibility = JavaVersion.VERSION_1_8
@@ -260,10 +253,7 @@ val signature by configurations.getting
 dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
   if (isKotlinMultiplatform && !withoutAndroid) {
-    when {
-      requiresAndroid24 -> signature("net.sf.androidscents.signature:android-api-level-24:7.0_r2@signature")
-      else -> signature("net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature")
-    }
+    signature("com.toasttab.android:gummy-bears-api-21:0.12.0:coreLib2@signature")
   }
 }
 

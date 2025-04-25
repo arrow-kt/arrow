@@ -37,40 +37,14 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     val awaitingNow: Int,
     override val epoch: Long,
     val unblock: CompletableDeferred<Unit>
-  ) : State {
-    override fun hashCode(): Int {
-      var result = awaitingNow
-      result = 31 * result + epoch.toInt()
-      result = 31 * result + unblock.hashCode()
-      return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is Awaiting) return false
-      return awaitingNow == other.awaitingNow && epoch == other.epoch && unblock == other.unblock
-    }
-  }
+  ) : State
 
   private data class Resetting(
     val awaitingNow: Int,
     override val epoch: Long,
     /** Barrier used to ensure all awaiting threads are ready to reset. **/
     val unblock: CompletableDeferred<Unit>
-  ) : State {
-    override fun hashCode(): Int {
-      var result = awaitingNow
-      result = 31 * result + epoch.toInt()
-      result = 31 * result + unblock.hashCode()
-      return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is Resetting) return false
-      return awaitingNow == other.awaitingNow && epoch == other.epoch && unblock == other.unblock
-    }
-  }
+  ) : State
 
   private val state: Atomic<State> = Atomic(Awaiting(capacity, 0, CompletableDeferred()))
 
