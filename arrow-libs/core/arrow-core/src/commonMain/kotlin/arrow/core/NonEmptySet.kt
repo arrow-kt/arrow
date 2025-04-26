@@ -107,6 +107,7 @@ public fun <E> Set<E>.toNonEmptySetOrNone(): Option<NonEmptySet<E>> =
  * Any modification made to [this] will also be visible through the returned [NonEmptySet].
  * You are responsible for keeping the non-emptiness invariant at all times.
  */
+@PotentiallyUnsafeNonEmptyOperation
 public fun <T> Set<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> {
   require(isNotEmpty())
   return NonEmptySet(this)
@@ -118,33 +119,8 @@ public fun <T> Set<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> {
  * Any modification made to [this] will also be visible through the returned [NonEmptySet].
  * You are responsible for keeping the non-emptiness invariant at all times.
  */
+@PotentiallyUnsafeNonEmptyOperation
 public fun <T> Set<T>.wrapAsNonEmptySetOrNull(): NonEmptySet<T>? = when {
-  isEmpty() -> null
-  else -> NonEmptySet(this)
-}
-
-/**
- * Returns a [NonEmptySet] that wraps the given [this], avoiding an additional copy.
- *
- * Any modification made to [this] will also be visible through the returned [NonEmptySet].
- * You are responsible for keeping the non-emptiness invariant at all times.
- */
-@PotentiallyUnsafeNonEmptyOperation
-@JvmName("wrapAsNonEmptySetOrThrowMutable")
-public fun <T> MutableSet<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> {
-  require(isNotEmpty())
-  return NonEmptySet(this)
-}
-
-/**
- * Returns a [NonEmptySet] that wraps the given [this], avoiding an additional copy.
- *
- * Any modification made to [this] will also be visible through the returned [NonEmptySet].
- * You are responsible for keeping the non-emptiness invariant at all times.
- */
-@PotentiallyUnsafeNonEmptyOperation
-@JvmName("wrapAsNonEmptySetOrNullMutable")
-public fun <T> MutableSet<T>.wrapAsNonEmptySetOrNull(): NonEmptySet<T>? = when {
   isEmpty() -> null
   else -> NonEmptySet(this)
 }

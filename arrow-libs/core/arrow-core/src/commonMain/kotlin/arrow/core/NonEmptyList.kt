@@ -449,6 +449,7 @@ public fun <T> Iterable<T>.toNonEmptyListOrThrow(): NonEmptyList<T>? {
  * Any modification made to [this] will also be visible through the returned [NonEmptyList].
  * You are responsible for keeping the non-emptiness invariant at all times.
  */
+@PotentiallyUnsafeNonEmptyOperation
 public fun <T> List<T>.wrapAsNonEmptyListOrThrow(): NonEmptyList<T> {
   require(isNotEmpty())
   return NonEmptyList(this)
@@ -460,33 +461,8 @@ public fun <T> List<T>.wrapAsNonEmptyListOrThrow(): NonEmptyList<T> {
  * Any modification made to [this] will also be visible through the returned [NonEmptyList].
  * You are responsible for keeping the non-emptiness invariant at all times.
  */
+@PotentiallyUnsafeNonEmptyOperation
 public fun <T> List<T>.wrapAsNonEmptyListOrNull(): NonEmptyList<T>? = when {
-  isEmpty() -> null
-  else -> NonEmptyList(this)
-}
-
-/**
- * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.
- *
- * Any modification made to [this] will also be visible through the returned [NonEmptyList].
- * You are responsible for keeping the non-emptiness invariant at all times.
- */
-@PotentiallyUnsafeNonEmptyOperation
-@JvmName("wrapAsNonEmptyListOrThrowMutable")
-public fun <T> MutableList<T>.wrapAsNonEmptyListOrThrow(): NonEmptyList<T> {
-  require(isNotEmpty())
-  return NonEmptyList(this)
-}
-
-/**
- * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.
- *
- * Any modification made to [this] will also be visible through the returned [NonEmptyList].
- * You are responsible for keeping the non-emptiness invariant at all times.
- */
-@PotentiallyUnsafeNonEmptyOperation
-@JvmName("wrapAsNonEmptyListOrNullMutable")
-public fun <T> MutableList<T>.wrapAsNonEmptyListOrNull(): NonEmptyList<T>? = when {
   isEmpty() -> null
   else -> NonEmptyList(this)
 }

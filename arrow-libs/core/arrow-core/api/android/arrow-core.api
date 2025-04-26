@@ -503,9 +503,7 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun unzip-GZgkXh4 (Ljava/util/List;)Lkotlin/Pair;
 	public static final fun unzip-ZALtuoE (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
 	public static final fun wrapAsNonEmptyListOrNull (Ljava/util/List;)Ljava/util/List;
-	public static final fun wrapAsNonEmptyListOrNullMutable (Ljava/util/List;)Ljava/util/List;
 	public static final fun wrapAsNonEmptyListOrThrow (Ljava/util/List;)Ljava/util/List;
-	public static final fun wrapAsNonEmptyListOrThrowMutable (Ljava/util/List;)Ljava/util/List;
 }
 
 public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {
@@ -579,9 +577,7 @@ public final class arrow/core/NonEmptySetKt {
 	public static final synthetic fun toNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
 	public static final fun toNonEmptySetOrThrow (Ljava/lang/Iterable;)Ljava/util/Set;
 	public static final fun wrapAsNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
-	public static final fun wrapAsNonEmptySetOrNullMutable (Ljava/util/Set;)Ljava/util/Set;
 	public static final fun wrapAsNonEmptySetOrThrow (Ljava/util/Set;)Ljava/util/Set;
-	public static final fun wrapAsNonEmptySetOrThrowMutable (Ljava/util/Set;)Ljava/util/Set;
 }
 
 public final class arrow/core/NonFatalKt {
