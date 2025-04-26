@@ -517,6 +517,7 @@ internal expect val IODispatcher: CoroutineDispatcher
  * <!--- KNIT example-resource-10.kt -->
  */
 @ResourceDSL
+@OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
@@ -533,6 +534,7 @@ public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   }
 }
 
+@OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
 public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,

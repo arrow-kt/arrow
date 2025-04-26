@@ -69,16 +69,17 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  // required to be part of the Kotlin User Projects repository
-  providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_api_version").ifAvailable { apiVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
+  apiVersion = KotlinVersion.KOTLIN_1_9
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
     "-Wextra",
     "-Xuse-fir-experimental-checkers",
   )
+  // required to be part of the Kotlin User Projects repository
+  providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_api_version").ifAvailable { apiVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
 }
 
 if (isKotlinMultiplatform) {
