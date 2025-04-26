@@ -70,6 +70,7 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
   apiVersion = KotlinVersion.KOTLIN_1_9
+  languageVersion = KotlinVersion.KOTLIN_2_0
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
