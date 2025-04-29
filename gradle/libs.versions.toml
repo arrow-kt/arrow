@@ -1,5 +1,5 @@
 [versions]
-animalSniffer = "2.0.0"
+animalSniffer = "2.0.1"
 coroutines = "1.10.2"
 classgraph = "4.8.179"
 dokka = "2.0.0"
@@ -21,7 +21,7 @@ agp = "8.9.2"
 cache4k = "0.14.0"
 publish = "0.31.0"
 jacksonModuleKotlin = "2.19.0"
-shadow = "9.0.0-beta12"
+shadow = "9.0.0-beta13"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
