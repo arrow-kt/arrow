@@ -2,7 +2,7 @@
 <html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <title>getNullAccessPattern</title>
+    <title>PotentiallyUnsafeNonEmptyOperation</title>
 <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
     <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
@@ -41,11 +41,11 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.0
+        <div class="library-version" id="library-version">2.1.1
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-core-jackson/main">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -54,11 +54,11 @@
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
-                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":arrow-core-jackson/main" data-filter=":arrow-core-jackson/main">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core/commonMain" data-filter=":arrow-core/commonMain">
                                 <span class="checkbox--icon"></span>
-                                jvm
+                                common
                             </label>
                         </li>
                 </ul>
@@ -90,12 +90,16 @@
                 </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="member" id="content" pageids="arrow-core-jackson::arrow.integrations.jackson.module/OptionDeserializer/getNullAccessPattern/#/PointingToDeclaration//-1167666519">
-  <div class="breadcrumbs"><a href="../../index.html">arrow-core-jackson</a><span class="delimiter">/</span><a href="../index.html">arrow.integrations.jackson.module</a><span class="delimiter">/</span><a href="index.html">OptionDeserializer</a><span class="delimiter">/</span><span class="current">getNullAccessPattern</span></div>
+<div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core/PotentiallyUnsafeNonEmptyOperation///PointingToDeclaration//1759373422">
+  <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core</a><span class="delimiter">/</span><span class="current">PotentiallyUnsafeNonEmptyOperation</span></div>
   <div class="cover ">
-    <h1 class="cover"><span>get</span><wbr><span>Null</span><wbr><span>Access</span><wbr><span><span>Pattern</span></span></h1>
+    <h1 class="cover"><span>Potentially</span><wbr><span>Unsafe</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span><span>Operation</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="index.html">PotentiallyUnsafeNonEmptyOperation</a></div><p class="paragraph">Marks operations which may break non-emptiness invariants if used wrong. In most cases, it involves using mutable collections without copying the elements first.</p></div></div>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-null-access-pattern.html"><span class="token function">getNullAccessPattern</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind.util/AccessPattern///PointingToDeclaration/">AccessPattern</span></div></div></div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"></div>
+    <div class="tabs-section-body"></div>
+  </div>
 </div>
     <div class="footer">
         <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
