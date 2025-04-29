@@ -20,7 +20,7 @@ group = property("projects.group").toString()
 val projectNameWithDots = project.name.replace('-', '.')
 
 val Project.withoutAndroid
-  get() = project.name == "suspendapp"
+  get() = project.name == "suspendapp" || project.name == "suspendapp-ktor"
 
 val Project.requiresAndroidCoreLibraryDesugaring
   get() = project.name == "arrow-collectors"

@@ -4,12 +4,12 @@ import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.ResourceScope
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Ktor [ApplicationEngine] as a [Resource]. This [Resource] will gracefully shut down the server
@@ -31,7 +31,7 @@ import kotlinx.io.files.SystemFileSystem
 public suspend fun <
   TEngine : ApplicationEngine,
   TConfiguration : ApplicationEngine.Configuration,
-> ResourceScope.server(
+  > ResourceScope.server(
   factory: ApplicationEngineFactory<TEngine, TConfiguration>,
   port: Int = 80,
   host: String = "0.0.0.0",
@@ -43,7 +43,7 @@ public suspend fun <
 ): EmbeddedServer<TEngine, TConfiguration> =
   install({
     embeddedServer(factory, host = host, port = port, watchPaths = watchPaths, module = module)
-      .apply(EmbeddedServer<TEngine, TConfiguration>::start)
+      .warnAndStart()
   }) { engine, _ ->
     engine.release(preWait, grace, timeout)
   }
@@ -66,7 +66,7 @@ public suspend fun <
 public suspend fun <
   TEngine : ApplicationEngine,
   TConfiguration : ApplicationEngine.Configuration,
-> ResourceScope.server(
+  > ResourceScope.server(
   factory: ApplicationEngineFactory<TEngine, TConfiguration>,
   rootConfig: ServerConfig,
   configure: TConfiguration.() -> Unit = {},
@@ -76,10 +76,23 @@ public suspend fun <
 ): EmbeddedServer<TEngine, TConfiguration> =
   install({
     embeddedServer(factory, rootConfig, configure)
-      .apply(EmbeddedServer<TEngine, TConfiguration>::start)
+      .warnAndStart()
   }) { engine, _ ->
     engine.release(preWait, grace, timeout)
   }
+
+private suspend fun <E: EmbeddedServer<*, *>> E.warnAndStart(): E = also {
+  it.warnShutdownHook()
+  it.startSuspend()
+}
+
+internal expect val ktorShutdownHookEnabled: Boolean
+
+private fun EmbeddedServer<*, *>.warnShutdownHook() {
+  if (ktorShutdownHookEnabled) {
+    environment.log.warn("Ktor ShutdownHook is enabled, preWait delay may be ignored. See: https://arrow-kt.io/learn/coroutines/suspendapp/ktor")
+  }
+}
 
 private suspend fun EmbeddedServer<*, *>.release(
   preWait: Duration,
@@ -93,7 +106,7 @@ private suspend fun EmbeddedServer<*, *>.release(
     delay(preWait.inWholeMilliseconds)
   }
   environment.log.info("Shutting down HTTP server...")
-  stop(grace.inWholeMilliseconds, timeout.inWholeMicroseconds)
+  stopSuspend(grace.inWholeMilliseconds, timeout.inWholeMicroseconds)
   environment.log.info("HTTP server shutdown!")
 }
 
