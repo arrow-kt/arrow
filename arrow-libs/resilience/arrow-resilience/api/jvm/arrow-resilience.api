@@ -78,10 +78,8 @@ public final class arrow/resilience/CircuitBreaker$State$Closed : arrow/resilien
 public final class arrow/resilience/CircuitBreaker$State$HalfOpen : arrow/resilience/CircuitBreaker$State {
 	public fun <init> (Larrow/resilience/CircuitBreaker$OpeningStrategy;D)V
 	public synthetic fun <init> (Larrow/resilience/CircuitBreaker$OpeningStrategy;JLkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun equals (Ljava/lang/Object;)Z
 	public fun getOpeningStrategy ()Larrow/resilience/CircuitBreaker$OpeningStrategy;
 	public final fun getResetTimeout-UwyO8pc ()J
-	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -91,7 +89,6 @@ public final class arrow/resilience/CircuitBreaker$State$Open : arrow/resilience
 	public fun getOpeningStrategy ()Larrow/resilience/CircuitBreaker$OpeningStrategy;
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getStartedAt ()Lkotlin/time/TimeMark;
-	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 

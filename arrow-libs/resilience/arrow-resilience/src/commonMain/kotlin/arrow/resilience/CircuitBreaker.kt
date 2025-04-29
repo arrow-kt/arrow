@@ -8,9 +8,7 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
-import arrow.resilience.CircuitBreaker.State.Closed
-import arrow.resilience.CircuitBreaker.State.HalfOpen
-import arrow.resilience.CircuitBreaker.State.Open
+import arrow.resilience.CircuitBreaker.State.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
@@ -455,13 +453,6 @@ private constructor(
 
       override fun toString(): String =
         "CircuitBreaker.State.Open(startedAt=$startedAt, resetTimeoutNanos=$resetTimeout, expiresAt=$expiresAt)"
-
-      override fun hashCode(): Int {
-        var result = startedAt.hashCode()
-        result = 31 * result + resetTimeout.hashCode()
-        result = 31 * result + expiresAt.hashCode()
-        return result
-      }
     }
 
     /**
@@ -483,13 +474,6 @@ private constructor(
       public constructor(openingStrategy: OpeningStrategy, resetTimeout: Duration) : this(openingStrategy, resetTimeout, CompletableDeferred())
 
       public constructor(openingStrategy: OpeningStrategy, resetTimeoutNanos: Double) : this(openingStrategy, resetTimeoutNanos.nanoseconds, CompletableDeferred())
-
-      override fun hashCode(): Int =
-        resetTimeout.hashCode()
-
-      override fun equals(other: Any?): Boolean =
-        if (other is HalfOpen) resetTimeout == other.resetTimeout
-        else false
 
       override fun toString(): String =
         "HalfOpen(resetTimeoutNanos=$resetTimeout)"

@@ -19,6 +19,7 @@ import kotlinx.coroutines.*
  *   regardless of finalizers.
  * @param block the lambda of the actual application.
  */
+@OptIn(ExperimentalStdlibApi::class)  // 'use' in stdlib < 2.0
 public fun SuspendApp(
   context: CoroutineContext = Dispatchers.Default,
   uncaught: (Throwable) -> Unit = Throwable::printStackTrace,

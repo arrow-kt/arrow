@@ -88,6 +88,7 @@ public interface AutoCloseScope {
     release: (A, Throwable?) -> Unit
   ): A = acquire().also { a -> onClose { release(a, it) } }
 
+  @OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoCloseable.also { onClose { autoCloseable.close() } }
 }

@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.Serializers
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.databind.type.CollectionType
+import com.fasterxml.jackson.databind.type.TypeBindings
+import com.fasterxml.jackson.databind.type.TypeFactory
 
 public class NonEmptyCollectionsModule : SimpleModule(NonEmptyCollectionsModule::class.java.name, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
@@ -74,7 +76,9 @@ public class NonEmptyCollectionDeserializer<T : NonEmptyCollection<*>>(
   private val converter: (List<*>) -> T?,
 ) : StdDeserializer<T>(klass) {
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T? {
-    val collection = CollectionType.construct(ArrayList::class.java, contentType)
+    val bindings = TypeBindings.create(ArrayList::class.java, contentType)
+    val superClass = TypeFactory.defaultInstance().constructParametricType(List::class.java, contentType)
+    val collection = CollectionType.construct(ArrayList::class.java, bindings, superClass, null, contentType)
     return converter(ctxt.readValue(p, collection))
   }
 }

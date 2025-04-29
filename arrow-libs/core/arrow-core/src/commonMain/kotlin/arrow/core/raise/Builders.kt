@@ -5,7 +5,7 @@
 package arrow.core.raise
 
 import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
+import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.EmptyValue
 import arrow.core.Ior
@@ -306,9 +306,11 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   private val state: Atomic<Any?>,
   private val raise: Raise<Error>,
 ) : Raise<Error> by raise {
-  @Suppress("UNCHECKED_CAST")
   @PublishedApi
-  internal fun combine(e: Error): Error = state.updateAndGet { EmptyValue.combine(it, e, combineError) } as Error
+  internal fun combine(e: Error): Error = state.update(
+    function = { EmptyValue.combine(it, e, combineError) },
+    transform = { _, new -> new }
+  )
 
   @RaiseDSL
   public fun accumulate(value: Error): Unit = Ior.Both(value, Unit).bind()

@@ -714,6 +714,7 @@ class ResourceTest {
     released.shouldHaveCompleted() shouldBe ExitCase.Completed
   }
 
+  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
