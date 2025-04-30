@@ -496,8 +496,15 @@ public inline fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, 
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> =
-  if (containsKey(key)) Some(get(key) as V) else None
+public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> {
+  val value = get(key)
+  if (value == null && !containsKey(key)) {
+    return None
+  } else {
+    @Suppress("UNCHECKED_CAST")
+    return Some(value as V)
+  }
+}
 
 /** Combines two maps using [combine] to combine values for the same key. */
 public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
