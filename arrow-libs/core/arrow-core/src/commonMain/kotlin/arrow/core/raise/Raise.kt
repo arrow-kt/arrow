@@ -658,6 +658,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
 ): A {
   contract {
     callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
   }
   recover({ return block(this) }) { raise(transform(it)) }
 }
