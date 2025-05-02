@@ -226,6 +226,9 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
   extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
     dokkaSourceSets.named(kotlinSourceSet.name) {
+      if ("androidAndJvm" in kotlinSourceSet.name) {
+        platform.set(org.jetbrains.dokka.Platform.jvm)
+      }
       perPackageOption {
         matchingRegex.set(".*\\.internal.*")
         suppress.set(true)
