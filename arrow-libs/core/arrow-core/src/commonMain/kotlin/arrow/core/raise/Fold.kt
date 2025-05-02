@@ -5,10 +5,11 @@
 package arrow.core.raise
 
 import arrow.atomic.AtomicBoolean
-import arrow.core.nonFatalOrThrow
 import arrow.core.Either
+import arrow.core.nonFatalOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
@@ -198,20 +199,32 @@ public inline fun <Error, A> Raise<Error>.traced(
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
   contract {
-    callsInPlace(block, AT_MOST_ONCE)
     callsInPlace(trace, AT_MOST_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return withErrorTraced({ t, error -> error.also { trace(t, error) } }, block)
+}
+
+@OptIn(DelicateRaiseApi::class)
+@ExperimentalTraceApi
+public inline fun <Error, OtherError, A> Raise<Error>.withErrorTraced(
+  transform: (Trace, OtherError) -> Error,
+  block: Raise<OtherError>.() -> A
+): A {
+  contract {
+    callsInPlace(transform, AT_MOST_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
   }
   val nested = DefaultRaise(true)
   return try {
     block(nested).also { nested.complete() }
   } catch (e: Traced) {
     nested.complete()
-    val r: Error = e.raisedOrRethrow(nested)
-    trace(Trace(e), r)
+    val error = transform(Trace(e), e.raisedOrRethrow(nested))
     // If our outer Raise happens to be traced
     // Then we want the stack trace to match the inner one
     try {
-      raise(r)
+      raise(error)
     } catch (rethrown: Traced) {
       throw rethrown.withCause(e)
     }
@@ -240,6 +253,7 @@ internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Rais
 
   @PublishedApi
   internal fun complete(): Boolean = isActive.getAndSet(false)
+
   @OptIn(DelicateRaiseApi::class)
   override fun raise(r: Any?): Nothing = when {
     isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
@@ -267,7 +281,7 @@ public sealed class RaiseCancellationException(
 internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
 @DelicateRaiseApi
-internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null): RaiseCancellationException(raised, raise)
+internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """
