@@ -437,7 +437,7 @@ public fun <T> Iterable<T>.toNonEmptyListOrNone(): Option<NonEmptyList<T>> =
  * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
  */
 @JvmName("toNonEmptyListOrThrow")
-public fun <T> Iterable<T>.toNonEmptyListOrThrow(): NonEmptyList<T>? {
+public fun <T> Iterable<T>.toNonEmptyListOrThrow(): NonEmptyList<T> {
   val iter = iterator()
   require(iter.hasNext())
   return NonEmptyList(Iterable { iter }.toList())

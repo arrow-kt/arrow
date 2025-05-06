@@ -87,7 +87,7 @@ public fun <T> Iterable<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
  */
-public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T>? {
+public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T> {
   val iter = iterator()
   require(iter.hasNext())
   return NonEmptySet(Iterable { iter }.toSet())
