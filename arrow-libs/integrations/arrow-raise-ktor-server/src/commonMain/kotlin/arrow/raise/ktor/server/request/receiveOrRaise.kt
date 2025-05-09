@@ -36,27 +36,31 @@ public suspend inline fun <reified A : Any> RaiseRoutingContext.receiveNullableO
 internal suspend fun <A : Any> Raise<Malformed>.receiveOrRaise(
   call: RoutingCall,
   typeInfo: TypeInfo,
-): A = receiveOrRaise(typeInfo) { call.receive(it) }
+): A = handleConversionError(typeInfo) { call.receive(it) }
 
 @PublishedApi
 internal suspend fun <A : Any> Raise<Malformed>.receiveNullableOrRaise(
   call: RoutingCall,
   typeInfo: TypeInfo,
-): A? = receiveOrRaise(typeInfo) { call.receiveNullable(it) }
+): A? = handleConversionError(typeInfo) { call.receiveNullable(it) }
 
-private inline fun <A> Raise<Malformed>.receiveOrRaise(
+private inline fun <A> Raise<Malformed>.handleConversionError(
   typeInfo: TypeInfo,
-  f: (TypeInfo) -> A
+  receive: (TypeInfo) -> A
 ): A {
-  contract { callsInPlace(f, AT_MOST_ONCE) }
-  return catch({ f(typeInfo) }) {
+  contract { callsInPlace(receive, AT_MOST_ONCE) }
+  return catch({ receive(typeInfo) }) {
     val cause = when (it) {
       is ContentTransformationException,
       is ContentConvertException -> it
-
-      is BadRequestException -> it.cause ?: it // TODO: do we want to unwrap this?
+      is BadRequestException -> it.findConvertException() ?: it
       else -> throw it
     }
     raise(Malformed(ReceiveBody, "could not be deserialized to ${typeInfo.simpleName}", cause))
   }
+}
+
+private tailrec fun Throwable.findConvertException(): ContentConvertException? = when (this) {
+  is ContentConvertException -> this
+  else -> cause?.findConvertException()
 }

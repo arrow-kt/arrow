@@ -9,7 +9,7 @@ import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.recover
 import arrow.raise.ktor.server.RaiseRoutingContext
 import arrow.raise.ktor.server.Response
-import arrow.raise.ktor.server.errorResponse
+import arrow.raise.ktor.server.errorsResponse
 import io.ktor.http.*
 import io.ktor.server.routing.*
 import io.ktor.util.reflect.*
@@ -40,7 +40,7 @@ public class CallValidationContext @PublishedApi internal constructor(
 
 @ExperimentalRaiseAccumulateApi
 public inline fun <A> RaiseRoutingContext.validate(
-  transform: (errors: NonEmptyList<RequestError>) -> Response = call::errorResponse,
+  transform: (errors: NonEmptyList<RequestError>) -> Response = call::errorsResponse,
   block: CallValidationContext.() -> A,
 ): A {
   contract {

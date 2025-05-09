@@ -1,6 +1,7 @@
 package arrow.raise.ktor.server
 
 import arrow.core.NonEmptyList
+import arrow.core.nel
 import arrow.raise.ktor.server.request.RequestError
 import arrow.raise.ktor.server.request.toSimpleMessage
 import io.ktor.http.ContentType
@@ -12,21 +13,24 @@ import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.util.AttributeKey
 import io.ktor.util.Attributes
 
-private typealias ErrorResponse = (NonEmptyList<RequestError>) -> Response
+private typealias ErrorsResponse = (NonEmptyList<RequestError>) -> Response
 
-private val errorResponseKey = AttributeKey<ErrorResponse>("ktor-raise-error-response")
+private val errorsResponseKey = AttributeKey<ErrorsResponse>("ktor-raise-error-response")
 
-internal var Attributes.errorResponse: ErrorResponse
-  get() = getOrNull(errorResponseKey) ?: ::defaultErrorsResponse
+internal var Attributes.errorsResponse: ErrorsResponse
+  get() = getOrNull(errorsResponseKey) ?: ::defaultErrorsResponse
   private set(value) {
-    put(errorResponseKey, value)
+    put(errorsResponseKey, value)
   }
 
 @PublishedApi
-internal fun ApplicationCall.errorResponse(errors: NonEmptyList<RequestError>): Response = attributes.errorResponse(errors)
+internal fun ApplicationCall.errorResponse(error: RequestError): Response = attributes.errorsResponse(error.nel())
+
+@PublishedApi
+internal fun ApplicationCall.errorsResponse(errors: NonEmptyList<RequestError>): Response = attributes.errorsResponse(errors)
 
 public class RaiseErrorResponseConfig(
-  public var errorResponse: ErrorResponse = ::defaultErrorsResponse,
+  public var errorResponse: ErrorsResponse = ::defaultErrorsResponse,
 ) {
   public fun errorResponse(response: (NonEmptyList<RequestError>) -> Response) {
     errorResponse = response
@@ -38,7 +42,7 @@ public val RaiseErrorResponse: RouteScopedPlugin<RaiseErrorResponseConfig> = cre
   createConfiguration = { RaiseErrorResponseConfig() }
 ) {
   onCall { call ->
-    call.attributes.errorResponse = pluginConfig.errorResponse
+    call.attributes.errorsResponse = pluginConfig.errorResponse
   }
 }
 

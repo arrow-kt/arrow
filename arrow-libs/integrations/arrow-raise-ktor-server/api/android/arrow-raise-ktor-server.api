@@ -11,7 +11,8 @@ public class arrow/raise/ktor/server/CallRaiseContext {
 }
 
 public final class arrow/raise/ktor/server/ErrorResponseKt {
-	public static final fun errorResponse-EgRvm48 (Lio/ktor/server/application/ApplicationCall;Ljava/util/List;)Larrow/raise/ktor/server/Response;
+	public static final fun errorResponse (Lio/ktor/server/application/ApplicationCall;Larrow/raise/ktor/server/request/RequestError;)Larrow/raise/ktor/server/Response;
+	public static final fun errorsResponse-EgRvm48 (Lio/ktor/server/application/ApplicationCall;Ljava/util/List;)Larrow/raise/ktor/server/Response;
 	public static final fun getRaiseErrorResponse ()Lio/ktor/server/application/RouteScopedPlugin;
 }
 
@@ -20,8 +21,11 @@ public final class arrow/raise/ktor/server/HandleOrRaiseKt {
 	public static final fun handleOrRaise (Lio/ktor/server/routing/RoutingContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun raise (Larrow/core/raise/Raise;Lio/ktor/http/HttpStatusCode;)Ljava/lang/Void;
 	public static final fun raise (Larrow/core/raise/Raise;Lio/ktor/http/content/OutgoingContent;)Ljava/lang/Void;
-	public static final fun raiseBadRequest (Larrow/core/raise/Raise;)Ljava/lang/Void;
-	public static final fun raiseNotFound (Larrow/core/raise/Raise;)Ljava/lang/Void;
+}
+
+public final class arrow/raise/ktor/server/RaiseErrorKt {
+	public static final fun raiseError (Larrow/raise/ktor/server/RaiseRoutingContext;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun raiseErrors (Larrow/raise/ktor/server/RaiseRoutingContext;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public final class arrow/raise/ktor/server/RaiseErrorResponseConfig {
@@ -53,17 +57,14 @@ public final class arrow/raise/ktor/server/RaiseRoutingContext : arrow/raise/kto
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 }
 
-public abstract interface class arrow/raise/ktor/server/ReceivingRespondOrRaiseHandler {
+public abstract interface class arrow/raise/ktor/server/ReceivingRespondingRaiseRoutingHandler {
 	public abstract fun handle (Larrow/raise/ktor/server/RaiseRoutingContext;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class arrow/raise/ktor/server/RespondOrRaiseHandlersKt {
-	public static final fun asKtorHandler (Larrow/raise/ktor/server/ReceivingRespondOrRaiseHandler;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;)Lkotlin/jvm/functions/Function3;
-	public static final fun asKtorHandler (Lkotlin/jvm/functions/Function2;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;)Lkotlin/jvm/functions/Function2;
-}
-
 public final class arrow/raise/ktor/server/RespondOrRaiseKt {
+	public static final fun respondOrRaise (Lio/ktor/server/routing/RoutingContext;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lio/ktor/util/reflect/TypeInfo;Larrow/raise/ktor/server/ReceivingRespondingRaiseRoutingHandler;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun respondOrRaise (Lio/ktor/server/routing/RoutingContext;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun respondOrRaise$default (Lio/ktor/server/routing/RoutingContext;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lio/ktor/util/reflect/TypeInfo;Larrow/raise/ktor/server/ReceivingRespondingRaiseRoutingHandler;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun respondOrRaise$default (Lio/ktor/server/routing/RoutingContext;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun respondSafely (Lio/ktor/server/routing/RoutingCall;Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }

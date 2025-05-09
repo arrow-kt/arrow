@@ -80,26 +80,23 @@ val KtorExtension.jvmName get() = "${extensionName}OrRaise${jvmNameSuffix}"
 
 val KtorExtension.bodyParameter
   get() = when (this) {
-    is StandardKtorExtension -> "noinline body: RespondOrRaiseHandler<Response>"
-    is ReceivingKtorExtension -> "body: ReceivingRespondOrRaiseHandler<Request, Response>"
+    is StandardKtorExtension -> "crossinline body: RespondingRaiseRoutingHandler<TResponse>"
+    is ReceivingKtorExtension -> "body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>"
   }
 
 val KtorExtension.typeParameters
   get() = when (this) {
-    is StandardKtorExtension -> "<reified Response>"
-    is ReceivingKtorExtension -> "<reified Request : Any, reified Response>"
+    is StandardKtorExtension -> "<reified TResponse>"
+    is ReceivingKtorExtension -> "<reified TRequest : Any, reified TResponse>"
   }
 
 val KtorExtension.invocation
-  get() = when (this) {
-    is StandardKtorExtension -> "$extensionName$invocationParams"
-    is ReceivingKtorExtension -> "$extensionName<Request>$invocationParams"
-  }
+  get() = "$extensionName$invocationParams"
 
 val KtorExtension.invocationParams
   get() = when (pathType) {
-    null -> "(body.asKtorHandler(statusCode))"
-    else -> "(path, body.asKtorHandler(statusCode))"
+    null -> " { respondOrRaise(statusCode, body) }"
+    else -> "(path) { respondOrRaise(statusCode, body) }"
   }
 //endregion
 

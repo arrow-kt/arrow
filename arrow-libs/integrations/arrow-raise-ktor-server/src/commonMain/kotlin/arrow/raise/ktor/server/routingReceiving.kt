@@ -11,77 +11,77 @@ import kotlin.jvm.JvmName
 @KtorDsl
 @RaiseDSL
 @JvmName("patchOrRaiseTyped")
-public inline fun <reified Request : Any, reified Response> Route.patchOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.patchOrRaise(
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = patch<Request>(body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = patch { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("patchOrRaiseTypedPath")
-public inline fun <reified Request : Any, reified Response> Route.patchOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.patchOrRaise(
   path: String,
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = patch<Request>(path, body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = patch(path) { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("patchOrRaiseTypedRegex")
-public inline fun <reified Request : Any, reified Response> Route.patchOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.patchOrRaise(
   path: Regex,
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = patch<Request>(path, body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = patch(path) { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("postOrRaiseTyped")
-public inline fun <reified Request : Any, reified Response> Route.postOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.postOrRaise(
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = post<Request>(body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = post { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("postOrRaiseTypedPath")
-public inline fun <reified Request : Any, reified Response> Route.postOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.postOrRaise(
   path: String,
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = post<Request>(path, body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = post(path) { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("postOrRaiseTypedRegex")
-public inline fun <reified Request : Any, reified Response> Route.postOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.postOrRaise(
   path: Regex,
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = post<Request>(path, body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = post(path) { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("putOrRaiseTyped")
-public inline fun <reified Request : Any, reified Response> Route.putOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.putOrRaise(
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = put<Request>(body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = put { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("putOrRaiseTypedPath")
-public inline fun <reified Request : Any, reified Response> Route.putOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.putOrRaise(
   path: String,
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = put<Request>(path, body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = put(path) { respondOrRaise(statusCode, body) }
 
 @KtorDsl
 @RaiseDSL
 @JvmName("putOrRaiseTypedRegex")
-public inline fun <reified Request : Any, reified Response> Route.putOrRaise(
+public inline fun <reified TRequest : Any, reified TResponse> Route.putOrRaise(
   path: Regex,
   statusCode: HttpStatusCode? = null,
-  body: ReceivingRespondOrRaiseHandler<Request, Response>,
-): Route = put<Request>(path, body.asKtorHandler(statusCode))
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = put(path) { respondOrRaise(statusCode, body) }

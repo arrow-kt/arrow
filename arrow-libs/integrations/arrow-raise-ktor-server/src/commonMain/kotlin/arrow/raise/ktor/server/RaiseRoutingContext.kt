@@ -23,7 +23,7 @@ public class RaiseRoutingContext(
   @PublishedApi
   internal val errorRaise: Raise<RequestError> =
     object : Raise<RequestError> {
-      override fun raise(requestError: RequestError) = raise(call.errorResponse(requestError.nel()))
+      override fun raise(requestError: RequestError) = raise(call.errorsResponse(requestError.nel()))
     }
 
   public fun raise(requestError: RequestError): Nothing = errorRaise.raise(requestError)
@@ -73,7 +73,6 @@ public open class CallRaiseContext internal constructor(public val call: Routing
 
   @ExperimentalRaiseAccumulateApi
   public fun RaiseAccumulate<RequestError>.queryOrAccumulate(name: String): RaiseAccumulate.Value<String> = accumulating { queryOrRaise(call, name) }
-
 
   @ExperimentalRaiseAccumulateApi
   public suspend inline fun <reified A : Any> RaiseAccumulate<RequestError>.receiveOrAccumulate(): RaiseAccumulate.Value<A> = accumulating { receiveOrRaise(call) }

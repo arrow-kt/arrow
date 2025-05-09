@@ -12,6 +12,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.content.*
 import io.ktor.serialization.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -122,7 +123,7 @@ class HandleOrRaiseTest {
     routing {
       route("/three-check/{value}") {
         handleOrRaise {
-          val value = call.parameters["value"]?.toIntOrNull() ?: raiseBadRequest()
+          val value = call.parameters["value"]?.toIntOrNull() ?: raise(BadRequest)
 
           withError({ raise(HttpStatusCode.InternalServerError, it.msg) }) {
             ensure(value > 3) {

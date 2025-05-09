@@ -25,7 +25,7 @@ public sealed interface Response {
     public inline fun <reified T> payload(value: T, statusCode: HttpStatusCode = HttpStatusCode.Companion.OK): Response = Response(statusCode, value, typeInfo<T>())
 
     // allows using a HttpStatusCode as a "constructor" of a response, i.e. `NotFound("user was missing")`
-    public inline operator fun <reified T : Any> HttpStatusCode.invoke(payload: T) = Response(this, payload, typeInfo<T>())
+    public inline operator fun <reified T : Any> HttpStatusCode.invoke(payload: T): Response = Response(this, payload, typeInfo<T>())
   }
 }
 

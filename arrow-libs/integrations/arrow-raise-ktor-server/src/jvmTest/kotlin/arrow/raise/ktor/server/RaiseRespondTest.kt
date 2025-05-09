@@ -11,6 +11,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.content.*
 import io.ktor.http.*
+import io.ktor.http.HttpStatusCode.Companion.BadRequest
+import io.ktor.http.HttpStatusCode.Companion.NotFound
+import io.ktor.http.HttpStatusCode.Companion.OK
+import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.serialization.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
@@ -32,7 +36,7 @@ class RaiseRespondTest {
 
     client.get("/foo").let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.OK
+        it.status shouldBe OK
         it.bodyAsText() shouldBe "bar"
       }
     }
@@ -141,7 +145,7 @@ class RaiseRespondTest {
       setBody("hello")
     }.let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.OK
+        it.status shouldBe OK
         it.bodyAsText() shouldBe "HELLO"
       }
     }
@@ -157,7 +161,7 @@ class RaiseRespondTest {
       setBody("hello")
     }.let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.OK
+        it.status shouldBe OK
         it.bodyAsText() shouldBe "HELLO"
       }
     }
@@ -173,12 +177,12 @@ class RaiseRespondTest {
     }
 
     assertSoftly(client.get("/upper/hello")) {
-      it.status shouldBe HttpStatusCode.OK
+      it.status shouldBe OK
       it.bodyAsText() shouldBe "HELLO"
     }
 
     assertSoftly(client.get("/upper")) {
-      it.status shouldBe HttpStatusCode.BadRequest
+      it.status shouldBe BadRequest
       it.bodyAsText() shouldBe "Missing path parameter 'text'."
     }
   }
@@ -204,7 +208,7 @@ class RaiseRespondTest {
     data class ErrorPayload(val code: String, val message: String)
 
     fun Raise<Response>.handleError(domainError: DomainError): Nothing = when (domainError) {
-      is UserBanned -> raise(HttpStatusCode.Unauthorized, ErrorPayload("Banned", domainError.userId))
+      is UserBanned -> raise(Unauthorized, ErrorPayload("Banned", domainError.userId))
       is ServerError -> raise(HttpStatusCode.InternalServerError, ErrorPayload("ServerError:${domainError.code}", domainError.message))
       else -> error("no local sealed class ;)")
     }
@@ -220,10 +224,10 @@ class RaiseRespondTest {
 
     routing {
       getOrRaise("/users/{userId?}") {
-        val userId = call.pathParameters["userId"] ?: raiseBadRequest("userId not specified")
+        val userId = call.pathParameters["userId"] ?: raise(BadRequest, "userId not specified")
         withError(::handleError) {
           with(userService) {
-            lookupUser(userId) ?: raise(HttpStatusCode.NotFound)
+            lookupUser(userId) ?: raise(NotFound)
           }
         }
       }
@@ -231,28 +235,28 @@ class RaiseRespondTest {
 
     client.get("/users/").let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.BadRequest
+        it.status shouldBe BadRequest
         it.bodyAsText() shouldBe "userId not specified"
       }
     }
 
     client.get("/users/alice").let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.OK
+        it.status shouldBe OK
         it.bodyAsText() shouldBe "User(id=alice)"
       }
     }
 
     client.get("/users/bob").let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.Unauthorized
+        it.status shouldBe Unauthorized
         it.bodyAsText() shouldBe "ErrorPayload(code=Banned, message=bob)"
       }
     }
 
     client.get("/users/carol").let {
       assertSoftly {
-        it.status shouldBe HttpStatusCode.NotFound
+        it.status shouldBe NotFound
         it.bodyAsText() shouldBe ""
       }
     }

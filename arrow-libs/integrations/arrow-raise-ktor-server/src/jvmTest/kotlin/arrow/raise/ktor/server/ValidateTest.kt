@@ -48,7 +48,7 @@ class ValidateTest {
     install(ContentNegotiation) { json() }
     routing {
       putOrRaise("/user/{id}") {
-        val person = withError({ raise(call.errorResponse(it)) }) {
+        val person = withError({ raise(call.errorsResponse(it)) }) {
           accumulate {
             val name by accumulating { pathOrRaise("name") }
             val age by accumulating { queryOrRaise<Int>("age") }
@@ -115,7 +115,7 @@ class ValidateTest {
     install(ContentNegotiation) { json() }
     routing {
       put("/user/{name}") {
-        val response = call.validate(call::errorResponse) {
+        val response = call.validate(call::errorsResponse) {
           val name: String by pathAccumulating
           val form = formParametersDelegate()
           val age by form<Int>()
