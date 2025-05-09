@@ -40,3 +40,12 @@ public interface NonEmptyCollection<out E> : Collection<E> {
   private inline fun <T> delegate(crossinline f: (Collection<E>) -> List<T>): NonEmptyList<T> =
     f(this as Collection<E>).toNonEmptyListOrNull()!!
 }
+
+/**
+ * Marks operations which may break non-emptiness invariants if used wrong.
+ * In most cases, it involves using mutable collections without copying the elements first.
+ */
+@RequiresOptIn
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+public annotation class PotentiallyUnsafeNonEmptyOperation

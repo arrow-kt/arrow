@@ -43,6 +43,7 @@ private object JvmProcess : Process {
   private fun addSignalHandler(signal: String, action: suspend () -> Unit): Unit =
     try {
       var handle: SignalHandler? = null
+      @Suppress("ASSIGNED_VALUE_IS_NEVER_READ")
       handle =
         Signal.handle(Signal(signal)) { prev ->
           runBlocking { action() }

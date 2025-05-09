@@ -81,8 +81,7 @@ public inline fun <V> Atomic<V>.updateAndGet(function: (V) -> V): V {
   return update(function) { _, new -> new }
 }
 
-@PublishedApi
-internal inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform: (old: V, new: U) -> R): R {
+public inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform: (old: V, new: U) -> R): R {
   contract {
     callsInPlace(function, InvocationKind.AT_LEAST_ONCE)
     callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
@@ -93,8 +92,7 @@ internal inline fun <V, U: V, R> Atomic<V>.update(function: (V) -> U, transform:
   }
 }
 
-@PublishedApi
-internal inline fun <V, U: V> Atomic<V>.tryUpdate(function: (V) -> U, onUpdated: (old: V, new: U) -> Unit): Boolean {
+public inline fun <V, U: V> Atomic<V>.tryUpdate(function: (V) -> U, onUpdated: (old: V, new: U) -> Unit): Boolean {
   contract {
     callsInPlace(function, InvocationKind.EXACTLY_ONCE)
     callsInPlace(onUpdated, InvocationKind.AT_MOST_ONCE)

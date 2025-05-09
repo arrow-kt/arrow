@@ -5,9 +5,10 @@ package arrow.core
 import arrow.core.raise.RaiseAccumulate
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmName
 
 @JvmInline
-public value class NonEmptySet<out E> private constructor(
+public value class NonEmptySet<out E> internal constructor(
   @PublishedApi internal val elements: Set<E>
 ) : Set<E> by elements, NonEmptyCollection<E> {
 
@@ -68,14 +69,29 @@ public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
 public fun <E> nonEmptySetOf(first: E, vararg rest: E): NonEmptySet<E> =
   NonEmptySet(first, rest.asIterable())
 
+/**
+ * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
+ */
 public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? {
   val iter = iterator()
   if (!iter.hasNext()) return null
-  return NonEmptySet(iter.next(), Iterable { iter })
+  return NonEmptySet(Iterable { iter }.toSet())
 }
 
+/**
+ * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
+ */
 public fun <T> Iterable<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
   toNonEmptySetOrNull().toOption()
+
+/**
+ * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
+ */
+public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T> {
+  val iter = iterator()
+  require(iter.hasNext())
+  return NonEmptySet(Iterable { iter }.toSet())
+}
 
 @Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
 public fun <E> Set<E>.toNonEmptySetOrNull(): NonEmptySet<E>? =
@@ -84,3 +100,27 @@ public fun <E> Set<E>.toNonEmptySetOrNull(): NonEmptySet<E>? =
 @Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
 public fun <E> Set<E>.toNonEmptySetOrNone(): Option<NonEmptySet<E>> =
   toNonEmptySetOrNull().toOption()
+
+/**
+ * Returns a [NonEmptySet] that wraps the given [this], avoiding an additional copy.
+ *
+ * Any modification made to [this] will also be visible through the returned [NonEmptySet].
+ * You are responsible for keeping the non-emptiness invariant at all times.
+ */
+@PotentiallyUnsafeNonEmptyOperation
+public fun <T> Set<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> {
+  require(isNotEmpty())
+  return NonEmptySet(this)
+}
+
+/**
+ * Returns a [NonEmptySet] that wraps the given [this], avoiding an additional copy.
+ *
+ * Any modification made to [this] will also be visible through the returned [NonEmptySet].
+ * You are responsible for keeping the non-emptiness invariant at all times.
+ */
+@PotentiallyUnsafeNonEmptyOperation
+public fun <T> Set<T>.wrapAsNonEmptySetOrNull(): NonEmptySet<T>? = when {
+  isEmpty() -> null
+  else -> NonEmptySet(this)
+}

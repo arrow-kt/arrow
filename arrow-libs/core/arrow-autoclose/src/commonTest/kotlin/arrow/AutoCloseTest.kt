@@ -188,6 +188,8 @@ class AutoCloseTest {
     closed.cancel()
   }
 
+
+  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 

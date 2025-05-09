@@ -7,6 +7,7 @@ import arrow.core.leftIor
 import arrow.core.rightIor
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -17,7 +18,6 @@ import io.kotest.property.arbitrary.alphanumeric
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.az
 import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.enum
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
@@ -184,11 +184,27 @@ class IorModuleTest {
 
   private val arbTestClass: Arb<TestClass> = arbitrary { TestClass(Arb.ior(arbFoo, arbBar).bind()) }
 
-  private fun <L, R> Arb.Companion.ior(arbL: Arb<L>, arbR: Arb<R>): Arb<Ior<L, R>> = Arb.choice(
-    arbitrary { arbL.bind().leftIor() },
-    arbitrary { arbR.bind().rightIor() },
-    arbitrary { (arbL.bind() to arbR.bind()).bothIor() },
-  )
-
   private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
+
+  @Test
+  fun `works with Map, issue #131, part 1`() = runTest {
+    checkAll(arbMapContainer(Arb.ior(arbFoo, arbBar))) { original ->
+      val serialized = mapper.writeValueAsString(original)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<MapContainer<Ior<Foo, Bar>>>())
+      }
+      deserialized shouldBe original
+    }
+  }
+
+  @Test
+  fun `works with Map, issue #131, part 2`() = runTest {
+    checkAll(arbMapContainer(Arb.ior(arbFoo, arbBar))) { original ->
+      val serialized = mapper.writeValueAsString(original.value)
+      val deserialized = shouldNotThrowAny {
+        mapper.readValue(serialized, jacksonTypeRef<Map<MapContainer.Key, Ior<Foo, Bar>>>())
+      }
+      deserialized shouldBe original.value
+    }
+  }
 }

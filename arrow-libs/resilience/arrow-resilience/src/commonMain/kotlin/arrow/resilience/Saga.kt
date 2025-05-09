@@ -1,7 +1,7 @@
 package arrow.resilience
 
 import arrow.atomic.Atomic
-import arrow.atomic.updateAndGet
+import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -133,7 +133,10 @@ internal class SagaBuilder(
       // the compensation stack will run in the `transact` stage, this is just the builder
       when (res) {
         null -> Unit
-        else -> stack.updateAndGet { listOf(suspend { compensation(res) }) + it }
+        else -> stack.update(
+          function = { listOf(suspend { compensation(res) }) + it },
+          transform = { _, new -> new }
+        )
       }
     }
 

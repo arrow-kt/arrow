@@ -1,17 +1,13 @@
+import groovy.util.Node
+import groovy.util.NodeList
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import java.net.URL
+import java.net.URI
 import java.time.Duration
-import groovy.util.Node
-import groovy.util.NodeList
-import org.gradle.api.Project
-import org.gradle.api.XmlProvider
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 repositories {
   mavenCentral()
@@ -24,7 +20,10 @@ group = property("projects.group").toString()
 val projectNameWithDots = project.name.replace('-', '.')
 
 val Project.withoutAndroid
-  get() = project.name == "suspendapp"
+  get() = project.name == "suspendapp" || project.name == "suspendapp-ktor"
+
+val Project.requiresAndroidCoreLibraryDesugaring
+  get() = project.name == "arrow-collectors"
 
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
@@ -70,16 +69,18 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  // required to be part of the Kotlin User Projects repository
-  providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_api_version").ifAvailable { apiVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
+  apiVersion = KotlinVersion.KOTLIN_1_9
+  languageVersion = KotlinVersion.KOTLIN_2_0
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
     "-Wextra",
     "-Xuse-fir-experimental-checkers",
   )
+  // required to be part of the Kotlin User Projects repository
+  providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_api_version").ifAvailable { apiVersion = KotlinVersion.fromVersion(it) }
+  providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
 }
 
 if (isKotlinMultiplatform) {
@@ -207,7 +208,11 @@ if (pluginManager.hasPlugin("com.android.library")) {
     namespace = projectNameWithDots
     compileSdk = 35
     defaultConfig {
-      minSdk = 24
+      minSdk = 21
+    }
+    compileOptions {
+      sourceCompatibility = JavaVersion.VERSION_1_8
+      targetCompatibility = JavaVersion.VERSION_1_8
     }
   }
 }
@@ -221,15 +226,18 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
   extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
     dokkaSourceSets.named(kotlinSourceSet.name) {
+      if ("androidAndJvm" in kotlinSourceSet.name) {
+        platform.set(org.jetbrains.dokka.Platform.jvm)
+      }
       perPackageOption {
         matchingRegex.set(".*\\.internal.*")
         suppress.set(true)
       }
       externalDocumentationLink {
-        url.set(URL("https://kotlinlang.org/api/kotlinx.serialization/"))
+        url.set(URI("https://kotlinlang.org/api/kotlinx.serialization/").toURL())
       }
       externalDocumentationLink {
-        url.set(URL("https://kotlinlang.org/api/kotlinx.coroutines/"))
+        url.set(URI("https://kotlinlang.org/api/kotlinx.coroutines/").toURL())
       }
       skipDeprecated.set(true)
       reportUndocumented.set(false)
@@ -237,7 +245,7 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
       kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
         sourceLink {
           localDirectory.set(srcDir)
-          remoteUrl.set(URL("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}"))
+          remoteUrl.set(URI("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
           remoteLineSuffix.set("#L")
         }
       }
@@ -252,8 +260,13 @@ configure<ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension> {
 val signature by configurations.getting
 dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
-  if (isKotlinMultiplatform && !withoutAndroid) {
-    signature("net.sf.androidscents.signature:android-api-level-24:7.0_r2@signature")
+  when {
+    !isKotlinMultiplatform -> { }
+    withoutAndroid -> { }
+    requiresAndroidCoreLibraryDesugaring ->
+      signature("com.toasttab.android:gummy-bears-api-21:0.12.0:coreLib2@signature")
+    else ->
+      signature("com.toasttab.android:gummy-bears-api-21:0.12.0@signature")
   }
 }
 

@@ -15,6 +15,7 @@ import kotlin.test.Test
 
 class ResourceAutoCloseTest {
 
+  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
   class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)

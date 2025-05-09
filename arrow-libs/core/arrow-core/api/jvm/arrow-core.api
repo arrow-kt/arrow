@@ -495,8 +495,11 @@ public final class arrow/core/NonEmptyListKt {
 	public static final fun nonEmptyListOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/List;
 	public static final fun toNonEmptyListOrNone (Ljava/lang/Iterable;)Larrow/core/Option;
 	public static final fun toNonEmptyListOrNull (Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun toNonEmptyListOrThrow (Ljava/lang/Iterable;)Ljava/util/List;
 	public static final fun unzip-GZgkXh4 (Ljava/util/List;)Lkotlin/Pair;
 	public static final fun unzip-ZALtuoE (Ljava/util/List;Lkotlin/jvm/functions/Function1;)Lkotlin/Pair;
+	public static final fun wrapAsNonEmptyListOrNull (Ljava/util/List;)Ljava/util/List;
+	public static final fun wrapAsNonEmptyListOrThrow (Ljava/util/List;)Ljava/util/List;
 }
 
 public final class arrow/core/NonEmptySet : arrow/core/NonEmptyCollection, java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {
@@ -568,6 +571,9 @@ public final class arrow/core/NonEmptySetKt {
 	public static final synthetic fun toNonEmptySetOrNone (Ljava/util/Set;)Larrow/core/Option;
 	public static final fun toNonEmptySetOrNull (Ljava/lang/Iterable;)Ljava/util/Set;
 	public static final synthetic fun toNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
+	public static final fun toNonEmptySetOrThrow (Ljava/lang/Iterable;)Ljava/util/Set;
+	public static final fun wrapAsNonEmptySetOrNull (Ljava/util/Set;)Ljava/util/Set;
+	public static final fun wrapAsNonEmptySetOrThrow (Ljava/util/Set;)Ljava/util/Set;
 }
 
 public final class arrow/core/NonFatalKt {
@@ -624,6 +630,9 @@ public final class arrow/core/OptionKt {
 	public static final fun toOption (Ljava/lang/Object;)Larrow/core/Option;
 	public static final fun toOption (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun toOption (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class arrow/core/PotentiallyUnsafeNonEmptyOperation : java/lang/annotation/Annotation {
 }
 
 public final class arrow/core/PredefKt {
@@ -1079,6 +1088,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun traced (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
 	public static final fun withCause (Larrow/core/raise/Traced;Larrow/core/raise/Traced;)Larrow/core/raise/Traced;
 	public static final fun withError (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun withErrorTraced (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function9;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function8;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function7;)Ljava/lang/Object;
