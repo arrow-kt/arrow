@@ -1,9 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int

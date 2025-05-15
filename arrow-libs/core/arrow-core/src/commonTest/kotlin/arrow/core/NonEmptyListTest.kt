@@ -2,8 +2,6 @@ package arrow.core
 
 import arrow.core.test.nonEmptyList
 import arrow.platform.stackSafeIteration
-import io.kotest.assertions.withClue
-import io.kotest.inspectors.shouldForAll
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -65,10 +63,10 @@ class NonEmptyListTest {
       val result = a.align(b)
 
       result.size shouldBe max(a.size, b.size)
-      result.take(min(a.size, b.size)).shouldForAll {
+      result.take(min(a.size, b.size)).forEach {
         it.isBoth() shouldBe true
       }
-      result.drop(min(a.size, b.size)).shouldForAll {
+      result.drop(min(a.size, b.size)).forEach {
         if (a.size < b.size) {
           it.isRight() shouldBe true
         } else {
@@ -339,10 +337,8 @@ class NonEmptyListTest {
     checkAll(
       Arb.nonEmptyList(Arb.int())
     ) { a ->
-      withClue("$a should be equal to ${a.all}") {
-        // `shouldBe` doesn't use the `equals` methods on `Iterable`
-        (a == a.all).shouldBeTrue()
-      }
+      // `shouldBe` doesn't use the `equals` methods on `Iterable`
+      (a == a.all).shouldBeTrue()
     }
   }
 

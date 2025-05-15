@@ -1,7 +1,7 @@
 package arrow.core.raise
 
 import arrow.core.right
-import io.kotest.assertions.throwables.shouldThrow
+import arrow.core.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int

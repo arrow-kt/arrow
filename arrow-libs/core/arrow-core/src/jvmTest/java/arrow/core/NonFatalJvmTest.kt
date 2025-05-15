@@ -1,6 +1,6 @@
 package arrow.core
 
-import io.kotest.assertions.throwables.shouldThrowAny
+import arrow.core.shouldThrowAny
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test

@@ -3,7 +3,7 @@ package arrow.core.examples.exampleEither36
 
 import arrow.core.Either
 import arrow.core.catch
-import io.kotest.assertions.throwables.shouldThrowUnit
+import arrow.core.shouldThrow
 import io.kotest.matchers.shouldBe
 
 fun test() {
@@ -12,8 +12,9 @@ fun test() {
   val caught: Either<Nothing, Int> = left.catch { _: RuntimeException -> 1 }
   val failure: Either<String, Int> = left.catch { _: RuntimeException -> raise("failure") }
 
-  shouldThrowUnit<RuntimeException> {
+  shouldThrow<RuntimeException> {
     val caught2: Either<Nothing, Int> = left.catch { _: IllegalStateException -> 1 }
+    Unit
   }
 
   caught shouldBe Either.Right(1)

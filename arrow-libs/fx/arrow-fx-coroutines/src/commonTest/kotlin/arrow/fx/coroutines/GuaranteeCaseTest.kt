@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll

@@ -1,15 +1,15 @@
 package arrow.core.raise
 
 import arrow.core.identity
+import arrow.core.shouldBeTypeOf
+import arrow.core.shouldThrow
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import io.kotest.assertions.fail
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
-import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string

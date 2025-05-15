@@ -1,6 +1,5 @@
 package arrow.fx.coroutines
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import java.util.concurrent.atomic.AtomicBoolean

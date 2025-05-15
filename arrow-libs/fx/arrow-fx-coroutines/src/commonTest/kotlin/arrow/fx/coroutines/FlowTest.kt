@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long

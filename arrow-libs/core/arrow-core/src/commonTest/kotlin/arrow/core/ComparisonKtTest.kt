@@ -1,6 +1,5 @@
 package arrow.core
 
-import io.kotest.assertions.assertSoftly
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
@@ -36,10 +35,8 @@ class ComparisonKtTest {
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-        }
+        first shouldBe aa
+        second shouldBe bb
       }
     }
 
@@ -48,11 +45,9 @@ class ComparisonKtTest {
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
+        first shouldBe aa
+        second shouldBe bb
+        third shouldBe cc
       }
     }
 
@@ -71,10 +66,8 @@ class ComparisonKtTest {
         val (first, second) = sort(a, b, Person.comparator)
         val (aa, bb) = listOf(a, b).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-        }
+        first shouldBe aa
+        second shouldBe bb
       }
     }
 
@@ -83,11 +76,9 @@ class ComparisonKtTest {
         val (first, second, third) = sort(a, b, c, Person.comparator)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
+        first shouldBe aa
+        second shouldBe bb
+        third shouldBe cc
       }
     }
 
@@ -96,10 +87,8 @@ class ComparisonKtTest {
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-        }
+        first shouldBe aa
+        second shouldBe bb
       }
     }
 
@@ -108,11 +97,9 @@ class ComparisonKtTest {
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
+        first shouldBe aa
+        second shouldBe bb
+        third shouldBe cc
       }
     }
 
@@ -130,10 +117,8 @@ class ComparisonKtTest {
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-        }
+        first shouldBe aa
+        second shouldBe bb
       }
     }
 
@@ -142,11 +127,9 @@ class ComparisonKtTest {
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
+        first shouldBe aa
+        second shouldBe bb
+        third shouldBe cc
       }
     }
 
@@ -174,11 +157,9 @@ class ComparisonKtTest {
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
+        first shouldBe aa
+        second shouldBe bb
+        third shouldBe cc
       }
     }
 
@@ -196,10 +177,8 @@ class ComparisonKtTest {
         val (first, second) = sort(a, b)
         val (aa, bb) = listOf(a, b).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-        }
+        first shouldBe aa
+        second shouldBe bb
       }
     }
 
@@ -208,11 +187,9 @@ class ComparisonKtTest {
         val (first, second, third) = sort(a, b, c)
         val (aa, bb, cc) = listOf(a, b, c).sorted()
 
-        assertSoftly {
-          first shouldBe aa
-          second shouldBe bb
-          third shouldBe cc
-        }
+        first shouldBe aa
+        second shouldBe bb
+        third shouldBe cc
       }
     }
 

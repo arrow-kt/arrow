@@ -1,7 +1,6 @@
 package arrow
 
 import arrow.atomic.AtomicBoolean
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test

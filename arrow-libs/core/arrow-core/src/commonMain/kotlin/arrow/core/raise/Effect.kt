@@ -89,7 +89,7 @@ import kotlin.jvm.JvmName
  * import arrow.core.raise.ensure
  * import io.kotest.matchers.collections.shouldNotBeEmpty
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeInstanceOf
+ * import arrow.core.shouldBeInstanceOf
  * import java.io.File
  * import java.io.FileNotFoundException
  * -->
@@ -332,7 +332,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.parZip
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeTypeOf
+ * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
  * import kotlinx.coroutines.awaitCancellation
  * -->
@@ -369,7 +369,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.parMap
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeTypeOf
+ * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
  * import kotlinx.coroutines.awaitCancellation
  *
@@ -408,7 +408,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.raceN
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeTypeOf
+ * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
  * import kotlinx.coroutines.awaitCancellation
  *
@@ -444,7 +444,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.bracketCase
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeTypeOf
+ * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
  * import java.io.BufferedReader
  * import java.io.File
@@ -477,7 +477,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.resourceScope
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeTypeOf
+ * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
  * import java.io.BufferedReader
  * import java.io.File
@@ -519,7 +519,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.guaranteeCase
  * import io.kotest.assertions.fail
  * import io.kotest.matchers.shouldBe
- * import io.kotest.matchers.types.shouldBeInstanceOf
+ * import arrow.core.shouldBeInstanceOf
  * import kotlinx.coroutines.CompletableDeferred
  * import kotlinx.coroutines.Dispatchers
  * import kotlinx.coroutines.awaitCancellation

@@ -8,12 +8,12 @@ import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspWithCompilation
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
-import io.kotest.assertions.withClue
+import io.kotest.assertions.fail
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import org.jetbrains.kotlin.config.JvmTarget
 import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -36,16 +36,12 @@ fun String.compilationFails() {
 
 fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
   val compilationResult = compile(this, allWarningsAsErrors = allWarningsAsErrors)
-  withClue(compilationResult.messages) {
-    compilationResult.exitCode shouldBe KotlinCompilation.ExitCode.OK
-  }
+  compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
 }
 
 fun String.evals(thing: Pair<String, Any?>) {
   val compilationResult = compile(this)
-  withClue(compilationResult.messages) {
-    compilationResult.exitCode shouldBe KotlinCompilation.ExitCode.OK
-  }
+  compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
   val classesDirectory = compilationResult.outputDirectory
   val (variable, output) = thing
   eval(variable, classesDirectory) shouldBe output
@@ -60,7 +56,7 @@ internal fun compile(text: String, allWarningsAsErrors: Boolean = false): Compil
 }
 
 fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = KotlinCompilation().apply {
-  jvmTarget = "11"
+  jvmTarget = JvmTarget.JVM_1_8.description
   classpaths = listOf(
     "arrow-annotations:$arrowVersion",
     "arrow-core:$arrowVersion",
@@ -79,10 +75,10 @@ private fun classpathOf(dependency: String): File {
     ClassGraph().classpathFiles.firstOrNull { classpath ->
       dependenciesMatch(classpath, dependency)
     }
-  withClue("$dependency not found in test runtime. Check your build configuration.") {
-    file.shouldNotBeNull()
+  if (file == null) {
+    fail("$dependency not found in test runtime. Check your build configuration.")
   }
-  return file!!
+  return file
 }
 
 private fun dependenciesMatch(classpath: File, dependency: String): Boolean {

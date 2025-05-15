@@ -10,7 +10,6 @@ import arrow.core.test.map3
 import arrow.core.test.option
 import arrow.core.test.testLaws
 import arrow.platform.test.FlakyOnJs
-import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
@@ -18,7 +17,6 @@ import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.maps.shouldNotContainKey
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
@@ -364,13 +362,13 @@ class MapKTest {
       ) { xs ->
         val (found, notFound) = (0 .. 1000).partition { xs.containsKey(it) }
 
-        found.forAll {
+        found.forEach {
           xs.getOrNone(it)
             .shouldBeInstanceOf<Some<String>>()
             .value.shouldBe(xs[it])
         }
 
-        notFound.forAll {
+        notFound.forEach {
           xs.getOrNone(it)
             .shouldBeInstanceOf<None>()
         }
@@ -401,13 +399,13 @@ class MapKTest {
       ) { (a, b) ->
         val x = a.padZip(b)
 
-        a.forAll {
+        a.forEach {
           val value = x[it.key].shouldNotBeNull()
 
           value.first shouldBe it.value
         }
 
-        b.forAll {
+        b.forEach {
           val value = x[it.key].shouldNotBeNull()
 
           value.second shouldBe it.value
@@ -438,7 +436,7 @@ class MapKTest {
       ) { xs ->
         val rs = xs.mapValuesNotNull { (_, pred) -> if(pred) true else null }
 
-        xs.forAll {
+        xs.forEach {
           if (it.value)
             rs shouldContainKey it.key
           else
@@ -453,7 +451,7 @@ class MapKTest {
       ) { xs ->
         val rs = xs.filterOption()
 
-        xs.forAll {
+        xs.forEach {
           val value = it.value
           if (value is Some<Int>)
             rs shouldContain (it.key to value.value)

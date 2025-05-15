@@ -1,6 +1,5 @@
 package arrow.fx.stm
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
