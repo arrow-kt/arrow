@@ -25,6 +25,9 @@ val Project.withoutAndroid
 val Project.requiresAndroidCoreLibraryDesugaring
   get() = project.name == "arrow-collectors"
 
+val Project.needsJava11
+  get() = project.name.endsWith("-compose")
+
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
@@ -44,9 +47,14 @@ val doNotPublish = listOf("arrow-raise-ktor-server")
 if (project.name !in doNotPublish)
   plugins.apply("com.vanniktech.maven.publish")
 
+val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks {
   withType<Test>().configureEach {
     maxParallelForks = Runtime.getRuntime().availableProcessors()
+    // always use Java 11, because Kotest requires it
+    javaLauncher.set(javaToolchains.launcherFor {
+      languageVersion.set(JavaLanguageVersion.of(11))
+    })
     useJUnitPlatform()
     testLogging {
       setExceptionFormat("full")
@@ -61,7 +69,8 @@ configure<KotlinProjectExtension> {
 
 configure<JavaPluginExtension> {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(11))
+    languageVersion.set(JavaLanguageVersion.of(8))
+    targetCompatibility = if (needsJava11) JavaVersion.VERSION_11 else JavaVersion.VERSION_1_8
   }
 }
 
@@ -89,7 +98,7 @@ if (isKotlinMultiplatform) {
 
     jvm {
       compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
+        jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
       }
       tasks.named<Jar>("jvmJar") {
         manifest {
@@ -197,7 +206,7 @@ if (isKotlinJvm) {
 
   configure<KotlinJvmExtension> {
     compilerOptions {
-      jvmTarget = JvmTarget.JVM_11
+      jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
       commonCompilerOptions()
     }
   }

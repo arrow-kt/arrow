@@ -7,7 +7,7 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import java.io.BufferedReader
 import java.io.File

@@ -4,6 +4,8 @@ package arrow.core
 
 import io.kotest.property.checkAll
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlin.random.Random
@@ -12,7 +14,7 @@ import kotlin.test.Test
 
 class MemoizationTest {
   @Test fun memoizeRaces() = runTest {
-    checkAll<Int> {
+    checkAll(Arb.int()) {
       fun sum(): Int =
         Random.nextInt(Int.MAX_VALUE)
 

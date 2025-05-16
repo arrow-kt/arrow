@@ -3,10 +3,12 @@ package arrow.fx.stm
 import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.assertionCounter
+import io.kotest.assertions.failure
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.ints.shouldBeInRange
 import io.kotest.matchers.shouldBe
+import io.kotest.mpp.bestName
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
@@ -287,5 +289,27 @@ class STMTest {
     ) { _, _ -> Unit }
     // the above only finishes if the consumer reads at least 100 values, this here is just to make sure there are no leftovers
     atomically { tq.flush() } shouldBe emptyList()
+  }
+}
+
+// copied from Kotest so we can inline it
+inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
+  assertionCounter.inc()
+  val expectedExceptionClass = T::class
+  val thrownThrowable = try {
+    block()
+    null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
+  } catch (thrown: Throwable) {
+    thrown
+  }
+
+  return when (thrownThrowable) {
+    null -> throw failure("Expected exception ${expectedExceptionClass.bestName()} but no exception was thrown.")
+    is T -> thrownThrowable               // This should be before `is AssertionError`. If the user is purposefully trying to verify `shouldThrow<AssertionError>{}` this will take priority
+    is AssertionError -> throw thrownThrowable
+    else -> throw failure(
+      "Expected exception ${expectedExceptionClass.bestName()} but a ${thrownThrowable::class.simpleName} was thrown instead.",
+      thrownThrowable
+    )
   }
 }

@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Tuple8
-import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.should
 import io.kotest.matchers.string.shouldStartWith
 import io.kotest.property.Arb
@@ -174,9 +173,7 @@ class ParZip8JvmTest {
           listOf(a, b, c, d, e, f, g, h)
         }
       }
-      assertSoftly {
-        res.forEach { it shouldStartWith "single" }
-      }
+      res.forEach { it shouldStartWith "single" }
     }
   }
 }

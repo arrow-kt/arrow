@@ -1,9 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.property.Arb
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred

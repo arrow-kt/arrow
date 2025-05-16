@@ -21,9 +21,5 @@ fun testLaws(vararg laws: List<Law>): TestResult = runTest {
   laws
     .flatMap(List<Law>::asIterable)
     .distinctBy(Law::name)
-    .forEach { law: Law ->
-      withClue("Testing ${law.name}") {
-        law.test(this@runTest)
-      }
-    }
+    .forEach { law: Law -> law.test(this@runTest) }
 }

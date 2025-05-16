@@ -10,7 +10,7 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import arrow.core.shouldBeInstanceOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation

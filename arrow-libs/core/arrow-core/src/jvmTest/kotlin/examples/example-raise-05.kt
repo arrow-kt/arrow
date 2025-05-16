@@ -8,7 +8,7 @@ import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.parZip
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 

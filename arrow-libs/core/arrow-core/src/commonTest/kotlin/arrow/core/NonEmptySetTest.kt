@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.test.nonEmptySet
 import arrow.platform.stackSafeIteration
-import io.kotest.assertions.withClue
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -59,10 +58,8 @@ class NonEmptySetTest {
       Arb.nonEmptySet(Arb.int())
     ) { nes ->
       val s = nes.toSet()
-      withClue("$nes should be equal to $s") {
-        (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
-        nes.hashCode() shouldBe s.hashCode()
-      }
+      (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
+      nes.hashCode() shouldBe s.hashCode()
     }
   }
 
@@ -71,10 +68,8 @@ class NonEmptySetTest {
       Arb.nonEmptySet(Arb.int())
     ) { nes ->
       val s = nes.toSet().toNonEmptySetOrNull()!!
-      withClue("$nes should be equal to $s") {
-        (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
-        nes.hashCode() shouldBe s.hashCode()
-      }
+      (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
+      nes.hashCode() shouldBe s.hashCode()
     }
   }
 

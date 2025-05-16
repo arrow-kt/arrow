@@ -14,7 +14,7 @@ import arrow.core.raise.ensureNotNull
 import arrow.core.raise.ensure
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import arrow.core.shouldBeInstanceOf
 import java.io.File
 import java.io.FileNotFoundException
 

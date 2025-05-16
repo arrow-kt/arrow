@@ -6,7 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.test.nonEmptyList
 import arrow.core.toIorNel
-import io.kotest.assertions.throwables.shouldThrow
+import arrow.core.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int

@@ -1,8 +1,10 @@
 package arrow
 
 import arrow.atomic.AtomicBoolean
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.assertionCounter
+import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
+import io.kotest.mpp.bestName
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
@@ -209,5 +211,27 @@ class AutoCloseTest {
   private suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {
     isCompleted shouldBe true
     return await()
+  }
+}
+
+// copied from Kotest so we can inline it
+inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
+  assertionCounter.inc()
+  val expectedExceptionClass = T::class
+  val thrownThrowable = try {
+    block()
+    null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
+  } catch (thrown: Throwable) {
+    thrown
+  }
+
+  return when (thrownThrowable) {
+    null -> throw failure("Expected exception ${expectedExceptionClass.bestName()} but no exception was thrown.")
+    is T -> thrownThrowable               // This should be before `is AssertionError`. If the user is purposefully trying to verify `shouldThrow<AssertionError>{}` this will take priority
+    is AssertionError -> throw thrownThrowable
+    else -> throw failure(
+      "Expected exception ${expectedExceptionClass.bestName()} but a ${thrownThrowable::class.simpleName} was thrown instead.",
+      thrownThrowable
+    )
   }
 }

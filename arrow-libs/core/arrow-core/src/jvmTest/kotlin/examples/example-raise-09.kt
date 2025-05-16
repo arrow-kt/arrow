@@ -9,7 +9,7 @@ import arrow.fx.coroutines.autoCloseable
 import arrow.fx.coroutines.resourceScope
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import java.io.BufferedReader
 import java.io.File
