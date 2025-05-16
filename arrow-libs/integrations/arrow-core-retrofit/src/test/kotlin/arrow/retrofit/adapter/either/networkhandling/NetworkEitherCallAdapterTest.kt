@@ -8,7 +8,7 @@ import arrow.retrofit.adapter.mock.ResponseMock
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.matchers.types.beInstanceOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -24,6 +24,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -222,4 +224,14 @@ class NetworkEitherCallAdapterTestKotlinxSerialization : NetworkEitherCallAdapte
   @Test override fun shouldReturnUnitForUnitBody() = super.shouldReturnUnitForUnitBody()
 
   @Test override fun shouldReturnCallErrorWithUnitForNonNullBody() = super.shouldReturnCallErrorWithUnitForNonNullBody()
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun <reified T : Any> Any?.shouldBeInstanceOf(): T {
+  contract {
+    returns() implies (this@shouldBeInstanceOf is T)
+  }
+  val matcher = beInstanceOf(T::class)
+  this shouldBe matcher
+  return this as T
 }

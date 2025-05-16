@@ -2,9 +2,9 @@ package arrow.integrations.jackson.module
 
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
-import io.kotest.property.arbitrary.enum
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.string
 
 data class SomeObject(val someString: String, val someInt: Int)
@@ -15,4 +15,6 @@ data class MapContainer<V>(val value: Map<Key, V>) {
   enum class Key { First, Second }
 }
 
-fun <V> arbMapContainer(arbValue: Arb<V>): Arb<MapContainer<V>> = Arb.map(Arb.enum<MapContainer.Key>(), arbValue).map { MapContainer<V>(it) }
+fun <V> arbMapContainer(arbValue: Arb<V>): Arb<MapContainer<V>> =
+  Arb.map(Arb.of(MapContainer.Key.First, MapContainer.Key.Second), arbValue)
+    .map { MapContainer(it) }
