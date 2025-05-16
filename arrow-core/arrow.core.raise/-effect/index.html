@@ -41,7 +41,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.1
+        <div class="library-version" id="library-version">2.1.2
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
@@ -113,7 +113,7 @@ import arrow.core.raise.ensureNotNull
 import arrow.core.raise.ensure
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import arrow.core.shouldBeInstanceOf
 import java.io.File
 import java.io.FileNotFoundException
 --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">@JvmInline<br>value class Content(val body: List&lt;String&gt;)<br><br>sealed interface FileError<br>@JvmInline value class SecurityError(val msg: String?) : FileError<br>@JvmInline value class FileNotFound(val path: String) : FileError<br>object EmptyPath : FileError {<br>  override fun toString() = "EmptyPath"<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can finish our function, but we need to refactor the return type from <code class="lang-kotlin">Unit</code> to <code class="lang-kotlin">Content</code> and the error type from <code class="lang-kotlin">EmptyPath</code> to <code class="lang-kotlin">FileError</code>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun readFile(path: String?): Effect&lt;FileError, Content&gt; = effect {<br>  ensureNotNull(path) { EmptyPath }<br>  ensure(path.isNotEmpty()) { EmptyPath }<br>  try {<br>    val lines = File(path).readLines()<br>    Content(lines)<br>  } catch (e: FileNotFoundException) {<br>    raise(FileNotFound(path))<br>  } catch (e: SecurityException) {<br>    raise(SecurityError(e.message))<br>  }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">The <code class="lang-kotlin">readFile</code> function defines a <code class="lang-kotlin">suspend fun</code> that will return:</p><ul><li><p class="paragraph">the <code class="lang-kotlin">Content</code> of a given <code class="lang-kotlin">path</code></p></li><li><p class="paragraph">a <code class="lang-kotlin">FileError</code></p></li><li><p class="paragraph">An unexpected fatal error (<code class="lang-kotlin">OutOfMemoryException</code>)</p></li></ul><p class="paragraph">Since these are the properties of our <code class="lang-kotlin">Effect</code> function, we can turn it into a value.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun main() {<br>   readFile("").toEither() shouldBe Either.Left(EmptyPath)<br>   readFile("gradle.properties").toIor() shouldBe Ior.Left(FileNotFound("gradle.properties"))<br>   readFile("README.MD").toOption { None } shouldBe None<br><br>   readFile("build.gradle.kts").fold({ _: FileError -&gt; null }, { it })<br>     .shouldBeInstanceOf&lt;Content&gt;()<br>      .body.shouldNotBeEmpty()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-02.kt --><p class="paragraph">The functions above are available out of the box, but it's easy to define your own extension functions in terms of <code class="lang-kotlin">fold</code>. Implementing the <code class="lang-kotlin">toEither()</code> operator is as simple as:</p><!-- INCLUDE
@@ -137,7 +137,7 @@ import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.parZip
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun &lt;A&gt; awaitExitCase(exit: CompletableDeferred&lt;ExitCase&gt;): A =<br>  guaranteeCase(::awaitCancellation) { exitCase -&gt; exit.complete(exitCase) }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h3 class="">Arrow Fx Coroutines</h3><p class="paragraph">All operators in Arrow Fx Coroutines run in place, so they have no way of leaking <code class="lang-kotlin">raise</code>. It's there always safe to compose <code class="lang-kotlin">effect</code> with any Arrow Fx combinator. Let's see some small examples below.</p><h4 class="">parZip</h4><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea"> suspend fun main() {<br>   val error = "Error"<br>   val exit = CompletableDeferred&lt;ExitCase&gt;()<br>  effect&lt;String, Int&gt; {<br>    parZip({ awaitExitCase&lt;Int&gt;(exit) }, { raise(error) }) { a: Int, b: Int -&gt; a + b }<br>  }.fold({ it shouldBe error }, { fail("Int can never be the result") })<br>  exit.await().shouldBeTypeOf&lt;ExitCase&gt;()<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-05.kt --><h4 class="">parTraverse</h4><!-- INCLUDE
@@ -148,7 +148,7 @@ import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.parMap
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 
@@ -166,7 +166,7 @@ import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.raceN
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 
@@ -182,7 +182,7 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import java.io.BufferedReader
 import java.io.File
@@ -195,7 +195,7 @@ import arrow.fx.coroutines.autoCloseable
 import arrow.fx.coroutines.resourceScope
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
+import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
 import java.io.BufferedReader
 import java.io.File
@@ -209,7 +209,7 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import arrow.core.shouldBeInstanceOf
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
