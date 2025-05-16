@@ -14,6 +14,6 @@ inline fun <T> shouldNotThrowAny(block: () -> T): T {
 
   throw failure(
     "No exception expected, but a ${thrownException::class.simpleName} was thrown with message: \"${thrownException.message}\".",
-    thrownException
+    thrownException,
   )
 }

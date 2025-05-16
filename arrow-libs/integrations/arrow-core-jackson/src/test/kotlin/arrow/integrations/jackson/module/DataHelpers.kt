@@ -15,6 +15,5 @@ data class MapContainer<V>(val value: Map<Key, V>) {
   enum class Key { First, Second }
 }
 
-fun <V> arbMapContainer(arbValue: Arb<V>): Arb<MapContainer<V>> =
-  Arb.map(Arb.of(MapContainer.Key.First, MapContainer.Key.Second), arbValue)
-    .map { MapContainer(it) }
+fun <V> arbMapContainer(arbValue: Arb<V>): Arb<MapContainer<V>> = Arb.map(Arb.of(MapContainer.Key.First, MapContainer.Key.Second), arbValue)
+  .map { MapContainer(it) }
