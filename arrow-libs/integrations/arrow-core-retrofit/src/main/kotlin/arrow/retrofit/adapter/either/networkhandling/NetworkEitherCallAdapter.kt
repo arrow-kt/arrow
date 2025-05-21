@@ -33,36 +33,6 @@ private class EitherCall<R>(
         callback.onResponse(this@EitherCall, Response.success(response.toEither()))
       }
 
-      private fun Response<R>.toEither(): Either<CallError, R> {
-        // Http error response (4xx - 5xx)
-        if (!isSuccessful) {
-          val errorBody = errorBody()!!.string()
-          return HttpError(
-            code = code(),
-            message = message(),
-            body = errorBody,
-          ).left()
-        }
-
-        // Http success response with body
-        body()?.let { body -> return body.right() }
-
-        // if we defined Unit as success type it means we expected no response body
-        // e.g. in case of 204 No Content
-        return if (successType == Unit::class.java) {
-          @Suppress("UNCHECKED_CAST")
-          Unit.right() as Either<CallError, R>
-        } else {
-          UnexpectedCallError(
-            IllegalStateException(
-              "Response code is ${code()} but body is null.\n" +
-                "If you expect response body to be null then define your API method as returning Unit:\n" +
-                "@POST fun postSomething(): Either<CallError, Unit>",
-            ),
-          ).left()
-        }
-      }
-
       override fun onFailure(call: Call<R?>, throwable: Throwable) {
         val error = if (throwable is IOException) {
           IOError(throwable)
@@ -71,7 +41,7 @@ private class EitherCall<R>(
         }
         callback.onResponse(this@EitherCall, Response.success(error.left()))
       }
-    },
+    }
   )
 
   override fun timeout(): Timeout = delegate.timeout()
@@ -84,7 +54,40 @@ private class EitherCall<R>(
 
   override fun cancel() = delegate.cancel()
 
-  override fun execute(): Response<Either<CallError, R>> = throw UnsupportedOperationException("This adapter does not support sync execution")
+  override fun execute(): Response<Either<CallError, R>> {
+    val response = delegate.execute()
+    return Response.success(response.toEither(), response.raw())
+  }
 
   override fun request(): Request = delegate.request()
+
+  private fun Response<R>.toEither(): Either<CallError, R> {
+    // Http error response (4xx - 5xx)
+    if (!isSuccessful) {
+      val errorBody = errorBody()!!.string()
+      return HttpError(
+        code = code(),
+        message = message(),
+        body = errorBody,
+      ).left()
+    }
+
+    // Http success response with body
+    body()?.let { body -> return body.right() }
+
+    // if we defined Unit as success type it means we expected no response body
+    // e.g. in case of 204 No Content
+    return if (successType == Unit::class.java) {
+      @Suppress("UNCHECKED_CAST")
+      Unit.right() as Either<CallError, R>
+    } else {
+      UnexpectedCallError(
+        IllegalStateException(
+          "Response code is ${code()} but body is null.\n" +
+            "If you expect response body to be null then define your API method as returning Unit:\n" +
+            "@POST fun postSomething(): Either<CallError, Unit>",
+        ),
+      ).left()
+    }
+  }
 }
