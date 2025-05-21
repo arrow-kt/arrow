@@ -41,7 +41,7 @@ private class EitherCall<R>(
         }
         callback.onResponse(this@EitherCall, Response.success(error.left()))
       }
-    }
+    },
   )
 
   override fun timeout(): Timeout = delegate.timeout()
