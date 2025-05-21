@@ -1,10 +1,13 @@
 @file:OptIn(ExperimentalTypeInference::class)
+@file:JvmMultifileClass
+@file:JvmName("RaiseContextualKt")
 
-package arrow.core.raise.contextual
+package arrow.core.raise
 
 import arrow.core.NonEmptyList
-import arrow.core.raise.*
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmMultifileClass
+import kotlin.jvm.JvmName
 
 context(raise: Raise<NonEmptyList<Error>>)
 @ExperimentalRaiseAccumulateApi public inline fun <Error, A> accumulate(
