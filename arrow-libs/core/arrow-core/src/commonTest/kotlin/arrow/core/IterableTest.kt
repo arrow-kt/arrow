@@ -501,7 +501,7 @@ class IterableTest {
   }
 
   @Test
-  fun `flattenOrAccumulate EitherNel combine`() = runTest {
+  fun flattenOrAccumulateEitherNelCombine() = runTest {
     checkAll(
       Arb.list(
         Arb.either(
