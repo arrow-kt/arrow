@@ -302,7 +302,7 @@ class IterableTest {
   }
 
   @Test
-  fun `align compare contents`() = runTest {
+  fun alignCompareContents() = runTest {
     checkAll(Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b ->
       val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
       val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
