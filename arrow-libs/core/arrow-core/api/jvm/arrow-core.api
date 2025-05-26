@@ -976,7 +976,7 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Raise {
 	public final fun bindNel (Larrow/core/Either;)Ljava/lang/Object;
 	public final fun bindNelOrAccumulate (Larrow/core/Either;)Larrow/core/raise/RaiseAccumulate$Value;
 	public final fun bindOrAccumulate (Larrow/core/Either;)Larrow/core/raise/RaiseAccumulate$Value;
-	public final fun ensureNotNullOrAccumulate (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)V
+	public final fun ensureNotNullOrAccumulate (Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/raise/RaiseAccumulate$Value;
 	public final fun ensureOrAccumulate (ZLkotlin/jvm/functions/Function0;)V
 	public final fun getRaise ()Larrow/core/raise/Raise;
 	public final fun getValue (Larrow/core/raise/RaiseAccumulate$Value;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
