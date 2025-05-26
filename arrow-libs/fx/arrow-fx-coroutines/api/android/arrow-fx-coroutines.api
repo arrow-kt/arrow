@@ -214,6 +214,12 @@ public final class arrow/fx/coroutines/Race3Kt {
 	public static synthetic fun raceN$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class arrow/fx/coroutines/RaceUntilKt {
+	public static final fun raceUntil (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;[Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun raceUntil (Lkotlin/jvm/functions/Function1;[Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun raceUntil$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;[Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
 public abstract interface annotation class arrow/fx/coroutines/ResourceDSL : java/lang/annotation/Annotation {
 }
 
