@@ -6,7 +6,6 @@ import arrow.core.test.testLaws
 import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
@@ -16,12 +15,10 @@ import kotlin.test.Test
 
 class IorTest {
 
-  val ARB = Arb.ior(Arb.string(), Arb.int())
-
   @Test fun semigroupLaws() = testLaws(
     SemigroupLaws("Ior", { a, b ->
       a.combine(b, String::plus, Int::plus)
-    }, ARB)
+    }, Arb.ior(Arb.string(), Arb.int())),
   )
 
   @Test fun mapRightOk() = runTest {
@@ -76,7 +73,6 @@ class IorTest {
       Ior.Both(a, b).getOrNull() shouldBe b
     }
   }
-
 
   @Test fun leftOrNullOk() = runTest {
     checkAll(Arb.int(), Arb.string()) { a: Int, b: String ->
@@ -140,14 +136,14 @@ class IorTest {
       row(Ior.Right(8000), Ior.Both("Over", 1000), Ior.Both("Over", 9000)),
       row(Ior.Both("Hello ", 1), Ior.Left("number"), Ior.Both("Hello number", 1)),
       row(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
-      row(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2))
+      row(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2)),
     ) { a, b, expectedResult ->
       a.combine(b, String::plus, Int::plus) shouldBe expectedResult
     }
   }
 
   @Test fun isLeftOk() = runTest {
-    checkAll(Arb.int(), Arb.string()){ a, b ->
+    checkAll(Arb.int(), Arb.string()) { a, b ->
       Ior.Left(a).isLeft() shouldBe true
       Ior.Right(b).isLeft() shouldBe false
       Ior.Both(a, b).isLeft() shouldBe false
@@ -174,8 +170,11 @@ class IorTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val predicate = { i: Int -> i % 2 == 0 }
 
-      if (predicate(a)) Ior.Left(a).isLeft(predicate) shouldBe true
-      else Ior.Left(a).isLeft(predicate) shouldBe false
+      if (predicate(a)) {
+        Ior.Left(a).isLeft(predicate) shouldBe true
+      } else {
+        Ior.Left(a).isLeft(predicate) shouldBe false
+      }
 
       Ior.Right(b).isLeft(predicate) shouldBe false
       Ior.Both(a, b).isLeft(predicate) shouldBe false
@@ -186,8 +185,11 @@ class IorTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val predicate = { s: String -> s.length % 2 == 0 }
 
-      if (predicate(b)) Ior.Right(b).isRight(predicate) shouldBe true
-      else Ior.Right(b).isRight(predicate) shouldBe false
+      if (predicate(b)) {
+        Ior.Right(b).isRight(predicate) shouldBe true
+      } else {
+        Ior.Right(b).isRight(predicate) shouldBe false
+      }
 
       Ior.Left(a).isRight(predicate) shouldBe false
       Ior.Both(a, b).isRight(predicate) shouldBe false
@@ -198,8 +200,11 @@ class IorTest {
     checkAll(Arb.int(), Arb.string()) { a, b ->
       val leftPredicate = { i: Int -> i % 2 == 0 }
       val rightPredicate = { s: String -> s.length % 2 == 0 }
-      if (leftPredicate(a) && rightPredicate(b)) Ior.Both(a, b).isBoth(leftPredicate, rightPredicate) shouldBe true
-      else Ior.Both(a, b).isBoth(leftPredicate, rightPredicate) shouldBe false
+      if (leftPredicate(a) && rightPredicate(b)) {
+        Ior.Both(a, b).isBoth(leftPredicate, rightPredicate) shouldBe true
+      } else {
+        Ior.Both(a, b).isBoth(leftPredicate, rightPredicate) shouldBe false
+      }
 
       Ior.Left(a).isBoth(leftPredicate, rightPredicate) shouldBe false
       Ior.Right(b).isBoth(leftPredicate, rightPredicate) shouldBe false
@@ -228,5 +233,16 @@ class IorTest {
     both22.compareTo(both11) shouldBe 1
     both11.compareTo(left1) shouldBe 1
     both11.compareTo(right1) shouldBe 1
+  }
+
+  @Test
+  fun toPair() = runTest {
+    checkAll(Arb.ior(Arb.string(), Arb.int())) { a ->
+      when (a) {
+        is Ior.Left -> a.toPair() shouldBe (a.leftOrNull() to null)
+        is Ior.Right -> a.toPair() shouldBe (null to a.getOrNull())
+        is Ior.Both -> a.toPair() shouldBe (a.leftOrNull() to a.getOrNull())
+      }
+    }
   }
 }
