@@ -1,5 +1,6 @@
 package arrow.retrofit.adapter.either
 
+import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import okhttp3.Request
@@ -67,7 +68,14 @@ internal class ArrowResponseECallAdapter<E, R>(
 
     override fun cancel() = original.cancel()
 
-    override fun execute(): Response<ResponseE<E, R>> = throw UnsupportedOperationException("This adapter does not support sync execution")
+    override fun execute(): Response<ResponseE<E, R>> {
+      val response = original.execute()
+      val result: Either<E, R> =
+        response.body()?.right()
+          ?: response.errorBody()?.let { errorConverter.convert(it) }?.left()
+          ?: throw IllegalStateException()
+      return Response.success(ResponseE(response.raw(), result), response.raw())
+    }
 
     override fun request(): Request = original.request()
   }

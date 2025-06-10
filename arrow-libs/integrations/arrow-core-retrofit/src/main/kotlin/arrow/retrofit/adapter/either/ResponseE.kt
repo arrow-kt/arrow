@@ -9,11 +9,11 @@ public data class ResponseE<E, A>(
   val body: Either<E, A>,
 ) {
 
-  val code: Int = raw.code()
+  val code: Int = raw.code
 
-  val message: String? = raw.message()
+  val message: String? = raw.message
 
-  val headers: Headers = raw.headers()
+  val headers: Headers = raw.headers
 
   val isSuccessful: Boolean = raw.isSuccessful
 }
