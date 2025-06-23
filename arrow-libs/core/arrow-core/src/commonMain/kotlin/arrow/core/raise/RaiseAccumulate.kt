@@ -974,9 +974,9 @@ public open class RaiseAccumulate<Error>(
   }
 
   @ExperimentalRaiseAccumulateApi
-  public inline fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error) {
+  public inline fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
     contract { callsInPlace(raise, AT_MOST_ONCE) }
-    ensureOrAccumulate(value != null, raise)
+    return accumulating { ensureNotNull(value, raise) }
   }
 
   @ExperimentalRaiseAccumulateApi
