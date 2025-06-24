@@ -78,7 +78,7 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  apiVersion = KotlinVersion.KOTLIN_1_9
+  apiVersion = KotlinVersion.KOTLIN_2_0
   languageVersion = KotlinVersion.KOTLIN_2_0
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
