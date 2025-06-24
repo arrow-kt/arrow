@@ -21,7 +21,7 @@ internal class ArrowEitherCallAdapter<E, R>(
 ) : CallAdapter<R, Call<Either<E, R>>> {
 
   private val errorConverter: Converter<ResponseBody, E> =
-    retrofit.responseBodyConverter(errorType, arrayOfNulls(0))
+    retrofit.responseBodyConverter(errorType, arrayOf())
 
   override fun adapt(call: Call<R>): Call<Either<E, R>> = EitherCall(call, errorConverter, bodyType)
 
@@ -68,7 +68,14 @@ internal class ArrowEitherCallAdapter<E, R>(
 
     override fun cancel() = original.cancel()
 
-    override fun execute(): Response<Either<E, R>> = throw UnsupportedOperationException("This adapter does not support sync execution")
+    override fun execute(): Response<Either<E, R>> {
+      val response = original.execute()
+      val result: Either<E, R> =
+        response.body()?.right()
+          ?: response.errorBody()?.let { errorConverter.convert(it) }?.left()
+          ?: throw IllegalStateException()
+      return Response.success(result, response.raw())
+    }
 
     override fun request(): Request = original.request()
   }

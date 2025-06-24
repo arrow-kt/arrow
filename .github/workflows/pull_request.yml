@@ -65,7 +65,7 @@ jobs:
         run: ./gradlew apiDump
 
       - name: Commit updated API files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: Auto-update API files
           file_pattern: arrow-libs/**/api/*.api
@@ -94,7 +94,7 @@ jobs:
         run: ./gradlew spotlessApply
 
       - name: Commit newly formatted files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: Auto-apply Spotless rules
           file_pattern: arrow-libs/**/*.kt
