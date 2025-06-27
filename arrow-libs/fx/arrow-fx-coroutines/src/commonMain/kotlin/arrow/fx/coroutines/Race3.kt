@@ -102,7 +102,7 @@ public suspend inline fun <A, B, C> raceN(
 }
 
 @PublishedApi
-internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>): Unit {
+internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>) {
   val e1 = try {
     first.cancelAndJoin()
     null
