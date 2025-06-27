@@ -6,9 +6,16 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContainOnlyOnce
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.*
+import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.negativeInt
+import io.kotest.property.arbitrary.pair
+import io.kotest.property.arbitrary.set
 import io.kotest.property.checkAll
+import io.kotest.property.exhaustive.exhaustive
 import kotlinx.coroutines.test.runTest
 import kotlin.math.max
 import kotlin.math.min
@@ -21,7 +28,7 @@ class NonEmptyListTest {
     checkAll(
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { nel1, nel2, nel3 ->
       (nel1 + nel2) + nel3 shouldBe nel1 + (nel2 + nel3)
     }
@@ -80,7 +87,8 @@ class NonEmptyListTest {
   fun mapOrAccumulateIsStackSafeAndRunsInOriginalOrder() = runTest {
     val acc = mutableListOf<Int>()
     val res = (0..stackSafeIteration())
-      .toNonEmptyListOrNull()!!
+      .toNonEmptyListOrNull()
+      .shouldNotBeNull()
       .mapOrAccumulate(String::plus) {
         acc.add(it)
         it
@@ -91,7 +99,7 @@ class NonEmptyListTest {
 
   @Test
   fun mapOrAccumulateAccumulatesErrors() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.int(), range = 0 .. 20)) { nel ->
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0..20)) { nel ->
       val res = nel.mapOrAccumulate { i ->
         if (i % 2 == 0) i else raise(i)
       }
@@ -105,7 +113,7 @@ class NonEmptyListTest {
 
   @Test
   fun mapOrAccumulateAccumulatesErrorsWithCombineFunction() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.negativeInt(), range = 0 .. 20)) { nel ->
+    checkAll(Arb.nonEmptyList(Arb.negativeInt(), range = 0..20)) { nel ->
       val res = nel.mapOrAccumulate(String::plus) { i ->
         if (i > 0) i else raise("Negative")
       }
@@ -134,10 +142,11 @@ class NonEmptyListTest {
       result.size shouldBe max(a.size, b.size)
       result.take(minSize) shouldBe a.take(minSize).zip(b.take(minSize)) { x, y -> x + y }
 
-      if (a.size > b.size)
+      if (a.size > b.size) {
         result.drop(minSize) shouldBe a.drop(minSize).map { it * 2 }
-      else
+      } else {
         result.drop(minSize) shouldBe b.drop(minSize).map { it * 3 }
+      }
     }
   }
 
@@ -177,7 +186,7 @@ class NonEmptyListTest {
     checkAll(
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c ->
       val result = a.zip(b, c, ::Triple)
       val expected = a.all.zip(b.all, c.all, ::Triple).toNonEmptyListOrNull()
@@ -191,7 +200,7 @@ class NonEmptyListTest {
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c, d ->
       val result = a.zip(b, c, d, ::Tuple4)
       val expected = a.all.zip(b.all, c.all, d.all, ::Tuple4).toNonEmptyListOrNull()
@@ -206,7 +215,7 @@ class NonEmptyListTest {
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c, d, e ->
       val result = a.zip(b, c, d, e, ::Tuple5)
       val expected = a.all.zip(b.all, c.all, d.all, e.all, ::Tuple5).toNonEmptyListOrNull()
@@ -222,7 +231,7 @@ class NonEmptyListTest {
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c, d, e, f ->
       val result = a.zip(b, c, d, e, f, ::Tuple6)
       val expected =
@@ -240,7 +249,7 @@ class NonEmptyListTest {
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c, d, e, f, g ->
       val result = a.zip(b, c, d, e, f, g, ::Tuple7)
       val expected =
@@ -259,7 +268,7 @@ class NonEmptyListTest {
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c, d, e, f, g, h ->
       val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
       val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, ::Tuple8)
@@ -279,7 +288,7 @@ class NonEmptyListTest {
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
       Arb.nonEmptyList(Arb.int()),
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a, b, c, d, e, f, g, h, i ->
       val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
       val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, ::Tuple9)
@@ -291,7 +300,7 @@ class NonEmptyListTest {
   @Test
   fun maxElement() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.max()
       val expected = a.maxOrNull()
@@ -302,7 +311,7 @@ class NonEmptyListTest {
   @Test
   fun maxByElement() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.maxBy(::identity)
       val expected = a.maxByOrNull(::identity)
@@ -313,7 +322,7 @@ class NonEmptyListTest {
   @Test
   fun minElement() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.min()
       val expected = a.minOrNull()
@@ -324,7 +333,7 @@ class NonEmptyListTest {
   @Test
   fun minByElement() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.minBy(::identity)
       val expected = a.minByOrNull(::identity)
@@ -335,7 +344,7 @@ class NonEmptyListTest {
   @Test
   fun nonEmptyListEqualsList() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       // `shouldBe` doesn't use the `equals` methods on `Iterable`
       (a == a.all).shouldBeTrue()
@@ -345,7 +354,7 @@ class NonEmptyListTest {
   @Test
   fun lastOrNull() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.lastOrNull()
       val expected = a.last()
@@ -356,7 +365,7 @@ class NonEmptyListTest {
   @Test
   fun extract() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.extract()
       val expected = a.head
@@ -368,7 +377,7 @@ class NonEmptyListTest {
   fun plus() = runTest {
     checkAll(
       Arb.nonEmptyList(Arb.int()),
-      Arb.int()
+      Arb.int(),
     ) { a, b ->
       val result = a + b
       val expected = a.all + b
@@ -379,7 +388,7 @@ class NonEmptyListTest {
   @Test
   fun coflatMapKeepsLength() = runTest {
     checkAll(
-      Arb.nonEmptyList(Arb.int())
+      Arb.nonEmptyList(Arb.int()),
     ) { a ->
       val result = a.coflatMap { it.all }
       val expected = a.all
@@ -391,10 +400,129 @@ class NonEmptyListTest {
   fun foldLeftAddition() = runTest {
     checkAll(
       Arb.nonEmptyList(Arb.int()),
-      Arb.int()
+      Arb.int(),
     ) { list, initial ->
       val result = list.foldLeft(initial) { acc, i -> acc + i }
       val expected = initial + list.all.sum()
+      result shouldBe expected
+    }
+  }
+
+  @Test
+  fun hashCodeConsistent() = runTest {
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0..10)) { a ->
+      buildSet {
+        repeat(3) {
+          add(a.hashCode())
+        }
+      }.size shouldBe 1
+    }
+  }
+
+  @Test
+  fun toList() = runTest {
+    checkAll(Arb.list(Arb.int(), range = 0..20)) { a ->
+      a.toNonEmptyListOrNull()
+        ?.toList()
+        ?.shouldBe(a)
+    }
+  }
+
+  @Test
+  fun distinct() = runTest {
+    val ex = listOf(1, 2, 3, 4, 5).exhaustive()
+    checkAll(Arb.list(ex, range = 0..20)) { a ->
+      val expected = a.distinct()
+
+      a.toNonEmptyListOrNull()
+        ?.distinct()
+        ?.shouldBe(expected)
+    }
+  }
+
+  @Test
+  fun distinctBy() = runTest {
+    val ex = listOf(1, 2, 3, 4, 5).exhaustive()
+    fun selector(i: Int) = i % 2 == 0
+
+    checkAll(Arb.list(ex, range = 0..20)) { a ->
+      val expected = a.distinctBy(::selector)
+
+      a.toNonEmptyListOrNull()
+        ?.distinctBy(::selector)
+        ?.shouldBe(expected)
+    }
+  }
+
+  @Test
+  fun flatMap() = runTest {
+    fun transform(i: Int) = listOf(i) + 1
+
+    checkAll(Arb.list(Arb.int(), range = 0..20)) { a ->
+      val expected = a.flatMap(::transform)
+
+      a.toNonEmptyListOrNull()
+        ?.flatMap {
+          transform(it).let(::NonEmptyList)
+        }
+        ?.shouldBe(expected)
+    }
+  }
+
+  @Test
+  fun plusIterable() = runTest {
+    checkAll(
+      Arb.list(Arb.int(), range = 0..10),
+      Arb.list(Arb.int(), range = 0..10),
+    ) { a, b ->
+      a.toNonEmptyListOrNull()
+        ?.also {
+          it + b shouldBe (a + b)
+        }
+    }
+  }
+
+  @Test
+  fun toStringContainsNelValues() = runTest {
+    checkAll(20, Arb.set(Arb.int(0..9), 0..10)) { a ->
+      a.toNonEmptyListOrNull().toString().let { s ->
+        a.forEach {
+          s shouldContainOnlyOnce it.toString()
+        }
+      }
+    }
+  }
+
+  @Test
+  fun zip10() = runTest {
+    data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(
+      val first: A,
+      val second: B,
+      val third: C,
+      val fourth: D,
+      val fifth: E,
+      val sixth: F,
+      val seventh: G,
+      val eighth: H,
+      val ninth: I,
+      val tenth: J,
+    )
+
+    checkAll(
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+      Arb.nonEmptyList(Arb.int()),
+    ) { a, b, c, d, e, f, g, h, i, j ->
+      val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
+      val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
+        .toNonEmptyListOrNull()
       result shouldBe expected
     }
   }
