@@ -1012,6 +1012,42 @@ public abstract class arrow/core/raise/RaiseCancellationException : java/util/co
 	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
+public final class arrow/core/raise/RaiseContextualKt {
+	public static final fun accumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun bind (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
+	public static final fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun bind (Larrow/core/raise/ResultRaise;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun bind (Larrow/core/raise/SingletonRaise;Larrow/core/Option;)Ljava/lang/Object;
+	public static final fun bind (Larrow/core/raise/SingletonRaise;Ljava/lang/Object;)Ljava/lang/Object;
+	public static final fun bindAllEither (Larrow/core/raise/Raise;Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun bindAllEither (Larrow/core/raise/Raise;Ljava/util/List;)Ljava/util/List;
+	public static final fun bindAllEither (Larrow/core/raise/Raise;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun bindAllEither (Larrow/core/raise/Raise;Ljava/util/Set;)Ljava/util/Set;
+	public static final fun bindAllNullable (Larrow/core/raise/SingletonRaise;Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun bindAllNullable (Larrow/core/raise/SingletonRaise;Ljava/util/List;)Ljava/util/List;
+	public static final fun bindAllNullable (Larrow/core/raise/SingletonRaise;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun bindAllNullable (Larrow/core/raise/SingletonRaise;Ljava/util/Set;)Ljava/util/Set;
+	public static final fun bindAllOption (Larrow/core/raise/SingletonRaise;Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun bindAllOption (Larrow/core/raise/SingletonRaise;Ljava/util/List;)Ljava/util/List;
+	public static final fun bindAllOption (Larrow/core/raise/SingletonRaise;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun bindAllOption (Larrow/core/raise/SingletonRaise;Ljava/util/Set;)Ljava/util/Set;
+	public static final fun bindAllResult (Larrow/core/raise/ResultRaise;Ljava/lang/Iterable;)Ljava/util/List;
+	public static final fun bindAllResult (Larrow/core/raise/ResultRaise;Ljava/util/List;)Ljava/util/List;
+	public static final fun bindAllResult (Larrow/core/raise/ResultRaise;Ljava/util/Map;)Ljava/util/Map;
+	public static final fun bindAllResult (Larrow/core/raise/ResultRaise;Ljava/util/Set;)Ljava/util/Set;
+	public static final fun ensure (Larrow/core/raise/Raise;ZLkotlin/jvm/functions/Function0;)V
+	public static final fun ensureNotNull (Larrow/core/raise/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun mapOrAccumulate-l8IBlHg (Larrow/core/raise/Raise;Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public static final fun mapValuesOrAccumulate (Larrow/core/raise/Raise;Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
+	public static final fun raise (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Void;
+	public static final fun withError (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;)Ljava/lang/Object;
+	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Ljava/lang/Object;
+	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+}
+
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
 }
 

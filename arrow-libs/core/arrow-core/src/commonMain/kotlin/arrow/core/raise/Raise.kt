@@ -272,10 +272,13 @@ public interface Raise<in Error> {
    * <!--- KNIT example-raise-dsl-05.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  @RaiseDSL
-  public fun <A> Either<Error, A>.bind(): A = when (this) {
-    is Either.Left -> raise(value)
-    is Either.Right -> value
+  @RaiseDSL @Suppress("CONTRACT_NOT_ALLOWED")
+  public fun <A> Either<Error, A>.bind(): A {
+    contract { returns() implies (this@bind is Either.Right) }
+    when (this) {
+      is Either.Left -> raise(value)
+      is Either.Right -> return value
+    }
   }
 
   /**
