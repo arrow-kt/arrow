@@ -1,11 +1,13 @@
-@file:OptIn(ExperimentalTypeInference::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalStdlibApi::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core
 
 import arrow.core.raise.RaiseAccumulate
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 
 @JvmInline
 public value class NonEmptySet<out E> internal constructor(
@@ -21,6 +23,9 @@ public value class NonEmptySet<out E> internal constructor(
     NonEmptySet(this.elements + element)
 
   override fun isEmpty(): Boolean = false
+
+  @JvmExposeBoxed
+  public fun toSet(): Set<E> = elements
 
   override val head: E get() = elements.first()
 
@@ -53,6 +58,16 @@ public value class NonEmptySet<out E> internal constructor(
 
   override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> =
     NonEmptyList(elements.zip(other))
+
+  public companion object {
+    @JvmStatic @JvmExposeBoxed
+    public fun <E> of(head: E, vararg t: E): NonEmptySet<E> =
+      nonEmptySetOf(head, *t)
+
+    @JvmStatic @JvmExposeBoxed
+    public fun <E> of(values: Iterable<E>): NonEmptySet<E> =
+      values.toNonEmptySetOrThrow()
+  }
 }
 
 public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
