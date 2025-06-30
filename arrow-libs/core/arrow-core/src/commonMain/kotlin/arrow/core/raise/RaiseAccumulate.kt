@@ -990,6 +990,7 @@ public open class RaiseAccumulate<Error>(
     }
   }
 
+  @Suppress("NOTHING_TO_INLINE")
   public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
   public sealed interface Value<out A> {
