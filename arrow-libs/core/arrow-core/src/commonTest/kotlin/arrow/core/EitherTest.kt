@@ -930,6 +930,7 @@ class EitherTest {
         is Left -> {
           res.value::class shouldBe ArithmeticException::class
         }
+
         is Right -> {
           res.value shouldBe func()
         }
@@ -954,4 +955,76 @@ class EitherTest {
     }
   }
 
+  @Test
+  fun handleErrorWith() = runTest {
+    fun func(i: Int) = (i + 1).left()
+
+    checkAll(Arb.either(Arb.int(), Arb.int())) { e ->
+      val expected = e.fold(::func, { e })
+      e.handleErrorWith(::func) shouldBe expected
+    }
+  }
+
+  @Test
+  fun flatten() = runTest {
+    checkAll(Arb.either(Arb.string(), Arb.either(Arb.string(), Arb.int()))) { e ->
+      e.flatten().let {
+        when (e) {
+          is Left -> {
+            it shouldBe e
+          }
+          is Right -> {
+            it shouldBe e.value
+          }
+        }
+      }
+    }
+  }
+
+  @Test
+  fun compareTo() = runTest {
+    checkAll(Arb.either(Arb.string(), Arb.int()), Arb.either(Arb.string(), Arb.int())) { a, b ->
+
+      val expected = when (a) {
+        is Left -> {
+          when (b) {
+            is Left -> {
+              a.compareTo(b)
+            }
+            is Right -> { // Left is lesser than Right
+              -1
+            }
+          }
+        }
+        is Right -> {
+          when (b) {
+            is Left -> { // Right is greater than Left
+              1
+            }
+            is Right -> {
+              a.compareTo(b)
+            }
+          }
+        }
+      }
+
+      a.compareTo(b) shouldBe expected
+    }
+  }
+
+  @Test
+  fun toEitherNel() = runTest {
+    checkAll(Arb.either(Arb.string(), Arb.int())) { e ->
+      e.toEitherNel().let { enel ->
+        when (e) {
+          is Left -> {
+            enel shouldBe listOf(e.value).toNonEmptyListOrNull().left()
+          }
+          is Right -> {
+            enel shouldBe e
+          }
+        }
+      }
+    }
+  }
 }
