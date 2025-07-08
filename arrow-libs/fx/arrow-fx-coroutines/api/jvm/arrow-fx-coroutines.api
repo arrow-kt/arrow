@@ -1,5 +1,18 @@
-public final class arrow/fx/coroutines/AcquireStep {
+public final class arrow/fx/coroutines/AcquireStep : arrow/fx/coroutines/ResourceScope {
+	public static final field Companion Larrow/fx/coroutines/AcquireStep$Companion;
 	public static final field INSTANCE Larrow/fx/coroutines/AcquireStep;
+	public fun <init> (Larrow/fx/coroutines/ResourceScope;)V
+	public fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+	public fun install (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun onClose (Lkotlin/jvm/functions/Function1;)V
+	public fun onRelease (Lkotlin/jvm/functions/Function2;)V
+	public fun release (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun releaseCase (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/AcquireStep$Companion {
 }
 
 public final class arrow/fx/coroutines/BracketKt {

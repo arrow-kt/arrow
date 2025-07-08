@@ -43,6 +43,17 @@ final class arrow.fx.coroutines.await/AwaitAllScope : kotlinx.coroutines/Corouti
     final fun <#A1: kotlin/Any?> async(kotlin.coroutines/CoroutineContext = ..., kotlinx.coroutines/CoroutineStart = ..., kotlin.coroutines/SuspendFunction1<kotlinx.coroutines/CoroutineScope, #A1>): kotlinx.coroutines/Deferred<#A1> // arrow.fx.coroutines.await/AwaitAllScope.async|async(kotlin.coroutines.CoroutineContext;kotlinx.coroutines.CoroutineStart;kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope,0:0>){0§<kotlin.Any?>}[0]
 }
 
+final class arrow.fx.coroutines/AcquireStep : arrow.fx.coroutines/ResourceScope { // arrow.fx.coroutines/AcquireStep|null[0]
+    constructor <init>(arrow.fx.coroutines/ResourceScope) // arrow.fx.coroutines/AcquireStep.<init>|<init>(arrow.fx.coroutines.ResourceScope){}[0]
+
+    final fun onRelease(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ExitCase, kotlin/Unit>) // arrow.fx.coroutines/AcquireStep.onRelease|onRelease(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ExitCase,kotlin.Unit>){}[0]
+
+    final object Companion { // arrow.fx.coroutines/AcquireStep.Companion|null[0]
+        final val INSTANCE // arrow.fx.coroutines/AcquireStep.Companion.INSTANCE|{}INSTANCE[0]
+            final fun <get-INSTANCE>(): arrow.fx.coroutines/AcquireStep // arrow.fx.coroutines/AcquireStep.Companion.INSTANCE.<get-INSTANCE>|<get-INSTANCE>(){}[0]
+    }
+}
+
 final class arrow.fx.coroutines/CountDownLatch { // arrow.fx.coroutines/CountDownLatch|null[0]
     constructor <init>(kotlin/Long) // arrow.fx.coroutines/CountDownLatch.<init>|<init>(kotlin.Long){}[0]
 
@@ -143,8 +154,6 @@ sealed class arrow.fx.coroutines/ExitCase { // arrow.fx.coroutines/ExitCase|null
         final fun toString(): kotlin/String // arrow.fx.coroutines/ExitCase.Completed.toString|toString(){}[0]
     }
 }
-
-final object arrow.fx.coroutines/AcquireStep // arrow.fx.coroutines/AcquireStep|null[0]
 
 final val arrow.fx.coroutines/errorOrNull // arrow.fx.coroutines/errorOrNull|@arrow.fx.coroutines.ExitCase{}errorOrNull[0]
     final fun (arrow.fx.coroutines/ExitCase).<get-errorOrNull>(): kotlin/Throwable? // arrow.fx.coroutines/errorOrNull.<get-errorOrNull>|<get-errorOrNull>@arrow.fx.coroutines.ExitCase(){}[0]

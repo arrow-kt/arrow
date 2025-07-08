@@ -17,6 +17,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.jvm.JvmField
 
 @DslMarker
 public annotation class ScopeDSL
@@ -286,7 +287,21 @@ public typealias Resource<A> = suspend ResourceScope.() -> A
  * This is done to ensure correct usage of [ResourceScope].
  */
 @ResourceDSL
-public object AcquireStep
+@Deprecated("Don't refer to this class directly, use ResourceScope instead", level = DeprecationLevel.WARNING)
+public class AcquireStep(private val underlying: ResourceScope): ResourceScope {
+  override fun onRelease(release: suspend (ExitCase) -> Unit): Unit = underlying.onRelease(release)
+
+  public companion object {
+    @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+    @JvmField
+    @Suppress("DEPRECATION")
+    public val INSTANCE: AcquireStep = AcquireStep(object : ResourceScope {
+      override fun onRelease(release: suspend (ExitCase) -> Unit) {
+        error("AcquireStep should not be used directly. Use install instead")
+      }
+    })
+  }
+}
 
 @ResourceDSL
 public interface ResourceScope : AutoCloseScope {
@@ -304,11 +319,12 @@ public interface ResourceScope : AutoCloseScope {
    * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
    */
   @ResourceDSL
+  @Suppress("DEPRECATION")
   public suspend fun <A> install(
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
   ): A = withContext(NonCancellable) {
-    acquire(AcquireStep).also { a -> onRelease { release(a, it) } }
+    acquire(AcquireStep(this@ResourceScope)).also { a -> onRelease { release(a, it) } }
   }
 
   /** Composes a [release] action to a [Resource] value before binding. */
