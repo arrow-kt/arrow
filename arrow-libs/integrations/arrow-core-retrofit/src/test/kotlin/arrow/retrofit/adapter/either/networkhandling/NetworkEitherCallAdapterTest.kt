@@ -21,7 +21,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.SocketException
+import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 import kotlin.contracts.ExperimentalContracts
@@ -103,7 +103,7 @@ abstract class NetworkEitherCallAdapterTest(
 
     body.shouldBeInstanceOf<Left<*>>()
       .value.shouldBeInstanceOf<IOError>()
-      .cause.shouldBeInstanceOf<SocketException>()
+      .cause.shouldBeInstanceOf<IOException>()
   }
 
   open fun shouldReturnIOErrorNoResponse() = runTest {
