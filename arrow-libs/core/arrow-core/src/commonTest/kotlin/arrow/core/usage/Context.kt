@@ -1,6 +1,7 @@
-package arrow.core.raise
+package arrow.core.usage
 
 import arrow.core.Either
+import arrow.core.raise.context.*
 
 // this file checks that everything still resolves
 // once the context parameter versions are used

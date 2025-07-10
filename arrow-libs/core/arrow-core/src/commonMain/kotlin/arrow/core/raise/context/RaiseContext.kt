@@ -2,36 +2,45 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseContextualKt")
 
-package arrow.core.raise
+package arrow.core.raise.context
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.raise.Effect
+import arrow.core.raise.RaiseDSL
+import arrow.core.raise.ensure as ensureExt
+import arrow.core.raise.ensureNotNull as ensureNotNullExt
+import arrow.core.raise.withError as withErrorExt
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+public typealias Raise<A> = arrow.core.raise.Raise<A>
+public typealias SingletonRaise<A> = arrow.core.raise.SingletonRaise<A>
+public typealias ResultRaise = arrow.core.raise.ResultRaise
+
 context(raise: Raise<Error>) @RaiseDSL public fun <Error> raise(e: Error): Nothing =
   raise.raise(e)
 
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error> ensure(condition: Boolean, otherwise: () -> Error) {
   contract { returns() implies condition }
-  raise.ensure(condition, otherwise)
+  raise.ensureExt(condition, otherwise)
 }
 
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, B : Any> ensureNotNull(value: B?, otherwise: () -> Error): B {
   contract { returns() implies (value != null) }
-  return raise.ensureNotNull(value, otherwise)
+  return raise.ensureNotNullExt(value, otherwise)
 }
 
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, OtherError, A> withError(
   transform: (OtherError) -> Error,
   @BuilderInference block: Raise<OtherError>.() -> A
-): A = raise.withError(transform, block)
+): A = raise.withErrorExt(transform, block)
 
 context(raise: Raise<Error>) @RaiseDSL public suspend fun <Error, A> Effect<Error, A>.bind(): A =
   with(raise) { bind() }
@@ -54,7 +63,7 @@ context(raise: SingletonRaise<Error>) @RaiseDSL public fun <Error, A> A?.bind():
   return with(raise) { this@bind.bind() }
 }
 
-context(raise: ResultRaise) @RaiseDSL public fun <Error, A> Result<A>.bind(): A {
+context(raise: ResultRaise) @RaiseDSL public fun <A> Result<A>.bind(): A {
   return with(raise) { this@bind.bind() }
 }
 
@@ -107,17 +116,17 @@ public fun <Error, A> NonEmptySet<A?>.bindAll(): NonEmptySet<A> =
   with(raise) { bindAll() }
 
 context(raise: ResultRaise) @RaiseDSL @JvmName("bindAllResult")
-public fun <Error, K, A> Map<K, Result<A>>.bindAll(): Map<K, A> =
+public fun <K, A> Map<K, Result<A>>.bindAll(): Map<K, A> =
   with(raise) { bindAll() }
 
 context(raise: ResultRaise) @RaiseDSL @JvmName("bindAllResult")
-public fun <Error, A> Iterable<Result<A>>.bindAll(): List<A> =
+public fun <A> Iterable<Result<A>>.bindAll(): List<A> =
   with(raise) { bindAll() }
 
 context(raise: ResultRaise) @RaiseDSL @JvmName("bindAllResult")
-public fun <Error, A> NonEmptyList<Result<A>>.bindAll(): NonEmptyList<A> =
+public fun <A> NonEmptyList<Result<A>>.bindAll(): NonEmptyList<A> =
   with(raise) { bindAll() }
 
 context(raise: ResultRaise) @RaiseDSL @JvmName("bindAllResult")
-public fun <Error, A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> =
+public fun <A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> =
   with(raise) { bindAll() }
