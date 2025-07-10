@@ -281,11 +281,7 @@ public annotation class ResourceDSL
  **/
 public typealias Resource<A> = suspend ResourceScope.() -> A
 
-/**
- * This Marker exists to prevent being able to call `bind` from `install`, and its derived methods.
- * This is done to ensure correct usage of [ResourceScope].
- */
-@ResourceDSL
+@Deprecated("Don't refer to this type. It'll be removed in the future.", level = DeprecationLevel.WARNING)
 public object AcquireStep
 
 @ResourceDSL
@@ -304,6 +300,7 @@ public interface ResourceScope : AutoCloseScope {
    * It results either in [ExitCase.Completed], [ExitCase.Cancelled] or [ExitCase.Failure] depending on the terminal state of [Resource] lambda.
    */
   @ResourceDSL
+  @Suppress("DEPRECATION")
   public suspend fun <A> install(
     acquire: suspend AcquireStep.() -> A,
     release: suspend (A, ExitCase) -> Unit,
