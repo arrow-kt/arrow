@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalStdlibApi::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core
 
@@ -7,8 +8,10 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 import kotlin.collections.unzip as stdlibUnzip
 
 public typealias Nel<A> = NonEmptyList<A>
@@ -170,6 +173,7 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
 
   override fun isEmpty(): Boolean = false
 
+  @JvmExposeBoxed
   public fun toList(): List<E> = all
 
   public override val head: E
@@ -251,6 +255,14 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     @PublishedApi
     internal val unit: NonEmptyList<Unit> =
       nonEmptyListOf(Unit)
+
+    @JvmStatic @JvmExposeBoxed
+    public fun <E> of(head: E, vararg t: E): NonEmptyList<E> =
+      nonEmptyListOf(head, *t)
+
+    @JvmStatic @JvmExposeBoxed
+    public fun <E> of(values: Iterable<E>): NonEmptyList<E> =
+      values.toNonEmptyListOrThrow()
   }
 
   public fun <T> zip(other: NonEmptyList<T>): NonEmptyList<Pair<E, T>> =
