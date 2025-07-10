@@ -39,7 +39,7 @@ context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, B : Any> ensure
 
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, OtherError, A> withError(
   transform: (OtherError) -> Error,
-  @BuilderInference block: Raise<OtherError>.() -> A
+  @BuilderInference block: context(Raise<OtherError>) () -> A
 ): A = raise.withErrorExt(transform, block)
 
 context(raise: Raise<Error>) @RaiseDSL public suspend fun <Error, A> Effect<Error, A>.bind(): A =
