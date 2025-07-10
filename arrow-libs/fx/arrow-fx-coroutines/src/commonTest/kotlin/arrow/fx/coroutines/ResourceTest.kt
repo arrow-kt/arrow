@@ -207,8 +207,7 @@ class ResourceTest {
     val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
     val res = promises.fold(resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
       resource {
-        val ii = acc.bind()
-        install({ ii + i }) { _, _ ->
+        install({ acc.bind() + i }) { _, _ ->
           require(promise.complete(i))
         }
       }
