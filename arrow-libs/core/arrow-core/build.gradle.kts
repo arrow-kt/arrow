@@ -4,9 +4,10 @@ plugins {
   id("arrow.kotlin")
 }
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-  @OptIn(ExperimentalKotlinGradlePluginApi::class)
   compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+  compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
 
   sourceSets {
     commonMain {
