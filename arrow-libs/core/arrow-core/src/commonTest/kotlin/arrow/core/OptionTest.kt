@@ -11,10 +11,9 @@ import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.orNull
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 
 class OptionTest {
 
@@ -22,7 +21,7 @@ class OptionTest {
   val none: Option<String> = None
 
   @Test fun testMonoidLaws() = testLaws(
-    MonoidLaws("Option", None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int()))
+    MonoidLaws("Option", None, { x, y -> x.combine(y, Int::plus) }, Arb.option(Arb.int())),
   )
 
   @Test fun ensureNullInOptionComputation() = runTest {
@@ -265,7 +264,7 @@ class OptionTest {
   }
 
   @Test fun catchShouldReturnSomeResultWhenFDoesNotThrow() = runTest {
-    val recover: (Throwable) -> Option<Int> = { _ -> None}
+    val recover: (Throwable) -> Option<Int> = { _ -> None }
     Option.catch(recover) { 1 } shouldBe Some(1)
   }
 
@@ -343,6 +342,26 @@ class OptionTest {
     (none <= some) shouldBe true
     (none == some) shouldBe false
     (none != some) shouldBe true
+  }
+
+  @Test fun recover() = runTest {
+    checkAll(Arb.option(Arb.int()), Arb.int()) { op, a ->
+      val expected = op.fold(
+        ifEmpty = { a.toOption() },
+        ifSome = { op },
+      )
+      op.recover { a } shouldBe expected
+    }
+  }
+
+  @Test fun toEither() = runTest {
+    checkAll(Arb.option(Arb.int()), Arb.int()) { op, a ->
+      val expected = op.fold(
+        ifEmpty = { a.left() },
+        ifSome = { it.right() },
+      )
+      op.toEither { a } shouldBe expected
+    }
   }
 }
 
