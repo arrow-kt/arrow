@@ -7,6 +7,7 @@ class WasmJsSpec : JsSpec() {
   companion object {
     val config = JsTestConfig("wasmJsNodeRun")
 
+    @Suppress("unused")
     @JvmStatic
     fun enabled() = config.validConfig()
   }

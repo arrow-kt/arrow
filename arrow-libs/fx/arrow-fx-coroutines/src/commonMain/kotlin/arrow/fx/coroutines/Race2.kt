@@ -20,7 +20,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * Races the participants [fa], [fb] in parallel on the [Dispatchers.Default].
  * The winner of the race cancels the other participants.
  * Cancelling the operation cancels all participants.
- * An [uncancellable] participant will back-pressure the result of [raceN].
+ * A [kotlinx.coroutines.NonCancellable] participant will back-pressure the result of [raceN].
  *
  * ```kotlin
  * import arrow.core.Either
@@ -48,7 +48,6 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @param fa task to participate in the race
  * @param fb task to participate in the race
  * @return either [Either.Left] if [fa] won the race, or [Either.Right] if [fb] won the race.
- * @see racePair for a version that does not automatically cancel the loser.
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
 public suspend inline fun <A, B> raceN(crossinline fa: suspend CoroutineScope.() -> A, crossinline fb: suspend CoroutineScope.() -> B): Either<A, B> {

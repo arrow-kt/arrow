@@ -5,9 +5,9 @@ public fun <A : Comparable<A>> sort(a: A, b: A): Pair<A, A> =
 
 public fun <A : Comparable<A>> sort(a: A, b: A, c: A): Triple<A, A, A> =
   when {
-    a <= b && b <= c -> Triple(a, b, c)
+    b in a..c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
+    a in b..c -> Triple(b, a, c)
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
@@ -33,9 +33,9 @@ public fun sort(a: Byte, b: Byte): Pair<Byte, Byte> =
 
 public fun sort(a: Byte, b: Byte, c: Byte): Triple<Byte, Byte, Byte> =
   when {
-    a <= b && b <= c -> Triple(a, b, c)
+    b in a..c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
+    a in b..c -> Triple(b, a, c)
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
@@ -47,9 +47,9 @@ public fun sort(a: Short, b: Short): Pair<Short, Short> =
 
 public fun sort(a: Short, b: Short, c: Short): Triple<Short, Short, Short> =
   when {
-    a <= b && b <= c -> Triple(a, b, c)
+    b in a..c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
+    a in b..c -> Triple(b, a, c)
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
@@ -61,9 +61,9 @@ public fun sort(a: Int, b: Int): Pair<Int, Int> =
 
 public fun sort(a: Int, b: Int, c: Int): Triple<Int, Int, Int> =
   when {
-    a <= b && b <= c -> Triple(a, b, c)
+    b in a..c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
+    a in b..c -> Triple(b, a, c)
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 
@@ -75,9 +75,9 @@ public fun sort(a: Long, b: Long): Pair<Long, Long> =
 
 public fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> =
   when {
-    a <= b && b <= c -> Triple(a, b, c)
+    b in a..c -> Triple(a, b, c)
     a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
+    a in b..c -> Triple(b, a, c)
     else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
   }
 

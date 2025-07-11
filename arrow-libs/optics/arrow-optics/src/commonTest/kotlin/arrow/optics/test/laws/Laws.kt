@@ -1,7 +1,6 @@
 package arrow.optics.test.laws
 
 import io.kotest.assertions.fail
-import io.kotest.assertions.withClue
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

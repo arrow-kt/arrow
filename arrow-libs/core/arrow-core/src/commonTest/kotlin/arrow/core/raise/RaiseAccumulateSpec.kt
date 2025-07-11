@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalRaiseAccumulateApi::class)
 package arrow.core.raise
 
-import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.nonEmptyListOf
 import arrow.core.right
@@ -11,7 +10,7 @@ import kotlinx.coroutines.test.runTest
 
 class RaiseAccumulateSpec {
   @Test fun raiseAccumulateTakesPrecedenceOverExtensionFunction() = runTest {
-    either<NonEmptyList<String>, Int> {
+    either {
       zipOrAccumulate(
         { ensure(false) { "false" } },
         { mapOrAccumulate(1..2) { ensure(false) { "$it: IsFalse" } } }
@@ -21,8 +20,8 @@ class RaiseAccumulateSpec {
 
   @Test fun raiseAccumulateTakesPrecedenceOverExtensionFunctionNel() {
     accumulate(::either) {
-      val x by accumulating { ensure(false) { "false" } }
-      val y by accumulating { mapOrAccumulate(1..2) { ensure(false) { "$it: IsFalse" } } }
+      accumulating { ensure(false) { "false" } }
+      accumulating { mapOrAccumulate(1..2) { ensure(false) { "$it: IsFalse" } } }
       1
     } shouldBe nonEmptyListOf("false", "1: IsFalse", "2: IsFalse").left()
   }
@@ -37,13 +36,11 @@ class RaiseAccumulateSpec {
 
   @Test fun raiseAccumulatingTwoFailures() {
     accumulate(::either) {
-      val x by accumulating {
+      val x: Int by accumulating {
         raise("hello")
-        1
       }
-      val y by accumulating {
+      val y: Int by accumulating {
         raise("bye")
-        2
       }
       x + y
     } shouldBe nonEmptyListOf("hello", "bye").left()
@@ -52,7 +49,7 @@ class RaiseAccumulateSpec {
   @Test fun raiseAccumulatingOneFailure() {
     accumulate(::either) {
       val x by accumulating { 1 }
-      val y by accumulating { raise("bye") ; 2 }
+      val y: Int by accumulating { raise("bye") }
       x + y
     } shouldBe nonEmptyListOf("bye").left()
   }
@@ -75,10 +72,8 @@ class RaiseAccumulateSpec {
 
   @Test fun raiseAccumulatingIntermediateRaise() {
     accumulate(::either) {
-      val x by accumulating { raise("hello") ; 1 }
+      accumulating { raise("hello") }
       raise("hi")
-      val y by accumulating { 2 }
-      x + y
     } shouldBe nonEmptyListOf("hello", "hi").left()
   }
 }

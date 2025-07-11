@@ -104,7 +104,7 @@ class CopyTest {
         35,
         Address(Street("Kotlinstraat", 1), City("Hilversum", "Netherlands"), listOf(1, 2))
       )
-    val meAfterMoving1 = me.moveToAmsterdamInside()
+    val meAfterMoving1 = me.moveToAmsterdamCopy()
     val meAfterMoving2 = me.moveToAmsterdamInside()
     meAfterMoving1 shouldBe meAfterMoving2
     meAfterMoving1.address.city.name shouldBe "Amsterdam"

@@ -14,7 +14,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
-import kotlin.time.Duration.Companion.seconds
 
 class ParZip4JvmTest {
     @Test fun parZip4ReturnsToOriginalContext(): Unit = runBlocking(Dispatchers.Default) {

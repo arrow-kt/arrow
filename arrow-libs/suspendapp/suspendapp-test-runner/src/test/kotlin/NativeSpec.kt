@@ -19,6 +19,7 @@ class NativeSpec : SuspendAppTest() {
       println("Running native tests... $executable in $workdir...")
     }
 
+    @Suppress("unused")
     @JvmStatic
     fun enabled() = (executable?.exists() ?: false) && (workdir?.exists() ?: false)
   }

@@ -145,6 +145,7 @@ private constructor(
 ) {
 
   /** Returns the current [State], meant for debugging purposes.*/
+  @Suppress("RedundantSuspendModifier")
   public suspend fun state(): State = state.get()
 
   /**
@@ -453,6 +454,12 @@ private constructor(
 
       override fun toString(): String =
         "CircuitBreaker.State.Open(startedAt=$startedAt, resetTimeoutNanos=$resetTimeout, expiresAt=$expiresAt)"
+
+      override fun hashCode(): Int {
+        var result = startedAt.hashCode()
+        result = 31 * result + resetTimeout.hashCode()
+        return result
+      }
     }
 
     /**

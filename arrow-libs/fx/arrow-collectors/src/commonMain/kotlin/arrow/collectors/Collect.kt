@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 
 /**
  * Performs collection over the elements of [this].
@@ -108,23 +106,20 @@ public fun <T, R> Iterator<T>.collect(
 ): R = collectI(collector)
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-@Suppress("UNINITIALIZED_VARIABLE", "UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST")
 internal suspend fun <A, T, R> Flow<T>.collectI(
   collector: CollectorI<A, T, R>,
   concurrency: Int = DEFAULT_CONCURRENCY,
 ): R {
-  var accumulator: A
+  val accumulator: A = collector.supply()
 
-  val started = this.onStart { accumulator = collector.supply() }
-
-  val continued = when {
+  when {
     collector.has(Characteristics.CONCURRENT, Characteristics.UNORDERED) ->
-      started.parMapUnordered(concurrency) { collector.accumulate(accumulator, it) }
+      parMapUnordered(concurrency) { collector.accumulate(accumulator, it) }.collect()
     collector.has(Characteristics.CONCURRENT) ->
-      started.parMap(concurrency) { collector.accumulate(accumulator, it) }
-    else -> started.map { collector.accumulate(accumulator, it) }
+      parMap(concurrency) { collector.accumulate(accumulator, it) }.collect()
+    else -> collect { collector.accumulate(accumulator, it) }
   }
-  continued.collect()
 
   return when {
     collector.has(Characteristics.IDENTITY_FINISH) -> accumulator as R

@@ -358,7 +358,7 @@ class ScheduleTest {
 
     assertThrows<IllegalStateException> {
       Schedule.forever<Throwable>()
-        .retry<IllegalArgumentException, _> { if (count++ == 0) throw ex else 1 }
+        .retry<IllegalArgumentException, _> { if (count++ == 0) throw ex }
     }
   }
 
@@ -367,7 +367,7 @@ class ScheduleTest {
     val count = AtomicLong(0)
     val iterations = stackSafeIteration().toLong()
 
-    suspend fun increment() {
+    fun increment() {
       count.incrementAndGet()
     }
 
@@ -392,7 +392,7 @@ class ScheduleTest {
     val count = AtomicLong(0)
     val iterations = stackSafeIteration().toLong()
 
-    suspend fun increment() {
+    fun increment() {
       count.incrementAndGet()
     }
 

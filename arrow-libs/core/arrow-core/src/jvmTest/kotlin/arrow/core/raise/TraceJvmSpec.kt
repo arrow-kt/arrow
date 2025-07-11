@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalTraceApi::class)
 class TraceJvmSpec {
   @Test fun canTraceATypedError() = runTest {
-    either<RuntimeException, Nothing> {
+    either {
       traced({ raise(RuntimeException("")) }) { traced, raised ->
         // Remove first 2 lines:
         // arrow.core.raise.RaiseCancellationException

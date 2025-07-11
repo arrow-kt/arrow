@@ -1,7 +1,7 @@
 package arrow.fx.stm
 
-public fun <A> STM.newTMVar(a: A): TMVar<A> = TMVar<A>(newTVar(Option.Some(a)))
-public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
+public fun <A> STM.newTMVar(a: A): TMVar<A> = TMVar(newTVar(Option.Some(a)))
+public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar(newTVar(Option.None))
 
 /**
  * A [TMVar] is a mutable reference that can either be empty or hold a value.
@@ -181,8 +181,8 @@ public fun <A> STM.newEmptyTMVar(): TMVar<A> = TMVar<A>(newTVar(Option.None))
  */
 public data class TMVar<A> internal constructor(internal val v: TVar<Option<A>>) {
   public companion object {
-    public suspend fun <A> new(a: A): TMVar<A> = TMVar<A>(TVar.new(Option.Some(a)))
-    public suspend fun <A> empty(): TMVar<A> = TMVar<A>(TVar.new(Option.None))
+    public suspend fun <A> new(a: A): TMVar<A> = TMVar(TVar.new(Option.Some(a)))
+    public suspend fun <A> empty(): TMVar<A> = TMVar(TVar.new(Option.None))
   }
 }
 

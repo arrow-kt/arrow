@@ -12,7 +12,7 @@ import kotlin.jvm.JvmName
  *
  * @receiver [Optional] with a focus in [S]
  * @param filter [FilterIndex] instance to provide a [Optional] to focus into [S] at [I]
- * @param i index [I] to focus into [S] and find focus [A]
+ * @param predicate index [I] to focus into [S] and find focus [A]
  * @return [Optional] with a focus in [A] at given index [I]
  */
 public fun <T, S, I, A> Traversal<T, S>.filterIndex(filter: FilterIndex<S, I, A>, predicate: Predicate<I>): Traversal<T, A> =

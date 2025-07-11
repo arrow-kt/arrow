@@ -45,7 +45,7 @@ class EffectSpec {
       effect {
         try {
           raise(s())
-        } catch (e: RaiseCancellationException) {
+        } catch (_: RaiseCancellationException) {
           i()
         }
       }.getOrElse { unreachable() } shouldBe i()
@@ -72,7 +72,7 @@ class EffectSpec {
       effect<String, Int> {
         try {
           raise(s())
-        } catch (e: RaiseCancellationException) {
+        } catch (_: RaiseCancellationException) {
           i()
         }
         raise(s2())
@@ -111,7 +111,7 @@ class EffectSpec {
   }
 
   @Test fun recoverSuccess() = runTest {
-    checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
+    checkAll(Arb.int().suspend()) { i ->
       effect<String, Int> {
         effect<Long, Int> { i() } getOrElse { unreachable() }
       }.getOrElse { unreachable() } shouldBe i()
@@ -173,7 +173,7 @@ class EffectSpec {
   }
 
   @Test fun recoverCatchRaiseAndThrow() = runTest {
-    checkAll(Arb.long().suspend(), Arb.string().suspend()) { l, s ->
+    checkAll(Arb.long().suspend()) { l ->
       effect<String, Int> {
         effect<Long, Int> {
           raise(l())
@@ -199,7 +199,7 @@ class EffectSpec {
   }
 
   @Test fun recoverCatchSuccess() = runTest {
-    checkAll(Arb.int().suspend(), Arb.long().suspend()) { i, l ->
+    checkAll(Arb.int().suspend()) { i ->
       effect<String, Int> {
         effect<Long, Int> { i() }
           .catch { unreachable() }.getOrElse { unreachable() }
@@ -567,7 +567,7 @@ class EffectSpec {
   }
 
   @Test fun catchReifiedErrorPathAndNoMatch() = runTest {
-    checkAll(Arb.string().suspend(), Arb.int().suspend()) { msg, error ->
+    checkAll(Arb.string().suspend()) { msg ->
       effect<Int, String> {
         throw RuntimeException(msg())
       }.catch { _: ArithmeticException ->
@@ -664,7 +664,7 @@ class EffectSpec {
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
-      either<NonEmptyList<Int>, List<Int>> {
+      either {
         zipOrAccumulate(
           { eithers.bindAll() },
           { emptyList<Int>() }
@@ -687,7 +687,7 @@ class EffectSpec {
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
-      either<NonEmptyList<Int>, NonEmptyList<Int>> {
+      either {
         zipOrAccumulate(
           { eithers.bindAll() },
           { emptyList<Int>() }
@@ -710,7 +710,7 @@ class EffectSpec {
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
 
-      either<NonEmptyList<Int>, NonEmptySet<Int>> {
+      either {
         zipOrAccumulate(
           { eithers.bindAll() },
           { emptySet<Int>() }

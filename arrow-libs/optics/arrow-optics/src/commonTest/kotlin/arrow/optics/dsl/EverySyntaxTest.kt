@@ -1,8 +1,6 @@
 package arrow.optics.dsl
 
 import arrow.core.*
-import arrow.optics.Lens
-import kotlin.jvm.JvmInline
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

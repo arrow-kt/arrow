@@ -29,6 +29,7 @@ class AtSyntaxTest {
     assertEquals(expected, actual)
   }
 
+  @Test
   fun setKeep() {
     val original = setOf(1)
     val expected = Wrapper(setOf(1, 2))

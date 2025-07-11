@@ -244,9 +244,9 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
@@ -272,12 +272,12 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
@@ -303,13 +303,13 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g, h, i)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
         }
       }
@@ -328,9 +328,9 @@ class EitherTest {
       val all = listOf(a, b)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Pair(it[0], it[1]).right()
         }
       }
@@ -350,9 +350,9 @@ class EitherTest {
       val all = listOf(a, b, c)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Triple(it[0], it[1], it[2]).right()
         }
       }
@@ -373,9 +373,9 @@ class EitherTest {
       val all = listOf(a, b, c, d)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple4(it[0], it[1], it[2], it[3]).right()
         }
       }
@@ -397,9 +397,9 @@ class EitherTest {
       val all = listOf(a, b, c, d, e)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple5(it[0], it[1], it[2], it[3], it[4]).right()
         }
       }
@@ -422,9 +422,9 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple6(it[0], it[1], it[2], it[3], it[4], it[5]).right()
         }
       }
@@ -448,9 +448,9 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple7(it[0], it[1], it[2], it[3], it[4], it[5], it[6]).right()
         }
       }
@@ -475,9 +475,9 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g, h)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
+        all.filterLefts().fold("") { acc, t -> "$acc$t" }.left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple8(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7]).right()
         }
       }
@@ -496,12 +496,12 @@ class EitherTest {
       val all = listOf(a, b)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Pair(it[0], it[1]).right()
         }
       }
@@ -521,12 +521,12 @@ class EitherTest {
       val all = listOf(a, b, c)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Triple(it[0], it[1], it[2]).right()
         }
       }
@@ -547,12 +547,12 @@ class EitherTest {
       val all = listOf(a, b, c, d)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple4(it[0], it[1], it[2], it[3]).right()
         }
       }
@@ -574,12 +574,12 @@ class EitherTest {
       val all = listOf(a, b, c, d, e)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple5(it[0], it[1], it[2], it[3], it[4]).right()
         }
       }
@@ -602,12 +602,12 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple6(it[0], it[1], it[2], it[3], it[4], it[5]).right()
         }
       }
@@ -631,12 +631,12 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple7(it[0], it[1], it[2], it[3], it[4], it[5], it[6]).right()
         }
       }
@@ -661,12 +661,12 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g, h)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
+        all.filterLefts()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple8(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7]).right()
         }
       }
@@ -685,13 +685,13 @@ class EitherTest {
       val all = listOf(a, b)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Pair(it[0], it[1]).right()
         }
       }
@@ -711,13 +711,13 @@ class EitherTest {
       val all = listOf(a, b, c)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Triple(it[0], it[1], it[2]).right()
         }
       }
@@ -738,13 +738,13 @@ class EitherTest {
       val all = listOf(a, b, c, d)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple4(it[0], it[1], it[2], it[3]).right()
         }
       }
@@ -766,13 +766,13 @@ class EitherTest {
       val all = listOf(a, b, c, d, e)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple5(it[0], it[1], it[2], it[3], it[4]).right()
         }
       }
@@ -795,13 +795,13 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple6(it[0], it[1], it[2], it[3], it[4], it[5]).right()
         }
       }
@@ -825,13 +825,13 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple7(it[0], it[1], it[2], it[3], it[4], it[5], it[6]).right()
         }
       }
@@ -856,13 +856,13 @@ class EitherTest {
       val all = listOf(a, b, c, d, e, f, g, h)
 
       val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
+        all.filterLefts()
+          .flatten()
           .toNonEmptyListOrNull()
           .shouldNotBeNull()
           .left()
       } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
+        all.filterRights().let {
           Tuple8(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7]).right()
         }
       }
@@ -924,9 +924,7 @@ class EitherTest {
   fun catchOrThrowRuntimeException() = runTest {
     checkAll(20, Arb.int(-2..2)) { a ->
       fun func() = 1001 / a
-      val res = Either.catchOrThrow<Throwable, Int>(::func)
-
-      when (res) {
+      when (val res = Either.catch(::func)) {
         is Left -> {
           res.value::class shouldBe ArithmeticException::class
         }
@@ -960,7 +958,7 @@ class EitherTest {
     fun func(i: Int) = (i + 1).left()
 
     checkAll(Arb.either(Arb.int(), Arb.int())) { e ->
-      val expected = e.fold(::func, { e })
+      val expected = e.fold(::func) { e }
       e.handleErrorWith(::func) shouldBe expected
     }
   }
@@ -1028,3 +1026,9 @@ class EitherTest {
     }
   }
 }
+
+private fun <E, A> List<Either<E, A>>.filterRights(): List<A> =
+  filterIsInstance<Right<A>>().map { it.value }
+
+private fun <E, A> List<Either<E, A>>.filterLefts(): List<E> =
+  filterIsInstance<Left<E>>().map { it.value }

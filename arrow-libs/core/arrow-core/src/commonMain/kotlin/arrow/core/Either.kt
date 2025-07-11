@@ -777,7 +777,7 @@ public sealed class Either<out A, out B> {
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
-  public data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
+  public data class Left<out A>(val value: A) : Either<A, Nothing>() {
     override fun toString(): String = "Either.Left($value)"
 
     public companion object
@@ -786,7 +786,7 @@ public sealed class Either<out A, out B> {
   /**
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
-  public data class Right<out B> constructor(val value: B) : Either<Nothing, B>() {
+  public data class Right<out B>(val value: B) : Either<Nothing, B>() {
     override fun toString(): String = "Either.Right($value)"
 
     public companion object {

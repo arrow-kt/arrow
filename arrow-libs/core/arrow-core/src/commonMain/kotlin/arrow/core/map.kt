@@ -3,7 +3,6 @@
 package arrow.core
 
 import arrow.core.raise.either
-import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapValuesOrAccumulate
 import kotlin.experimental.ExperimentalTypeInference
