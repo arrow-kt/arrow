@@ -7,7 +7,9 @@ internal actual fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellation
   val surrogateError = RaiseCancellationExceptionLike(raised, raise)
 
   val cancellationExceptionPrototype = RaiseCancellationException::class.js.asDynamic().prototype
-  Reflect.setPrototypeOf(surrogateError, cancellationExceptionPrototype)
+  require(Reflect.setPrototypeOf(surrogateError, cancellationExceptionPrototype)) {
+    "Unknown error occurred while setting the prototype of constructed JS RaiseCancellationException. Please report this to the Arrow maintainers!"
+  }
 
   // This assignment should be done after the prototype setting
   // because Error prototype contains empty string in message property.
