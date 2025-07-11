@@ -16,6 +16,12 @@ kotlin {
       }
     }
 
+    jsMain {
+      dependencies {
+        implementation(libs.kotlinWrappers.js)
+      }
+    }
+
     commonTest {
       dependencies {
         implementation(projects.arrowFxCoroutines)
