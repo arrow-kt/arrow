@@ -8,7 +8,7 @@ private external interface HasMutableMessage {
 
 @OptIn(DelicateRaiseApi::class)
 internal actual fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException {
-  val surrogateError = js("{raised: raised, raise: raise}")
+  val surrogateError = RaiseCancellationExceptionLike(raised, raise)
 
   val cancellationExceptionPrototype = RaiseCancellationException::class.js.asDynamic().prototype
   Reflect.setPrototypeOf(surrogateError, cancellationExceptionPrototype)

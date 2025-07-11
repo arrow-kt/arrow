@@ -1,10 +1,12 @@
 package arrow.core.raise
 
+import kotlinx.js.JsPlainObject
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * TODO: explain
  */
+@JsPlainObject
 internal external interface RaiseCancellationExceptionLike {
   val raised: Any?
   val raise: Raise<Any?>
