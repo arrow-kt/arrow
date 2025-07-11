@@ -5,7 +5,6 @@ package arrow.core
 import arrow.core.raise.RaiseAccumulate
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmInline
-import kotlin.jvm.JvmName
 
 @JvmInline
 public value class NonEmptySet<out E> internal constructor(

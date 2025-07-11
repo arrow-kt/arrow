@@ -38,7 +38,7 @@ public fun <T, A> StateFlow<T>.optic(g: Lens<T, A>): StateFlow<A> = object : Sta
 
 /**
  * Exposes the values of [this] through the optic.
- * Any change made to [value] is reflected in the original [MutableStateFlow].
+ * Any change made to [MutableStateFlow.value] is reflected in the original [MutableStateFlow].
  */
 public fun <T, A> MutableStateFlow<T>.optic(lens: Lens<T, A>): MutableStateFlow<A> = object : MutableStateFlow<A> {
   override var value: A

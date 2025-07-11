@@ -9,6 +9,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.test.runTest
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 
@@ -215,7 +218,11 @@ class AutoCloseTest {
 }
 
 // copied from Kotest so we can inline it
+@OptIn(ExperimentalContracts::class)
 inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
+  contract {
+    callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+  }
   assertionCounter.inc()
   val expectedExceptionClass = T::class
   val thrownThrowable = try {

@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 internal data class SuspendSideEffect(var counter: Int = 0) {
-  suspend fun increment() {
+  fun increment() {
     counter++
   }
 }

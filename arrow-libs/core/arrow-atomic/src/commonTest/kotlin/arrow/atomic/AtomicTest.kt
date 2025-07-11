@@ -74,10 +74,10 @@ class AtomicTest {
   fun tryUpdateShouldFailToUpdateIfModificationHasOccurred() = runTest {
     checkAll(Arb.string()) { x ->
       val ref = Atomic(x)
-      ref.tryUpdate {
+      ref.tryUpdate { x2 ->
         suspend { ref.update { it + "a" } }
           .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { })
-        it + "b"
+        x2 + "b"
       } shouldBe false
     }
   }

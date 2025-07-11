@@ -14,6 +14,7 @@ open class JsSpec : SuspendAppTest() {
   companion object {
     val config = JsTestConfig("jsNodeRun")
 
+    @Suppress("unused")
     @JvmStatic
     fun enabled() = config.validConfig()
   }

@@ -72,8 +72,7 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
       barrierAction.invoke()
     } catch (e: Throwable) {
       val cancellationException =
-        if (e is CancellationException) e
-        else CancellationException("CyclicBarrier barrierAction failed with exception.", e.nonFatalOrThrow())
+        e as? CancellationException ?: CancellationException("CyclicBarrier barrierAction failed with exception.", e.nonFatalOrThrow())
       unblock.cancel(cancellationException)
       throw cancellationException
     }

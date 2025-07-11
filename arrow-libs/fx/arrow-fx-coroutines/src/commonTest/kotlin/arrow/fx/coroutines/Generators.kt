@@ -31,7 +31,7 @@ import kotlin.coroutines.startCoroutine
 fun <A> Arb.Companion.flow(arbA: Arb<A>, range: IntRange = 1 .. 20): Arb<Flow<A>> =
   Arb.choose(
     10 to Arb.list(arbA, range).map { it.asFlow() },
-    10 to Arb.list(arbA, range).map { channelFlow { it.forEach { send(it) } }.buffer(Channel.RENDEZVOUS) },
+    10 to Arb.list(arbA, range).map { l -> channelFlow { l.forEach { send(it) } }.buffer(Channel.RENDEZVOUS) },
     1 to Arb.constant(emptyFlow()),
   )
 
@@ -153,7 +153,7 @@ inline fun <A> assertThrowable(executable: () -> A): Throwable {
     e
   }
 
-  return if (a is Throwable) a else fail("Expected an exception but found: $a")
+  return a as? Throwable ?: fail("Expected an exception but found: $a")
 }
 
 suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {

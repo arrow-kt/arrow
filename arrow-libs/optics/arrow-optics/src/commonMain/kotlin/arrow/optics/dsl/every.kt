@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.optics.Every
-import arrow.optics.Optional
 import arrow.optics.Traversal
 import kotlin.jvm.JvmName
 
