@@ -176,23 +176,14 @@ if (isKotlinMultiplatform) {
       val nonJvmMain by creating { dependsOn(commonMain.get()) }
       val nonJvmTest by creating { dependsOn(commonTest.get()) }
 
-      val nonJvmAndJsMain by creating { dependsOn(commonMain.get()) }
-      val nonJvmAndJsTest by creating { dependsOn(commonTest.get()) }
-
       nativeMain.get().dependsOn(nonJvmMain)
       nativeTest.get().dependsOn(nonJvmTest)
-
-      nativeMain.get().dependsOn(nonJvmAndJsMain)
-      nativeTest.get().dependsOn(nonJvmAndJsTest)
 
       jsMain.get().dependsOn(nonJvmMain)
       jsTest.get().dependsOn(nonJvmTest)
 
       wasmJsMain.get().dependsOn(nonJvmMain)
       wasmJsTest.get().dependsOn(nonJvmTest)
-
-      wasmJsMain.get().dependsOn(nonJvmAndJsMain)
-      wasmJsMain.get().dependsOn(nonJvmAndJsTest)
 
       if (!withoutAndroid) {
         val androidAndJvmMain by creating { dependsOn(commonMain.get()) }
