@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
   id("arrow.kotlin")
+  alias(libs.plugins.kotlin.jsPlainObjects)
 }
 
 kotlin {
@@ -13,6 +14,12 @@ kotlin {
       dependencies {
         api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
+      }
+    }
+
+    jsMain {
+      dependencies {
+        implementation(libs.kotlinWrappers.js)
       }
     }
 
