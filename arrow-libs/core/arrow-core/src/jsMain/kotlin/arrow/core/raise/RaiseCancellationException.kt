@@ -4,7 +4,10 @@ import kotlinx.js.JsPlainObject
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * TODO: explain
+ * There is no direct way to create an instance of [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) without a stack in JS.
+ * But we can throw any object or primitive in the JS platform.
+ * This interface is used to enforce structural contract
+ * between actual instance of [NoTrace] object and [RaiseCancellationException] class.
  */
 @JsPlainObject
 internal external interface RaiseCancellationExceptionLike {
