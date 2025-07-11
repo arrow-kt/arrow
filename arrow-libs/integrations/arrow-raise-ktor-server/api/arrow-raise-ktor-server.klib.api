@@ -47,20 +47,20 @@ open class <#A: kotlin/Any?> arrow.raise.ktor.server/RaiseAccumulate : arrow.cor
         final fun <get-raise>(): arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>> // arrow.raise.ktor.server/RaiseAccumulate.raise.<get-raise>|<get-raise>(){}[0]
 
     final fun <#A1: kotlin/Any> ensureNotNullOrAccumulate(#A1?, kotlin/Function0<#A>) // arrow.raise.ktor.server/RaiseAccumulate.ensureNotNullOrAccumulate|ensureNotNullOrAccumulate(0:0?;kotlin.Function0<1:0>){0§<kotlin.Any>}[0]
-    final fun <#A1: kotlin/Any?> (arrow.core/Either<#A, #A1>).bindOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1, #A> // arrow.raise.ktor.server/RaiseAccumulate.bindOrAccumulate|bindOrAccumulate@arrow.core.Either<1:0,0:0>(){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (arrow.core/Either<#A, #A1>).bindOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1> // arrow.raise.ktor.server/RaiseAccumulate.bindOrAccumulate|bindOrAccumulate@arrow.core.Either<1:0,0:0>(){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> (arrow.core/Either<arrow.core/NonEmptyList<#A>, #A1>).bindNel(): #A1 // arrow.raise.ktor.server/RaiseAccumulate.bindNel|bindNel@arrow.core.Either<arrow.core.NonEmptyList<1:0>,0:0>(){0§<kotlin.Any?>}[0]
-    final fun <#A1: kotlin/Any?> (arrow.core/Either<arrow.core/NonEmptyList<#A>, #A1>).bindNelOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1, #A> // arrow.raise.ktor.server/RaiseAccumulate.bindNelOrAccumulate|bindNelOrAccumulate@arrow.core.Either<arrow.core.NonEmptyList<1:0>,0:0>(){0§<kotlin.Any?>}[0]
-    final fun <#A1: kotlin/Any?> (kotlin.collections/Iterable<arrow.core/Either<#A, #A1>>).bindAllOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<kotlin.collections/List<#A1>, #A> // arrow.raise.ktor.server/RaiseAccumulate.bindAllOrAccumulate|bindAllOrAccumulate@kotlin.collections.Iterable<arrow.core.Either<1:0,0:0>>(){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (arrow.core/Either<arrow.core/NonEmptyList<#A>, #A1>).bindNelOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1> // arrow.raise.ktor.server/RaiseAccumulate.bindNelOrAccumulate|bindNelOrAccumulate@arrow.core.Either<arrow.core.NonEmptyList<1:0>,0:0>(){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.collections/Iterable<arrow.core/Either<#A, #A1>>).bindAllOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<kotlin.collections/List<#A1>> // arrow.raise.ktor.server/RaiseAccumulate.bindAllOrAccumulate|bindAllOrAccumulate@kotlin.collections.Iterable<arrow.core.Either<1:0,0:0>>(){0§<kotlin.Any?>}[0]
     final fun addErrors(kotlin.collections/Iterable<#A>) // arrow.raise.ktor.server/RaiseAccumulate.addErrors|addErrors(kotlin.collections.Iterable<1:0>){}[0]
     final fun ensureOrAccumulate(kotlin/Boolean, kotlin/Function0<#A>) // arrow.raise.ktor.server/RaiseAccumulate.ensureOrAccumulate|ensureOrAccumulate(kotlin.Boolean;kotlin.Function0<1:0>){}[0]
     final fun hasErrors(): kotlin/Boolean // arrow.raise.ktor.server/RaiseAccumulate.hasErrors|hasErrors(){}[0]
     final fun raiseErrors(): kotlin/Nothing // arrow.raise.ktor.server/RaiseAccumulate.raiseErrors|raiseErrors(){}[0]
-    final inline fun <#A1: kotlin/Any?> accumulating(kotlin/Function1<arrow.raise.ktor.server/RaiseAccumulate<#A>, #A1>): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1, #A> // arrow.raise.ktor.server/RaiseAccumulate.accumulating|accumulating(kotlin.Function1<arrow.raise.ktor.server.RaiseAccumulate<1:0>,0:0>){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: kotlin/Any?> accumulating(kotlin/Function1<arrow.raise.ktor.server/RaiseAccumulate<#A>, #A1>): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1> // arrow.raise.ktor.server/RaiseAccumulate.accumulating|accumulating(kotlin.Function1<arrow.raise.ktor.server.RaiseAccumulate<1:0>,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> withNel(kotlin/Function1<arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>, #A1>): #A1 // arrow.raise.ktor.server/RaiseAccumulate.withNel|withNel(kotlin.Function1<arrow.core.raise.Raise<arrow.core.NonEmptyList<1:0>>,0:0>){0§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Either<#A, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.raise.ktor.server/RaiseAccumulate.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Either<1:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     open fun raise(#A): kotlin/Nothing // arrow.raise.ktor.server/RaiseAccumulate.raise|raise(1:0){}[0]
 
-    abstract inner class <#A1: out kotlin/Any?> Value { // arrow.raise.ktor.server/RaiseAccumulate.Value|null[0]
+    abstract class <#A1: out kotlin/Any?> Value { // arrow.raise.ktor.server/RaiseAccumulate.Value|null[0]
         constructor <init>() // arrow.raise.ktor.server/RaiseAccumulate.Value.<init>|<init>(){}[0]
 
         abstract val result // arrow.raise.ktor.server/RaiseAccumulate.Value.result|{}result[0]
@@ -69,14 +69,14 @@ open class <#A: kotlin/Any?> arrow.raise.ktor.server/RaiseAccumulate : arrow.cor
         final fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.raise.ktor.server/RaiseAccumulate.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
     }
 
-    final inner class <#A1: out kotlin/Any?> Ok : arrow.raise.ktor.server/RaiseAccumulate.Value<#A1, #A> { // arrow.raise.ktor.server/RaiseAccumulate.Ok|null[0]
+    final class <#A1: out kotlin/Any?> Ok : arrow.raise.ktor.server/RaiseAccumulate.Value<#A1> { // arrow.raise.ktor.server/RaiseAccumulate.Ok|null[0]
         constructor <init>(#A1) // arrow.raise.ktor.server/RaiseAccumulate.Ok.<init>|<init>(1:0){}[0]
 
         final val result // arrow.raise.ktor.server/RaiseAccumulate.Ok.result|{}result[0]
             final fun <get-result>(): #A1 // arrow.raise.ktor.server/RaiseAccumulate.Ok.result.<get-result>|<get-result>(){}[0]
     }
 
-    final inner class Error : arrow.raise.ktor.server/RaiseAccumulate.Value<kotlin/Nothing, #A> { // arrow.raise.ktor.server/RaiseAccumulate.Error|null[0]
+    final inner class Error : arrow.raise.ktor.server/RaiseAccumulate.Value<kotlin/Nothing> { // arrow.raise.ktor.server/RaiseAccumulate.Error|null[0]
         constructor <init>() // arrow.raise.ktor.server/RaiseAccumulate.Error.<init>|<init>(){}[0]
 
         final val result // arrow.raise.ktor.server/RaiseAccumulate.Error.result|{}result[0]
