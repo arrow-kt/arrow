@@ -8,7 +8,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
 /**
  * Empty arrays means "Everything that matches annotated class"
  */
-public annotation class optics(val targets: Array<OpticsTarget> = emptyArray())
+public annotation class optics(val targets: Array<OpticsTarget> = [])
 
 public enum class OpticsTarget {
   ISO, LENS, PRISM, OPTIONAL, DSL

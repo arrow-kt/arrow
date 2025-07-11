@@ -247,7 +247,7 @@ class STMTest {
         delay(20.milliseconds)
         atomically { acc1.modify { it + 60 } }
       },
-      { _, _ -> Unit }
+      { _, _ -> }
     )
     acc1.unsafeRead() shouldBeExactly 50
     acc2.unsafeRead() shouldBeExactly 250
@@ -277,7 +277,7 @@ class STMTest {
       },
       {
         val collected = mutableSetOf<Int>()
-        for (i in 1..100) {
+        repeat(100) {
           // consumer
           atomically {
             tq.read().also { it shouldBeInRange (1..100) }
@@ -286,7 +286,7 @@ class STMTest {
         // verify that we got 100 unique numbers
         collected.size shouldBeExactly 100
       }
-    ) { _, _ -> Unit }
+    ) { _, _ -> }
     // the above only finishes if the consumer reads at least 100 values, this here is just to make sure there are no leftovers
     atomically { tq.flush() } shouldBe emptyList()
   }

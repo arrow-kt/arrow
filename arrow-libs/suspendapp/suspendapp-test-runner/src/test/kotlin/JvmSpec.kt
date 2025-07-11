@@ -12,6 +12,7 @@ class JvmSpec : SuspendAppTest() {
     val java = ProcessHandle.current().info().command().getOrNull()
     val jar = System.getProperty("jvmJar")?.let(::Path)
 
+    @Suppress("unused")
     @JvmStatic
     fun enabled() = java != null && jar?.exists() ?: false
   }

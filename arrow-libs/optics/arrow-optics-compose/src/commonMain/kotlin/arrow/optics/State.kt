@@ -16,7 +16,7 @@ public fun <T, A> State<T>.optic(g: Lens<T, A>): State<A> = object : State<A> {
 
 /**
  * Exposes the value of [this] through the optic.
- * Any change made to [value] is reflected in the original [MutableState].
+ * Any change made to [MutableState.value] is reflected in the original [MutableState].
  */
 public fun <T, A> MutableState<T>.optic(lens: Lens<T, A>): MutableState<A> = object : MutableState<A> {
   override var value: A

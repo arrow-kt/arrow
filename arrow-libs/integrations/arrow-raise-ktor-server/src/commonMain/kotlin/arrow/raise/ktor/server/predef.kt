@@ -30,7 +30,7 @@ public open class RaiseAccumulate<Error>(
     raise.raise((errors + r).toNonEmptyListOrNull()!!)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
-    raise.mapValuesOrAccumulate(this) { it -> it.value.bind() }
+    raise.mapValuesOrAccumulate(this) { it.value.bind() }
 
   @RaiseDSL
   public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {
@@ -75,7 +75,7 @@ public open class RaiseAccumulate<Error>(
       Error()
     }
 
-  public abstract inner class Value<out A> {
+  public abstract class Value<out A> {
     public abstract val result: A
     public operator fun getValue(value: Nothing?, property: KProperty<*>): A = result
   }
@@ -87,5 +87,5 @@ public open class RaiseAccumulate<Error>(
         raiseErrors()
       }
   }
-  @PublishedApi internal inner class Ok<out A>(override val result: A): Value<A>()
+  @PublishedApi internal class Ok<out A>(override val result: A): Value<A>()
 }

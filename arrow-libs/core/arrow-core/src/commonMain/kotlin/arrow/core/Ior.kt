@@ -51,10 +51,10 @@ public sealed class Ior<out A, out B> {
    */
   public fun isLeft(): Boolean {
     contract {
-      returns(true) implies (this@Ior is Ior.Left<A>)
-      returns(false) implies (this@Ior is Ior.Right<B> || this@Ior is Ior.Both<A, B>)
+      returns(true) implies (this@Ior is Left<A>)
+      returns(false) implies (this@Ior is Right<B> || this@Ior is Both<A, B>)
     }
-    return this@Ior is Ior.Left<A>
+    return this@Ior is Left<A>
   }
 
   /**
@@ -75,10 +75,10 @@ public sealed class Ior<out A, out B> {
    */
   public fun isRight(): Boolean {
     contract {
-      returns(true) implies (this@Ior is Ior.Right<B>)
-      returns(false) implies (this@Ior is Ior.Left<A> || this@Ior is Ior.Both<A, B>)
+      returns(true) implies (this@Ior is Right<B>)
+      returns(false) implies (this@Ior is Left<A> || this@Ior is Both<A, B>)
     }
-    return this@Ior is Ior.Right<B>
+    return this@Ior is Right<B>
   }
 
   /**
@@ -98,10 +98,10 @@ public sealed class Ior<out A, out B> {
    */
   public fun isBoth(): Boolean {
     contract {
-      returns(false) implies (this@Ior is Ior.Right<B> || this@Ior is Ior.Left<A>)
-      returns(true) implies (this@Ior is Ior.Both<A, B>)
+      returns(false) implies (this@Ior is Right<B> || this@Ior is Left<A>)
+      returns(true) implies (this@Ior is Both<A, B>)
     }
-    return this@Ior is Ior.Both<A, B>
+    return this@Ior is Both<A, B>
   }
 
   public companion object {
@@ -451,11 +451,11 @@ public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
 }
 
 
-public fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
+public fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Both(this.first, this.second)
 
-public fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
+public fun <A> A.leftIor(): Ior<A, Nothing> = Left(this)
 
-public fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
+public fun <A> A.rightIor(): Ior<Nothing, A> = Right(this)
 
 public inline fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) -> A, combineB: (B, B) -> B): Ior<A, B> {
   contract {
@@ -463,22 +463,22 @@ public inline fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) ->
     callsInPlace(combineB, InvocationKind.AT_MOST_ONCE)
   }
   return when (this) {
-    is Ior.Left -> when (other) {
-      is Ior.Left -> Ior.Left(combineA(value, other.value))
-      is Ior.Right -> Ior.Both(value, other.value)
-      is Ior.Both -> Ior.Both(combineA(value, other.leftValue), other.rightValue)
+    is Left -> when (other) {
+      is Left -> Left(combineA(value, other.value))
+      is Right -> Both(value, other.value)
+      is Both -> Both(combineA(value, other.leftValue), other.rightValue)
     }
 
-    is Ior.Right -> when (other) {
-      is Ior.Left -> Ior.Both(other.value, value)
-      is Ior.Right -> Ior.Right(combineB(value, other.value))
-      is Ior.Both -> Ior.Both(other.leftValue, combineB(value, other.rightValue))
+    is Right -> when (other) {
+      is Left -> Both(other.value, value)
+      is Right -> Right(combineB(value, other.value))
+      is Both -> Both(other.leftValue, combineB(value, other.rightValue))
     }
 
-    is Ior.Both -> when (other) {
-      is Ior.Left -> Ior.Both(combineA(leftValue, other.value), rightValue)
-      is Ior.Right -> Ior.Both(leftValue, combineB(rightValue, other.value))
-      is Ior.Both -> Ior.Both(combineA(leftValue, other.leftValue), combineB(rightValue, other.rightValue))
+    is Both -> when (other) {
+      is Left -> Both(combineA(leftValue, other.value), rightValue)
+      is Right -> Both(leftValue, combineB(rightValue, other.value))
+      is Both -> Both(combineA(leftValue, other.leftValue), combineB(rightValue, other.rightValue))
     }
   }
 }
