@@ -17,8 +17,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.negativeInt
 import io.kotest.property.arbitrary.positiveInt
-import io.kotest.property.checkAll
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -26,13 +26,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.runTest
-import kotlin.test.Test
-import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
+import kotlin.test.Test
 
 class ResourceTest {
 
@@ -207,8 +207,7 @@ class ResourceTest {
     val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
     val res = promises.fold(resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
       resource {
-        val ii = acc.bind()
-        install({ ii + i }) { _, _ ->
+        install({ acc.bind() + i }) { _, _ ->
           require(promise.complete(i))
         }
       }
@@ -820,5 +819,32 @@ class ResourceTest {
     exitCase.shouldHaveCompleted() shouldBe ExitCase.Completed
     wasActive.shouldHaveCompleted() shouldBe true
     res.isActive() shouldBe false
+  }
+
+  @Test
+  fun allowsInstallingInsideInstall() = runTest {
+    val res1 = Res()
+    val res2 = Res()
+    val res3 = Res()
+    val closed = Channel<Res>(Channel.UNLIMITED)
+    val releaser: suspend (Res, ExitCase) -> Unit = { r, _ ->
+      closed.trySend(r).getOrThrow()
+      r.shutdown()
+    }
+
+    resourceScope {
+      install({
+        install({
+          install({ res1 }, releaser)
+          res2
+        }, releaser)
+        res3
+      }, releaser)
+    }
+
+    closed.receive() shouldBe res3
+    closed.receive() shouldBe res2
+    closed.receive() shouldBe res1
+    closed.cancel()
   }
 }
