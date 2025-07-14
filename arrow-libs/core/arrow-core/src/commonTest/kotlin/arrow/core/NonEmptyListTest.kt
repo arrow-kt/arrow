@@ -14,6 +14,7 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.negativeInt
 import io.kotest.property.arbitrary.pair
 import io.kotest.property.arbitrary.set
+import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import io.kotest.property.exhaustive.exhaustive
 import kotlinx.coroutines.test.runTest
@@ -524,6 +525,66 @@ class NonEmptyListTest {
       val expected = a.all.zip(b.all, c.all, d.all, e.all, f.all, g.all, h.all, i.all, j.all, ::Tuple10)
         .toNonEmptyListOrNull()
       result shouldBe expected
+    }
+  }
+
+  @Test
+  fun compareTo() = runTest {
+    checkAll(Arb.list(Arb.int(), 1..10), Arb.list(Arb.int(), 1..10)) { a, b ->
+      val expected = a.compareTo(b)
+
+      a.toNonEmptyListOrThrow()
+        .compareTo(b.toNonEmptyListOrThrow()) shouldBe expected
+    }
+  }
+
+  @Test
+  fun flatten() = runTest {
+    checkAll(Arb.list(Arb.list(Arb.int(), 1..10), 1..10)) { a ->
+      val expected = a.flatten()
+
+      a.map { it.toNonEmptyListOrThrow() }
+        .toNonEmptyListOrThrow().flatten() shouldBe expected
+    }
+  }
+
+  @Test
+  fun unzip() = runTest {
+    checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string(0..10)), 1..10)) { a ->
+      val expA = a.map { it.first }
+      val expB = a.map { it.second }
+
+      with(a.toNonEmptyListOrThrow().unzip()) {
+        first shouldBe expA
+        second shouldBe expB
+      }
+    }
+  }
+
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  @Test
+  fun wrapAsNonEmptyListOrThrow() = runTest {
+    checkAll(Arb.list(Arb.int(), 0..10)) { a ->
+      runCatching {
+        a.wrapAsNonEmptyListOrThrow()
+      }.also {
+        when (a.isEmpty()) {
+          true -> {
+            it.isFailure shouldBe true
+          }
+          false -> {
+            it.getOrNull() shouldBe a.toNonEmptyListOrThrow()
+          }
+        }
+      }
+    }
+  }
+
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  @Test
+  fun wrapAsNonEmptyListOrNull() = runTest {
+    checkAll(Arb.list(Arb.int(), 0..10)) { a ->
+      a.wrapAsNonEmptyListOrNull() shouldBe a.toNonEmptyListOrNull()
     }
   }
 }
