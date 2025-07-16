@@ -986,21 +986,30 @@ public open class RaiseAccumulate<Error>(
       Ok(block(RaiseAccumulate(this@inner)))
     }) {
       addErrors(it)
-      Error()
+      Error(this)
     }
   }
 
+  @Suppress("NOTHING_TO_INLINE")
+  @Deprecated(message = "Deprecated in favor of member", level = DeprecationLevel.HIDDEN)
   public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
-  public sealed interface Value<out A> {
-    public val value: A
+  public sealed class Value<out A> {
+    public abstract val value: A
+
+    @Suppress("NOTHING_TO_INLINE")
+    public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = value
   }
 
-  @PublishedApi internal inner class Error: Value<Nothing> {
+  @PublishedApi internal class Error(
+    val raise: RaiseAccumulate<*>
+  ): Value<Nothing>() {
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-    override val value get(): Nothing = raiseErrors()
+    override val value get(): Nothing = raise.raiseErrors()
   }
 
-  @PublishedApi internal class Ok<out A>(override val value: A): Value<A>
+  @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
 }
+
+
