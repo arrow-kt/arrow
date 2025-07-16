@@ -412,6 +412,9 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptyList : arrow.core/Non
     final object Companion { // arrow.core/NonEmptyList.Companion|null[0]
         final val unit // arrow.core/NonEmptyList.Companion.unit|{}unit[0]
             final fun <get-unit>(): arrow.core/NonEmptyList<kotlin/Unit> // arrow.core/NonEmptyList.Companion.unit.<get-unit>|<get-unit>(){}[0]
+
+        final fun <#A2: kotlin/Any?> of(#A2, kotlin/Array<out #A2>...): arrow.core/NonEmptyList<#A2> // arrow.core/NonEmptyList.Companion.of|of(0:0;kotlin.Array<out|0:0>...){0§<kotlin.Any?>}[0]
+        final fun <#A2: kotlin/Any?> of(kotlin.collections/Iterable<#A2>): arrow.core/NonEmptyList<#A2> // arrow.core/NonEmptyList.Companion.of|of(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
     }
 
     // Targets: [js]
@@ -443,7 +446,13 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptySet : arrow.core/NonE
     final fun lastOrNull(): #A // arrow.core/NonEmptySet.lastOrNull|lastOrNull(){}[0]
     final fun plus(#A): arrow.core/NonEmptySet<#A> // arrow.core/NonEmptySet.plus|plus(1:0){}[0]
     final fun plus(kotlin.collections/Iterable<#A>): arrow.core/NonEmptySet<#A> // arrow.core/NonEmptySet.plus|plus(kotlin.collections.Iterable<1:0>){}[0]
+    final fun toSet(): kotlin.collections/Set<#A> // arrow.core/NonEmptySet.toSet|toSet(){}[0]
     final fun toString(): kotlin/String // arrow.core/NonEmptySet.toString|toString(){}[0]
+
+    final object Companion { // arrow.core/NonEmptySet.Companion|null[0]
+        final fun <#A2: kotlin/Any?> of(#A2, kotlin/Array<out #A2>...): arrow.core/NonEmptySet<#A2> // arrow.core/NonEmptySet.Companion.of|of(0:0;kotlin.Array<out|0:0>...){0§<kotlin.Any?>}[0]
+        final fun <#A2: kotlin/Any?> of(kotlin.collections/Iterable<#A2>): arrow.core/NonEmptySet<#A2> // arrow.core/NonEmptySet.Companion.of|of(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
+    }
 
     // Targets: [js]
     final fun asJsReadonlySetView(): kotlin.js.collections/JsReadonlySet<#A> // arrow.core/NonEmptySet.asJsReadonlySetView|asJsReadonlySetView(){}[0]
