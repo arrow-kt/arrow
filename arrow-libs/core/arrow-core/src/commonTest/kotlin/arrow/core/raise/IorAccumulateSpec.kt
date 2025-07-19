@@ -2,6 +2,7 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.right
 import arrow.core.test.nonEmptyList
@@ -21,9 +22,10 @@ import kotlinx.coroutines.test.runTest
   "IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION",
   "UNUSED_VARIABLE"
 )
-class IorSpec {
+@OptIn(ExperimentalRaiseAccumulateApi::class)
+class IorAccumulateSpec {
   @Test fun accumulates() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two = Ior.Both(", World!", 2).bind()
       one + two
@@ -31,7 +33,7 @@ class IorSpec {
   }
 
   @Test fun accumulatesAndShortCircuitsWithLeft() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two: Int = Ior.Left(", World!").bind()
       one + two
@@ -39,7 +41,7 @@ class IorSpec {
   }
 
   @Test fun accumulatesWithEither() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two: Int = Either.Left(", World!").bind<Int>()
       one + two
@@ -48,7 +50,7 @@ class IorSpec {
 
   @Test fun concurrentArrowIorBind() = runTest {
     checkAll(Arb.nonEmptyList(Arb.int(), range = 0 .. 20)) { xs ->
-      ior(List<Int>::plus) {
+      iorAccumulate(List<Int>::plus) {
         xs.mapIndexed { index, s -> async { Ior.Both(listOf(s), index).bind() } }.awaitAll()
       }
         .mapLeft { it.toSet() } shouldBe Ior.Both(xs.toSet(), xs.indices.toList())
@@ -56,7 +58,7 @@ class IorSpec {
   }
 
   @Test fun accumulatesEagerly() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two = Ior.Both(", World!", 2).bind()
       one + two
@@ -64,7 +66,7 @@ class IorSpec {
   }
 
   @Test fun accumulatesWithEitherEagerly() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = Ior.Both("Hello", 1).bind()
       val two: Int = Either.Left(", World!").bind<Int>()
       one + two
@@ -72,7 +74,7 @@ class IorSpec {
   }
 
   @Test fun accumulatesAndShortCircuits() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       Ior.Both("Hello", Unit).bind()
       raise(" World")
     } shouldBe Ior.Left("Hello World")
@@ -81,14 +83,14 @@ class IorSpec {
   @Test fun iorRethrowsException() = runTest {
     val boom = RuntimeException("Boom!")
     shouldThrow<RuntimeException> {
-      ior(String::plus) {
+      iorAccumulate(String::plus) {
        throw boom
       }
     }.message shouldBe "Boom!"
   }
 
   @Test fun recoverWorksAsExpected() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = recover({
         Ior.Both("H", Unit).bind()
         Ior.Both("i", Unit).bind()
@@ -104,7 +106,7 @@ class IorSpec {
   }
 
   @Test fun recoverWithThrow() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = try {
         recover({
           Ior.Both("H", Unit).bind()
@@ -123,7 +125,7 @@ class IorSpec {
   }
 
   @Test fun recoverWithRaiseIsNoOp() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one: Int =
         recover({
           Ior.Both("Hi", Unit).bind()
@@ -138,7 +140,7 @@ class IorSpec {
   }
 
   @Test fun tryCatchRecoverRaise() = runTest {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val one = try {
         Ior.Both("Hi", Unit).bind()
         Ior.Left("Hello").bind()
@@ -152,7 +154,7 @@ class IorSpec {
   }
 
   @Test fun iorNelAccumulates() = runTest {
-    iorNel {
+    iorAccumulate(NonEmptyList<String>::plus) {
       val one = Ior.Both("ErrorOne", 1).toIorNel().bind()
       val two = Ior.Both("ErrorTwo", 2).toIorNel().bind()
       one + two
@@ -160,23 +162,33 @@ class IorSpec {
   }
 
   @Test fun accumulateErrorManually() {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       accumulate("nonfatal")
       "output"
     } shouldBe Ior.Both("nonfatal", "output")
   }
 
   @Test fun getOrAccumulateRightEither() {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val result = "success".right().getOrAccumulate { "failed" }
       "output: $result"
     } shouldBe Ior.Right("output: success")
   }
 
   @Test fun getOrAccumulateLeftEither() {
-    ior(String::plus) {
+    iorAccumulate(String::plus) {
       val result = "nonfatal".left().getOrAccumulate { "failed" }
       "output: $result"
+    } shouldBe Ior.Both("nonfatal", "output: failed")
+  }
+
+  @Test fun preservesAccumulatedErrorsInAccumulating() {
+    iorAccumulate(String::plus) {
+      val x by accumulating {
+        accumulate("nonfatal")
+        "output: failed"
+      }
+      x
     } shouldBe Ior.Both("nonfatal", "output: failed")
   }
 }
