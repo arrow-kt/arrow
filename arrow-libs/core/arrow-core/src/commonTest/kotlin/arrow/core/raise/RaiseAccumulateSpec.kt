@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalRaiseAccumulateApi::class)
 package arrow.core.raise
 
+import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.nonEmptyListOf
@@ -80,5 +81,18 @@ class RaiseAccumulateSpec {
       val y by accumulating { 2 }
       x + y
     } shouldBe nonEmptyListOf("hello", "hi").left()
+  }
+
+  @Test fun preservesAccumulatedErrorsInAccumulating() {
+    var reachedEnd = false
+    accumulate(::either) {
+      val x by accumulating {
+        accumulate("nonfatal")
+        "output: failed"
+      }
+      x shouldBe "output: failed"
+      reachedEnd = true
+    } shouldBe nonEmptyListOf("nonfatal").left()
+    reachedEnd shouldBe true
   }
 }
