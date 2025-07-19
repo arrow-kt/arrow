@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalRaiseAccumulateApi::class)
 package arrow.core.raise
 
-import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.nonEmptyListOf
