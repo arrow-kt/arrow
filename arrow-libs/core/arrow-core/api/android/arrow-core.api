@@ -1208,6 +1208,10 @@ public final class arrow/core/raise/context/RaiseContextualKt {
 	public static final fun ensureNotNull (Larrow/core/raise/Raise;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 	public static final fun ensureNotNullOrAccumulate (Larrow/core/raise/RaiseAccumulate;Ljava/lang/Object;Lkotlin/jvm/functions/Function0;)Larrow/core/raise/RaiseAccumulate$Value;
 	public static final fun ensureOrAccumulate (Larrow/core/raise/RaiseAccumulate;ZLkotlin/jvm/functions/Function0;)V
+	public static final fun impure (Lkotlin/jvm/functions/Function1;)V
+	public static final fun ior (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static final fun iorNel (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/core/Ior;
+	public static synthetic fun iorNel$default (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/core/Ior;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate (Larrow/core/raise/Raise;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public static final fun mapOrAccumulate-l8IBlHg (Larrow/core/raise/Raise;Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
@@ -1216,6 +1220,7 @@ public final class arrow/core/raise/context/RaiseContextualKt {
 	public static final fun option (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun raise (Larrow/core/raise/Raise;Ljava/lang/Object;)Ljava/lang/Void;
 	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun singleton (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withError (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun withNel (Larrow/core/raise/RaiseAccumulate;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function4;)Ljava/lang/Object;

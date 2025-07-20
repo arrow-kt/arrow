@@ -25,7 +25,7 @@ import kotlin.jvm.JvmName
 public typealias RaiseAccumulate<A> = arrow.core.raise.RaiseAccumulate<A>
 
 context(raise: Raise<NonEmptyList<Error>>)
-@ExperimentalRaiseAccumulateApi public inline fun <Error, A> accumulate(
+@ExperimentalRaiseAccumulateApi @RaiseDSL public inline fun <Error, A> accumulate(
   block: context(RaiseAccumulate<Error>) () -> A
 ): A = raise.accumulateExt(block)
 
@@ -83,36 +83,36 @@ context(raise: RaiseAccumulate<Error>)
 public inline fun <A> withNel(block: context(Raise<NonEmptyList<Error>>) () -> A): A =
   with(raise) { withNel(block) }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
 public fun <Error, A> Either<Error, A>.bindOrAccumulate(): Value<A> =
   with(raise) { this@bindOrAccumulate.bindOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
 public fun <Error, A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> =
   with(raise) { this@bindAllOrAccumulate.bindAllOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
 public fun <Error, A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
   with(raise) { this@bindNelOrAccumulate.bindNelOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
 public inline fun <Error> ensureOrAccumulate(condition: Boolean, error: () -> Error) {
   contract { callsInPlace(error, AT_MOST_ONCE) }
   with(raise) { ensureOrAccumulate(condition, error) }
 }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
 public inline fun <Error, B: Any> ensureNotNullOrAccumulate(value: B?, error: () -> Error): Value<B> {
   contract { callsInPlace(error, AT_MOST_ONCE) }
   return with(raise) { ensureNotNullOrAccumulate(value, error) }
 }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
 public inline fun <Error, A> accumulating(block: context(RaiseAccumulate<Error>) () -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
