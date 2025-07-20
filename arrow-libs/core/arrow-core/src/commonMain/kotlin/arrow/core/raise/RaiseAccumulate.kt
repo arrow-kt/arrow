@@ -8,6 +8,7 @@ import arrow.core.EitherNel
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.collectionSizeOrDefault
 import arrow.core.getOrElse
 import arrow.core.nel
@@ -17,6 +18,8 @@ import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptyListOrThrow
 import arrow.core.toNonEmptySetOrNull
+import arrow.core.wrapAsNonEmptyListOrNull
+import arrow.core.wrapAsNonEmptyListOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -833,7 +836,10 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapValuesOrAccumul
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
+@Target(
+  AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR,
+  AnnotationTarget.CLASS
+)
 public annotation class ExperimentalRaiseAccumulateApi
 
 @ExperimentalRaiseAccumulateApi
@@ -868,31 +874,17 @@ public inline fun <Error, A, R> accumulate(
 public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constructor(
   accumulate: Accumulate<Error>, private val raiseErrorsWith: (Error) -> Nothing
 ) : Accumulate<Error> by accumulate, Raise<Error> {
+  @OptIn(ExperimentalRaiseAccumulateApi::class)
   public constructor(raise: Raise<NonEmptyList<Error>>) : this(raise, mutableListOf<Error>())
 
-  @OptIn(ExperimentalRaiseAccumulateApi::class)
-  private constructor(raise: Raise<NonEmptyList<Error>>, list: MutableList<Error>) : this(object : Accumulate<Error> {
-    private val error = Error { raise.raise(list.toNonEmptyListOrThrow()) }
-
-    @ExperimentalRaiseAccumulateApi
-    override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
-      list.addAll(errors)
-      return error
-    }
-
-    @ExperimentalRaiseAccumulateApi
-    override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
-  }, { raise.raise((list + it).toNonEmptyListOrThrow()) })
+  @ExperimentalRaiseAccumulateApi
+  private constructor(raise: Raise<NonEmptyList<Error>>, list: MutableList<Error>) :
+    this(ListAccumulate<Error>(raise, list), { raise.raise((list + it).toNonEmptyListOrThrow()) })
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
   @OptIn(ExperimentalRaiseAccumulateApi::class)
-  public val raise: Raise<NonEmptyList<Error>> = object : Raise<NonEmptyList<Error>> {
-    override fun raise(r: NonEmptyList<Error>): Nothing {
-      r.all.subList(0, r.size - 1).toNonEmptyListOrNull()?.let(::accumulateAll)
-      raise(r.last())
-    }
-  }
+  public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapValuesOrAccumulate(this) { it.value.bind() }
@@ -988,6 +980,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   internal fun hasErrors(): Boolean = hasAccumulatedErrors
 
+  @Suppress("KotlinUnreachableCode") // wrong inspection
   @OptIn(ExperimentalRaiseAccumulateApi::class)
   @PublishedApi
   @Deprecated("Binary compatibility", level = DeprecationLevel.WARNING)
@@ -1048,6 +1041,32 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     mapValues { (_, v) -> v.bind() }
 }
 
+@ExperimentalRaiseAccumulateApi
+private class RaiseNel<Error>(private val raiseAccumulate: RaiseAccumulate<Error>) : Raise<NonEmptyList<Error>> {
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  override fun raise(r: NonEmptyList<Error>): Nothing {
+    r.all.subList(0, r.size - 1).wrapAsNonEmptyListOrNull()?.let(raiseAccumulate::accumulateAll)
+    raiseAccumulate.raise(r.last())
+  }
+}
+
+private class ListAccumulate<Error>(
+  private val raise: Raise<NonEmptyList<Error>>,
+  private val list: MutableList<Error>
+) : Accumulate<Error> {
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  private val error = Error { raise.raise(list.wrapAsNonEmptyListOrThrow()) } // only valid if list is not empty
+
+  @ExperimentalRaiseAccumulateApi
+  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
+    list.addAll(errors)
+    return error
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
+}
+
 public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
 public interface Accumulate<Error> {
@@ -1074,12 +1093,10 @@ public interface Accumulate<Error> {
 
   // IorRaise methods
   @ExperimentalRaiseAccumulateApi
-  public fun <A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A =
-    getOrElse {
-      accumulate(it)
-      recover(it)
-    }
-
+  public fun <A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A = getOrElse {
+    accumulate(it)
+    recover(it)
+  }
 }
 
 @ExperimentalRaiseAccumulateApi
