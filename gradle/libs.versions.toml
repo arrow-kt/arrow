@@ -20,7 +20,7 @@ composePlugin = "1.8.2"
 agp = "8.11.1"
 cache4k = "0.14.0"
 publish = "0.34.0"
-jacksonModuleKotlin = "2.19.1"
+jacksonModuleKotlin = "2.19.2"
 shadow = "9.0.0-rc1"
 
 [libraries]
