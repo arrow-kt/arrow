@@ -15,7 +15,6 @@ import arrow.core.NonEmptySet
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
