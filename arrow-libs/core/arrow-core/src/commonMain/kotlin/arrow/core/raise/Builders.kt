@@ -171,8 +171,9 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
 
   @RaiseDSL
   public fun <A> Option<A>.bind(): A {
-    contract { returns() implies (this@bind is Some<A>) }
-    return getOrElse { raise() }
+    contract { returns() implies (this@bind is Some) }
+    ensure(this is Some)
+    return value
   }
 
   @RaiseDSL
