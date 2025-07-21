@@ -986,12 +986,19 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @Deprecated("Binary compatibility", level = DeprecationLevel.WARNING)
   internal fun raiseErrors(): Nothing = latestError?.value ?: error("No accumulated errors to raise")
 
-  public sealed interface Value<out A> {
-    public val value: A
+  @Suppress("NOTHING_TO_INLINE")
+  @Deprecated(message = "Deprecated in favor of member", level = DeprecationLevel.HIDDEN)
+  public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
+
+  public sealed class Value<out A> {
+    public abstract val value: A
+
+    @Suppress("NOTHING_TO_INLINE")
+    public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = value
   }
 
   @PublishedApi
-  internal class Error(private val raise: () -> Nothing) : Value<Nothing> {
+  internal class Error(private val raise: () -> Nothing) : Value<Nothing>() {
     @OptIn(ExperimentalRaiseAccumulateApi::class)
     @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
     constructor(raiseAccumulate: RaiseAccumulate<*>) : this({
@@ -1002,7 +1009,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     override val value get(): Nothing = raise()
   }
 
-  @PublishedApi internal class Ok<out A>(override val value: A): Value<A>
+  @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
 
   // IorRaise methods
   @RaiseDSL
