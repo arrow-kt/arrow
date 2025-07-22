@@ -277,8 +277,7 @@ public sealed class RaiseCancellationException(
 ) : CancellationException(RaiseCancellationExceptionCaptured)
 
 @DelicateRaiseApi
-@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
 
 @DelicateRaiseApi
 internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)
