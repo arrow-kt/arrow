@@ -5,6 +5,8 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.eval.Eval.Now
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.jvm.JvmStatic
 
 public sealed interface SuspendEval<out A> {
@@ -15,6 +17,10 @@ public sealed interface SuspendEval<out A> {
     @JvmStatic
     public inline fun <A> later(crossinline f: suspend () -> A): Later<A> =
       Later { f() }
+
+    @JvmStatic
+    public inline fun <A> atMostOnce(crossinline f: suspend () -> A): AtMostOnce<A> =
+      AtMostOnce { f() }
 
     @JvmStatic
     public inline fun <A> always(crossinline f: suspend () -> A): Always<A> =
@@ -147,7 +153,7 @@ public sealed interface SuspendEval<out A> {
     }
 
   public data class Later<out A>(private val f: suspend () -> A) : SuspendEval<A> {
-    var result: Option<@UnsafeVariance A> = None
+    private var result: Option<@UnsafeVariance A> = None
 
     override suspend fun run(): A = result.getOrElse {
       f().also { result = Some(it) }
@@ -157,6 +163,25 @@ public sealed interface SuspendEval<out A> {
 
     override fun toString(): String =
       "SuspendEval.Later(f)"
+  }
+
+  public data class AtMostOnce<out A>(private val f: suspend () -> A) : SuspendEval<A> {
+    private val mutex: Mutex = Mutex()
+    private var result: Option<@UnsafeVariance A> = None
+
+    override suspend fun run(): A =
+      result.getOrElse { // don't hold the mutex if we already have 'Some'
+        mutex.withLock {
+          result.getOrElse {
+            f().also { result = Some(it) }
+          }
+        }
+      }
+
+    override fun memoize(): SuspendEval<A> = this
+
+    override fun toString(): String =
+      "SuspendEval.AtMostOnce(f)"
   }
 
   public data class Always<out A>(private val f: suspend () -> A) : SuspendEval<A> {
