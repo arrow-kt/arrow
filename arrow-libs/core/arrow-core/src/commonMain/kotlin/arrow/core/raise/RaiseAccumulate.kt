@@ -1011,6 +1011,39 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
 
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    return merge {
+      Ok(block(RaiseAccumulate(this@RaiseAccumulate) { raise(accumulate(it)) }))
+    }
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  @RaiseDSL
+  public inline fun <A> recover(
+    block: RaiseAccumulate<Error>.() -> A,
+    recover: (error: Error) -> A,
+  ): A {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    return arrow.core.raise.recover({
+      block(RaiseAccumulate(this@RaiseAccumulate, ::raise))
+    }, recover)
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun ensureOrAccumulate(condition: Boolean, raise: () -> Error): Value<Unit> {
+    contract { callsInPlace(raise, AT_MOST_ONCE) }
+    return if (condition) Ok(Unit) else accumulate(raise())
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun <B : Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
+    contract { callsInPlace(raise, AT_MOST_ONCE) }
+    return if (value != null) Ok(value) else accumulate(raise())
+  }
+
   // IorRaise methods
   @RaiseDSL
   @JvmName("bindAllIor")
