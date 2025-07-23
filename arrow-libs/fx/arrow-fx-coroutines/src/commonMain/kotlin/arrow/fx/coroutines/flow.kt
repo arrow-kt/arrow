@@ -263,7 +263,7 @@ public fun fixedRate(
       } else {
         val ticks: Long = ((now - lastAwakeAt).inWholeMilliseconds - 1) / period.inWholeMilliseconds
         when {
-          ticks < 0L -> Unit
+          ticks < 0L -> { }
           ticks == 0L || dampen -> emit(Unit)
           else -> repeat(ticks.toInt()) { emit(Unit) }
         }
