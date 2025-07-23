@@ -1016,7 +1016,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
     contract { callsInPlace(block, AT_MOST_ONCE) }
     return merge {
-      Ok(block(RaiseAccumulate(this@RaiseAccumulate) { raise(accumulate(it)) }))
+      Ok(block(RaiseAccumulate(tolerant(this)) { raise(accumulate(it)) }))
     }
   }
 
@@ -1105,6 +1105,26 @@ private class ListAccumulate<Error>(
   override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
 }
 
+private class TolerantAccumulate<Error>(
+  private val underlying: Accumulate<Error>,
+  private val raise: Raise<Value<Nothing>>
+) : Accumulate<Error> {
+  @ExperimentalRaiseAccumulateApi
+  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
+    val error = underlying.accumulateAll(errors)
+    return Error { raise.raise(error) }
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  override val latestError: Value<Nothing>? get() {
+    val error = underlying.latestError ?: return null
+    return Error { raise.raise(error) }
+  }
+}
+
+@PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
+  TolerantAccumulate(this, raise)
+
 public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
 public interface Accumulate<Error> {
@@ -1141,7 +1161,7 @@ public interface Accumulate<Error> {
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return merge {
-    Ok(block(RaiseAccumulate(this@accumulating) { raise(accumulate(it)) }))
+    Ok(block(RaiseAccumulate(tolerant(this)) { raise(accumulate(it)) }))
   }
 }
 
