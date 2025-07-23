@@ -71,6 +71,21 @@ sealed interface <#A: out kotlin/Any?> arrow.eval/SuspendEval { // arrow.eval/Su
         final suspend fun run(): #A1 // arrow.eval/SuspendEval.Always.run|run(){}[0]
     }
 
+    final class <#A1: out kotlin/Any?> AtMostOnce : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.AtMostOnce|null[0]
+        constructor <init>(kotlin.coroutines/SuspendFunction0<#A1>) // arrow.eval/SuspendEval.AtMostOnce.<init>|<init>(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+
+        final var result // arrow.eval/SuspendEval.AtMostOnce.result|{}result[0]
+            final fun <get-result>(): arrow.core/Option<#A1> // arrow.eval/SuspendEval.AtMostOnce.result.<get-result>|<get-result>(){}[0]
+            final fun <set-result>(arrow.core/Option<#A1>) // arrow.eval/SuspendEval.AtMostOnce.result.<set-result>|<set-result>(arrow.core.Option<1:0>){}[0]
+
+        final fun copy(kotlin.coroutines/SuspendFunction0<#A1> = ...): arrow.eval/SuspendEval.AtMostOnce<#A1> // arrow.eval/SuspendEval.AtMostOnce.copy|copy(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.AtMostOnce.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.eval/SuspendEval.AtMostOnce.hashCode|hashCode(){}[0]
+        final fun memoize(): arrow.eval/SuspendEval<#A1> // arrow.eval/SuspendEval.AtMostOnce.memoize|memoize(){}[0]
+        final fun toString(): kotlin/String // arrow.eval/SuspendEval.AtMostOnce.toString|toString(){}[0]
+        final suspend fun run(): #A1 // arrow.eval/SuspendEval.AtMostOnce.run|run(){}[0]
+    }
+
     final class <#A1: out kotlin/Any?> Defer : arrow.eval/SuspendEval.AbstractDefer<#A1> { // arrow.eval/SuspendEval.Defer|null[0]
         constructor <init>(kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A1>>) // arrow.eval/SuspendEval.Defer.<init>|<init>(kotlin.coroutines.SuspendFunction0<arrow.eval.SuspendEval<1:0>>){}[0]
 
@@ -105,6 +120,7 @@ sealed interface <#A: out kotlin/Any?> arrow.eval/SuspendEval { // arrow.eval/Su
         final fun <#A2: kotlin/Any?> now(#A2): arrow.eval/SuspendEval<#A2> // arrow.eval/SuspendEval.Companion.now|now(0:0){0§<kotlin.Any?>}[0]
         final fun raise(kotlin/Throwable): arrow.eval/SuspendEval<kotlin/Nothing> // arrow.eval/SuspendEval.Companion.raise|raise(kotlin.Throwable){}[0]
         final inline fun <#A2: kotlin/Any?> always(crossinline kotlin.coroutines/SuspendFunction0<#A2>): arrow.eval/SuspendEval.Always<#A2> // arrow.eval/SuspendEval.Companion.always|always(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> atMostOnce(crossinline kotlin.coroutines/SuspendFunction0<#A2>): arrow.eval/SuspendEval.AtMostOnce<#A2> // arrow.eval/SuspendEval.Companion.atMostOnce|atMostOnce(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
         final inline fun <#A2: kotlin/Any?> defer(crossinline kotlin.coroutines/SuspendFunction0<arrow.eval/SuspendEval<#A2>>): arrow.eval/SuspendEval<#A2> // arrow.eval/SuspendEval.Companion.defer|defer(kotlin.coroutines.SuspendFunction0<arrow.eval.SuspendEval<0:0>>){0§<kotlin.Any?>}[0]
         final inline fun <#A2: kotlin/Any?> later(crossinline kotlin.coroutines/SuspendFunction0<#A2>): arrow.eval/SuspendEval.Later<#A2> // arrow.eval/SuspendEval.Companion.later|later(kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.Any?>}[0]
     }
@@ -160,11 +176,12 @@ sealed class <#A: out kotlin/Any?> arrow.eval/Eval : arrow.eval/SuspendEval<#A> 
 
     final class <#A1: out kotlin/Any?> Later : arrow.eval/Eval<#A1>, kotlin/Lazy<#A1> { // arrow.eval/Eval.Later|null[0]
         constructor <init>(kotlin/Function0<#A1>) // arrow.eval/Eval.Later.<init>|<init>(kotlin.Function0<1:0>){}[0]
+        constructor <init>(kotlin/LazyThreadSafetyMode, kotlin/Function0<#A1>) // arrow.eval/Eval.Later.<init>|<init>(kotlin.LazyThreadSafetyMode;kotlin.Function0<1:0>){}[0]
 
         final val value // arrow.eval/Eval.Later.value|{}value[0]
             final fun <get-value>(): #A1 // arrow.eval/Eval.Later.value.<get-value>|<get-value>(){}[0]
 
-        final fun copy(kotlin/Function0<#A1> = ...): arrow.eval/Eval.Later<#A1> // arrow.eval/Eval.Later.copy|copy(kotlin.Function0<1:0>){}[0]
+        final fun copy(kotlin/LazyThreadSafetyMode = ..., kotlin/Function0<#A1> = ...): arrow.eval/Eval.Later<#A1> // arrow.eval/Eval.Later.copy|copy(kotlin.LazyThreadSafetyMode;kotlin.Function0<1:0>){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/Eval.Later.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // arrow.eval/Eval.Later.hashCode|hashCode(){}[0]
         final fun isInitialized(): kotlin/Boolean // arrow.eval/Eval.Later.isInitialized|isInitialized(){}[0]
@@ -198,6 +215,7 @@ sealed class <#A: out kotlin/Any?> arrow.eval/Eval : arrow.eval/SuspendEval<#A> 
         final fun <#A2: kotlin/Any?> now(#A2): arrow.eval/Eval<#A2> // arrow.eval/Eval.Companion.now|now(0:0){0§<kotlin.Any?>}[0]
         final fun raise(kotlin/Throwable): arrow.eval/Eval<kotlin/Nothing> // arrow.eval/Eval.Companion.raise|raise(kotlin.Throwable){}[0]
         final inline fun <#A2: kotlin/Any?> always(crossinline kotlin/Function0<#A2>): arrow.eval/Eval.Always<#A2> // arrow.eval/Eval.Companion.always|always(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+        final inline fun <#A2: kotlin/Any?> atMostOnce(crossinline kotlin/Function0<#A2>): arrow.eval/Eval.Later<#A2> // arrow.eval/Eval.Companion.atMostOnce|atMostOnce(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
         final inline fun <#A2: kotlin/Any?> defer(crossinline kotlin/Function0<arrow.eval/Eval<#A2>>): arrow.eval/Eval<#A2> // arrow.eval/Eval.Companion.defer|defer(kotlin.Function0<arrow.eval.Eval<0:0>>){0§<kotlin.Any?>}[0]
         final inline fun <#A2: kotlin/Any?> later(crossinline kotlin/Function0<#A2>): arrow.eval/Eval.Later<#A2> // arrow.eval/Eval.Companion.later|later(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
     }
