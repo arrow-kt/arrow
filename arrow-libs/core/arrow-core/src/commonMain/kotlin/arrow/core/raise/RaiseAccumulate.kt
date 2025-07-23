@@ -18,7 +18,6 @@ import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptyListOrThrow
 import arrow.core.toNonEmptySetOrNull
-import arrow.core.wrapAsNonEmptyListOrNull
 import arrow.core.wrapAsNonEmptyListOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
@@ -884,6 +883,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
   @OptIn(ExperimentalRaiseAccumulateApi::class)
+  @Deprecated("use withNel instead", level = DeprecationLevel.WARNING)
   public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
@@ -1049,19 +1049,19 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @JvmName("bindAllIor")
   @ExperimentalRaiseAccumulateApi
   public fun <A> Iterable<Ior<Error, A>>.bindAll(): List<A> =
-    map { it.bind() }
+    mapOrAccumulate { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllIor")
   @ExperimentalRaiseAccumulateApi
   public fun <A> NonEmptyList<Ior<Error, A>>.bindAll(): NonEmptyList<A> =
-    map { it.bind() }
+    mapOrAccumulate { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllIor")
   @ExperimentalRaiseAccumulateApi
   public fun <A> NonEmptySet<Ior<Error, A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }.toNonEmptySet()
+    mapOrAccumulate { it.bind() }
 
   @RaiseDSL
   @ExperimentalRaiseAccumulateApi
@@ -1078,15 +1078,13 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @JvmName("bindAllIor")
   @ExperimentalRaiseAccumulateApi
   public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
-    mapValues { (_, v) -> v.bind() }
+    mapValuesOrAccumulate { (_, v) -> v.bind() }
 }
 
 @ExperimentalRaiseAccumulateApi
-private class RaiseNel<Error>(private val raiseAccumulate: RaiseAccumulate<Error>) : Raise<NonEmptyList<Error>> {
-  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise<NonEmptyList<Error>> {
   override fun raise(r: NonEmptyList<Error>): Nothing {
-    r.all.subList(0, r.size - 1).wrapAsNonEmptyListOrNull()?.let(raiseAccumulate::accumulateAll)
-    raiseAccumulate.raise(r.last())
+    accumulate.accumulateAll(r).value
   }
 }
 
