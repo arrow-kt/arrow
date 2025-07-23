@@ -69,7 +69,9 @@ public final class arrow/eval/Eval$Later : arrow/eval/Eval, kotlin/Lazy {
 	public fun <init> (Lkotlin/LazyThreadSafetyMode;Lkotlin/jvm/functions/Function0;)V
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public final fun copy (Lkotlin/LazyThreadSafetyMode;Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
+	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
 	public static synthetic fun copy$default (Larrow/eval/Eval$Later;Lkotlin/LazyThreadSafetyMode;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Later;
+	public static synthetic fun copy$default (Larrow/eval/Eval$Later;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Later;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
 	public fun hashCode ()I
@@ -179,12 +181,10 @@ public final class arrow/eval/SuspendEval$AtMostOnce : arrow/eval/SuspendEval {
 	public static synthetic fun copy$default (Larrow/eval/SuspendEval$AtMostOnce;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/eval/SuspendEval$AtMostOnce;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
-	public final fun getResult ()Larrow/core/Option;
 	public fun hashCode ()I
 	public fun mapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
 	public fun memoize ()Larrow/eval/SuspendEval;
 	public fun run (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun setResult (Larrow/core/Option;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -234,12 +234,10 @@ public final class arrow/eval/SuspendEval$Later : arrow/eval/SuspendEval {
 	public static synthetic fun copy$default (Larrow/eval/SuspendEval$Later;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/eval/SuspendEval$Later;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
-	public final fun getResult ()Larrow/core/Option;
 	public fun hashCode ()I
 	public fun mapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
 	public fun memoize ()Larrow/eval/SuspendEval;
 	public fun run (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun setResult (Larrow/core/Option;)V
 	public fun toString ()Ljava/lang/String;
 }
 

@@ -74,10 +74,6 @@ sealed interface <#A: out kotlin/Any?> arrow.eval/SuspendEval { // arrow.eval/Su
     final class <#A1: out kotlin/Any?> AtMostOnce : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.AtMostOnce|null[0]
         constructor <init>(kotlin.coroutines/SuspendFunction0<#A1>) // arrow.eval/SuspendEval.AtMostOnce.<init>|<init>(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
 
-        final var result // arrow.eval/SuspendEval.AtMostOnce.result|{}result[0]
-            final fun <get-result>(): arrow.core/Option<#A1> // arrow.eval/SuspendEval.AtMostOnce.result.<get-result>|<get-result>(){}[0]
-            final fun <set-result>(arrow.core/Option<#A1>) // arrow.eval/SuspendEval.AtMostOnce.result.<set-result>|<set-result>(arrow.core.Option<1:0>){}[0]
-
         final fun copy(kotlin.coroutines/SuspendFunction0<#A1> = ...): arrow.eval/SuspendEval.AtMostOnce<#A1> // arrow.eval/SuspendEval.AtMostOnce.copy|copy(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.AtMostOnce.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // arrow.eval/SuspendEval.AtMostOnce.hashCode|hashCode(){}[0]
@@ -103,10 +99,6 @@ sealed interface <#A: out kotlin/Any?> arrow.eval/SuspendEval { // arrow.eval/Su
 
     final class <#A1: out kotlin/Any?> Later : arrow.eval/SuspendEval<#A1> { // arrow.eval/SuspendEval.Later|null[0]
         constructor <init>(kotlin.coroutines/SuspendFunction0<#A1>) // arrow.eval/SuspendEval.Later.<init>|<init>(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
-
-        final var result // arrow.eval/SuspendEval.Later.result|{}result[0]
-            final fun <get-result>(): arrow.core/Option<#A1> // arrow.eval/SuspendEval.Later.result.<get-result>|<get-result>(){}[0]
-            final fun <set-result>(arrow.core/Option<#A1>) // arrow.eval/SuspendEval.Later.result.<set-result>|<set-result>(arrow.core.Option<1:0>){}[0]
 
         final fun copy(kotlin.coroutines/SuspendFunction0<#A1> = ...): arrow.eval/SuspendEval.Later<#A1> // arrow.eval/SuspendEval.Later.copy|copy(kotlin.coroutines.SuspendFunction0<1:0>){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/SuspendEval.Later.equals|equals(kotlin.Any?){}[0]
@@ -181,6 +173,7 @@ sealed class <#A: out kotlin/Any?> arrow.eval/Eval : arrow.eval/SuspendEval<#A> 
         final val value // arrow.eval/Eval.Later.value|{}value[0]
             final fun <get-value>(): #A1 // arrow.eval/Eval.Later.value.<get-value>|<get-value>(){}[0]
 
+        final fun copy(kotlin/Function0<#A1> = ...): arrow.eval/Eval.Later<#A1> // arrow.eval/Eval.Later.copy|copy(kotlin.Function0<1:0>){}[0]
         final fun copy(kotlin/LazyThreadSafetyMode = ..., kotlin/Function0<#A1> = ...): arrow.eval/Eval.Later<#A1> // arrow.eval/Eval.Later.copy|copy(kotlin.LazyThreadSafetyMode;kotlin.Function0<1:0>){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // arrow.eval/Eval.Later.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // arrow.eval/Eval.Later.hashCode|hashCode(){}[0]

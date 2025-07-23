@@ -338,8 +338,12 @@ public sealed class Eval<out A>: SuspendEval<A> {
     override fun value(): A = value
     override fun memoize(): Eval<A> = this
 
-    override fun toString(): String =
-      "Eval.Later(f)"
+    public fun copy(f: () -> @UnsafeVariance A = this.f): Later<A> = Later(mode, f)
+
+    override fun toString(): String = when (mode) {
+      LazyThreadSafetyMode.NONE -> "Eval.Later(f)"
+      else -> "Eval.Later($mode, f)"
+    }
   }
 
   /**

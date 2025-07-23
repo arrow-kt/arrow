@@ -153,7 +153,7 @@ public sealed interface SuspendEval<out A> {
     }
 
   public data class Later<out A>(private val f: suspend () -> A) : SuspendEval<A> {
-    var result: Option<@UnsafeVariance A> = None
+    private var result: Option<@UnsafeVariance A> = None
 
     override suspend fun run(): A = result.getOrElse {
       f().also { result = Some(it) }
@@ -167,13 +167,16 @@ public sealed interface SuspendEval<out A> {
 
   public data class AtMostOnce<out A>(private val f: suspend () -> A) : SuspendEval<A> {
     private val mutex: Mutex = Mutex()
-    var result: Option<@UnsafeVariance A> = None
+    private var result: Option<@UnsafeVariance A> = None
 
-    override suspend fun run(): A = mutex.withLock {
-      result.getOrElse {
-        f().also { result = Some(it) }
+    override suspend fun run(): A =
+      result.getOrElse { // don't hold the mutex if we already have 'Some'
+        mutex.withLock {
+          result.getOrElse {
+            f().also { result = Some(it) }
+          }
+        }
       }
-    }
 
     override fun memoize(): SuspendEval<A> = this
 
