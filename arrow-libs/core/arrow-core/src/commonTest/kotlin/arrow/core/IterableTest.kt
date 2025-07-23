@@ -544,7 +544,7 @@ class IterableTest {
       fun trans(i: Int) = incr.map { it + i }
 
       var expected = emptyList<Int>()
-      a.reversed().forEach { n ->  // need to reverse due to historical feature/bug (#3633)
+      a.reversed().forEach { n ->
         expected = trans(n).interleave(expected)
       }
 
@@ -559,7 +559,7 @@ class IterableTest {
       val transarr: List<(Int) -> Int> = incr.map { i -> { it + i } }
 
       val expected = mutableListOf<List<Int>>()
-      val arev = a.reversed() // need to reverse due to historical feature/bug (#3633)
+      val arev = a.reversed()
       transarr.forEach { t ->
         arev.map { t(it) }.takeIf { it.isNotEmpty() }
           ?.let(expected::add)
@@ -590,7 +590,7 @@ class IterableTest {
     checkAll(Arb.list(Arb.int(), 0..10), Arb.pair(Arb.int(1..1000), Arb.int())) { a, mod ->
       fun trans(i: Int) = if (i % mod.first == 0) i + mod.second else null
 
-      val expected = a.reversed().mapNotNull(::trans) // need to reverse due to historical feature/bug (#3633)
+      val expected = a.reversed().mapNotNull(::trans)
       a.crosswalkNull(::trans) shouldBe expected
     }
   }
