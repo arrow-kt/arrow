@@ -884,7 +884,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
   @OptIn(ExperimentalRaiseAccumulateApi::class)
-  public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this, this)
+  public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapValuesOrAccumulate(this) { it.value.bind() }
@@ -1049,11 +1049,11 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 }
 
 @ExperimentalRaiseAccumulateApi
-internal class RaiseNel<Error>(private val raise: Raise<Error>, private val accumulate: Accumulate<Error>) : Raise<NonEmptyList<Error>> {
+private class RaiseNel<Error>(private val raiseAccumulate: RaiseAccumulate<Error>) : Raise<NonEmptyList<Error>> {
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun raise(r: NonEmptyList<Error>): Nothing {
-    r.all.subList(0, r.size - 1).wrapAsNonEmptyListOrNull()?.let(accumulate::accumulateAll)
-    raise.raise(r.last())
+    r.all.subList(0, r.size - 1).wrapAsNonEmptyListOrNull()?.let(raiseAccumulate::accumulateAll)
+    raiseAccumulate.raise(r.last())
   }
 }
 
@@ -1073,6 +1073,8 @@ private class ListAccumulate<Error>(
   @ExperimentalRaiseAccumulateApi
   override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
 }
+
+public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
 public interface Accumulate<Error> {
   @ExperimentalRaiseAccumulateApi
