@@ -559,7 +559,6 @@ class SequenceKTest {
         second.add(it.second)
       }
 
-      
       a.asSequence().unzip(::transform).let {
         it.first.toList() shouldBe first
         it.second.toList() shouldBe second
