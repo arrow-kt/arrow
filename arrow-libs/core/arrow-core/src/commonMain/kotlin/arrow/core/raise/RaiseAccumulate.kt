@@ -847,11 +847,9 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
 ): A {
   contract { callsInPlace(block, EXACTLY_ONCE) }
   return with(RaiseAccumulate(this)) {
-    block().also { latestError?.value } // raises if there are accumulated errors
-  return with(RaiseAccumulate(this)) {
     val result = block()
     if (hasAccumulatedErrors) { latestError?.value }
-    return result
+    result
   }
 }
 
