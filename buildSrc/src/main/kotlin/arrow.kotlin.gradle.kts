@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.androidLibrary
 import groovy.util.Node
 import groovy.util.NodeList
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -36,7 +37,7 @@ val Project.isKotlinMultiplatform: Boolean
 
 if (!isKotlinJvm) {
   plugins.apply("org.jetbrains.kotlin.multiplatform")
-  if (!withoutAndroid) plugins.apply("com.android.library")
+  if (!withoutAndroid) plugins.apply("com.android.kotlin.multiplatform.library")
 }
 plugins.apply("com.diffplug.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
@@ -136,7 +137,16 @@ if (isKotlinMultiplatform) {
       }
     }
 
-    if (!withoutAndroid) androidTarget()
+    if (!withoutAndroid) {
+      androidLibrary {
+        namespace = projectNameWithDots
+        compileSdk = 36
+        minSdk = 21
+        compilerOptions {
+          jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
+        }
+      }
+    }
 
     // Native: https://kotlinlang.org/docs/native-target-support.html
     // -- Tier 1 --
@@ -208,20 +218,6 @@ if (isKotlinJvm) {
     compilerOptions {
       jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
       commonCompilerOptions()
-    }
-  }
-}
-
-if (pluginManager.hasPlugin("com.android.library")) {
-  configure<com.android.build.gradle.LibraryExtension> {
-    namespace = projectNameWithDots
-    compileSdk = 35
-    defaultConfig {
-      minSdk = 21
-    }
-    compileOptions {
-      sourceCompatibility = JavaVersion.VERSION_1_8
-      targetCompatibility = JavaVersion.VERSION_1_8
     }
   }
 }

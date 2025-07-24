@@ -4,7 +4,7 @@ import org.gradle.internal.classpath.Instrumented.systemProperty
 
 allprojects {
   val version = (property("version") as? String).let { version ->
-    if (version == null || version == "unspecified") "2.1.0-SNAPSHOT"
+    if (version == null || version == "unspecified") "2.2.0-SNAPSHOT"
     else version
   }
   setProperty("version", version)
@@ -26,7 +26,7 @@ buildscript {
 plugins {
   base
   id(libs.plugins.kotlin.multiplatform.get().pluginId) apply false
-  id(libs.plugins.android.library.get().pluginId) apply false
+  id(libs.plugins.android.kmp.get().pluginId) apply false
   id(libs.plugins.spotless.get().pluginId) apply false
   id(libs.plugins.animalSniffer.get().pluginId) apply false
   id(libs.plugins.dokka.get().pluginId)
