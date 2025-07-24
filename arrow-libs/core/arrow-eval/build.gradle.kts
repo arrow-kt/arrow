@@ -7,6 +7,7 @@ kotlin {
     commonMain {
       dependencies {
         implementation(projects.arrowCore)
+        implementation(libs.coroutines.core)
       }
     }
 
@@ -14,6 +15,12 @@ kotlin {
       dependencies {
         implementation(projects.arrowPlatform)
         implementation(libs.bundles.testing)
+      }
+    }
+
+    jvmTest {
+      dependencies {
+        implementation(libs.coroutines.core)
       }
     }
   }

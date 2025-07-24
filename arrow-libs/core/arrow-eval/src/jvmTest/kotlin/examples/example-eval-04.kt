@@ -4,6 +4,6 @@ package arrow.eval.examples.exampleEval04
 import arrow.eval.*
 
 fun main() {
-  val alwaysEvaled = Eval.always { "expensive computation" }
-  println(alwaysEvaled.value())
+  val lazyEvaled = Eval.atMostOnce { "expensive computation" }
+  println(lazyEvaled.value())
 }
