@@ -548,7 +548,7 @@ class SequenceKTest {
     }
   }
 
-  @Test fun unzipT() = runTest {
+  @Test fun unzip() = runTest {
     checkAll(Arb.list(Arb.int())) { a ->
       fun transform(i: Int) = i / 2 to i
 
@@ -559,6 +559,7 @@ class SequenceKTest {
         second.add(it.second)
       }
 
+      
       a.asSequence().unzip(::transform).let {
         it.first.toList() shouldBe first
         it.second.toList() shouldBe second
