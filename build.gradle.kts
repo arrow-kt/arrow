@@ -35,7 +35,7 @@ plugins {
   alias(libs.plugins.compose.jetbrains) apply false
   alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.kotlinx.knit)
-  alias(libs.plugins.kotlinx.kover)
+  id(libs.plugins.kotlinx.kover.get().pluginId)
   alias(libs.plugins.kotlin.binaryCompatibilityValidator)
 }
 

@@ -145,6 +145,7 @@ if (isKotlinMultiplatform) {
         compilerOptions {
           jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
         }
+        withHostTestBuilder {}
       }
     }
 

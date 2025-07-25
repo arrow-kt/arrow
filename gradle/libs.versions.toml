@@ -53,6 +53,7 @@ gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatfo
 gradlePlugin-android-kmp = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessVersion" }
 gradlePlugin-animalSniffer = { module = "ru.vyarus.animalsniffer:ru.vyarus.animalsniffer.gradle.plugin", version.ref = "animalSniffer" }
+gradlePlugin-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
 gradlePlugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 
 [bundles]

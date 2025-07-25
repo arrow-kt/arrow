@@ -14,5 +14,6 @@ dependencies {
   implementation(libs.gradlePlugin.android.kmp)
   implementation(libs.gradlePlugin.spotless)
   implementation(libs.gradlePlugin.animalSniffer)
+  implementation(libs.gradlePlugin.kover)
   implementation(libs.gradlePlugin.dokka)
 }
