@@ -1,6 +1,7 @@
 public abstract class arrow/eval/Eval : arrow/eval/SuspendEval {
 	public static final field Companion Larrow/eval/Eval$Companion;
 	public static final fun always (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Always;
+	public static final fun atMostOnce (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
 	public final fun coflatMap (Lkotlin/jvm/functions/Function1;)Larrow/eval/Eval;
 	public static final fun defer (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval;
 	public final fun flatMap (Lkotlin/jvm/functions/Function1;)Larrow/eval/Eval;
@@ -31,6 +32,7 @@ public final class arrow/eval/Eval$Always : arrow/eval/Eval {
 
 public final class arrow/eval/Eval$Companion {
 	public final fun always (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Always;
+	public final fun atMostOnce (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
 	public final fun defer (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval;
 	public final fun later (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
 	public final fun now (Ljava/lang/Object;)Larrow/eval/Eval;
@@ -64,8 +66,11 @@ public abstract class arrow/eval/Eval$FlatMap : arrow/eval/Eval, arrow/eval/Susp
 }
 
 public final class arrow/eval/Eval$Later : arrow/eval/Eval, kotlin/Lazy {
+	public fun <init> (Lkotlin/LazyThreadSafetyMode;Lkotlin/jvm/functions/Function0;)V
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public final fun copy (Lkotlin/LazyThreadSafetyMode;Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
 	public final fun copy (Lkotlin/jvm/functions/Function0;)Larrow/eval/Eval$Later;
+	public static synthetic fun copy$default (Larrow/eval/Eval$Later;Lkotlin/LazyThreadSafetyMode;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Later;
 	public static synthetic fun copy$default (Larrow/eval/Eval$Later;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Larrow/eval/Eval$Later;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun getValue ()Ljava/lang/Object;
@@ -116,6 +121,7 @@ public final class arrow/eval/EvalKt {
 public abstract interface class arrow/eval/SuspendEval {
 	public static final field Companion Larrow/eval/SuspendEval$Companion;
 	public static fun always (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$Always;
+	public static fun atMostOnce (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$AtMostOnce;
 	public static fun defer (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval;
 	public abstract fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
 	public static fun later (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$Later;
@@ -169,8 +175,22 @@ public final class arrow/eval/SuspendEval$Always : arrow/eval/SuspendEval {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class arrow/eval/SuspendEval$AtMostOnce : arrow/eval/SuspendEval {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public final fun copy (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$AtMostOnce;
+	public static synthetic fun copy$default (Larrow/eval/SuspendEval$AtMostOnce;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/eval/SuspendEval$AtMostOnce;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
+	public fun hashCode ()I
+	public fun mapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
+	public fun memoize ()Larrow/eval/SuspendEval;
+	public fun run (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class arrow/eval/SuspendEval$Companion {
 	public final fun always (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$Always;
+	public final fun atMostOnce (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$AtMostOnce;
 	public final fun defer (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval;
 	public final fun later (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$Later;
 	public final fun now (Ljava/lang/Object;)Larrow/eval/SuspendEval;
@@ -214,12 +234,10 @@ public final class arrow/eval/SuspendEval$Later : arrow/eval/SuspendEval {
 	public static synthetic fun copy$default (Larrow/eval/SuspendEval$Later;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Larrow/eval/SuspendEval$Later;
 	public fun equals (Ljava/lang/Object;)Z
 	public fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
-	public final fun getResult ()Larrow/core/Option;
 	public fun hashCode ()I
 	public fun mapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
 	public fun memoize ()Larrow/eval/SuspendEval;
 	public fun run (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun setResult (Larrow/core/Option;)V
 	public fun toString ()Ljava/lang/String;
 }
 

@@ -42,7 +42,7 @@ public value class NonEmptySet<out E> internal constructor(
     elements.hashCode()
 
   public override fun distinct(): NonEmptyList<E> =
-    NonEmptyList(elements.distinct())
+    NonEmptyList(elements.toList())
 
   public override fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> =
     NonEmptyList(elements.distinctBy(selector))
