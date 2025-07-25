@@ -2,8 +2,8 @@ package arrow.raise.ktor.server.response
 
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseDSL
+import arrow.core.raise.context.withError
 import arrow.core.raise.fold
-import arrow.core.raise.withError
 import arrow.raise.ktor.server.response.Response.Companion.Response
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -13,20 +13,20 @@ import io.ktor.util.reflect.*
 
 public suspend inline fun <reified TResponse> ApplicationCall.respondOrRaise(
   statusCode: HttpStatusCode? = null,
-  body: suspend Raise<Response>.() -> TResponse,
+  body: suspend context(Raise<Response>) () -> TResponse,
 ): Unit = respondOrRaise(statusCode, typeInfo<TResponse>(), body)
 
 public suspend inline fun <Error, reified TResponse> ApplicationCall.respondOrRaise(
   errorResponse: (Error) -> Response,
   statusCode: HttpStatusCode? = null,
-  body: suspend Raise<Error>.() -> TResponse,
-): Unit = respondOrRaise(statusCode, typeInfo<TResponse>()) { withError(errorResponse) { body(this) } }
+  body: suspend context(Raise<Error>) () -> TResponse,
+): Unit = respondOrRaise(statusCode, typeInfo<TResponse>()) { withError(errorResponse) { body() } }
 
 @PublishedApi
 internal suspend inline fun <TResponse> ApplicationCall.respondOrRaise(
   statusCode: HttpStatusCode? = null,
   responseTypeInfo: TypeInfo,
-  body: suspend Raise<Response>.() -> TResponse,
+  body: suspend context(Raise<Response>) () -> TResponse,
 ): Unit = fold(
   block = { body(this) },
   recover = { it.respondTo(this) },
