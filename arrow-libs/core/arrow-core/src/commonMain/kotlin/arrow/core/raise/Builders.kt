@@ -144,6 +144,57 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
 }
 
 /**
+ * Runs a computation [block] using [Raise], and return its outcome as [Ior].
+ * - [Ior.Right] represents success,
+ * - [Ior.Left] represents logical failure which made it impossible to continue,
+ * - [Ior.Both] represents that some logical failures were raised,
+ *   but it was possible to continue until producing a final value.
+ *
+ * This function re-throws any exceptions thrown within the [Raise] block.
+ *
+ * In both [Ior.Left] and [Ior.Both] cases, if more than one logical failure
+ * has been raised, they are combined using [combineError].
+ *
+ * Read more about running a [Raise] computation in the
+ * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
+ */
+@ExperimentalRaiseAccumulateApi
+public inline fun <Error, A> iorAccumulate(noinline combineError: (Error, Error) -> Error, block: RaiseAccumulate<Error>.() -> A): Ior<Error, A> {
+  contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
+  val state: Atomic<Any?> = Atomic(EmptyValue)
+  return recover({
+    val a = block(IorRaiseAccumulate(state, combineError))
+    EmptyValue.fold(state.get(), { Ior.Right(a) }) { e: Error -> Ior.Both(e, a) }
+  }, { Ior.Left(it) })
+}
+
+@ExperimentalRaiseAccumulateApi
+@PublishedApi
+internal fun <Error> Raise<Error>.IorRaiseAccumulate(
+  state: Atomic<Any?>,
+  combineError: (Error, Error) -> Error
+): RaiseAccumulate<Error> = RaiseAccumulate(IorAccumulate(state, combineError, this)) { e -> raise(EmptyValue.combine(state.get(), e, combineError)) }
+
+private class IorAccumulate<Error>(
+  private val state: Atomic<Any?>,
+  private val combineError: (Error, Error) -> Error,
+  private val raise: Raise<Error>,
+) : Accumulate<Error> {
+  private val raiseAccumulated = RaiseAccumulate.Error { raise.raise(EmptyValue.unbox(state.get())) }
+
+  @ExperimentalRaiseAccumulateApi
+  override fun accumulateAll(errors: NonEmptyList<Error>): RaiseAccumulate.Value<Nothing> {
+    val combined = errors.reduce(combineError)
+    state.update { EmptyValue.combine(it, combined, combineError) }
+    return raiseAccumulated
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  override val latestError: RaiseAccumulate.Value<Nothing>?
+    get() = if (state.get() === EmptyValue) null else raiseAccumulated
+}
+
+/**
  * Runs a computation [block] using [Raise], and ignore its outcome.
  *
  * This function re-throws any exceptions thrown within the [Raise] block.
