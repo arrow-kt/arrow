@@ -139,6 +139,9 @@ project(":arrow-raise-ktor-server").projectDir = file("arrow-libs/integrations/a
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")
 
+include("arrow-version-catalog")
+project(":arrow-version-catalog").projectDir = file("arrow-libs/version-catalog")
+
 develocity {
   buildScan {
     termsOfUseUrl = "https://gradle.com/terms-of-service"
