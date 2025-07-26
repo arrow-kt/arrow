@@ -248,7 +248,7 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
-internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Raise<Any?> {
+internal class DefaultRaise(override val isTraced: Boolean) : Raise<Any?> {
   private val isActive = AtomicBoolean(true)
 
   @PublishedApi

@@ -884,6 +884,9 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
+  override val isTraced: Boolean
+    get() = super<Accumulate>.isTraced
+
   @OptIn(ExperimentalRaiseAccumulateApi::class)
   @Deprecated("use withNel instead", level = DeprecationLevel.WARNING)
   public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this)
@@ -1088,6 +1091,9 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
   override fun raise(r: NonEmptyList<Error>): Nothing {
     accumulate.accumulateAll(r).value
   }
+
+  override val isTraced: Boolean
+    get() = accumulate.isTraced
 }
 
 private class ListAccumulate<Error>(
@@ -1105,6 +1111,9 @@ private class ListAccumulate<Error>(
 
   @ExperimentalRaiseAccumulateApi
   override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
+
+  override val isTraced: Boolean
+    get() = raise.isTraced
 }
 
 private class TolerantAccumulate<Error>(
@@ -1122,6 +1131,9 @@ private class TolerantAccumulate<Error>(
     val error = underlying.latestError ?: return null
     return Error { raise.raise(error) }
   }
+
+  override val isTraced: Boolean
+    get() = underlying.isTraced
 }
 
 @PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
@@ -1157,6 +1169,9 @@ public interface Accumulate<Error> {
     accumulate(it)
     recover(it)
   }
+
+  public val isTraced: Boolean
+    get() = false
 }
 
 @ExperimentalRaiseAccumulateApi

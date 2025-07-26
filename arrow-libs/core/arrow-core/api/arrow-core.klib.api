@@ -27,6 +27,9 @@ open annotation class arrow.core/PotentiallyUnsafeNonEmptyOperation : kotlin/Ann
 }
 
 abstract interface <#A: in kotlin/Any?> arrow.core.raise/Raise { // arrow.core.raise/Raise|null[0]
+    open val isTraced // arrow.core.raise/Raise.isTraced|{}isTraced[0]
+        open fun <get-isTraced>(): kotlin/Boolean // arrow.core.raise/Raise.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
+
     abstract fun raise(#A): kotlin/Nothing // arrow.core.raise/Raise.raise|raise(1:0){}[0]
     open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Either<#A, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/Raise.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Either<1:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/Any?> (arrow.core/Either<#A, #A1>).bind(): #A1 // arrow.core.raise/Raise.bind|bind@arrow.core.Either<1:0,0:0>(){0§<kotlin.Any?>}[0]
@@ -49,6 +52,8 @@ abstract interface <#A: kotlin/Any?> arrow.core.raise/Accumulate { // arrow.core
         abstract fun <get-latestError>(): arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>? // arrow.core.raise/Accumulate.latestError.<get-latestError>|<get-latestError>(){}[0]
     open val hasAccumulatedErrors // arrow.core.raise/Accumulate.hasAccumulatedErrors|{}hasAccumulatedErrors[0]
         open fun <get-hasAccumulatedErrors>(): kotlin/Boolean // arrow.core.raise/Accumulate.hasAccumulatedErrors.<get-hasAccumulatedErrors>|<get-hasAccumulatedErrors>(){}[0]
+    open val isTraced // arrow.core.raise/Accumulate.isTraced|{}isTraced[0]
+        open fun <get-isTraced>(): kotlin/Boolean // arrow.core.raise/Accumulate.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
 
     abstract fun accumulateAll(arrow.core/NonEmptyList<#A>): arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing> // arrow.core.raise/Accumulate.accumulateAll|accumulateAll(arrow.core.NonEmptyList<1:0>){}[0]
     open fun <#A1: kotlin/Any?> (arrow.core/Either<#A, #A1>).bindOrAccumulate(): arrow.core.raise/RaiseAccumulate.Value<#A1> // arrow.core.raise/Accumulate.bindOrAccumulate|bindOrAccumulate@arrow.core.Either<1:0,0:0>(){0§<kotlin.Any?>}[0]
@@ -80,6 +85,9 @@ abstract interface <#A: out kotlin/Any?> arrow.core/NonEmptyCollection : kotlin.
 final class <#A: in kotlin/Any?> arrow.core.raise/SingletonRaise : arrow.core.raise/Raise<#A> { // arrow.core.raise/SingletonRaise|null[0]
     constructor <init>(arrow.core.raise/Raise<kotlin/Unit>) // arrow.core.raise/SingletonRaise.<init>|<init>(arrow.core.raise.Raise<kotlin.Unit>){}[0]
 
+    final val isTraced // arrow.core.raise/SingletonRaise.isTraced|{}isTraced[0]
+        final fun <get-isTraced>(): kotlin/Boolean // arrow.core.raise/SingletonRaise.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
+
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, #B1?>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/SingletonRaise.bindAll|bindAll@kotlin.collections.Map<0:0,0:1?>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Option<#B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/SingletonRaise.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Option<0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> (#A1?).bind(): #A1 // arrow.core.raise/SingletonRaise.bind|bind@0:0?(){0§<kotlin.Any?>}[0]
@@ -103,6 +111,8 @@ final class <#A: kotlin/Any?> arrow.core.raise/IorRaise : arrow.core.raise/Raise
 
     final val combineError // arrow.core.raise/IorRaise.combineError|{}combineError[0]
         final fun <get-combineError>(): kotlin/Function2<#A, #A, #A> // arrow.core.raise/IorRaise.combineError.<get-combineError>|<get-combineError>(){}[0]
+    final val isTraced // arrow.core.raise/IorRaise.isTraced|{}isTraced[0]
+        final fun <get-isTraced>(): kotlin/Boolean // arrow.core.raise/IorRaise.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
 
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Either<#A, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/IorRaise.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Either<1:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Ior<#A, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/IorRaise.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Ior<1:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
@@ -342,6 +352,9 @@ final class arrow.core.raise/DefaultRaise : arrow.core.raise/Raise<kotlin/Any?> 
 final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwable> { // arrow.core.raise/ResultRaise|null[0]
     constructor <init>(arrow.core.raise/Raise<kotlin/Throwable>) // arrow.core.raise/ResultRaise.<init>|<init>(arrow.core.raise.Raise<kotlin.Throwable>){}[0]
 
+    final val isTraced // arrow.core.raise/ResultRaise.isTraced|{}isTraced[0]
+        final fun <get-isTraced>(): kotlin/Boolean // arrow.core.raise/ResultRaise.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
+
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Either<kotlin/Throwable, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/ResultRaise.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Either<kotlin.Throwable,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, kotlin/Result<#B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/ResultRaise.bindAll|bindAll@kotlin.collections.Map<0:0,kotlin.Result<0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> (arrow.core/Either<kotlin/Throwable, #A1>).bind(): #A1 // arrow.core.raise/ResultRaise.bind|bind@arrow.core.Either<kotlin.Throwable,0:0>(){0§<kotlin.Any?>}[0]
@@ -491,6 +504,8 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
         final fun <get-raise>(): arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>> // arrow.core.raise/RaiseAccumulate.raise.<get-raise>|<get-raise>(){}[0]
     open val hasAccumulatedErrors // arrow.core.raise/RaiseAccumulate.hasAccumulatedErrors|{}hasAccumulatedErrors[0]
         open fun <get-hasAccumulatedErrors>(): kotlin/Boolean // arrow.core.raise/RaiseAccumulate.hasAccumulatedErrors.<get-hasAccumulatedErrors>|<get-hasAccumulatedErrors>(){}[0]
+    open val isTraced // arrow.core.raise/RaiseAccumulate.isTraced|{}isTraced[0]
+        open fun <get-isTraced>(): kotlin/Boolean // arrow.core.raise/RaiseAccumulate.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
     open val latestError // arrow.core.raise/RaiseAccumulate.latestError|{}latestError[0]
         open fun <get-latestError>(): arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>? // arrow.core.raise/RaiseAccumulate.latestError.<get-latestError>|<get-latestError>(){}[0]
 

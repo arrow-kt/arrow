@@ -310,6 +310,9 @@ public interface Raise<in Error> {
   @RaiseDSL
   public fun <A> NonEmptySet<Either<Error, A>>.bindAll(): NonEmptySet<A> =
     map { it.bind() }.toNonEmptySet()
+
+  public val isTraced: Boolean
+    get() = false
 }
 
 /**
@@ -663,6 +666,8 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
     callsInPlace(block, EXACTLY_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
+  @OptIn(ExperimentalTraceApi::class) // if `isTraced`, then clearly the calling code opts in already
+  if (isTraced) return withErrorTraced({ _, it -> transform(it) }, block)
   recover({ return block(this) }) { raise(transform(it)) }
 }
 
