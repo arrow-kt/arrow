@@ -214,7 +214,7 @@ public interface Raise<in Error> {
    *
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
-  public operator fun <A> EagerEffect<Error, A>.invoke(): A = invoke(this@Raise)
+  public fun <A> EagerEffect<Error, A>.invoke(): A = invoke(this@Raise)
 
   /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
@@ -233,7 +233,7 @@ public interface Raise<in Error> {
    *
    * @see [recover] if you want to attempt to recover from any _logical failure_.
    */
-  public suspend operator fun <A> Effect<Error, A>.invoke(): A = invoke(this@Raise)
+  public suspend fun <A> Effect<Error, A>.invoke(): A = invoke(this@Raise)
 
   /**
    * Invoke an [Effect] inside `this` [Raise] context.
