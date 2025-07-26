@@ -1,12 +1,10 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-
 plugins {
   id("arrow.kotlin")
+  alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
-  @OptIn(ExperimentalKotlinGradlePluginApi::class)
-  compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
+  compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
 
   sourceSets {
     commonMain {
@@ -18,6 +16,8 @@ kotlin {
 
     commonTest {
       dependencies {
+        implementation(libs.ktor.server.contentNegotiation)
+        implementation(libs.ktor.serialization.kotlinxJson)
         implementation(libs.ktor.test)
         implementation(libs.bundles.testing)
       }
