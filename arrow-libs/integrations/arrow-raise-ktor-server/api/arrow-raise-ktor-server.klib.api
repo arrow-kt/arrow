@@ -45,6 +45,8 @@ open class <#A: kotlin/Any?> arrow.raise.ktor.server/RaiseAccumulate : arrow.cor
 
     final val raise // arrow.raise.ktor.server/RaiseAccumulate.raise|{}raise[0]
         final fun <get-raise>(): arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>> // arrow.raise.ktor.server/RaiseAccumulate.raise.<get-raise>|<get-raise>(){}[0]
+    open val isTraced // arrow.raise.ktor.server/RaiseAccumulate.isTraced|{}isTraced[0]
+        open fun <get-isTraced>(): kotlin/Boolean // arrow.raise.ktor.server/RaiseAccumulate.isTraced.<get-isTraced>|<get-isTraced>(){}[0]
 
     final fun <#A1: kotlin/Any> ensureNotNullOrAccumulate(#A1?, kotlin/Function0<#A>) // arrow.raise.ktor.server/RaiseAccumulate.ensureNotNullOrAccumulate|ensureNotNullOrAccumulate(0:0?;kotlin.Function0<1:0>){0§<kotlin.Any>}[0]
     final fun <#A1: kotlin/Any?> (arrow.core/Either<#A, #A1>).bindOrAccumulate(): arrow.raise.ktor.server/RaiseAccumulate.Value<#A1, #A> // arrow.raise.ktor.server/RaiseAccumulate.bindOrAccumulate|bindOrAccumulate@arrow.core.Either<1:0,0:0>(){0§<kotlin.Any?>}[0]

@@ -916,6 +916,7 @@ public abstract interface class arrow/core/raise/Accumulate {
 	public abstract fun getHasAccumulatedErrors ()Z
 	public abstract fun getLatestError ()Larrow/core/raise/RaiseAccumulate$Value;
 	public abstract fun getOrAccumulate (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public abstract fun isTraced ()Z
 }
 
 public final class arrow/core/raise/Accumulate$DefaultImpls {
@@ -925,6 +926,7 @@ public final class arrow/core/raise/Accumulate$DefaultImpls {
 	public static fun bindOrAccumulate (Larrow/core/raise/Accumulate;Larrow/core/Either;)Larrow/core/raise/RaiseAccumulate$Value;
 	public static fun getHasAccumulatedErrors (Larrow/core/raise/Accumulate;)Z
 	public static fun getOrAccumulate (Larrow/core/raise/Accumulate;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun isTraced (Larrow/core/raise/Accumulate;)Z
 }
 
 public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
@@ -939,7 +941,7 @@ public final class arrow/core/raise/DefaultRaise : arrow/core/raise/Raise {
 	public final fun complete ()Z
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun isTraced ()Z
+	public fun isTraced ()Z
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 }
 
@@ -972,6 +974,7 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 	public final fun getOrAccumulate (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isTraced ()Z
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
@@ -986,6 +989,7 @@ public abstract interface class arrow/core/raise/Raise {
 	public abstract fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun isTraced ()Z
 	public abstract fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 }
 
@@ -999,6 +1003,7 @@ public final class arrow/core/raise/Raise$DefaultImpls {
 	public static fun bindAll-vcjLgH4 (Larrow/core/raise/Raise;Ljava/util/List;)Ljava/util/List;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun isTraced (Larrow/core/raise/Raise;)Z
 }
 
 public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Accumulate, arrow/core/raise/Raise {
@@ -1037,6 +1042,7 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Accumulate, arr
 	public final synthetic fun hasErrors ()Z
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isTraced ()Z
 	public final fun mapOrAccumulate (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public final fun mapOrAccumulate-FrVv2gs (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
@@ -1188,6 +1194,7 @@ public final class arrow/core/raise/ResultRaise : arrow/core/raise/Raise {
 	public final fun bindAllResult (Ljava/util/Set;)Ljava/util/Set;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isTraced ()Z
 	public synthetic fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public fun raise (Ljava/lang/Throwable;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
@@ -1217,6 +1224,7 @@ public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Raise {
 	public final fun ignoreErrors (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isTraced ()Z
 	public final fun raise ()Ljava/lang/Void;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
