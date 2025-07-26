@@ -50,18 +50,18 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> Raise<NonE
   val a9: T9
   val a10: T10
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
+        { a9 = action9() },
+        { a10 = action10() },
       ) { _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -109,19 +109,19 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> Raise
   val a10: T10
   val a11: T11
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
       ) { _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -172,20 +172,20 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> 
   val a11: T11
   val a12: T12
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
       ) { _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -239,21 +239,21 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a12: T12
   val a13: T13
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
       ) { _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -310,22 +310,22 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a13: T13
   val a14: T14
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
       ) { _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -385,23 +385,23 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a14: T14
   val a15: T15
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
-        { a15 = action15(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
+        { a15 = action15() },
       ) { _, _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -464,24 +464,24 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a15: T15
   val a16: T16
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
-        { a15 = action15(this) },
-        { a16 = action16(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
+        { a15 = action15() },
+        { a16 = action16() },
       ) { _, _, _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -547,25 +547,25 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a16: T16
   val a17: T17
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
-        { a15 = action15(this) },
-        { a16 = action16(this) },
-        { a17 = action17(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
+        { a15 = action15() },
+        { a16 = action16() },
+        { a17 = action17() },
       ) { _, _, _, _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -634,26 +634,26 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a17: T17
   val a18: T18
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
-        { a15 = action15(this) },
-        { a16 = action16(this) },
-        { a17 = action17(this) },
-        { a18 = action18(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
+        { a15 = action15() },
+        { a16 = action16() },
+        { a17 = action17() },
+        { a18 = action18() },
       ) { _, _, _, _, _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -725,27 +725,27 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a18: T18
   val a19: T19
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
-        { a15 = action15(this) },
-        { a16 = action16(this) },
-        { a17 = action17(this) },
-        { a18 = action18(this) },
-        { a19 = action19(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
+        { a15 = action15() },
+        { a16 = action16() },
+        { a17 = action17() },
+        { a18 = action18() },
+        { a19 = action19() },
       ) { _, _, _, _, _, _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }
@@ -820,28 +820,28 @@ public inline fun <Error, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
   val a19: T19
   val a20: T20
   zipOrAccumulate(
-    { a1 = action1(this) },
-    { a2 = action2(this) },
-    { a3 = action3(this) },
-    { a4 = action4(this) },
-    { a5 = action5(this) },
-    { a6 = action6(this) },
-    { a7 = action7(this) },
-    { a8 = action8(this) },
+    { a1 = action1() },
+    { a2 = action2() },
+    { a3 = action3() },
+    { a4 = action4() },
+    { a5 = action5() },
+    { a6 = action6() },
+    { a7 = action7() },
+    { a8 = action8() },
     {
       zipOrAccumulate(
-        { a9 = action9(this) },
-        { a10 = action10(this) },
-        { a11 = action11(this) },
-        { a12 = action12(this) },
-        { a13 = action13(this) },
-        { a14 = action14(this) },
-        { a15 = action15(this) },
-        { a16 = action16(this) },
-        { a17 = action17(this) },
-        { a18 = action18(this) },
-        { a19 = action19(this) },
-        { a20 = action20(this) },
+        { a9 = action9() },
+        { a10 = action10() },
+        { a11 = action11() },
+        { a12 = action12() },
+        { a13 = action13() },
+        { a14 = action14() },
+        { a15 = action15() },
+        { a16 = action16() },
+        { a17 = action17() },
+        { a18 = action18() },
+        { a19 = action19() },
+        { a20 = action20() },
       ) { _, _, _, _, _, _, _, _, _, _, _, _ -> }
     }
   ) { _, _, _, _, _, _, _, _, _ -> }

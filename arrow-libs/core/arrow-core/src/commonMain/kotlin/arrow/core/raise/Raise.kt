@@ -663,7 +663,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
     callsInPlace(block, EXACTLY_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  recover({ return block(this) }) { raise(transform(it)) }
+  recover({ return block() }) { raise(transform(it)) }
 }
 
 /**
