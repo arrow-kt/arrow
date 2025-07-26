@@ -192,6 +192,9 @@ private class IorAccumulate<Error>(
   @ExperimentalRaiseAccumulateApi
   override val latestError: RaiseAccumulate.Value<Nothing>?
     get() = if (state.get() === EmptyValue) null else raiseAccumulated
+
+  override val isTraced: Boolean
+    get() = raise.isTraced
 }
 
 /**
@@ -213,6 +216,9 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
 
   @RaiseDSL
   override fun raise(r: E): Nothing = raise()
+
+  override val isTraced: Boolean
+    get() = raise.isTraced
 
   @RaiseDSL
   public fun ensure(condition: Boolean) {

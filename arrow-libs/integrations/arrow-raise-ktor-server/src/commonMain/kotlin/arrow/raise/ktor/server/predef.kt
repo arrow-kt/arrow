@@ -1,9 +1,15 @@
 @file:OptIn(ExperimentalContracts::class)
 package arrow.raise.ktor.server
 
-import arrow.core.*
-import arrow.core.raise.*
+import arrow.core.Either
+import arrow.core.EitherNel
+import arrow.core.NonEmptyList
+import arrow.core.raise.Raise
+import arrow.core.raise.RaiseDSL
+import arrow.core.raise.ensure
 import arrow.core.raise.mapValuesOrAccumulate
+import arrow.core.raise.recover
+import arrow.core.toNonEmptyListOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -22,12 +28,14 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
 public open class RaiseAccumulate<Error>(
   public val raise: Raise<NonEmptyList<Error>>
 ) : Raise<Error> {
-
   internal val errors: MutableList<Error> = mutableListOf()
 
   @RaiseDSL
   public override fun raise(r: Error): Nothing =
     raise.raise((errors + r).toNonEmptyListOrNull()!!)
+
+  override val isTraced: Boolean
+    get() = raise.isTraced
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapValuesOrAccumulate(this) { it -> it.value.bind() }
