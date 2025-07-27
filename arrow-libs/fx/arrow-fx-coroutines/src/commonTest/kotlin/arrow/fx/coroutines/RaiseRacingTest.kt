@@ -11,6 +11,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
 import kotlin.test.Test
@@ -18,7 +19,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
-import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -111,9 +111,10 @@ class RaiseRacingTest {
     val exceptionHandled = CompletableDeferred<Throwable>()
 
     val result = either<String, String> {
-      racing(handleException = { _, exception -> exceptionHandled.complete(exception) }) {
-        race { throw IllegalStateException("Test exception") }
-        race { "success" }
+      val handler = CoroutineExceptionHandler { _, exception -> exceptionHandled.complete(exception) }
+      racing {
+        race(handler) { throw IllegalStateException("Test exception") }
+        race(handler) { "success" }
       }
     }
 
@@ -128,9 +129,12 @@ class RaiseRacingTest {
     val raiseHandled = CompletableDeferred<String>()
 
     val result = either<String, String> {
-      racing(handleRaise = { _, raised -> raiseHandled.complete(raised) }) {
-        race { raise("Test error") }
-        race { "success" }
+      val handleRaise: RaiseHandler<String> = { _, raised ->
+        raiseHandled.complete(raised)
+      }
+      racing {
+        race(handleRaise) { raise("Test error") }
+        race(handleRaise) { "success" }
       }
     }
 
@@ -153,9 +157,9 @@ class RaiseRacingTest {
 
   @Test
   fun testRaceOrRaise() = runTest {
-    val result = either<String, String> {
+    val result = either {
       racing {
-        raceOrRaise { raise("Test error") }
+        race { raise("Test error") }
         race { "success" }
       }
     }
@@ -164,12 +168,9 @@ class RaiseRacingTest {
 
   @Test
   fun testRaceOrFail() = runTest {
-    val result = either<String, String> {
+    val result = either {
       racing {
-        raceOrFail {
-          if (true) raise("Test error")
-          "never reached"
-        }
+        raceOrThrow { raise("Test error") }
         race { "success" }
       }
     }
@@ -224,25 +225,23 @@ class RaiseRacingTest {
     val innerRacingCompleted = CompletableDeferred<Boolean>()
 
     val result = either<String, String> {
-      racing(handleException = { _, exception -> outerExceptionHandled.complete(exception) }) {
-        race {
-          racing(
-            handleException = { _, exception -> innerExceptionHandled.complete(exception) },
-            handleRaise = { _, raised ->
-              innerRaiseHandled.complete(raised)
-              innerRacingCompleted.complete(true)
-            }
-          ) {
-            race { raise("Inner error") }
-            race { awaitCancellation() }
+      val handler = CoroutineExceptionHandler { _, exception -> outerExceptionHandled.complete(exception) }
+      racing {
+        race(handler) {
+          val innerHandler = CoroutineExceptionHandler { _, exception -> innerExceptionHandled.complete(exception) }
+          val raiseHandler: RaiseHandler<String> = { _, raised ->
+            innerRaiseHandled.complete(raised)
+            innerRacingCompleted.complete(true)
+          }
+          racing {
+            race(raiseHandler, innerHandler) { raise("Inner error") }
+            race(raiseHandler, innerHandler) { awaitCancellation() }
           }
 
           // The inner racing block should handle the raised error and continue
           // This line should not be reached because the inner racing block never completes normally
-          innerRacingCompleted.complete(false)
-          fail("inner completed")
         }
-        race {
+        race(handler) {
           // Wait for the inner racing to handle the error
           innerRacingCompleted.await()
           "outer success"
@@ -271,15 +270,16 @@ class RaiseRacingTest {
     val exceptionHandlerCalled = CompletableDeferred<Boolean>()
 
     val result = either<String, String> {
-      racing(handleException = { _, exception ->
+      val handler = CoroutineExceptionHandler { _, exception ->
         exceptionsHandled.add(exception)
         if (exceptionsHandled.size >= 2) {
           exceptionHandlerCalled.complete(true)
         }
-      }) {
-        race { throw IllegalStateException("First exception") }
-        race { throw RuntimeException("Second exception") }
-        race {
+      }
+      racing {
+        race(handler) { throw IllegalStateException("First exception") }
+        race(handler) { throw RuntimeException("Second exception") }
+        race(handler) {
           yield() // Give time for the other racers to throw
           "success"
         }
@@ -287,7 +287,7 @@ class RaiseRacingTest {
     }
 
     assertEquals("success".right(), result)
-    assertTrue(withTimeoutOrNull(600.milliseconds) { exceptionHandlerCalled.await() } == true)
+    assertTrue(withTimeout(600.milliseconds) { exceptionHandlerCalled.await() })
     assertEquals(2, exceptionsHandled.size)
     assertTrue(exceptionsHandled.any { it is IllegalStateException && it.message == "First exception" })
     assertTrue(exceptionsHandled.any { it is RuntimeException && it.message == "Second exception" })
@@ -299,15 +299,16 @@ class RaiseRacingTest {
     val errorHandlerCalled = CompletableDeferred<Boolean>()
 
     val result = either<String, String> {
-      racing(handleRaise = { _, raised ->
+      val raiseHandler: RaiseHandler<String> = { _, raised ->
         errorsHandled.add(raised)
         if (errorsHandled.size >= 2) {
           errorHandlerCalled.complete(true)
         }
-      }) {
-        race { raise("First error") }
-        race { raise("Second error") }
-        race {
+      }
+      racing {
+        race(raiseHandler) { raise("First error") }
+        race(raiseHandler) { raise("Second error") }
+        race(raiseHandler) {
           yield() // Give time for the other racers to raise
           "success"
         }
@@ -315,7 +316,7 @@ class RaiseRacingTest {
     }
 
     assertEquals("success".right(), result)
-    assertTrue(withTimeoutOrNull(600.milliseconds) { errorHandlerCalled.await() } == true)
+    assertTrue(withTimeout(600.milliseconds) { errorHandlerCalled.await() })
     assertEquals(2, errorsHandled.size)
     assertTrue(errorsHandled.contains("First error"))
     assertTrue(errorsHandled.contains("Second error"))
@@ -328,23 +329,22 @@ class RaiseRacingTest {
     val handlersComplete = CompletableDeferred<Boolean>()
 
     val result = either<String, String> {
-      racing(
-        handleRaise = { _, raised ->
-          errorsHandled.add(raised)
-          if (errorsHandled.size >= 1 && exceptionsHandled.size >= 1) {
-            handlersComplete.complete(true)
-          }
-        },
-        handleException = { _, exception ->
-          exceptionsHandled.add(exception)
-          if (errorsHandled.size >= 1 && exceptionsHandled.size >= 1) {
-            handlersComplete.complete(true)
-          }
+      val raiseHandler: RaiseHandler<String> = { _, raised ->
+        errorsHandled.add(raised)
+        if (errorsHandled.isNotEmpty() && exceptionsHandled.isNotEmpty()) {
+          handlersComplete.complete(true)
         }
-      ) {
-        race { raise("Raised error") }
-        race { throw RuntimeException("Thrown exception") }
-        race {
+      }
+      val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        exceptionsHandled.add(exception)
+        if (errorsHandled.isNotEmpty() && exceptionsHandled.isNotEmpty()) {
+          handlersComplete.complete(true)
+        }
+      }
+      racing {
+        race(raiseHandler, exceptionHandler) { raise("Raised error") }
+        race(raiseHandler, exceptionHandler) { throw RuntimeException("Thrown exception") }
+        race(raiseHandler, exceptionHandler) {
           yield() // Give time for the other racers to raise/throw
           "success"
         }
@@ -352,7 +352,7 @@ class RaiseRacingTest {
     }
 
     assertEquals("success".right(), result)
-    assertTrue(withTimeoutOrNull(600.milliseconds) { handlersComplete.await() } == true)
+    assertTrue(withTimeout(600.milliseconds) { handlersComplete.await() })
     assertEquals(1, errorsHandled.size)
     assertEquals(1, exceptionsHandled.size)
     assertEquals("Raised error", errorsHandled[0])

@@ -1,22 +1,18 @@
 package arrow.fx.coroutines
 
+import arrow.core.raise.catch
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.job
 import kotlinx.coroutines.selects.SelectBuilder
 import kotlinx.coroutines.selects.select
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration
 
 /**
  * A scope that allows racing multiple coroutine blocks against each other.
@@ -27,30 +23,38 @@ import kotlin.time.Duration
 public interface RacingScope<in Result> : CoroutineScope {
   /**
    * Races a coroutine block against other blocks in the racing scope.
-   * If the block throws an exception, it will be handled by the exception handler provided to [racing].
-   * The block will be cancelled if another block completes first.
-   *
-   * @param context The [CoroutineContext] to run the block in.
-   * @param block The coroutine block to race.
-   */
-  public suspend fun race(
-    context: CoroutineContext = EmptyCoroutineContext,
-    block: suspend CoroutineScope.() -> Result
-  )
-
-  /**
-   * Races a coroutine block against other blocks in the racing scope.
    * If the block throws an exception, it will be propagated and cancel the entire racing scope.
    * The block will be cancelled if another block completes first.
    *
    * @param context The [CoroutineContext] to run the block in.
    * @param block The coroutine block to race.
    */
-  public suspend fun raceOrThrow(
+  public fun raceOrThrow(
     context: CoroutineContext = EmptyCoroutineContext,
     block: suspend CoroutineScope.() -> Result
   )
 }
+
+private val defaultCoroutineExceptionHandler = CoroutineExceptionHandler { _, exception -> exception.printStackTrace() }
+
+/**
+ * Races a coroutine block against other blocks in the racing scope.
+ * If the block throws an exception, it will be handled by [CoroutineExceptionHandler].
+ * The block will be cancelled if another block completes first.
+ *
+ * @param context The [CoroutineContext] to run the block in.
+ * @param block The coroutine block to race.
+ */
+public fun <Result> RacingScope<Result>.race(
+  context: CoroutineContext = EmptyCoroutineContext,
+  block: suspend CoroutineScope.() -> Result
+): Unit = raceOrThrow(context) {
+  catch({ block() }) {
+    (coroutineContext[CoroutineExceptionHandler] ?: defaultCoroutineExceptionHandler).handleException(currentCoroutineContext(), it)
+    awaitCancellation()
+  }
+}
+
 
 /**
  * Creates a racing scope that allows multiple coroutine blocks to race against each other.
@@ -84,54 +88,26 @@ public interface RacingScope<in Result> : CoroutineScope {
  * ```
  *
  * @param A The type of value that will be returned by the racing blocks.
- * @param handleException A function to handle exceptions thrown by racing blocks. If null, exceptions will be handled
- *                       by the current coroutine context's [CoroutineExceptionHandler] or printed to stderr.
  * @param block The block of code to execute within the racing scope.
  * @return The result of the first racing block to complete successfully.
  */
 public suspend fun <A> racing(
-  handleException: (suspend (context: CoroutineContext, exception: Throwable) -> Unit)? = null,
-  block: suspend RacingScope<A>.() -> Unit,
-): A {
-  val exceptionHandler: suspend (context: CoroutineContext, exception: Throwable) -> Unit =
-    handleException
-      ?: currentCoroutineContext()[CoroutineExceptionHandler]?.let { { ctx, e -> it.handleException(ctx, e) } }
-      ?: { _, e -> e.printStackTrace() }
-  return coroutineScope {
-    val job = Job(currentCoroutineContext()[Job])
-    try {
-      select {
-        launch(start = CoroutineStart.UNDISPATCHED) {
-          val scope = SelectRacingScope(this@select, this@coroutineScope, job, exceptionHandler)
-          scope.block()
-        }
-      }
-    } finally {
-      job.cancelAndJoin()
+  block: RacingScope<A>.() -> Unit,
+): A = coroutineScope {
+  try {
+    select {
+      SelectRacingScope(this@select, this@coroutineScope).block()
     }
+  } finally {
+    coroutineContext.job.cancelChildren()
   }
 }
 
 private class SelectRacingScope<A>(
   private val select: SelectBuilder<A>,
   scope: CoroutineScope,
-  private val job: Job,
-  private val handleException: suspend (context: CoroutineContext, exception: Throwable) -> Unit
 ) : RacingScope<A>, CoroutineScope by scope {
-  override suspend fun raceOrThrow(context: CoroutineContext, block: suspend CoroutineScope.() -> A) =
-    with(select) {
-      async(context = context + job, block = block).onAwait { it }
-    }
-
-  override suspend fun race(context: CoroutineContext, block: suspend CoroutineScope.() -> A) =
-    raceOrThrow {
-      try {
-        block()
-      } catch (e: CancellationException) {
-        throw e
-      } catch (e: Throwable) {
-        handleException(currentCoroutineContext(), e/*.nonFatalOrThrow()*/)
-        awaitCancellation()
-      }
-    }
+  override fun raceOrThrow(context: CoroutineContext, block: suspend CoroutineScope.() -> A) = with(select) {
+    async(context, block = block).onAwait { it }
+  }
 }
