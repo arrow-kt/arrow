@@ -75,7 +75,7 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  return fold({ invoke(this) }, catch, recover, transform)
+  return fold(this, catch, recover, transform)
 }
 
 /**

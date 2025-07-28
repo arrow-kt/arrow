@@ -2,8 +2,12 @@ package arrow.eval
 
 import arrow.platform.stackSafeIteration
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 internal data class SuspendSideEffect(var counter: Int = 0) {
   suspend fun increment() {
@@ -147,5 +151,20 @@ class SuspendEvalTest {
     sideEffect.counter shouldBe 0
     flatMapped.run() shouldBe -1
     sideEffect.counter shouldBe limit + 1
+  }
+
+  @Test
+  fun atMostOnceSemantics() = runTest {
+    var executionCount = 0
+
+    val name: SuspendEval<String> =
+      SuspendEval.atMostOnce {
+        executionCount++
+        delay(1.seconds)
+        "John"
+      }
+
+    awaitAll(*Array(20) { async { name.run() } })
+    executionCount shouldBe 1
   }
 }

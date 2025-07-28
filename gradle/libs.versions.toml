@@ -3,7 +3,7 @@ animalSniffer = "2.0.1"
 coroutines = "1.10.2"
 classgraph = "4.8.181"
 dokka = "2.0.0"
-kotest = "6.0.0.M5"
+kotest = "6.0.0.M6"
 kover = "0.9.1"
 kotlin = "2.2.0"
 kotlinBinaryCompatibilityValidator = "0.18.1"
@@ -15,13 +15,13 @@ ktor = "3.2.2"
 mockWebServer = "5.1.0"
 retrofit = "3.0.0"
 moshi = "1.15.2"
-spotlessVersion = "7.2.0"
+spotlessVersion = "7.2.1"
 composePlugin = "1.8.2"
 agp = "8.11.1"
 cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.19.2"
-shadow = "9.0.0-rc1"
+shadow = "9.0.0-rc2"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -50,9 +50,10 @@ ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 # required for the convention plugin
 gradlePlugin-kotlin-base = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin"}
-gradlePlugin-android-library = { module = "com.android.library:com.android.library.gradle.plugin", version.ref = "agp" }
+gradlePlugin-android-kmp = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessVersion" }
 gradlePlugin-animalSniffer = { module = "ru.vyarus.animalsniffer:ru.vyarus.animalsniffer.gradle.plugin", version.ref = "animalSniffer" }
+gradlePlugin-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
 gradlePlugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 
 [bundles]
@@ -71,5 +72,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 compose-jetbrains = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-android-library = { id = "com.android.library", version.ref = "agp" }
+android-kmp = { id ="com.android.kotlin.multiplatform.library", version.ref ="agp" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

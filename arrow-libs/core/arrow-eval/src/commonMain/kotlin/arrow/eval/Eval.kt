@@ -12,9 +12,10 @@ import kotlin.jvm.JvmStatic
  *
  * Three basic evaluation strategies:
  *
- *  - Now:    evaluated immediately
- *  - Later:  evaluated once when value is needed
- *  - Always: evaluated every time value is needed
+ *  - Now:        evaluated immediately
+ *  - Later:      evaluated once when value is needed, may evaluate more than once
+ *  - AtMostOnce: evaluated once when the value is needed, evaluates at most once
+ *  - Always:     evaluated every time value is needed
  *
  * The Later and Always are both lazy strategies while Now is eager.
  * Later and Always are distinguished from each other only by
@@ -90,6 +91,8 @@ public sealed class Eval<out A>: SuspendEval<A> {
     /**
      * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked memoizing the computed value.
      *
+     * ⚠️ This function has no synchronization guarantees if several computations need to initialize the value concurrently.
+     *
      * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
      *
      * ```kotlin
@@ -111,6 +114,32 @@ public sealed class Eval<out A>: SuspendEval<A> {
       Later { f() }
 
     /**
+     * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked memoizing the computed value.
+     *
+     * ⚠️ This function ensures that the value is initialized at most once, even in concurrent scenarios.
+     * As a result, the thread or coroutine may block or suspend to guarantee that invariant.
+     *
+     * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
+     *
+     * ```kotlin
+     * import arrow.eval.*
+     *
+     * fun main() {
+     * //sampleStart
+     *   val lazyEvaled = Eval.atMostOnce { "expensive computation" }
+     *   println(lazyEvaled.value())
+     * //sampleEnd
+     * }
+     * ```
+     * <!--- KNIT example-eval-04.kt -->
+     *
+     * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
+     */
+    @JvmStatic
+    public inline fun <A> atMostOnce(crossinline f: () -> A): Later<A> =
+      Later(LazyThreadSafetyMode.SYNCHRONIZED) { f() }
+
+    /**
      * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked recomputing each time `.value()` is invoked.
      *
      * @param f is a function or computation that will be called every time `.value()` is invoked.
@@ -125,7 +154,7 @@ public sealed class Eval<out A>: SuspendEval<A> {
      * //sampleEnd
      * }
      * ```
- * <!--- KNIT example-eval-04.kt -->
+ * <!--- KNIT example-eval-05.kt -->
      *
      * "expensive computation" is computed every time `value()` is invoked.
      */
@@ -295,8 +324,13 @@ public sealed class Eval<out A>: SuspendEval<A> {
    * Once Later has been evaluated, the closure (and any values captured by the closure) will not be retained, and
    * will be available for garbage collection.
    */
-  public data class Later<out A>(private val f: () -> A) : Eval<A>(), Lazy<A> {
-    private val underlying: Lazy<A> = lazy(f)
+  public data class Later<out A>(
+    private val mode: LazyThreadSafetyMode,
+    private val f: () -> A
+  ) : Eval<A>(), Lazy<A> {
+    public constructor(f: () -> A): this(LazyThreadSafetyMode.NONE, f)
+
+    private val underlying: Lazy<A> = lazy(mode, f)
 
     override val value: A by underlying
     override fun isInitialized(): Boolean = underlying.isInitialized()
@@ -304,8 +338,12 @@ public sealed class Eval<out A>: SuspendEval<A> {
     override fun value(): A = value
     override fun memoize(): Eval<A> = this
 
-    override fun toString(): String =
-      "Eval.Later(f)"
+    public fun copy(f: () -> @UnsafeVariance A = this.f): Later<A> = Later(mode, f)
+
+    override fun toString(): String = when (mode) {
+      LazyThreadSafetyMode.NONE -> "Eval.Later(f)"
+      else -> "Eval.Later($mode, f)"
+    }
   }
 
   /**
