@@ -3,7 +3,7 @@ package arrow.core.examples.exampleRaise11
 
 import arrow.core.raise.effect
 import arrow.core.raise.fold
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.collections.shouldBeIn
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

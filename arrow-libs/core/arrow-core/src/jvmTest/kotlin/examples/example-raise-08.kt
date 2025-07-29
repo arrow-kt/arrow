@@ -5,7 +5,7 @@ import arrow.core.raise.effect
 import arrow.core.raise.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.bracketCase
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.shouldBe
 import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred

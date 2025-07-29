@@ -6,7 +6,7 @@ import arrow.core.raise.fold
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.parZip
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.shouldBe
 import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred

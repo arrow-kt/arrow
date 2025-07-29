@@ -5,7 +5,7 @@ import arrow.core.shouldBeTypeOf
 import arrow.core.shouldThrow
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe

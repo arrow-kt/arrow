@@ -1,6 +1,6 @@
 package arrow.core.test
 
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.time.Duration.Companion.seconds
