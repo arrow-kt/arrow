@@ -571,7 +571,7 @@ public sealed class Either<out A, out B> {
    * ```kotlin
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
-   * import io.kotest.assertions.fail
+   * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
    *
    * fun test() {
    *   Either.Right(1)

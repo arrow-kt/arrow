@@ -12,7 +12,7 @@ import arrow.core.test.either
 import arrow.core.test.nonEmptyList
 import arrow.core.test.nonEmptySet
 import arrow.core.toNonEmptyListOrNull
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith

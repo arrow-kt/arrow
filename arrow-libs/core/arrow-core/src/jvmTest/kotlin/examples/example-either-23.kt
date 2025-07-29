@@ -3,7 +3,7 @@ package arrow.core.examples.exampleEither23
 
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 
 fun test() {
   Either.Right(1)

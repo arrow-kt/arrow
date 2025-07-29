@@ -7,7 +7,7 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ResourceScope
 import arrow.fx.coroutines.autoCloseable
 import arrow.fx.coroutines.resourceScope
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.shouldBe
 import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred
