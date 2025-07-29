@@ -11,11 +11,11 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.core.recover
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
@@ -283,7 +283,7 @@ public interface Raise<in Error> {
 
   /**
    * Extracts all the values in the [Map], raising every [Either.Left]
-   * as a _logical failure_. In other words, executed [bind] over every
+   * as a _logical failure_. In other words, executes [bind] over every
    * value in this [Map].
    */
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
@@ -295,7 +295,7 @@ public interface Raise<in Error> {
 
   /**
    * Extracts all the values in the [NonEmptyList], raising every [Either.Left]
-   * as a _logical failure_. In other words, executed [bind] over every
+   * as a _logical failure_. In other words, executes [bind] over every
    * value in this [NonEmptyList].
    */
   @RaiseDSL
@@ -304,7 +304,7 @@ public interface Raise<in Error> {
 
   /**
    * Extracts all the values in the [NonEmptySet], raising every [Either.Left]
-   * as a _logical failure_. In other words, executed [bind] over every
+   * as a _logical failure_. In other words, executes [bind] over every
    * value in this [NonEmptySet].
    */
   @RaiseDSL
@@ -314,7 +314,7 @@ public interface Raise<in Error> {
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
- * and recover by providing a transform [Error] into a fallback value of type [A].
+ * and recover by providing a transform of [Error] into a fallback value of type [A].
  * Base implementation of `effect { f() } getOrElse { fallback() }`.
  *
  * <!--- INCLUDE
@@ -349,8 +349,8 @@ public inline fun <Error, A> recover(
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
- * and [recover] by providing a transform [Error] into a fallback value of type [A],
- * or [catch] any unexpected exceptions by providing a transform [Throwable] into a fallback value of type [A],
+ * and [recover] by providing a transform of [Error] into a fallback value of type [A],
+ * or [catch] any unexpected exceptions by providing a transform of [Throwable] into a fallback value of type [A],
  *
  * <!--- INCLUDE
  * import arrow.core.raise.recover
@@ -391,8 +391,9 @@ public inline fun <Error, A> recover(
 
 /**
  * Execute the [Raise] context function resulting in [A] or any _logical error_ of type [Error],
- * and [recover] by providing a transform [Error] into a fallback value of type [A],
- * or [catch] any unexpected exceptions by providing a transform [Throwable] into a fallback value of type [A],
+ * and [recover] by providing a transform of [Error] into a fallback value of type [A],
+ * or [catch] only exceptions of type [T] by providing a transform of [T] into a fallback value of type [A],
+ * all other types ot exceptions are rethrown.
  *
  * <!--- INCLUDE
  * import arrow.core.raise.recover
