@@ -81,4 +81,17 @@ class RaiseAccumulateSpec {
       x + y
     } shouldBe nonEmptyListOf("hello", "hi").left()
   }
+
+  @Test fun preservesAccumulatedErrorsInAccumulating() {
+    var reachedEnd = false
+    accumulate(::either) {
+      val x by accumulating {
+        accumulate("nonfatal")
+        "output: failed"
+      }
+      x shouldBe "output: failed"
+      reachedEnd = true
+    } shouldBe nonEmptyListOf("nonfatal").left()
+    reachedEnd shouldBe true
+  }
 }

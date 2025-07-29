@@ -5,11 +5,20 @@ package arrow.core.raise
 
 import arrow.core.Either
 import arrow.core.EitherNel
+import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.collectionSizeOrDefault
+import arrow.core.getOrElse
+import arrow.core.nel
+import arrow.core.raise.RaiseAccumulate.Error
+import arrow.core.raise.RaiseAccumulate.Ok
+import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
+import arrow.core.toNonEmptyListOrThrow
 import arrow.core.toNonEmptySetOrNull
+import arrow.core.wrapAsNonEmptyListOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -668,7 +677,7 @@ internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImp
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ): Unit = accumulate {
   iterator.forEach {
-    accumulating { block(it, hasErrors()) }
+    accumulating { block(it, hasAccumulatedErrors) }
   }
 }
 
@@ -826,7 +835,10 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapValuesOrAccumul
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING, message = "This API is work-in-progress and is subject to change.")
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION)
+@Target(
+  AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR,
+  AnnotationTarget.CLASS
+)
 public annotation class ExperimentalRaiseAccumulateApi
 
 @ExperimentalRaiseAccumulateApi
@@ -834,10 +846,11 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   block: RaiseAccumulate<Error>.() -> A
 ): A {
   contract { callsInPlace(block, EXACTLY_ONCE) }
-  val nel = RaiseAccumulate(this)
-  val result = block(nel)
-  if (nel.hasErrors()) nel.raiseErrors()
-  return result
+  return with(RaiseAccumulate(this)) {
+    val result = block()
+    if (hasAccumulatedErrors) { latestError?.value }
+    result
+  }
 }
 
 @ExperimentalRaiseAccumulateApi
@@ -856,15 +869,24 @@ public inline fun <Error, A, R> accumulate(
  * Allows binding both [Either] and [EitherNel] values for [Either.Left] types of [Error].
  * It extends [Raise] of [Error], and allows working over [Raise] of [NonEmptyList] of [Error] as well.
  */
-public open class RaiseAccumulate<Error>(
-  public val raise: Raise<NonEmptyList<Error>>
-) : Raise<Error> {
+@OptIn(ExperimentalSubclassOptIn::class)
+@Suppress("DEPRECATION")
+@SubclassOptInRequired(ExperimentalRaiseAccumulateApi::class)
+public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constructor(
+  accumulate: Accumulate<Error>, private val raiseErrorsWith: (Error) -> Nothing
+) : Accumulate<Error> by accumulate, Raise<Error> {
+  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  public constructor(raise: Raise<NonEmptyList<Error>>) : this(raise, mutableListOf<Error>())
 
-  internal val errors: MutableList<Error> = mutableListOf()
+  @ExperimentalRaiseAccumulateApi
+  private constructor(raise: Raise<NonEmptyList<Error>>, list: MutableList<Error>) :
+    this(ListAccumulate<Error>(raise, list), { raise.raise((list + it).toNonEmptyListOrThrow()) })
 
-  @RaiseDSL
-  public override fun raise(r: Error): Nothing =
-    raise.raise((errors + r).toNonEmptyListOrNull()!!)
+  override fun raise(r: Error): Nothing = raiseErrorsWith(r)
+
+  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  @Deprecated("use withNel instead", level = DeprecationLevel.WARNING)
+  public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapValuesOrAccumulate(this) { it.value.bind() }
@@ -938,10 +960,7 @@ public open class RaiseAccumulate<Error>(
     mapOrAccumulate { it.bind() }
 
   @RaiseDSL
-  public fun <A> EitherNel<Error, A>.bindNel(): A = when (this) {
-    is Either.Left -> raise.raise(value)
-    is Either.Right -> value
-  }
+  public fun <A> EitherNel<Error, A>.bindNel(): A = with(raise) { bind() }
 
   @RaiseDSL
   public inline fun <A> withNel(block: Raise<NonEmptyList<Error>>.() -> A): A {
@@ -951,44 +970,23 @@ public open class RaiseAccumulate<Error>(
     return block(raise)
   }
 
-  @PublishedApi internal fun addErrors(newErrors: Iterable<Error>) { errors.addAll(newErrors) }
-  @PublishedApi internal fun hasErrors(): Boolean = errors.isNotEmpty()
-  @PublishedApi internal fun raiseErrors(): Nothing = raise.raise(errors.toNonEmptyListOrNull()!!)
-
-  @ExperimentalRaiseAccumulateApi
-  public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> =
-    accumulating { this@bindOrAccumulate.bind() }
-
-  @ExperimentalRaiseAccumulateApi
-  public fun <A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> =
-    accumulating { this@bindAllOrAccumulate.bindAll() }
-
-  @ExperimentalRaiseAccumulateApi
-  public fun <A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
-    accumulating { this@bindNelOrAccumulate.bindNel() }
-
-  @ExperimentalRaiseAccumulateApi
-  public inline fun ensureOrAccumulate(condition: Boolean, raise: () -> Error) {
-    contract { callsInPlace(raise, AT_MOST_ONCE) }
-    accumulating { ensure(condition, raise) }
+  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  @PublishedApi
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  internal fun addErrors(newErrors: Iterable<Error>) {
+    newErrors.toNonEmptyListOrNull()?.let(::accumulateAll)
   }
 
-  @ExperimentalRaiseAccumulateApi
-  public inline fun <B: Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
-    contract { callsInPlace(raise, AT_MOST_ONCE) }
-    return accumulating { ensureNotNull(value, raise) }
-  }
+  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  @PublishedApi
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  internal fun hasErrors(): Boolean = hasAccumulatedErrors
 
-  @ExperimentalRaiseAccumulateApi
-  public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
-    contract { callsInPlace(block, AT_MOST_ONCE) }
-    return recover(inner@{
-      Ok(block(RaiseAccumulate(this@inner)))
-    }) {
-      addErrors(it)
-      Error(this)
-    }
-  }
+  @Suppress("KotlinUnreachableCode") // wrong inspection
+  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  @PublishedApi
+  @Deprecated("Binary compatibility", level = DeprecationLevel.WARNING)
+  internal fun raiseErrors(): Nothing = latestError?.value ?: error("No accumulated errors to raise")
 
   @Suppress("NOTHING_TO_INLINE")
   @Deprecated(message = "Deprecated in favor of member", level = DeprecationLevel.HIDDEN)
@@ -1001,15 +999,195 @@ public open class RaiseAccumulate<Error>(
     public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = value
   }
 
-  @PublishedApi internal class Error(
-    val raise: RaiseAccumulate<*>
-  ): Value<Nothing>() {
+  @PublishedApi
+  internal class Error(private val raise: () -> Nothing) : Value<Nothing>() {
+    @OptIn(ExperimentalRaiseAccumulateApi::class)
+    @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+    constructor(raiseAccumulate: RaiseAccumulate<*>) : this({
+      raiseAccumulate.latestError?.value ?: error("No accumulated errors to raise")
+    })
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-    override val value get(): Nothing = raise.raiseErrors()
+    override val value get(): Nothing = raise()
   }
 
   @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
+
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    return merge {
+      Ok(block(RaiseAccumulate(tolerant(this)) { raise(accumulate(it)) }))
+    }
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  @RaiseDSL
+  public inline fun <A> recover(
+    block: RaiseAccumulate<Error>.() -> A,
+    recover: (error: Error) -> A,
+  ): A {
+    contract { callsInPlace(block, AT_MOST_ONCE) }
+    return arrow.core.raise.recover({
+      block(RaiseAccumulate(this@RaiseAccumulate, ::raise))
+    }, recover)
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun ensureOrAccumulate(condition: Boolean, raise: () -> Error): Value<Unit> {
+    contract { callsInPlace(raise, AT_MOST_ONCE) }
+    return if (condition) Ok(Unit) else accumulate(raise())
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  public inline fun <B : Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
+    contract { callsInPlace(raise, AT_MOST_ONCE) }
+    return if (value != null) Ok(value) else accumulate(raise())
+  }
+
+  // IorRaise methods
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Iterable<Ior<Error, A>>.bindAll(): List<A> =
+    mapOrAccumulate { it.bind() }
+
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> NonEmptyList<Ior<Error, A>>.bindAll(): NonEmptyList<A> =
+    mapOrAccumulate { it.bind() }
+
+  @RaiseDSL
+  @JvmName("bindAllIor")
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> NonEmptySet<Ior<Error, A>>.bindAll(): NonEmptySet<A> =
+    mapOrAccumulate { it.bind() }
+
+  @RaiseDSL
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Ior<Error, A>.bind(): A =
+    when (this) {
+      is Ior.Left -> raise(value)
+      is Ior.Right -> value
+      is Ior.Both -> {
+        accumulate(leftValue)
+        rightValue
+      }
+    }
+
+  @JvmName("bindAllIor")
+  @ExperimentalRaiseAccumulateApi
+  public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
+    mapValuesOrAccumulate { (_, v) -> v.bind() }
 }
 
+@ExperimentalRaiseAccumulateApi
+private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise<NonEmptyList<Error>> {
+  override fun raise(r: NonEmptyList<Error>): Nothing {
+    accumulate.accumulateAll(r).value
+  }
+}
 
+private class ListAccumulate<Error>(
+  private val raise: Raise<NonEmptyList<Error>>,
+  private val list: MutableList<Error>
+) : Accumulate<Error> {
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  private val error = Error { raise.raise(list.wrapAsNonEmptyListOrThrow()) } // only valid if list is not empty
+
+  @ExperimentalRaiseAccumulateApi
+  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
+    list.addAll(errors)
+    return error
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
+}
+
+private class TolerantAccumulate<Error>(
+  private val underlying: Accumulate<Error>,
+  private val raise: Raise<Value<Nothing>>
+) : Accumulate<Error> {
+  @ExperimentalRaiseAccumulateApi
+  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
+    val error = underlying.accumulateAll(errors)
+    return Error { raise.raise(error) }
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  override val latestError: Value<Nothing>? get() {
+    val error = underlying.latestError ?: return null
+    return Error { raise.raise(error) }
+  }
+}
+
+@PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
+  TolerantAccumulate(this, raise)
+
+public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
+
+public interface Accumulate<Error> {
+  @ExperimentalRaiseAccumulateApi
+  public fun accumulate(error: Error): Value<Nothing> = accumulateAll(error.nel())
+
+  @ExperimentalRaiseAccumulateApi
+  public fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing>
+
+  @ExperimentalRaiseAccumulateApi
+  public val hasAccumulatedErrors: Boolean get() = latestError != null
+
+  @ExperimentalRaiseAccumulateApi
+  public val latestError: Value<Nothing>?
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> = accumulating { bind() }
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> = accumulating { bindAll() }
+
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> = accumulating { bindNel() }
+
+  // IorRaise methods
+  @ExperimentalRaiseAccumulateApi
+  public fun <A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A = getOrElse {
+    accumulate(it)
+    recover(it)
+  }
+}
+
+@ExperimentalRaiseAccumulateApi
+public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  return merge {
+    Ok(block(RaiseAccumulate(tolerant(this)) { raise(accumulate(it)) }))
+  }
+}
+
+@ExperimentalRaiseAccumulateApi
+@RaiseDSL
+public inline fun <Error, A> Accumulate<Error>.recover(
+  block: RaiseAccumulate<Error>.() -> A,
+  recover: (error: Error) -> A,
+): A {
+  contract { callsInPlace(block, AT_MOST_ONCE) }
+  val accumulate = this
+  return arrow.core.raise.recover({
+    block(RaiseAccumulate(accumulate, ::raise))
+  }, recover)
+}
+
+@ExperimentalRaiseAccumulateApi
+public inline fun <Error> Accumulate<Error>.ensureOrAccumulate(condition: Boolean, raise: () -> Error): Value<Unit> {
+  contract { callsInPlace(raise, AT_MOST_ONCE) }
+  return if (condition) Ok(Unit) else accumulate(raise())
+}
+
+@ExperimentalRaiseAccumulateApi
+public inline fun <Error, B : Any> Accumulate<Error>.ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
+  contract { callsInPlace(raise, AT_MOST_ONCE) }
+  return if (value != null) Ok(value) else accumulate(raise())
+}

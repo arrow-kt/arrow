@@ -213,11 +213,13 @@ jobs:
         run: ./gradlew jvmTest --scan
 
       - name: Code coverage
-        if: "! github.event.pull_request.head.repo.fork "
+        # if: "! github.event.pull_request.head.repo.fork "
+        if: false
         run: ./gradlew koverXmlReport
 
       - name: Add code coverage report
-        if: "! github.event.pull_request.head.repo.fork "
+        # if: "! github.event.pull_request.head.repo.fork "
+        if: false
         id: kover
         uses: mi-kas/kover-report@v1
         with:
@@ -348,7 +350,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Android (release) tests
-        run: ./gradlew testReleaseUnitTest
+        run: ./gradlew testAndroid
 
       - name: Upload reports
         if: failure()
