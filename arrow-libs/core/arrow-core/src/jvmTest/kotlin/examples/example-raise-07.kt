@@ -7,7 +7,7 @@ import arrow.core.merge
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.raceN
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.shouldBe
 import arrow.core.shouldBeTypeOf
 import kotlinx.coroutines.CompletableDeferred

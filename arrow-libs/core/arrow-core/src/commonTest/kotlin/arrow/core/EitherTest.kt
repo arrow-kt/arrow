@@ -7,7 +7,7 @@ import arrow.core.test.intSmall
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.nonEmptyList
 import arrow.core.test.testLaws
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain

@@ -3,13 +3,12 @@ package arrow.core
 import arrow.core.test.ior
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.testLaws
-import io.kotest.data.forAll
-import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import io.kotest.property.forAll
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -127,17 +126,17 @@ class IorTest {
   }
 
   @Test fun combineSemigroup() = runTest {
-    forAll(
-      row("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
-      row(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
-      row(Ior.Left("Hello, "), Ior.Both("number", 1), Ior.Both("Hello, number", 1)),
-      row(Ior.Right(9000), Ior.Left("Over"), Ior.Both("Over", 9000)),
-      row(Ior.Right(9000), Ior.Right(1), Ior.Right(9001)),
-      row(Ior.Right(8000), Ior.Both("Over", 1000), Ior.Both("Over", 9000)),
-      row(Ior.Both("Hello ", 1), Ior.Left("number"), Ior.Both("Hello number", 1)),
-      row(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
-      row(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2)),
-    ) { a, b, expectedResult ->
+    listOf(
+      Triple("Hello, ".leftIor(), Ior.Left("Arrow!"), Ior.Left("Hello, Arrow!")),
+      Triple(Ior.Left("Hello"), Ior.Right(2020), Ior.Both("Hello", 2020)),
+      Triple(Ior.Left("Hello, "), Ior.Both("number", 1), Ior.Both("Hello, number", 1)),
+      Triple(Ior.Right(9000), Ior.Left("Over"), Ior.Both("Over", 9000)),
+      Triple(Ior.Right(9000), Ior.Right(1), Ior.Right(9001)),
+      Triple(Ior.Right(8000), Ior.Both("Over", 1000), Ior.Both("Over", 9000)),
+      Triple(Ior.Both("Hello ", 1), Ior.Left("number"), Ior.Both("Hello number", 1)),
+      Triple(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
+      Triple(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2)),
+    ).forEach { (a, b, expectedResult) ->
       a.combine(b, String::plus, Int::plus) shouldBe expectedResult
     }
   }

@@ -330,7 +330,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parZip
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -367,7 +367,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parMap
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -406,7 +406,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.raceN
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -442,7 +442,7 @@ import kotlin.jvm.JvmName
  * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.bracketCase
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -475,7 +475,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ResourceScope
  * import arrow.fx.coroutines.autoCloseable
  * import arrow.fx.coroutines.resourceScope
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -517,7 +517,7 @@ import kotlin.jvm.JvmName
  * import arrow.core.raise.ensure
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeInstanceOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -577,7 +577,7 @@ import kotlin.jvm.JvmName
  * <!--- INCLUDE
  * import arrow.core.raise.effect
  * import arrow.core.raise.fold
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.collections.shouldBeIn
  * import kotlinx.coroutines.async
  * import kotlinx.coroutines.coroutineScope
@@ -602,7 +602,7 @@ import kotlin.jvm.JvmName
  * <!--- INCLUDE
  * import arrow.core.raise.effect
  * import arrow.core.raise.fold
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import kotlinx.coroutines.coroutineScope
  * import kotlinx.coroutines.launch
