@@ -50,9 +50,14 @@ internal fun KSClassDeclaration.targets(): Set<OpticsTarget> = targetsFromOptics
 internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): Set<OpticsTarget> = annotations
   .single { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
   .arguments
-  .flatMap { (it.value as? ArrayList<*>).orEmpty().mapNotNull { it as? KSType } }
+  .flatMap { (it.value as? List<*>).orEmpty() }
   .mapNotNull {
-    when (it.qualifiedString()) {
+    val qualifiedName = when (it) {
+      is KSType -> it.qualifiedString()
+      is KSDeclaration -> it.qualifiedName?.asString()
+      else -> null
+    }
+    when (qualifiedName) {
       "arrow.optics.OpticsTarget.ISO" -> OpticsTarget.ISO
       "arrow.optics.OpticsTarget.LENS" -> OpticsTarget.LENS
       "arrow.optics.OpticsTarget.PRISM" -> OpticsTarget.PRISM
@@ -214,9 +219,10 @@ internal fun KSType.qualifiedString(prefix: String = ""): String = when (declara
   }
 }
 
-internal fun KSTypeArgument.qualifiedString(): String = when (val ty = type?.resolve()) {
-  null -> toString()
-  else -> when (variance) {
+internal fun KSTypeArgument.qualifiedString(): String {
+  if (variance == STAR) return "*"
+  val ty = type?.resolve() ?: return toString()
+  return when (variance) {
     STAR -> "*"
     INVARIANT -> ty.qualifiedString()
     else -> ty.qualifiedString(prefix = "${variance.label} ")
