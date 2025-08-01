@@ -8,6 +8,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSName
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeParameter
+import com.google.devtools.ksp.symbol.Variance
 import com.google.devtools.ksp.symbol.Visibility
 import java.util.Locale
 
@@ -20,7 +21,7 @@ data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val target
     Visibility.INTERNAL -> "internal"
     else -> "public"
   }
-  val typeParameters: List<String> = declaration.typeParameters.map { it.simpleName.asString() }
+  val typeParameters: List<String> = declaration.typeParameters.map { if (it.variance == Variance.STAR) "*" else it.simpleName.asString() }
   val angledTypeParameters: String = when {
     typeParameters.isEmpty() -> ""
     else -> "<${typeParameters.joinToString(separator = ",")}>"
@@ -83,7 +84,9 @@ data class Focus(
   val refinedArguments: List<String>
     get() = refinedType?.arguments?.filter {
       it.type?.resolve()?.declaration is KSTypeParameter
-    }?.map { it.qualifiedString() }.orEmpty()
+    }?.map {
+      it.qualifiedString()
+    }.orEmpty()
 
   companion object {
     operator fun invoke(fullName: String, paramName: String, subclasses: List<String> = emptyList()): Focus = Focus(fullName, paramName, null, subclasses = subclasses)
