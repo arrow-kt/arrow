@@ -9,7 +9,7 @@ internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget)
 )
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>): String {
-  val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"
+  val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameterNames}"
 
   val setBody = { focus: Focus ->
     val setBodyCopy = """${adt.sourceName}.copy(${

@@ -21,10 +21,28 @@ data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val target
     Visibility.INTERNAL -> "internal"
     else -> "public"
   }
-  val typeParameters: List<String> = declaration.typeParameters.map { if (it.variance == Variance.STAR) "*" else it.simpleName.asString() }
+  val typeParameters: List<String> = declaration.typeParameters.map { tyParam ->
+    if (tyParam.variance == Variance.STAR) return@map "*"
+    // val prefix = when (it.variance) {
+    //   Variance.COVARIANT, Variance.CONTRAVARIANT -> "${it.variance.label} "
+    //   else -> ""
+    // }
+    val boundNames = tyParam.bounds.mapNotNull {
+      it.resolve().qualifiedString().takeIf { it != "kotlin.Any?" }
+    }
+    val bounds = when (boundNames.count()) {
+      0 -> ""
+      else -> ": ${boundNames.joinToString()}"
+    }
+    return@map "${tyParam.simpleName.asString()}$bounds"
+  }
   val angledTypeParameters: String = when {
     typeParameters.isEmpty() -> ""
     else -> "<${typeParameters.joinToString(separator = ",")}>"
+  }
+  val angledTypeParameterNames: String = when {
+    typeParameters.isEmpty() -> ""
+    else -> "<${declaration.typeParameters.joinToString(separator = ",") { if (it.variance == Variance.STAR) "*" else it.simpleName.asString() } } >"
   }
 
   operator fun Snippet.plus(snippet: Snippet): Snippet = copy(imports = imports + snippet.imports, content = "$content\n${snippet.content}")
