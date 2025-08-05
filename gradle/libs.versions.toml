@@ -3,7 +3,7 @@ animalSniffer = "2.0.1"
 coroutines = "1.10.2"
 classgraph = "4.8.181"
 dokka = "2.0.0"
-kotest = "6.0.0.M9"
+kotest = "6.0.0.M10"
 kover = "0.9.1"
 kotlin = "2.2.0"
 kotlinBinaryCompatibilityValidator = "0.18.1"
@@ -22,7 +22,7 @@ cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.19.2"
 shadow = "9.0.0-rc3"
-kotlinWrappers = "2025.8.2"
+kotlinWrappers = "2025.8.4"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
