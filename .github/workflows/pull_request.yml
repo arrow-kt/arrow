@@ -20,6 +20,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache Kotlin Native dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
