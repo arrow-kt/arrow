@@ -271,14 +271,16 @@ public annotation class DelicateRaiseApi
  * It drives the short-circuiting behavior of [Raise].
  */
 @DelicateRaiseApi
-public sealed class RaiseCancellationException(
-  internal val raised: Any?,
+public expect sealed class RaiseCancellationException(
+  raised: Any?,
+  raise: Raise<Any?>
+) : CancellationException {
+  internal val raised: Any?
   internal val raise: Raise<Any?>
-) : CancellationException(RaiseCancellationExceptionCaptured)
+}
 
 @DelicateRaiseApi
-@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-internal expect class NoTrace(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException
+internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException
 
 @DelicateRaiseApi
 internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)

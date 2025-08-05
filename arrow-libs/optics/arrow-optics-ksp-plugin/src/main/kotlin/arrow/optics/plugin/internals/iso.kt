@@ -5,7 +5,7 @@ import arrow.optics.plugin.OpticsProcessorOptions
 internal fun OpticsProcessorOptions.generateIsos(ele: ADT, target: IsoTarget) = Snippet(`package` = ele.packageName, name = ele.simpleName, content = processElement(ele, target.foci.first()))
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, focus: Focus): String {
-  val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameters}"
+  val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameterNames}"
   val firstLine = when {
     adt.typeParameters.isEmpty() ->
       "${adt.visibilityModifierName} $inlineText val ${adt.sourceClassName}.Companion.${focus.escapedParamName}: $Iso<${adt.sourceClassName}, ${focus.className}> $inlineText get()"

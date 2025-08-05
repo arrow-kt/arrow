@@ -3,7 +3,7 @@ animalSniffer = "2.0.1"
 coroutines = "1.10.2"
 classgraph = "4.8.181"
 dokka = "2.0.0"
-kotest = "6.0.0.M8"
+kotest = "6.0.0.M10"
 kover = "0.9.1"
 kotlin = "2.2.0"
 kotlinBinaryCompatibilityValidator = "0.18.1"
@@ -17,11 +17,12 @@ retrofit = "3.0.0"
 moshi = "1.15.2"
 spotlessVersion = "7.2.1"
 composePlugin = "1.8.2"
-agp = "8.11.1"
+agp = "8.12.0"
 cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.19.2"
-shadow = "9.0.0-rc2"
+shadow = "9.0.0-rc3"
+kotlinWrappers = "2025.8.4"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -31,6 +32,7 @@ kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest"
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinWrappers-js = { module = "org.jetbrains.kotlin-wrappers:kotlin-js",  version.ref = "kotlinWrappers" }
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofit-lib = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squareup-retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
@@ -67,6 +69,7 @@ publish = { id = "com.vanniktech.maven.publish", version.ref="publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jsPlainObjects = { id = "org.jetbrains.kotlin.plugin.js-plain-objects", version.ref = "kotlin" }
 kotlin-binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlinBinaryCompatibilityValidator" }
 kotlinx-knit = { id = "org.jetbrains.kotlinx.knit", version.ref = "knit" }
 kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
