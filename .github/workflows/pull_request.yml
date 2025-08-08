@@ -13,20 +13,12 @@ jobs:
 
   knit:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -49,46 +41,9 @@ jobs:
           name: 'reports-check'
           path: '**/build/reports/**'
 
-  api_dump:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-
-      - name: Update API files
-        run: ./gradlew apiDump
-
-      - name: Commit updated API files
-        uses: stefanzweifel/git-auto-commit-action@v6
-        with:
-          commit_message: Auto-update API files
-          file_pattern: arrow-libs/**/api/*.api
-
   spotless:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -231,8 +186,7 @@ jobs:
 
   jvm:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    needs: api_dump  # to avoid recompilation
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -276,58 +230,14 @@ jobs:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
 
-  js:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: api_dump  # to avoid recompilation
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-
-      - name: Upgrade yarn.lock
-        run: ./gradlew kotlinUpgradeYarnLock
-        continue-on-error: true
-
-      - name: JS tests
-        run: ./gradlew jsTest
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'reports-js'
-          path: '**/build/reports/**'
-
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    needs: api_dump  # to avoid recompilation
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -350,26 +260,29 @@ jobs:
           name: 'reports-linux'
           path: '**/build/reports/**'
 
-  wasm:
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    needs: api_dump  # to avoid recompilation
+      - name: Android (release) tests
+        run: ./gradlew testAndroid
 
-    steps:
-      - uses: actions/checkout@v4
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          fetch-depth: 0
+          name: 'reports-android'
+          path: '**/build/reports/**'
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
+      - name: Upgrade yarn.lock
+        run: ./gradlew kotlinUpgradeYarnLock
+        continue-on-error: true
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: JS tests
+        run: ./gradlew jsTest
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          name: 'reports-js'
+          path: '**/build/reports/**'
 
       - name: Compile WebAssembly
         run: ./gradlew wasmJsApiBuild wasmJsJar :suspendapp-test-runner:wasmJsTest -Penable_wasm=true
@@ -381,33 +294,11 @@ jobs:
           name: 'reports-wasm'
           path: '**/build/reports/**'
 
-  android:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    needs: api_dump  # to avoid recompilation
+      - name: Update API files
+        run: ./gradlew apiDump
 
-    steps:
-      - uses: actions/checkout@v4
+      - name: Commit updated API files
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          fetch-depth: 0
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-
-      - name: Android (release) tests
-        run: ./gradlew testAndroid
-
-      - name: Upload reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: 'reports-wasm'
-          path: '**/build/reports/**'
+          commit_message: Auto-update API files
+          file_pattern: arrow-libs/**/api/*.api
