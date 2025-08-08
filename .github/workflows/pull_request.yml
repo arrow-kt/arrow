@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
 
-  check:
+  knit:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -40,7 +40,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Knit and API checks
-        run: ./gradlew knitCheck apiCheck --parallel
+        run: ./gradlew knitCheck
 
       - name: Upload reports
         if: failure()
@@ -49,7 +49,7 @@ jobs:
           name: 'reports-check'
           path: '**/build/reports/**'
 
-  update_api:
+  api_dump:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -78,7 +78,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Update API files
-        run: ./gradlew apiDump --parallel
+        run: ./gradlew apiDump
 
       - name: Commit updated API files
         uses: stefanzweifel/git-auto-commit-action@v6
@@ -144,7 +144,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: iOS tests
-        run: ./gradlew iosSimulatorArm64Test --parallel
+        run: ./gradlew iosSimulatorArm64Test
 
       - name: Upload reports
         if: failure()
@@ -232,6 +232,7 @@ jobs:
   jvm:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    needs: api_dump  # to avoid recompilation
 
     steps:
       - uses: actions/checkout@v4
@@ -278,6 +279,7 @@ jobs:
   js:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: api_dump  # to avoid recompilation
 
     steps:
       - uses: actions/checkout@v4
@@ -312,6 +314,7 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    needs: api_dump  # to avoid recompilation
 
     steps:
       - uses: actions/checkout@v4
@@ -350,6 +353,7 @@ jobs:
   wasm:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    needs: api_dump  # to avoid recompilation
 
     steps:
       - uses: actions/checkout@v4
@@ -380,6 +384,7 @@ jobs:
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    needs: api_dump  # to avoid recompilation
 
     steps:
       - uses: actions/checkout@v4
