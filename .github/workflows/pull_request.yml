@@ -182,7 +182,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: macOS tests
-        run: ./gradlew macosArm64Test --parallel
+        run: ./gradlew macosArm64Test
 
       - name: Upload reports
         if: failure()
@@ -220,7 +220,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Windows (MinGW-w64) tests
-        run: ./gradlew mingwX64Test --parallel
+        run: ./gradlew mingwX64Test
 
       - name: Upload reports
         if: failure()
@@ -250,7 +250,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: JVM tests
-        run: ./gradlew jvmTest --parallel
+        run: ./gradlew jvmTest
 
       - name: Code coverage
         # if: "! github.event.pull_request.head.repo.fork "
@@ -300,7 +300,7 @@ jobs:
         continue-on-error: true
 
       - name: JS tests
-        run: ./gradlew jsTest --parallel
+        run: ./gradlew jsTest
 
       - name: Upload reports
         if: failure()
@@ -338,7 +338,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Linux (x64) tests
-        run: ./gradlew linuxX64Test --parallel
+        run: ./gradlew linuxX64Test
 
       - name: Upload reports
         if: failure()
@@ -368,7 +368,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Compile WebAssembly
-        run: ./gradlew wasmJsApiBuild wasmJsJar :suspendapp-test-runner:wasmJsTest -Penable_wasm=true --parallel
+        run: ./gradlew wasmJsApiBuild wasmJsJar :suspendapp-test-runner:wasmJsTest -Penable_wasm=true
 
       - name: Upload reports
         if: failure()
@@ -398,7 +398,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Android (release) tests
-        run: ./gradlew testAndroid --parallel
+        run: ./gradlew testAndroid
 
       - name: Upload reports
         if: failure()
