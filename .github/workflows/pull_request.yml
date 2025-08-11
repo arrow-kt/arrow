@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -46,7 +46,7 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -75,12 +75,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -113,12 +113,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -151,12 +151,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -189,7 +189,7 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -235,7 +235,7 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
