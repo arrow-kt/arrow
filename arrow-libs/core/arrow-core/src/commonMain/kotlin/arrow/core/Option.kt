@@ -382,7 +382,7 @@ public sealed class Option<out A> {
    */
   public fun isNone(): Boolean {
     contract {
-      returns(false) implies (this@Option is Some<A>)
+      returns(false) implies (this@Option is Some)
       returns(true) implies (this@Option is None)
     }
     return this@Option is None
@@ -394,7 +394,7 @@ public sealed class Option<out A> {
    */
   public fun isSome(): Boolean {
     contract {
-      returns(true) implies (this@Option is Some<A>)
+      returns(true) implies (this@Option is Some)
       returns(false) implies (this@Option is None)
     }
     return this@Option is Some<A>
@@ -426,7 +426,7 @@ public sealed class Option<out A> {
   public inline fun isSome(predicate: (A) -> Boolean): Boolean {
     contract {
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
-      returns(true) implies (this@Option is Some<A>)
+      returns(true) implies (this@Option is Some)
     }
     return this@Option is Some<A> && predicate(value)
   }
@@ -448,8 +448,7 @@ public sealed class Option<out A> {
    */
   public fun getOrNull(): A? {
     contract {
-      returns(null) implies (this@Option is None)
-      returnsNotNull() implies (this@Option is Some<A>)
+      returnsNotNull() implies (this@Option is Some)
     }
     return getOrElse { null }
   }
