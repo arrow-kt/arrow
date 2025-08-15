@@ -589,17 +589,7 @@ class IterableTest {
     checkAll(Arb.list(Arb.int(), 0..10), Arb.pair(Arb.int(1..1000), Arb.int())) { a, mod ->
       fun trans(i: Int) = if (i % mod.first == 0) i + mod.second else null
 
-      var expected: MutableList<Int>? = if (a.isEmpty()) mutableListOf() else null
-      a.forEach { n ->
-        val result = trans(n)
-        if (result != null) {
-          if (expected == null) {
-            expected = mutableListOf(result)
-          } else {
-            expected.add(result)
-          }
-        }
-      }
+      val expected = if (a.isEmpty()) a else a.mapNotNull(::trans).takeIf { it.isNotEmpty() }
       a.crosswalkNull(::trans) shouldBe expected
     }
   }

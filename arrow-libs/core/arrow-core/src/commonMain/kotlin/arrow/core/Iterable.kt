@@ -899,7 +899,7 @@ public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<
   }
 
 public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
-  mapNotNull(f).takeIf { it.isNotEmpty() || !this.any() }
+  mapNotNull(f).takeIf { it.isNotEmpty() || it.isEmpty() }
 
 public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
   align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }
