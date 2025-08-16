@@ -559,9 +559,8 @@ class IterableTest {
       val transarr: List<(Int) -> Int> = incr.map { i -> { it + i } }
 
       val expected = mutableListOf<List<Int>>()
-      val arev = a.reversed()
       transarr.forEach { t ->
-        arev.map { t(it) }.takeIf { it.isNotEmpty() }
+        a.map { t(it) }.takeIf { it.isNotEmpty() }
           ?.let(expected::add)
       }
 
@@ -590,7 +589,7 @@ class IterableTest {
     checkAll(Arb.list(Arb.int(), 0..10), Arb.pair(Arb.int(1..1000), Arb.int())) { a, mod ->
       fun trans(i: Int) = if (i % mod.first == 0) i + mod.second else null
 
-      val expected = a.reversed().mapNotNull(::trans)
+      val expected = if (a.isEmpty()) a else a.mapNotNull(::trans).takeIf { it.isNotEmpty() }
       a.crosswalkNull(::trans) shouldBe expected
     }
   }
