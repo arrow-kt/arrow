@@ -589,7 +589,7 @@ class IterableTest {
     checkAll(Arb.list(Arb.int(), 0..10), Arb.pair(Arb.int(1..1000), Arb.int())) { a, mod ->
       fun trans(i: Int) = if (i % mod.first == 0) i + mod.second else null
 
-      val expected = if (a.isEmpty()) a else a.mapNotNull(::trans).takeIf { it.isNotEmpty() || it.isEmpty() }
+      val expected = if (a.isEmpty()) a else a.mapNotNull(::trans).takeIf { it.isNotEmpty() }
       a.crosswalkNull(::trans) shouldBe expected
     }
   }
