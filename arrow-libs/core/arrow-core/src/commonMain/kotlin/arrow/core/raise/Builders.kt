@@ -15,7 +15,6 @@ import arrow.core.NonEmptySet
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
@@ -39,7 +38,7 @@ public inline fun <A> singleton(
 }
 
 /**
- * Runs a computation [block] using [Raise], and return its outcome as [Either].
+ * Runs a computation [block] using [Raise], and returns its outcome as [Either].
  * - [Either.Right] represents success,
  * - [Either.Left] represents logical failure.
  *
@@ -54,7 +53,7 @@ public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> 
 }
 
 /**
- * Runs a computation [block] using [Raise], and return its outcome as nullable type,
+ * Runs a computation [block] using [Raise], and returns its outcome as nullable type,
  * where `null` represents logical failure.
  *
  * This function re-throws any exceptions thrown within the [Raise] block.
@@ -71,7 +70,7 @@ public inline fun <A> nullable(block: SingletonRaise<Nothing?>.() -> A): A? {
 }
 
 /**
- * Runs a computation [block] using [Raise], and return its outcome as [Result].
+ * Runs a computation [block] using [Raise], and returns its outcome as [Result].
  *
  *
  * Read more about running a [Raise] computation in the
@@ -83,7 +82,7 @@ public inline fun <A> result(block: ResultRaise.() -> A): Result<A> {
 }
 
 /**
- * Runs a computation [block] using [Raise], and return its outcome as [Option].
+ * Runs a computation [block] using [Raise], and returns its outcome as [Option].
  * - [Some] represents success,
  * - [None] represents logical failure.
  *
@@ -98,10 +97,10 @@ public inline fun <A> option(block: SingletonRaise<None>.() -> A): Option<A> {
 }
 
 /**
- * Runs a computation [block] using [Raise], and return its outcome as [Ior].
+ * Runs a computation [block] using [Raise], and returns its outcome as [Ior].
  * - [Ior.Right] represents success,
  * - [Ior.Left] represents logical failure which made it impossible to continue,
- * - [Ior.Both] represents that some logical failures were raised,
+ * - [Ior.Both] represents the fact that some logical failures were raised,
  *   but it was possible to continue until producing a final value.
  *
  * This function re-throws any exceptions thrown within the [Raise] block.
@@ -118,15 +117,15 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
   return fold(
     { block(IorRaise(combineError, state, this)) },
     { e -> Ior.Left(EmptyValue.combine(state.get(), e, combineError)) },
-    { a -> EmptyValue.fold(state.get(), { Ior.Right(a) }, { e: Error -> Ior.Both(e, a) }) }
+    { a -> EmptyValue.fold(state.get(), { Ior.Right(a) }, { e: Error -> Ior.Both(e, a) }) },
   )
 }
 
 /**
- * Run a computation [block] using [Raise]. and return its outcome as [IorNel].
+ * Run a computation [block] using [Raise]. and returns its outcome as [IorNel].
  * - [Ior.Right] represents success,
  * - [Ior.Left] represents logical failure which made it impossible to continue,
- * - [Ior.Both] represents that some logical failures were raised,
+ * - [Ior.Both] represents the fact that some logical failures were raised,
  *   but it was possible to continue until producing a final value.
  *
  * This function re-throws any exceptions thrown within the [Raise] block.
@@ -144,10 +143,10 @@ public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>,
 }
 
 /**
- * Runs a computation [block] using [Raise], and return its outcome as [Ior].
+ * Runs a computation [block] using [Raise], and returns its outcome as [Ior].
  * - [Ior.Right] represents success,
  * - [Ior.Left] represents logical failure which made it impossible to continue,
- * - [Ior.Both] represents that some logical failures were raised,
+ * - [Ior.Both] represents the fact that some logical failures were raised,
  *   but it was possible to continue until producing a final value.
  *
  * This function re-throws any exceptions thrown within the [Raise] block.
@@ -172,7 +171,7 @@ public inline fun <Error, A> iorAccumulate(noinline combineError: (Error, Error)
 @PublishedApi
 internal fun <Error> Raise<Error>.IorRaiseAccumulate(
   state: Atomic<Any?>,
-  combineError: (Error, Error) -> Error
+  combineError: (Error, Error) -> Error,
 ): RaiseAccumulate<Error> = RaiseAccumulate(IorAccumulate(state, combineError, this)) { e -> raise(EmptyValue.combine(state.get(), e, combineError)) }
 
 private class IorAccumulate<Error>(
@@ -195,7 +194,7 @@ private class IorAccumulate<Error>(
 }
 
 /**
- * Runs a computation [block] using [Raise], and ignore its outcome.
+ * Runs a computation [block] using [Raise], and ignores its outcome.
  *
  * This function re-throws any exceptions thrown within the [Raise] block.
  *
@@ -207,7 +206,7 @@ public inline fun impure(block: SingletonRaise<Unit>.() -> Unit) {
   return singleton({ }, block)
 }
 
-public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
+public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
   @RaiseDSL
   public fun raise(): Nothing = raise.raise(Unit)
 
@@ -241,42 +240,34 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>): Raise<E> {
 
   @RaiseDSL
   @JvmName("bindAllNullable")
-  public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> =
-    mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
 
   @JvmName("bindAllOption")
-  public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> =
-    mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
 
   @RaiseDSL
   @JvmName("bindAllNullable")
-  public fun <A> Iterable<A?>.bindAll(): List<A> =
-    map { it.bind() }
+  public fun <A> Iterable<A?>.bindAll(): List<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllOption")
-  public fun <A> Iterable<Option<A>>.bindAll(): List<A> =
-    map { it.bind() }
+  public fun <A> Iterable<Option<A>>.bindAll(): List<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllNullable")
-  public fun <A> NonEmptyList<A?>.bindAll(): NonEmptyList<A> =
-    map { it.bind() }
+  public fun <A> NonEmptyList<A?>.bindAll(): NonEmptyList<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllOption")
-  public fun <A> NonEmptyList<Option<A>>.bindAll(): NonEmptyList<A> =
-    map { it.bind() }
+  public fun <A> NonEmptyList<Option<A>>.bindAll(): NonEmptyList<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllNullable")
-  public fun <A> NonEmptySet<A?>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }.toNonEmptySet()
+  public fun <A> NonEmptySet<A?>.bindAll(): NonEmptySet<A> = map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
   @JvmName("bindAllOption")
-  public fun <A> NonEmptySet<Option<A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }.toNonEmptySet()
+  public fun <A> NonEmptySet<Option<A>>.bindAll(): NonEmptySet<A> = map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
   public inline fun <A> recover(
@@ -315,23 +306,19 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
 
   @JvmName("bindAllResult")
-  public fun <K, V> Map<K, Result<V>>.bindAll(): Map<K, V> =
-    mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, Result<V>>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
 
   @RaiseDSL
   @JvmName("bindAllResult")
-  public fun <A> Iterable<Result<A>>.bindAll(): List<A> =
-    map { it.bind() }
+  public fun <A> Iterable<Result<A>>.bindAll(): List<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllResult")
-  public fun <A> NonEmptyList<Result<A>>.bindAll(): NonEmptyList<A> =
-    map { it.bind() }
+  public fun <A> NonEmptyList<Result<A>>.bindAll(): NonEmptyList<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllResult")
-  public fun <A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }.toNonEmptySet()
+  public fun <A> NonEmptySet<Result<A>>.bindAll(): NonEmptySet<A> = map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
   public inline fun <A> recover(
@@ -344,7 +331,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
     }
     return result(block).fold(
       onSuccess = { it },
-      onFailure = { recover(it) }
+      onFailure = { recover(it) },
     )
   }
 }
@@ -361,45 +348,39 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   @PublishedApi
   internal fun combine(e: Error): Error = state.update(
     function = { EmptyValue.combine(it, e, combineError) },
-    transform = { _, new -> new }
+    transform = { _, new -> new },
   )
 
   @RaiseDSL
   public fun accumulate(value: Error): Unit = Ior.Both(value, Unit).bind()
 
   @RaiseDSL
-  public fun <A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A =
-    fold(ifLeft = { Ior.Both(it, recover(it)) }, ifRight = { Ior.Right(it) }).bind()
+  public fun <A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A = fold(ifLeft = { Ior.Both(it, recover(it)) }, ifRight = { Ior.Right(it) }).bind()
 
   @RaiseDSL
   @JvmName("bindAllIor")
-  public fun <A> Iterable<Ior<Error, A>>.bindAll(): List<A> =
-    map { it.bind() }
+  public fun <A> Iterable<Ior<Error, A>>.bindAll(): List<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllIor")
-  public fun <A> NonEmptyList<Ior<Error, A>>.bindAll(): NonEmptyList<A> =
-    map { it.bind() }
+  public fun <A> NonEmptyList<Ior<Error, A>>.bindAll(): NonEmptyList<A> = map { it.bind() }
 
   @RaiseDSL
   @JvmName("bindAllIor")
-  public fun <A> NonEmptySet<Ior<Error, A>>.bindAll(): NonEmptySet<A> =
-    map { it.bind() }.toNonEmptySet()
+  public fun <A> NonEmptySet<Ior<Error, A>>.bindAll(): NonEmptySet<A> = map { it.bind() }.toNonEmptySet()
 
   @RaiseDSL
-  public fun <A> Ior<Error, A>.bind(): A =
-    when (this) {
-      is Ior.Left -> raise(value)
-      is Ior.Right -> value
-      is Ior.Both -> {
-        combine(leftValue)
-        rightValue
-      }
+  public fun <A> Ior<Error, A>.bind(): A = when (this) {
+    is Ior.Left -> raise(value)
+    is Ior.Right -> value
+    is Ior.Both -> {
+      combine(leftValue)
+      rightValue
     }
+  }
 
   @JvmName("bindAllIor")
-  public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
-    mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
 
   @RaiseDSL
   public inline fun <A> recover(
