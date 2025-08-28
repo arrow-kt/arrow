@@ -882,7 +882,7 @@ public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
       ior.fold(
         { listOf(it) },
         ::identity,
-        { l, r -> listOf(l) + r }
+        { l, r -> r + l }
       )
     }
   }
@@ -893,19 +893,13 @@ public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<
       ior.fold(
         { listOf(it) },
         ::identity,
-        { l, r -> listOf(l) + r }
+        { l, r -> r + l }
       )
     }
   }
 
 public fun <A, B> Iterable<A>.crosswalkNull(f: (A) -> B?): List<B>? =
-  fold<A, List<B>?>(emptyList()) { bs, a ->
-    Ior.fromNullables(f(a), bs)?.fold(
-      { listOf(it) },
-      ::identity,
-      { l, r -> listOf(l) + r }
-    )
-  }
+  mapNotNull(f).takeIf { it.isNotEmpty() || !this.any() }
 
 public operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
   align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }
