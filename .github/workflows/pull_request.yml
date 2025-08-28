@@ -285,7 +285,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Compile WebAssembly
-        run: ./gradlew wasmJsApiBuild wasmJsJar :suspendapp-test-runner:wasmJsTest -Penable_wasm=true
+        run: ./gradlew wasmJsJar :suspendapp-test-runner:wasmJsTest -Penable_wasm=true
 
       - name: Upload reports
         if: failure()
@@ -295,7 +295,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Update API files
-        run: ./gradlew apiDump
+        run: ./gradlew updateLegacyAbi
 
       - name: Commit updated API files
         uses: stefanzweifel/git-auto-commit-action@v6

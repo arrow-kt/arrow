@@ -4,9 +4,14 @@ import groovy.util.NodeList
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationVariantSpec
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import java.net.URI
 import java.time.Duration
 
@@ -28,6 +33,13 @@ val Project.requiresAndroidCoreLibraryDesugaring
 
 val Project.needsJava11
   get() = project.name.endsWith("-compose")
+
+val Project.needsAbiValidation
+  get() = project.name !in listOf(
+    "arrow-optics-ksp-plugin",
+    "suspendapp-test-app",
+    "suspendapp-test-runner",
+  )
 
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
@@ -91,9 +103,31 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
   providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
 }
 
+@OptIn(ExperimentalAbiValidation::class)
+fun AbiValidationVariantSpec.commonValidationOptions() {
+  filters {
+    excluded {
+      annotatedWith.addAll(
+        "arrow.fx.coroutines.await.ExperimentalAwaitAllApi",
+        "arrow.core.raise.ExperimentalRaiseAccumulateApi",
+        "arrow.core.raise.ExperimentalTraceApi",
+      )
+    }
+  }
+}
+
 if (isKotlinMultiplatform) {
   configure<KotlinMultiplatformExtension> {
     compilerOptions { commonCompilerOptions() }
+
+    @OptIn(ExperimentalAbiValidation::class)
+    if (needsAbiValidation) {
+      extensions.configure<AbiValidationMultiplatformExtension>("abiValidation") {
+        enabled.set(true)
+        klib.enabled.set(true)
+        commonValidationOptions()
+      }
+    }
 
     jvm {
       compilerOptions {
@@ -217,6 +251,16 @@ if (isKotlinJvm) {
     compilerOptions {
       jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
       commonCompilerOptions()
+    }
+  }
+
+  configure<KotlinJvmProjectExtension> {
+    @OptIn(ExperimentalAbiValidation::class)
+    if (needsAbiValidation) {
+      extensions.configure<AbiValidationExtension>("abiValidation") {
+        enabled.set(true)
+        commonValidationOptions()
+      }
     }
   }
 }
