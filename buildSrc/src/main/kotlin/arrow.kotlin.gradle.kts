@@ -84,8 +84,6 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
-    "-Wextra",
-    "-Xuse-fir-experimental-checkers",
   )
   // required to be part of the Kotlin User Projects repository
   providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
