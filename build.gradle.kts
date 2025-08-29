@@ -1,5 +1,4 @@
 import kotlinx.knit.KnitPluginExtension
-import kotlinx.validation.ExperimentalBCVApi
 import org.gradle.internal.classpath.Instrumented.systemProperty
 
 allprojects {
@@ -36,7 +35,6 @@ plugins {
   alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.kotlinx.knit)
   id(libs.plugins.kotlinx.kover.get().pluginId)
-  alias(libs.plugins.kotlin.binaryCompatibilityValidator)
 }
 
 configure<KnitPluginExtension> {
@@ -115,14 +113,4 @@ dokka {
     customAssets.from("static/img/logo/logo-icon.svg")
     footerMessage.set("© Arrow Contributors")
   }
-}
-
-apiValidation {
-  ignoredProjects.addAll(listOf(
-    "arrow-optics-ksp-plugin",
-    "suspendapp-test-app",
-    "suspendapp-test-runner",
-  ))
-  @OptIn(ExperimentalBCVApi::class)
-  klib.enabled = true
 }
