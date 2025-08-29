@@ -2,9 +2,9 @@
 package arrow.core.examples.exampleEither32
 
 import arrow.core.Either
-import arrow.core.getOrElse
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Left(12) getOrElse { it + 5 } shouldBe 17
+  Either.Right(12).leftOrNull() shouldBe null
+  Either.Left(12).leftOrNull() shouldBe 12
 }

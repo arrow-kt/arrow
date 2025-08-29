@@ -663,14 +663,6 @@ public sealed class Either<out A, out B> {
     }
   }
 
-  @Deprecated("Replaced by a version with Raise", level = DeprecationLevel.HIDDEN)
-  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
-    contract {
-      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
-    }
-    return also { if (it.isRight()) action(it.value) }
-  }
-
   /**
    * Performs the given [action] on the encapsulated [B] value if this instance represents [Either.Right].
    * Returns the original [Either] unchanged unless you [raise].
@@ -680,16 +672,38 @@ public sealed class Either<out A, out B> {
    * import io.kotest.matchers.shouldBe
    *
    * fun test() {
-   *   Either.Right(1).onRight { print(it) } shouldBe Either.Right(1)
-   *
-   *   val x: Either<String, Int> = Either.Right(2)
-   *   x.onRight { raise("hello") } shouldBe Either.Left("hello")
+   *   Either.Right(1).onRight(::println) shouldBe Either.Right(1)
    * }
    * ```
    * <!--- KNIT example-either-27.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onRight(action: Raise<@UnsafeVariance A>.(right: B) -> Unit): Either<A, B> {
+  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isRight()) action(it.value) }
+  }
+
+  /**
+   * Performs the given [action] on the encapsulated [B] value if this instance represents [Either.Right].
+   * Returns the original [Either] unchanged, unless you [raise].
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *   Either.Right(1).onRightBind { print(it) } shouldBe Either.Right(1)
+   *
+   *   val x: Either<String, Int> = Either.Right(2)
+   *   x.onRightBind { raise("hello") } shouldBe Either.Left("hello")
+   * }
+   * ```
+   * <!--- KNIT example-either-28.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
+  public inline fun onRightBind(action: Raise<@UnsafeVariance A>.(right: B) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
@@ -711,7 +725,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(2).onLeft(::println) shouldBe Either.Left(2)
    * }
    * ```
-   * <!--- KNIT example-either-28.kt -->
+   * <!--- KNIT example-either-29.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
@@ -719,6 +733,34 @@ public sealed class Either<out A, out B> {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
     return also { if (it.isLeft()) action(it.value) }
+  }
+
+  /**
+   * Performs the given [action] on the encapsulated [A] if this instance represents [Either.Left].
+   * Returns the original [Either] unchanged, unless you [raise].
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *   Either.Left(2).onLeftBind { println(it) } shouldBe Either.Left(2)
+   *
+   *   val x: Either<String, Int> = Either.Left("hello")
+   *   x.onLeftBind { raise("bye") } shouldBe Either.Left("bye")
+   * }
+   * ```
+   * <!--- KNIT example-either-30.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
+  public inline fun onLeftBind(action: Raise<@UnsafeVariance A>.(left: A) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return when (val me = this) {
+      is Left<A> -> either { action(me.value) ; raise(me.value) }
+      else -> me
+    }
   }
 
   /**
@@ -733,7 +775,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).getOrNull() shouldBe null
    * }
    * ```
-   * <!--- KNIT example-either-29.kt -->
+   * <!--- KNIT example-either-31.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNull(): B? {
@@ -755,7 +797,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).leftOrNull() shouldBe 12
    * }
    * ```
-   * <!--- KNIT example-either-30.kt -->
+   * <!--- KNIT example-either-32.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public fun leftOrNull(): A? {
@@ -781,7 +823,7 @@ public sealed class Either<out A, out B> {
    *   Either.Left(12).getOrNone() shouldBe None
    * }
    * ```
-   * <!--- KNIT example-either-31.kt -->
+   * <!--- KNIT example-either-33.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
   public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
@@ -1345,7 +1387,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  *   Either.Left(12) getOrElse { it + 5 } shouldBe 17
  * }
  * ```
- * <!--- KNIT example-either-32.kt -->
+ * <!--- KNIT example-either-34.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
@@ -1370,7 +1412,7 @@ public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  *   Left(12).merge() // Result: 12
  * }
  * ```
- * <!--- KNIT example-either-33.kt -->
+ * <!--- KNIT example-either-35.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Either<A, A>.merge(): A =
@@ -1442,7 +1484,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *   fallback shouldBe Either.Right(5)
  * }
  * ```
- * <!--- KNIT example-either-34.kt -->
+ * <!--- KNIT example-either-36.kt -->
  * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [EE] into the [Either.Left] channel,
@@ -1459,7 +1501,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
  * ```
- * <!--- KNIT example-either-35.kt -->
+ * <!--- KNIT example-either-37.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
@@ -1497,7 +1539,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  *   failure shouldBe Either.Left("failure")
  * }
  * ```
- * <!--- KNIT example-either-36.kt -->
+ * <!--- KNIT example-either-38.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)

@@ -65,4 +65,12 @@ class EitherKnitTest {
     arrow.core.examples.exampleEither36.test()
   }
 
+  @Test fun exampleEither37() = runTest {
+    arrow.core.examples.exampleEither37.test()
+  }
+
+  @Test fun exampleEither38() = runTest {
+    arrow.core.examples.exampleEither38.test()
+  }
+
 }
