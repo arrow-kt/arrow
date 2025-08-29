@@ -19,7 +19,7 @@ composePlugin = "1.8.2"
 agp = "8.12.2"
 cache4k = "0.14.0"
 publish = "0.34.0"
-jacksonModuleKotlin = "2.19.2"
+jacksonModuleKotlin = "2.20.0"
 shadow = "9.0.2"
 kotlinWrappers = "2025.8.20"
 
