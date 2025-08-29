@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -15,9 +16,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 class RacingTest {
   @Test
@@ -49,6 +50,26 @@ class RacingTest {
   }
 
   @Test
+  fun testCondition() = runTest {
+    val result = racing {
+      race(condition = { false }) { "fast" }
+      race { delay(500.milliseconds) ; "slow" }
+    }
+    assertEquals("slow", result)
+  }
+
+  @Test
+  fun testConditionNoneSucceeds() = runTest {
+    val result = withTimeoutOrNull(600.milliseconds) {
+      racing {
+        race(condition = { false }) { 1 }
+        race(condition = { false }) { 2 }
+      }
+    }
+    assertNull( result)
+  }
+
+  @Test
   fun testRaceLosersCancellation() = runTest {
     val slowRacerCancelled = CompletableDeferred<CancellationException>()
 
@@ -68,7 +89,7 @@ class RacingTest {
     }
 
     assertEquals("fast", result)
-    withTimeoutOrNull(600.seconds) { slowRacerCancelled.await() }
+    withTimeoutOrNull(600.milliseconds) { slowRacerCancelled.await() }
   }
 
   @Test
@@ -107,9 +128,9 @@ class RacingTest {
     }
 
     assertEquals("fast", result)
-    withTimeoutOrNull(600.seconds) { launchFinalizerCalled.await() }
-    withTimeoutOrNull(600.seconds) { asyncFinalizerCalled.await() }
-    withTimeoutOrNull(600.seconds) { suspendFinalizerCalled.await() }
+    withTimeoutOrNull(600.milliseconds) { launchFinalizerCalled.await() }
+    withTimeoutOrNull(600.milliseconds) { asyncFinalizerCalled.await() }
+    withTimeoutOrNull(600.milliseconds) { suspendFinalizerCalled.await() }
   }
 
   @Test
@@ -123,7 +144,7 @@ class RacingTest {
     }
 
     assertEquals("success", result)
-    val exception = withTimeoutOrNull(600.seconds) { exceptionHandled.await() }
+    val exception = withTimeoutOrNull(600.milliseconds) { exceptionHandled.await() }
     assertIs<IllegalStateException>(exception)
     assertEquals("Test exception", exception.message)
   }
