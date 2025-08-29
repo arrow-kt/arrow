@@ -40,15 +40,6 @@ final class <#A: kotlin/Any?> arrow.fx.coroutines/ScopedRaiseAccumulate : arrow.
         final fun <get-coroutineContext>(): kotlin.coroutines/CoroutineContext // arrow.fx.coroutines/ScopedRaiseAccumulate.coroutineContext.<get-coroutineContext>|<get-coroutineContext>(){}[0]
 }
 
-final class arrow.fx.coroutines.await/AwaitAllScope : kotlinx.coroutines/CoroutineScope { // arrow.fx.coroutines.await/AwaitAllScope|null[0]
-    constructor <init>(kotlinx.coroutines/CoroutineScope) // arrow.fx.coroutines.await/AwaitAllScope.<init>|<init>(kotlinx.coroutines.CoroutineScope){}[0]
-
-    final val coroutineContext // arrow.fx.coroutines.await/AwaitAllScope.coroutineContext|{}coroutineContext[0]
-        final fun <get-coroutineContext>(): kotlin.coroutines/CoroutineContext // arrow.fx.coroutines.await/AwaitAllScope.coroutineContext.<get-coroutineContext>|<get-coroutineContext>(){}[0]
-
-    final fun <#A1: kotlin/Any?> async(kotlin.coroutines/CoroutineContext = ..., kotlinx.coroutines/CoroutineStart = ..., kotlin.coroutines/SuspendFunction1<kotlinx.coroutines/CoroutineScope, #A1>): kotlinx.coroutines/Deferred<#A1> // arrow.fx.coroutines.await/AwaitAllScope.async|async(kotlin.coroutines.CoroutineContext;kotlinx.coroutines.CoroutineStart;kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope,0:0>){0§<kotlin.Any?>}[0]
-}
-
 final class arrow.fx.coroutines/CountDownLatch { // arrow.fx.coroutines/CountDownLatch|null[0]
     constructor <init>(kotlin/Long) // arrow.fx.coroutines/CountDownLatch.<init>|<init>(kotlin.Long){}[0]
 
@@ -181,8 +172,6 @@ final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterabl
 final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterable<#A>).arrow.fx.coroutines/parMapNotNull(kotlin.coroutines/CoroutineContext = ..., kotlin.coroutines/SuspendFunction2<kotlinx.coroutines/CoroutineScope, #A, #B?>): kotlin.collections/List<#B> // arrow.fx.coroutines/parMapNotNull|parMapNotNull@kotlin.collections.Iterable<0:0>(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction2<kotlinx.coroutines.CoroutineScope,0:0,0:1?>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.collections/Iterable<#A>).arrow.fx.coroutines/parMapNotNull(kotlin.coroutines/CoroutineContext = ..., kotlin/Int, kotlin.coroutines/SuspendFunction2<kotlinx.coroutines/CoroutineScope, #A, #B?>): kotlin.collections/List<#B> // arrow.fx.coroutines/parMapNotNull|parMapNotNull@kotlin.collections.Iterable<0:0>(kotlin.coroutines.CoroutineContext;kotlin.Int;kotlin.coroutines.SuspendFunction2<kotlinx.coroutines.CoroutineScope,0:0,0:1?>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ResourceScope, #A>).arrow.fx.coroutines/allocate(): kotlin/Pair<#A, kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines/ExitCase, kotlin/Unit>> // arrow.fx.coroutines/allocate|allocate@kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.ResourceScope,0:0>(){0§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Any?> (kotlinx.coroutines/CoroutineScope).arrow.fx.coroutines.await/awaitAll(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines.await/AwaitAllScope, #A>): #A // arrow.fx.coroutines.await/awaitAll|awaitAll@kotlinx.coroutines.CoroutineScope(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.await.AwaitAllScope,0:0>){0§<kotlin.Any?>}[0]
-final suspend fun <#A: kotlin/Any?> arrow.fx.coroutines.await/awaitAll(kotlin.coroutines/SuspendFunction1<arrow.fx.coroutines.await/AwaitAllScope, #A>): #A // arrow.fx.coroutines.await/awaitAll|awaitAll(kotlin.coroutines.SuspendFunction1<arrow.fx.coroutines.await.AwaitAllScope,0:0>){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?> arrow.fx.coroutines/racing(kotlin/Function1<arrow.fx.coroutines/RacingScope<#A>, kotlin/Unit>): #A // arrow.fx.coroutines/racing|racing(kotlin.Function1<arrow.fx.coroutines.RacingScope<0:0>,kotlin.Unit>){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/AutoCloseable> (arrow.fx.coroutines/ResourceScope).arrow.fx.coroutines/autoCloseable(kotlinx.coroutines/CoroutineDispatcher = ..., kotlin.coroutines/SuspendFunction0<#A>): #A // arrow.fx.coroutines/autoCloseable|autoCloseable@arrow.fx.coroutines.ResourceScope(kotlinx.coroutines.CoroutineDispatcher;kotlin.coroutines.SuspendFunction0<0:0>){0§<kotlin.AutoCloseable>}[0]
 final suspend fun arrow.fx.coroutines/cancelAndCompose(kotlinx.coroutines/Deferred<*>, kotlinx.coroutines/Deferred<*>) // arrow.fx.coroutines/cancelAndCompose|cancelAndCompose(kotlinx.coroutines.Deferred<*>;kotlinx.coroutines.Deferred<*>){}[0]

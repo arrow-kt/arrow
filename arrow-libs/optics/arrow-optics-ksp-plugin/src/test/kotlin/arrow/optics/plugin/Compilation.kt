@@ -5,10 +5,10 @@ package arrow.optics.plugin
 import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.kspWithCompilation
+import com.tschuchort.compiletesting.configureKsp
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -65,9 +65,11 @@ fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = Kotli
   sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
   verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
-  languageVersion = "1.9"
-  kspWithCompilation = true
-  symbolProcessorProviders = mutableListOf(OpticsProcessorProvider())
+  languageVersion = "2.0"
+  configureKsp(useKsp2 = true) {
+    withCompilation = true
+    symbolProcessorProviders += OpticsProcessorProvider()
+  }
 }
 
 private fun classpathOf(dependency: String): File {

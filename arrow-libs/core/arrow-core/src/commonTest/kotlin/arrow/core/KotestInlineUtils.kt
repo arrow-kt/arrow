@@ -2,12 +2,13 @@
 
 package arrow.core
 
-import io.kotest.assertions.assertionCounter
-import io.kotest.assertions.failure
+import io.kotest.assertions.AssertionErrorBuilder
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
+import io.kotest.common.reflection.bestName
+import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
 import io.kotest.matchers.types.beOfType
-import io.kotest.mpp.bestName
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -40,13 +41,15 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
   }
 
   return when (thrownThrowable) {
-    null -> throw failure("Expected exception ${expectedExceptionClass.bestName()} but no exception was thrown.")
-    is T -> thrownThrowable               // This should be before `is AssertionError`. If the user is purposefully trying to verify `shouldThrow<AssertionError>{}` this will take priority
+    null -> throw AssertionErrorBuilder.create()
+      .withMessage("Expected exception ${expectedExceptionClass.bestName()} but no exception was thrown.")
+      .build()
+    is T -> thrownThrowable
     is AssertionError -> throw thrownThrowable
-    else -> throw failure(
-      "Expected exception ${expectedExceptionClass.bestName()} but a ${thrownThrowable::class.simpleName} was thrown instead.",
-      thrownThrowable
-    )
+    else -> throw AssertionErrorBuilder.create()
+      .withMessage("Expected exception ${expectedExceptionClass.bestName()} but a ${thrownThrowable::class.simpleName} was thrown instead.")
+      .withCause(thrownThrowable)
+      .build()
   }
 }
 
@@ -59,5 +62,5 @@ inline fun shouldThrowAny(block: () -> Any?): Throwable {
     e
   }
 
-  return thrownException ?: throw failure("Expected a throwable, but nothing was thrown.")
+  return thrownException ?: fail("Expected a throwable, but nothing was thrown.")
 }

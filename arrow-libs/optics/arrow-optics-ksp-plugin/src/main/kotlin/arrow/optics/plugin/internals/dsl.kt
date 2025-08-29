@@ -43,7 +43,7 @@ private fun OpticsProcessorOptions.processLensSyntax(ele: ADT, foci: List<Focus>
     """.trimMargin()
   }
 } else {
-  val sourceClassNameWithParams = "${ele.sourceClassName}${ele.angledTypeParameters}"
+  val sourceClassNameWithParams = "${ele.sourceClassName}${ele.angledTypeParameterNames}"
   val joinedTypeParams = ele.typeParameters.joinToString(separator = ",")
   foci.joinToString(separator = "\n") { focus ->
     """
@@ -66,7 +66,7 @@ private fun OpticsProcessorOptions.processPrismSyntax(ele: ADT, dsl: SealedClass
   }
 } else {
   dsl.foci.joinToString(separator = "\n\n") { focus ->
-    val sourceClassNameWithParams = focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameters}"
+    val sourceClassNameWithParams = focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameterNames}"
     val joinedTypeParams = when {
       focus.refinedArguments.isEmpty() -> ""
       else -> focus.refinedArguments.joinToString(separator = ",")
@@ -93,7 +93,7 @@ private fun OpticsProcessorOptions.processIsoSyntax(ele: ADT, dsl: ValueClassDsl
   }
 } else {
   dsl.foci.joinToString(separator = "\n\n") { focus ->
-    val sourceClassNameWithParams = focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameters}"
+    val sourceClassNameWithParams = focus.refinedType?.qualifiedString() ?: "${ele.sourceClassName}${ele.angledTypeParameterNames}"
     val joinedTypeParams = when {
       focus.refinedArguments.isEmpty() -> ""
       else -> focus.refinedArguments.joinToString(separator = ",")

@@ -8,7 +8,7 @@ import arrow.core.raise.ensureNotNull
 import arrow.core.raise.ensure
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.guaranteeCase
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.shouldBe
 import arrow.core.shouldBeInstanceOf
 import kotlinx.coroutines.CompletableDeferred

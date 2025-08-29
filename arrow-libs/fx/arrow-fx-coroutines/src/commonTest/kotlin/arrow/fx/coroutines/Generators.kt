@@ -1,10 +1,10 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.assertions.fail
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
+import io.kotest.assertions.eq.EqMatcher
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
-import io.kotest.matchers.equalityMatcher
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.choice
@@ -130,7 +130,7 @@ fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
           )
         }
 
-        is Either.Right -> equalityMatcher(e).test(value)
+        is Either.Right -> EqMatcher(e).test(value)
       }
   }
 

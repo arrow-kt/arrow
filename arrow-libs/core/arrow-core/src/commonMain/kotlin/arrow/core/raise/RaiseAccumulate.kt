@@ -1129,6 +1129,7 @@ private class TolerantAccumulate<Error>(
 
 public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
+@ExperimentalRaiseAccumulateApi
 public interface Accumulate<Error> {
   @ExperimentalRaiseAccumulateApi
   public fun accumulate(error: Error): Value<Nothing> = accumulateAll(error.nel())

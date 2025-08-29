@@ -8,7 +8,7 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 /**
- * [Effect] represents a function of `suspend Raise<R>.() -> A`, that short-circuit with a value of `R` or `Throwable`, or completes with a value of `A`.
+ * [Effect] represents a function of `suspend Raise<R>.() -> A`, that short-circuits with a value of `R` or `Throwable`, or completes with a value of `A`.
  *
  * So [Effect] is defined by `suspend fun <B> fold(recover: suspend (Throwable) -> B, resolve: suspend (R) -> B, transform: suspend (A) -> B): B`,
  * to map all values of `R`, `Throwable` and `A` to a value of `B`.
@@ -38,9 +38,9 @@ import kotlin.jvm.JvmName
  * Let's write a small program to read a file from disk, and instead of having the program work exception based we want to
  * turn it into a polymorphic type-safe program.
  *
- * We'll start by defining a small function that accepts a [String], and does some simply validation to check that the path
- * is not empty. If the path is empty, we want to program to result in `EmptyPath`. So we're immediately going to see how
- * we can raise an error of any arbitrary type `R` by using the function `raise`. The name `raise` comes raising an intterupt, or
+ * We'll start by defining a small function that accepts a [String], and does some simple validation to check that the path
+ * is not empty. If the path is empty, we want the program to result in `EmptyPath`. So we're immediately going to see how
+ * we can raise an error of any arbitrary type `R` by using the function `raise`. The name `raise` comes from raising an intterupt, or
  * changing, especially unexpectedly, away from the computation and finishing the `Continuation` with `R`.
  *
  * <!--- INCLUDE
@@ -59,7 +59,7 @@ import kotlin.jvm.JvmName
  *
  * Here we see how we can define an `Effect<R, A>` which has `EmptyPath` for the raise type `R`, and `Unit` for the success type `A`.
  *
- * Patterns like validating a [Boolean] is very common, and the [Effect] DSL offers utility functions like [kotlin.require]
+ * Patterns like validating a [Boolean] are very common, and the [Effect] DSL offers utility functions like [kotlin.require]
  * and [kotlin.requireNotNull]. They're named [ensure] and [ensureNotNull] to avoid conflicts with the `kotlin` namespace.
  * So let's rewrite the function from above to use the DSL instead.
  *
@@ -72,7 +72,7 @@ import kotlin.jvm.JvmName
  * <!--- KNIT example-raise-01.kt -->
  *
  * Now that we have the path, we can read from the `File` and return it as a domain model `Content`.
- * We also want to take a look at what exceptions reading from a file might occur `FileNotFoundException` & `SecurityError`,
+ * We also want to take care of exceptions that might occur when reading from a file - `FileNotFoundException` & `SecurityError`,
  * so lets make some domain errors for those too. Grouping them as a sealed interface is useful since that way we can resolve *all* errors in a type safe manner.
  *
  * <!--- INCLUDE
@@ -185,7 +185,7 @@ import kotlin.jvm.JvmName
  * There are two separate handlers to transform either of the error channels.
  *
  * - `recover` to handle, and transform any error of type `R`.
- * - `catch` to handle, and transform and error of type `Throwable`.
+ * - `catch` to handle, and transform an error of type `Throwable`.
  *
  * ### recover
  *
@@ -272,7 +272,7 @@ import kotlin.jvm.JvmName
  * ```
  *
  * A big difference with `recover` is that `catch` **cannot** change the error type of `R` because it doesn't resolve it, so it stays unchanged.
- * You can however compose `recover`, and `v` to resolve the error type **and** recover the exception.
+ * You can however compose `recover`, and `catch` to resolve the error type **and** recover the exception.
  *
  * ```kotlin
  * val default4: Effect<Nothing, Int> =
@@ -320,7 +320,7 @@ import kotlin.jvm.JvmName
  *
  * Let's overview below how `raise` behaves with the different concurrency builders from Arrow Fx & KotlinX Coroutines.
  * In the examples below we're going to be using a utility to show how _sibling tasks_ get cancelled.
- * The utility function show below called `awaitExitCase` will `never` finish suspending, and completes a `Deferred` with the `ExitCase`.
+ * The utility function shown below called `awaitExitCase` will `never` finish suspending, and completes a `Deferred` with the `ExitCase`.
  * `ExitCase` is a sealed class that can be a value of `Failure(Throwable)`, `Cancelled(CancellationException)`, or `Completed`.
  * Since `awaitExitCase` suspends forever, it can only result in `Cancelled(CancellationException)`.
  *
@@ -330,7 +330,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parZip
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -344,7 +344,7 @@ import kotlin.jvm.JvmName
  *
  * ### Arrow Fx Coroutines
  * All operators in Arrow Fx Coroutines run in place, so they have no way of leaking `raise`.
- * It's there always safe to compose `effect` with any Arrow Fx combinator. Let's see some small examples below.
+ * It's therefore always safe to compose `effect` with any Arrow Fx combinator. Let's see some small examples below.
  *
  * #### parZip
  *
@@ -367,7 +367,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.parMap
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -406,7 +406,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
  * import arrow.fx.coroutines.raceN
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -442,7 +442,7 @@ import kotlin.jvm.JvmName
  * import arrow.core.raise.fold
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.bracketCase
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -475,7 +475,7 @@ import kotlin.jvm.JvmName
  * import arrow.fx.coroutines.ResourceScope
  * import arrow.fx.coroutines.autoCloseable
  * import arrow.fx.coroutines.resourceScope
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeTypeOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -517,7 +517,7 @@ import kotlin.jvm.JvmName
  * import arrow.core.raise.ensure
  * import arrow.fx.coroutines.ExitCase
  * import arrow.fx.coroutines.guaranteeCase
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import arrow.core.shouldBeInstanceOf
  * import kotlinx.coroutines.CompletableDeferred
@@ -577,7 +577,7 @@ import kotlin.jvm.JvmName
  * <!--- INCLUDE
  * import arrow.core.raise.effect
  * import arrow.core.raise.fold
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.collections.shouldBeIn
  * import kotlinx.coroutines.async
  * import kotlinx.coroutines.coroutineScope
@@ -602,7 +602,7 @@ import kotlin.jvm.JvmName
  * <!--- INCLUDE
  * import arrow.core.raise.effect
  * import arrow.core.raise.fold
- * import io.kotest.assertions.fail
+ * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
  * import io.kotest.matchers.shouldBe
  * import kotlinx.coroutines.coroutineScope
  * import kotlinx.coroutines.launch

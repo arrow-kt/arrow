@@ -489,8 +489,8 @@ public sealed class Either<out A, out B> {
    */
   public fun isLeft(): Boolean {
     contract {
-      returns(true) implies (this@Either is Left<A>)
-      returns(false) implies (this@Either is Right<B>)
+      returns(true) implies (this@Either is Left)
+      returns(false) implies (this@Either is Right)
     }
     return this@Either is Left<A>
   }
@@ -500,8 +500,8 @@ public sealed class Either<out A, out B> {
    */
   public fun isRight(): Boolean {
     contract {
-      returns(true) implies (this@Either is Right<B>)
-      returns(false) implies (this@Either is Left<A>)
+      returns(true) implies (this@Either is Right)
+      returns(false) implies (this@Either is Left)
     }
     return this@Either is Right<B>
   }
@@ -529,7 +529,7 @@ public sealed class Either<out A, out B> {
    */
   public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
     contract {
-      returns(true) implies (this@Either is Left<A>)
+      returns(true) implies (this@Either is Left)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Either is Left<A> && predicate(value)
@@ -558,7 +558,7 @@ public sealed class Either<out A, out B> {
    */
   public inline fun isRight(predicate: (B) -> Boolean): Boolean {
     contract {
-      returns(true) implies (this@Either is Right<B>)
+      returns(true) implies (this@Either is Right)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Either is Right<B> && predicate(value)
@@ -571,7 +571,7 @@ public sealed class Either<out A, out B> {
    * ```kotlin
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
-   * import io.kotest.assertions.fail
+   * import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
    *
    * fun test() {
    *   Either.Right(1)
@@ -724,8 +724,7 @@ public sealed class Either<out A, out B> {
    */
   public fun getOrNull(): B? {
     contract {
-      returns(null) implies (this@Either is Left<A>)
-      returnsNotNull() implies (this@Either is Right<B>)
+      returnsNotNull() implies (this@Either is Right)
     }
     return getOrElse { null }
   }
@@ -747,8 +746,7 @@ public sealed class Either<out A, out B> {
    */
   public fun leftOrNull(): A? {
     contract {
-      returnsNotNull() implies (this@Either is Left<A>)
-      returns(null) implies (this@Either is Right<B>)
+      returnsNotNull() implies (this@Either is Left)
     }
     return fold(::identity) { null }
   }

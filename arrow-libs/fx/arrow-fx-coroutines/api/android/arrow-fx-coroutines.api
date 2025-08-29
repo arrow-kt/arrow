@@ -220,6 +220,42 @@ public final class arrow/fx/coroutines/RaceUntilKt {
 	public static synthetic fun raceUntil$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;[Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class arrow/fx/coroutines/RacingKt {
+	public static final fun race (Larrow/fx/coroutines/RacingScope;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
+	public static synthetic fun race$default (Larrow/fx/coroutines/RacingScope;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static final fun racing (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/fx/coroutines/RacingScope : kotlinx/coroutines/CoroutineScope {
+	public abstract fun raceOrThrow (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
+}
+
+public final class arrow/fx/coroutines/RacingScope$DefaultImpls {
+	public static synthetic fun raceOrThrow$default (Larrow/fx/coroutines/RacingScope;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+}
+
+public final class arrow/fx/coroutines/RaiseRacingKt {
+	public static final fun race (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
+	public static synthetic fun race$default (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static final fun raceOrThrow (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
+	public static synthetic fun raceOrThrow$default (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+}
+
+public abstract interface class arrow/fx/coroutines/RaiseScope : arrow/core/raise/Raise, kotlinx/coroutines/CoroutineScope {
+}
+
+public final class arrow/fx/coroutines/RaiseScope$DefaultImpls {
+	public static fun bind (Larrow/fx/coroutines/RaiseScope;Larrow/core/Either;)Ljava/lang/Object;
+	public static fun bind (Larrow/fx/coroutines/RaiseScope;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun bind (Larrow/fx/coroutines/RaiseScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun bindAll (Larrow/fx/coroutines/RaiseScope;Ljava/lang/Iterable;)Ljava/util/List;
+	public static fun bindAll (Larrow/fx/coroutines/RaiseScope;Ljava/util/Map;)Ljava/util/Map;
+	public static fun bindAll-1TN0_VU (Larrow/fx/coroutines/RaiseScope;Ljava/util/Set;)Ljava/util/Set;
+	public static fun bindAll-vcjLgH4 (Larrow/fx/coroutines/RaiseScope;Ljava/util/List;)Ljava/util/List;
+	public static fun invoke (Larrow/fx/coroutines/RaiseScope;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static fun invoke (Larrow/fx/coroutines/RaiseScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public abstract interface annotation class arrow/fx/coroutines/ResourceDSL : java/lang/annotation/Annotation {
 }
 
@@ -276,18 +312,6 @@ public abstract interface annotation class arrow/fx/coroutines/ScopeDSL : java/l
 public final class arrow/fx/coroutines/ScopedRaiseAccumulate : arrow/core/raise/RaiseAccumulate, kotlinx/coroutines/CoroutineScope {
 	public fun <init> (Larrow/core/raise/Raise;Lkotlinx/coroutines/CoroutineScope;)V
 	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
-}
-
-public final class arrow/fx/coroutines/await/AwaitAllScope : kotlinx/coroutines/CoroutineScope {
-	public fun <init> (Lkotlinx/coroutines/CoroutineScope;)V
-	public final fun async (Lkotlin/coroutines/CoroutineContext;Lkotlinx/coroutines/CoroutineStart;Lkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/Deferred;
-	public static synthetic fun async$default (Larrow/fx/coroutines/await/AwaitAllScope;Lkotlin/coroutines/CoroutineContext;Lkotlinx/coroutines/CoroutineStart;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lkotlinx/coroutines/Deferred;
-	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
-}
-
-public final class arrow/fx/coroutines/await/AwaitAllScopeKt {
-	public static final fun awaitAll (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun awaitAll (Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/fx/coroutines/await/ExperimentalAwaitAllApi : java/lang/annotation/Annotation {

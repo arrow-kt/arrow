@@ -228,4 +228,22 @@ class DSLTests {
       |val r = i != null
       """.evals("r" to true)
   }
+
+  @Test
+  fun `Respects upper bounds, #3692`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |interface Foo
+      |
+      |@optics
+      |data class Wrapper<T : Foo>(val item: T) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<Wrapper<Foo>, Foo> = Wrapper.item()
+      |val r = i != null
+      """.evals("r" to true)
+  }
 }
