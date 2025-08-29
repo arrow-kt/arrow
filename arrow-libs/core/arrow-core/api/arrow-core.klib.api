@@ -526,6 +526,7 @@ sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.core/Either { // a
     final inline fun isRight(kotlin/Function1<#B, kotlin/Boolean>): kotlin/Boolean // arrow.core/Either.isRight|isRight(kotlin.Function1<1:1,kotlin.Boolean>){}[0]
     final inline fun onLeft(kotlin/Function1<#A, kotlin/Unit>): arrow.core/Either<#A, #B> // arrow.core/Either.onLeft|onLeft(kotlin.Function1<1:0,kotlin.Unit>){}[0]
     final inline fun onRight(kotlin/Function1<#B, kotlin/Unit>): arrow.core/Either<#A, #B> // arrow.core/Either.onRight|onRight(kotlin.Function1<1:1,kotlin.Unit>){}[0]
+    final inline fun onRight(kotlin/Function2<arrow.core.raise/Raise<#A>, #B, kotlin/Unit>): arrow.core/Either<#A, #B> // arrow.core/Either.onRight|onRight(kotlin.Function2<arrow.core.raise.Raise<1:0>,1:1,kotlin.Unit>){}[0]
     open fun toString(): kotlin/String // arrow.core/Either.toString|toString(){}[0]
 
     final class <#A1: out kotlin/Any?> Left : arrow.core/Either<#A1, kotlin/Nothing> { // arrow.core/Either.Left|null[0]

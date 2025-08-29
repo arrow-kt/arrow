@@ -663,26 +663,40 @@ public sealed class Either<out A, out B> {
     }
   }
 
+  @Deprecated("Replaced by a version with Raise", level = DeprecationLevel.HIDDEN)
+  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
+    contract {
+      callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    return also { if (it.isRight()) action(it.value) }
+  }
+
   /**
    * Performs the given [action] on the encapsulated [B] value if this instance represents [Either.Right].
-   * Returns the original [Either] unchanged.
+   * Returns the original [Either] unchanged unless you [raise].
    *
    * ```kotlin
    * import arrow.core.Either
    * import io.kotest.matchers.shouldBe
    *
    * fun test() {
-   *   Either.Right(1).onRight(::println) shouldBe Either.Right(1)
+   *   Either.Right(1).onRight { print(it) } shouldBe Either.Right(1)
+   *
+   *   val x: Either<String, Int> = Either.Right(2)
+   *   x.onRight { raise("hello") } shouldBe Either.Left("hello")
    * }
    * ```
    * <!--- KNIT example-either-27.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
-  public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
+  public inline fun onRight(action: Raise<@UnsafeVariance A>.(right: B) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
     }
-    return also { if (it.isRight()) action(it.value) }
+    return when (val me = this) {
+      is Right<B> -> either { action(me.value) ; me.value }
+      else -> me
+    }
   }
 
   /**
