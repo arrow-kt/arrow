@@ -5,5 +5,8 @@ import arrow.core.Either
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Left(2).onLeft(::println) shouldBe Either.Left(2)
+  Either.Right(1).onRightBind { print(it) } shouldBe Either.Right(1)
+
+  val x: Either<String, Int> = Either.Right(2)
+  x.onRightBind { raise("hello") } shouldBe Either.Left("hello")
 }

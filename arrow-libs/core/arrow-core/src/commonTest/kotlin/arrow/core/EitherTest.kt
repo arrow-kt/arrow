@@ -81,6 +81,20 @@ class EitherTest {
   }
 
   @Test
+  fun tapMayRaise() = runTest {
+    checkAll(Arb.either(Arb.long(), Arb.int())) { either ->
+      var effect = 0
+      val res = either.onRightBind { effect += 1 ; raise(100L) }
+      val expected = when (either) {
+        is Left -> 0
+        is Right -> 1
+      }
+      effect shouldBe expected
+      res.shouldBeInstanceOf<Left<Long>>()
+    }
+  }
+
+  @Test
   fun tapLeftAppliesEffects() = runTest {
     checkAll(Arb.either(Arb.long(), Arb.int())) { either ->
       var effect = 0
@@ -91,6 +105,23 @@ class EitherTest {
       }
       effect shouldBe expected
       res shouldBe either
+    }
+  }
+
+  @Test
+  fun tapLeftMayRaise() = runTest {
+    checkAll(Arb.either(Arb.long(), Arb.int())) { either ->
+      var effect = 0
+      val res = either.onLeftBind { effect += 1 ; raise(100L) }
+      val expected = when (either) {
+        is Left -> 1
+        is Right -> 0
+      }
+      effect shouldBe expected
+      when (either){
+        is Left -> res shouldBe Left(100L)
+        is Right -> res shouldBe either
+      }
     }
   }
 
