@@ -1,6 +1,13 @@
 plugins {
   `java-platform`
-  alias(libs.plugins.publish)
+  id(libs.plugins.publish.get().pluginId)
+}
+
+mavenPublishing {
+  configureBasedOnAppliedPlugins()
+  pomFromGradleProperties()
+  publishToMavenCentral(automaticRelease = true)
+  signAllPublications()
 }
 
 group = property("projects.group").toString()

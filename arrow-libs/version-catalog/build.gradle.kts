@@ -1,5 +1,13 @@
 plugins {
     `version-catalog`
+    id(libs.plugins.publish.get().pluginId)
+}
+
+mavenPublishing {
+    configureBasedOnAppliedPlugins()
+    pomFromGradleProperties()
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
 }
 
 catalog {
