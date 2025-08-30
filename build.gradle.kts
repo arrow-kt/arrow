@@ -30,7 +30,7 @@ plugins {
   id(libs.plugins.animalSniffer.get().pluginId) apply false
   id(libs.plugins.dokka.get().pluginId)
   alias(libs.plugins.kotlinx.serialization) apply false
-  alias(libs.plugins.publish) apply false
+  id(libs.plugins.publish.get().pluginId) apply false
   alias(libs.plugins.compose.jetbrains) apply false
   alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.kotlinx.knit)

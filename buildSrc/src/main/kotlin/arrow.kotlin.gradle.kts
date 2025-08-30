@@ -25,8 +25,8 @@ repositories {
 group = property("projects.group").toString()
 val projectNameWithDots = project.name.replace('-', '.')
 
-val Project.withoutAndroid
-  get() = project.name == "suspendapp" || project.name == "suspendapp-ktor"
+val Project.multiplatformWithAndroid
+  get() = !project.name.startsWith("suspendapp")
 
 val Project.requiresAndroidCoreLibraryDesugaring
   get() = project.name == "arrow-collectors"
@@ -41,6 +41,8 @@ val Project.needsAbiValidation
     "suspendapp-test-runner",
   )
 
+val shouldPublish = project.name in listOf("arrow-raise-ktor-server")
+
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
@@ -49,16 +51,13 @@ val Project.isKotlinMultiplatform: Boolean
 
 if (!isKotlinJvm) {
   plugins.apply("org.jetbrains.kotlin.multiplatform")
-  if (!withoutAndroid) plugins.apply("com.android.kotlin.multiplatform.library")
+  if (multiplatformWithAndroid) plugins.apply("com.android.kotlin.multiplatform.library")
 }
 plugins.apply("com.diffplug.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
 plugins.apply("org.jetbrains.kotlinx.kover")
-
-val doNotPublish = listOf("arrow-raise-ktor-server")
-if (project.name !in doNotPublish)
-  plugins.apply("com.vanniktech.maven.publish")
+if (shouldPublish) plugins.apply("com.vanniktech.maven.publish.base")
 
 val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks {
@@ -169,7 +168,7 @@ if (isKotlinMultiplatform) {
       }
     }
 
-    if (!withoutAndroid) {
+    if (multiplatformWithAndroid) {
       androidLibrary {
         namespace = projectNameWithDots
         compileSdk = 36
@@ -217,7 +216,7 @@ if (isKotlinMultiplatform) {
       wasmJsMain.get().dependsOn(nonJvmMain)
       wasmJsTest.get().dependsOn(nonJvmTest)
 
-      if (!withoutAndroid) {
+      if (multiplatformWithAndroid) {
         val androidAndJvmMain by creating { dependsOn(commonMain.get()) }
         jvmMain.get().dependsOn(androidAndJvmMain)
         androidMain.get().dependsOn(androidAndJvmMain)
@@ -309,12 +308,20 @@ val signature by configurations.getting
 dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
   when {
-    !isKotlinMultiplatform -> { }
-    withoutAndroid -> { }
+    !isKotlinMultiplatform || !multiplatformWithAndroid -> { }
     requiresAndroidCoreLibraryDesugaring ->
       signature("com.toasttab.android:gummy-bears-api-21:0.12.0:coreLib2@signature")
     else ->
       signature("com.toasttab.android:gummy-bears-api-21:0.12.0@signature")
+  }
+}
+
+if (shouldPublish) {
+  configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
+    configureBasedOnAppliedPlugins()
+    pomFromGradleProperties()
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
   }
 }
 
