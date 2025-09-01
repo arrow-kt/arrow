@@ -9,6 +9,7 @@ import arrow.core.Either.Right
 import arrow.core.Either.Right.Companion.unit
 import arrow.core.raise.Raise
 import arrow.core.raise.either
+import arrow.core.raise.fold
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -773,6 +774,32 @@ public sealed class Either<out A, out B> {
   public fun getOrNone(): Option<B> = fold({ None }, { Some(it) })
 
   /**
+   * Runs some [validation], expressed as a lambda that may [raise], on [Right] values.
+   * If the [validation] is successful, the value is left unchanged.
+   * The main use case is in combination with [ensure] and other validation functions.
+   *
+   * ```kotlin
+   * import arrow.core.Either
+   * import arrow.core.raise.ensure
+   * import io.kotest.matchers.shouldBe
+   *
+   * fun test() {
+   *   val one: Either<String, Int> = Either.Right(1)
+   *   one.validate { ensure(it > 0) { "negative" } } shouldBe one
+   *
+   *   val zero: Either<String, Int> = Either.Right(0)
+   *   zero.validate { ensure(it > 0) { "negative" } } shouldBe Either.Left("negative")
+   * }
+   * ```
+   * <!--- KNIT example-either-32.kt -->
+   * <!--- TEST lines.isEmpty() -->
+   */
+  public fun validate(validation: Raise<@UnsafeVariance A>.(B) -> Unit): Either<A, B> = when (this) {
+    is Left -> this
+    is Right -> fold({ validation(value) }, { Left(it) }, { this })
+  }
+
+  /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
   public data class Left<out A> constructor(val value: A) : Either<A, Nothing>() {
@@ -1331,7 +1358,7 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  *   Either.Left(12) getOrElse { it + 5 } shouldBe 17
  * }
  * ```
- * <!--- KNIT example-either-32.kt -->
+ * <!--- KNIT example-either-33.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
@@ -1356,7 +1383,7 @@ public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  *   Left(12).merge() // Result: 12
  * }
  * ```
- * <!--- KNIT example-either-33.kt -->
+ * <!--- KNIT example-either-34.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Either<A, A>.merge(): A =
@@ -1428,7 +1455,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *   fallback shouldBe Either.Right(5)
  * }
  * ```
- * <!--- KNIT example-either-34.kt -->
+ * <!--- KNIT example-either-35.kt -->
  * <!--- TEST lines.isEmpty() -->
  *
  * When shifting a new error [EE] into the [Either.Left] channel,
@@ -1445,7 +1472,7 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  *   listOfErrors shouldBe Either.Left(listOf('e', 'r', 'r', 'o', 'r'))
  * }
  * ```
- * <!--- KNIT example-either-35.kt -->
+ * <!--- KNIT example-either-36.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)
@@ -1483,7 +1510,7 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  *   failure shouldBe Either.Left("failure")
  * }
  * ```
- * <!--- KNIT example-either-36.kt -->
+ * <!--- KNIT example-either-37.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
 @OptIn(ExperimentalTypeInference::class)

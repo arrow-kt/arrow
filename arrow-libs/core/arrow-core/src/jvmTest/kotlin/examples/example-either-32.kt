@@ -2,9 +2,13 @@
 package arrow.core.examples.exampleEither32
 
 import arrow.core.Either
-import arrow.core.getOrElse
+import arrow.core.raise.ensure
 import io.kotest.matchers.shouldBe
 
 fun test() {
-  Either.Left(12) getOrElse { it + 5 } shouldBe 17
+  val one: Either<String, Int> = Either.Right(1)
+  one.validate { ensure(it > 0) { "negative" } } shouldBe one
+
+  val zero: Either<String, Int> = Either.Right(0)
+  zero.validate { ensure(it > 0) { "negative" } } shouldBe Either.Left("negative")
 }

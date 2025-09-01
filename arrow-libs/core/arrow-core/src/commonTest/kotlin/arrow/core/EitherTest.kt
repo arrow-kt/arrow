@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.raise.ensure
 import arrow.core.test.either
 import arrow.core.test.intSmall
 import arrow.core.test.laws.MonoidLaws
@@ -1024,6 +1025,18 @@ class EitherTest {
             enel shouldBe e
           }
         }
+      }
+    }
+  }
+
+  @Test
+  fun validateWorks() = runTest {
+    checkAll(Arb.either(Arb.string(), Arb.int())) { e ->
+      e.validate { /* nothing */ } shouldBe e
+      e.validate { raise("problem") }.shouldBeInstanceOf<Left<String>>()
+      e.validate { ensure(it > 0) { "negative" } } shouldBe when (e) {
+        is Right -> if (e.value > 0) e else "negative".left()
+        is Left -> e
       }
     }
   }
