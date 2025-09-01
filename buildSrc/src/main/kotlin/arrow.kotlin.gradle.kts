@@ -28,7 +28,7 @@ val projectNameWithDots = project.name.replace('-', '.')
 val Project.multiplatformWithAndroid
   get() = !project.name.startsWith("suspendapp")
 
-val Project.requiresAndroidCoreLibraryDesugaring
+val Project.needsAndroidCoreLibraryDesugaring
   get() = project.name == "arrow-collectors"
 
 val Project.needsJava11
@@ -40,8 +40,6 @@ val Project.needsAbiValidation
     "suspendapp-test-app",
     "suspendapp-test-runner",
   )
-
-val shouldPublish = project.name in listOf("arrow-raise-ktor-server")
 
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
@@ -57,7 +55,7 @@ plugins.apply("com.diffplug.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
 plugins.apply("org.jetbrains.kotlinx.kover")
-if (shouldPublish) plugins.apply("com.vanniktech.maven.publish.base")
+plugins.apply("com.vanniktech.maven.publish.base")
 
 val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks {
@@ -309,20 +307,18 @@ dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
   when {
     !isKotlinMultiplatform || !multiplatformWithAndroid -> { }
-    requiresAndroidCoreLibraryDesugaring ->
+    needsAndroidCoreLibraryDesugaring ->
       signature("com.toasttab.android:gummy-bears-api-21:0.12.0:coreLib2@signature")
     else ->
       signature("com.toasttab.android:gummy-bears-api-21:0.12.0@signature")
   }
 }
 
-if (shouldPublish) {
-  configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
-    configureBasedOnAppliedPlugins()
-    pomFromGradleProperties()
-    publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
-  }
+configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
+  configureBasedOnAppliedPlugins()
+  pomFromGradleProperties()
+  publishToMavenCentral(automaticRelease = true)
+  signAllPublications()
 }
 
 afterEvaluate {
