@@ -795,7 +795,7 @@ public sealed class Either<out A, out B> {
    */
   public fun validate(validation: Raise<@UnsafeVariance A>.(B) -> Unit): Either<A, B> = when (this) {
     is Left -> this
-    is Right -> either { validation(value) ; value }
+    is Right -> fold({ validation(value) }, { Left(it) }, { this })
   }
 
   /**
