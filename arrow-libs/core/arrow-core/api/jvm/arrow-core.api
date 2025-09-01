@@ -78,6 +78,7 @@ public abstract class arrow/core/Either {
 	public final fun swap ()Larrow/core/Either;
 	public final fun toIor ()Larrow/core/Ior;
 	public fun toString ()Ljava/lang/String;
+	public final fun validate (Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 }
 
 public final class arrow/core/Either$Companion {

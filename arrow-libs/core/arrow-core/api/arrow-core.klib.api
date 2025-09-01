@@ -519,6 +519,7 @@ sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.core/Either { // a
     final fun leftOrNull(): #A? // arrow.core/Either.leftOrNull|leftOrNull(){}[0]
     final fun swap(): arrow.core/Either<#B, #A> // arrow.core/Either.swap|swap(){}[0]
     final fun toIor(): arrow.core/Ior<#A, #B> // arrow.core/Either.toIor|toIor(){}[0]
+    final fun validate(kotlin/Function2<arrow.core.raise/Raise<#A>, #B, kotlin/Unit>): arrow.core/Either<#A, #B> // arrow.core/Either.validate|validate(kotlin.Function2<arrow.core.raise.Raise<1:0>,1:1,kotlin.Unit>){}[0]
     final inline fun <#A1: kotlin/Any?> fold(kotlin/Function1<#A, #A1>, kotlin/Function1<#B, #A1>): #A1 // arrow.core/Either.fold|fold(kotlin.Function1<1:0,0:0>;kotlin.Function1<1:1,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> map(kotlin/Function1<#B, #A1>): arrow.core/Either<#A, #A1> // arrow.core/Either.map|map(kotlin.Function1<1:1,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> mapLeft(kotlin/Function1<#A, #A1>): arrow.core/Either<#A1, #B> // arrow.core/Either.mapLeft|mapLeft(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
