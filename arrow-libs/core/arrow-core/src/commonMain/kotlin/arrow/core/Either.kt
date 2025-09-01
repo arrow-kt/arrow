@@ -9,6 +9,7 @@ import arrow.core.Either.Right
 import arrow.core.Either.Right.Companion.unit
 import arrow.core.raise.Raise
 import arrow.core.raise.either
+import arrow.core.raise.fold
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
