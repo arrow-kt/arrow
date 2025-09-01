@@ -21,7 +21,7 @@ cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.20.0"
 shadow = "9.1.0"
-kotlinWrappers = "2025.8.22"
+kotlinWrappers = "2025.9.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
