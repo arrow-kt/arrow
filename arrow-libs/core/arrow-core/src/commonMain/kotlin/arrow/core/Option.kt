@@ -453,6 +453,11 @@ public sealed class Option<out A> {
     return getOrElse { null }
   }
 
+  public fun validate(validation: SingletonRaise<None>.(A) -> Unit): Option<A> = when (this) {
+    is None -> this
+    is Some -> arrow.core.raise.fold({ validation(SingletonRaise(this), value) }, { None }, { this })
+  }
+
   /**
    * Returns a [Some<$B>] containing the result of applying $f to this $option's
    * value if this $option is nonempty. Otherwise return $none.

@@ -633,6 +633,7 @@ public abstract class arrow/core/Option {
 	public fun toString ()Ljava/lang/String;
 	public static final fun tryCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
 	public static final fun tryCatchOrNone (Lkotlin/jvm/functions/Function1;)Larrow/core/Option;
+	public final fun validate (Lkotlin/jvm/functions/Function2;)Larrow/core/Option;
 }
 
 public final class arrow/core/Option$Companion {
