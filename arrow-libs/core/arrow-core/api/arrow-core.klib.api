@@ -671,6 +671,7 @@ sealed class <#A: out kotlin/Any?> arrow.core/Option { // arrow.core/Option|null
     final fun isNone(): kotlin/Boolean // arrow.core/Option.isNone|isNone(){}[0]
     final fun isSome(): kotlin/Boolean // arrow.core/Option.isSome|isSome(){}[0]
     final fun toList(): kotlin.collections/List<#A> // arrow.core/Option.toList|toList(){}[0]
+    final fun validate(kotlin/Function2<arrow.core.raise/SingletonRaise<arrow.core/None>, #A, kotlin/Unit>): arrow.core/Option<#A> // arrow.core/Option.validate|validate(kotlin.Function2<arrow.core.raise.SingletonRaise<arrow.core.None>,1:0,kotlin.Unit>){}[0]
     final inline fun <#A1: kotlin/Any?> flatMap(kotlin/Function1<#A, arrow.core/Option<#A1>>): arrow.core/Option<#A1> // arrow.core/Option.flatMap|flatMap(kotlin.Function1<1:0,arrow.core.Option<0:0>>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> fold(kotlin/Function0<#A1>, kotlin/Function1<#A, #A1>): #A1 // arrow.core/Option.fold|fold(kotlin.Function0<0:0>;kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> map(kotlin/Function1<#A, #A1>): arrow.core/Option<#A1> // arrow.core/Option.map|map(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
