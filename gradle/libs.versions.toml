@@ -20,8 +20,8 @@ agp = "8.12.2"
 cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.20.0"
-shadow = "9.0.2"
-kotlinWrappers = "2025.8.20"
+shadow = "9.1.0"
+kotlinWrappers = "2025.9.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -58,13 +58,14 @@ gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle
 gradlePlugin-animalSniffer = { module = "ru.vyarus.animalsniffer:ru.vyarus.animalsniffer.gradle.plugin", version.ref = "animalSniffer" }
 gradlePlugin-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
 gradlePlugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+gradlePlugin-publish = { module = "com.vanniktech.maven.publish.base:com.vanniktech.maven.publish.base.gradle.plugin", version.ref = "publish" }
 
 [bundles]
 testing = [ "coroutines-test", "kotest-assertionsCore", "kotest-property" ]
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
-publish = { id = "com.vanniktech.maven.publish", version.ref="publish" }
+publish = { id = "com.vanniktech.maven.publish.base", version.ref="publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

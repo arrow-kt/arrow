@@ -43,13 +43,19 @@ private val defaultCoroutineExceptionHandler = CoroutineExceptionHandler { _, ex
  * The block will be cancelled if another block completes first.
  *
  * @param context The [CoroutineContext] to run the block in.
+ * @param condition Optional condition to consider the block as successful.
  * @param block The coroutine block to race.
  */
 public fun <Result> RacingScope<Result>.race(
   context: CoroutineContext = EmptyCoroutineContext,
+  condition: (Result) -> Boolean = { true },
   block: suspend CoroutineScope.() -> Result
 ): Unit = raceOrThrow(context) {
-  catch({ block() }) {
+  catch({
+    val result = block()
+    if (!condition(result)) awaitCancellation()
+    result
+  }) {
     (coroutineContext[CoroutineExceptionHandler] ?: defaultCoroutineExceptionHandler).handleException(currentCoroutineContext(), it)
     awaitCancellation()
   }

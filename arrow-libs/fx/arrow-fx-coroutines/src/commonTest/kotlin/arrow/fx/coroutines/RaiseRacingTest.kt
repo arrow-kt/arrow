@@ -20,7 +20,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 class RaiseRacingTest {
   @Test
@@ -65,7 +64,7 @@ class RaiseRacingTest {
     }
 
     assertEquals("fast".right(), result)
-    withTimeoutOrNull(600.seconds) { slowRacerCancelled.await() }
+    withTimeoutOrNull(600.milliseconds) { slowRacerCancelled.await() }
   }
 
   @Test
@@ -119,7 +118,7 @@ class RaiseRacingTest {
     }
 
     assertEquals("success".right(), result)
-    val exception = withTimeoutOrNull(600.seconds) { exceptionHandled.await() }
+    val exception = withTimeoutOrNull(600.milliseconds) { exceptionHandled.await() }
     assertIs<IllegalStateException>(exception)
     assertEquals("Test exception", exception.message)
   }
@@ -139,7 +138,7 @@ class RaiseRacingTest {
     }
 
     assertEquals("success".right(), result)
-    val error = withTimeoutOrNull(600.seconds) { raiseHandled.await() }
+    val error = withTimeoutOrNull(600.milliseconds) { raiseHandled.await() }
     assertEquals("Test error", error)
   }
 

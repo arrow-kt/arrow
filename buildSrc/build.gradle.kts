@@ -16,4 +16,5 @@ dependencies {
   implementation(libs.gradlePlugin.animalSniffer)
   implementation(libs.gradlePlugin.kover)
   implementation(libs.gradlePlugin.dokka)
+  implementation(libs.gradlePlugin.publish)
 }
