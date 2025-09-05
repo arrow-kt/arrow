@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationVariantSpec
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-import java.net.URI
 import java.time.Duration
 
 repositories {
@@ -268,21 +267,22 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
   }
 }
 
-tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+
+configure<org.jetbrains.dokka.gradle.DokkaExtension> {
   extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
     dokkaSourceSets.named(kotlinSourceSet.name) {
       if ("androidAndJvm" in kotlinSourceSet.name) {
-        platform.set(org.jetbrains.dokka.Platform.jvm)
+        analysisPlatform.set(org.jetbrains.dokka.gradle.engine.parameters.KotlinPlatform.JVM)
       }
       perPackageOption {
         matchingRegex.set(".*\\.internal.*")
         suppress.set(true)
       }
-      externalDocumentationLink {
-        url.set(URI("https://kotlinlang.org/api/kotlinx.serialization/").toURL())
+      externalDocumentationLinks.register("kotlinx.serialization") {
+        url("https://kotlinlang.org/api/kotlinx.serialization/")
       }
-      externalDocumentationLink {
-        url.set(URI("https://kotlinlang.org/api/kotlinx.coroutines/").toURL())
+      externalDocumentationLinks.register("kotlinx.coroutines") {
+        url("https://kotlinlang.org/api/kotlinx.coroutines/")
       }
       skipDeprecated.set(true)
       reportUndocumented.set(false)
@@ -290,7 +290,7 @@ tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
       kotlinSourceSet.kotlin.srcDirs.filter { it.exists() }.forEach { srcDir ->
         sourceLink {
           localDirectory.set(srcDir)
-          remoteUrl.set(URI("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}").toURL())
+          remoteUrl("https://github.com/arrow-kt/arrow/blob/main/${srcDir.relativeTo(rootProject.rootDir)}")
           remoteLineSuffix.set("#L")
         }
       }
