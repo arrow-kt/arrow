@@ -2,7 +2,7 @@
 animalSniffer = "2.0.1"
 coroutines = "1.10.2"
 classgraph = "4.8.181"
-dokka = "2.0.0"
+dokka = "2.1.0-Beta"
 kotest = "6.0.3"
 kover = "0.9.1"
 kotlin = "2.2.10"
