@@ -31,7 +31,7 @@ public value class NonEmptySet<out E> internal constructor(
 
   override fun lastOrNull(): E = elements.last()
 
-  override fun toString(): String = "NonEmptySet(${this.joinToString()})"
+  override fun toString(): String = elements.toString()
 
   @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun equals(other: Any?): Boolean =

@@ -237,8 +237,7 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
   public fun extract(): E =
     this.head
 
-  override fun toString(): String =
-    "NonEmptyList(${all.joinToString()})"
+  override fun toString(): String = all.toString()
 
   public fun <T> align(other: NonEmptyList<T>): NonEmptyList<Ior<E, T>> =
     NonEmptyList(all.align(other))

@@ -587,4 +587,17 @@ class NonEmptyListTest {
       a.wrapAsNonEmptyListOrNull() shouldBe a.toNonEmptyListOrNull()
     }
   }
+
+  class MyVerySpecialList<out A>(private val other: List<A>): List<A> by other {
+    override fun toString(): String = "MyVerySpecialList(${other.reversed()})"
+  }
+
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  @Test
+  fun toStringUsesUnderlyingImplementation() = runTest {
+    checkAll(Arb.list(Arb.int(), 1..100)) {
+      it.wrapAsNonEmptyListOrThrow().toString() shouldBe it.toString()
+      (MyVerySpecialList(it)).wrapAsNonEmptyListOrThrow().toString() shouldBe "MyVerySpecialList(${it.reversed()})"
+    }
+  }
 }

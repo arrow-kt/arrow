@@ -228,4 +228,17 @@ class NonEmptySetTest {
       a.wrapAsNonEmptySetOrNull() shouldBe a.toNonEmptySetOrNull()
     }
   }
+
+  class MyVerySpecialSet<out A>(private val other: Set<A>): Set<A> by other {
+    override fun toString(): String = "MyVerySpecialSet(${other.reversed()})"
+  }
+
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  @Test
+  fun toStringUsesUnderlyingImplementation() = runTest {
+    checkAll(Arb.set(Arb.int(), 1..100)) {
+      NonEmptySet(it).toString() shouldBe it.toString()
+      NonEmptySet(MyVerySpecialSet(it)).toString() shouldBe "MyVerySpecialSet(${it.reversed()})"
+    }
+  }
 }
