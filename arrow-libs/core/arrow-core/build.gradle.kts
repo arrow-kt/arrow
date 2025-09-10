@@ -7,8 +7,11 @@ plugins {
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-  compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-  compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
+  compilerOptions.freeCompilerArgs.addAll(
+    "-Xexpect-actual-classes",
+    "-Xcontext-parameters",
+    "-Xallow-contracts-on-more-functions"
+  )
 
   sourceSets {
     val nonJvmAndJsMain by creating { dependsOn(nonJvmMain.get()) }
