@@ -90,6 +90,7 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
   apiVersion = KotlinVersion.KOTLIN_2_0
   languageVersion = KotlinVersion.KOTLIN_2_0
   freeCompilerArgs.addAll(
+    "-Xdata-flow-based-exhaustiveness",
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
   )

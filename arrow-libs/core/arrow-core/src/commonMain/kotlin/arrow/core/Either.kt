@@ -490,8 +490,8 @@ public sealed class Either<out A, out B> {
    */
   public fun isLeft(): Boolean {
     contract {
-      returns(true) implies (this@Either is Left)
-      returns(false) implies (this@Either is Right)
+      returns(true) implies (this@Either is Left<A>)
+      returns(false) implies (this@Either is Right<B>)
     }
     return this@Either is Left<A>
   }
@@ -501,8 +501,8 @@ public sealed class Either<out A, out B> {
    */
   public fun isRight(): Boolean {
     contract {
-      returns(true) implies (this@Either is Right)
-      returns(false) implies (this@Either is Left)
+      returns(true) implies (this@Either is Right<B>)
+      returns(false) implies (this@Either is Left<A>)
     }
     return this@Either is Right<B>
   }
@@ -530,7 +530,7 @@ public sealed class Either<out A, out B> {
    */
   public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
     contract {
-      returns(true) implies (this@Either is Left)
+      returns(true) implies (this@Either is Left<A>)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Either is Left<A> && predicate(value)
@@ -559,7 +559,7 @@ public sealed class Either<out A, out B> {
    */
   public inline fun isRight(predicate: (B) -> Boolean): Boolean {
     contract {
-      returns(true) implies (this@Either is Right)
+      returns(true) implies (this@Either is Right<B>)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Either is Right<B> && predicate(value)
@@ -725,7 +725,7 @@ public sealed class Either<out A, out B> {
    */
   public fun getOrNull(): B? {
     contract {
-      returnsNotNull() implies (this@Either is Right)
+      returnsNotNull() implies (this@Either is Right<B>)
     }
     return getOrElse { null }
   }
@@ -747,7 +747,7 @@ public sealed class Either<out A, out B> {
    */
   public fun leftOrNull(): A? {
     contract {
-      returnsNotNull() implies (this@Either is Left)
+      returnsNotNull() implies (this@Either is Left<A>)
     }
     return fold(::identity) { null }
   }
