@@ -1,6 +1,5 @@
 package arrow.optics.plugin
 
-import arrow.optics.plugin.internals.Snippet
 import arrow.optics.plugin.internals.adt
 import arrow.optics.plugin.internals.asFileText
 import arrow.optics.plugin.internals.join
@@ -17,6 +16,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.validate
 
 class OpticsProcessor(
@@ -25,16 +25,11 @@ class OpticsProcessor(
   private val options: OpticsProcessorOptions,
 ) : SymbolProcessor {
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    val (resolved, deferred) = resolver
-      .getSymbolsWithAnnotation("arrow.optics.optics")
-      .filterIsInstance<KSClassDeclaration>()
+    val symbols = resolver.getSymbolsWithAnnotation("arrow.optics.optics")
+    val (resolved, deferred) = symbols.filterIsInstance<KSClassDeclaration>()
       .partition {
         it.validate { _, element ->
-          when (element) {
-            is KSAnnotation -> false
-            is KSFunctionDeclaration -> false
-            else -> true
-          }
+          element !is KSAnnotation && element !is KSFunctionDeclaration && element !is KSPropertyDeclaration
         }
       }
     resolved.forEach(::processClass)
@@ -58,19 +53,16 @@ class OpticsProcessor(
       return
     }
 
-    val adts = adt(klass, logger)
-    val snippets = adts.snippets(options)
-    snippets.groupBy(Snippet::fqName).values.map(List<Snippet>::join).forEach {
-      val writer =
-        codegen
-          .createNewFile(
-            Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
-            it.`package`,
-            it.name + "__Optics",
-          )
-          .writer()
-      writer.write(it.asFileText())
-      writer.flush()
+    val snippets = adt(klass, logger).snippets(options).groupBy { Pair(it.`package`, it.name) }
+    for ((info, snippets) in snippets) {
+      codegen.createNewFile(
+        Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
+        info.first,
+        info.second + "__Optics"
+      ).writer().use { writer ->
+        writer.write(snippets.join().asFileText())
+        writer.flush()
+      }
     }
   }
 }

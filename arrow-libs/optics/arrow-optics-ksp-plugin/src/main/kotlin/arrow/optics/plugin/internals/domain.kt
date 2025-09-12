@@ -5,18 +5,17 @@ package arrow.optics.plugin.internals
 import arrow.optics.plugin.companionObject
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSName
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Variance
 import com.google.devtools.ksp.symbol.Visibility
 import java.util.Locale
 
-data class ADT(val pckg: KSName, val declaration: KSClassDeclaration, val targets: List<Target>) {
+data class ADT(val declaration: KSClassDeclaration, val targets: List<Target>) {
   val sourceClassName = declaration.qualifiedNameOrSimpleName
   val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }.sanitize()
   val simpleName = declaration.nameWithParentClass
-  val packageName = pckg.asSanitizedString()
+  val packageName = declaration.packageName.asSanitizedString()
   val visibilityModifierName = when (declaration.companionObject?.getVisibility()) {
     Visibility.INTERNAL -> "internal"
     else -> "public"
@@ -122,9 +121,7 @@ data class Snippet(
   val name: String,
   val imports: Set<String> = emptySet(),
   val content: String,
-) {
-  val fqName = "$`package`.$name"
-}
+)
 
 fun Snippet.asFileText(): String =
   """
