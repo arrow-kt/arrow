@@ -17,7 +17,6 @@ import com.google.devtools.ksp.symbol.Variance.STAR
 import java.util.Locale
 
 internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT = ADT(
-  c.packageName,
   c,
   c.targets().map { target ->
     when (target) {

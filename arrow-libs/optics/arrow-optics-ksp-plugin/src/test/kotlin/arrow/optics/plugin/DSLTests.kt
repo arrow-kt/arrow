@@ -1,5 +1,6 @@
 package arrow.optics.plugin
 
+import com.tschuchort.compiletesting.SourceFile
 import kotlin.test.Test
 
 class DSLTests {
@@ -245,5 +246,42 @@ class DSLTests {
       |val i: Lens<Wrapper<Foo>, Foo> = Wrapper.item()
       |val r = i != null
       """.evals("r" to true)
+  }
+
+  @Test
+  fun `Multiple files`() {
+    val source1 = SourceFile.kotlin(
+      "Source1.kt", """
+      package nofix
+      
+      import arrow.optics.optics
+      
+      @optics
+      data class Broken(val a: Int) {
+          companion object {
+              val breaks = a
+          }
+      }
+      """
+    )
+    val source2 = SourceFile.kotlin(
+      "Source2.kt", """
+      package fix
+
+      import arrow.optics.optics
+      
+      @optics
+      data class Broken(val a: Int) {
+          companion object {
+              val breaks = a
+          }
+      }
+      
+      @optics
+      data class Fixes(val a: Int) {
+          companion object
+      }"""
+    )
+    compilationSucceeds(allWarningsAsErrors = false, source1, source2)
   }
 }
