@@ -251,7 +251,8 @@ class DSLTests {
   @Test
   fun `Multiple files`() {
     val source1 = SourceFile.kotlin(
-      "Source1.kt", """
+      "Source1.kt",
+      """
       package nofix
       
       import arrow.optics.optics
@@ -262,10 +263,11 @@ class DSLTests {
               val breaks = a
           }
       }
-      """
+      """,
     )
     val source2 = SourceFile.kotlin(
-      "Source2.kt", """
+      "Source2.kt",
+      """
       package fix
 
       import arrow.optics.optics
@@ -280,7 +282,7 @@ class DSLTests {
       @optics
       data class Fixes(val a: Int) {
           companion object
-      }"""
+      }""",
     )
     compilationSucceeds(allWarningsAsErrors = false, source1, source2)
   }

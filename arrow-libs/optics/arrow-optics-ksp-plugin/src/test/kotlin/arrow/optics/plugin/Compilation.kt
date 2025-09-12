@@ -39,7 +39,7 @@ fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
 
 fun compilationSucceeds(
   allWarningsAsErrors: Boolean = false,
-  vararg sources: SourceFile
+  vararg sources: SourceFile,
 ) {
   val compilationResult = compile(allWarningsAsErrors = allWarningsAsErrors, *sources)
   compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
@@ -56,8 +56,7 @@ fun String.evals(thing: Pair<String, Any?>) {
 // UTILITY FUNCTIONS COPIED FROM META-TEST
 // =======================================
 
-internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult =
-  compile(allWarningsAsErrors, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult = compile(allWarningsAsErrors, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
 
 internal fun compile(allWarningsAsErrors: Boolean = false, vararg sources: SourceFile): CompilationResult {
   val compilation = buildCompilation(allWarningsAsErrors = allWarningsAsErrors, *sources)

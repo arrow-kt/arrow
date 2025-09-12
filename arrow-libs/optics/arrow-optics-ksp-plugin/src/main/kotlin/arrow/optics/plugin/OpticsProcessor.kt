@@ -58,7 +58,7 @@ class OpticsProcessor(
       codegen.createNewFile(
         Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
         info.first,
-        info.second + "__Optics"
+        info.second + "__Optics",
       ).writer().use { writer ->
         writer.write(snippets.join().asFileText())
         writer.flush()
