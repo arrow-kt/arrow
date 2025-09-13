@@ -6,7 +6,6 @@ import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.configureKsp
-import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.classgraph.ClassGraph
 import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -35,7 +34,14 @@ fun String.compilationFails() {
 }
 
 fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
-  val compilationResult = compile(this, allWarningsAsErrors = allWarningsAsErrors)
+  compilationSucceeds(allWarningsAsErrors, SourceFile.kotlin(SOURCE_FILENAME, this.trimMargin()))
+}
+
+fun compilationSucceeds(
+  allWarningsAsErrors: Boolean = false,
+  vararg sources: SourceFile,
+) {
+  val compilationResult = compile(allWarningsAsErrors = allWarningsAsErrors, *sources)
   compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
 }
 
@@ -50,22 +56,24 @@ fun String.evals(thing: Pair<String, Any?>) {
 // UTILITY FUNCTIONS COPIED FROM META-TEST
 // =======================================
 
-internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult {
-  val compilation = buildCompilation(text, allWarningsAsErrors = allWarningsAsErrors)
+internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult = compile(allWarningsAsErrors, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+
+internal fun compile(allWarningsAsErrors: Boolean = false, vararg sources: SourceFile): CompilationResult {
+  val compilation = buildCompilation(allWarningsAsErrors = allWarningsAsErrors, *sources)
   return compilation.compile()
 }
 
-fun buildCompilation(text: String, allWarningsAsErrors: Boolean = false) = KotlinCompilation().apply {
-  jvmTarget = JvmTarget.JVM_1_8.description
-  classpaths = listOf(
+fun buildCompilation(allWarningsAsErrors: Boolean = false, vararg sources: SourceFile) = KotlinCompilation().apply {
+  this.jvmTarget = JvmTarget.JVM_1_8.description
+  this.classpaths = listOf(
     "arrow-annotations:$arrowVersion",
     "arrow-core:$arrowVersion",
     "arrow-optics:$arrowVersion",
   ).map { classpathOf(it) }
-  sources = listOf(SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
-  verbose = false
+  this.sources = sources.toList()
+  this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
-  languageVersion = "2.0"
+  this.languageVersion = "2.0"
   configureKsp(useKsp2 = true) {
     withCompilation = true
     symbolProcessorProviders += OpticsProcessorProvider()
