@@ -10,6 +10,7 @@ internal fun ADT.snippets(options: OpticsProcessorOptions): List<Snippet> = targ
     is SealedClassDsl -> options.generatePrismDsl(this, it)
     is DataClassDsl -> options.generateLensDsl(this, it)
     is ValueClassDsl -> options.generateIsoDsl(this, it)
+    is CopyTarget -> options.generateCopy(this, it)
   }
 }
 
