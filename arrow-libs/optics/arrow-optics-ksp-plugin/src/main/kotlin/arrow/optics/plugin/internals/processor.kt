@@ -235,5 +235,4 @@ internal fun KSTypeArgument.qualifiedString(): String {
   }
 }
 
-internal fun KSClassDeclaration.getConstructorParamNames(): List<String> =
-  primaryConstructor?.parameters?.mapNotNull { it.name?.asString() }.orEmpty()
+internal fun KSClassDeclaration.getConstructorParamNames(): List<String> = primaryConstructor?.parameters?.mapNotNull { it.name?.asString() }.orEmpty()

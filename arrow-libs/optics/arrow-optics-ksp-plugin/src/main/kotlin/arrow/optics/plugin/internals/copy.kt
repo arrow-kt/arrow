@@ -2,13 +2,12 @@ package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.OpticsProcessorOptions
 
-internal fun OpticsProcessorOptions.generateCopy(ele: ADT, target: CopyTarget) =
-  Snippet(
-    `package` = ele.packageName,
-    name = ele.simpleName,
-    content = processElement(ele, target.companionName),
-    imports = setOf("import arrow.optics.copy"),
-  )
+internal fun OpticsProcessorOptions.generateCopy(ele: ADT, target: CopyTarget) = Snippet(
+  `package` = ele.packageName,
+  name = ele.simpleName,
+  content = processElement(ele, target.companionName),
+  imports = setOf("import arrow.optics.copy"),
+)
 
 private fun OpticsProcessorOptions.processElement(adt: ADT, companionName: String): String {
   val sourceClassNameWithParams = "${adt.sourceClassName}${adt.angledTypeParameterNames}"

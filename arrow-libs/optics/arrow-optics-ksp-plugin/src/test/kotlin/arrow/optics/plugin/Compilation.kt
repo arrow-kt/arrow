@@ -69,7 +69,7 @@ internal fun compile(
 internal fun compile(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
-  vararg sources: SourceFile
+  vararg sources: SourceFile,
 ): CompilationResult {
   val compilation = buildCompilation(allWarningsAsErrors, contextParameters, *sources)
   return compilation.compile()
@@ -78,7 +78,7 @@ internal fun compile(
 fun buildCompilation(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
-  vararg sources: SourceFile
+  vararg sources: SourceFile,
 ) = KotlinCompilation().apply {
   this.jvmTarget = JvmTarget.JVM_1_8.description
   this.classpaths = listOf(
@@ -90,7 +90,9 @@ fun buildCompilation(
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
   this.languageVersion = "2.0"
-  if (contextParameters) { this.kotlincArguments = listOf("-Xcontext-parameters") }
+  if (contextParameters) {
+    this.kotlincArguments = listOf("-Xcontext-parameters")
+  }
   configureKsp(useKsp2 = true) {
     withCompilation = true
     symbolProcessorProviders += OpticsProcessorProvider()
