@@ -26,12 +26,16 @@ class OpticsProcessor(
 ) : SymbolProcessor {
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val symbols = resolver.getSymbolsWithAnnotation("arrow.optics.optics")
-    val (resolved, deferred) = symbols.filterIsInstance<KSClassDeclaration>()
-      .partition {
-        it.validate { _, element ->
-          element !is KSAnnotation && element !is KSFunctionDeclaration && element !is KSPropertyDeclaration
+    val (resolved, deferred) =
+      symbols
+        .filterIsInstance<KSClassDeclaration>()
+        .partition {
+          it.validate { _, element ->
+            element !is KSAnnotation && element !is KSFunctionDeclaration && element !is KSPropertyDeclaration
+          }
         }
-      }
+
+    // Generate the optics
     resolved.forEach(::processClass)
 
     // If types used by the annotated class are by other processors,
