@@ -33,20 +33,24 @@ fun String.compilationFails() {
   compilationResult.exitCode shouldNotBe KotlinCompilation.ExitCode.OK
 }
 
-fun String.compilationSucceeds(allWarningsAsErrors: Boolean = false) {
-  compilationSucceeds(allWarningsAsErrors, SourceFile.kotlin(SOURCE_FILENAME, this.trimMargin()))
+fun String.compilationSucceeds(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+) {
+  compilationSucceeds(allWarningsAsErrors, contextParameters, SourceFile.kotlin(SOURCE_FILENAME, this.trimMargin()))
 }
 
 fun compilationSucceeds(
   allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
   vararg sources: SourceFile,
 ) {
-  val compilationResult = compile(allWarningsAsErrors = allWarningsAsErrors, *sources)
+  val compilationResult = compile(allWarningsAsErrors, contextParameters, *sources)
   compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
 }
 
-fun String.evals(thing: Pair<String, Any?>) {
-  val compilationResult = compile(this)
+fun String.evals(thing: Pair<String, Any?>, contextParameters: Boolean = false) {
+  val compilationResult = compile(this, contextParameters = contextParameters)
   compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
   val classesDirectory = compilationResult.outputDirectory
   val (variable, output) = thing
@@ -56,14 +60,26 @@ fun String.evals(thing: Pair<String, Any?>) {
 // UTILITY FUNCTIONS COPIED FROM META-TEST
 // =======================================
 
-internal fun compile(text: String, allWarningsAsErrors: Boolean = false): CompilationResult = compile(allWarningsAsErrors, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+internal fun compile(
+  text: String,
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+): CompilationResult = compile(allWarningsAsErrors, contextParameters, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
 
-internal fun compile(allWarningsAsErrors: Boolean = false, vararg sources: SourceFile): CompilationResult {
-  val compilation = buildCompilation(allWarningsAsErrors = allWarningsAsErrors, *sources)
+internal fun compile(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+  vararg sources: SourceFile,
+): CompilationResult {
+  val compilation = buildCompilation(allWarningsAsErrors, contextParameters, *sources)
   return compilation.compile()
 }
 
-fun buildCompilation(allWarningsAsErrors: Boolean = false, vararg sources: SourceFile) = KotlinCompilation().apply {
+fun buildCompilation(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+  vararg sources: SourceFile,
+) = KotlinCompilation().apply {
   this.jvmTarget = JvmTarget.JVM_1_8.description
   this.classpaths = listOf(
     "arrow-annotations:$arrowVersion",
@@ -74,6 +90,9 @@ fun buildCompilation(allWarningsAsErrors: Boolean = false, vararg sources: Sourc
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
   this.languageVersion = "2.0"
+  if (contextParameters) {
+    this.kotlincArguments = listOf("-Xcontext-parameters")
+  }
   configureKsp(useKsp2 = true) {
     withCompilation = true
     symbolProcessorProviders += OpticsProcessorProvider()
