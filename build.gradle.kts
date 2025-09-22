@@ -74,6 +74,7 @@ dependencies {
   kover(projects.arrowCoreSerialization)
   kover(projects.arrowResilienceKtorClient)
   kover(projects.arrowRaiseKtorServer)
+  kover(projects.arrowCoreResult4k)
   kover(projects.suspendapp)
   kover(projects.suspendappKtor)
 }
@@ -100,6 +101,7 @@ dependencies {
   dokka(projects.arrowCoreSerialization)
   dokka(projects.arrowResilienceKtorClient)
   dokka(projects.arrowRaiseKtorServer)
+  dokka(projects.arrowCoreResult4k)
   dokka(projects.suspendapp)
   dokka(projects.suspendappKtor)
 }

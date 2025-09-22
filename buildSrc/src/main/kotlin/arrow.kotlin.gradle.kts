@@ -31,7 +31,7 @@ val Project.needsAndroidCoreLibraryDesugaring
   get() = project.name == "arrow-collectors"
 
 val Project.needsJava11
-  get() = project.name.endsWith("-compose")
+  get() = project.name.endsWith("-compose") || project.name.endsWith("-result4k")
 
 val Project.needsAbiValidation
   get() = project.name !in listOf(
@@ -263,7 +263,7 @@ if (isKotlinJvm) {
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
   kotlin {
-    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+    ktlint("1.7.1").editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
   }
 }
 
