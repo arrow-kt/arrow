@@ -1,3 +1,4 @@
+@file:JvmName("Result4k")
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 
 package arrow.core.raise
