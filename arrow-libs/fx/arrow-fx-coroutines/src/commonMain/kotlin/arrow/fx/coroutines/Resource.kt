@@ -560,7 +560,7 @@ public suspend fun CompletableJob.completeWithAndJoin(exitCase: ExitCase) {
   return join()
 }
 
-private fun ResourceScope.coroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
+private inline fun ResourceScope.coroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
   val job = jobCreator(coroutineContext[Job])
   onRelease { job.completeWithAndJoin(it) }
   return CoroutineScope(coroutineContext + job)
