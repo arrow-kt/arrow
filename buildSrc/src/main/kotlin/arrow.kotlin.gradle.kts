@@ -263,7 +263,7 @@ if (isKotlinJvm) {
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
   kotlin {
-    ktlint("1.7.1").editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
   }
 }
 
