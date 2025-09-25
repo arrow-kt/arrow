@@ -24,6 +24,7 @@ catalog {
         library("core-jackson", "io.arrow-kt", "arrow-core-jackson").versionRef("arrow")
         library("core-retrofit", "io.arrow-kt", "arrow-core-retrofit").versionRef("arrow")
         library("core-serialization", "io.arrow-kt", "arrow-core-serialization").versionRef("arrow")
+        library("core-result4k", "io.arrow-kt", "arrow-core-result4k").versionRef("arrow")
         library("eval", "io.arrow-kt", "arrow-eval").versionRef("arrow")
         library("functions", "io.arrow-kt", "arrow-functions").versionRef("arrow")
         library("fx-coroutines", "io.arrow-kt", "arrow-fx-coroutines").versionRef("arrow")
