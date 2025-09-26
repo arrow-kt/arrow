@@ -275,8 +275,6 @@ public final class arrow/fx/coroutines/ResourceKt {
 	public static final fun autoCloseable (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static synthetic fun autoCloseable$default (Larrow/fx/coroutines/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun autoCloseable$default (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/jvm/functions/Function2;
-	public static final fun completeWith (Lkotlinx/coroutines/CompletableJob;Larrow/fx/coroutines/ExitCase;)V
-	public static final fun completeWithAndJoin (Lkotlinx/coroutines/CompletableJob;Larrow/fx/coroutines/ExitCase;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun coroutineScope (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
 	public static synthetic fun coroutineScope$default (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
 	public static final fun resource (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;

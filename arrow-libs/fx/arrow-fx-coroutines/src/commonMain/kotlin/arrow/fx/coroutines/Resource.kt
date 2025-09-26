@@ -10,12 +10,11 @@ import arrow.core.prependTo
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -547,7 +546,7 @@ public fun <A : AutoCloseable> autoCloseable(
   autoCloseable(closingDispatcher, autoCloseable)
 }
 
-public fun CompletableJob.completeWith(exitCase: ExitCase) {
+private fun CompletableJob.completeWith(exitCase: ExitCase) {
   when (exitCase) {
     is ExitCase.Cancelled -> cancel(exitCase.exception)
     is ExitCase.Failure -> completeExceptionally(exitCase.failure)
@@ -555,7 +554,7 @@ public fun CompletableJob.completeWith(exitCase: ExitCase) {
   }
 }
 
-public suspend fun CompletableJob.completeWithAndJoin(exitCase: ExitCase) {
+private suspend fun CompletableJob.completeWithAndJoin(exitCase: ExitCase) {
   completeWith(exitCase)
   return join()
 }
