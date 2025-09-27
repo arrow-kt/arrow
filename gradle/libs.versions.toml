@@ -21,7 +21,7 @@ cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.20.0"
 shadow = "9.2.2"
-kotlinWrappers = "2025.9.10"
+kotlinWrappers = "2025.9.11"
 result4k="2.22.5.0"
 
 [libraries]
