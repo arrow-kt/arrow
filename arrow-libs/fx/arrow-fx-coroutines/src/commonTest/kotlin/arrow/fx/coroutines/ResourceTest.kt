@@ -21,16 +21,22 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import kotlin.test.Test
 
@@ -846,5 +852,74 @@ class ResourceTest {
     closed.receive() shouldBe res2
     closed.receive() shouldBe res1
     closed.cancel()
+  }
+
+  @Test
+  fun resourceScopeBoundSupervisorScope() = runTest {
+    val channel = Channel<String>(Channel.UNLIMITED)
+
+    withContext(CoroutineExceptionHandler { _, _ ->  }) {
+      resourceScope {
+        channel.send("hello".also(::println))
+        onRelease { channel.send("goodbye".also(::println)) }
+
+        val supervisor = supervisorScope(coroutineContext)
+        supervisor.launch {
+          channel.send("start nested".also(::println))
+          delay(100)
+          channel.send("end nested".also(::println))
+        }
+        supervisor.launch {
+          delay(10)
+          error("boom.")
+        }
+
+        runCurrent() // let the nested job run until the first delay
+        channel.send("finished".also(::println))
+      }
+    }
+
+    channel.receive() shouldBe "hello"
+    channel.receive() shouldBe "start nested"
+    channel.receive() shouldBe "finished"
+    channel.receive() shouldBe "end nested"
+    channel.receive() shouldBe "goodbye"
+    channel.cancel()
+  }
+
+  @Test
+  fun resourceScopeBoundCoroutineScope() = runTest {
+    val channel = Channel<String>(Channel.UNLIMITED)
+
+    val result = supervisorScope {
+      async {
+        resourceScope {
+          channel.send("hello".also(::println))
+          onRelease { channel.send("goodbye".also(::println)) }
+
+          val scope = coroutineScope(currentCoroutineContext())
+          scope.launch {
+            channel.send("start nested".also(::println))
+            delay(100)
+            fail("shouldn't be reached")
+          }
+          scope.launch {
+            delay(10)
+            error("boom.")
+          }
+
+          awaitCancellation()
+        }
+      }
+    }
+
+    result.getCompletionExceptionOrNull()
+      .shouldBeInstanceOf<IllegalStateException>()
+      .message shouldBe "boom."
+
+    channel.receive() shouldBe "hello"
+    channel.receive() shouldBe "start nested"
+    channel.receive() shouldBe "goodbye"
+    channel.cancel()
   }
 }
