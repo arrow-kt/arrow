@@ -1,5 +1,6 @@
 package arrow.optics.plugin.internals
 
+import arrow.optics.plugin.companionObject
 import arrow.optics.plugin.isDataClass
 import arrow.optics.plugin.isSealed
 import arrow.optics.plugin.isValue
@@ -34,6 +35,8 @@ internal fun adt(c: KSClassDeclaration, logger: KSPLogger): ADT = ADT(
           .let(::PrismTarget)
 
       OpticsTarget.DSL -> evalAnnotatedDslElement(c, logger)
+
+      OpticsTarget.COPY -> CopyTarget(c.companionObject!!.qualifiedNameOrSimpleName)
     }
   },
 )
@@ -44,7 +47,7 @@ internal fun KSClassDeclaration.targets(): Set<OpticsTarget> = targetsFromOptics
     isValue -> targets intersect VALUE_TARGETS
     else -> targets intersect OTHER_TARGETS
   }
-}
+} + listOfNotNull(OpticsTarget.COPY.takeIf { hasOpticsCopy() })
 
 internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): Set<OpticsTarget> = annotations
   .single { it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics" }
@@ -63,7 +66,11 @@ internal fun KSClassDeclaration.targetsFromOpticsAnnotation(): Set<OpticsTarget>
       "arrow.optics.OpticsTarget.DSL" -> OpticsTarget.DSL
       else -> null
     }
-  }.ifEmpty { ALL_TARGETS }.toSet()
+  }.ifEmpty { DEFAULT_TARGETS }.toSet()
+
+internal fun KSClassDeclaration.hasOpticsCopy(): Boolean = annotations.any {
+  it.annotationType.resolve().declaration.qualifiedName?.asString() == "arrow.optics.optics.copy"
+}
 
 internal fun evalAnnotatedPrismElement(
   element: KSClassDeclaration,

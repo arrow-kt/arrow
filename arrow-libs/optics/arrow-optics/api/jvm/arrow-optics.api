@@ -10,6 +10,8 @@ public final class arrow/optics/Copy$DefaultImpls {
 
 public final class arrow/optics/CopyKt {
 	public static final fun copy (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun set (Larrow/optics/Copy;Larrow/optics/PTraversal;Ljava/lang/Object;)V
+	public static final fun transform (Larrow/optics/Copy;Larrow/optics/PTraversal;Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class arrow/optics/DelicateKt {

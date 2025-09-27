@@ -44,6 +44,22 @@ public interface Copy<A> {
     field.transform { it.copy(f) }
 }
 
+/**
+ * Changes the value of the element(s) pointed by the [Traversal].
+ */
+context(copy: Copy<A>)
+public infix fun <A, B> Traversal<A, B>.set(b: B) {
+  with(copy) { set(b) }
+}
+
+/**
+ * Transforms the value of the element(s) pointed by the [Traversal].
+ */
+context(copy: Copy<A>)
+public infix fun <A, B> Traversal<A, B>.transform(f: (B) -> B) {
+  with(copy) { transform(f) }
+}
+
 // mutable builder of copies
 private class CopyImpl<A>(var current: A): Copy<A> {
   override fun <B> Traversal<A, B>.set(b: B) {
