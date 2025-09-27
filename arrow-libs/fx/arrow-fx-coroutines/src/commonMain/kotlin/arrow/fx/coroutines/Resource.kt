@@ -14,7 +14,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -554,14 +553,12 @@ private fun CompletableJob.completeWith(exitCase: ExitCase) {
   }
 }
 
-private suspend fun CompletableJob.completeWithAndJoin(exitCase: ExitCase) {
-  completeWith(exitCase)
-  return join()
-}
-
 private inline fun ResourceScope.coroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
   val job = jobCreator(coroutineContext[Job])
-  onRelease { job.completeWithAndJoin(it) }
+  onRelease {
+    job.completeWith(it)
+    job.join()
+  }
   return CoroutineScope(coroutineContext + job)
 }
 
