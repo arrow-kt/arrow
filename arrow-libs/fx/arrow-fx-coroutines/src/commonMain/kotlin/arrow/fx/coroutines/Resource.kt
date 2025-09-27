@@ -555,8 +555,8 @@ private fun CompletableJob.completeWith(exitCase: ExitCase) {
 
 private inline fun ResourceScope.coroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
   val job = jobCreator(coroutineContext[Job])
-  onRelease {
-    job.completeWith(it)
+  onRelease { exitCase ->
+    job.completeWith(exitCase)
     job.join()
   }
   return CoroutineScope(coroutineContext + job)
