@@ -20,8 +20,8 @@ agp = "8.13.0"
 cache4k = "0.14.0"
 publish = "0.34.0"
 jacksonModuleKotlin = "2.20.0"
-shadow = "9.2.1"
-kotlinWrappers = "2025.9.9"
+shadow = "9.2.2"
+kotlinWrappers = "2025.9.10"
 result4k="2.22.5.0"
 
 [libraries]
