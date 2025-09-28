@@ -4,7 +4,9 @@ import arrow.core.Option
 import arrow.core.some
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -33,10 +35,11 @@ class OptionModuleTest {
   @Test
   fun `serializing Option with NON_ABSENT should honor such configuration and omit serialization when option is empty`() = runTest {
     val mapperWithSettings =
-      ObjectMapper()
-        .registerModule(OptionModule)
-        .registerKotlinModule()
-        .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
+      JsonMapper.builder()
+        .addModule(OptionModule)
+        .addModule(kotlinModule())
+        .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT))
+        .build()
 
     data class Wrapper(val option: Option<Any>)
 
