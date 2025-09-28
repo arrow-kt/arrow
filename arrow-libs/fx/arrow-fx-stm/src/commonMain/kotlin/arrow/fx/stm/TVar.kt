@@ -131,7 +131,7 @@ public class TVar<A> internal constructor(a: A) {
    */
   private val ref = Atomic(a as Any?)
 
-  internal val value
+  private val value
     get() = ref.value
 
   /**
@@ -181,7 +181,7 @@ public class TVar<A> internal constructor(a: A) {
    * If [frame] no longer has the lock (a write happened and now read
    *  tries to unlock) it is ignored
    */
-  internal fun release(frame: STMFrame, a: A): Unit {
+  internal fun release(frame: STMFrame, a: A) {
     ref.compareAndSet(frame, a as Any?)
   }
 
@@ -212,14 +212,14 @@ public class TVar<A> internal constructor(a: A) {
   /**
    * A transaction resumed so remove it from the [TVar]
    */
-  internal fun removeWaiting(trans: STMTransaction): Unit {
+  internal fun removeWaiting(trans: STMTransaction) {
     waiting.update { it.filter { it !== trans } }
   }
 
   /**
    * Resume execution of all transactions waiting for this [TVar] to change.
    */
-  internal fun notify(): Unit {
+  internal fun notify() {
     waiting.getAndSet(emptyList()).forEach { it.getCont()?.resume(Unit) }
   }
 

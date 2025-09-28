@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.1.1"
+  id("com.gradle.develocity") version "4.2"
   id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
 }
 
@@ -134,6 +134,9 @@ project(":arrow-resilience-ktor-client").projectDir = file("arrow-libs/integrati
 
 include("arrow-raise-ktor-server")
 project(":arrow-raise-ktor-server").projectDir = file("arrow-libs/integrations/arrow-raise-ktor-server")
+
+include("arrow-core-result4k")
+project(":arrow-core-result4k").projectDir = file("arrow-libs/integrations/arrow-core-result4k")
 
 // STACK
 include("arrow-stack")

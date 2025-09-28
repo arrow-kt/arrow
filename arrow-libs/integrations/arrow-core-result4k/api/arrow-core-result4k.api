@@ -1,0 +1,7 @@
+public final class arrow/core/raise/Result4k {
+	public static final fun bind (Larrow/core/raise/Raise;Ldev/forkhandles/result4k/Result;)Ljava/lang/Object;
+	public static final fun result4k (Lkotlin/jvm/functions/Function1;)Ldev/forkhandles/result4k/Result;
+	public static final fun toEither (Ldev/forkhandles/result4k/Result;)Larrow/core/Either;
+	public static final fun toResult4k (Larrow/core/Either;)Ldev/forkhandles/result4k/Result;
+}
+

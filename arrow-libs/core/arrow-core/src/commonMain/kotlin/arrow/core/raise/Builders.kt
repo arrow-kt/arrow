@@ -174,6 +174,7 @@ internal fun <Error> Raise<Error>.IorRaiseAccumulate(
   combineError: (Error, Error) -> Error,
 ): RaiseAccumulate<Error> = RaiseAccumulate(IorAccumulate(state, combineError, this)) { e -> raise(EmptyValue.combine(state.get(), e, combineError)) }
 
+@ExperimentalRaiseAccumulateApi
 private class IorAccumulate<Error>(
   private val state: Atomic<Any?>,
   private val combineError: (Error, Error) -> Error,

@@ -869,7 +869,7 @@ public inline fun <Error, A, R> accumulate(
  * Allows binding both [Either] and [EitherNel] values for [Either.Left] types of [Error].
  * It extends [Raise] of [Error], and allows working over [Raise] of [NonEmptyList] of [Error] as well.
  */
-@OptIn(ExperimentalSubclassOptIn::class)
+@OptIn(ExperimentalSubclassOptIn::class, ExperimentalRaiseAccumulateApi::class)
 @Suppress("DEPRECATION")
 @SubclassOptInRequired(ExperimentalRaiseAccumulateApi::class)
 public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constructor(
@@ -880,7 +880,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   @ExperimentalRaiseAccumulateApi
   private constructor(raise: Raise<NonEmptyList<Error>>, list: MutableList<Error>) :
-    this(ListAccumulate<Error>(raise, list), { raise.raise((list + it).toNonEmptyListOrThrow()) })
+    this(ListAccumulate(raise, list), { raise.raise((list + it).toNonEmptyListOrThrow()) })
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
@@ -1090,6 +1090,7 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
   }
 }
 
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 private class ListAccumulate<Error>(
   private val raise: Raise<NonEmptyList<Error>>,
   private val list: MutableList<Error>
@@ -1107,6 +1108,7 @@ private class ListAccumulate<Error>(
   override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
 }
 
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 private class TolerantAccumulate<Error>(
   private val underlying: Accumulate<Error>,
   private val raise: Raise<Value<Nothing>>
@@ -1124,6 +1126,7 @@ private class TolerantAccumulate<Error>(
   }
 }
 
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 @PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
   TolerantAccumulate(this, raise)
 
