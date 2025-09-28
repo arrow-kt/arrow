@@ -13,7 +13,7 @@ public fun ObjectMapper.registerArrowModule(
   IorModule(iorModuleConfig.leftFieldName, iorModuleConfig.rightFieldName),
 )
 
-public fun <M: ObjectMapper, B: MapperBuilder<M, B>> MapperBuilder<M, B>.addArrowModule(
+public fun <M : ObjectMapper, B : MapperBuilder<M, B>> MapperBuilder<M, B>.addArrowModule(
   eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),
   iorModuleConfig: IorModuleConfig = IorModuleConfig("left", "right"),
 ): MapperBuilder<M, B> = addModules(
