@@ -553,7 +553,7 @@ private fun CompletableJob.completeWith(exitCase: ExitCase) {
   }
 }
 
-private inline fun ResourceScope.coroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
+private inline fun ResourceScope.managedCoroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
   val job = jobCreator(coroutineContext[Job])
   onRelease { exitCase ->
     job.completeWith(exitCase)
@@ -562,8 +562,8 @@ private inline fun ResourceScope.coroutineScope(coroutineContext: CoroutineConte
   return CoroutineScope(coroutineContext + job)
 }
 
-public fun ResourceScope.supervisorScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
-  coroutineScope(coroutineContext, ::SupervisorJob)
+public fun ResourceScope.managedSupervisorScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
+  managedCoroutineScope(coroutineContext, ::SupervisorJob)
 
-public fun ResourceScope.coroutineScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
-  coroutineScope(coroutineContext, ::Job)
+public fun ResourceScope.managedCoroutineScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
+  managedCoroutineScope(coroutineContext, ::Job)

@@ -855,7 +855,7 @@ class ResourceTest {
   }
 
   @Test
-  fun resourceScopeBoundSupervisorScope() = runTest {
+  fun resourceScopeManagedSupervisorScope() = runTest {
     val channel = Channel<String>(Channel.UNLIMITED)
 
     withContext(CoroutineExceptionHandler { _, _ ->  }) {
@@ -863,7 +863,7 @@ class ResourceTest {
         channel.send("hello".also(::println))
         onRelease { channel.send("goodbye".also(::println)) }
 
-        val supervisor = supervisorScope(coroutineContext)
+        val supervisor = managedSupervisorScope(coroutineContext)
         supervisor.launch {
           channel.send("start nested".also(::println))
           delay(100)
@@ -888,7 +888,7 @@ class ResourceTest {
   }
 
   @Test
-  fun resourceScopeBoundCoroutineScope() = runTest {
+  fun resourceScopeManagedCoroutineScope() = runTest {
     val channel = Channel<String>(Channel.UNLIMITED)
 
     val result = supervisorScope {
@@ -897,7 +897,7 @@ class ResourceTest {
           channel.send("hello".also(::println))
           onRelease { channel.send("goodbye".also(::println)) }
 
-          val scope = coroutineScope(currentCoroutineContext())
+          val scope = managedCoroutineScope(currentCoroutineContext())
           scope.launch {
             channel.send("start nested".also(::println))
             delay(100)
