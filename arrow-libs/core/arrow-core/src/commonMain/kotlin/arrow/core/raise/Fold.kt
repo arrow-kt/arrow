@@ -282,7 +282,7 @@ public expect sealed class RaiseCancellationException(
 @DelicateRaiseApi
 internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException
 
-@DelicateRaiseApi
+@DelicateRaiseApi @PublishedApi
 internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
