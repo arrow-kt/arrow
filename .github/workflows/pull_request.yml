@@ -208,13 +208,11 @@ jobs:
         run: ./gradlew jvmTest
 
       - name: Code coverage
-        # if: "! github.event.pull_request.head.repo.fork "
-        if: false
+        if: "! github.event.pull_request.head.repo.fork "
         run: ./gradlew koverXmlReport
 
       - name: Add code coverage report
-        # if: "! github.event.pull_request.head.repo.fork "
-        if: false
+        if: "! github.event.pull_request.head.repo.fork "
         id: kover
         uses: mi-kas/kover-report@v1
         with:
