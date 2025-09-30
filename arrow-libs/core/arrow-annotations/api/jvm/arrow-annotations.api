@@ -13,6 +13,9 @@ public abstract interface annotation class arrow/optics/optics : java/lang/annot
 	public abstract fun targets ()[Larrow/optics/OpticsTarget;
 }
 
+public abstract interface annotation class arrow/optics/optics$copy : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/synthetic : java/lang/annotation/Annotation {
 }
 
