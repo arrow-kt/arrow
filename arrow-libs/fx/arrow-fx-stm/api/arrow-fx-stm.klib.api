@@ -138,6 +138,10 @@ final class arrow.fx.stm.internal/BlockedIndefinitely : kotlin/Throwable { // ar
     constructor <init>() // arrow.fx.stm.internal/BlockedIndefinitely.<init>|<init>(){}[0]
 }
 
+final class arrow.fx.stm.internal/RetryException : kotlin/Throwable { // arrow.fx.stm.internal/RetryException|null[0]
+    constructor <init>() // arrow.fx.stm.internal/RetryException.<init>|<init>(){}[0]
+}
+
 final class arrow.fx.stm/TSemaphore { // arrow.fx.stm/TSemaphore|null[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.stm/TSemaphore.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // arrow.fx.stm/TSemaphore.hashCode|hashCode(){}[0]
@@ -147,8 +151,6 @@ final class arrow.fx.stm/TSemaphore { // arrow.fx.stm/TSemaphore|null[0]
         final suspend fun new(kotlin/Int): arrow.fx.stm/TSemaphore // arrow.fx.stm/TSemaphore.Companion.new|new(kotlin.Int){}[0]
     }
 }
-
-final object arrow.fx.stm.internal/RetryException : kotlin/Throwable // arrow.fx.stm.internal/RetryException|null[0]
 
 final fun (arrow.fx.stm/STM).arrow.fx.stm/check(kotlin/Boolean) // arrow.fx.stm/check|check@arrow.fx.stm.STM(kotlin.Boolean){}[0]
 final fun (arrow.fx.stm/STM).arrow.fx.stm/newTSem(kotlin/Int): arrow.fx.stm/TSemaphore // arrow.fx.stm/newTSem|newTSem@arrow.fx.stm.STM(kotlin.Int){}[0]

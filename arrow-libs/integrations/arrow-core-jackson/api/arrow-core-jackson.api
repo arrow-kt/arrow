@@ -1,4 +1,6 @@
 public final class arrow/integrations/jackson/module/ArrowModuleKt {
+	public static final fun addArrowModule (Lcom/fasterxml/jackson/databind/cfg/MapperBuilder;Larrow/integrations/jackson/module/EitherModuleConfig;Larrow/integrations/jackson/module/IorModuleConfig;)Lcom/fasterxml/jackson/databind/cfg/MapperBuilder;
+	public static synthetic fun addArrowModule$default (Lcom/fasterxml/jackson/databind/cfg/MapperBuilder;Larrow/integrations/jackson/module/EitherModuleConfig;Larrow/integrations/jackson/module/IorModuleConfig;ILjava/lang/Object;)Lcom/fasterxml/jackson/databind/cfg/MapperBuilder;
 	public static final fun registerArrowModule (Lcom/fasterxml/jackson/databind/ObjectMapper;Larrow/integrations/jackson/module/EitherModuleConfig;Larrow/integrations/jackson/module/IorModuleConfig;)Lcom/fasterxml/jackson/databind/ObjectMapper;
 	public static synthetic fun registerArrowModule$default (Lcom/fasterxml/jackson/databind/ObjectMapper;Larrow/integrations/jackson/module/EitherModuleConfig;Larrow/integrations/jackson/module/IorModuleConfig;ILjava/lang/Object;)Lcom/fasterxml/jackson/databind/ObjectMapper;
 }
