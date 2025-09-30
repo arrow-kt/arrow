@@ -236,7 +236,7 @@ public final class arrow/fx/stm/internal/BlockedIndefinitely : java/lang/Throwab
 }
 
 public final class arrow/fx/stm/internal/RetryException : java/lang/Throwable {
-	public static final field INSTANCE Larrow/fx/stm/internal/RetryException;
+	public fun <init> ()V
 	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
