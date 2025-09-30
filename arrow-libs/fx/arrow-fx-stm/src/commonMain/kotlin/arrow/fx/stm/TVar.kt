@@ -131,7 +131,7 @@ public class TVar<A> internal constructor(a: A) {
    */
   private val ref = Atomic(a as Any?)
 
-  private val value
+  internal val _value
     get() = ref.value
 
   /**
@@ -197,12 +197,12 @@ public class TVar<A> internal constructor(a: A) {
    *  normal lock release.
    */
   internal fun registerWaiting(trans: STMTransaction, expected: A): Boolean {
-    if (value !== expected) {
+    if (_value !== expected) {
       trans.getCont()?.resume(Unit)
       return false
     }
     waiting.update { it + trans }
-    return if (value !== expected) {
+    return if (_value !== expected) {
       removeWaiting(trans)
       trans.getCont()?.resume(Unit)
       false
