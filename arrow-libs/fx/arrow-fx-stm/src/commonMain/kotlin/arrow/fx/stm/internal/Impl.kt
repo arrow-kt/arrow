@@ -41,7 +41,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
   private fun readVar(v: TVar<Any?>): Any =
     accessMap[v]?.getValue() ?: parent?.readVar(v) ?: Entry.NotPresent
 
-  override fun retry(): Nothing = throw RetryException
+  override fun retry(): Nothing = throw RetryException()
 
   override fun <A> (STM.() -> A).orElse(other: STM.() -> A): A =
     runLocal(this@orElse, { this@STMFrame.other() }) { throw it }
@@ -65,7 +65,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
           this@STMFrame.merge(frame)
           return res
         }
-      } catch (ignored: RetryException) {
+      } catch (_: RetryException) {
         if (frame.validate()) {
           this@STMFrame.mergeReads(frame)
           return onRetry()
@@ -101,7 +101,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
   }
 
   internal fun validate(): Boolean =
-    accessMap.all { (tv, entry) -> tv.value === entry.initialVal }
+    accessMap.all { (tv, entry) -> tv._value === entry.initialVal }
 
   internal fun validateAndCommit(): Boolean {
     if (accessMap.isEmpty()) return true
@@ -128,7 +128,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
           return@validateAndCommit false
         }
       } else {
-        if (tv.value !== entry.initialVal) {
+        if (tv._value !== entry.initialVal) {
           locked.forEach { it.key.release(this, it.value.initialVal) }
           return@validateAndCommit false
         } else {
@@ -137,7 +137,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
       }
     }
 
-    if (reads.any { (tv, entry) -> tv.value !== entry.initialVal }) {
+    if (reads.any { (tv, entry) -> tv._value !== entry.initialVal }) {
       locked.forEach { it.key.release(this, it.value.initialVal) }
       return false
     }
@@ -164,7 +164,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
  */
 public class BlockedIndefinitely : Throwable("Transaction blocked indefinitely")
 
-public expect object RetryException : Throwable
+public expect class RetryException() : Throwable
 
 // --------
 /**
@@ -197,7 +197,7 @@ internal class STMTransaction {
         val res = frame.f()
 
         if (frame.validateAndCommit()) return res
-      } catch (ignored: RetryException) {
+      } catch (_: RetryException) {
         if (frame.accessMap.isEmpty()) throw BlockedIndefinitely()
 
         val registered = mutableListOf<TVar<Any?>>()
