@@ -269,16 +269,16 @@ public final class arrow/fx/coroutines/ResourceExtensionsKt {
 }
 
 public final class arrow/fx/coroutines/ResourceKt {
+	public static final fun ManagedCoroutineScope (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
+	public static synthetic fun ManagedCoroutineScope$default (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
+	public static final fun ManagedSupervisorScope (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
+	public static synthetic fun ManagedSupervisorScope$default (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
 	public static final fun allocate (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun asFlow (Lkotlin/jvm/functions/Function2;)Lkotlinx/coroutines/flow/Flow;
 	public static final fun autoCloseable (Larrow/fx/coroutines/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun autoCloseable (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function2;
 	public static synthetic fun autoCloseable$default (Larrow/fx/coroutines/ResourceScope;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static synthetic fun autoCloseable$default (Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlin/jvm/functions/Function2;
-	public static final fun managedCoroutineScope (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
-	public static synthetic fun managedCoroutineScope$default (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
-	public static final fun managedSupervisorScope (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
-	public static synthetic fun managedSupervisorScope$default (Larrow/fx/coroutines/ResourceScope;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
 	public static final fun resource (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun resource (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun resourceScope (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
