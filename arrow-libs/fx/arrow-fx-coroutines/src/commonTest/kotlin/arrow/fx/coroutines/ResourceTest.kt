@@ -23,6 +23,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
@@ -863,7 +864,7 @@ class ResourceTest {
         channel.send("hello".also(::println))
         onRelease { channel.send("goodbye".also(::println)) }
 
-        val supervisor = managedSupervisorScope(coroutineContext)
+        val supervisor = ManagedSupervisorScope(coroutineContext)
         supervisor.launch {
           channel.send("start nested".also(::println))
           delay(100)
@@ -897,7 +898,7 @@ class ResourceTest {
           channel.send("hello".also(::println))
           onRelease { channel.send("goodbye".also(::println)) }
 
-          val scope = managedCoroutineScope(currentCoroutineContext())
+          val scope = ManagedCoroutineScope(coroutineContext)
           scope.launch {
             channel.send("start nested".also(::println))
             delay(100)
