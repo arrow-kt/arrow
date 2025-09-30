@@ -2,8 +2,11 @@ package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.none
 import arrow.core.raise.either
+import arrow.core.some
 import arrow.fx.coroutines.ExitCase.Companion.ExitCase
 import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.collections.shouldContainExactly
@@ -22,22 +25,23 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import kotlin.test.Test
 
@@ -157,7 +161,7 @@ class ResourceTest {
 
     shouldThrow<CancellationException> {
       resourceScope {
-        install({  }) { _, ex -> require(exit.complete(ex)) }
+        install({ }) { _, ex -> require(exit.complete(ex)) }
         throw CancellationException("BOOM!")
       }
     }.message shouldBe "BOOM!"
@@ -856,29 +860,80 @@ class ResourceTest {
   }
 
   @Test
+  fun resourceScopeWaitsOnManagedCoroutineScope() = runTest {
+    resourceScope {
+      val scope = ManagedCoroutineScope(StandardTestDispatcher(testScheduler))
+      scope.launch { delay(1000) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    currentTime shouldBe 1000L
+  }
+
+  @Test
+  fun resourceScopeCancelsNestedManagedCoroutineScope() = runTest {
+    lateinit var scope: CoroutineScope
+    shouldThrow<CancellationException> {
+      resourceScope {
+        scope = ManagedCoroutineScope()
+        throw CancellationException("BOOM!")
+      }
+    }.message shouldBe "BOOM!"
+
+    scope.coroutineContext.job.isCompleted shouldBe true
+    var completionCause = none<Throwable?>()
+    scope.coroutineContext.job.invokeOnCompletion { completionCause = it.some() }
+    completionCause.getOrElse { fail("expected cause") }
+      .shouldBeInstanceOf<CancellationException>()
+      .message shouldBe "BOOM!"
+  }
+
+  @Test
+  fun resourceScopeCancelsNestedManagedCoroutineScopeOnFailure() = runTest {
+    lateinit var scope: CoroutineScope
+    shouldThrow<IllegalStateException> {
+      resourceScope {
+        scope = ManagedCoroutineScope()
+        error("BOOM!")
+      }
+    }.message shouldBe "BOOM!"
+
+    scope.coroutineContext.job.isCompleted shouldBe true
+    var completionCause = none<Throwable?>()
+    scope.coroutineContext.job.invokeOnCompletion { completionCause = it.some() }
+    completionCause.getOrElse { fail("expected cause") }
+      .shouldBeInstanceOf<IllegalStateException>()
+      .message shouldBe "BOOM!"
+  }
+
+  @Test
   fun resourceScopeManagedSupervisorScope() = runTest {
     val channel = Channel<String>(Channel.UNLIMITED)
 
-    withContext(CoroutineExceptionHandler { _, _ ->  }) {
-      resourceScope {
-        channel.send("hello".also(::println))
-        onRelease { channel.send("goodbye".also(::println)) }
+    var capturedException: Throwable? = null
+    resourceScope {
+      channel.send("hello")
+      onRelease { channel.send("goodbye") }
 
-        val supervisor = ManagedSupervisorScope(coroutineContext)
-        supervisor.launch {
-          channel.send("start nested".also(::println))
-          delay(100)
-          channel.send("end nested".also(::println))
-        }
-        supervisor.launch {
-          delay(10)
-          error("boom.")
-        }
-
-        runCurrent() // let the nested job run until the first delay
-        channel.send("finished".also(::println))
+      val nestedContext = StandardTestDispatcher(testScheduler) + CoroutineExceptionHandler { _, ex -> capturedException = ex }
+      val supervisor = ManagedSupervisorScope(nestedContext)
+      supervisor.launch {
+        channel.send("start nested")
+        delay(100)
+        channel.send("end nested")
       }
+      supervisor.launch {
+        delay(50)
+        error("boom.")
+      }
+
+      @OptIn(ExperimentalCoroutinesApi::class)
+      runCurrent() // let the nested scope run until the first delay
+      channel.send("finished")
     }
+
+    capturedException.shouldBeInstanceOf<IllegalStateException>()
+      .message shouldBe "boom."
 
     channel.receive() shouldBe "hello"
     channel.receive() shouldBe "start nested"
@@ -892,34 +947,25 @@ class ResourceTest {
   fun resourceScopeManagedCoroutineScope() = runTest {
     val channel = Channel<String>(Channel.UNLIMITED)
 
-    val result = supervisorScope {
-      async {
-        resourceScope {
-          channel.send("hello".also(::println))
-          onRelease { channel.send("goodbye".also(::println)) }
+    val job = launch {
+      resourceScope {
+        channel.send("hello")
+        onRelease { channel.send("goodbye") }
 
-          val scope = ManagedCoroutineScope(coroutineContext)
-          scope.launch {
-            channel.send("start nested".also(::println))
-            delay(100)
-            fail("shouldn't be reached")
-          }
-          scope.launch {
-            delay(10)
-            error("boom.")
-          }
-
-          awaitCancellation()
+        val scope = ManagedCoroutineScope()
+        scope.launch {
+          channel.send("start nested")
+          backgroundScope.async { delay(100) }.await()
+          fail("shouldn't be reached")
         }
+
+        awaitCancellation()
       }
     }
 
-    result.getCompletionExceptionOrNull()
-      .shouldBeInstanceOf<IllegalStateException>()
-      .message shouldBe "boom."
-
     channel.receive() shouldBe "hello"
     channel.receive() shouldBe "start nested"
+    job.cancel()
     channel.receive() shouldBe "goodbye"
     channel.cancel()
   }
