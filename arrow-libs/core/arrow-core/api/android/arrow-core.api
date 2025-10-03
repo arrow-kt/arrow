@@ -1178,6 +1178,13 @@ public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Raise {
 	public final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
 }
 
+public final class arrow/core/raise/Traced : arrow/core/raise/RaiseCancellationException {
+	public fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Larrow/core/raise/Traced;)V
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Larrow/core/raise/Traced;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getCause ()Larrow/core/raise/Traced;
+	public synthetic fun getCause ()Ljava/lang/Throwable;
+}
+
 public final class arrow/core/raise/context/RaiseContextualKt {
 	public static final fun bind (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

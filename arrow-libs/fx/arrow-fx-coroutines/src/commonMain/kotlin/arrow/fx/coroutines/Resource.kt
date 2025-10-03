@@ -7,15 +7,21 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
 @DslMarker
@@ -270,7 +276,7 @@ public annotation class ResourceDSL
  *
  * ## Conclusion
  *
- * [Resource] guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the [kotlinx.coroutines.Job] is running gets canceled.
+ * [Resource] guarantee that their release finalizers are always invoked in the correct order when an exception is raised or the [Job] is running gets canceled.
  *
  * To achieve this [Resource] ensures that the `acquire` & `release` step are [NonCancellable].
  * If a cancellation signal, or an exception is received during `acquire`, the resource is assumed to not have been acquired and thus will not trigger the release function.
@@ -538,3 +544,29 @@ public fun <A : AutoCloseable> autoCloseable(
 ): Resource<A> = resource {
   autoCloseable(closingDispatcher, autoCloseable)
 }
+
+private fun CompletableJob.completeWith(exitCase: ExitCase) {
+  when (exitCase) {
+    is ExitCase.Cancelled -> cancel(exitCase.exception)
+    is ExitCase.Failure -> completeExceptionally(exitCase.failure)
+    ExitCase.Completed -> complete()
+  }
+}
+
+@Suppress("FunctionName")
+private inline fun ResourceScope.ManagedCoroutineScope(coroutineContext: CoroutineContext, jobCreator: (Job?) -> CompletableJob): CoroutineScope {
+  val job = jobCreator(coroutineContext[Job])
+  onRelease { exitCase ->
+    job.completeWith(exitCase)
+    job.join()
+  }
+  return CoroutineScope(coroutineContext + job)
+}
+
+@Suppress("FunctionName")
+public fun ResourceScope.ManagedSupervisorScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
+  ManagedCoroutineScope(coroutineContext, ::SupervisorJob)
+
+@Suppress("FunctionName")
+public fun ResourceScope.ManagedCoroutineScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
+  ManagedCoroutineScope(coroutineContext, ::Job)

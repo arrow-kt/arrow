@@ -346,6 +346,13 @@ final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwab
     final suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Throwable>, #A1>).invoke(): #A1 // arrow.core.raise/ResultRaise.invoke|invoke@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Throwable>,0:0>(){0§<kotlin.Any?>}[0]
 }
 
+final class arrow.core.raise/Traced : arrow.core.raise/RaiseCancellationException { // arrow.core.raise/Traced|null[0]
+    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>, arrow.core.raise/Traced? = ...) // arrow.core.raise/Traced.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;arrow.core.raise.Traced?){}[0]
+
+    final val cause // arrow.core.raise/Traced.cause|{}cause[0]
+        final fun <get-cause>(): arrow.core.raise/Traced? // arrow.core.raise/Traced.cause.<get-cause>|<get-cause>(){}[0]
+}
+
 final value class <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/AtomicMemoizationCache : arrow.core/MemoizationCache<#A, #B> { // arrow.core/AtomicMemoizationCache|null[0]
     constructor <init>(arrow.atomic/Atomic<kotlin.collections/Map<#A, #B>> = ...) // arrow.core/AtomicMemoizationCache.<init>|<init>(arrow.atomic.Atomic<kotlin.collections.Map<1:0,1:1>>){}[0]
 
