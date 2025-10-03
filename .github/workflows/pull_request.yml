@@ -300,3 +300,33 @@ jobs:
         with:
           commit_message: Auto-update API files
           file_pattern: arrow-libs/**/api/*.api
+
+  gradle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Optics Gradle plugin
+        run: ./test-optics-gradle-plugin.sh
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'reports-gradle'
+          path: '**/build/reports/**'
