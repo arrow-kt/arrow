@@ -29,10 +29,13 @@ fun KotlinSingleTargetExtension<*>.arrowOptics() {
 fun KotlinMultiplatformExtension.arrowOpticsCommon() =
   arrowOptics(metadata())
 
+fun KotlinMultiplatformExtension.arrowOpticsAllTargets() =
+  arrowOptics(targets.toList())
+
 fun KotlinMultiplatformExtension.arrowOptics(target: KotlinTarget, vararg moreTargets: KotlinTarget) =
   arrowOptics(listOf(target) + moreTargets.toList())
 
-fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget> = this.targets.toList()) {
+fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget>) {
   for (target in targets) {
     val miniTarget = target.name.lowercase()
 
