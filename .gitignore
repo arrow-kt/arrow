@@ -2,7 +2,7 @@
 
 ### Kotlin ###
 
-.kotlin
+**/.kotlin
 
 ### Android ###
 # Built application files
@@ -21,8 +21,8 @@ gen/
 out/
 
 # Gradle files
-.gradle/
-build/
+**/.gradle/
+**/build/
 
 # dokka + ank apidocs merge to sources
 apidocs/

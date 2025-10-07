@@ -38,6 +38,7 @@ val Project.needsAbiValidation
     "arrow-optics-ksp-plugin",
     "suspendapp-test-app",
     "suspendapp-test-runner",
+    "arrow-optics-plugin",
   )
 
 val Project.isKotlinJvm: Boolean
@@ -317,8 +318,21 @@ dependencies {
 configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
   configureBasedOnAppliedPlugins()
   pomFromGradleProperties()
-  publishToMavenCentral(automaticRelease = true)
-  signAllPublications()
+  if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() != true) {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+  }
+}
+
+if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() == true) {
+  configure<org.gradle.api.publish.PublishingExtension> {
+    repositories {
+      maven {
+        name = "localPluginRepository"
+        url = uri("${rootProject.projectDir.absolutePath}/build/local-plugin-repository")
+      }
+    }
+  }
 }
 
 afterEvaluate {
