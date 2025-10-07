@@ -74,7 +74,7 @@ fun buildCompilation(allWarningsAsErrors: Boolean = false, vararg sources: Sourc
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
   this.languageVersion = "2.0"
-  configureKsp(useKsp2 = true) {
+  configureKsp {
     withCompilation = true
     symbolProcessorProviders += OpticsProcessorProvider()
   }
