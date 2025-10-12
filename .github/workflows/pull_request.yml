@@ -65,7 +65,7 @@ jobs:
         run: ./gradlew spotlessApply
 
       - name: Commit newly formatted files
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Auto-apply Spotless rules
           file_pattern: arrow-libs/**/*.kt
@@ -296,7 +296,7 @@ jobs:
         run: ./gradlew updateLegacyAbi
 
       - name: Commit updated API files
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Auto-update API files
           file_pattern: arrow-libs/**/api/*.api
