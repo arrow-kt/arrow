@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>NonEmptyList</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,45 +62,47 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core/NonEmptyList///PointingToDeclaration//1759373422">
   <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core</a><span class="delimiter">/</span><span class="current">NonEmptyList</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Non</span><wbr><span>Empty</span><wbr><span><span>List</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-inline/index.html"><span class="token annotation builtin">JvmInline</span></a></div></div><span class="token keyword">value </span><span class="token keyword">class </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">E</a><span class="token operator">&gt;</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="index.html">E</a><span class="token operator">&gt; </span>, <a href="../-non-empty-collection/index.html">NonEmptyCollection</a><span class="token operator">&lt;</span><a href="index.html">E</a><span class="token operator">&gt; </span></div><p class="paragraph"><code class="lang-kotlin">NonEmptyList</code> is a data type used in <strong>Λrrow</strong> to model ordered lists that guarantee to have at least one value.</p><h2 class="">Constructing NonEmptyList</h2><p class="paragraph">A <code class="lang-kotlin">NonEmptyList</code> guarantees the list always has at least 1 element.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.nonEmptyListOf<br>import arrow.core.toNonEmptyListOrNull<br><br>fun main() {<br> println(nonEmptyListOf(1, 2, 3, 4, 5))<br> println(listOf(1, 2, 3).toNonEmptyListOrNull())<br> println(emptyList&lt;Int&gt;().toNonEmptyListOrNull())<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-nonemptylist-01.kt --><div class="sample-container"><pre><code class="block lang-text" theme="idea">NonEmptyList(1, 2, 3, 4, 5)<br>NonEmptyList(1, 2, 3)<br>null</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h2 class="">head</h2><p class="paragraph">Unlike <code class="lang-kotlin">List[0]</code>, <code class="lang-kotlin">NonEmptyList.head</code> it's a safe operation that guarantees no exception throwing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.nonEmptyListOf<br><br>val value =<br>//sampleStart<br> nonEmptyListOf(1, 2, 3, 4, 5).head<br>//sampleEnd<br>fun main() {<br> println(value)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-nonemptylist-02.kt --><h2 class="">foldLeft</h2><p class="paragraph">When we fold over a <code class="lang-kotlin">NonEmptyList</code>, we turn a <code class="lang-kotlin">NonEmptyList&lt; A &gt;</code> into <code class="lang-kotlin">B</code> by providing a <strong>seed</strong> value and a <strong>function</strong> that carries the state on each iteration over the elements of the list. The first argument is a function that addresses the <strong>seed value</strong>, this can be any object of any type which will then become the resulting typed value. The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.NonEmptyList<br>import arrow.core.nonEmptyListOf<br><br>//sampleStart<br>fun sumNel(nel: NonEmptyList&lt;Int&gt;): Int =<br> nel.foldLeft(0) { acc, n -&gt; acc + n }<br>val value = sumNel(nonEmptyListOf(1, 1, 1, 1))<br>//sampleEnd<br>fun main() {<br> println("value = $value")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-nonemptylist-03.kt --><h2 class="">map</h2><p class="paragraph"><code class="lang-kotlin">map</code> allows us to transform <code class="lang-kotlin">A</code> into <code class="lang-kotlin">B</code> in <code class="lang-kotlin">NonEmptyList&lt; A &gt;</code></p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.nonEmptyListOf<br><br>val value =<br>//sampleStart<br> nonEmptyListOf(1, 1, 1, 1).map { it + 1 }<br>//sampleEnd<br>fun main() {<br> println(value)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-nonemptylist-04.kt --><h2 class="">Combining NonEmptyLists</h2><h3 class="">flatMap</h3><p class="paragraph"><code class="lang-kotlin">flatMap</code> allows us to compute over the contents of multiple <code class="lang-kotlin">NonEmptyList&lt; * &gt;</code> values</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.NonEmptyList<br>import arrow.core.nonEmptyListOf<br><br>//sampleStart<br>val nelOne: NonEmptyList&lt;Int&gt; = nonEmptyListOf(1, 2, 3)<br>val nelTwo: NonEmptyList&lt;Int&gt; = nonEmptyListOf(4, 5)<br><br>val value = nelOne.flatMap { one -&gt;<br> nelTwo.map { two -&gt;<br>   one + two<br> }<br>}<br>//sampleEnd<br>fun main() {<br> println("value = $value")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-nonemptylist-05.kt --><h3 class="">zip</h3><p class="paragraph">Λrrow contains methods that allow you to preserve type information when computing over different <code class="lang-kotlin">NonEmptyList</code> typed values.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.NonEmptyList<br>import arrow.core.nonEmptyListOf<br>import kotlin.random.Random<br><br>data class Person(val id: Long, val name: String, val year: Int)<br><br>// Note each NonEmptyList is of a different type<br>val nelId: NonEmptyList&lt;Long&gt; = nonEmptyListOf(Random.nextLong(), Random.nextLong())<br>val nelName: NonEmptyList&lt;String&gt; = nonEmptyListOf("William Alvin Howard", "Haskell Curry")<br>val nelYear: NonEmptyList&lt;Int&gt; = nonEmptyListOf(1926, 1900)<br><br>val value = nelId.zip(nelName, nelYear) { id, name, year -&gt;<br> Person(id, name, year)<br>}<br>//sampleEnd<br>fun main() {<br> println("value = $value")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-nonemptylist-06.kt --><h3 class="">Summary</h3><ul><li><p class="paragraph"><code class="lang-kotlin">NonEmptyList</code> is <strong>used to model lists that guarantee at least one element</strong></p></li><li><p class="paragraph">We can easily construct values of <code class="lang-kotlin">NonEmptyList</code> with <code class="lang-kotlin">nonEmptyListOf</code></p></li><li><p class="paragraph"><code class="lang-kotlin">foldLeft</code>, <code class="lang-kotlin">map</code>, <code class="lang-kotlin">flatMap</code> and others are used to compute over the internal contents of a <code class="lang-kotlin">NonEmptyList</code> value.</p></li><li><p class="paragraph"><code class="lang-kotlin">a.zip(b, c) { ... }</code> can be used to compute over multiple <code class="lang-kotlin">NonEmptyList</code> values preserving type information and <strong>abstracting over arity</strong> with <code class="lang-kotlin">zip</code></p></li></ul></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-inline/index.html"><span class="token annotation builtin">JvmInline</span></a></div></div><span class="token keyword">value </span><span class="token keyword">class </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">E</a><span class="token operator">&gt;</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="index.html">E</a><span class="token operator">&gt; </span>, <a href="../-non-empty-collection/index.html">NonEmptyCollection</a><span class="token operator">&lt;</span><a href="index.html">E</a><span class="token operator">&gt; </span></div><p class="paragraph"><code class="lang-kotlin">NonEmptyList</code> is a data type used in <strong>Λrrow</strong> to model ordered lists that guarantee to have at least one value.</p><h2 class="">Constructing NonEmptyList</h2><p class="paragraph">A <code class="lang-kotlin">NonEmptyList</code> guarantees the list always has at least 1 element.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.nonEmptyListOf<br>import arrow.core.toNonEmptyListOrNull<br><br>fun main() {<br> println(nonEmptyListOf(1, 2, 3, 4, 5))<br> println(listOf(1, 2, 3).toNonEmptyListOrNull())<br> println(emptyList&lt;Int&gt;().toNonEmptyListOrNull())<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-nonemptylist-01.kt --><div class="sample-container"><pre><code class="block lang-text" theme="idea">NonEmptyList(1, 2, 3, 4, 5)<br>NonEmptyList(1, 2, 3)<br>null</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><h2 class="">head</h2><p class="paragraph">Unlike <code class="lang-kotlin">List[0]</code>, <code class="lang-kotlin">NonEmptyList.head</code> it's a safe operation that guarantees no exception throwing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.nonEmptyListOf<br><br>val value =<br>//sampleStart<br> nonEmptyListOf(1, 2, 3, 4, 5).head<br>//sampleEnd<br>fun main() {<br> println(value)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-nonemptylist-02.kt --><h2 class="">foldLeft</h2><p class="paragraph">When we fold over a <code class="lang-kotlin">NonEmptyList</code>, we turn a <code class="lang-kotlin">NonEmptyList&lt; A &gt;</code> into <code class="lang-kotlin">B</code> by providing a <strong>seed</strong> value and a <strong>function</strong> that carries the state on each iteration over the elements of the list. The first argument is a function that addresses the <strong>seed value</strong>, this can be any object of any type which will then become the resulting typed value. The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.NonEmptyList<br>import arrow.core.nonEmptyListOf<br><br>//sampleStart<br>fun sumNel(nel: NonEmptyList&lt;Int&gt;): Int =<br> nel.foldLeft(0) { acc, n -&gt; acc + n }<br>val value = sumNel(nonEmptyListOf(1, 1, 1, 1))<br>//sampleEnd<br>fun main() {<br> println("value = $value")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-nonemptylist-03.kt --><h2 class="">map</h2><p class="paragraph"><code class="lang-kotlin">map</code> allows us to transform <code class="lang-kotlin">A</code> into <code class="lang-kotlin">B</code> in <code class="lang-kotlin">NonEmptyList&lt; A &gt;</code></p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.nonEmptyListOf<br><br>val value =<br>//sampleStart<br> nonEmptyListOf(1, 1, 1, 1).map { it + 1 }<br>//sampleEnd<br>fun main() {<br> println(value)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-nonemptylist-04.kt --><h2 class="">Combining NonEmptyLists</h2><h3 class="">flatMap</h3><p class="paragraph"><code class="lang-kotlin">flatMap</code> allows us to compute over the contents of multiple <code class="lang-kotlin">NonEmptyList&lt; * &gt;</code> values</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.NonEmptyList<br>import arrow.core.nonEmptyListOf<br><br>//sampleStart<br>val nelOne: NonEmptyList&lt;Int&gt; = nonEmptyListOf(1, 2, 3)<br>val nelTwo: NonEmptyList&lt;Int&gt; = nonEmptyListOf(4, 5)<br><br>val value = nelOne.flatMap { one -&gt;<br> nelTwo.map { two -&gt;<br>   one + two<br> }<br>}<br>//sampleEnd<br>fun main() {<br> println("value = $value")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-nonemptylist-05.kt --><h3 class="">zip</h3><p class="paragraph">Λrrow contains methods that allow you to preserve type information when computing over different <code class="lang-kotlin">NonEmptyList</code> typed values.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.NonEmptyList<br>import arrow.core.nonEmptyListOf<br>import kotlin.random.Random<br><br>data class Person(val id: Long, val name: String, val year: Int)<br><br>// Note each NonEmptyList is of a different type<br>val nelId: NonEmptyList&lt;Long&gt; = nonEmptyListOf(Random.nextLong(), Random.nextLong())<br>val nelName: NonEmptyList&lt;String&gt; = nonEmptyListOf("William Alvin Howard", "Haskell Curry")<br>val nelYear: NonEmptyList&lt;Int&gt; = nonEmptyListOf(1926, 1900)<br><br>val value = nelId.zip(nelName, nelYear) { id, name, year -&gt;<br> Person(id, name, year)<br>}<br>//sampleEnd<br>fun main() {<br> println("value = $value")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-nonemptylist-06.kt --><h3 class="">Summary</h3><ul><li><p class="paragraph"><code class="lang-kotlin">NonEmptyList</code> is <strong>used to model lists that guarantee at least one element</strong></p></li><li><p class="paragraph">We can easily construct values of <code class="lang-kotlin">NonEmptyList</code> with <code class="lang-kotlin">nonEmptyListOf</code></p></li><li><p class="paragraph"><code class="lang-kotlin">foldLeft</code>, <code class="lang-kotlin">map</code>, <code class="lang-kotlin">flatMap</code> and others are used to compute over the internal contents of a <code class="lang-kotlin">NonEmptyList</code> value.</p></li><li><p class="paragraph"><code class="lang-kotlin">a.zip(b, c) { ... }</code> can be used to compute over multiple <code class="lang-kotlin">NonEmptyList</code> values preserving type information and <strong>abstracting over arity</strong> with <code class="lang-kotlin">zip</code></p></li></ul></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
-        <h2 class="">Constructors</h2>
+        <h2 class="tableheader">Constructors</h2>
         <div class="table"><a data-name="-1396411958%2FConstructors%2F1759373422" anchor-label="NonEmptyList" id="-1396411958%2FConstructors%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-list.html"><span>Non</span><wbr><span>Empty</span><wbr><span><span>List</span></span></a></div>
@@ -119,9 +119,9 @@
         </div>
       </div>
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-33352790%2FClasslikes%2F1759373422" anchor-label="Companion" id="-33352790%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
@@ -138,9 +138,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="1057596514%2FProperties%2F1759373422" anchor-label="all" id="1057596514%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="all.html"><span><span>all</span></span></a></div>
@@ -155,7 +155,7 @@
             </div>
           </div>
 <a data-name="-121207945%2FProperties%2F1759373422" anchor-label="head" id="-121207945%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="head.html"><span><span>head</span></span></a></div>
@@ -170,7 +170,7 @@
             </div>
           </div>
 <a data-name="844915858%2FProperties%2F1759373422" anchor-label="size" id="844915858%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#844915858%2FProperties%2F1759373422"><span><span>size</span></span></a></div>
@@ -185,7 +185,7 @@
             </div>
           </div>
 <a data-name="-23839993%2FProperties%2F1759373422" anchor-label="tail" id="-23839993%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="tail.html"><span><span>tail</span></span></a></div>
@@ -202,9 +202,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="1627097522%2FFunctions%2F1759373422" anchor-label="align" id="1627097522%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="align.html"><span><span>align</span></span></a></div>
@@ -219,7 +219,7 @@
             </div>
           </div>
 <a data-name="-585275467%2FFunctions%2F1759373422" anchor-label="align" id="-585275467%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../align.html"><span><span>align</span></span></a></div>
@@ -233,8 +233,38 @@
               </div>
             </div>
           </div>
+<a data-name="347836484%2FFunctions%2F1759373422" anchor-label="bindAll" id="347836484%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../arrow.core.raise.context/bind-all.html"><span>bind</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="347836484%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllEither"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllEither"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllResult"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-result-raise/index.html">ResultRaise</a></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllResult"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-result-raise/index.html">ResultRaise</a></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllNullable"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllOption"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../-option/index.html">Option</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllNullable"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllOption"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../-option/index.html">Option</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1705272895%2FFunctions%2F1759373422" anchor-label="bindAllOrAccumulate" id="-1705272895%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html"><span>bind</span><wbr><span>All</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1705272895%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html"><span class="token function">bindAllOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind-all-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="835237250%2FFunctions%2F1759373422" anchor-label="coflatMap" id="835237250%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="coflat-map.html"><span>coflat</span><wbr><span><span>Map</span></span></a></div>
@@ -249,7 +279,7 @@
             </div>
           </div>
 <a data-name="1600935164%2FFunctions%2F1759373422" anchor-label="collectionSizeOrDefault" id="1600935164%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../collection-size-or-default.html"><span>collection</span><wbr><span>Size</span><wbr><span>Or</span><wbr><span><span>Default</span></span></a></div>
@@ -264,7 +294,7 @@
             </div>
           </div>
 <a data-name="161861910%2FFunctions%2F1759373422" anchor-label="compareTo" id="161861910%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../compare-to.html"><span>compare</span><wbr><span><span>To</span></span></a></div>
@@ -279,7 +309,7 @@
             </div>
           </div>
 <a data-name="765883978%2FFunctions%2F1759373422" anchor-label="contains" id="765883978%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#765883978%2FFunctions%2F1759373422"><span><span>contains</span></span></a></div>
@@ -294,7 +324,7 @@
             </div>
           </div>
 <a data-name="-225903147%2FFunctions%2F1759373422" anchor-label="containsAll" id="-225903147%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-225903147%2FFunctions%2F1759373422"><span>contains</span><wbr><span><span>All</span></span></a></div>
@@ -309,7 +339,7 @@
             </div>
           </div>
 <a data-name="-1256518838%2FFunctions%2F1759373422" anchor-label="crosswalk" id="-1256518838%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../crosswalk.html"><span><span>crosswalk</span></span></a></div>
@@ -324,7 +354,7 @@
             </div>
           </div>
 <a data-name="-2109526734%2FFunctions%2F1759373422" anchor-label="crosswalkMap" id="-2109526734%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../crosswalk-map.html"><span>crosswalk</span><wbr><span><span>Map</span></span></a></div>
@@ -339,7 +369,7 @@
             </div>
           </div>
 <a data-name="-1501798302%2FFunctions%2F1759373422" anchor-label="crosswalkNull" id="-1501798302%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../crosswalk-null.html"><span>crosswalk</span><wbr><span><span>Null</span></span></a></div>
@@ -354,7 +384,7 @@
             </div>
           </div>
 <a data-name="997194971%2FFunctions%2F1759373422" anchor-label="distinct" id="997194971%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="distinct.html"><span><span>distinct</span></span></a></div>
@@ -369,7 +399,7 @@
             </div>
           </div>
 <a data-name="-1550422930%2FFunctions%2F1759373422" anchor-label="distinctBy" id="-1550422930%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="distinct-by.html"><span>distinct</span><wbr><span><span>By</span></span></a></div>
@@ -384,7 +414,7 @@
             </div>
           </div>
 <a data-name="-849844079%2FFunctions%2F1759373422" anchor-label="elementAtOrNone" id="-849844079%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../element-at-or-none.html"><span>element</span><wbr><span>At</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -399,7 +429,7 @@
             </div>
           </div>
 <a data-name="-1690090230%2FFunctions%2F1759373422" anchor-label="equals" id="-1690090230%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="equals.html"><span><span>equals</span></span></a></div>
@@ -414,7 +444,7 @@
             </div>
           </div>
 <a data-name="633944706%2FFunctions%2F1759373422" anchor-label="extract" id="633944706%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="extract.html"><span><span>extract</span></span></a></div>
@@ -429,7 +459,7 @@
             </div>
           </div>
 <a data-name="-2126908107%2FFunctions%2F1759373422" anchor-label="filterOption" id="-2126908107%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../filter-option.html"><span>filter</span><wbr><span><span>Option</span></span></a></div>
@@ -444,7 +474,7 @@
             </div>
           </div>
 <a data-name="82617453%2FFunctions%2F1759373422" anchor-label="firstOrNone" id="82617453%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../first-or-none.html"><span>first</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -459,7 +489,7 @@
             </div>
           </div>
 <a data-name="-1054388343%2FFunctions%2F1759373422" anchor-label="firstOrNull" id="-1054388343%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../-non-empty-collection/first-or-null.html"><span>first</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -474,7 +504,7 @@
             </div>
           </div>
 <a data-name="-82834074%2FFunctions%2F1759373422" anchor-label="flatMap" id="-82834074%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flat-map.html"><span>flat</span><wbr><span><span>Map</span></span></a></div>
@@ -489,7 +519,7 @@
             </div>
           </div>
 <a data-name="-2031767860%2FFunctions%2F1759373422" anchor-label="flatten" id="-2031767860%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../flatten.html"><span><span>flatten</span></span></a></div>
@@ -504,7 +534,7 @@
             </div>
           </div>
 <a data-name="-2147347271%2FFunctions%2F1759373422" anchor-label="flattenOption" id="-2147347271%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../flatten-option.html"><span>flatten</span><wbr><span><span>Option</span></span></a></div>
@@ -519,7 +549,7 @@
             </div>
           </div>
 <a data-name="-360239026%2FFunctions%2F1759373422" anchor-label="flattenOrAccumulate" id="-360239026%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../flatten-or-accumulate.html"><span>flatten</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -534,7 +564,7 @@
             </div>
           </div>
 <a data-name="-1214202917%2FFunctions%2F1759373422" anchor-label="foldLeft" id="-1214202917%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fold-left.html"><span>fold</span><wbr><span><span>Left</span></span></a></div>
@@ -549,7 +579,7 @@
             </div>
           </div>
 <a data-name="961975567%2FFunctions%2F1759373422" anchor-label="get" id="961975567%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#961975567%2FFunctions%2F1759373422"><span><span>get</span></span></a></div>
@@ -564,7 +594,7 @@
             </div>
           </div>
 <a data-name="-708890468%2FFunctions%2F1759373422" anchor-label="hashCode" id="-708890468%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
@@ -579,7 +609,7 @@
             </div>
           </div>
 <a data-name="-407930336%2FFunctions%2F1759373422" anchor-label="indexOf" id="-407930336%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-407930336%2FFunctions%2F1759373422"><span>index</span><wbr><span><span>Of</span></span></a></div>
@@ -594,7 +624,7 @@
             </div>
           </div>
 <a data-name="-1355335682%2FFunctions%2F1759373422" anchor-label="interleave" id="-1355335682%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../interleave.html"><span><span>interleave</span></span></a></div>
@@ -609,7 +639,7 @@
             </div>
           </div>
 <a data-name="-476347648%2FFunctions%2F1759373422" anchor-label="isEmpty" id="-476347648%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-empty.html"><span>is</span><wbr><span><span>Empty</span></span></a></div>
@@ -624,7 +654,7 @@
             </div>
           </div>
 <a data-name="-1577986619%2FFunctions%2F1759373422" anchor-label="iterator" id="-1577986619%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-1577986619%2FFunctions%2F1759373422"><span><span>iterator</span></span></a></div>
@@ -639,7 +669,7 @@
             </div>
           </div>
 <a data-name="1327716778%2FFunctions%2F1759373422" anchor-label="lastIndexOf" id="1327716778%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#1327716778%2FFunctions%2F1759373422"><span>last</span><wbr><span>Index</span><wbr><span><span>Of</span></span></a></div>
@@ -654,7 +684,7 @@
             </div>
           </div>
 <a data-name="1573194145%2FFunctions%2F1759373422" anchor-label="lastOrNone" id="1573194145%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../last-or-none.html"><span>last</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -669,7 +699,7 @@
             </div>
           </div>
 <a data-name="-356921961%2FFunctions%2F1759373422" anchor-label="lastOrNull" id="-356921961%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="last-or-null.html"><span>last</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -684,7 +714,7 @@
             </div>
           </div>
 <a data-name="47226137%2FFunctions%2F1759373422" anchor-label="leftPadZip" id="47226137%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../left-pad-zip.html"><span>left</span><wbr><span>Pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -699,7 +729,7 @@
             </div>
           </div>
 <a data-name="-1452260150%2FFunctions%2F1759373422" anchor-label="listIterator" id="-1452260150%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-236165689%2FFunctions%2F1759373422"><span>list</span><wbr><span><span>Iterator</span></span></a></div>
@@ -714,7 +744,7 @@
             </div>
           </div>
 <a data-name="1523280523%2FFunctions%2F1759373422" anchor-label="map" id="1523280523%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map.html"><span><span>map</span></span></a></div>
@@ -729,7 +759,7 @@
             </div>
           </div>
 <a data-name="-958685563%2FFunctions%2F1759373422" anchor-label="mapIndexed" id="-958685563%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-indexed.html"><span>map</span><wbr><span><span>Indexed</span></span></a></div>
@@ -743,23 +773,23 @@
               </div>
             </div>
           </div>
-<a data-name="1700996724%2FFunctions%2F1759373422" anchor-label="mapOrAccumulate" id="1700996724%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+<a data-name="-1487438958%2FFunctions%2F1759373422" anchor-label="mapOrAccumulate" id="-1487438958%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../map-or-accumulate.html"><span>map</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1700996724%2FFunctions%2F1759373422"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1487438958%2FFunctions%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">combine<span class="token operator">: </span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><br><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns <a href="../-either/index.html">Either</a> a <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a> containing the results of applying the given <a href="../map-or-accumulate.html">transform</a> function to each element in the original collection, <strong>or</strong> accumulate all the <i>logical errors</i> into a <a href="index.html">NonEmptyList</a> that were <i>raised</i> while applying the <a href="../map-or-accumulate.html">transform</a> function.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">combine<span class="token operator">: </span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns <a href="../-either/index.html">Either</a> a <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a> containing the results of applying the given <a href="../map-or-accumulate.html">transform</a> function to each element in the original collection, <strong>or</strong> accumulate all the <i>logical errors</i> that were <i>raised</i> while transforming the collection using the <a href="../map-or-accumulate.html">combine</a> function is used to accumulate all the <i>logical errors</i>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">E</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">combine<span class="token operator">: </span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">E</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/map-or-accumulate.html">A</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/map-or-accumulate.html">B</a><span class="token operator">&gt; </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token keyword">context</span><span class="token punctuation">(</span><a href="../../arrow.core.raise.context/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">) </span><span class="token punctuation">(</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../arrow.core.raise.context/map-or-accumulate.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">B</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/map-or-accumulate.html">A</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/map-or-accumulate.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><span class="token keyword">context</span><span class="token punctuation">(</span><a href="../../arrow.core.raise.context/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">) </span><span class="token punctuation">(</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../arrow.core.raise.context/map-or-accumulate.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/map-or-accumulate.html">B</a><span class="token operator">&gt;</span></div><br><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns <a href="../-either/index.html">Either</a> a <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a> containing the results of applying the given <a href="../map-or-accumulate.html">transform</a> function to each element in the original collection, <strong>or</strong> accumulate all the <i>logical errors</i> into a <a href="index.html">NonEmptyList</a> that were <i>raised</i> while applying the <a href="../map-or-accumulate.html">transform</a> function.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../map-or-accumulate.html"><span class="token function">mapOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">combine<span class="token operator">: </span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">transform<span class="token operator">: </span><a href="../../arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="../map-or-accumulate.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../map-or-accumulate.html">B</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-either/index.html">Either</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../map-or-accumulate.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns <a href="../-either/index.html">Either</a> a <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a> containing the results of applying the given <a href="../map-or-accumulate.html">transform</a> function to each element in the original collection, <strong>or</strong> accumulate all the <i>logical errors</i> that were <i>raised</i> while transforming the collection using the <a href="../map-or-accumulate.html">combine</a> function is used to accumulate all the <i>logical errors</i>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1389328446%2FFunctions%2F1759373422" anchor-label="max" id="-1389328446%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../max.html"><span><span>max</span></span></a></div>
@@ -774,7 +804,7 @@
             </div>
           </div>
 <a data-name="-129388461%2FFunctions%2F1759373422" anchor-label="maxBy" id="-129388461%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../max-by.html"><span>max</span><wbr><span><span>By</span></span></a></div>
@@ -789,7 +819,7 @@
             </div>
           </div>
 <a data-name="-390354128%2FFunctions%2F1759373422" anchor-label="min" id="-390354128%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../min.html"><span><span>min</span></span></a></div>
@@ -804,7 +834,7 @@
             </div>
           </div>
 <a data-name="-192923099%2FFunctions%2F1759373422" anchor-label="minBy" id="-192923099%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../min-by.html"><span>min</span><wbr><span><span>By</span></span></a></div>
@@ -819,7 +849,7 @@
             </div>
           </div>
 <a data-name="-1631136614%2FFunctions%2F1759373422" anchor-label="padZip" id="-1631136614%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="pad-zip.html"><span>pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -834,7 +864,7 @@
             </div>
           </div>
 <a data-name="1274265025%2FFunctions%2F1759373422" anchor-label="padZip" id="1274265025%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../pad-zip.html"><span>pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -849,7 +879,7 @@
             </div>
           </div>
 <a data-name="2060070641%2FFunctions%2F1759373422" anchor-label="plus" id="2060070641%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="plus.html"><span><span>plus</span></span></a></div>
@@ -864,7 +894,7 @@
             </div>
           </div>
 <a data-name="475734265%2FFunctions%2F1759373422" anchor-label="reduceOrNull" id="475734265%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../reduce-or-null.html"><span>reduce</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -879,7 +909,7 @@
             </div>
           </div>
 <a data-name="-2016103670%2FFunctions%2F1759373422" anchor-label="reduceRightNull" id="-2016103670%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../reduce-right-null.html"><span>reduce</span><wbr><span>Right</span><wbr><span><span>Null</span></span></a></div>
@@ -894,7 +924,7 @@
             </div>
           </div>
 <a data-name="283654527%2FFunctions%2F1759373422" anchor-label="rightPadZip" id="283654527%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../right-pad-zip.html"><span>right</span><wbr><span>Pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -909,7 +939,7 @@
             </div>
           </div>
 <a data-name="-614842528%2FFunctions%2F1759373422" anchor-label="separateEither" id="-614842528%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../separate-either.html"><span>separate</span><wbr><span><span>Either</span></span></a></div>
@@ -924,7 +954,7 @@
             </div>
           </div>
 <a data-name="-537174434%2FFunctions%2F1759373422" anchor-label="separateIor" id="-537174434%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../separate-ior.html"><span>separate</span><wbr><span><span>Ior</span></span></a></div>
@@ -939,7 +969,7 @@
             </div>
           </div>
 <a data-name="1843991009%2FFunctions%2F1759373422" anchor-label="singleOrNone" id="1843991009%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../single-or-none.html"><span>single</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -954,7 +984,7 @@
             </div>
           </div>
 <a data-name="1555181443%2FFunctions%2F1759373422" anchor-label="split" id="1555181443%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../split.html"><span><span>split</span></span></a></div>
@@ -969,7 +999,7 @@
             </div>
           </div>
 <a data-name="423386006%2FFunctions%2F1759373422" anchor-label="subList" id="423386006%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#423386006%2FFunctions%2F1759373422"><span>sub</span><wbr><span><span>List</span></span></a></div>
@@ -984,7 +1014,7 @@
             </div>
           </div>
 <a data-name="1423255301%2FFunctions%2F1759373422" anchor-label="tail" id="1423255301%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../tail.html"><span><span>tail</span></span></a></div>
@@ -999,7 +1029,7 @@
             </div>
           </div>
 <a data-name="-526308546%2FFunctions%2F1759373422" anchor-label="toList" id="-526308546%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-list.html"><span>to</span><wbr><span><span>List</span></span></a></div>
@@ -1008,13 +1038,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="to-list.html"><span class="token function">toList</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="index.html">E</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-expose-boxed/index.html"><span class="token annotation builtin">JvmExposeBoxed</span></a></div></div><span class="token keyword">fun </span><a href="to-list.html"><span class="token function">toList</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="index.html">E</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-2046385314%2FFunctions%2F1759373422" anchor-label="toNonEmptyList" id="-2046385314%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../-non-empty-collection/to-non-empty-list.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span><span>List</span></span></a></div>
@@ -1029,7 +1059,7 @@
             </div>
           </div>
 <a data-name="17476449%2FFunctions%2F1759373422" anchor-label="toNonEmptyListOrNone" id="17476449%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-non-empty-list-or-none.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -1044,7 +1074,7 @@
             </div>
           </div>
 <a data-name="1502078066%2FFunctions%2F1759373422" anchor-label="toNonEmptyListOrNull" id="1502078066%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-non-empty-list-or-null.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1059,7 +1089,7 @@
             </div>
           </div>
 <a data-name="-2009922189%2FFunctions%2F1759373422" anchor-label="toNonEmptyListOrThrow" id="-2009922189%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-non-empty-list-or-throw.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1074,7 +1104,7 @@
             </div>
           </div>
 <a data-name="-866972868%2FFunctions%2F1759373422" anchor-label="toNonEmptySet" id="-866972868%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../-non-empty-collection/to-non-empty-set.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span><span>Set</span></span></a></div>
@@ -1089,7 +1119,7 @@
             </div>
           </div>
 <a data-name="-947933765%2FFunctions%2F1759373422" anchor-label="toNonEmptySetOrNone" id="-947933765%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-non-empty-set-or-none.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -1104,7 +1134,7 @@
             </div>
           </div>
 <a data-name="536667852%2FFunctions%2F1759373422" anchor-label="toNonEmptySetOrNull" id="536667852%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-non-empty-set-or-null.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1119,7 +1149,7 @@
             </div>
           </div>
 <a data-name="-1872867751%2FFunctions%2F1759373422" anchor-label="toNonEmptySetOrThrow" id="-1872867751%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-non-empty-set-or-throw.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1134,7 +1164,7 @@
             </div>
           </div>
 <a data-name="-887056533%2FFunctions%2F1759373422" anchor-label="toString" id="-887056533%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
@@ -1149,7 +1179,7 @@
             </div>
           </div>
 <a data-name="-1127598010%2FFunctions%2F1759373422" anchor-label="unalign" id="-1127598010%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../unalign.html"><span><span>unalign</span></span></a></div>
@@ -1164,7 +1194,7 @@
             </div>
           </div>
 <a data-name="583611402%2FFunctions%2F1759373422" anchor-label="unweave" id="583611402%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../unweave.html"><span><span>unweave</span></span></a></div>
@@ -1179,7 +1209,7 @@
             </div>
           </div>
 <a data-name="-1330958064%2FFunctions%2F1759373422" anchor-label="unzip" id="-1330958064%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../unzip.html"><span><span>unzip</span></span></a></div>
@@ -1194,7 +1224,7 @@
             </div>
           </div>
 <a data-name="2068107653%2FFunctions%2F1759373422" anchor-label="wrapAsNonEmptyListOrNull" id="2068107653%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../wrap-as-non-empty-list-or-null.html"><span>wrap</span><wbr><span>As</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1209,7 +1239,7 @@
             </div>
           </div>
 <a data-name="68351336%2FFunctions%2F1759373422" anchor-label="wrapAsNonEmptyListOrThrow" id="68351336%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../wrap-as-non-empty-list-or-throw.html"><span>wrap</span><wbr><span>As</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1224,7 +1254,7 @@
             </div>
           </div>
 <a data-name="-50217983%2FFunctions%2F1759373422" anchor-label="zip" id="-50217983%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../-non-empty-collection/zip.html"><span><span>zip</span></span></a></div>
@@ -1239,7 +1269,7 @@
             </div>
           </div>
 <a data-name="714858047%2FFunctions%2F1759373422" anchor-label="zip" id="714858047%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../zip.html"><span><span>zip</span></span></a></div>
@@ -1259,17 +1289,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

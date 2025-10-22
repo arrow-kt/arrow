@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>arrow.core.raise</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,36 +24,44 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":arrow-core/androidAndJvmMain">androidAndJvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" aria-pressed="true" data-filter=":arrow-core/jsMain">js</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/nonJvmAndJsMain">nonJvmAndJs</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core/androidAndJvmMain" data-filter=":arrow-core/androidAndJvmMain">
+                                <span class="checkbox--icon"></span>
+                                androidAndJvm
+                            </label>
+                        </li>
                         <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox--input" id=":arrow-core/commonMain" data-filter=":arrow-core/commonMain">
@@ -61,36 +69,52 @@
                                 common
                             </label>
                         </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core/jsMain" data-filter=":arrow-core/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-core/nonJvmAndJsMain" data-filter=":arrow-core/nonJvmAndJsMain">
+                                <span class="checkbox--icon"></span>
+                                nonJvmAndJs
+                            </label>
+                        </li>
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="package" id="content" pageids="arrow-core::arrow.core.raise////PointingToDeclaration//1759373422">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="arrow-core::arrow.core.raise////PointingToDeclaration//-986218234">
   <div class="breadcrumbs"><a href="../index.html">arrow-core</a><span class="delimiter">/</span><span class="current">arrow.core.raise</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
@@ -99,9 +123,24 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
-        <div class="table"><a data-name="1664150729%2FClasslikes%2F1759373422" anchor-label="DelicateRaiseApi" id="1664150729%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-2068453566%2FClasslikes%2F1759373422" anchor-label="Accumulate" id="-2068453566%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-accumulate/index.html"><span><span>Accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2068453566%2FClasslikes%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="-accumulate/index.html">Error</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1664150729%2FClasslikes%2F1759373422" anchor-label="DelicateRaiseApi" id="1664150729%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-delicate-raise-api/index.html"><span>Delicate</span><wbr><span>Raise</span><wbr><span><span>Api</span></span></a></div>
@@ -116,7 +155,7 @@
             </div>
           </div>
 <a data-name="575068053%2FClasslikes%2F1759373422" anchor-label="EagerEffect" id="575068053%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-eager-effect/index.html"><span>Eager</span><wbr><span><span>Effect</span></span></a></div>
@@ -131,7 +170,7 @@
             </div>
           </div>
 <a data-name="-1135360141%2FClasslikes%2F1759373422" anchor-label="Effect" id="-1135360141%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-effect/index.html"><span><span>Effect</span></span></a></div>
@@ -140,13 +179,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="-effect/index.html">Error</a><span class="token punctuation">, </span><a href="-effect/index.html">A</a><span class="token operator">&gt;</span><span class="token operator"> = </span><span class="token keyword">suspend </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="-effect/index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-effect/index.html">A</a></div><div class="brief "><p class="paragraph"><a href="-effect/index.html">Effect</a> represents a function of <code class="lang-kotlin">suspend Raise&lt;R&gt;.() -&gt; A</code>, that short-circuit with a value of <code class="lang-kotlin">R</code> or <code class="lang-kotlin">Throwable</code>, or completes with a value of <code class="lang-kotlin">A</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="-effect/index.html">Error</a><span class="token punctuation">, </span><a href="-effect/index.html">A</a><span class="token operator">&gt;</span><span class="token operator"> = </span><span class="token keyword">suspend </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="-effect/index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-effect/index.html">A</a></div><div class="brief "><p class="paragraph"><a href="-effect/index.html">Effect</a> represents a function of <code class="lang-kotlin">suspend Raise&lt;R&gt;.() -&gt; A</code>, that short-circuits with a value of <code class="lang-kotlin">R</code> or <code class="lang-kotlin">Throwable</code>, or completes with a value of <code class="lang-kotlin">A</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1240942192%2FClasslikes%2F1759373422" anchor-label="ExperimentalRaiseAccumulateApi" id="-1240942192%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-experimental-raise-accumulate-api/index.html"><span>Experimental</span><wbr><span>Raise</span><wbr><span>Accumulate</span><wbr><span><span>Api</span></span></a></div>
@@ -155,13 +194,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-experimental-raise-accumulate-api/index.html">ExperimentalRaiseAccumulateApi</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-c-o-n-s-t-r-u-c-t-o-r/index.html">AnnotationTarget.CONSTRUCTOR</a><span class="token punctuation">, </span></span><wbr><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-c-l-a-s-s/index.html">AnnotationTarget.CLASS</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-experimental-raise-accumulate-api/index.html">ExperimentalRaiseAccumulateApi</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1058015655%2FClasslikes%2F1759373422" anchor-label="ExperimentalTraceApi" id="1058015655%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-experimental-trace-api/index.html"><span>Experimental</span><wbr><span>Trace</span><wbr><span><span>Api</span></span></a></div>
@@ -176,7 +215,7 @@
             </div>
           </div>
 <a data-name="1165200356%2FClasslikes%2F1759373422" anchor-label="IorRaise" id="1165200356%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-raise/index.html"><span>Ior</span><wbr><span><span>Raise</span></span></a></div>
@@ -191,7 +230,7 @@
             </div>
           </div>
 <a data-name="817084338%2FClasslikes%2F1759373422" anchor-label="Raise" id="817084338%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-raise/index.html"><span><span>Raise</span></span></a></div>
@@ -206,7 +245,7 @@
             </div>
           </div>
 <a data-name="-140361936%2FClasslikes%2F1759373422" anchor-label="RaiseAccumulate" id="-140361936%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-raise-accumulate/index.html"><span>Raise</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -215,28 +254,30 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>raise<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Receiver type belonging to <a href="-raise-accumulate/map-or-accumulate.html">mapOrAccumulate</a>. Allows binding both <a href="../arrow.core/-either/index.html">Either</a> and <a href="../arrow.core/-either-nel/index.html">EitherNel</a> values for <a href="../arrow.core/-either/-left/index.html">Either.Left</a> types of <a href="-raise-accumulate/index.html">Error</a>. It extends <a href="-raise/index.html">Raise</a> of <a href="-raise-accumulate/index.html">Error</a>, and allows working over <a href="-raise/index.html">Raise</a> of <a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a> of <a href="-raise-accumulate/index.html">Error</a> as well.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">accumulate<span class="token operator">: </span><a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">raiseErrorsWith<span class="token operator">: </span><span class="token punctuation">(</span><a href="-raise-accumulate/index.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a></span></span><span class="token punctuation">)</span> : <a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt; </span>, <a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="-raise-accumulate/index.html">Error</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">Receiver type belonging to <a href="-raise-accumulate/map-or-accumulate.html">mapOrAccumulate</a>. Allows binding both <a href="../arrow.core/-either/index.html">Either</a> and <a href="../arrow.core/-either-nel/index.html">EitherNel</a> values for <a href="../arrow.core/-either/-left/index.html">Either.Left</a> types of <a href="-raise-accumulate/index.html">Error</a>. It extends <a href="-raise/index.html">Raise</a> of <a href="-raise-accumulate/index.html">Error</a>, and allows working over <a href="-raise/index.html">Raise</a> of <a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a> of <a href="-raise-accumulate/index.html">Error</a> as well.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="896779876%2FClasslikes%2F1759373422" anchor-label="RaiseCancellationException" id="896779876%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+<a data-name="896779876%2FClasslikes%2F-986218234" anchor-label="RaiseCancellationException" id="896779876%2FClasslikes%2F-986218234" data-filterable-set=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/jsMain,:arrow-core/nonJvmAndJsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/jsMain,:arrow-core/nonJvmAndJsMain" data-filterable-set=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/jsMain,:arrow-core/nonJvmAndJsMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-raise-cancellation-exception/index.html"><span>Raise</span><wbr><span>Cancellation</span><wbr><span><span>Exception</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="896779876%2FClasslikes%2F1759373422"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="896779876%2FClasslikes%2F-986218234"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="-delicate-raise-api/index.html"><span class="token annotation builtin">DelicateRaiseApi</span></a></div></div><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div><div class="brief "><p class="paragraph"><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> is a <i>delicate</i> api, and should be used with care. It drives the short-circuiting behavior of <a href="-raise/index.html">Raise</a>.</p></div></div></div>
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain" data-active="" data-toggle=":arrow-core/androidAndJvmMain">androidAndJvm</button><button class="platform-bookmark" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain" data-toggle=":arrow-core/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-core/jsMain" data-filterable-set=":arrow-core/jsMain" data-toggle=":arrow-core/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-core/nonJvmAndJsMain" data-filterable-set=":arrow-core/nonJvmAndJsMain" data-toggle=":arrow-core/nonJvmAndJsMain">nonJvmAndJs</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":arrow-core/androidAndJvmMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="-delicate-raise-api/index.html"><span class="token annotation builtin">DelicateRaiseApi</span></a></div></div><span class="token keyword">actual </span><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> : <span data-unresolved-link="/<ERROR CLASS> ERROR CLASS: Symbol not found for CancellationException///PointingToDeclaration/">&lt;ERROR CLASS&gt; ERROR CLASS: Symbol not found for CancellationException</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="-delicate-raise-api/index.html"><span class="token annotation builtin">DelicateRaiseApi</span></a></div></div><span class="token keyword">expect </span><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div><div class="brief "><p class="paragraph"><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> is a <i>delicate</i> api, and should be used with care. It drives the short-circuiting behavior of <a href="-raise/index.html">Raise</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core/jsMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../arrow-core/arrow.core.raise/-delicate-raise-api/index.html"><span class="token annotation builtin">DelicateRaiseApi</span></a></div></div><span class="token keyword">actual </span><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-core/nonJvmAndJsMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../arrow-core/arrow.core.raise/-delicate-raise-api/index.html"><span class="token annotation builtin">DelicateRaiseApi</span></a></div></div><span class="token keyword">actual </span><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-raise-cancellation-exception/index.html">RaiseCancellationException</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines.cancellation/-cancellation-exception/index.html">CancellationException</a></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="405211667%2FClasslikes%2F1759373422" anchor-label="RaiseDSL" id="405211667%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-raise-d-s-l/index.html"><span>Raise</span><wbr><span><span>DSL</span></span></a></div>
@@ -251,7 +292,7 @@
             </div>
           </div>
 <a data-name="1711297903%2FClasslikes%2F1759373422" anchor-label="ResultRaise" id="1711297903%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-result-raise/index.html"><span>Result</span><wbr><span><span>Raise</span></span></a></div>
@@ -266,7 +307,7 @@
             </div>
           </div>
 <a data-name="-1884823197%2FClasslikes%2F1759373422" anchor-label="SingletonRaise" id="-1884823197%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-singleton-raise/index.html"><span>Singleton</span><wbr><span><span>Raise</span></span></a></div>
@@ -281,7 +322,7 @@
             </div>
           </div>
 <a data-name="-725486471%2FClasslikes%2F1759373422" anchor-label="Trace" id="-725486471%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-trace/index.html"><span><span>Trace</span></span></a></div>
@@ -298,9 +339,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="807156484%2FFunctions%2F1759373422" anchor-label="accumulate" id="807156484%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="accumulate.html"><span><span>accumulate</span></span></a></div>
@@ -315,7 +356,7 @@
             </div>
           </div>
 <a data-name="1479525009%2FFunctions%2F1759373422" anchor-label="accumulate" id="1479525009%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="accumulate.html"><span><span>accumulate</span></span></a></div>
@@ -329,8 +370,23 @@
               </div>
             </div>
           </div>
+<a data-name="-1529471874%2FFunctions%2F1759373422" anchor-label="accumulating" id="-1529471874%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="accumulating.html"><span><span>accumulating</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1529471874%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="accumulating.html">Error</a><span class="token punctuation">, </span><a href="accumulating.html">A</a><span class="token operator">&gt; </span><a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="accumulating.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="accumulating.html"><span class="token function">accumulating</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="accumulating.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="accumulating.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="accumulating.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="1516005078%2FFunctions%2F1759373422" anchor-label="catch" id="1516005078%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="catch.html"><span><span>catch</span></span></a></div>
@@ -345,7 +401,7 @@
             </div>
           </div>
 <a data-name="1133407969%2FFunctions%2F1759373422" anchor-label="catch" id="1133407969%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="catch.html"><span><span>catch</span></span></a></div>
@@ -360,7 +416,7 @@
             </div>
           </div>
 <a data-name="2023722796%2FFunctions%2F1759373422" anchor-label="eagerEffect" id="2023722796%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="eager-effect.html"><span>eager</span><wbr><span><span>Effect</span></span></a></div>
@@ -375,7 +431,7 @@
             </div>
           </div>
 <a data-name="132037359%2FFunctions%2F1759373422" anchor-label="effect" id="132037359%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effect.html"><span><span>effect</span></span></a></div>
@@ -390,7 +446,7 @@
             </div>
           </div>
 <a data-name="1860988236%2FFunctions%2F1759373422" anchor-label="either" id="1860988236%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="either.html"><span><span>either</span></span></a></div>
@@ -399,13 +455,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="either.html">Error</a><span class="token punctuation">, </span><a href="either.html">A</a><span class="token operator">&gt; </span><a href="either.html"><span class="token function">either</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="either.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="either.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="either.html">Error</a><span class="token punctuation">, </span><a href="either.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="either.html">block</a> using <a href="-raise/index.html">Raise</a>, and return its outcome as <a href="../arrow.core/-either/index.html">Either</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="either.html">Error</a><span class="token punctuation">, </span><a href="either.html">A</a><span class="token operator">&gt; </span><a href="either.html"><span class="token function">either</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="either.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="either.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="either.html">Error</a><span class="token punctuation">, </span><a href="either.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="either.html">block</a> using <a href="-raise/index.html">Raise</a>, and returns its outcome as <a href="../arrow.core/-either/index.html">Either</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="874277938%2FFunctions%2F1759373422" anchor-label="ensure" id="874277938%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="ensure.html"><span><span>ensure</span></span></a></div>
@@ -420,7 +476,7 @@
             </div>
           </div>
 <a data-name="-382598237%2FFunctions%2F1759373422" anchor-label="ensureNotNull" id="-382598237%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="ensure-not-null.html"><span>ensure</span><wbr><span>Not</span><wbr><span><span>Null</span></span></a></div>
@@ -434,8 +490,38 @@
               </div>
             </div>
           </div>
+<a data-name="-326417556%2FFunctions%2F1759373422" anchor-label="ensureNotNullOrAccumulate" id="-326417556%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ensure-not-null-or-accumulate.html"><span>ensure</span><wbr><span>Not</span><wbr><span>Null</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-326417556%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ensure-not-null-or-accumulate.html">Error</a><span class="token punctuation">, </span><a href="ensure-not-null-or-accumulate.html">B</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="ensure-not-null-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="ensure-not-null-or-accumulate.html"><span class="token function">ensureNotNullOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="ensure-not-null-or-accumulate.html">B</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">raise<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ensure-not-null-or-accumulate.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="ensure-not-null-or-accumulate.html">B</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1793733699%2FFunctions%2F1759373422" anchor-label="ensureOrAccumulate" id="-1793733699%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ensure-or-accumulate.html"><span>ensure</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1793733699%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ensure-or-accumulate.html">Error</a><span class="token operator">&gt; </span><a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="ensure-or-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="ensure-or-accumulate.html"><span class="token function">ensureOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">condition<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">raise<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ensure-or-accumulate.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="931679896%2FFunctions%2F1759373422" anchor-label="fold" id="931679896%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fold.html"><span><span>fold</span></span></a></div>
@@ -450,7 +536,7 @@
             </div>
           </div>
 <a data-name="-180236591%2FFunctions%2F1759373422" anchor-label="fold" id="-180236591%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fold.html"><span><span>fold</span></span></a></div>
@@ -465,7 +551,7 @@
             </div>
           </div>
 <a data-name="-235093258%2FFunctions%2F1759373422" anchor-label="forEachAccumulating" id="-235093258%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="for-each-accumulating.html"><span>for</span><wbr><span>Each</span><wbr><span><span>Accumulating</span></span></a></div>
@@ -480,7 +566,7 @@
             </div>
           </div>
 <a data-name="1113944133%2FFunctions%2F1759373422" anchor-label="get" id="1113944133%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get.html"><span><span>get</span></span></a></div>
@@ -495,7 +581,7 @@
             </div>
           </div>
 <a data-name="-973202095%2FFunctions%2F1759373422" anchor-label="getOrElse" id="-973202095%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-else.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Else</span></span></a></div>
@@ -510,7 +596,7 @@
             </div>
           </div>
 <a data-name="-206434507%2FFunctions%2F1759373422" anchor-label="getOrNull" id="-206434507%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-null.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -524,8 +610,23 @@
               </div>
             </div>
           </div>
+<a data-name="708295887%2FFunctions%2F1759373422" anchor-label="getValue" id="708295887%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-value.html"><span>get</span><wbr><span><span>Value</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="708295887%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-value.html">A</a><span class="token operator">&gt; </span><a href="-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="get-value.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="get-value.html"><span class="token function">getValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">thisRef<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">property<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-property/index.html">KProperty</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-value.html">A</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="1770246128%2FFunctions%2F1759373422" anchor-label="impure" id="1770246128%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="impure.html"><span><span>impure</span></span></a></div>
@@ -534,13 +635,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="impure.html"><span class="token function">impure</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="impure.html">block</a> using <a href="-raise/index.html">Raise</a>, and ignore its outcome.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="impure.html"><span class="token function">impure</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="impure.html">block</a> using <a href="-raise/index.html">Raise</a>, and ignores its outcome.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="205196665%2FFunctions%2F1759373422" anchor-label="ior" id="205196665%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="ior.html"><span><span>ior</span></span></a></div>
@@ -549,13 +650,28 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ior.html">Error</a><span class="token punctuation">, </span><a href="ior.html">A</a><span class="token operator">&gt; </span><a href="ior.html"><span class="token function">ior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">noinline </span>combineError<span class="token operator">: </span><span class="token punctuation">(</span><a href="ior.html">Error</a><span class="token punctuation">, </span><a href="ior.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="-ior-raise/index.html">IorRaise</a><span class="token operator">&lt;</span><a href="ior.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="ior.html">Error</a><span class="token punctuation">, </span><a href="ior.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="ior.html">block</a> using <a href="-raise/index.html">Raise</a>, and return its outcome as <a href="../arrow.core/-ior/index.html">Ior</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ior.html">Error</a><span class="token punctuation">, </span><a href="ior.html">A</a><span class="token operator">&gt; </span><a href="ior.html"><span class="token function">ior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">noinline </span>combineError<span class="token operator">: </span><span class="token punctuation">(</span><a href="ior.html">Error</a><span class="token punctuation">, </span><a href="ior.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="-ior-raise/index.html">IorRaise</a><span class="token operator">&lt;</span><a href="ior.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="ior.html">Error</a><span class="token punctuation">, </span><a href="ior.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="ior.html">block</a> using <a href="-raise/index.html">Raise</a>, and returns its outcome as <a href="../arrow.core/-ior/index.html">Ior</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1713751355%2FFunctions%2F1759373422" anchor-label="iorAccumulate" id="1713751355%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ior-accumulate.html"><span>ior</span><wbr><span><span>Accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1713751355%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ior-accumulate.html">Error</a><span class="token punctuation">, </span><a href="ior-accumulate.html">A</a><span class="token operator">&gt; </span><a href="ior-accumulate.html"><span class="token function">iorAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">noinline </span>combineError<span class="token operator">: </span><span class="token punctuation">(</span><a href="ior-accumulate.html">Error</a><span class="token punctuation">, </span><a href="ior-accumulate.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior-accumulate.html">Error</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="ior-accumulate.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior-accumulate.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="ior-accumulate.html">Error</a><span class="token punctuation">, </span><a href="ior-accumulate.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="ior-accumulate.html">block</a> using <a href="-raise/index.html">Raise</a>, and returns its outcome as <a href="../arrow.core/-ior/index.html">Ior</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1949475264%2FFunctions%2F1759373422" anchor-label="iorNel" id="-1949475264%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="ior-nel.html"><span>ior</span><wbr><span><span>Nel</span></span></a></div>
@@ -564,13 +680,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token punctuation">, </span><a href="ior-nel.html">A</a><span class="token operator">&gt; </span><a href="ior-nel.html"><span class="token function">iorNel</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">noinline </span>combineError<span class="token operator">: </span><span class="token punctuation">(</span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token operator"> = </span>{ a, b -&gt; a + b }<span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="-ior-raise/index.html">IorRaise</a><span class="token operator">&lt;</span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior-nel.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-ior-nel/index.html">IorNel</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token punctuation">, </span><a href="ior-nel.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Run a computation <a href="ior-nel.html">block</a> using <a href="-raise/index.html">Raise</a>. and return its outcome as <a href="../arrow.core/-ior-nel/index.html">IorNel</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token punctuation">, </span><a href="ior-nel.html">A</a><span class="token operator">&gt; </span><a href="ior-nel.html"><span class="token function">iorNel</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">noinline </span>combineError<span class="token operator">: </span><span class="token punctuation">(</span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token operator"> = </span>{ a, b -&gt; a + b }<span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><a href="-ior-raise/index.html">IorRaise</a><span class="token operator">&lt;</span><a href="../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="ior-nel.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-ior-nel/index.html">IorNel</a><span class="token operator">&lt;</span><a href="ior-nel.html">Error</a><span class="token punctuation">, </span><a href="ior-nel.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Run a computation <a href="ior-nel.html">block</a> using <a href="-raise/index.html">Raise</a>. and returns its outcome as <a href="../arrow.core/-ior-nel/index.html">IorNel</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-2117320102%2FFunctions%2F1759373422" anchor-label="mapError" id="-2117320102%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-error.html"><span>map</span><wbr><span><span>Error</span></span></a></div>
@@ -585,7 +701,7 @@
             </div>
           </div>
 <a data-name="-1071542920%2FFunctions%2F1759373422" anchor-label="mapOrAccumulate" id="-1071542920%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-or-accumulate.html"><span>map</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -600,7 +716,7 @@
             </div>
           </div>
 <a data-name="-1049216670%2FFunctions%2F1759373422" anchor-label="mapValuesOrAccumulate" id="-1049216670%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-values-or-accumulate.html"><span>map</span><wbr><span>Values</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -615,7 +731,7 @@
             </div>
           </div>
 <a data-name="1026603323%2FFunctions%2F1759373422" anchor-label="merge" id="1026603323%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="merge.html"><span><span>merge</span></span></a></div>
@@ -630,7 +746,7 @@
             </div>
           </div>
 <a data-name="-456225867%2FFunctions%2F1759373422" anchor-label="merge" id="-456225867%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="merge.html"><span><span>merge</span></span></a></div>
@@ -645,7 +761,7 @@
             </div>
           </div>
 <a data-name="-1408844528%2FFunctions%2F1759373422" anchor-label="nullable" id="-1408844528%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nullable.html"><span><span>nullable</span></span></a></div>
@@ -654,13 +770,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="nullable.html">A</a><span class="token operator">&gt; </span><a href="nullable.html"><span class="token function">nullable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="nullable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="nullable.html">A</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="nullable.html">block</a> using <a href="-raise/index.html">Raise</a>, and return its outcome as nullable type, where <code class="lang-kotlin">null</code> represents logical failure.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="nullable.html">A</a><span class="token operator">&gt; </span><a href="nullable.html"><span class="token function">nullable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="nullable.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="nullable.html">A</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="nullable.html">block</a> using <a href="-raise/index.html">Raise</a>, and returns its outcome as nullable type, where <code class="lang-kotlin">null</code> represents logical failure.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1273921479%2FFunctions%2F1759373422" anchor-label="option" id="-1273921479%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="option.html"><span><span>option</span></span></a></div>
@@ -669,13 +785,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="option.html">A</a><span class="token operator">&gt; </span><a href="option.html"><span class="token function">option</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../arrow.core/-none/index.html">None</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="option.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><a href="option.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="option.html">block</a> using <a href="-raise/index.html">Raise</a>, and return its outcome as <a href="../arrow.core/-option/index.html">Option</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="option.html">A</a><span class="token operator">&gt; </span><a href="option.html"><span class="token function">option</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../arrow.core/-none/index.html">None</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="option.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../arrow.core/-option/index.html">Option</a><span class="token operator">&lt;</span><a href="option.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="option.html">block</a> using <a href="-raise/index.html">Raise</a>, and returns its outcome as <a href="../arrow.core/-option/index.html">Option</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-986219398%2FFunctions%2F1759373422" anchor-label="recover" id="-986219398%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="recover.html"><span><span>recover</span></span></a></div>
@@ -684,28 +800,28 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><div class="brief "><p class="paragraph">Execute the <a href="-raise/index.html">Raise</a> context function resulting in <a href="recover.html">A</a> or any <i>logical error</i> of type <a href="recover.html">Error</a>, and recover by providing a transform <a href="recover.html">Error</a> into a fallback value of type <a href="recover.html">A</a>. Base implementation of <code class="lang-kotlin">effect { f() } getOrElse { fallback() }</code>.</p></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"recoverReified"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">, </span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">catch<span class="token operator">: </span><span class="token punctuation">(</span>t<span class="token operator">: </span><a href="recover.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">catch<span class="token operator">: </span><span class="token punctuation">(</span>throwable<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><div class="brief "><p class="paragraph">Execute the <a href="-raise/index.html">Raise</a> context function resulting in <a href="recover.html">A</a> or any <i>logical error</i> of type <a href="recover.html">Error</a>, and <a href="recover.html">recover</a> by providing a transform <a href="recover.html">Error</a> into a fallback value of type <a href="recover.html">A</a>, or <a href="recover.html">catch</a> any unexpected exceptions by providing a transform <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a> into a fallback value of type <a href="recover.html">A</a>,</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><div class="brief "><p class="paragraph">Execute the <a href="-raise/index.html">Raise</a> context function resulting in <a href="recover.html">A</a> or any <i>logical error</i> of type <a href="recover.html">Error</a>, and recover by providing a transform of <a href="recover.html">Error</a> into a fallback value of type <a href="recover.html">A</a>. Base implementation of <code class="lang-kotlin">effect { f() } getOrElse { fallback() }</code>.</p></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"recoverReified"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">, </span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">catch<span class="token operator">: </span><span class="token punctuation">(</span>t<span class="token operator">: </span><a href="recover.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><div class="brief "><p class="paragraph">Execute the <a href="-raise/index.html">Raise</a> context function resulting in <a href="recover.html">A</a> or any <i>logical error</i> of type <a href="recover.html">Error</a>, and <a href="recover.html">recover</a> by providing a transform of <a href="recover.html">Error</a> into a fallback value of type <a href="recover.html">A</a>, or <a href="recover.html">catch</a> only exceptions of type <a href="recover.html">T</a> by providing a transform of <a href="recover.html">T</a> into a fallback value of type <a href="recover.html">A</a>, all other types ot exceptions are rethrown.</p></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">catch<span class="token operator">: </span><span class="token punctuation">(</span>throwable<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><div class="brief "><p class="paragraph">Execute the <a href="-raise/index.html">Raise</a> context function resulting in <a href="recover.html">A</a> or any <i>logical error</i> of type <a href="recover.html">Error</a>, and <a href="recover.html">recover</a> by providing a transform of <a href="recover.html">Error</a> into a fallback value of type <a href="recover.html">A</a>, or <a href="recover.html">catch</a> any unexpected exceptions by providing a transform of <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a> into a fallback value of type <a href="recover.html">A</a>,</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1980655126%2FFunctions%2F1759373422" anchor-label="recover" id="1980655126%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+<a data-name="1062068316%2FFunctions%2F1759373422" anchor-label="recover" id="1062068316%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="recover.html"><span><span>recover</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1980655126%2FFunctions%2F1759373422"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1062068316%2FFunctions%2F1759373422"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recover<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span></div><br><div class="symbol monospace"><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recover<span class="token operator">: </span><span class="token keyword">suspend </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Catch the raised value <a href="recover.html">Error</a> of the <code class="lang-kotlin">Effect</code>. You can either return a value a new value of <a href="recover.html">A</a>, or short-circuit the effect by raising with a value of <a href="recover.html">OtherError</a>, or raise an exception into <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/index.html">suspend</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recover<span class="token operator">: </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="-accumulate/index.html">Accumulate</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="recover.html">A</a></div><br><div class="symbol monospace"><span class="token keyword">infix </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt; </span><a href="-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="recover.html">Error</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="recover.html"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recover<span class="token operator">: </span><span class="token keyword">suspend </span><a href="-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="recover.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="recover.html">OtherError</a><span class="token punctuation">, </span><a href="recover.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Catch the raised value <a href="recover.html">Error</a> of the <code class="lang-kotlin">Effect</code>. You can either return a value a new value of <a href="recover.html">A</a>, or short-circuit the effect by raising with a value of <a href="recover.html">OtherError</a>, or raise an exception into <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/index.html">suspend</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="596936075%2FFunctions%2F1759373422" anchor-label="result" id="596936075%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="result.html"><span><span>result</span></span></a></div>
@@ -714,13 +830,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="result.html">A</a><span class="token operator">&gt; </span><a href="result.html"><span class="token function">result</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-result-raise/index.html">ResultRaise</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="result.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><a href="result.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="result.html">block</a> using <a href="-raise/index.html">Raise</a>, and return its outcome as <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="result.html">A</a><span class="token operator">&gt; </span><a href="result.html"><span class="token function">result</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="-result-raise/index.html">ResultRaise</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="result.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><a href="result.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs a computation <a href="result.html">block</a> using <a href="-raise/index.html">Raise</a>, and returns its outcome as <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1433128139%2FFunctions%2F1759373422" anchor-label="singleton" id="1433128139%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="singleton.html"><span><span>singleton</span></span></a></div>
@@ -735,7 +851,7 @@
             </div>
           </div>
 <a data-name="25463807%2FFunctions%2F1759373422" anchor-label="toEither" id="25463807%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-either.html"><span>to</span><wbr><span><span>Either</span></span></a></div>
@@ -750,7 +866,7 @@
             </div>
           </div>
 <a data-name="-2074977259%2FFunctions%2F1759373422" anchor-label="toIor" id="-2074977259%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-ior.html"><span>to</span><wbr><span><span>Ior</span></span></a></div>
@@ -765,7 +881,7 @@
             </div>
           </div>
 <a data-name="-418868602%2FFunctions%2F1759373422" anchor-label="toOption" id="-418868602%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-option.html"><span>to</span><wbr><span><span>Option</span></span></a></div>
@@ -780,7 +896,7 @@
             </div>
           </div>
 <a data-name="611796145%2FFunctions%2F1759373422" anchor-label="toResult" id="611796145%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-result.html"><span>to</span><wbr><span><span>Result</span></span></a></div>
@@ -795,7 +911,7 @@
             </div>
           </div>
 <a data-name="-1379423432%2FFunctions%2F1759373422" anchor-label="traced" id="-1379423432%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="traced.html"><span><span>traced</span></span></a></div>
@@ -810,7 +926,7 @@
             </div>
           </div>
 <a data-name="1965986626%2FFunctions%2F1759373422" anchor-label="withError" id="1965986626%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="with-error.html"><span>with</span><wbr><span><span>Error</span></span></a></div>
@@ -825,7 +941,7 @@
             </div>
           </div>
 <a data-name="-521823185%2FFunctions%2F1759373422" anchor-label="withErrorTraced" id="-521823185%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="with-error-traced.html"><span>with</span><wbr><span>Error</span><wbr><span><span>Traced</span></span></a></div>
@@ -840,7 +956,7 @@
             </div>
           </div>
 <a data-name="-1547725396%2FFunctions%2F1759373422" anchor-label="zipOrAccumulate" id="-1547725396%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="zip-or-accumulate.html"><span>zip</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -860,17 +976,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

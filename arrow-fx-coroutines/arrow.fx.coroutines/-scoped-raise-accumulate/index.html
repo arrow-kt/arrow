@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>ScopedRaiseAccumulate</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-coroutines/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-fx-coroutines/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-coroutines::arrow.fx.coroutines/ScopedRaiseAccumulate///PointingToDeclaration//1374329387">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-coroutines</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.coroutines</a><span class="delimiter">/</span><span class="current">ScopedRaiseAccumulate</span></div>
   <div class="cover ">
@@ -100,9 +100,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
-        <h2 class="">Constructors</h2>
+        <h2 class="tableheader">Constructors</h2>
         <div class="table"><a data-name="27882178%2FConstructors%2F1374329387" anchor-label="ScopedRaiseAccumulate" id="27882178%2FConstructors%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-scoped-raise-accumulate.html"><span>Scoped</span><wbr><span>Raise</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -119,9 +119,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="-1654120400%2FProperties%2F1374329387" anchor-label="coroutineContext" id="-1654120400%2FProperties%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../../arrow.fx.coroutines.await/-await-all-scope/index.html#-1654120400%2FProperties%2F1374329387"><span>coroutine</span><wbr><span><span>Context</span></span></a></div>
@@ -135,8 +135,38 @@
               </div>
             </div>
           </div>
+<a data-name="-263027236%2FProperties%2F1374329387" anchor-label="hasAccumulatedErrors" id="-263027236%2FProperties%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-263027236%2FProperties%2F1374329387"><span>has</span><wbr><span>Accumulated</span><wbr><span><span>Errors</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-263027236%2FProperties%2F1374329387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-263027236%2FProperties%2F1374329387">hasAccumulatedErrors</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1143122102%2FProperties%2F1374329387" anchor-label="latestError" id="-1143122102%2FProperties%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1143122102%2FProperties%2F1374329387"><span>latest</span><wbr><span><span>Error</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1143122102%2FProperties%2F1374329387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-1143122102%2FProperties%2F1374329387">latestError</a><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="606187263%2FProperties%2F1374329387" anchor-label="raise" id="606187263%2FProperties%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#606187263%2FProperties%2F1374329387"><span><span>raise</span></span></a></div>
@@ -145,7 +175,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#606187263%2FProperties%2F1374329387">raise</a><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#606187263%2FProperties%2F1374329387"><strike>raise</strike></a><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise/index.html">Raise</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -153,9 +183,39 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="2042745936%2FFunctions%2F1374329387" anchor-label="accumulating" id="2042745936%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-2113835855%2FFunctions%2F1374329387" anchor-label="accumulate" id="-2113835855%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-2113835855%2FFunctions%2F1374329387"><span><span>accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2113835855%2FFunctions%2F1374329387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-2113835855%2FFunctions%2F1374329387"><span class="token function">accumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">error<span class="token operator">: </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="248676640%2FFunctions%2F1374329387" anchor-label="accumulateAll" id="248676640%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#248676640%2FFunctions%2F1374329387"><span>accumulate</span><wbr><span><span>All</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="248676640%2FFunctions%2F1374329387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#248676640%2FFunctions%2F1374329387"><span class="token function">accumulateAll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">errors<span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2042745936%2FFunctions%2F1374329387" anchor-label="accumulating" id="2042745936%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#2042745936%2FFunctions%2F1374329387"><span><span>accumulating</span></span></a></div>
@@ -170,7 +230,7 @@
             </div>
           </div>
 <a data-name="1731526142%2FFunctions%2F1374329387" anchor-label="awaitAll" id="1731526142%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../../arrow.fx.coroutines.await/await-all.html"><span>await</span><wbr><span><span>All</span></span></a></div>
@@ -184,38 +244,38 @@
               </div>
             </div>
           </div>
-<a data-name="1976639046%2FFunctions%2F1374329387" anchor-label="bind" id="1976639046%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+<a data-name="556661034%2FFunctions%2F1374329387" anchor-label="bind" id="556661034%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#-1142561667%2FFunctions%2F1374329387"><span><span>bind</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1976639046%2FFunctions%2F1374329387"></span>
+                  <div><a href="../-raise-scope/index.html#-1142561667%2FFunctions%2F1374329387"><span><span>bind</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="556661034%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1142561667%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1142561667%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#1713127244%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#1713127244%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#1277750037%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#1277750037%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../-raise-scope/index.html#-1142561667%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-raise-scope/index.html#-1142561667%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../-raise-scope/index.html#1713127244%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-raise-scope/index.html#1713127244%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../-raise-scope/index.html#1277750037%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-raise-scope/index.html#1277750037%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1584196316%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1584196316%2FFunctions%2F1374329387"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1065128878%2FFunctions%2F1374329387" anchor-label="bindAll" id="-1065128878%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+<a data-name="1005023492%2FFunctions%2F1374329387" anchor-label="bindAll" id="1005023492%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-348719598%2FFunctions%2F1374329387"><span>bind</span><wbr><span><span>All</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1065128878%2FFunctions%2F1374329387"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1005023492%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-348719598%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-348719598%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#14043732%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#14043732%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#204699522%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#204699522%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#294225098%2FFunctions%2F1374329387">K</a><span class="token punctuation">, </span><a href="index.html#294225098%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">K</a><span class="token punctuation">, </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#294225098%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">K</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-348719598%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-348719598%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllIor"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#743607901%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#743607901%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#14043732%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#14043732%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllIor"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1813810853%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1813810853%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#204699522%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#204699522%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllIor"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1068301587%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1068301587%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#294225098%2FFunctions%2F1374329387">K</a><span class="token punctuation">, </span><a href="index.html#294225098%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">K</a><span class="token punctuation">, </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#294225098%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">K</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-name/index.html"><span class="token annotation builtin">JvmName</span></a><span class="token punctuation">(</span><span>name<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"bindAllIor"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#596720293%2FFunctions%2F1374329387">K</a><span class="token punctuation">, </span><a href="index.html#596720293%2FFunctions%2F1374329387">V</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">K</a><span class="token punctuation">, </span><a href="../../../arrow-core/arrow.core/-ior/index.html">Ior</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#596720293%2FFunctions%2F1374329387"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">K</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all.html">V</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="358167879%2FFunctions%2F1374329387" anchor-label="bindAllOrAccumulate" id="358167879%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#358167879%2FFunctions%2F1374329387"><span>bind</span><wbr><span>All</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -224,13 +284,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#358167879%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#358167879%2FFunctions%2F1374329387"><span class="token function">bindAllOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#358167879%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#358167879%2FFunctions%2F1374329387"><span class="token function">bindAllOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-all-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-919655914%2FFunctions%2F1374329387" anchor-label="bindNel" id="-919655914%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-919655914%2FFunctions%2F1374329387"><span>bind</span><wbr><span><span>Nel</span></span></a></div>
@@ -245,7 +305,7 @@
             </div>
           </div>
 <a data-name="-1807268773%2FFunctions%2F1374329387" anchor-label="bindNelOrAccumulate" id="-1807268773%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-1807268773%2FFunctions%2F1374329387"><span>bind</span><wbr><span>Nel</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -254,13 +314,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1807268773%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either-nel/index.html">EitherNel</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-nel-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1807268773%2FFunctions%2F1374329387"><span class="token function">bindNelOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-nel-or-accumulate.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1807268773%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either-nel/index.html">EitherNel</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-nel-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1807268773%2FFunctions%2F1374329387"><span class="token function">bindNelOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-nel-or-accumulate.html">A</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="806712026%2FFunctions%2F1374329387" anchor-label="bindOrAccumulate" id="806712026%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#806712026%2FFunctions%2F1374329387"><span>bind</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -269,13 +329,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#806712026%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#806712026%2FFunctions%2F1374329387"><span class="token function">bindOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-or-accumulate.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#806712026%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#806712026%2FFunctions%2F1374329387"><span class="token function">bindOrAccumulate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/bind-or-accumulate.html">A</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1717348250%2FFunctions%2F1374329387" anchor-label="ensureNotNullOrAccumulate" id="-1717348250%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-1717348250%2FFunctions%2F1374329387"><span>ensure</span><wbr><span>Not</span><wbr><span>Null</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -284,13 +344,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1717348250%2FFunctions%2F1374329387">B</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="index.html#-1717348250%2FFunctions%2F1374329387"><span class="token function">ensureNotNullOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/ensure-not-null-or-accumulate.html">B</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">raise<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1717348250%2FFunctions%2F1374329387">B</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="index.html#-1717348250%2FFunctions%2F1374329387"><span class="token function">ensureNotNullOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/ensure-not-null-or-accumulate.html">B</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">raise<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/ensure-not-null-or-accumulate.html">B</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1399899093%2FFunctions%2F1374329387" anchor-label="ensureOrAccumulate" id="-1399899093%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-1399899093%2FFunctions%2F1374329387"><span>ensure</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -299,43 +359,43 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html#-1399899093%2FFunctions%2F1374329387"><span class="token function">ensureOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">condition<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">raise<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="index.html#-1399899093%2FFunctions%2F1374329387"><span class="token function">ensureOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">condition<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">raise<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1908324253%2FFunctions%2F1374329387" anchor-label="getValue" id="-1908324253%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+<a data-name="-224294123%2FFunctions%2F1374329387" anchor-label="getOrAccumulate" id="-224294123%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#-1908324253%2FFunctions%2F1374329387"><span>get</span><wbr><span><span>Value</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1908324253%2FFunctions%2F1374329387"></span>
+                  <div><a href="index.html#-224294123%2FFunctions%2F1374329387"><span>get</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-224294123%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">inline operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-1908324253%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/-value/index.html">RaiseAccumulate.Value</a><span class="token operator">&lt;</span><a href="index.html#-1908324253%2FFunctions%2F1374329387">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-1908324253%2FFunctions%2F1374329387"><span class="token function">getValue</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">thisRef<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">property<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-property/index.html">KProperty</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html#-1908324253%2FFunctions%2F1374329387">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#-224294123%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/get-or-accumulate.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#-224294123%2FFunctions%2F1374329387"><span class="token function">getOrAccumulate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/get-or-accumulate.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/get-or-accumulate.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-599133003%2FFunctions%2F1374329387" anchor-label="invoke" id="-599133003%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="index.html#615850183%2FFunctions%2F1374329387"><span><span>invoke</span></span></a></div>
+                  <div><a href="../-raise-scope/index.html#615850183%2FFunctions%2F1374329387"><span><span>invoke</span></span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-599133003%2FFunctions%2F1374329387"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#615850183%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#615850183%2FFunctions%2F1374329387"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#629703632%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="index.html#629703632%2FFunctions%2F1374329387"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../-raise-scope/index.html#615850183%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-raise-scope/index.html#615850183%2FFunctions%2F1374329387"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../-raise-scope/index.html#629703632%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="../../../arrow-core/arrow.core.raise/-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../-raise-scope/index.html#629703632%2FFunctions%2F1374329387"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/invoke.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1295247946%2FFunctions%2F1374329387" anchor-label="mapOrAccumulate" id="-1295247946%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-124982461%2FFunctions%2F1374329387"><span>map</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -350,7 +410,7 @@
             </div>
           </div>
 <a data-name="-463783139%2FFunctions%2F1374329387" anchor-label="mapValuesOrAccumulate" id="-463783139%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-463783139%2FFunctions%2F1374329387"><span>map</span><wbr><span>Values</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -365,7 +425,7 @@
             </div>
           </div>
 <a data-name="-330716824%2FFunctions%2F1374329387" anchor-label="parZipOrAccumulate" id="-330716824%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../par-zip-or-accumulate.html"><span>par</span><wbr><span>Zip</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -380,7 +440,7 @@
             </div>
           </div>
 <a data-name="315182879%2FFunctions%2F1374329387" anchor-label="raise" id="315182879%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#315182879%2FFunctions%2F1374329387"><span><span>raise</span></span></a></div>
@@ -389,13 +449,28 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#315182879%2FFunctions%2F1374329387"><span class="token function">raise</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">r<span class="token operator">: </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#315182879%2FFunctions%2F1374329387"><span class="token function">raise</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">r<span class="token operator">: </span><a href="index.html">Error</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-nothing/index.html">Nothing</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="365065036%2FFunctions%2F1374329387" anchor-label="recover" id="365065036%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#365065036%2FFunctions%2F1374329387"><span><span>recover</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="365065036%2FFunctions%2F1374329387"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-coroutines/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="index.html#365065036%2FFunctions%2F1374329387">A</a><span class="token operator">&gt; </span><a href="index.html#365065036%2FFunctions%2F1374329387"><span class="token function">recover</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="../../../arrow-core/arrow.core.raise/-raise-accumulate/index.html">RaiseAccumulate</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/recover.html">A</a><span class="token punctuation">, </span></span><span class="parameter ">recover<span class="token operator">: </span><span class="token punctuation">(</span>error<span class="token operator">: </span><a href="index.html">Error</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/recover.html">A</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../arrow-fx-coroutines/arrow.fx.coroutines/-scoped-raise-accumulate/recover.html">A</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1280154788%2FFunctions%2F1374329387" anchor-label="withNel" id="-1280154788%2FFunctions%2F1374329387" data-filterable-set=":arrow-fx-coroutines/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-coroutines/commonMain" data-filterable-set=":arrow-fx-coroutines/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="index.html#-1280154788%2FFunctions%2F1374329387"><span>with</span><wbr><span><span>Nel</span></span></a></div>
@@ -415,17 +490,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

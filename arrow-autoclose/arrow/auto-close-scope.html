@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>autoCloseScope</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-autoclose/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-autoclose/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="member" id="content" pageids="arrow-autoclose::arrow//autoCloseScope/#kotlin.Function1[arrow.AutoCloseScope,TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration//738945118">
   <div class="breadcrumbs"><a href="../index.html">arrow-autoclose</a><span class="delimiter">/</span><a href="index.html">arrow</a><span class="delimiter">/</span><span class="current">autoCloseScope</span></div>
   <div class="cover ">
@@ -99,20 +99,24 @@
 public fun main() {
 --><!-- SUFFIX
 }
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">Scanner("testRead.txt")<br>  .use { scanner -&gt;<br>    Printer("testWrite.txt")<br>      .use { printer -&gt;<br>        for(line in scanner) {<br>          printer.print(line)<br>        }<br>      }<br>  }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><p class="paragraph">We can also write this code as follows:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">autoCloseScope {<br>  val scanner = install(Scanner("testRead.txt"))<br>  val printer = install(Printer("testWrite.txt"))<br>  for(line in scanner) {<br>    printer.print(line)<br>  }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-autocloseable-01.kt --><p class="paragraph">In the snippet above, <code class="lang-kotlin">Scanner</code>, and <code class="lang-kotlin">File</code> just like the nested <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/index.html">use</a> blocks</p><p class="paragraph">This also works with <code class="lang-kotlin">suspend</code>, since <a href="auto-close-scope.html">autoCloseScope</a> is <code class="lang-kotlin">inline</code> however if you need to take into <i>inspect</i> cancellation then you need to use <code class="lang-kotlin">ResourceScope</code> from Arrow Fx Coroutines. So both <a href="-auto-close-scope/index.html">AutoCloseScope</a>, and <code class="lang-kotlin">ResourceScope</code> behave correctly when encountering cancellation, by closing the source, but <code class="lang-kotlin">ResourceScope</code> allows inspecting <i>complete</i>, <i>failure</i>, <strong>and</strong> <i>cancellation</i> in the finalizer.</p><p class="paragraph">We can write the same code from above as a function by adding the scope as receiver:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun AutoCloseScope.copyFiles(input: String, output: String) {<br>  val scanner = install(Scanner(input))<br>  val printer = install(Printer(output))<br>  for(line in scanner) {<br>    printer.print(line)<br>  }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-autocloseable-02.kt --></div></div>
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">Scanner("testRead.txt")<br>  .use { scanner -&gt;<br>    Printer("testWrite.txt")<br>      .use { printer -&gt;<br>        for(line in scanner) {<br>          printer.print(line)<br>        }<br>      }<br>  }</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><p class="paragraph">We can also write this code as follows:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">autoCloseScope {<br>  val scanner = install(Scanner("testRead.txt"))<br>  val printer = install(Printer("testWrite.txt"))<br>  for(line in scanner) {<br>    printer.print(line)<br>  }<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-autocloseable-01.kt --><p class="paragraph">In the snippet above, <code class="lang-kotlin">Scanner</code>, and <code class="lang-kotlin">File</code> just like the nested <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/index.html">use</a> blocks</p><p class="paragraph">This also works with <code class="lang-kotlin">suspend</code>, since <a href="auto-close-scope.html">autoCloseScope</a> is <code class="lang-kotlin">inline</code> however if you need to take into <i>inspect</i> cancellation then you need to use <code class="lang-kotlin">ResourceScope</code> from Arrow Fx Coroutines. So both <a href="-auto-close-scope/index.html">AutoCloseScope</a>, and <code class="lang-kotlin">ResourceScope</code> behave correctly when encountering cancellation, by closing the source, but <code class="lang-kotlin">ResourceScope</code> allows inspecting <i>complete</i>, <i>failure</i>, <strong>and</strong> <i>cancellation</i> in the finalizer.</p><p class="paragraph">We can write the same code from above as a function by adding the scope as receiver:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun AutoCloseScope.copyFiles(input: String, output: String) {<br>  val scanner = install(Scanner(input))<br>  val printer = install(Printer(output))<br>  for(line in scanner) {<br>    printer.print(line)<br>  }<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-autocloseable-02.kt --></div></div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

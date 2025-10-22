@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>arrow.atomic</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,41 +24,39 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-atomic/androidAndJvmMain">androidAndJvm</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-atomic/commonMain">common</button>
-                <button class="platform-tag platform-selector js-like" data-active="" data-filter=":arrow-atomic/jsMain">js</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-atomic/nativeMain">native</button>
-                <button class="platform-tag platform-selector wasm-like" data-active="" data-filter=":arrow-atomic/wasmJsMain">wasmJs</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/androidAndJvmMain">androidAndJvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/commonMain">common</button>
+                <button class="platform-tag platform-selector js-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/jsMain">js</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/nativeMain">native</button>
+                <button class="platform-tag platform-selector wasm-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/wasmJsMain">wasmJs</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
-                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox--input" id=":arrow-atomic/androidAndJvmMain" data-filter=":arrow-atomic/androidAndJvmMain">
                                 <span class="checkbox--icon"></span>
@@ -96,33 +94,35 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="package" id="content" pageids="arrow-atomic::arrow.atomic////PointingToDeclaration//-845993285">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="arrow-atomic::arrow.atomic////PointingToDeclaration//-2072370547">
   <div class="breadcrumbs"><a href="../index.html">arrow-atomic</a><span class="delimiter">/</span><span class="current">arrow.atomic</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
@@ -131,26 +131,26 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
-        <div class="table"><a data-name="115491815%2FClasslikes%2F-845993285" anchor-label="Atomic" id="115491815%2FClasslikes%2F-845993285" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="115491815%2FClasslikes%2F-2072370547" anchor-label="Atomic" id="115491815%2FClasslikes%2F-2072370547" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-atomic/index.html"><span><span>Atomic</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="115491815%2FClasslikes%2F-845993285"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="115491815%2FClasslikes%2F-2072370547"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/androidAndJvmMain" data-active="" data-toggle=":arrow-atomic/androidAndJvmMain">androidAndJvm</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain" data-toggle=":arrow-atomic/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/jsMain" data-filterable-set=":arrow-atomic/jsMain" data-toggle=":arrow-atomic/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/nativeMain" data-filterable-set=":arrow-atomic/nativeMain" data-toggle=":arrow-atomic/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/wasmJsMain" data-filterable-set=":arrow-atomic/wasmJsMain" data-toggle=":arrow-atomic/wasmJsMain">wasmJs</button></div>
-<div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token operator"> = </span>ERROR CLASS: Symbol not found for AtomicReference</div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph"><a href="-atomic/index.html">Atomic</a> value of <a href="-atomic/index.html">V</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicReference.html">AtomicReference</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicReference.html">AtomicReference</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph"><a href="-atomic/index.html">Atomic</a> value of <a href="-atomic/index.html">V</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic/index.html">Atomic</a><span class="token operator">&lt;</span><a href="-atomic/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="-atomic/index.html">V</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-449395533%2FClasslikes%2F2099820986" anchor-label="AtomicBoolean" id="-449395533%2FClasslikes%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-atomic-boolean/index.html"><span>Atomic</span><wbr><span><span>Boolean</span></span></a></div>
@@ -164,36 +164,36 @@
               </div>
             </div>
           </div>
-<a data-name="-1265894452%2FClasslikes%2F-845993285" anchor-label="AtomicInt" id="-1265894452%2FClasslikes%2F-845993285" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain">
+<a data-name="-1265894452%2FClasslikes%2F-2072370547" anchor-label="AtomicInt" id="-1265894452%2FClasslikes%2F-2072370547" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-atomic-int/index.html"><span>Atomic</span><wbr><span><span>Int</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1265894452%2FClasslikes%2F-845993285"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1265894452%2FClasslikes%2F-2072370547"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/androidAndJvmMain" data-active="" data-toggle=":arrow-atomic/androidAndJvmMain">androidAndJvm</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain" data-toggle=":arrow-atomic/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/jsMain" data-filterable-set=":arrow-atomic/jsMain" data-toggle=":arrow-atomic/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/nativeMain" data-filterable-set=":arrow-atomic/nativeMain" data-toggle=":arrow-atomic/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/wasmJsMain" data-filterable-set=":arrow-atomic/wasmJsMain" data-toggle=":arrow-atomic/wasmJsMain">wasmJs</button></div>
-<div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token operator"> = </span>ERROR CLASS: Symbol not found for AtomicInteger</div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicInteger.html">AtomicInteger</a></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicInteger.html">AtomicInteger</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-int/index.html">AtomicInt</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-691526197%2FClasslikes%2F-845993285" anchor-label="AtomicLong" id="-691526197%2FClasslikes%2F-845993285" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain">
+<a data-name="-691526197%2FClasslikes%2F-2072370547" anchor-label="AtomicLong" id="-691526197%2FClasslikes%2F-2072370547" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/commonMain,:arrow-atomic/jsMain,:arrow-atomic/nativeMain,:arrow-atomic/wasmJsMain,:arrow-atomic/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-atomic-long/index.html"><span>Atomic</span><wbr><span><span>Long</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-691526197%2FClasslikes%2F-845993285"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-691526197%2FClasslikes%2F-2072370547"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic/androidAndJvmMain" data-filterable-set=":arrow-atomic/androidAndJvmMain" data-active="" data-toggle=":arrow-atomic/androidAndJvmMain">androidAndJvm</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain" data-toggle=":arrow-atomic/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/jsMain" data-filterable-set=":arrow-atomic/jsMain" data-toggle=":arrow-atomic/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/nativeMain" data-filterable-set=":arrow-atomic/nativeMain" data-toggle=":arrow-atomic/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/wasmJsMain" data-filterable-set=":arrow-atomic/wasmJsMain" data-toggle=":arrow-atomic/wasmJsMain">wasmJs</button></div>
-<div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token operator"> = </span>ERROR CLASS: Loop in supertypes involving arrow/atomic/AtomicLong</div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">typealias </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicLong.html">java.util.concurrent.atomic.AtomicLong</a></div><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token operator"> = </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicLong.html">java.util.concurrent.atomic.AtomicLong</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="-atomic-long/index.html">AtomicLong</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initialValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -201,9 +201,9 @@
         </div>
       </div>
       <div data-togglable="EXTENSION_PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="-830201174%2FProperties%2F2099820986" anchor-label="value" id="-830201174%2FProperties%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="value.html"><span><span>value</span></span></a></div>
@@ -220,9 +220,9 @@
         </div>
       </div>
       <div data-togglable="EXTENSION_FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-2126647883%2FFunctions%2F2099820986" anchor-label="getAndUpdate" id="-2126647883%2FFunctions%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-and-update.html"><span>get</span><wbr><span>And</span><wbr><span><span>Update</span></span></a></div>
@@ -237,7 +237,7 @@
             </div>
           </div>
 <a data-name="-2060683939%2FFunctions%2F2099820986" anchor-label="loop" id="-2060683939%2FFunctions%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="loop.html"><span><span>loop</span></span></a></div>
@@ -252,7 +252,7 @@
             </div>
           </div>
 <a data-name="1744706044%2FFunctions%2F2099820986" anchor-label="tryUpdate" id="1744706044%2FFunctions%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="try-update.html"><span>try</span><wbr><span><span>Update</span></span></a></div>
@@ -267,7 +267,7 @@
             </div>
           </div>
 <a data-name="-191580990%2FFunctions%2F2099820986" anchor-label="update" id="-191580990%2FFunctions%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="update.html"><span><span>update</span></span></a></div>
@@ -282,7 +282,7 @@
             </div>
           </div>
 <a data-name="1798074297%2FFunctions%2F2099820986" anchor-label="updateAndGet" id="1798074297%2FFunctions%2F2099820986" data-filterable-set=":arrow-atomic/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="update-and-get.html"><span>update</span><wbr><span>And</span><wbr><span><span>Get</span></span></a></div>
@@ -302,17 +302,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>TMVar</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-stm/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-fx-stm/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,45 +62,47 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-stm::arrow.fx.stm/TMVar///PointingToDeclaration//279525696">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-stm</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.stm</a><span class="delimiter">/</span><span class="current">TMVar</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>TMVar</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">TMVar</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div><p class="paragraph">A <a href="index.html">TMVar</a> is a mutable reference that can either be empty or hold a value.</p><p class="paragraph">The main use for <a href="index.html">TMVar</a> is as a synchronization primitive as it can be used to force other transactions to wait until a <a href="index.html">TMVar</a> is full.</p><h2 class="">Creating a <a href="index.html">TMVar</a>:</h2><p class="paragraph">As usual with <a href="../-s-t-m/index.html">STM</a> types there are two equal sets of operators for creating them, one that can be used inside and one for use outside of transactions:</p><ul><li><p class="paragraph"><a href="-companion/new.html">TMVar.new</a> and <a href="../new-t-m-var.html">STM.newTMVar</a> create a new filled <a href="index.html">TMVar</a></p></li><li><p class="paragraph"><a href="-companion/empty.html">TMVar.empty</a> and <a href="../new-empty-t-m-var.html">STM.newEmptyTMVar</a> create an empty <a href="index.html">TMVar</a></p></li></ul><h2 class="">Reading the content of a <a href="index.html">TMVar</a></h2><p class="paragraph">Taking the value out of a <a href="index.html">TMVar</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(10)<br>  val result = atomically {<br>    tmvar.take()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-01.kt --><p class="paragraph">Should the <a href="index.html">TMVar</a> be empty at the time of calling <a href="../-s-t-m/take.html">STM.take</a>, it will call <a href="../-s-t-m/retry.html">STM.retry</a>, suspend and wait for another transaction to put a value back.</p><p class="paragraph">This behaviour can be avoided by using <a href="../-s-t-m/try-take.html">STM.tryTake</a> instead:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  val result = atomically {<br>    tmvar.tryTake()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-02.kt --><p class="paragraph">Another effect of using either <a href="../-s-t-m/take.html">STM.take</a> or <a href="../-s-t-m/try-take.html">STM.tryTake</a> is that the <a href="index.html">TMVar</a> will be empty after a successful call. Alternatively if you just want to read without emptying you can use either <a href="../-s-t-m/read.html">STM.read</a> or <a href="../-s-t-m/try-read.html">STM.tryRead</a> which will not remove the value. As with <a href="../-s-t-m/read.html">STM.take</a> will fail and retry the transaction should the <a href="index.html">TMVar</a> be empty, whereas <a href="../-s-t-m/try-take.html">STM.tryTake</a> and <a href="../-s-t-m/try-read.html">STM.tryRead</a> will return null instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(30)<br>  val result = atomically {<br>    tmvar.read()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-03.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  val result = atomically {<br>    tmvar.tryRead()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-04.kt --><h2 class="">Setting the value of a <a href="index.html">TMVar</a>:</h2><p class="paragraph">Changing the value of an empty <a href="index.html">TMVar</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  atomically {<br>    tmvar.put(20)<br>  }<br>  //sampleEnd<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-05.kt --><p class="paragraph">Should the <a href="index.html">TMVar</a> be full, <a href="../-s-t-m/put.html">STM.put</a> will call <a href="../-s-t-m/retry.html">STM.retry</a> and wait for another transaction to empty the <a href="index.html">TMVar</a> again. This can be avoided by using <a href="../-s-t-m/try-put.html">STM.tryPut</a> instead. <a href="../-s-t-m/try-put.html">STM.tryPut</a> returns whether or not the operation was successful.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(20)<br>  val result = atomically {<br>    tmvar.tryPut(30)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-06.kt --><p class="paragraph">Another common pattern is to swap the value of a <a href="index.html">TMVar</a>, returning the old value and setting a new one:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(30)<br>  val result = atomically {<br>    tmvar.swap(40)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-07.kt --><h2 class="">Checking if a <a href="index.html">TMVar</a> is empty:</h2><p class="paragraph">Checking if a <a href="index.html">TMVar</a> is empty or not can be done by either using <a href="../-s-t-m/is-empty.html">STM.isEmpty</a> or <a href="../-s-t-m/is-not-empty.html">STM.isNotEmpty</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  val result = atomically {<br>    tmvar.isEmpty()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmvar-08.kt --><blockquote class="quotation"><p class="paragraph">Because the state of a transaction is constant there can never be a race condition between checking if a <code class="lang-kotlin">TMVar</code> is empty and subsequent reads in the <i>same</i> transaction.</p></blockquote></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">TMVar</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div><p class="paragraph">A <a href="index.html">TMVar</a> is a mutable reference that can either be empty or hold a value.</p><p class="paragraph">The main use for <a href="index.html">TMVar</a> is as a synchronization primitive as it can be used to force other transactions to wait until a <a href="index.html">TMVar</a> is full.</p><h2 class="">Creating a <a href="index.html">TMVar</a>:</h2><p class="paragraph">As usual with <a href="../-s-t-m/index.html">STM</a> types there are two equal sets of operators for creating them, one that can be used inside and one for use outside of transactions:</p><ul><li><p class="paragraph"><a href="-companion/new.html">TMVar.new</a> and <a href="../new-t-m-var.html">STM.newTMVar</a> create a new filled <a href="index.html">TMVar</a></p></li><li><p class="paragraph"><a href="-companion/empty.html">TMVar.empty</a> and <a href="../new-empty-t-m-var.html">STM.newEmptyTMVar</a> create an empty <a href="index.html">TMVar</a></p></li></ul><h2 class="">Reading the content of a <a href="index.html">TMVar</a></h2><p class="paragraph">Taking the value out of a <a href="index.html">TMVar</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(10)<br>  val result = atomically {<br>    tmvar.take()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-01.kt --><p class="paragraph">Should the <a href="index.html">TMVar</a> be empty at the time of calling <a href="../-s-t-m/take.html">STM.take</a>, it will call <a href="../-s-t-m/retry.html">STM.retry</a>, suspend and wait for another transaction to put a value back.</p><p class="paragraph">This behaviour can be avoided by using <a href="../-s-t-m/try-take.html">STM.tryTake</a> instead:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  val result = atomically {<br>    tmvar.tryTake()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-02.kt --><p class="paragraph">Another effect of using either <a href="../-s-t-m/take.html">STM.take</a> or <a href="../-s-t-m/try-take.html">STM.tryTake</a> is that the <a href="index.html">TMVar</a> will be empty after a successful call. Alternatively if you just want to read without emptying you can use either <a href="../-s-t-m/read.html">STM.read</a> or <a href="../-s-t-m/try-read.html">STM.tryRead</a> which will not remove the value. As with <a href="../-s-t-m/read.html">STM.take</a> will fail and retry the transaction should the <a href="index.html">TMVar</a> be empty, whereas <a href="../-s-t-m/try-take.html">STM.tryTake</a> and <a href="../-s-t-m/try-read.html">STM.tryRead</a> will return null instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(30)<br>  val result = atomically {<br>    tmvar.read()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-03.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  val result = atomically {<br>    tmvar.tryRead()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-04.kt --><h2 class="">Setting the value of a <a href="index.html">TMVar</a>:</h2><p class="paragraph">Changing the value of an empty <a href="index.html">TMVar</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  atomically {<br>    tmvar.put(20)<br>  }<br>  //sampleEnd<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-05.kt --><p class="paragraph">Should the <a href="index.html">TMVar</a> be full, <a href="../-s-t-m/put.html">STM.put</a> will call <a href="../-s-t-m/retry.html">STM.retry</a> and wait for another transaction to empty the <a href="index.html">TMVar</a> again. This can be avoided by using <a href="../-s-t-m/try-put.html">STM.tryPut</a> instead. <a href="../-s-t-m/try-put.html">STM.tryPut</a> returns whether or not the operation was successful.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(20)<br>  val result = atomically {<br>    tmvar.tryPut(30)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-06.kt --><p class="paragraph">Another common pattern is to swap the value of a <a href="index.html">TMVar</a>, returning the old value and setting a new one:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.new(30)<br>  val result = atomically {<br>    tmvar.swap(40)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>  println("New value ${atomically { tmvar.tryTake() } }")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-07.kt --><h2 class="">Checking if a <a href="index.html">TMVar</a> is empty:</h2><p class="paragraph">Checking if a <a href="index.html">TMVar</a> is empty or not can be done by either using <a href="../-s-t-m/is-empty.html">STM.isEmpty</a> or <a href="../-s-t-m/is-not-empty.html">STM.isNotEmpty</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMVar<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmvar = TMVar.empty&lt;Int&gt;()<br>  val result = atomically {<br>    tmvar.isEmpty()<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmvar-08.kt --><blockquote class="quotation"><p class="paragraph">Because the state of a transaction is constant there can never be a race condition between checking if a <code class="lang-kotlin">TMVar</code> is empty and subsequent reads in the <i>same</i> transaction.</p></blockquote></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-1505657601%2FClasslikes%2F279525696" anchor-label="Companion" id="-1505657601%2FClasslikes%2F279525696" data-filterable-set=":arrow-fx-stm/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
@@ -122,17 +122,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

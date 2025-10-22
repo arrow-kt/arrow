@@ -20,12 +20,15 @@ arrow.collectors
 module:arrow-core
 arrow.core
 arrow.core.raise
+arrow.core.raise.context
 module:arrow-core-high-arity
 arrow.core
 arrow.core.raise
 module:arrow-core-jackson
 arrow.integrations.jackson.module
 arrow.integrations.jackson.module.internal
+module:arrow-core-result4k
+arrow.core.raise
 module:arrow-core-retrofit
 arrow.retrofit.adapter.either
 arrow.retrofit.adapter.either.networkhandling
@@ -55,7 +58,8 @@ module:arrow-platform
 arrow.platform
 arrow.platform.test
 module:arrow-raise-ktor-server
-arrow.raise.ktor.server
+arrow.raise.ktor.server.response
+arrow.raise.ktor.server.routing
 module:arrow-resilience
 arrow.resilience
 module:arrow-resilience-ktor-client

@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>arrow.integrations.jackson.module</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":arrow-core-jackson/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":arrow-core-jackson/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="package" id="content" pageids="arrow-core-jackson::arrow.integrations.jackson.module////PointingToDeclaration//-1167666519">
   <div class="breadcrumbs"><a href="../index.html">arrow-core-jackson</a><span class="delimiter">/</span><span class="current">arrow.integrations.jackson.module</span></div>
   <div class="cover ">
@@ -99,9 +99,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="897138197%2FClasslikes%2F-1167666519" anchor-label="EitherDeserializerResolver" id="897138197%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either-deserializer-resolver/index.html"><span>Either</span><wbr><span>Deserializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -116,7 +116,7 @@
             </div>
           </div>
 <a data-name="-240500798%2FClasslikes%2F-1167666519" anchor-label="EitherModule" id="-240500798%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either-module/index.html"><span>Either</span><wbr><span><span>Module</span></span></a></div>
@@ -131,7 +131,7 @@
             </div>
           </div>
 <a data-name="550982112%2FClasslikes%2F-1167666519" anchor-label="EitherModuleConfig" id="550982112%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either-module-config/index.html"><span>Either</span><wbr><span>Module</span><wbr><span><span>Config</span></span></a></div>
@@ -146,7 +146,7 @@
             </div>
           </div>
 <a data-name="880180342%2FClasslikes%2F-1167666519" anchor-label="EitherSerializerResolver" id="880180342%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either-serializer-resolver/index.html"><span>Either</span><wbr><span>Serializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -161,7 +161,7 @@
             </div>
           </div>
 <a data-name="1247353962%2FClasslikes%2F-1167666519" anchor-label="IorDeserializerResolver" id="1247353962%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-deserializer-resolver/index.html"><span>Ior</span><wbr><span>Deserializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -176,7 +176,7 @@
             </div>
           </div>
 <a data-name="-1748326697%2FClasslikes%2F-1167666519" anchor-label="IorModule" id="-1748326697%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-module/index.html"><span>Ior</span><wbr><span><span>Module</span></span></a></div>
@@ -191,7 +191,7 @@
             </div>
           </div>
 <a data-name="-1481550539%2FClasslikes%2F-1167666519" anchor-label="IorModuleConfig" id="-1481550539%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-module-config/index.html"><span>Ior</span><wbr><span>Module</span><wbr><span><span>Config</span></span></a></div>
@@ -206,7 +206,7 @@
             </div>
           </div>
 <a data-name="-218895349%2FClasslikes%2F-1167666519" anchor-label="IorSerializerResolver" id="-218895349%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-serializer-resolver/index.html"><span>Ior</span><wbr><span>Serializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -221,7 +221,7 @@
             </div>
           </div>
 <a data-name="-821681758%2FClasslikes%2F-1167666519" anchor-label="NonEmptyCollectionDeserializer" id="-821681758%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-collection-deserializer/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>Collection</span><wbr><span><span>Deserializer</span></span></a></div>
@@ -236,7 +236,7 @@
             </div>
           </div>
 <a data-name="-777758916%2FClasslikes%2F-1167666519" anchor-label="NonEmptyCollectionDeserializerResolver" id="-777758916%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-collection-deserializer-resolver/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>Collection</span><wbr><span>Deserializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -251,7 +251,7 @@
             </div>
           </div>
 <a data-name="67120835%2FClasslikes%2F-1167666519" anchor-label="NonEmptyCollectionSerializer" id="67120835%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-collection-serializer/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>Collection</span><wbr><span><span>Serializer</span></span></a></div>
@@ -266,7 +266,7 @@
             </div>
           </div>
 <a data-name="51622749%2FClasslikes%2F-1167666519" anchor-label="NonEmptyCollectionSerializerResolver" id="51622749%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-collection-serializer-resolver/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>Collection</span><wbr><span>Serializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -281,7 +281,7 @@
             </div>
           </div>
 <a data-name="-428717362%2FClasslikes%2F-1167666519" anchor-label="NonEmptyCollectionsModule" id="-428717362%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-collections-module/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span>Collections</span><wbr><span><span>Module</span></span></a></div>
@@ -296,7 +296,7 @@
             </div>
           </div>
 <a data-name="-1538793525%2FClasslikes%2F-1167666519" anchor-label="OptionDeserializer" id="-1538793525%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-deserializer/index.html"><span>Option</span><wbr><span><span>Deserializer</span></span></a></div>
@@ -311,7 +311,7 @@
             </div>
           </div>
 <a data-name="1597889637%2FClasslikes%2F-1167666519" anchor-label="OptionDeserializerResolver" id="1597889637%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-deserializer-resolver/index.html"><span>Option</span><wbr><span>Deserializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -326,7 +326,7 @@
             </div>
           </div>
 <a data-name="-356570606%2FClasslikes%2F-1167666519" anchor-label="OptionModule" id="-356570606%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-module/index.html"><span>Option</span><wbr><span><span>Module</span></span></a></div>
@@ -341,7 +341,7 @@
             </div>
           </div>
 <a data-name="-742563028%2FClasslikes%2F-1167666519" anchor-label="OptionSerializer" id="-742563028%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-serializer/index.html"><span>Option</span><wbr><span><span>Serializer</span></span></a></div>
@@ -356,7 +356,7 @@
             </div>
           </div>
 <a data-name="2087612102%2FClasslikes%2F-1167666519" anchor-label="OptionSerializerResolver" id="2087612102%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-serializer-resolver/index.html"><span>Option</span><wbr><span>Serializer</span><wbr><span><span>Resolver</span></span></a></div>
@@ -371,7 +371,7 @@
             </div>
           </div>
 <a data-name="-2097037779%2FClasslikes%2F-1167666519" anchor-label="OptionTypeModifier" id="-2097037779%2FClasslikes%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option-type-modifier/index.html"><span>Option</span><wbr><span>Type</span><wbr><span><span>Modifier</span></span></a></div>
@@ -388,9 +388,24 @@
         </div>
       </div>
       <div data-togglable="EXTENSION_FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="-796298667%2FFunctions%2F-1167666519" anchor-label="registerArrowModule" id="-796298667%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
-          <div class="table-row" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1686534124%2FFunctions%2F-1167666519" anchor-label="addArrowModule" id="-1686534124%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-arrow-module.html"><span>add</span><wbr><span>Arrow</span><wbr><span><span>Module</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1686534124%2FFunctions%2F-1167666519"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="add-arrow-module.html">M</a><span class="token operator"> : </span><span data-unresolved-link="com.fasterxml.jackson.databind/ObjectMapper///PointingToDeclaration/">ObjectMapper</span><span class="token punctuation">, </span><a href="add-arrow-module.html">B</a><span class="token operator"> : </span><span data-unresolved-link="com.fasterxml.jackson.databind.cfg/MapperBuilder///PointingToDeclaration/">MapperBuilder</span><span class="token operator">&lt;</span><a href="add-arrow-module.html">M</a><span class="token punctuation">, </span><a href="add-arrow-module.html">B</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><span data-unresolved-link="com.fasterxml.jackson.databind.cfg/MapperBuilder///PointingToDeclaration/">MapperBuilder</span><span class="token operator">&lt;</span><a href="add-arrow-module.html">M</a><span class="token punctuation">, </span><a href="add-arrow-module.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="add-arrow-module.html"><span class="token function">addArrowModule</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eitherModuleConfig<span class="token operator">: </span><a href="-either-module-config/index.html">EitherModuleConfig</a><span class="token operator"> = </span>EitherModuleConfig("left", "right")<span class="token punctuation">, </span></span><span class="parameter ">iorModuleConfig<span class="token operator">: </span><a href="-ior-module-config/index.html">IorModuleConfig</a><span class="token operator"> = </span>IorModuleConfig("left", "right")</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind.cfg/MapperBuilder///PointingToDeclaration/">MapperBuilder</span><span class="token operator">&lt;</span><a href="add-arrow-module.html">M</a><span class="token punctuation">, </span><a href="add-arrow-module.html">B</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-796298667%2FFunctions%2F-1167666519" anchor-label="registerArrowModule" id="-796298667%2FFunctions%2F-1167666519" data-filterable-set=":arrow-core-jackson/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core-jackson/main" data-filterable-set=":arrow-core-jackson/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-arrow-module.html"><span>register</span><wbr><span>Arrow</span><wbr><span><span>Module</span></span></a></div>
@@ -410,17 +425,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

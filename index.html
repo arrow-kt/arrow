@@ -1,44 +1,42 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>All modules</title>
     <link href="images/logo-icon.svg" rel="icon" type="image/svg">
-    <script>var pathToRoot = "";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+        <script>var pathToRoot = "";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script>
 <link href="styles/style.css" rel="Stylesheet">
 <link href="styles/main.css" rel="Stylesheet">
 <link href="styles/prism.css" rel="Stylesheet">
 <link href="styles/logo-styles.css" rel="Stylesheet">
-<link href="styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script>
 <script type="text/javascript" src="scripts/main.js" defer="defer"></script>
 <script type="text/javascript" src="scripts/prism.js" async="async"></script>
 <script type="text/javascript" src="ui-kit/ui-kit.min.js" defer="defer"></script>
-<script type="text/javascript" src="scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 <link href="images/logo-icon.svg">
 </head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-            <a class="library-name--link" href="index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="index.html" tabindex="1">
                     Arrow
             </a>
         <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
@@ -46,7 +44,7 @@
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
         <div class="library-version" id="library-version">
-2.1.2        </div>
+2.2.0-beta.4        </div>
         <div class="navigation-controls">
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
                     type="button">Switch theme
@@ -55,32 +53,34 @@
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
-                        data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" id="content" pageIds="Arrow::.ext/allModules///PointingToDeclaration//0">
   <div class="breadcrumbs"></div>
   <div class="cover ">
     <h2 class="">All modules:</h2>
     <div class="table"><a data-name="1145874221%2FMain%2F0" anchor-label="arrow-annotations" id="1145874221%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-annotations/index.html">arrow-annotations</a></div>
@@ -91,7 +91,7 @@
         </div>
       </div>
 <a data-name="-1541622074%2FMain%2F0" anchor-label="arrow-atomic" id="-1541622074%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-atomic/index.html">arrow-atomic</a></div>
@@ -102,7 +102,7 @@
         </div>
       </div>
 <a data-name="193446984%2FMain%2F0" anchor-label="arrow-autoclose" id="193446984%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-autoclose/index.html">arrow-autoclose</a></div>
@@ -113,7 +113,7 @@
         </div>
       </div>
 <a data-name="791000632%2FMain%2F0" anchor-label="arrow-cache4k" id="791000632%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-cache4k/index.html">arrow-cache4k</a></div>
@@ -124,7 +124,7 @@
         </div>
       </div>
 <a data-name="1348993995%2FMain%2F0" anchor-label="arrow-collectors" id="1348993995%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-collectors/index.html">arrow-collectors</a></div>
@@ -135,7 +135,7 @@
         </div>
       </div>
 <a data-name="-935378990%2FMain%2F0" anchor-label="arrow-core" id="-935378990%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-core/index.html">arrow-core</a></div>
@@ -146,7 +146,7 @@
         </div>
       </div>
 <a data-name="-704149519%2FMain%2F0" anchor-label="arrow-core-high-arity" id="-704149519%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-core-high-arity/index.html">arrow-core-high-arity</a></div>
@@ -157,7 +157,7 @@
         </div>
       </div>
 <a data-name="-2046584564%2FMain%2F0" anchor-label="arrow-core-jackson" id="-2046584564%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-core-jackson/index.html">arrow-core-jackson</a></div>
@@ -167,8 +167,19 @@
           <div><span class="brief-comment"></span></div>
         </div>
       </div>
+<a data-name="572612111%2FMain%2F0" anchor-label="arrow-core-result4k" id="572612111%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="arrow-core-result4k/index.html">arrow-core-result4k</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="572612111%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment"></span></div>
+        </div>
+      </div>
 <a data-name="1945226704%2FMain%2F0" anchor-label="arrow-core-retrofit" id="1945226704%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-core-retrofit/index.html">arrow-core-retrofit</a></div>
@@ -179,7 +190,7 @@
         </div>
       </div>
 <a data-name="-1792529777%2FMain%2F0" anchor-label="arrow-core-serialization" id="-1792529777%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-core-serialization/index.html">arrow-core-serialization</a></div>
@@ -190,7 +201,7 @@
         </div>
       </div>
 <a data-name="-282761867%2FMain%2F0" anchor-label="arrow-eval" id="-282761867%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-eval/index.html">arrow-eval</a></div>
@@ -201,7 +212,7 @@
         </div>
       </div>
 <a data-name="-1678727530%2FMain%2F0" anchor-label="arrow-functions" id="-1678727530%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-functions/index.html">arrow-functions</a></div>
@@ -212,7 +223,7 @@
         </div>
       </div>
 <a data-name="-134948325%2FMain%2F0" anchor-label="arrow-fx-coroutines" id="-134948325%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-fx-coroutines/index.html">arrow-fx-coroutines</a></div>
@@ -223,7 +234,7 @@
         </div>
       </div>
 <a data-name="-1767798528%2FMain%2F0" anchor-label="arrow-fx-stm" id="-1767798528%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-fx-stm/index.html">arrow-fx-stm</a></div>
@@ -234,7 +245,7 @@
         </div>
       </div>
 <a data-name="-1759567285%2FMain%2F0" anchor-label="arrow-optics" id="-1759567285%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-optics/index.html">arrow-optics</a></div>
@@ -245,7 +256,7 @@
         </div>
       </div>
 <a data-name="-699561178%2FMain%2F0" anchor-label="arrow-optics-compose" id="-699561178%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-optics-compose/index.html">arrow-optics-compose</a></div>
@@ -256,7 +267,7 @@
         </div>
       </div>
 <a data-name="1955707995%2FMain%2F0" anchor-label="arrow-optics-reflect" id="1955707995%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-optics-reflect/index.html">arrow-optics-reflect</a></div>
@@ -267,7 +278,7 @@
         </div>
       </div>
 <a data-name="-56283778%2FMain%2F0" anchor-label="arrow-platform" id="-56283778%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-platform/index.html">arrow-platform</a></div>
@@ -278,7 +289,7 @@
         </div>
       </div>
 <a data-name="498041966%2FMain%2F0" anchor-label="arrow-raise-ktor-server" id="498041966%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-raise-ktor-server/index.html">arrow-raise-ktor-server</a></div>
@@ -289,7 +300,7 @@
         </div>
       </div>
 <a data-name="-1871017760%2FMain%2F0" anchor-label="arrow-resilience" id="-1871017760%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-resilience/index.html">arrow-resilience</a></div>
@@ -300,7 +311,7 @@
         </div>
       </div>
 <a data-name="-969871903%2FMain%2F0" anchor-label="arrow-resilience-ktor-client" id="-969871903%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="arrow-resilience-ktor-client/index.html">arrow-resilience-ktor-client</a></div>
@@ -311,7 +322,7 @@
         </div>
       </div>
 <a data-name="334721168%2FMain%2F0" anchor-label="suspendapp" id="334721168%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="suspendapp/index.html">suspendapp</a></div>
@@ -322,7 +333,7 @@
         </div>
       </div>
 <a data-name="1543580313%2FMain%2F0" anchor-label="suspendapp-ktor" id="1543580313%2FMain%2F0" data-filterable-set=""></a>
-      <div class="table-row">
+      <div class="table-row table-row_multimodule">
         <div class="main-subrow ">
           <div class="w-100"><span class="inline-flex">
               <div><a href="suspendapp-ktor/index.html">suspendapp-ktor</a></div>
@@ -336,17 +347,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© Arrow Contributors</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© Arrow Contributors</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

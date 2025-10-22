@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>TMap</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-fx-stm/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-fx-stm/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,45 +62,47 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-fx-stm::arrow.fx.stm/TMap///PointingToDeclaration//279525696">
   <div class="breadcrumbs"><a href="../../index.html">arrow-fx-stm</a><span class="delimiter">/</span><a href="../index.html">arrow.fx.stm</a><span class="delimiter">/</span><span class="current">TMap</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>TMap</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">TMap</a><span class="token operator">&lt;</span><a href="index.html">K</a><span class="token punctuation">, </span><a href="index.html">V</a><span class="token operator">&gt;</span></div><p class="paragraph">A <a href="index.html">TMap</a> is a concurrent transactional implementation of a key value hashmap.</p><p class="paragraph">Based on a Hash-Array-Mapped-Trie implementation. While this does mean that a read may take up to 5 steps to be resolved (depending on how well distributed the hash function is), it also means that structural changes can be isolated and thus do not increase contention with other transactions. This effectively means concurrent access to different values is unlikely to interfere with each other.</p><blockquote class="quotation"><p class="paragraph">Hash conflicts are resolved by chaining.</p></blockquote><h2 class="">Creating a <a href="index.html">TMap</a></h2><p class="paragraph">Depending on whether or not you are in a transaction you can use either <a href="../new-t-map.html">STM.newTMap</a> or <a href="-companion/new.html">TMap.new</a> to create a new <a href="index.html">TMap</a>.</p><p class="paragraph">There are a few alternatives because <a href="index.html">TMap</a> can be supplied a custom hash strategy. If no argument is given it defaults to <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/hash-code.html">Any.hashCode</a>.</p><h2 class="">Reading an element with a key</h2><p class="paragraph">Reading from a <a href="index.html">TMap</a> can be done using either <a href="../-s-t-m/lookup.html">STM.lookup</a> or its alias <a href="../-s-t-m/get.html">STM.get</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap.set(1, "Hello")<br>    tmap[2] = "World"<br><br>    tmap.lookup(1) + tmap[2]<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-01.kt --><blockquote class="quotation"><p class="paragraph">If the key is not present <a href="../-s-t-m/lookup.html">STM.lookup</a> will not retry, instead it returns <code class="lang-kotlin">null</code>.</p></blockquote><h2 class="">Inserting a value</h2><p class="paragraph">Inserting can be done using either <a href="../-s-t-m/insert.html">STM.insert</a> or its alias <a href="../-s-t-m/set.html">STM.set</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap.insert(1, "Hello")<br>    tmap[2] = "World"<br>  }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-02.kt --><p class="paragraph">Another option when adding elements is to use <a href="../-s-t-m/plus-assign.html">STM.plusAssign</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap += (1 to "Hello")<br>    tmap += (2 to "World")<br>  }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-03.kt --><h2 class="">Updating an existing value <a href="index.html">TMap</a>:</h2><p class="paragraph">Using <a href="../-s-t-m/update.html">STM.update</a> it is possible to update an existing value of a <a href="index.html">TMap</a>. If the value is not present it does nothing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap[1] = "Hello"<br>    tmap[2] = "World"<br><br>    tmap.update(1) { it.reversed() }<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-04.kt --><h2 class="">Checking membership</h2><p class="paragraph">Using <a href="../-s-t-m/member.html">STM.member</a> it is possible to check if a <a href="index.html">TMap</a> contains a value for a key:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap[1] = "Hello"<br>    tmap.member(1)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-05.kt --><h2 class="">Removing a value from a <a href="index.html">TMap</a></h2><p class="paragraph">Removing is done by using <a href="../-s-t-m/remove.html">STM.remove</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap[1] = "Hello"<br><br>    tmap.remove(1)<br>  }<br>  //sampleEnd<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-tmap-06.kt --><h2 class="">Where are operations like <code class="lang-kotlin">isEmpty</code> or <code class="lang-kotlin">size</code>?</h2><p class="paragraph">This is a design tradeoff. It is entirely possible to track size however this usually requires one additional <a href="../-t-var/index.html">TVar</a> for size and almost every operation would modify that. That will lead to contention and thus decrease performance.</p><p class="paragraph">Should this feature interest you and performance is not as important please open an issue. It is most certainly possible to add another version of <a href="index.html">TMap</a> that keeps track of its size.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-fx-stm/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">TMap</a><span class="token operator">&lt;</span><a href="index.html">K</a><span class="token punctuation">, </span><a href="index.html">V</a><span class="token operator">&gt;</span></div><p class="paragraph">A <a href="index.html">TMap</a> is a concurrent transactional implementation of a key value hashmap.</p><p class="paragraph">Based on a Hash-Array-Mapped-Trie implementation. While this does mean that a read may take up to 5 steps to be resolved (depending on how well distributed the hash function is), it also means that structural changes can be isolated and thus do not increase contention with other transactions. This effectively means concurrent access to different values is unlikely to interfere with each other.</p><blockquote class="quotation"><p class="paragraph">Hash conflicts are resolved by chaining.</p></blockquote><h2 class="">Creating a <a href="index.html">TMap</a></h2><p class="paragraph">Depending on whether or not you are in a transaction you can use either <a href="../new-t-map.html">STM.newTMap</a> or <a href="-companion/new.html">TMap.new</a> to create a new <a href="index.html">TMap</a>.</p><p class="paragraph">There are a few alternatives because <a href="index.html">TMap</a> can be supplied a custom hash strategy. If no argument is given it defaults to <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/hash-code.html">Any.hashCode</a>.</p><h2 class="">Reading an element with a key</h2><p class="paragraph">Reading from a <a href="index.html">TMap</a> can be done using either <a href="../-s-t-m/lookup.html">STM.lookup</a> or its alias <a href="../-s-t-m/get.html">STM.get</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap.set(1, "Hello")<br>    tmap[2] = "World"<br><br>    tmap.lookup(1) + tmap[2]<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmap-01.kt --><blockquote class="quotation"><p class="paragraph">If the key is not present <a href="../-s-t-m/lookup.html">STM.lookup</a> will not retry, instead it returns <code class="lang-kotlin">null</code>.</p></blockquote><h2 class="">Inserting a value</h2><p class="paragraph">Inserting can be done using either <a href="../-s-t-m/insert.html">STM.insert</a> or its alias <a href="../-s-t-m/set.html">STM.set</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap.insert(1, "Hello")<br>    tmap[2] = "World"<br>  }<br>  //sampleEnd<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmap-02.kt --><p class="paragraph">Another option when adding elements is to use <a href="../-s-t-m/plus-assign.html">STM.plusAssign</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap += (1 to "Hello")<br>    tmap += (2 to "World")<br>  }<br>  //sampleEnd<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmap-03.kt --><h2 class="">Updating an existing value <a href="index.html">TMap</a>:</h2><p class="paragraph">Using <a href="../-s-t-m/update.html">STM.update</a> it is possible to update an existing value of a <a href="index.html">TMap</a>. If the value is not present it does nothing.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap[1] = "Hello"<br>    tmap[2] = "World"<br><br>    tmap.update(1) { it.reversed() }<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmap-04.kt --><h2 class="">Checking membership</h2><p class="paragraph">Using <a href="../-s-t-m/member.html">STM.member</a> it is possible to check if a <a href="index.html">TMap</a> contains a value for a key:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  val result = atomically {<br>    tmap[1] = "Hello"<br>    tmap.member(1)<br>  }<br>  //sampleEnd<br>  println("Result $result")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmap-05.kt --><h2 class="">Removing a value from a <a href="index.html">TMap</a></h2><p class="paragraph">Removing is done by using <a href="../-s-t-m/remove.html">STM.remove</a>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.fx.stm.TMap<br>import arrow.fx.stm.atomically<br><br>suspend fun main() {<br>  //sampleStart<br>  val tmap = TMap.new&lt;Int, String&gt;()<br>  atomically {<br>    tmap[1] = "Hello"<br><br>    tmap.remove(1)<br>  }<br>  //sampleEnd<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-tmap-06.kt --><h2 class="">Where are operations like <code class="lang-kotlin">isEmpty</code> or <code class="lang-kotlin">size</code>?</h2><p class="paragraph">This is a design tradeoff. It is entirely possible to track size however this usually requires one additional <a href="../-t-var/index.html">TVar</a> for size and almost every operation would modify that. That will lead to contention and thus decrease performance.</p><p class="paragraph">Should this feature interest you and performance is not as important please open an issue. It is most certainly possible to add another version of <a href="index.html">TMap</a> that keeps track of its size.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-950782831%2FClasslikes%2F279525696" anchor-label="Companion" id="-950782831%2FClasslikes%2F279525696" data-filterable-set=":arrow-fx-stm/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-fx-stm/commonMain" data-filterable-set=":arrow-fx-stm/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
@@ -122,17 +122,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

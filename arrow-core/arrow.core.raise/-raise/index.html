@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Raise</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core.raise/Raise///PointingToDeclaration//1759373422">
   <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core.raise</a><span class="delimiter">/</span><span class="current">Raise</span></div>
   <div class="cover ">
@@ -97,7 +97,7 @@
     <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">Raise</a><span class="token operator">&lt;</span><span class="token keyword">in </span><a href="index.html">Error</a><span class="token operator">&gt;</span></div><!-- TEST_NAME RaiseKnitTest --><p class="paragraph">The <a href="index.html">Raise</a> DSL allows you to work with <i>logical failures</i> of type <a href="index.html">Error</a>. A <i>logical failure</i> does not necessarily mean that the computation has failed, but that it has stopped or <i>short-circuited</i>. The Arrow website has a <a href="https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/">guide</a> introducing <a href="index.html">Raise</a> and how to use it effectively.</p><p class="paragraph">The <a href="index.html">Raise</a> DSL allows you to <a href="raise.html">raise</a> <i>logical failure</i> of type <a href="index.html">Error</a>, and you can <a href="../../arrow.core/recover.html">recover</a> from them.</p><!-- INCLUDE
 import arrow.core.raise.Raise
 import arrow.core.raise.recover
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun Raise&lt;String&gt;.failure(): Int = raise("failed")<br><br>fun recovered(): Int =<br>  recover({ failure() }) { _: String -&gt; 1 }</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-dsl-01.kt --><p class="paragraph">Above we defined a function <code class="lang-kotlin">failure</code> that raises a logical failure of type <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a> with value <code class="lang-kotlin">"failed"</code>. And in the function <code class="lang-kotlin">recovered</code> we recover from the failure by providing a fallback value, and resolving the error type <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a>.</p><p class="paragraph">You can also use the <a href="../../arrow.core/recover.html">recover</a> function inside the <a href="index.html">Raise</a> DSL to transform the error type to a different type such as <code class="lang-kotlin">List&lt;Char&gt;</code>. And you can do the same for other data types such as <code class="lang-kotlin">Effect</code>, <code class="lang-kotlin">Either</code>, etc. using <a href="../../arrow.core/get-or-else.html">getOrElse</a> as an alternative to <a href="../../arrow.core/recover.html">recover</a>.</p><!-- INCLUDE
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun Raise&lt;String&gt;.failure(): Int = raise("failed")<br><br>fun recovered(): Int =<br>  recover({ failure() }) { _: String -&gt; 1 }</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-raise-dsl-01.kt --><p class="paragraph">Above we defined a function <code class="lang-kotlin">failure</code> that raises a logical failure of type <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a> with value <code class="lang-kotlin">"failed"</code>. And in the function <code class="lang-kotlin">recovered</code> we recover from the failure by providing a fallback value, and resolving the error type <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a>.</p><p class="paragraph">You can also use the <a href="../../arrow.core/recover.html">recover</a> function inside the <a href="index.html">Raise</a> DSL to transform the error type to a different type such as <code class="lang-kotlin">List&lt;Char&gt;</code>. And you can do the same for other data types such as <code class="lang-kotlin">Effect</code>, <code class="lang-kotlin">Either</code>, etc. using <a href="../../arrow.core/get-or-else.html">getOrElse</a> as an alternative to <a href="../../arrow.core/recover.html">recover</a>.</p><!-- INCLUDE
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.raise.Raise
@@ -105,7 +105,7 @@ import arrow.core.raise.effect
 import arrow.core.raise.recover
 import arrow.core.raise.getOrElse
 import io.kotest.matchers.shouldBe
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun Raise&lt;String&gt;.failure(): Int = raise("failed")<br><br>fun Raise&lt;List&lt;Char&gt;&gt;.recovered(): Int =<br>  recover({ failure() }) { msg: String -&gt; raise(msg.toList()) }<br><br>suspend fun Raise&lt;List&lt;Char&gt;&gt;.recovered2(): Int =<br>  effect { failure() } getOrElse { msg: String -&gt; raise(msg.toList()) }<br><br>fun Raise&lt;List&lt;Char&gt;&gt;.recovered3(): Int =<br>  "failed".left() getOrElse { msg: String -&gt; raise(msg.toList()) }<br><br>fun test(): Unit {<br>  recover({ "failed".left().bind() }) { 1 } shouldBe "failed".left().getOrElse { 1 }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-dsl-02.kt --><!-- TEST lines.isEmpty() --><p class="paragraph">Since we defined programs in terms of <a href="index.html">Raise</a> they <i>seamlessly work with any of the builders</i> available in Arrow, or any you might build for your custom types.</p><!-- INCLUDE
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun Raise&lt;String&gt;.failure(): Int = raise("failed")<br><br>fun Raise&lt;List&lt;Char&gt;&gt;.recovered(): Int =<br>  recover({ failure() }) { msg: String -&gt; raise(msg.toList()) }<br><br>suspend fun Raise&lt;List&lt;Char&gt;&gt;.recovered2(): Int =<br>  effect { failure() } getOrElse { msg: String -&gt; raise(msg.toList()) }<br><br>fun Raise&lt;List&lt;Char&gt;&gt;.recovered3(): Int =<br>  "failed".left() getOrElse { msg: String -&gt; raise(msg.toList()) }<br><br>fun test(): Unit {<br>  recover({ "failed".left().bind() }) { 1 } shouldBe "failed".left().getOrElse { 1 }<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-raise-dsl-02.kt --><!-- TEST lines.isEmpty() --><p class="paragraph">Since we defined programs in terms of <a href="index.html">Raise</a> they <i>seamlessly work with any of the builders</i> available in Arrow, or any you might build for your custom types.</p><!-- INCLUDE
 import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.raise.Effect
@@ -117,7 +117,7 @@ import arrow.core.raise.toEither
 import io.kotest.matchers.shouldBe
 
 fun Raise<String>.failure(): Int = raise("failed")
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun test() {<br>  val either: Either&lt;String, Int&gt; =<br>    either { failure() }<br><br>  val effect: Effect&lt;String, Int&gt; =<br>    effect { failure() }<br><br>  val ior: Ior&lt;String, Int&gt; =<br>    ior(String::plus) { failure() }<br><br>  either shouldBe Either.Left("failed")<br>  effect.toEither() shouldBe Either.Left("failed")<br>  ior shouldBe Ior.Left("failed")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-dsl-03.kt --><!-- TEST lines.isEmpty() --><p class="paragraph">Arrow also exposes <a href="index.html">Raise</a> based error handlers for the most common data types, which allows to recover from <i>logical failures</i> whilst transforming the error type.</p><!-- INCLUDE
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun test() {<br>  val either: Either&lt;String, Int&gt; =<br>    either { failure() }<br><br>  val effect: Effect&lt;String, Int&gt; =<br>    effect { failure() }<br><br>  val ior: Ior&lt;String, Int&gt; =<br>    ior(String::plus) { failure() }<br><br>  either shouldBe Either.Left("failed")<br>  effect.toEither() shouldBe Either.Left("failed")<br>  ior shouldBe Ior.Left("failed")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-raise-dsl-03.kt --><!-- TEST lines.isEmpty() --><p class="paragraph">Arrow also exposes <a href="index.html">Raise</a> based error handlers for the most common data types, which allows to recover from <i>logical failures</i> whilst transforming the error type.</p><!-- INCLUDE
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.Raise
@@ -126,15 +126,15 @@ import arrow.core.raise.recover
 import arrow.core.recover
 import arrow.core.right
 import io.kotest.matchers.shouldBe
---><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun Raise&lt;String&gt;.failure(): Int = raise("failed")<br><br>fun test() {<br>  val failure: Either&lt;String, Int&gt; = either { failure() }<br><br>  failure.recover { _: String -&gt; 1.right().bind() } shouldBe Either.Right(1)<br><br>  failure.recover { msg: String -&gt; raise(msg.toList()) } shouldBe Either.Left(listOf('f', 'a', 'i', 'l', 'e', 'd'))<br><br>  recover({ failure.bind() }) { 1 } shouldBe failure.getOrElse { 1 }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-raise-dsl-04.kt --><!-- TEST lines.isEmpty() --><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-singleton-raise/index.html">SingletonRaise</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-result-raise/index.html">ResultRaise</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-ior-raise/index.html">IorRaise</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-raise-accumulate/index.html">RaiseAccumulate</a></div></span></div><div></div></div></div></div></div></div>
+--><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">fun Raise&lt;String&gt;.failure(): Int = raise("failed")<br><br>fun test() {<br>  val failure: Either&lt;String, Int&gt; = either { failure() }<br><br>  failure.recover { _: String -&gt; 1.right().bind() } shouldBe Either.Right(1)<br><br>  failure.recover { msg: String -&gt; raise(msg.toList()) } shouldBe Either.Left(listOf('f', 'a', 'i', 'l', 'e', 'd'))<br><br>  recover({ failure.bind() }) { 1 } shouldBe failure.getOrElse { 1 }<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-raise-dsl-04.kt --><!-- TEST lines.isEmpty() --><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-singleton-raise/index.html">SingletonRaise</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-result-raise/index.html">ResultRaise</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-ior-raise/index.html">IorRaise</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-raise-accumulate/index.html">RaiseAccumulate</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="1479525009%2FFunctions%2F1759373422" anchor-label="accumulate" id="1479525009%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../accumulate.html"><span><span>accumulate</span></span></a></div>
@@ -149,7 +149,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="1976639046%2FFunctions%2F1759373422" anchor-label="bind" id="1976639046%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bind.html"><span><span>bind</span></span></a></div>
@@ -164,7 +164,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="1123409874%2FFunctions%2F1759373422" anchor-label="bindAll" id="1123409874%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bind-all.html"><span>bind</span><wbr><span><span>All</span></span></a></div>
@@ -173,13 +173,13 @@ import io.kotest.matchers.shouldBe
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Extracts all the values in the <a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a>, raising every <a href="../../arrow.core/-either/-left/index.html">Either.Left</a> as a <i>logical failure</i>. In other words, executed <a href="bind.html">bind</a> over every value in this <a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Extracts all the values in the <a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a>, raising every <a href="../../arrow.core/-either/-left/index.html">Either.Left</a> as a <i>logical failure</i>. In other words, executed <a href="bind.html">bind</a> over every value in this <a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><br><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">K</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="bind-all.html">K</a><span class="token punctuation">, </span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="bind-all.html">K</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Extracts all the values in the <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a>, raising every <a href="../../arrow.core/-either/-left/index.html">Either.Left</a> as a <i>logical failure</i>. In other words, executed <a href="bind.html">bind</a> over every value in this <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Extracts all the values in the <a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a>, raising every <a href="../../arrow.core/-either/-left/index.html">Either.Left</a> as a <i>logical failure</i>. In other words, executes <a href="bind.html">bind</a> over every value in this <a href="../../arrow.core/-non-empty-list/index.html">NonEmptyList</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Extracts all the values in the <a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a>, raising every <a href="../../arrow.core/-either/-left/index.html">Either.Left</a> as a <i>logical failure</i>. In other words, executes <a href="bind.html">bind</a> over every value in this <a href="../../arrow.core/-non-empty-set/index.html">NonEmptySet</a>.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><br><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="bind-all.html">K</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="bind-all.html">K</a><span class="token punctuation">, </span><a href="../../arrow.core/-either/index.html">Either</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="bind-all.html"><span class="token function">bindAll</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="bind-all.html">K</a><span class="token punctuation">, </span><a href="bind-all.html">A</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Extracts all the values in the <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a>, raising every <a href="../../arrow.core/-either/-left/index.html">Either.Left</a> as a <i>logical failure</i>. In other words, executes <a href="bind.html">bind</a> over every value in this <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="874277938%2FFunctions%2F1759373422" anchor-label="ensure" id="874277938%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../ensure.html"><span><span>ensure</span></span></a></div>
@@ -194,7 +194,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-382598237%2FFunctions%2F1759373422" anchor-label="ensureNotNull" id="-382598237%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../ensure-not-null.html"><span>ensure</span><wbr><span>Not</span><wbr><span><span>Null</span></span></a></div>
@@ -209,7 +209,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-235093258%2FFunctions%2F1759373422" anchor-label="forEachAccumulating" id="-235093258%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../for-each-accumulating.html"><span>for</span><wbr><span>Each</span><wbr><span><span>Accumulating</span></span></a></div>
@@ -224,7 +224,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-599133003%2FFunctions%2F1759373422" anchor-label="invoke" id="-599133003%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="invoke.html"><span><span>invoke</span></span></a></div>
@@ -233,13 +233,13 @@ import io.kotest.matchers.shouldBe
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="invoke.html">A</a><span class="token operator">&gt; </span><a href="../-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="invoke.html">A</a></div><div class="brief "><p class="paragraph">Invoke an <a href="../-eager-effect/index.html">EagerEffect</a> inside <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context. Any <i>logical failure</i> is raised in <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context, and thus short-circuits the computation.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend operator </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="invoke.html">A</a><span class="token operator">&gt; </span><a href="../-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="invoke.html">A</a></div><div class="brief "><p class="paragraph">Invoke an <a href="../-effect/index.html">Effect</a> inside <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context. Any <i>logical failure</i> raised are raised in <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context, and thus short-circuits the computation.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="invoke.html">A</a><span class="token operator">&gt; </span><a href="../-eager-effect/index.html">EagerEffect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="invoke.html">A</a></div><div class="brief "><p class="paragraph">Invoke an <a href="../-eager-effect/index.html">EagerEffect</a> inside <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context. Any <i>logical failure</i> is raised in <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context, and thus short-circuits the computation.</p></div><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="invoke.html">A</a><span class="token operator">&gt; </span><a href="../-effect/index.html">Effect</a><span class="token operator">&lt;</span><a href="index.html">Error</a><span class="token punctuation">, </span><a href="invoke.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="invoke.html">A</a></div><div class="brief "><p class="paragraph">Invoke an <a href="../-effect/index.html">Effect</a> inside <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context. Any <i>logical failure</i> raised are raised in <code class="lang-kotlin">this</code> <a href="index.html">Raise</a> context, and thus short-circuits the computation.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1071542920%2FFunctions%2F1759373422" anchor-label="mapOrAccumulate" id="-1071542920%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../map-or-accumulate.html"><span>map</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -254,7 +254,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-1049216670%2FFunctions%2F1759373422" anchor-label="mapValuesOrAccumulate" id="-1049216670%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../map-values-or-accumulate.html"><span>map</span><wbr><span>Values</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -269,7 +269,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="95838173%2FFunctions%2F1759373422" anchor-label="raise" id="95838173%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="raise.html"><span><span>raise</span></span></a></div>
@@ -284,7 +284,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-1379423432%2FFunctions%2F1759373422" anchor-label="traced" id="-1379423432%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../traced.html"><span><span>traced</span></span></a></div>
@@ -299,7 +299,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="1965986626%2FFunctions%2F1759373422" anchor-label="withError" id="1965986626%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../with-error.html"><span>with</span><wbr><span><span>Error</span></span></a></div>
@@ -314,7 +314,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-521823185%2FFunctions%2F1759373422" anchor-label="withErrorTraced" id="-521823185%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../with-error-traced.html"><span>with</span><wbr><span>Error</span><wbr><span><span>Traced</span></span></a></div>
@@ -329,7 +329,7 @@ import io.kotest.matchers.shouldBe
             </div>
           </div>
 <a data-name="-1547725396%2FFunctions%2F1759373422" anchor-label="zipOrAccumulate" id="-1547725396%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../zip-or-accumulate.html"><span>zip</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -349,17 +349,21 @@ import io.kotest.matchers.shouldBe
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

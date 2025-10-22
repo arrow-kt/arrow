@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>arrow.core</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,39 +24,37 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/androidAndJvmMain">androidAndJvm</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/nonJvmMain">nonJvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":arrow-core/androidAndJvmMain">androidAndJvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/commonMain">common</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/nonJvmMain">nonJvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
-                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox--input" id=":arrow-core/androidAndJvmMain" data-filter=":arrow-core/androidAndJvmMain">
                                 <span class="checkbox--icon"></span>
@@ -80,33 +78,35 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="package" id="content" pageids="arrow-core::arrow.core////PointingToDeclaration//1935706770">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="arrow-core::arrow.core////PointingToDeclaration//405680380">
   <div class="breadcrumbs"><a href="../index.html">arrow-core</a><span class="delimiter">/</span><span class="current">arrow.core</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
@@ -115,9 +115,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="1535307203%2FClasslikes%2F1759373422" anchor-label="AtomicMemoizationCache" id="1535307203%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-atomic-memoization-cache/index.html"><span>Atomic</span><wbr><span>Memoization</span><wbr><span><span>Cache</span></span></a></div>
@@ -131,25 +131,25 @@
               </div>
             </div>
           </div>
-<a data-name="-1305206017%2FClasslikes%2F-1396690962" anchor-label="ConcurrentMapMemoizationCache" id="-1305206017%2FClasslikes%2F-1396690962" data-filterable-set=":arrow-core/androidAndJvmMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain">
+<a data-name="-1305206017%2FClasslikes%2F1461042520" anchor-label="ConcurrentMapMemoizationCache" id="-1305206017%2FClasslikes%2F1461042520" data-filterable-set=":arrow-core/androidAndJvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-concurrent-map-memoization-cache/index.html"><span>Concurrent</span><wbr><span>Map</span><wbr><span>Memoization</span><wbr><span><span>Cache</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1305206017%2FClasslikes%2F-1396690962"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1305206017%2FClasslikes%2F1461042520"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain" data-active="" data-toggle=":arrow-core/androidAndJvmMain">androidAndJvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">value </span><span class="token keyword">class </span><a href="-concurrent-map-memoization-cache/index.html">ConcurrentMapMemoizationCache</a><span class="token operator">&lt;</span><a href="-concurrent-map-memoization-cache/index.html">K</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token punctuation">, </span><a href="-concurrent-map-memoization-cache/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cache<span class="token operator">: </span>ERROR CLASS: Symbol not found for ConcurrentMap<span class="token operator"> = </span>ConcurrentHashMap()</span></span><span class="token punctuation">)</span> : <a href="-memoization-cache/index.html">MemoizationCache</a><span class="token operator">&lt;</span><a href="-concurrent-map-memoization-cache/index.html">K</a><span class="token punctuation">, </span><a href="-concurrent-map-memoization-cache/index.html">V</a><span class="token operator">&gt; </span></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">value </span><span class="token keyword">class </span><a href="-concurrent-map-memoization-cache/index.html">ConcurrentMapMemoizationCache</a><span class="token operator">&lt;</span><a href="-concurrent-map-memoization-cache/index.html">K</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token punctuation">, </span><a href="-concurrent-map-memoization-cache/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">cache<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentMap.html">ConcurrentMap</a><span class="token operator">&lt;</span><a href="-concurrent-map-memoization-cache/index.html">K</a><span class="token punctuation">, </span><a href="-concurrent-map-memoization-cache/index.html">V</a><span class="token operator">&gt;</span><span class="token operator"> = </span>ConcurrentHashMap()</span></span><span class="token punctuation">)</span> : <a href="-memoization-cache/index.html">MemoizationCache</a><span class="token operator">&lt;</span><a href="-concurrent-map-memoization-cache/index.html">K</a><span class="token punctuation">, </span><a href="-concurrent-map-memoization-cache/index.html">V</a><span class="token operator">&gt; </span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1461479103%2FClasslikes%2F1759373422" anchor-label="Either" id="-1461479103%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either/index.html"><span><span>Either</span></span></a></div>
@@ -164,7 +164,7 @@
             </div>
           </div>
 <a data-name="254305612%2FClasslikes%2F1759373422" anchor-label="EitherNel" id="254305612%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-either-nel/index.html"><span>Either</span><wbr><span><span>Nel</span></span></a></div>
@@ -179,7 +179,7 @@
             </div>
           </div>
 <a data-name="1348121666%2FClasslikes%2F1759373422" anchor-label="EmptyValue" id="1348121666%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-empty-value/index.html"><span>Empty</span><wbr><span><span>Value</span></span></a></div>
@@ -194,7 +194,7 @@
             </div>
           </div>
 <a data-name="-570203248%2FClasslikes%2F1759373422" anchor-label="Ior" id="-570203248%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior/index.html"><span><span>Ior</span></span></a></div>
@@ -209,7 +209,7 @@
             </div>
           </div>
 <a data-name="765478045%2FClasslikes%2F1759373422" anchor-label="IorNel" id="765478045%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-ior-nel/index.html"><span>Ior</span><wbr><span><span>Nel</span></span></a></div>
@@ -224,7 +224,7 @@
             </div>
           </div>
 <a data-name="-1677622418%2FClasslikes%2F1759373422" anchor-label="MemoizationCache" id="-1677622418%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-memoization-cache/index.html"><span>Memoization</span><wbr><span><span>Cache</span></span></a></div>
@@ -239,7 +239,7 @@
             </div>
           </div>
 <a data-name="1238756903%2FClasslikes%2F1759373422" anchor-label="Nel" id="1238756903%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-nel/index.html"><span><span>Nel</span></span></a></div>
@@ -254,7 +254,7 @@
             </div>
           </div>
 <a data-name="-1392774290%2FClasslikes%2F1759373422" anchor-label="None" id="-1392774290%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-none/index.html"><span><span>None</span></span></a></div>
@@ -269,7 +269,7 @@
             </div>
           </div>
 <a data-name="828249960%2FClasslikes%2F1759373422" anchor-label="NonEmptyCollection" id="828249960%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-collection/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span><span>Collection</span></span></a></div>
@@ -284,7 +284,7 @@
             </div>
           </div>
 <a data-name="1221314856%2FClasslikes%2F1759373422" anchor-label="NonEmptyList" id="1221314856%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-list/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span><span>List</span></span></a></div>
@@ -299,7 +299,7 @@
             </div>
           </div>
 <a data-name="-292780134%2FClasslikes%2F1759373422" anchor-label="NonEmptySet" id="-292780134%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-empty-set/index.html"><span>Non</span><wbr><span>Empty</span><wbr><span><span>Set</span></span></a></div>
@@ -314,7 +314,7 @@
             </div>
           </div>
 <a data-name="-1521844335%2FClasslikes%2F1759373422" anchor-label="Option" id="-1521844335%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-option/index.html"><span><span>Option</span></span></a></div>
@@ -329,7 +329,7 @@
             </div>
           </div>
 <a data-name="-892290416%2FClasslikes%2F1759373422" anchor-label="PotentiallyUnsafeNonEmptyOperation" id="-892290416%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-potentially-unsafe-non-empty-operation/index.html"><span>Potentially</span><wbr><span>Unsafe</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span><span>Operation</span></span></a></div>
@@ -344,7 +344,7 @@
             </div>
           </div>
 <a data-name="-1829037051%2FClasslikes%2F1759373422" anchor-label="Predicate" id="-1829037051%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-predicate/index.html"><span><span>Predicate</span></span></a></div>
@@ -359,7 +359,7 @@
             </div>
           </div>
 <a data-name="1111120178%2FClasslikes%2F1759373422" anchor-label="Some" id="1111120178%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-some/index.html"><span><span>Some</span></span></a></div>
@@ -374,7 +374,7 @@
             </div>
           </div>
 <a data-name="-1778267526%2FClasslikes%2F1759373422" anchor-label="Tuple4" id="-1778267526%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple4/index.html"><span><span>Tuple4</span></span></a></div>
@@ -389,7 +389,7 @@
             </div>
           </div>
 <a data-name="-1747247719%2FClasslikes%2F1759373422" anchor-label="Tuple5" id="-1747247719%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple5/index.html"><span><span>Tuple5</span></span></a></div>
@@ -404,7 +404,7 @@
             </div>
           </div>
 <a data-name="-1716227912%2FClasslikes%2F1759373422" anchor-label="Tuple6" id="-1716227912%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple6/index.html"><span><span>Tuple6</span></span></a></div>
@@ -419,7 +419,7 @@
             </div>
           </div>
 <a data-name="-1685208105%2FClasslikes%2F1759373422" anchor-label="Tuple7" id="-1685208105%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple7/index.html"><span><span>Tuple7</span></span></a></div>
@@ -434,7 +434,7 @@
             </div>
           </div>
 <a data-name="-1654188298%2FClasslikes%2F1759373422" anchor-label="Tuple8" id="-1654188298%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple8/index.html"><span><span>Tuple8</span></span></a></div>
@@ -449,7 +449,7 @@
             </div>
           </div>
 <a data-name="-1623168491%2FClasslikes%2F1759373422" anchor-label="Tuple9" id="-1623168491%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tuple9/index.html"><span><span>Tuple9</span></span></a></div>
@@ -466,9 +466,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="-336905369%2FProperties%2F1759373422" anchor-label="DeprecatedAmbiguity" id="-336905369%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-deprecated-ambiguity.html"><span>Deprecated</span><wbr><span><span>Ambiguity</span></span></a></div>
@@ -483,7 +483,7 @@
             </div>
           </div>
 <a data-name="562759292%2FProperties%2F1759373422" anchor-label="DeprecatedUnsafeAccess" id="562759292%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-deprecated-unsafe-access.html"><span>Deprecated</span><wbr><span>Unsafe</span><wbr><span><span>Access</span></span></a></div>
@@ -498,7 +498,7 @@
             </div>
           </div>
 <a data-name="804824996%2FProperties%2F1759373422" anchor-label="NicheAPI" id="804824996%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-niche-a-p-i.html"><span>Niche</span><wbr><span><span>API</span></span></a></div>
@@ -513,7 +513,7 @@
             </div>
           </div>
 <a data-name="1119570316%2FProperties%2F1759373422" anchor-label="RedundantAPI" id="1119570316%2FProperties%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-redundant-a-p-i.html"><span>Redundant</span><wbr><span><span>API</span></span></a></div>
@@ -530,9 +530,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-1747832051%2FFunctions%2F1759373422" anchor-label="align" id="-1747832051%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="align.html"><span><span>align</span></span></a></div>
@@ -547,7 +547,7 @@
             </div>
           </div>
 <a data-name="666932491%2FFunctions%2F1759373422" anchor-label="bothIor" id="666932491%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="both-ior.html"><span>both</span><wbr><span><span>Ior</span></span></a></div>
@@ -562,7 +562,7 @@
             </div>
           </div>
 <a data-name="571700324%2FFunctions%2F1759373422" anchor-label="catch" id="571700324%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="catch.html"><span><span>catch</span></span></a></div>
@@ -577,7 +577,7 @@
             </div>
           </div>
 <a data-name="1600935164%2FFunctions%2F1759373422" anchor-label="collectionSizeOrDefault" id="1600935164%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="collection-size-or-default.html"><span>collection</span><wbr><span>Size</span><wbr><span>Or</span><wbr><span><span>Default</span></span></a></div>
@@ -592,7 +592,7 @@
             </div>
           </div>
 <a data-name="-527997384%2FFunctions%2F1759373422" anchor-label="combine" id="-527997384%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="combine.html"><span><span>combine</span></span></a></div>
@@ -607,7 +607,7 @@
             </div>
           </div>
 <a data-name="-2103279435%2FFunctions%2F1759373422" anchor-label="compareTo" id="-2103279435%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="compare-to.html"><span>compare</span><wbr><span><span>To</span></span></a></div>
@@ -622,7 +622,7 @@
             </div>
           </div>
 <a data-name="1255430537%2FFunctions%2F1759373422" anchor-label="constant" id="1255430537%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="constant.html"><span><span>constant</span></span></a></div>
@@ -637,7 +637,7 @@
             </div>
           </div>
 <a data-name="-2073497258%2FFunctions%2F1759373422" anchor-label="crosswalk" id="-2073497258%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="crosswalk.html"><span><span>crosswalk</span></span></a></div>
@@ -652,7 +652,7 @@
             </div>
           </div>
 <a data-name="-2109526734%2FFunctions%2F1759373422" anchor-label="crosswalkMap" id="-2109526734%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="crosswalk-map.html"><span>crosswalk</span><wbr><span><span>Map</span></span></a></div>
@@ -667,7 +667,7 @@
             </div>
           </div>
 <a data-name="-462389050%2FFunctions%2F1759373422" anchor-label="crosswalkNull" id="-462389050%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="crosswalk-null.html"><span>crosswalk</span><wbr><span><span>Null</span></span></a></div>
@@ -682,7 +682,7 @@
             </div>
           </div>
 <a data-name="-849844079%2FFunctions%2F1759373422" anchor-label="elementAtOrNone" id="-849844079%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="element-at-or-none.html"><span>element</span><wbr><span>At</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -697,7 +697,7 @@
             </div>
           </div>
 <a data-name="2116432508%2FFunctions%2F1759373422" anchor-label="escaped" id="2116432508%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="escaped.html"><span><span>escaped</span></span></a></div>
@@ -712,7 +712,7 @@
             </div>
           </div>
 <a data-name="-1708329953%2FFunctions%2F1759373422" anchor-label="filterIsInstance" id="-1708329953%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="filter-is-instance.html"><span>filter</span><wbr><span>Is</span><wbr><span><span>Instance</span></span></a></div>
@@ -727,7 +727,7 @@
             </div>
           </div>
 <a data-name="-1918557319%2FFunctions%2F1759373422" anchor-label="filterOption" id="-1918557319%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="filter-option.html"><span>filter</span><wbr><span><span>Option</span></span></a></div>
@@ -742,7 +742,7 @@
             </div>
           </div>
 <a data-name="82617453%2FFunctions%2F1759373422" anchor-label="firstOrNone" id="82617453%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="first-or-none.html"><span>first</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -757,7 +757,7 @@
             </div>
           </div>
 <a data-name="-516304574%2FFunctions%2F1759373422" anchor-label="flatMap" id="-516304574%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flat-map.html"><span>flat</span><wbr><span><span>Map</span></span></a></div>
@@ -772,7 +772,7 @@
             </div>
           </div>
 <a data-name="377269196%2FFunctions%2F1759373422" anchor-label="flatMapValues" id="377269196%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flat-map-values.html"><span>flat</span><wbr><span>Map</span><wbr><span><span>Values</span></span></a></div>
@@ -787,7 +787,7 @@
             </div>
           </div>
 <a data-name="-1270090007%2FFunctions%2F1759373422" anchor-label="flatten" id="-1270090007%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flatten.html"><span><span>flatten</span></span></a></div>
@@ -802,7 +802,7 @@
             </div>
           </div>
 <a data-name="-2147347271%2FFunctions%2F1759373422" anchor-label="flattenOption" id="-2147347271%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flatten-option.html"><span>flatten</span><wbr><span><span>Option</span></span></a></div>
@@ -817,7 +817,7 @@
             </div>
           </div>
 <a data-name="-360239026%2FFunctions%2F1759373422" anchor-label="flattenOrAccumulate" id="-360239026%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flatten-or-accumulate.html"><span>flatten</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -832,7 +832,7 @@
             </div>
           </div>
 <a data-name="1910843262%2FFunctions%2F1759373422" anchor-label="fold" id="1910843262%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fold.html"><span><span>fold</span></span></a></div>
@@ -846,25 +846,25 @@
               </div>
             </div>
           </div>
-<a data-name="-2111784231%2FFunctions%2F-1396690962" anchor-label="foldLeft" id="-2111784231%2FFunctions%2F-1396690962" data-filterable-set=":arrow-core/androidAndJvmMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain">
+<a data-name="1661543263%2FFunctions%2F1461042520" anchor-label="foldLeft" id="1661543263%2FFunctions%2F1461042520" data-filterable-set=":arrow-core/androidAndJvmMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fold-left.html"><span>fold</span><wbr><span><span>Left</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2111784231%2FFunctions%2F-1396690962"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1661543263%2FFunctions%2F1461042520"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-core/androidAndJvmMain" data-filterable-set=":arrow-core/androidAndJvmMain" data-active="" data-toggle=":arrow-core/androidAndJvmMain">androidAndJvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">B</a><span class="token punctuation">, </span><a href="fold-left.html">C</a><span class="token operator">&gt; </span>ERROR CLASS: Symbol not found for SortedMap<span class="token punctuation">.</span><a href="fold-left.html"><span class="token function">foldLeft</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span>ERROR CLASS: Symbol not found for SortedMap<span class="token punctuation">, </span></span><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span>ERROR CLASS: Symbol not found for SortedMap<span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span>ERROR CLASS: Symbol not found for SortedMap</span></span><span class="token punctuation">)</span><span class="token operator">: </span>ERROR CLASS: Symbol not found for SortedMap</div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/androidAndJvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">B</a><span class="token punctuation">, </span><a href="fold-left.html">C</a><span class="token operator">&gt; </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedMap.html">SortedMap</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="fold-left.html"><span class="token function">foldLeft</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">b<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedMap.html">SortedMap</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedMap.html">SortedMap</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/-entry/index.html">Map.Entry</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">B</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedMap.html">SortedMap</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">C</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/SortedMap.html">SortedMap</a><span class="token operator">&lt;</span><a href="fold-left.html">A</a><span class="token punctuation">, </span><a href="fold-left.html">C</a><span class="token operator">&gt;</span></div></div>                  </div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1260476916%2FFunctions%2F1759373422" anchor-label="getOrElse" id="-1260476916%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-else.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Else</span></span></a></div>
@@ -879,7 +879,7 @@
             </div>
           </div>
 <a data-name="-1148362580%2FFunctions%2F1759373422" anchor-label="getOrNone" id="-1148362580%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-none.html"><span>get</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -894,7 +894,7 @@
             </div>
           </div>
 <a data-name="1658204284%2FFunctions%2F1759373422" anchor-label="handleErrorWith" id="1658204284%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="handle-error-with.html"><span>handle</span><wbr><span>Error</span><wbr><span><span>With</span></span></a></div>
@@ -909,7 +909,7 @@
             </div>
           </div>
 <a data-name="2123550883%2FFunctions%2F1759373422" anchor-label="identity" id="2123550883%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="identity.html"><span><span>identity</span></span></a></div>
@@ -924,7 +924,7 @@
             </div>
           </div>
 <a data-name="-476395572%2FFunctions%2F1759373422" anchor-label="interleave" id="-476395572%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="interleave.html"><span><span>interleave</span></span></a></div>
@@ -939,7 +939,7 @@
             </div>
           </div>
 <a data-name="1573194145%2FFunctions%2F1759373422" anchor-label="lastOrNone" id="1573194145%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="last-or-none.html"><span>last</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -954,7 +954,7 @@
             </div>
           </div>
 <a data-name="-466070642%2FFunctions%2F1759373422" anchor-label="left" id="-466070642%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="left.html"><span><span>left</span></span></a></div>
@@ -969,7 +969,7 @@
             </div>
           </div>
 <a data-name="-684738812%2FFunctions%2F1759373422" anchor-label="leftIor" id="-684738812%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="left-ior.html"><span>left</span><wbr><span><span>Ior</span></span></a></div>
@@ -984,7 +984,7 @@
             </div>
           </div>
 <a data-name="-939419251%2FFunctions%2F1759373422" anchor-label="leftNel" id="-939419251%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="left-nel.html"><span>left</span><wbr><span><span>Nel</span></span></a></div>
@@ -999,7 +999,7 @@
             </div>
           </div>
 <a data-name="-311478484%2FFunctions%2F1759373422" anchor-label="leftPadZip" id="-311478484%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="left-pad-zip.html"><span>left</span><wbr><span>Pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -1014,7 +1014,7 @@
             </div>
           </div>
 <a data-name="1897826212%2FFunctions%2F1759373422" anchor-label="many" id="1897826212%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="many.html"><span><span>many</span></span></a></div>
@@ -1029,7 +1029,7 @@
             </div>
           </div>
 <a data-name="1607425296%2FFunctions%2F1759373422" anchor-label="mapNullable" id="1607425296%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-nullable.html"><span>map</span><wbr><span><span>Nullable</span></span></a></div>
@@ -1044,7 +1044,7 @@
             </div>
           </div>
 <a data-name="1038893948%2FFunctions%2F1759373422" anchor-label="mapOrAccumulate" id="1038893948%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-or-accumulate.html"><span>map</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -1059,7 +1059,7 @@
             </div>
           </div>
 <a data-name="669259932%2FFunctions%2F1759373422" anchor-label="mapValuesNotNull" id="669259932%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-values-not-null.html"><span>map</span><wbr><span>Values</span><wbr><span>Not</span><wbr><span><span>Null</span></span></a></div>
@@ -1074,7 +1074,7 @@
             </div>
           </div>
 <a data-name="-1760163898%2FFunctions%2F1759373422" anchor-label="mapValuesOrAccumulate" id="-1760163898%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map-values-or-accumulate.html"><span>map</span><wbr><span>Values</span><wbr><span>Or</span><wbr><span><span>Accumulate</span></span></a></div>
@@ -1089,7 +1089,7 @@
             </div>
           </div>
 <a data-name="-1389328446%2FFunctions%2F1759373422" anchor-label="max" id="-1389328446%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="max.html"><span><span>max</span></span></a></div>
@@ -1104,7 +1104,7 @@
             </div>
           </div>
 <a data-name="-129388461%2FFunctions%2F1759373422" anchor-label="maxBy" id="-129388461%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="max-by.html"><span>max</span><wbr><span><span>By</span></span></a></div>
@@ -1119,7 +1119,7 @@
             </div>
           </div>
 <a data-name="-1751928041%2FFunctions%2F1759373422" anchor-label="MemoizedDeepRecursiveFunction" id="-1751928041%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-memoized-deep-recursive-function.html"><span>Memoized</span><wbr><span>Deep</span><wbr><span>Recursive</span><wbr><span><span>Function</span></span></a></div>
@@ -1134,7 +1134,7 @@
             </div>
           </div>
 <a data-name="253841302%2FFunctions%2F1759373422" anchor-label="merge" id="253841302%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="merge.html"><span><span>merge</span></span></a></div>
@@ -1149,7 +1149,7 @@
             </div>
           </div>
 <a data-name="-390354128%2FFunctions%2F1759373422" anchor-label="min" id="-390354128%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="min.html"><span><span>min</span></span></a></div>
@@ -1164,7 +1164,7 @@
             </div>
           </div>
 <a data-name="-192923099%2FFunctions%2F1759373422" anchor-label="minBy" id="-192923099%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="min-by.html"><span>min</span><wbr><span><span>By</span></span></a></div>
@@ -1179,7 +1179,7 @@
             </div>
           </div>
 <a data-name="2408468%2FFunctions%2F1759373422" anchor-label="nel" id="2408468%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nel.html"><span><span>nel</span></span></a></div>
@@ -1194,7 +1194,7 @@
             </div>
           </div>
 <a data-name="-1171690815%2FFunctions%2F1759373422" anchor-label="none" id="-1171690815%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="none.html"><span><span>none</span></span></a></div>
@@ -1209,7 +1209,7 @@
             </div>
           </div>
 <a data-name="383448377%2FFunctions%2F1759373422" anchor-label="nonEmptyListOf" id="383448377%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="non-empty-list-of.html"><span>non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span><span>Of</span></span></a></div>
@@ -1224,7 +1224,7 @@
             </div>
           </div>
 <a data-name="1213510069%2FFunctions%2F1759373422" anchor-label="nonEmptySetOf" id="1213510069%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="non-empty-set-of.html"><span>non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span><span>Of</span></span></a></div>
@@ -1238,12 +1238,12 @@
               </div>
             </div>
           </div>
-<a data-name="778709679%2FFunctions%2F1935706770" anchor-label="NonFatal" id="778709679%2FFunctions%2F1935706770" data-filterable-set=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/nonJvmMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/nonJvmMain" data-filterable-set=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/nonJvmMain">
+<a data-name="778709679%2FFunctions%2F405680380" anchor-label="NonFatal" id="778709679%2FFunctions%2F405680380" data-filterable-set=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/nonJvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/nonJvmMain" data-filterable-set=":arrow-core/commonMain,:arrow-core/androidAndJvmMain,:arrow-core/nonJvmMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-fatal.html"><span>Non</span><wbr><span><span>Fatal</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="778709679%2FFunctions%2F1935706770"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="778709679%2FFunctions%2F405680380"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -1256,7 +1256,7 @@
             </div>
           </div>
 <a data-name="1038470504%2FFunctions%2F1759373422" anchor-label="nonFatalOrThrow" id="1038470504%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="non-fatal-or-throw.html"><span>non</span><wbr><span>Fatal</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1271,7 +1271,7 @@
             </div>
           </div>
 <a data-name="1346435138%2FFunctions%2F1759373422" anchor-label="once" id="1346435138%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="once.html"><span><span>once</span></span></a></div>
@@ -1286,7 +1286,7 @@
             </div>
           </div>
 <a data-name="2072782620%2FFunctions%2F1759373422" anchor-label="padZip" id="2072782620%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="pad-zip.html"><span>pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -1301,7 +1301,7 @@
             </div>
           </div>
 <a data-name="-2116092177%2FFunctions%2F1759373422" anchor-label="plus" id="-2116092177%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="plus.html"><span><span>plus</span></span></a></div>
@@ -1316,7 +1316,7 @@
             </div>
           </div>
 <a data-name="-1837916340%2FFunctions%2F1759373422" anchor-label="prependTo" id="-1837916340%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="prepend-to.html"><span>prepend</span><wbr><span><span>To</span></span></a></div>
@@ -1331,7 +1331,7 @@
             </div>
           </div>
 <a data-name="-478664342%2FFunctions%2F1759373422" anchor-label="recover" id="-478664342%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="recover.html"><span><span>recover</span></span></a></div>
@@ -1346,7 +1346,7 @@
             </div>
           </div>
 <a data-name="475734265%2FFunctions%2F1759373422" anchor-label="reduceOrNull" id="475734265%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="reduce-or-null.html"><span>reduce</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1361,7 +1361,7 @@
             </div>
           </div>
 <a data-name="-2016103670%2FFunctions%2F1759373422" anchor-label="reduceRightNull" id="-2016103670%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="reduce-right-null.html"><span>reduce</span><wbr><span>Right</span><wbr><span><span>Null</span></span></a></div>
@@ -1376,7 +1376,7 @@
             </div>
           </div>
 <a data-name="-929630053%2FFunctions%2F1759373422" anchor-label="right" id="-929630053%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="right.html"><span><span>right</span></span></a></div>
@@ -1391,7 +1391,7 @@
             </div>
           </div>
 <a data-name="2031672023%2FFunctions%2F1759373422" anchor-label="rightIor" id="2031672023%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="right-ior.html"><span>right</span><wbr><span><span>Ior</span></span></a></div>
@@ -1406,7 +1406,7 @@
             </div>
           </div>
 <a data-name="1561050924%2FFunctions%2F1759373422" anchor-label="rightPadZip" id="1561050924%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="right-pad-zip.html"><span>right</span><wbr><span>Pad</span><wbr><span><span>Zip</span></span></a></div>
@@ -1421,7 +1421,7 @@
             </div>
           </div>
 <a data-name="1831361042%2FFunctions%2F1759373422" anchor-label="salign" id="1831361042%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="salign.html"><span><span>salign</span></span></a></div>
@@ -1436,7 +1436,7 @@
             </div>
           </div>
 <a data-name="1344383582%2FFunctions%2F1759373422" anchor-label="separateEither" id="1344383582%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="separate-either.html"><span>separate</span><wbr><span><span>Either</span></span></a></div>
@@ -1451,7 +1451,7 @@
             </div>
           </div>
 <a data-name="-537174434%2FFunctions%2F1759373422" anchor-label="separateIor" id="-537174434%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="separate-ior.html"><span>separate</span><wbr><span><span>Ior</span></span></a></div>
@@ -1466,7 +1466,7 @@
             </div>
           </div>
 <a data-name="1843991009%2FFunctions%2F1759373422" anchor-label="singleOrNone" id="1843991009%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="single-or-none.html"><span>single</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -1481,7 +1481,7 @@
             </div>
           </div>
 <a data-name="1547435387%2FFunctions%2F1759373422" anchor-label="some" id="1547435387%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="some.html"><span><span>some</span></span></a></div>
@@ -1496,7 +1496,7 @@
             </div>
           </div>
 <a data-name="914177540%2FFunctions%2F1759373422" anchor-label="sort" id="914177540%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="[common]sort.html"><span><span>sort</span></span></a></div>
@@ -1511,7 +1511,7 @@
             </div>
           </div>
 <a data-name="1203550920%2FFunctions%2F1759373422" anchor-label="split" id="1203550920%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="split.html"><span><span>split</span></span></a></div>
@@ -1526,7 +1526,7 @@
             </div>
           </div>
 <a data-name="2088306746%2FFunctions%2F1759373422" anchor-label="tail" id="2088306746%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="tail.html"><span><span>tail</span></span></a></div>
@@ -1541,7 +1541,7 @@
             </div>
           </div>
 <a data-name="-2061531559%2FFunctions%2F1759373422" anchor-label="toEitherNel" id="-2061531559%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-either-nel.html"><span>to</span><wbr><span>Either</span><wbr><span><span>Nel</span></span></a></div>
@@ -1556,7 +1556,7 @@
             </div>
           </div>
 <a data-name="298058817%2FFunctions%2F1759373422" anchor-label="toIorNel" id="298058817%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-ior-nel.html"><span>to</span><wbr><span>Ior</span><wbr><span><span>Nel</span></span></a></div>
@@ -1571,7 +1571,7 @@
             </div>
           </div>
 <a data-name="78518472%2FFunctions%2F1759373422" anchor-label="toMap" id="78518472%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-map.html"><span>to</span><wbr><span><span>Map</span></span></a></div>
@@ -1586,7 +1586,7 @@
             </div>
           </div>
 <a data-name="17476449%2FFunctions%2F1759373422" anchor-label="toNonEmptyListOrNone" id="17476449%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-non-empty-list-or-none.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -1601,7 +1601,7 @@
             </div>
           </div>
 <a data-name="1502078066%2FFunctions%2F1759373422" anchor-label="toNonEmptyListOrNull" id="1502078066%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-non-empty-list-or-null.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1616,7 +1616,7 @@
             </div>
           </div>
 <a data-name="-2009922189%2FFunctions%2F1759373422" anchor-label="toNonEmptyListOrThrow" id="-2009922189%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-non-empty-list-or-throw.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1631,7 +1631,7 @@
             </div>
           </div>
 <a data-name="-947933765%2FFunctions%2F1759373422" anchor-label="toNonEmptySetOrNone" id="-947933765%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-non-empty-set-or-none.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>None</span></span></a></div>
@@ -1646,7 +1646,7 @@
             </div>
           </div>
 <a data-name="536667852%2FFunctions%2F1759373422" anchor-label="toNonEmptySetOrNull" id="536667852%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-non-empty-set-or-null.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1661,7 +1661,7 @@
             </div>
           </div>
 <a data-name="-1872867751%2FFunctions%2F1759373422" anchor-label="toNonEmptySetOrThrow" id="-1872867751%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-non-empty-set-or-throw.html"><span>to</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1676,7 +1676,7 @@
             </div>
           </div>
 <a data-name="1172329719%2FFunctions%2F1759373422" anchor-label="toOption" id="1172329719%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-option.html"><span>to</span><wbr><span><span>Option</span></span></a></div>
@@ -1691,7 +1691,7 @@
             </div>
           </div>
 <a data-name="2102461570%2FFunctions%2F1759373422" anchor-label="unalign" id="2102461570%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="unalign.html"><span><span>unalign</span></span></a></div>
@@ -1706,7 +1706,7 @@
             </div>
           </div>
 <a data-name="-606938076%2FFunctions%2F1759373422" anchor-label="unweave" id="-606938076%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="unweave.html"><span><span>unweave</span></span></a></div>
@@ -1721,7 +1721,7 @@
             </div>
           </div>
 <a data-name="-652918910%2FFunctions%2F1759373422" anchor-label="unzip" id="-652918910%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="unzip.html"><span><span>unzip</span></span></a></div>
@@ -1736,7 +1736,7 @@
             </div>
           </div>
 <a data-name="2068107653%2FFunctions%2F1759373422" anchor-label="wrapAsNonEmptyListOrNull" id="2068107653%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="wrap-as-non-empty-list-or-null.html"><span>wrap</span><wbr><span>As</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1751,7 +1751,7 @@
             </div>
           </div>
 <a data-name="68351336%2FFunctions%2F1759373422" anchor-label="wrapAsNonEmptyListOrThrow" id="68351336%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="wrap-as-non-empty-list-or-throw.html"><span>wrap</span><wbr><span>As</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>List</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1766,7 +1766,7 @@
             </div>
           </div>
 <a data-name="-1294915613%2FFunctions%2F1759373422" anchor-label="wrapAsNonEmptySetOrNull" id="-1294915613%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="wrap-as-non-empty-set-or-null.html"><span>wrap</span><wbr><span>As</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1781,7 +1781,7 @@
             </div>
           </div>
 <a data-name="-1087502568%2FFunctions%2F1759373422" anchor-label="wrapAsNonEmptySetOrThrow" id="-1087502568%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="wrap-as-non-empty-set-or-throw.html"><span>wrap</span><wbr><span>As</span><wbr><span>Non</span><wbr><span>Empty</span><wbr><span>Set</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1796,7 +1796,7 @@
             </div>
           </div>
 <a data-name="753823855%2FFunctions%2F1759373422" anchor-label="zip" id="753823855%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="zip.html"><span><span>zip</span></span></a></div>
@@ -1816,17 +1816,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

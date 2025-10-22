@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Option</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     Arrow
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.1.2
+        <div class="library-version" id="library-version">2.2.0-beta.4
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":arrow-core/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-core/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,45 +62,47 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     Arrow
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="arrow-core::arrow.core/Option///PointingToDeclaration//1759373422">
   <div class="breadcrumbs"><a href="../../index.html">arrow-core</a><span class="delimiter">/</span><a href="../index.html">arrow.core</a><span class="delimiter">/</span><span class="current">Option</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Option</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Option</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span></div><!-- TEST_NAME OptionKnitTest --><p class="paragraph">If you have worked with Java at all in the past, it is very likely that you have come across a <code class="lang-kotlin">NullPointerException</code> at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns <code class="lang-kotlin">null</code> when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of <code class="lang-kotlin">null</code> is often abused to represent an absent optional value. Kotlin tries to solve the problem by getting rid of <code class="lang-kotlin">null</code> values altogether, and providing its own special syntax <a href="https://kotlinlang.org/docs/reference/null-safety.html">Null-safety machinery based on <code class="lang-kotlin">?</code></a>.</p><p class="paragraph">Arrow models the absence of values through the <code class="lang-kotlin">Option</code> datatype similar to how Scala, Haskell, and other FP languages handle optional values.</p><p class="paragraph"><code class="lang-kotlin">Option&lt;A&gt;</code> is a container for an optional value of type <code class="lang-kotlin">A</code>. If the value of type <code class="lang-kotlin">A</code> is present, the <code class="lang-kotlin">Option&lt;A&gt;</code> is an instance of <code class="lang-kotlin">Some&lt;A&gt;</code>, containing the present value of type <code class="lang-kotlin">A</code>. If the value is absent, the <code class="lang-kotlin">Option&lt;A&gt;</code> is the object <code class="lang-kotlin">None</code>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br>import arrow.core.Some<br>import arrow.core.none<br><br>//sampleStart<br>val someValue: Option&lt;String&gt; = Some("I am wrapped in something")<br>val emptyValue: Option&lt;String&gt; = none()<br>//sampleEnd<br>fun main() {<br> println("value = $someValue")<br> println("emptyValue = $emptyValue")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-01.kt --><p class="paragraph">Let's write a function that may or may not give us a string, thus returning <code class="lang-kotlin">Option&lt;String&gt;</code>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br>//sampleEnd</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-02.kt --><p class="paragraph">Using <code class="lang-kotlin">getOrElse</code>, we can provide a default value <code class="lang-kotlin">"No value"</code> when the optional argument <code class="lang-kotlin">None</code> does not exist:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br>import arrow.core.getOrElse<br><br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br><br>val value1 =<br>//sampleStart<br> maybeItWillReturnSomething(true)<br>    .getOrElse { "No value" }<br>//sampleEnd<br>fun main() {<br> println(value1)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-03.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br>import arrow.core.getOrElse<br><br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br><br>val value2 =<br>//sampleStart<br> maybeItWillReturnSomething(false)<br>  .getOrElse { "No value" }<br>//sampleEnd<br>fun main() {<br> println(value2)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-04.kt --><p class="paragraph">Checking whether option has value:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br><br> //sampleStart<br>val valueSome = maybeItWillReturnSomething(true) is None<br>val valueNone = maybeItWillReturnSomething(false) is None<br>//sampleEnd<br>fun main() {<br> println("valueSome = $valueSome")<br> println("valueNone = $valueNone")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-05.kt --><p class="paragraph">Creating a <code class="lang-kotlin">Option&lt;T&gt;</code> of a <code class="lang-kotlin">T?</code>. Useful for working with values that can be nullable:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br><br>//sampleStart<br>val myString: String? = "Nullable string"<br>val option: Option&lt;String&gt; = Option.fromNullable(myString)<br>//sampleEnd<br>fun main () {<br> println("option = $option")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-06.kt --><p class="paragraph">Option can also be used with when statements:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>val someValue: Option&lt;Double&gt; = Some(20.0)<br>val value = when(someValue) {<br> is Some -&gt; someValue.value<br> is None -&gt; 0.0<br>}<br>//sampleEnd<br>fun main () {<br> println("value = $value")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-07.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>val noValue: Option&lt;Double&gt; = None<br>val value = when(noValue) {<br> is Some -&gt; noValue.value<br> is None -&gt; 0.0<br>}<br>//sampleEnd<br>fun main () {<br> println("value = $value")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-08.kt --><p class="paragraph">An alternative for pattern matching is folding. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.</p><p class="paragraph">One of these operations is <code class="lang-kotlin">map</code>. This operation allows us to map the inner value to a different type while preserving the option:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>val number: Option&lt;Int&gt; = Some(3)<br>val noNumber: Option&lt;Int&gt; = None<br>val mappedResult1 = number.map { it * 1.5 }<br>val mappedResult2 = noNumber.map { it * 1.5 }<br>//sampleEnd<br>fun main () {<br> println("number = $number")<br> println("noNumber = $noNumber")<br> println("mappedResult1 = $mappedResult1")<br> println("mappedResult2 = $mappedResult2")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-09.kt --><p class="paragraph">Another operation is <code class="lang-kotlin">fold</code>. This operation will extract the value from the option, or provide a default if the value is <code class="lang-kotlin">None</code></p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br>import arrow.core.Some<br><br>val fold =<br>//sampleStart<br> Some(3).fold({ 1 }, { it * 3 })<br>//sampleEnd<br>fun main () {<br> println(fold)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-10.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br>import arrow.core.none<br><br>val fold =<br>//sampleStart<br> none&lt;Int&gt;().fold({ 1 }, { it * 3 })<br>//sampleEnd<br>fun main () {<br> println(fold)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-11.kt --><p class="paragraph">Arrow also adds syntax to all datatypes so you can easily lift them into the context of <code class="lang-kotlin">Option</code> where needed.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.some<br>import arrow.core.none<br><br>//sampleStart<br> val some = 1.some()<br> val none = none&lt;String&gt;()<br>//sampleEnd<br>fun main () {<br> println("some = $some")<br> println("none = $none")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-12.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.toOption<br><br>//sampleStart<br>val nullString: String? = null<br>val valueFromNull = nullString.toOption()<br><br>val helloString: String? = "Hello"<br>val valueFromStr = helloString.toOption()<br>//sampleEnd<br>fun main () {<br> println("valueFromNull = $valueFromNull")<br> println("valueFromStr = $valueFromStr")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-13.kt --><p class="paragraph">You can easily convert between <code class="lang-kotlin">A?</code> and <code class="lang-kotlin">Option&lt;A&gt;</code> by using the <code class="lang-kotlin">toOption()</code> extension or <code class="lang-kotlin">Option.fromNullable</code> constructor.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.firstOrNone<br>import arrow.core.toOption<br>import arrow.core.Option<br><br>//sampleStart<br>val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")<br><br>val empty = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()<br>val filled = Option.fromNullable(foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() })<br><br>//sampleEnd<br>fun main() {<br> println("empty = $empty")<br> println("filled = $filled")<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-14.kt --><h3 class="">Transforming the inner contents</h3><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Some<br><br>fun main() {<br>val value =<br> //sampleStart<br>   Some(1).map { it + 1 }<br> //sampleEnd<br> println(value)<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><!-- KNIT example-option-15.kt --><h2 class="">Credits</h2><p class="paragraph">Contents partially adapted from <a href="https://www.scala-exercises.org/std_lib/options">Scala Exercises Option Tutorial</a> Originally based on the Scala Koans.</p><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-none/index.html">None</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-some/index.html">Some</a></div></span></div><div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="index.html">Option</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="index.html">A</a><span class="token operator">&gt;</span></div><!-- TEST_NAME OptionKnitTest --><p class="paragraph">If you have worked with Java at all in the past, it is very likely that you have come across a <code class="lang-kotlin">NullPointerException</code> at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns <code class="lang-kotlin">null</code> when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of <code class="lang-kotlin">null</code> is often abused to represent an absent optional value. Kotlin tries to solve the problem by getting rid of <code class="lang-kotlin">null</code> values altogether, and providing its own special syntax <a href="https://kotlinlang.org/docs/reference/null-safety.html">Null-safety machinery based on <code class="lang-kotlin">?</code></a>.</p><p class="paragraph">Arrow models the absence of values through the <code class="lang-kotlin">Option</code> datatype similar to how Scala, Haskell, and other FP languages handle optional values.</p><p class="paragraph"><code class="lang-kotlin">Option&lt;A&gt;</code> is a container for an optional value of type <code class="lang-kotlin">A</code>. If the value of type <code class="lang-kotlin">A</code> is present, the <code class="lang-kotlin">Option&lt;A&gt;</code> is an instance of <code class="lang-kotlin">Some&lt;A&gt;</code>, containing the present value of type <code class="lang-kotlin">A</code>. If the value is absent, the <code class="lang-kotlin">Option&lt;A&gt;</code> is the object <code class="lang-kotlin">None</code>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br>import arrow.core.Some<br>import arrow.core.none<br><br>//sampleStart<br>val someValue: Option&lt;String&gt; = Some("I am wrapped in something")<br>val emptyValue: Option&lt;String&gt; = none()<br>//sampleEnd<br>fun main() {<br> println("value = $someValue")<br> println("emptyValue = $emptyValue")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-01.kt --><p class="paragraph">Let's write a function that may or may not give us a string, thus returning <code class="lang-kotlin">Option&lt;String&gt;</code>:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br>//sampleEnd</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-02.kt --><p class="paragraph">Using <code class="lang-kotlin">getOrElse</code>, we can provide a default value <code class="lang-kotlin">"No value"</code> when the optional argument <code class="lang-kotlin">None</code> does not exist:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br>import arrow.core.getOrElse<br><br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br><br>val value1 =<br>//sampleStart<br> maybeItWillReturnSomething(true)<br>    .getOrElse { "No value" }<br>//sampleEnd<br>fun main() {<br> println(value1)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-03.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br>import arrow.core.getOrElse<br><br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br><br>val value2 =<br>//sampleStart<br> maybeItWillReturnSomething(false)<br>  .getOrElse { "No value" }<br>//sampleEnd<br>fun main() {<br> println(value2)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-04.kt --><p class="paragraph">Checking whether option has value:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>fun maybeItWillReturnSomething(flag: Boolean): Option&lt;String&gt; =<br> if (flag) Some("Found value") else None<br><br> //sampleStart<br>val valueSome = maybeItWillReturnSomething(true) is None<br>val valueNone = maybeItWillReturnSomething(false) is None<br>//sampleEnd<br>fun main() {<br> println("valueSome = $valueSome")<br> println("valueNone = $valueNone")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-05.kt --><p class="paragraph">Creating a <code class="lang-kotlin">Option&lt;T&gt;</code> of a <code class="lang-kotlin">T?</code>. Useful for working with values that can be nullable:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br><br>//sampleStart<br>val myString: String? = "Nullable string"<br>val option: Option&lt;String&gt; = Option.fromNullable(myString)<br>//sampleEnd<br>fun main () {<br> println("option = $option")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-06.kt --><p class="paragraph">Option can also be used with when statements:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>val someValue: Option&lt;Double&gt; = Some(20.0)<br>val value = when(someValue) {<br> is Some -&gt; someValue.value<br> is None -&gt; 0.0<br>}<br>//sampleEnd<br>fun main () {<br> println("value = $value")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-07.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>val noValue: Option&lt;Double&gt; = None<br>val value = when(noValue) {<br> is Some -&gt; noValue.value<br> is None -&gt; 0.0<br>}<br>//sampleEnd<br>fun main () {<br> println("value = $value")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-08.kt --><p class="paragraph">An alternative for pattern matching is folding. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.</p><p class="paragraph">One of these operations is <code class="lang-kotlin">map</code>. This operation allows us to map the inner value to a different type while preserving the option:</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.None<br>import arrow.core.Option<br>import arrow.core.Some<br><br>//sampleStart<br>val number: Option&lt;Int&gt; = Some(3)<br>val noNumber: Option&lt;Int&gt; = None<br>val mappedResult1 = number.map { it * 1.5 }<br>val mappedResult2 = noNumber.map { it * 1.5 }<br>//sampleEnd<br>fun main () {<br> println("number = $number")<br> println("noNumber = $noNumber")<br> println("mappedResult1 = $mappedResult1")<br> println("mappedResult2 = $mappedResult2")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-09.kt --><p class="paragraph">Another operation is <code class="lang-kotlin">fold</code>. This operation will extract the value from the option, or provide a default if the value is <code class="lang-kotlin">None</code></p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br>import arrow.core.Some<br><br>val fold =<br>//sampleStart<br> Some(3).fold({ 1 }, { it * 3 })<br>//sampleEnd<br>fun main () {<br> println(fold)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-10.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Option<br>import arrow.core.none<br><br>val fold =<br>//sampleStart<br> none&lt;Int&gt;().fold({ 1 }, { it * 3 })<br>//sampleEnd<br>fun main () {<br> println(fold)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-11.kt --><p class="paragraph">Arrow also adds syntax to all datatypes so you can easily lift them into the context of <code class="lang-kotlin">Option</code> where needed.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.some<br>import arrow.core.none<br><br>//sampleStart<br> val some = 1.some()<br> val none = none&lt;String&gt;()<br>//sampleEnd<br>fun main () {<br> println("some = $some")<br> println("none = $none")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-12.kt --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.toOption<br><br>//sampleStart<br>val nullString: String? = null<br>val valueFromNull = nullString.toOption()<br><br>val helloString: String? = "Hello"<br>val valueFromStr = helloString.toOption()<br>//sampleEnd<br>fun main () {<br> println("valueFromNull = $valueFromNull")<br> println("valueFromStr = $valueFromStr")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-13.kt --><p class="paragraph">You can easily convert between <code class="lang-kotlin">A?</code> and <code class="lang-kotlin">Option&lt;A&gt;</code> by using the <code class="lang-kotlin">toOption()</code> extension or <code class="lang-kotlin">Option.fromNullable</code> constructor.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.firstOrNone<br>import arrow.core.toOption<br>import arrow.core.Option<br><br>//sampleStart<br>val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")<br><br>val empty = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()<br>val filled = Option.fromNullable(foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() })<br><br>//sampleEnd<br>fun main() {<br> println("empty = $empty")<br> println("filled = $filled")<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-14.kt --><h3 class="">Transforming the inner contents</h3><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">import arrow.core.Some<br><br>fun main() {<br>val value =<br> //sampleStart<br>   Some(1).map { it + 1 }<br> //sampleEnd<br> println(value)<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-option-15.kt --><h2 class="">Credits</h2><p class="paragraph">Contents partially adapted from <a href="https://www.scala-exercises.org/std_lib/options">Scala Exercises Option Tutorial</a> Originally based on the Scala Koans.</p><h4 class="tableheader">Inheritors</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-none/index.html">None</a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-some/index.html">Some</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button><button class="section-tab" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION,EXTENSION_PROPERTY,EXTENSION_FUNCTION">Members &amp; Extensions</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-35415341%2FClasslikes%2F1759373422" anchor-label="Companion" id="-35415341%2FClasslikes%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
@@ -119,9 +119,24 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1844456494%2FFunctions%2F1759373422" anchor-label="combine" id="1844456494%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="183132336%2FFunctions%2F1759373422" anchor-label="bind" id="183132336%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../arrow.core.raise.context/bind.html"><span><span>bind</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="183132336%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">context</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">raise<span class="token operator">: </span><a href="../../arrow.core.raise.context/-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind.html">Error</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><br><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind.html">Error</a><span class="token punctuation">, </span><a href="../../arrow.core.raise.context/bind.html">A</a><span class="token operator">&gt; </span><a href="index.html">Option</a><span class="token operator">&lt;</span><a href="../../arrow.core.raise.context/bind.html">A</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="../../arrow.core.raise.context/bind.html"><span class="token function">bind</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../arrow.core.raise.context/bind.html">A</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1844456494%2FFunctions%2F1759373422" anchor-label="combine" id="1844456494%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../combine.html"><span><span>combine</span></span></a></div>
@@ -136,7 +151,7 @@
             </div>
           </div>
 <a data-name="1168411955%2FFunctions%2F1759373422" anchor-label="compareTo" id="1168411955%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../compare-to.html"><span>compare</span><wbr><span><span>To</span></span></a></div>
@@ -151,7 +166,7 @@
             </div>
           </div>
 <a data-name="-2147074837%2FFunctions%2F1759373422" anchor-label="filter" id="-2147074837%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="filter.html"><span><span>filter</span></span></a></div>
@@ -166,7 +181,7 @@
             </div>
           </div>
 <a data-name="-1364274255%2FFunctions%2F1759373422" anchor-label="filterIsInstance" id="-1364274255%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../filter-is-instance.html"><span>filter</span><wbr><span>Is</span><wbr><span><span>Instance</span></span></a></div>
@@ -181,7 +196,7 @@
             </div>
           </div>
 <a data-name="1689898694%2FFunctions%2F1759373422" anchor-label="filterNot" id="1689898694%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="filter-not.html"><span>filter</span><wbr><span><span>Not</span></span></a></div>
@@ -196,7 +211,7 @@
             </div>
           </div>
 <a data-name="-685225736%2FFunctions%2F1759373422" anchor-label="flatMap" id="-685225736%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="flat-map.html"><span>flat</span><wbr><span><span>Map</span></span></a></div>
@@ -211,7 +226,7 @@
             </div>
           </div>
 <a data-name="1450402731%2FFunctions%2F1759373422" anchor-label="flatten" id="1450402731%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../flatten.html"><span><span>flatten</span></span></a></div>
@@ -226,7 +241,7 @@
             </div>
           </div>
 <a data-name="-810060129%2FFunctions%2F1759373422" anchor-label="fold" id="-810060129%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fold.html"><span><span>fold</span></span></a></div>
@@ -241,7 +256,7 @@
             </div>
           </div>
 <a data-name="1889654741%2FFunctions%2F1759373422" anchor-label="getOrElse" id="1889654741%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../get-or-else.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Else</span></span></a></div>
@@ -256,7 +271,7 @@
             </div>
           </div>
 <a data-name="-979031924%2FFunctions%2F1759373422" anchor-label="getOrNull" id="-979031924%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-null.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -271,7 +286,7 @@
             </div>
           </div>
 <a data-name="-1517554932%2FFunctions%2F1759373422" anchor-label="isNone" id="-1517554932%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-none.html"><span>is</span><wbr><span><span>None</span></span></a></div>
@@ -286,7 +301,7 @@
             </div>
           </div>
 <a data-name="-1874237407%2FFunctions%2F1759373422" anchor-label="isSome" id="-1874237407%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-some.html"><span>is</span><wbr><span><span>Some</span></span></a></div>
@@ -301,7 +316,7 @@
             </div>
           </div>
 <a data-name="2106509250%2FFunctions%2F1759373422" anchor-label="map" id="2106509250%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="map.html"><span><span>map</span></span></a></div>
@@ -316,7 +331,7 @@
             </div>
           </div>
 <a data-name="-711788369%2FFunctions%2F1759373422" anchor-label="onNone" id="-711788369%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-none.html"><span>on</span><wbr><span><span>None</span></span></a></div>
@@ -331,7 +346,7 @@
             </div>
           </div>
 <a data-name="-915552508%2FFunctions%2F1759373422" anchor-label="onSome" id="-915552508%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="on-some.html"><span>on</span><wbr><span><span>Some</span></span></a></div>
@@ -346,7 +361,7 @@
             </div>
           </div>
 <a data-name="1500070181%2FFunctions%2F1759373422" anchor-label="recover" id="1500070181%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../recover.html"><span><span>recover</span></span></a></div>
@@ -361,7 +376,7 @@
             </div>
           </div>
 <a data-name="1202731627%2FFunctions%2F1759373422" anchor-label="toEither" id="1202731627%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-either.html"><span>to</span><wbr><span><span>Either</span></span></a></div>
@@ -376,7 +391,7 @@
             </div>
           </div>
 <a data-name="-878371659%2FFunctions%2F1759373422" anchor-label="toList" id="-878371659%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-list.html"><span>to</span><wbr><span><span>List</span></span></a></div>
@@ -391,7 +406,7 @@
             </div>
           </div>
 <a data-name="78518472%2FFunctions%2F1759373422" anchor-label="toMap" id="78518472%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="../to-map.html"><span>to</span><wbr><span><span>Map</span></span></a></div>
@@ -406,7 +421,7 @@
             </div>
           </div>
 <a data-name="82708258%2FFunctions%2F1759373422" anchor-label="toString" id="82708258%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
-          <div class="table-row" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
@@ -420,23 +435,42 @@
               </div>
             </div>
           </div>
+<a data-name="-369893393%2FFunctions%2F1759373422" anchor-label="validate" id="-369893393%2FFunctions%2F1759373422" data-filterable-set=":arrow-core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":arrow-core/commonMain" data-filterable-set=":arrow-core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="validate.html"><span><span>validate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-369893393%2FFunctions%2F1759373422"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="validate.html"><span class="token function">validate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">validation<span class="token operator">: </span><a href="../../arrow.core.raise/-singleton-raise/index.html">SingletonRaise</a><span class="token operator">&lt;</span><a href="../-none/index.html">None</a><span class="token operator">&gt;</span><span class="token punctuation">.</span><span class="token punctuation">(</span><a href="index.html">A</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="index.html">Option</a><span class="token operator">&lt;</span><a href="index.html">A</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
