@@ -1,7 +1,7 @@
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   id("java-gradle-plugin")
-  id("com.github.gmazzo.buildconfig") version "5.6.8"
+  id("com.github.gmazzo.buildconfig") version "5.7.0"
   id("com.diffplug.spotless")
   id("com.vanniktech.maven.publish.base")
 }
