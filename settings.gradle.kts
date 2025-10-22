@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.2"
+  id("com.gradle.develocity") version "4.2.2"
   id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
 }
 
@@ -105,6 +105,9 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
+
+include("arrow-optics-plugin")
+project(":arrow-optics-plugin").projectDir = file("arrow-libs/optics/arrow-optics-plugin")
 
 // SUSPENDAPP
 include("suspendapp")

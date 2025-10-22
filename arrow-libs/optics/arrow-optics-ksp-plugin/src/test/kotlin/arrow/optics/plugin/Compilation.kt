@@ -93,7 +93,7 @@ fun buildCompilation(
   if (contextParameters) {
     this.kotlincArguments = listOf("-Xcontext-parameters")
   }
-  configureKsp(useKsp2 = true) {
+  configureKsp {
     withCompilation = true
     symbolProcessorProviders += OpticsProcessorProvider()
   }

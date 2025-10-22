@@ -52,7 +52,7 @@ class OpticsProcessor(
     }
 
     // check that the companion object exists
-    if (klass.companionObject == null) {
+    if (options.companionCheck && klass.companionObject == null) {
       logger.error(klass.qualifiedNameOrSimpleName.noCompanion, klass)
       return
     }
