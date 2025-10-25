@@ -1,22 +1,19 @@
 package arrow.integrations.jackson.module.internal
 
 import arrow.core.firstOrNone
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken
-import com.fasterxml.jackson.databind.BeanProperty
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.core.JsonParser
+import tools.jackson.core.JsonToken
+import tools.jackson.databind.BeanProperty
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.deser.std.StdDeserializer
 
 public class ProductTypeDeserializer<T>(
-  private val clazz: Class<T>,
   private val javaType: JavaType,
   private val fields: List<InjectField<T>>,
   private val fold: (List<T>) -> T,
-) : StdDeserializer<T>(clazz),
-  ContextualDeserializer {
+) : StdDeserializer<T>(javaType) {
   public class InjectField<T>(public val fieldName: String, public val point: (Any?) -> T)
 
   private val deserializers: MutableMap<String, ElementDeserializer> = mutableMapOf()
@@ -39,7 +36,7 @@ public class ProductTypeDeserializer<T>(
           } else {
             val message =
               "Malformed Json: Field collision were detected for ${parser.currentName()}"
-            ctxt.handleUnexpectedToken(clazz, parser.currentToken, parser, message)
+            ctxt.handleUnexpectedToken(javaType, parser.currentToken(), parser, message)
           }
         }
         is arrow.core.None -> {
@@ -47,7 +44,7 @@ public class ProductTypeDeserializer<T>(
           val message =
             "Cannot deserialize $javaType. Make sure json fields are valid: $validFields."
           @Suppress("UNCHECKED_CAST")
-          ctxt.handleUnexpectedToken(clazz, parser.currentToken, parser, message) as T
+          ctxt.handleUnexpectedToken(javaType, parser.currentToken(), parser, message) as T
         }
       }
     }
@@ -58,8 +55,8 @@ public class ProductTypeDeserializer<T>(
   override fun createContextual(
     ctxt: DeserializationContext,
     property: BeanProperty?,
-  ): JsonDeserializer<*> {
-    val deserializer = ProductTypeDeserializer(clazz, javaType, fields, fold)
+  ): ValueDeserializer<*> {
+    val deserializer = ProductTypeDeserializer(javaType, fields, fold)
     for ((index, field) in fields.withIndex()) {
       deserializer.deserializers[field.fieldName] =
         ElementDeserializer.resolve(

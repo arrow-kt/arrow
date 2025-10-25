@@ -1,20 +1,17 @@
 package arrow.integrations.jackson.module.internal
 
 import arrow.core.firstOrNone
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.BeanProperty
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.BeanProperty
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.deser.std.StdDeserializer
 
 public class UnionTypeDeserializer<T>(
-  private val clazz: Class<T>,
   private val javaType: JavaType,
   private val fields: List<InjectField<T>>,
-) : StdDeserializer<T>(clazz),
-  ContextualDeserializer {
+) : StdDeserializer<T>(javaType) {
   public class InjectField<T>(public val fieldName: String, public val point: (Any?) -> T)
 
   private val deserializers: MutableMap<String, ElementDeserializer> = mutableMapOf()
@@ -36,7 +33,7 @@ public class UnionTypeDeserializer<T>(
         val validFields = fields.map { it.fieldName }
         val message = "Cannot deserialize $javaType. Make sure json fields are valid: $validFields."
         @Suppress("UNCHECKED_CAST")
-        ctxt.handleUnexpectedToken(clazz, parser.currentToken, parser, message) as T
+        ctxt.handleUnexpectedToken(javaType, parser.currentToken(), parser, message) as T
       }
     }
   }
@@ -44,7 +41,7 @@ public class UnionTypeDeserializer<T>(
   override fun createContextual(
     ctxt: DeserializationContext,
     property: BeanProperty?,
-  ): JsonDeserializer<*> = UnionTypeDeserializer(clazz, javaType, fields).also { deserializer ->
+  ): ValueDeserializer<*> = UnionTypeDeserializer(javaType, fields).also { deserializer ->
     fields.forEachIndexed { index, field ->
       deserializer.deserializers[field.fieldName] =
         ElementDeserializer.resolve(
