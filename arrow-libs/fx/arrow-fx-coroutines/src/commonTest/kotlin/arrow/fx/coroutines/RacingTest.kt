@@ -3,7 +3,6 @@ package arrow.fx.coroutines
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -20,6 +19,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
+@ExperimentalRacingApi
 class RacingTest {
   @Test
   fun immediateWinner() = runTest {
@@ -107,7 +107,7 @@ class RacingTest {
             launchFinalizerCalled.complete(true)
           }
         }
-        async {
+        launch {
           try {
             awaitCancellation()
           } finally {
@@ -153,7 +153,7 @@ class RacingTest {
   fun testRaceOrThrow() = runTest {
     assertFailsWith<IllegalStateException> {
       racing {
-        raceOrThrow { throw IllegalStateException("Test exception") }
+        raceOrFail { throw IllegalStateException("Test exception") }
         race { awaitCancellation() }
       }
     }

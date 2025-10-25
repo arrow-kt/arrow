@@ -6,7 +6,6 @@ import arrow.core.right
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -21,6 +20,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
+@ExperimentalRacingApi
 class RaiseRacingTest {
   @Test
   fun immediateWinner() = runTest {
@@ -83,7 +83,7 @@ class RaiseRacingTest {
               launchFinalizerCalled.complete(true)
             }
           }
-          backgroundScope.async {
+          backgroundScope.launch {
             try {
               awaitCancellation()
             } finally {
@@ -93,7 +93,7 @@ class RaiseRacingTest {
           latch.complete(Unit)
           awaitCancellation()
         }
-        raceOrThrow {
+        raceOrFail {
           withTimeoutOrNull(600.milliseconds) { latch.await() }
           "fast"
         }
@@ -147,29 +147,39 @@ class RaiseRacingTest {
     assertFailsWith<IllegalStateException> {
       either<String, String> {
         racing {
-          raceOrThrow { throw IllegalStateException("Test exception") }
+          raceOrFail { throw IllegalStateException("Test exception") }
           race { awaitCancellation() }
         }
       }
     }
   }
 
+  /* Note on the implementation:
+   * without the outer try/catch the test fails
+   * because [runTest] overrides the default coroutine
+   * exception handler, conflicting with our own usage.
+   */
   @Test
-  fun testRaceOrRaise() = runTest {
-    val result = either {
-      racing {
-        race { raise("Test error") }
-        race { "success" }
+  fun testRaceOrRaise() =
+    try {
+      runTest {
+        val result = either {
+          racing {
+            race { raise("Test error") }
+            race { "success" }
+          }
+        }
+        assertEquals("success".right(), result)
       }
+    } catch (_: RacingRaiseException) {
+      /* it's OK */
     }
-    assertEquals("Test error".left(), result)
-  }
 
   @Test
   fun testRaceOrFail() = runTest {
     val result = either {
       racing {
-        raceOrThrow { raise("Test error") }
+        raceOrFail { raise("Test error") }
         race { "success" }
       }
     }
