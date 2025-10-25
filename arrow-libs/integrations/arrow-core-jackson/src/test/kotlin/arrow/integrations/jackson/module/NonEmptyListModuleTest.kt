@@ -2,9 +2,6 @@ package arrow.integrations.jackson.module
 
 import arrow.core.Nel
 import arrow.core.NonEmptyList
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -15,11 +12,13 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
 import kotlin.test.Ignore
 import kotlin.test.Test
 
 class NonEmptyListModuleTest {
-  private val mapper = ObjectMapper().registerKotlinModule().registerArrowModule()
+  private val mapper: JsonMapper = basicKotlinArrowMapper()
 
   @Test
   fun `serializing NonEmptyList should be the same as serializing the underlying list`() = runTest {

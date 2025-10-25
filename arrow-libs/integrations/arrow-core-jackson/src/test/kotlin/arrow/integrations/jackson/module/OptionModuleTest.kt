@@ -3,11 +3,6 @@ package arrow.integrations.jackson.module
 import arrow.core.Option
 import arrow.core.some
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.fasterxml.jackson.module.kotlin.kotlinModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -17,10 +12,13 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.kotlinModule
 import kotlin.test.Test
 
 class OptionModuleTest {
-  private val mapper = ObjectMapper().registerModule(OptionModule).registerKotlinModule()
+  private val mapper: JsonMapper = JsonMapper.builder().addModules(kotlinModule(), OptionModule).build()
 
   @Test
   fun `serializing Option should be the same as serializing a nullable value`() = runTest {
@@ -36,9 +34,8 @@ class OptionModuleTest {
   fun `serializing Option with NON_ABSENT should honor such configuration and omit serialization when option is empty`() = runTest {
     val mapperWithSettings =
       JsonMapper.builder()
-        .addModule(OptionModule)
-        .addModule(kotlinModule())
-        .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT))
+        .addModules(OptionModule, kotlinModule())
+        .changeDefaultPropertyInclusion { JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT) }
         .build()
 
     data class Wrapper(val option: Option<Any>)
@@ -70,7 +67,7 @@ class OptionModuleTest {
 
   @Test
   fun `should round-trip on wildcard types`() = runTest {
-    val mapper = ObjectMapper().registerArrowModule()
+    val mapper = basicKotlinArrowMapper()
     checkAll(Arb.option(Arb.int(1..10))) { original: Option<*> ->
       val serialized = mapper.writeValueAsString(original)
       val deserialized = shouldNotThrowAny { mapper.readValue(serialized, Option::class.java) }

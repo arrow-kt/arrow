@@ -8,16 +8,17 @@ import arrow.core.left
 import arrow.core.right
 import arrow.integrations.jackson.module.internal.UnionTypeDeserializer
 import arrow.integrations.jackson.module.internal.UnionTypeSerializer
-import com.fasterxml.jackson.core.json.PackageVersion
-import com.fasterxml.jackson.databind.BeanDescription
-import com.fasterxml.jackson.databind.DeserializationConfig
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonSerializer
-import com.fasterxml.jackson.databind.SerializationConfig
-import com.fasterxml.jackson.databind.deser.Deserializers
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.Serializers
+import com.fasterxml.jackson.annotation.JsonFormat
+import tools.jackson.core.json.PackageVersion
+import tools.jackson.databind.BeanDescription
+import tools.jackson.databind.DeserializationConfig
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.SerializationConfig
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.deser.Deserializers
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.databind.ser.Serializers
 
 public class EitherModule(private val leftFieldName: String, private val rightFieldName: String) : SimpleModule(EitherModule::class.java.canonicalName, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
@@ -40,8 +41,9 @@ public class EitherSerializerResolver(leftFieldName: String, rightFieldName: Str
   override fun findSerializer(
     config: SerializationConfig,
     javaType: JavaType,
-    beanDesc: BeanDescription?,
-  ): JsonSerializer<*>? = when {
+    beanDescRef: BeanDescription.Supplier?,
+    formatOverrides: JsonFormat.Value?,
+  ): ValueSerializer<*>? = when {
     Either::class.java.isAssignableFrom(javaType.rawClass) -> serializer
     else -> null
   }
@@ -53,14 +55,16 @@ public class EitherDeserializerResolver(
   private val leftFieldName: String,
   private val rightFieldName: String,
 ) : Deserializers.Base() {
+
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = Either::class.java.isAssignableFrom(valueType)
+
   override fun findBeanDeserializer(
     type: JavaType,
     config: DeserializationConfig,
-    beanDesc: BeanDescription?,
-  ): JsonDeserializer<*>? = when {
+    beanDesc: BeanDescription.Supplier?,
+  ): ValueDeserializer<*>? = when {
     Either::class.java.isAssignableFrom(type.rawClass) ->
       UnionTypeDeserializer(
-        Either::class.java,
         type,
         listOf(
           UnionTypeDeserializer.InjectField(leftFieldName) { leftValue -> leftValue.left() },
