@@ -223,21 +223,6 @@ public final class arrow/fx/coroutines/RacingKt {
 	public static final fun racing (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public abstract interface class arrow/fx/coroutines/RacingRaise : arrow/core/raise/Raise, arrow/fx/coroutines/RacingScope {
-}
-
-public final class arrow/fx/coroutines/RacingRaise$DefaultImpls {
-	public static fun bind (Larrow/fx/coroutines/RacingRaise;Larrow/core/Either;)Ljava/lang/Object;
-	public static fun bind (Larrow/fx/coroutines/RacingRaise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun bind (Larrow/fx/coroutines/RacingRaise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static fun bindAll (Larrow/fx/coroutines/RacingRaise;Ljava/lang/Iterable;)Ljava/util/List;
-	public static fun bindAll (Larrow/fx/coroutines/RacingRaise;Ljava/util/Map;)Ljava/util/Map;
-	public static fun bindAll-1TN0_VU (Larrow/fx/coroutines/RacingRaise;Ljava/util/Set;)Ljava/util/Set;
-	public static fun bindAll-vcjLgH4 (Larrow/fx/coroutines/RacingRaise;Ljava/util/List;)Ljava/util/List;
-	public static fun invoke (Larrow/fx/coroutines/RacingRaise;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public static fun invoke (Larrow/fx/coroutines/RacingRaise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
 public abstract interface class arrow/fx/coroutines/RacingScope : kotlinx/coroutines/CoroutineScope {
 	public abstract fun raceOrFail (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
 }
@@ -251,7 +236,6 @@ public final class arrow/fx/coroutines/RaiseRacingKt {
 	public static synthetic fun race$default (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 	public static final fun raceOrFail (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;)V
 	public static synthetic fun raceOrFail$default (Larrow/fx/coroutines/RacingScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static final fun racing (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class arrow/fx/coroutines/RaiseScope : arrow/core/raise/Raise, kotlinx/coroutines/CoroutineScope {
