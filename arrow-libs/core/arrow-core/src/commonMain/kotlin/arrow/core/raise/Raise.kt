@@ -478,6 +478,25 @@ public inline fun <A> catch(block: () -> A, catch: (throwable: Throwable) -> A):
 }
 
 /**
+ * Allows safely catching exceptions without capturing [CancellationException],
+ * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
+ *
+ * Depending on the outcome of the block, one of the two lambdas is run:
+ * - _success_ [transform] result of [A] to a value of [B].
+ * - _thrown_ [catch] the thrown [Throwable] and calculate a value of [B].
+ */
+@RaiseDSL
+public inline fun <A, B> catch(block: () -> A, transform: (value: A) -> B, catch: (throwable: Throwable) -> B): B {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  val value = catch({ block() }, { return catch(it) })
+  return transform(value)
+}
+
+/**
  * Allows safely catching exceptions of type `T` without capturing [CancellationException],
  * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
  *
@@ -516,6 +535,25 @@ public inline fun <reified T : Throwable, A> catch(block: () -> A, catch: (t: T)
     callsInPlace(catch, AT_MOST_ONCE)
   }
   return catch(block) { t: Throwable -> if (t is T) catch(t) else throw t }
+}
+
+/**
+ * Allows safely catching exceptions of type `T` without capturing [CancellationException],
+ * or fatal exceptions like `OutOfMemoryError` or `VirtualMachineError` on the JVM.
+ *
+ * Depending on the outcome of the block, one of the two lambdas is run:
+ * - _success_ [transform] result of [A] to a value of [B].
+ * - _thrown_ [catch] the thrown [T] and calculate a value of [B].
+ */
+@RaiseDSL
+@JvmName("catchReified")
+public inline fun <reified T : Throwable, A, B> catch(block: () -> A, transform: (A) -> B, catch: (t: T) -> B): B {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+  }
+  return catch(block, transform) { t: Throwable -> if (t is T) catch(t) else throw t }
 }
 
 /**
