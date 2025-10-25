@@ -22,6 +22,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @ExperimentalRacingApi
 class RaiseRacingTest {
+  private val defaultExceptionHandler = CoroutineExceptionHandler { _, _ ->}
+
   @Test
   fun immediateWinner() = runTest {
     val result = either<String, Int> {
@@ -160,20 +162,15 @@ class RaiseRacingTest {
    * exception handler, conflicting with our own usage.
    */
   @Test
-  fun testRaceOrRaise() =
-    try {
-      runTest {
-        val result = either {
-          racing {
-            race { raise("Test error") }
-            race { "success" }
-          }
-        }
-        assertEquals("success".right(), result)
+  fun testRaceOrRaise() = runTest {
+    val result = either {
+      racing {
+        race(defaultExceptionHandler) { raise("Test error") }
+        race(defaultExceptionHandler) { "success" }
       }
-    } catch (_: RacingRaiseException) {
-      /* it's OK */
     }
+    assertEquals("success".right(), result)
+  }
 
   @Test
   fun testRaceOrFail() = runTest {
@@ -367,5 +364,19 @@ class RaiseRacingTest {
     assertEquals("Raised error", errorsHandled[0])
     assertIs<RuntimeException>(exceptionsHandled[0])
     assertEquals("Thrown exception", exceptionsHandled[0].message)
+  }
+
+  @Test
+  fun testProducesSuccessIfPossible() = runTest {
+    val result = either {
+      racing {
+        race(defaultExceptionHandler) { kotlinx.coroutines.delay(1000); 104 }
+
+        // this blocks ends earlier,
+        // but it is not considered successful
+        race(defaultExceptionHandler) { raise("a problem") }
+      }
+    }
+    assertEquals(104.right(), result)
   }
 }
