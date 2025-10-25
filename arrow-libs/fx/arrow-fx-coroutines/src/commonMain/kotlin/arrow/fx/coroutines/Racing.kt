@@ -122,7 +122,7 @@ public fun <Result> RacingScope<Result>.race(
  *
  * suspend fun main() {
  *   val result = either<String, Int> {
- *     racing<String> {
+ *     racing<Int> {
  *       race { delay(1000) ; 104 }
  *
  *       // this blocks ends earlier,
