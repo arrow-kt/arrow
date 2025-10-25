@@ -59,6 +59,7 @@ enum class OpticsTarget {
   LENS,
   PRISM,
   DSL,
+  COPY,
 }
 
 typealias IsoTarget = Target.Iso
@@ -73,17 +74,23 @@ typealias DataClassDsl = Target.DataClassDsl
 
 typealias ValueClassDsl = Target.ValueClassDsl
 
-sealed class Target {
-  abstract val foci: List<Focus>
+typealias CopyTarget = Target.Copy
 
-  data class Prism(override val foci: List<Focus>) : Target()
-  data class Lens(override val foci: List<Focus>) : Target()
-  data class Iso(override val foci: List<Focus>) : Target()
-  data class SealedClassDsl(override val foci: List<Focus>) : Target()
-  data class DataClassDsl(override val foci: List<Focus>) : Target()
-  data class ValueClassDsl(val focus: Focus) : Target() {
+sealed class Target {
+  sealed class TargetWithFoci : Target() {
+    abstract val foci: List<Focus>
+  }
+
+  data class Prism(override val foci: List<Focus>) : TargetWithFoci()
+  data class Lens(override val foci: List<Focus>) : TargetWithFoci()
+  data class Iso(override val foci: List<Focus>) : TargetWithFoci()
+  data class SealedClassDsl(override val foci: List<Focus>) : TargetWithFoci()
+  data class DataClassDsl(override val foci: List<Focus>) : TargetWithFoci()
+  data class ValueClassDsl(val focus: Focus) : TargetWithFoci() {
     override val foci = listOf(focus)
   }
+
+  data class Copy(val companionName: String) : Target()
 }
 
 data class Focus(
