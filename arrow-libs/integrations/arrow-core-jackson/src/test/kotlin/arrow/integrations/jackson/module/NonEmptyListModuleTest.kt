@@ -2,8 +2,6 @@ package arrow.integrations.jackson.module
 
 import arrow.core.Nel
 import arrow.core.NonEmptyList
-import tools.jackson.module.kotlin.jacksonTypeRef
-import tools.jackson.module.kotlin.kotlinModule
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -15,6 +13,8 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.kotlinModule
 import kotlin.test.Ignore
 import kotlin.test.Test
 

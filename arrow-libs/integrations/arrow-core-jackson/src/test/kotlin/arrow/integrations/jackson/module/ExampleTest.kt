@@ -9,10 +9,10 @@ import arrow.core.right
 import arrow.core.some
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonValue
-import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.kotlinModule
 import io.kotest.matchers.shouldBe
 import tools.jackson.databind.ObjectWriter
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import java.net.URI
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -38,10 +38,10 @@ class ExampleTest {
   )
 
   val mapper: JsonMapper = JsonMapper.builder()
-      .addArrowModule().addModule(kotlinModule())
-      // will not serialize None as nulls
-      .changeDefaultPropertyInclusion {JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT) }
-      .build()
+    .addArrowModule().addModule(kotlinModule())
+    // will not serialize None as nulls
+    .changeDefaultPropertyInclusion { JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT) }
+    .build()
 
   val prettyPrinter: ObjectWriter = mapper.writerWithDefaultPrettyPrinter()
 

@@ -13,15 +13,14 @@ import tools.jackson.core.json.PackageVersion
 import tools.jackson.databind.BeanDescription
 import tools.jackson.databind.DeserializationConfig
 import tools.jackson.databind.JavaType
+import tools.jackson.databind.SerializationConfig
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
-import tools.jackson.databind.SerializationConfig
 import tools.jackson.databind.deser.Deserializers
 import tools.jackson.databind.module.SimpleModule
 import tools.jackson.databind.ser.Serializers
 
-public class EitherModule(private val leftFieldName: String, private val rightFieldName: String)
-  : SimpleModule(EitherModule::class.java.canonicalName, PackageVersion.VERSION) {
+public class EitherModule(private val leftFieldName: String, private val rightFieldName: String) : SimpleModule(EitherModule::class.java.canonicalName, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
     super.setupModule(context)
     context.addDeserializers(EitherDeserializerResolver(leftFieldName, rightFieldName))
@@ -57,8 +56,7 @@ public class EitherDeserializerResolver(
   private val rightFieldName: String,
 ) : Deserializers.Base() {
 
-  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean =
-    Either::class.java.isAssignableFrom(valueType)
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = Either::class.java.isAssignableFrom(valueType)
 
   override fun findBeanDeserializer(
     type: JavaType,

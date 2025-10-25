@@ -3,9 +3,6 @@ package arrow.integrations.jackson.module
 import arrow.core.Option
 import arrow.core.some
 import com.fasterxml.jackson.annotation.JsonInclude
-import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.jacksonTypeRef
-import tools.jackson.module.kotlin.kotlinModule
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -15,6 +12,9 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.kotlinModule
 import kotlin.test.Test
 
 class OptionModuleTest {
@@ -35,7 +35,7 @@ class OptionModuleTest {
     val mapperWithSettings =
       JsonMapper.builder()
         .addModules(OptionModule, kotlinModule())
-        .changeDefaultPropertyInclusion {JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT) }
+        .changeDefaultPropertyInclusion { JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT) }
         .build()
 
     data class Wrapper(val option: Option<Any>)

@@ -10,10 +10,10 @@ import tools.jackson.databind.BeanProperty
 import tools.jackson.databind.DeserializationConfig
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.JavaType
-import tools.jackson.databind.ValueDeserializer
-import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.MapperFeature
 import tools.jackson.databind.SerializationConfig
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.deser.Deserializers
 import tools.jackson.databind.deser.ValueInstantiator
 import tools.jackson.databind.deser.std.ReferenceTypeDeserializer
@@ -56,8 +56,7 @@ public object OptionSerializerResolver : Serializers.Base() {
 }
 
 public object OptionDeserializerResolver : Deserializers.Base() {
-  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean =
-    Option::class.java.isAssignableFrom(valueType)
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = Option::class.java.isAssignableFrom(valueType)
 
   override fun findReferenceDeserializer(
     type: ReferenceType,
@@ -138,8 +137,7 @@ public class OptionDeserializer : ReferenceTypeDeserializer<Option<*>> {
     jsonDeserializer: ValueDeserializer<*>?,
   ) : super(fullType, valueInstantiator, typeDeserializer, jsonDeserializer)
 
-  override fun withResolved(typeDeser: TypeDeserializer?, valueDeser: ValueDeserializer<*>?): ReferenceTypeDeserializer<Option<*>> =
-    OptionDeserializer(valueType, null, typeDeser, valueDeser)
+  override fun withResolved(typeDeser: TypeDeserializer?, valueDeser: ValueDeserializer<*>?): ReferenceTypeDeserializer<Option<*>> = OptionDeserializer(valueType, null, typeDeser, valueDeser)
 
   override fun getNullValue(ctxt: DeserializationContext?): Option<*> = None
   override fun referenceValue(contents: Any): Option<*> = Some(contents)

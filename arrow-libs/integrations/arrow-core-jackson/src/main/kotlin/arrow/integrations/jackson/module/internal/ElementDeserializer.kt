@@ -27,7 +27,7 @@ public data class ElementDeserializer(
       typeDeserializer = option {
         val prop = property.toOption().bind()
         context.findPropertyTypeDeserializer(containedType, prop.member).toOption().bind()
-      }
+      },
     )
   }
 

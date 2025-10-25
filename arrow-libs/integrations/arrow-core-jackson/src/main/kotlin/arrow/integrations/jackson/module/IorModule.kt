@@ -13,15 +13,14 @@ import tools.jackson.core.json.PackageVersion
 import tools.jackson.databind.BeanDescription
 import tools.jackson.databind.DeserializationConfig
 import tools.jackson.databind.JavaType
+import tools.jackson.databind.SerializationConfig
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
-import tools.jackson.databind.SerializationConfig
 import tools.jackson.databind.deser.Deserializers
 import tools.jackson.databind.module.SimpleModule
 import tools.jackson.databind.ser.Serializers
 
-public class IorModule(private val leftFieldName: String, private val rightFieldName: String)
-  : SimpleModule(IorModule::class.java.canonicalName, PackageVersion.VERSION) {
+public class IorModule(private val leftFieldName: String, private val rightFieldName: String) : SimpleModule(IorModule::class.java.canonicalName, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
     super.setupModule(context)
     context.addDeserializers(IorDeserializerResolver(leftFieldName, rightFieldName))
@@ -59,8 +58,7 @@ public class IorDeserializerResolver(
   private val rightFieldName: String,
 ) : Deserializers.Base() {
 
-  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean =
-    Ior::class.java.isAssignableFrom(valueType)
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = Ior::class.java.isAssignableFrom(valueType)
 
   override fun findBeanDeserializer(
     javaType: JavaType,

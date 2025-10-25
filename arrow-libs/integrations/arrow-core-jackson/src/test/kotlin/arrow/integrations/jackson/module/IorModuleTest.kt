@@ -6,7 +6,6 @@ import arrow.core.bothIor
 import arrow.core.leftIor
 import arrow.core.rightIor
 import com.fasterxml.jackson.annotation.JsonProperty
-import tools.jackson.module.kotlin.jacksonTypeRef
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -24,6 +23,7 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
 import kotlin.test.Test
 
 class IorModuleTest {

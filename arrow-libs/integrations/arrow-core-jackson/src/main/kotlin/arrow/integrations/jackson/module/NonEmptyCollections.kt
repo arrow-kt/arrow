@@ -13,10 +13,10 @@ import tools.jackson.databind.BeanDescription
 import tools.jackson.databind.DeserializationConfig
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.JavaType
-import tools.jackson.databind.ValueDeserializer
-import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.SerializationConfig
 import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.deser.Deserializers
 import tools.jackson.databind.deser.std.StdDeserializer
 import tools.jackson.databind.jsontype.TypeDeserializer
@@ -51,9 +51,8 @@ public object NonEmptyCollectionSerializerResolver : Serializers.Base() {
 }
 
 public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
-  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean =
-    NonEmptyList::class.java.isAssignableFrom(valueType) ||
-      NonEmptySet::class.java.isAssignableFrom(valueType)
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = NonEmptyList::class.java.isAssignableFrom(valueType) ||
+    NonEmptySet::class.java.isAssignableFrom(valueType)
 
   override fun findCollectionDeserializer(
     type: CollectionType,
