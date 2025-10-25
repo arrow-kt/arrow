@@ -11,8 +11,6 @@ import arrow.core.rightIor
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.toNonEmptySetOrNull
 import arrow.core.toOption
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -21,6 +19,15 @@ import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.kotlinModule
+
+internal fun basicKotlinArrowMapper(
+  eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),
+  iorModuleConfig: IorModuleConfig = IorModuleConfig("left", "right"),
+): JsonMapper = JsonMapper.builder().addModule(kotlinModule()).addArrowModule(eitherModuleConfig, iorModuleConfig).build()
 
 inline fun <reified T> T.shouldRoundTrip(mapper: ObjectMapper) {
   val encoded = mapper.writeValueAsString(this)
