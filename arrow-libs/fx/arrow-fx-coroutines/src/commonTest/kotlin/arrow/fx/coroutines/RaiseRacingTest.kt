@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @ExperimentalRacingApi
 class RaiseRacingTest {
-  private val defaultExceptionHandler = CoroutineExceptionHandler { _, _ ->}
+  private val doNothingExceptionHandler = CoroutineExceptionHandler { _, _ ->}
 
   @Test
   fun immediateWinner() = runTest {
@@ -157,7 +157,7 @@ class RaiseRacingTest {
   }
 
   /* Note on the implementation:
-   * without the outer try/catch the test fails
+   * without the 'doNothingExceptionHandler' the test fails
    * because [runTest] overrides the default coroutine
    * exception handler, conflicting with our own usage.
    */
@@ -165,8 +165,8 @@ class RaiseRacingTest {
   fun testRaceOrRaise() = runTest {
     val result = either {
       racing {
-        race(defaultExceptionHandler) { raise("Test error") }
-        race(defaultExceptionHandler) { "success" }
+        race(doNothingExceptionHandler) { raise("Test error") }
+        race(doNothingExceptionHandler) { "success" }
       }
     }
     assertEquals("success".right(), result)
@@ -370,11 +370,11 @@ class RaiseRacingTest {
   fun testProducesSuccessIfPossible() = runTest {
     val result = either {
       racing {
-        race(defaultExceptionHandler) { kotlinx.coroutines.delay(1000); 104 }
+        race(doNothingExceptionHandler) { kotlinx.coroutines.delay(1000); 104 }
 
         // this blocks ends earlier,
         // but it is not considered successful
-        race(defaultExceptionHandler) { raise("a problem") }
+        race(doNothingExceptionHandler) { raise("a problem") }
       }
     }
     assertEquals(104.right(), result)
