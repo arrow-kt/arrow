@@ -7,7 +7,7 @@ plugins {
   id("com.gradle.plugin-publish") version "2.0.0"
 }
 
-group = property("projects.group").toString()
+group = "arrow-kt"
 
 repositories {
   gradlePluginPortal()
@@ -65,7 +65,7 @@ gradlePlugin {
 
   plugins {
     create("ArrowOpticsPlugin") {
-      id = "io.arrow-kt.optics"
+      id = "arrow-kt.optics"
       displayName = "ArrowOpticsPlugin"
       description = "Arrow Optics for Kotlin (Multiplatform)"
       implementationClass = "arrow.optics.plugin.ArrowOpticsPlugin"
@@ -73,18 +73,6 @@ gradlePlugin {
     }
   }
 }
-
-/*
-mavenPublishing {
-  configureBasedOnAppliedPlugins()
-  pomFromGradleProperties()
-  if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() != true) {
-    publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
-  }
-}
-
- */
 
 if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() == true) {
   publishing {
