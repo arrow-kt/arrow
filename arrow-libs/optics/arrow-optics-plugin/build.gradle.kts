@@ -3,7 +3,8 @@ plugins {
   id("java-gradle-plugin")
   id("com.github.gmazzo.buildconfig") version "5.7.0"
   id("com.diffplug.spotless")
-  id("com.vanniktech.maven.publish.base")
+  // id("com.vanniktech.maven.publish.base")
+  id("com.gradle.plugin-publish") version "2.0.0"
 }
 
 group = property("projects.group").toString()
@@ -59,16 +60,21 @@ buildConfig {
 }
 
 gradlePlugin {
+  website = "https://arrow-kt.io/"
+  vcsUrl = "https://github.com/arrow-kt/arrow"
+
   plugins {
     create("ArrowOpticsPlugin") {
       id = "arrow.optics.plugin"
       displayName = "ArrowOpticsPlugin"
-      description = "ArrowOpticsPlugin"
+      description = "Arrow Optics for Kotlin (Multiplatform)"
       implementationClass = "arrow.optics.plugin.ArrowOpticsPlugin"
+      tags = listOf("arrow", "optics", "kotlin")
     }
   }
 }
 
+/*
 mavenPublishing {
   configureBasedOnAppliedPlugins()
   pomFromGradleProperties()
@@ -77,6 +83,8 @@ mavenPublishing {
     signAllPublications()
   }
 }
+
+ */
 
 if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() == true) {
   publishing {
