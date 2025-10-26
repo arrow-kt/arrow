@@ -65,7 +65,7 @@ gradlePlugin {
 
   plugins {
     create("ArrowOpticsPlugin") {
-      id = "arrow.optics.plugin"
+      id = "io.arrow-kt.optics"
       displayName = "ArrowOpticsPlugin"
       description = "Arrow Optics for Kotlin (Multiplatform)"
       implementationClass = "arrow.optics.plugin.ArrowOpticsPlugin"
