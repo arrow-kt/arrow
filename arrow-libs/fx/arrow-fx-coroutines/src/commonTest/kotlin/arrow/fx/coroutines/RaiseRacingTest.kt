@@ -6,7 +6,6 @@ import arrow.core.right
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -21,7 +20,10 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
+@ExperimentalRacingApi
 class RaiseRacingTest {
+  private val doNothingExceptionHandler = CoroutineExceptionHandler { _, _ ->}
+
   @Test
   fun immediateWinner() = runTest {
     val result = either<String, Int> {
@@ -83,7 +85,7 @@ class RaiseRacingTest {
               launchFinalizerCalled.complete(true)
             }
           }
-          backgroundScope.async {
+          backgroundScope.launch {
             try {
               awaitCancellation()
             } finally {
@@ -93,7 +95,7 @@ class RaiseRacingTest {
           latch.complete(Unit)
           awaitCancellation()
         }
-        raceOrThrow {
+        raceOrFail {
           withTimeoutOrNull(600.milliseconds) { latch.await() }
           "fast"
         }
@@ -147,29 +149,34 @@ class RaiseRacingTest {
     assertFailsWith<IllegalStateException> {
       either<String, String> {
         racing {
-          raceOrThrow { throw IllegalStateException("Test exception") }
+          raceOrFail { throw IllegalStateException("Test exception") }
           race { awaitCancellation() }
         }
       }
     }
   }
 
+  /* Note on the implementation:
+   * without the 'doNothingExceptionHandler' the test fails
+   * because [runTest] overrides the default coroutine
+   * exception handler, conflicting with our own usage.
+   */
   @Test
   fun testRaceOrRaise() = runTest {
     val result = either {
       racing {
-        race { raise("Test error") }
-        race { "success" }
+        race(doNothingExceptionHandler) { raise("Test error") }
+        race(doNothingExceptionHandler) { "success" }
       }
     }
-    assertEquals("Test error".left(), result)
+    assertEquals("success".right(), result)
   }
 
   @Test
   fun testRaceOrFail() = runTest {
     val result = either {
       racing {
-        raceOrThrow { raise("Test error") }
+        raceOrFail { raise("Test error") }
         race { "success" }
       }
     }
@@ -357,5 +364,19 @@ class RaiseRacingTest {
     assertEquals("Raised error", errorsHandled[0])
     assertIs<RuntimeException>(exceptionsHandled[0])
     assertEquals("Thrown exception", exceptionsHandled[0].message)
+  }
+
+  @Test
+  fun testProducesSuccessIfPossible() = runTest {
+    val result = either {
+      racing {
+        race(doNothingExceptionHandler) { kotlinx.coroutines.delay(1000); 104 }
+
+        // this blocks ends earlier,
+        // but it is not considered successful
+        race(doNothingExceptionHandler) { raise("a problem") }
+      }
+    }
+    assertEquals(104.right(), result)
   }
 }

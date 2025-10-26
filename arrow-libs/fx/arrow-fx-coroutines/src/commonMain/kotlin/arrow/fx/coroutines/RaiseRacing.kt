@@ -28,11 +28,12 @@ public typealias RaiseHandler<Error> = (context: CoroutineContext, error: Error)
  * @param context The [CoroutineContext] to run the block in.
  * @param block The coroutine block to race.
  */
-public fun <Error, Result> RacingScope<Result>.raceOrThrow(
+@ExperimentalRacingApi
+public fun <Error, Result> RacingScope<Result>.raceOrFail(
   handleError: RaiseHandler<Error>,
   context: CoroutineContext = EmptyCoroutineContext,
-  block: suspend RaiseScope<Error>.() -> Result
-): Unit = raceOrThrow(context) scope@{
+  block: suspend RaiseScope<Error>.() -> Result,
+): Unit = raceOrFail(context) scope@{
   recover({ block(RaiseScopeImpl(this@scope, this)) }) {
     handleError(currentCoroutineContext(), it)
     awaitCancellation()
@@ -48,10 +49,11 @@ public fun <Error, Result> RacingScope<Result>.raceOrThrow(
  * @param context The [CoroutineContext] to run the block in.
  * @param block The coroutine block to race.
  */
+@ExperimentalRacingApi
 public fun <Error, Result> RacingScope<Result>.race(
   handleError: RaiseHandler<Error>,
   context: CoroutineContext = EmptyCoroutineContext,
-  block: suspend RaiseScope<Error>.() -> Result
+  block: suspend RaiseScope<Error>.() -> Result,
 ): Unit = race(context) scope@{
   recover({ block(RaiseScopeImpl(this@scope, this)) }) {
     handleError(currentCoroutineContext(), it)
