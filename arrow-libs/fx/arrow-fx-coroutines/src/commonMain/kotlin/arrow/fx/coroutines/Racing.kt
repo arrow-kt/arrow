@@ -1,6 +1,8 @@
 package arrow.fx.coroutines
 
-import arrow.core.raise.catch
+import arrow.core.nonFatalOrThrow
+import arrow.core.raise.DelicateRaiseApi
+import arrow.core.raise.RaiseCancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -58,18 +60,20 @@ private val defaultCoroutineExceptionHandler =
  * @param condition Optional condition to consider the block as successful.
  * @param block The coroutine block to race.
  */
+@OptIn(DelicateRaiseApi::class)
 @ExperimentalRacingApi
 public fun <Result> RacingScope<Result>.race(
   context: CoroutineContext = EmptyCoroutineContext,
   condition: (Result) -> Boolean = { true },
   block: suspend CoroutineScope.() -> Result
 ): Unit = raceOrFail(context) {
-  catch({
+  try {
     val result = block()
     if (!condition(result)) awaitCancellation()
     result
-  }) {
-    (coroutineContext[CoroutineExceptionHandler] ?: defaultCoroutineExceptionHandler).handleException(currentCoroutineContext(), it)
+  } catch (t: Throwable) {
+    if (t !is RaiseCancellationException) t.nonFatalOrThrow()
+    (coroutineContext[CoroutineExceptionHandler] ?: defaultCoroutineExceptionHandler).handleException(currentCoroutineContext(), t)
     awaitCancellation()
   }
 }
@@ -78,13 +82,14 @@ public fun <Result> RacingScope<Result>.race(
 /**
  * Creates a racing scope that allows multiple coroutine blocks to race against each other.
  * The first block to complete successfully will provide the result, and all other blocks will be cancelled.
- * A block is by default considered successful if it doesn't throw an exception.
+ * A block is by default considered successful if it doesn't throw an exception
+ * nor raises an error through [arrow.core.raise.Raise].
  * To change this behavior, provide a success condition to [race] or use [raceOrFail].
  *
  * This function provides structured concurrency guarantees - all racing blocks will be properly cancelled
  * when the racing scope completes, either normally or exceptionally.
  *
- * Example:
+ * Example 1:
  *
  * ```kotlin
  * import arrow.fx.coroutines.racing
@@ -106,6 +111,27 @@ public fun <Result> RacingScope<Result>.race(
  *   }
  *
  *   println(result) // Prints: Timeout result
+ * }
+ * ```
+ *
+ * Example 2:
+ *
+ * ```kotlin
+ * import arrow.fx.coroutines.racing
+ * import arrow.core.raise.either
+ *
+ * suspend fun main() {
+ *   val result = either<String, Int> {
+ *     racing<Int> {
+ *       race { delay(1000) ; 104 }
+ *
+ *       // this blocks ends earlier,
+ *       // but it is not considered successful
+ *       race { raise("a problem") }
+ *     }
+ *   }
+ *
+ *   println(result) // Prints: Either.Right(104)
  * }
  * ```
  *
