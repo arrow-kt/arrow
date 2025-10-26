@@ -11,6 +11,10 @@ open annotation class arrow.optics/optics : kotlin/Annotation { // arrow.optics/
 
     final val targets // arrow.optics/optics.targets|{}targets[0]
         final fun <get-targets>(): kotlin/Array<arrow.optics/OpticsTarget> // arrow.optics/optics.targets.<get-targets>|<get-targets>(){}[0]
+
+    open annotation class copy : kotlin/Annotation { // arrow.optics/optics.copy|null[0]
+        constructor <init>() // arrow.optics/optics.copy.<init>|<init>(){}[0]
+    }
 }
 
 open annotation class arrow/synthetic : kotlin/Annotation { // arrow/synthetic|null[0]
