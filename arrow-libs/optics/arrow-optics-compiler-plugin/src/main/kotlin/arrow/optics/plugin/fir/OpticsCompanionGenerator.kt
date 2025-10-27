@@ -49,7 +49,9 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     if (!session.predicateBasedProvider.matches(predicate, owner)) return null
     if (owner.companionObjectSymbol != null) return null
     if (name != SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT) return null
-    return createCompanionObject(owner, Key).symbol
+    return createCompanionObject(owner, Key) {
+      this.visibility = owner.rawStatus.visibility
+    }.symbol
   }
 
   fun FirClassSymbol<*>.isGeneratedOpticsCompanion(): Boolean {

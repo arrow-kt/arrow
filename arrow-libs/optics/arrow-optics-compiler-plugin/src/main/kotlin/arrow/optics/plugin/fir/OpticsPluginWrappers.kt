@@ -1,6 +1,5 @@
 package arrow.optics.plugin.fir
 
-import arrow.optics.plugin.BuildConfig
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -11,15 +10,15 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 @Suppress("unused") // Used via reflection.
 class OpticsCommandLineProcessor : CommandLineProcessor {
-    override val pluginId: String = BuildConfig.KOTLIN_PLUGIN_ID
-    override val pluginOptions: Collection<CliOption> = emptyList()
+  override val pluginId: String = "arrow.optics.plugin"
+  override val pluginOptions: Collection<CliOption> = emptyList()
 
-    override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
-        error("Unexpected config option: '${option.optionName}'")
-    }
+  override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
+    error("Unexpected config option: '${option.optionName}'")
+  }
 }
 
-class OpticsPluginComponentRegistrar: CompilerPluginRegistrar() {
+class OpticsPluginComponentRegistrar : CompilerPluginRegistrar() {
   override val supportsK2: Boolean
     get() = true
 

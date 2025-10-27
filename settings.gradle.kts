@@ -106,6 +106,9 @@ project(":arrow-optics-compose").projectDir = file("arrow-libs/optics/arrow-opti
 include("arrow-optics-ksp-plugin")
 project(":arrow-optics-ksp-plugin").projectDir = file("arrow-libs/optics/arrow-optics-ksp-plugin")
 
+include("arrow-optics-compiler-plugin")
+project(":arrow-optics-compiler-plugin").projectDir = file("arrow-libs/optics/arrow-optics-compiler-plugin")
+
 include("arrow-optics-plugin")
 project(":arrow-optics-plugin").projectDir = file("arrow-libs/optics/arrow-optics-plugin")
 

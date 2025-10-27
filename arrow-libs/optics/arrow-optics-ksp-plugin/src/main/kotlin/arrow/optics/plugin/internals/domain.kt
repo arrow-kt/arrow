@@ -8,18 +8,15 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Variance
-import com.google.devtools.ksp.symbol.Visibility
-import java.util.Locale
+import java.util.*
 
 data class ADT(val declaration: KSClassDeclaration, val targets: List<Target>) {
   val sourceClassName = declaration.qualifiedNameOrSimpleName
   val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }.sanitize()
   val simpleName = declaration.nameWithParentClass
   val packageName = declaration.packageName.asSanitizedString()
-  val visibilityModifierName = when (declaration.companionObject?.getVisibility()) {
-    Visibility.INTERNAL -> "internal"
-    else -> "public"
-  }
+  val visibilityModifierName =
+    (declaration.companionObject?.getVisibility() ?: declaration.getVisibility()).name.lowercase()
   val typeParameters: List<String> = declaration.typeParameters.map { tyParam ->
     if (tyParam.variance == Variance.STAR) return@map "*"
     // val prefix = when (it.variance) {

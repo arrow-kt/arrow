@@ -63,7 +63,6 @@ dependencies {
   kover(projects.arrowFxCoroutines)
   kover(projects.arrowFxStm)
   kover(projects.arrowOptics)
-  kover(projects.arrowOpticsKspPlugin)
   kover(projects.arrowOpticsReflect)
   kover(projects.arrowOpticsCompose)
   kover(projects.arrowResilience)

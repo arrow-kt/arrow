@@ -14,7 +14,7 @@ repositories {
 }
 
 kotlin {
-  explicitApi = null
+  explicitApi()
   compilerOptions {
     optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
   }
@@ -25,17 +25,17 @@ dependencies {
   implementation(kotlin("gradle-plugin-api"))
   implementation(kotlin("gradle-plugin"))
   implementation(projects.arrowOpticsKspPlugin)
+  implementation(projects.arrowOpticsCompilerPlugin)
   implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${libs.versions.kspVersion.get()}")
 }
 
 buildConfig {
   packageName("arrow.optics.plugin")
 
-  buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"arrow.optics.plugin\"")
-
-  buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
-  buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project.name}\"")
-  buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
+  val compilerPluginProject = project(":arrow-optics-compiler-plugin")
+  buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${compilerPluginProject.group}\"")
+  buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${compilerPluginProject.name}\"")
+  buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${compilerPluginProject.version}\"")
 
   val kspPluginProject = project(":arrow-optics-ksp-plugin")
   buildConfigField(

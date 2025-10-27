@@ -36,9 +36,10 @@ val Project.needsJava11
 val Project.needsAbiValidation
   get() = project.name !in listOf(
     "arrow-optics-ksp-plugin",
+    "arrow-optics-compiler-plugin",
+    "arrow-optics-plugin",
     "suspendapp-test-app",
     "suspendapp-test-runner",
-    "arrow-optics-plugin",
   )
 
 val Project.isKotlinJvm: Boolean
