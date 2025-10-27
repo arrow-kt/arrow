@@ -832,13 +832,13 @@ public sealed class Either<out A, out B> {
     @JvmStatic
     public inline fun <R> catch(f: () -> R): Either<Throwable, R> {
       contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-      return arrow.core.raise.catch({ f().right() }) { it.left() }
+      return arrow.core.raise.catch(f, ::Right, ::Left)
     }
 
     @JvmStatic
     public inline fun <reified T : Throwable, R> catchOrThrow(f: () -> R): Either<T, R> {
       contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
-      return arrow.core.raise.catch<T, Either<T, R>>({ f().right() }) { it.left() }
+      return arrow.core.raise.catch<T, _, _>(f, ::Right, ::Left)
     }
 
     public inline fun <E, A, B, Z> zipOrAccumulate(
