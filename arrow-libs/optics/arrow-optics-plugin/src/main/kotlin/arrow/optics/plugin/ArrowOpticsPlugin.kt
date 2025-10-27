@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
-fun KotlinSingleTargetExtension<*>.arrowOptics() {
+public fun KotlinSingleTargetExtension<*>.arrowOptics() {
   project.dependencies.add("ksp", BuildConfig.KSP_PLUGIN_LIBRARY_COORDINATES)
 
   for (sourceSet in sourceSets) {
@@ -26,16 +26,19 @@ fun KotlinSingleTargetExtension<*>.arrowOptics() {
   }
 }
 
-fun KotlinMultiplatformExtension.arrowOpticsCommon() =
+public fun KotlinMultiplatformExtension.arrowOpticsCommon() {
   arrowOptics(metadata())
+}
 
-fun KotlinMultiplatformExtension.arrowOpticsAllTargets() =
+public fun KotlinMultiplatformExtension.arrowOpticsAllTargets() {
   arrowOptics(targets.toList())
+}
 
-fun KotlinMultiplatformExtension.arrowOptics(target: KotlinTarget, vararg moreTargets: KotlinTarget) =
+public fun KotlinMultiplatformExtension.arrowOptics(target: KotlinTarget, vararg moreTargets: KotlinTarget) {
   arrowOptics(listOf(target) + moreTargets.toList())
+}
 
-fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget>) {
+public fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget>) {
   for (target in targets) {
     val miniTarget = target.name.lowercase()
 
@@ -69,7 +72,7 @@ fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget>) {
   }
 }
 
-class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
+public class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
   override fun apply(target: Project) {
     target.pluginManager.apply(KspGradleSubplugin::class.java)
     target.extensions.configure(KspExtension::class.java) {
@@ -82,7 +85,7 @@ class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
   override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> =
     kotlinCompilation.target.project.provider { emptyList() }
 
-  override fun getCompilerPluginId(): String = BuildConfig.KOTLIN_PLUGIN_ID
+  override fun getCompilerPluginId(): String = "arrow.optics.plugin"
 
   override fun getPluginArtifact(): SubpluginArtifact = SubpluginArtifact(
     groupId = BuildConfig.KOTLIN_PLUGIN_GROUP,
@@ -93,4 +96,4 @@ class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
   override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
 }
 
-open class OpticsGradleExtension(objectFactory: ObjectFactory)
+public open class OpticsGradleExtension(objectFactory: ObjectFactory)
