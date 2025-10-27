@@ -40,4 +40,4 @@ jobs:
         run: ./gradlew publishToMavenCentral -Pversion=${{ github.event.release.name }} -Penable_wasm=true
 
       - name: Publish plug-ins
-        run: ./gradlew publishPlugins -Pversion=${{ github.event.release.name }} -Penable_wasm=true -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY_ARROW }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET_ARROW }}
+        run: ./gradlew publishPlugins -Pversion=${{ github.event.release.name }} -Penable_wasm=true -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}

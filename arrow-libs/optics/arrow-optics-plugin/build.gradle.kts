@@ -7,7 +7,7 @@ plugins {
   id("com.gradle.plugin-publish") version "2.0.0"
 }
 
-group = "arrow-kt"
+group = property("projects.group").toString()
 
 repositories {
   gradlePluginPortal()
@@ -65,7 +65,7 @@ gradlePlugin {
 
   plugins {
     create("ArrowOpticsPlugin") {
-      id = "arrow-kt.optics"
+      id = "io.arrow-kt.optics"
       displayName = "ArrowOpticsPlugin"
       description = "Arrow Optics for Kotlin (Multiplatform)"
       implementationClass = "arrow.optics.plugin.ArrowOpticsPlugin"
