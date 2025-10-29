@@ -8,16 +8,17 @@ import arrow.core.rightIor
 import arrow.core.some
 import arrow.integrations.jackson.module.internal.ProductTypeDeserializer
 import arrow.integrations.jackson.module.internal.ProductTypeSerializer
-import com.fasterxml.jackson.core.json.PackageVersion
-import com.fasterxml.jackson.databind.BeanDescription
-import com.fasterxml.jackson.databind.DeserializationConfig
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonSerializer
-import com.fasterxml.jackson.databind.SerializationConfig
-import com.fasterxml.jackson.databind.deser.Deserializers
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.Serializers
+import com.fasterxml.jackson.annotation.JsonFormat
+import tools.jackson.core.json.PackageVersion
+import tools.jackson.databind.BeanDescription
+import tools.jackson.databind.DeserializationConfig
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.SerializationConfig
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.deser.Deserializers
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.databind.ser.Serializers
 
 public class IorModule(private val leftFieldName: String, private val rightFieldName: String) : SimpleModule(IorModule::class.java.canonicalName, PackageVersion.VERSION) {
   override fun setupModule(context: SetupContext) {
@@ -44,8 +45,9 @@ public class IorSerializerResolver(leftFieldName: String, rightFieldName: String
   override fun findSerializer(
     config: SerializationConfig,
     type: JavaType,
-    beanDesc: BeanDescription?,
-  ): JsonSerializer<*>? = when {
+    beanDescRef: BeanDescription.Supplier?,
+    formatOverrides: JsonFormat.Value?,
+  ): ValueSerializer<*>? = when {
     Ior::class.java.isAssignableFrom(type.rawClass) -> serializer
     else -> null
   }
@@ -56,14 +58,15 @@ public class IorDeserializerResolver(
   private val rightFieldName: String,
 ) : Deserializers.Base() {
 
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = Ior::class.java.isAssignableFrom(valueType)
+
   override fun findBeanDeserializer(
     javaType: JavaType,
     config: DeserializationConfig,
-    beanDesc: BeanDescription?,
-  ): JsonDeserializer<*>? = when {
+    beanDesc: BeanDescription.Supplier?,
+  ): ValueDeserializer<*>? = when {
     Ior::class.java.isAssignableFrom(javaType.rawClass) ->
       ProductTypeDeserializer(
-        Ior::class.java,
         javaType,
         listOf(
           ProductTypeDeserializer.InjectField(leftFieldName) { firstValue ->

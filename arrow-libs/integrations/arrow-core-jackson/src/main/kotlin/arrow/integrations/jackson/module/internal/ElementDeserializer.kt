@@ -5,17 +5,16 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.raise.option
 import arrow.core.toOption
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.JsonToken
-import com.fasterxml.jackson.databind.BeanProperty
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer
+import tools.jackson.core.JsonParser
+import tools.jackson.core.JsonToken
+import tools.jackson.databind.BeanProperty
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.jsontype.TypeDeserializer
 
 public data class ElementDeserializer(
-  val deserializer: Option<JsonDeserializer<*>>,
+  val deserializer: Option<ValueDeserializer<*>>,
   val typeDeserializer: Option<TypeDeserializer>,
 ) {
   public companion object {
@@ -25,13 +24,9 @@ public data class ElementDeserializer(
       property: BeanProperty?,
     ): ElementDeserializer = ElementDeserializer(
       deserializer = context.findContextualValueDeserializer(containedType, property).toOption(),
-      typeDeserializer =
-      option {
+      typeDeserializer = option {
         val prop = property.toOption().bind()
-        BeanDeserializerFactory.instance
-          .findPropertyTypeDeserializer(context.config, containedType, prop.member)
-          .toOption()
-          .bind()
+        context.findPropertyTypeDeserializer(containedType, prop.member).toOption().bind()
       },
     )
   }
@@ -49,7 +44,7 @@ public data class ElementDeserializer(
       deserializer.value.deserialize(parser, context)
     else ->
       context.handleUnexpectedToken(
-        javaType.rawClass,
+        javaType,
         token,
         parser,
         "no deserializer was found for given type",
