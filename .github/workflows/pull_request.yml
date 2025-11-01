@@ -205,7 +205,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: JVM tests
-        run: ./gradlew jvmTest
+        run: ./gradlew jvmTest :arrow-core-jackson:test :arrow-core-retrofit:test :arrow-core-result4k:test :arrow-optics-ksp-plugin:test
 
       - name: Code coverage
         if: "! github.event.pull_request.head.repo.fork "
