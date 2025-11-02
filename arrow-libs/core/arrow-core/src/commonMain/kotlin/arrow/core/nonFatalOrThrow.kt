@@ -1,3 +1,5 @@
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.core
 
 /**
@@ -33,5 +35,6 @@ package arrow.core
  *
  */
 // https://youtrack.jetbrains.com/issue/KT-36036
+@IgnorableReturnValue
 public fun Throwable.nonFatalOrThrow(): Throwable =
   if (NonFatal(this)) this else throw this

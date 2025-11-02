@@ -26,7 +26,7 @@ public object Collectors {
    */
   public val length: NonSuspendCollector<Any?, Int> = Collector.nonSuspendOf(
     supply = { AtomicInt(0) },
-    accumulate = { current, _ -> current.incrementAndGet() },
+    accumulate = { current, _ -> val _ = current.incrementAndGet() },
     finish = AtomicInt::get,
     characteristics = Characteristics.CONCURRENT_UNORDERED
   )
