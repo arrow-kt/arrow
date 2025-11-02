@@ -1,6 +1,7 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise
 
@@ -346,7 +347,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   private val state: Atomic<Any?>,
   private val raise: Raise<Error>,
 ) : Raise<Error> by raise {
-  @PublishedApi
+  @PublishedApi @IgnorableReturnValue
   internal fun combine(e: Error): Error = state.update(
     function = { EmptyValue.combine(it, e, combineError) },
     transform = { _, new -> new },
