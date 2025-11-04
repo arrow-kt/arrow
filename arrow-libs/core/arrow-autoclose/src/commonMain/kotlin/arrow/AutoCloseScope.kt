@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalContracts::class)
-@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow
 
@@ -116,5 +115,5 @@ internal class DefaultAutoCloseScope : AutoCloseScope {
   }
 }
 
-@PublishedApi @IgnorableReturnValue
-internal expect fun Throwable.throwIfFatal(): Throwable
+@PublishedApi
+internal expect fun Throwable.throwIfFatal(): Unit

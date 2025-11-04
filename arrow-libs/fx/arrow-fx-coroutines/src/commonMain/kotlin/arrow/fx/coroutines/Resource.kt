@@ -5,8 +5,8 @@ package arrow.fx.coroutines
 import arrow.AutoCloseScope
 import arrow.atomic.Atomic
 import arrow.atomic.update
-import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
+import arrow.core.throwIfFatal
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -492,7 +492,7 @@ internal class ResourceScopeImpl : ResourceScope {
   }
 
   private fun Throwable?.add(other: Throwable?): Throwable? {
-    if (other !is CancellationException) other?.nonFatalOrThrow()
+    if (other !is CancellationException) other?.throwIfFatal()
     return this?.apply {
       other?.let { addSuppressed(it) }
     } ?: other

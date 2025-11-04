@@ -19,5 +19,5 @@ final class arrow/DefaultAutoCloseScope : arrow/AutoCloseScope { // arrow/Defaul
     final fun onClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/DefaultAutoCloseScope.onClose|onClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
 }
 
-final fun (kotlin/Throwable).arrow/throwIfFatal(): kotlin/Throwable // arrow/throwIfFatal|throwIfFatal@kotlin.Throwable(){}[0]
+final fun (kotlin/Throwable).arrow/throwIfFatal() // arrow/throwIfFatal|throwIfFatal@kotlin.Throwable(){}[0]
 final inline fun <#A: kotlin/Any?> arrow/autoCloseScope(kotlin/Function1<arrow/AutoCloseScope, #A>): #A // arrow/autoCloseScope|autoCloseScope(kotlin.Function1<arrow.AutoCloseScope,0:0>){0§<kotlin.Any?>}[0]
