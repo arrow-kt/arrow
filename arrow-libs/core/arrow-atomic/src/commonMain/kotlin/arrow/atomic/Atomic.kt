@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalContracts::class)
-@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.atomic
 
@@ -39,7 +38,6 @@ public expect class Atomic<V>(initialValue: V) {
    * Compare current value with expected and set to new if they're the same. Note, 'compare' is checking
    * the actual object id, not 'equals'.
    */
-  @IgnorableReturnValue
   public fun compareAndSet(expected: V, new: V): Boolean
 }
 

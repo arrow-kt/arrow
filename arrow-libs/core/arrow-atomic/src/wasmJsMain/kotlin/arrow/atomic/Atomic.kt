@@ -1,5 +1,3 @@
-@file:Suppress("API_NOT_AVAILABLE")
-
 package arrow.atomic
 
 public actual class Atomic<V> actual constructor(initialValue: V) {
@@ -11,7 +9,6 @@ public actual class Atomic<V> actual constructor(initialValue: V) {
     internalValue = value
   }
 
-  @IgnorableReturnValue
   public actual fun compareAndSet(expected: V, new: V): Boolean =
     if (expected === internalValue) {
       internalValue = new
