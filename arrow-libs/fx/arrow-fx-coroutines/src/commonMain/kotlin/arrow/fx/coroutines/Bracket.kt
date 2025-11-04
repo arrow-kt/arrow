@@ -2,7 +2,7 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.nonFatalOrThrow
+import arrow.core.throwIfFatal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -275,7 +275,7 @@ internal inline fun <R> finalizeCase(block: () -> R, finalizer: (ExitCase) -> Un
     exitCase = ExitCase.ExitCase(e)
     throw e
   } finally {
-    if (exitCase is ExitCase.Failure) exitCase.failure.nonFatalOrThrow()
+    if (exitCase is ExitCase.Failure) exitCase.failure.throwIfFatal()
     finalizer(exitCase)
   }
 }

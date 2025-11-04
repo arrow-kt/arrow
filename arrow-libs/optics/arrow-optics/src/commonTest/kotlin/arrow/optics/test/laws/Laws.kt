@@ -1,3 +1,5 @@
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.optics.test.laws
 
 import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
@@ -9,8 +11,9 @@ interface LawSet {
   val laws: List<Law>
 }
 
-data class Law(val name: String, val test: suspend TestScope.() -> Unit)
+data class Law(val name: String, val test: suspend TestScope.() -> Any?)
 
+@IgnorableReturnValue
 fun <A> A.equalUnderTheLaw(b: A, f: (A, A) -> Boolean = { x, y -> x == y }): Boolean =
   if (f(this, b)) true else fail("Found $this but expected: $b")
 
@@ -20,5 +23,5 @@ fun testLaws(vararg laws: List<Law>): TestResult = runTest {
   laws
     .flatMap(List<Law>::asIterable)
     .distinctBy(Law::name)
-    .forEach { law: Law -> law.test(this@runTest) }
+    .forEach { law: Law -> val _ = law.test(this@runTest) }
 }

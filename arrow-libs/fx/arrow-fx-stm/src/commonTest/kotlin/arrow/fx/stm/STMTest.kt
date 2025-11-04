@@ -1,3 +1,5 @@
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.fx.stm
 
 import arrow.fx.coroutines.parMap
@@ -217,7 +219,7 @@ class STMTest {
   @Test fun catchShouldWorkAsExcepted() = runTest {
     val tv = TVar.new(10)
     val ex = IllegalArgumentException("test")
-    atomically {
+    val _ = atomically {
       catch({
         tv.write(30)
         throw ex
@@ -247,7 +249,7 @@ class STMTest {
         delay(20.milliseconds)
         atomically { acc1.modify { it + 60 } }
       },
-      { _, _ -> Unit }
+      { _, _ -> }
     )
     acc1.unsafeRead() shouldBeExactly 50
     acc2.unsafeRead() shouldBeExactly 250
@@ -277,7 +279,7 @@ class STMTest {
       },
       {
         val collected = mutableSetOf<Int>()
-        for (i in 1..100) {
+        for (_ in 1..100) {
           // consumer
           atomically {
             tq.read().also { it shouldBeInRange (1..100) }
@@ -286,18 +288,19 @@ class STMTest {
         // verify that we got 100 unique numbers
         collected.size shouldBeExactly 100
       }
-    ) { _, _ -> Unit }
+    ) { _, _ -> }
     // the above only finishes if the consumer reads at least 100 values, this here is just to make sure there are no leftovers
     atomically { tq.flush() } shouldBe emptyList()
   }
 }
 
 // copied from Kotest so we can inline it
+@IgnorableReturnValue
 inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
   assertionCounter.inc()
   val expectedExceptionClass = T::class
   val thrownThrowable = try {
-    block()
+    val _ = block()
     null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
   } catch (thrown: Throwable) {
     thrown

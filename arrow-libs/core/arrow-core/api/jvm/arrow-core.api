@@ -606,6 +606,7 @@ public final class arrow/core/NonFatalKt {
 
 public final class arrow/core/NonFatalOrThrowKt {
 	public static final fun nonFatalOrThrow (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+	public static final fun throwIfFatal (Ljava/lang/Throwable;)V
 }
 
 public final class arrow/core/None : arrow/core/Option {
