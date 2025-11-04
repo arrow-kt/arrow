@@ -1,5 +1,3 @@
-@file:Suppress("API_NOT_AVAILABLE")
-
 package arrow.atomic
 
 import kotlin.concurrent.AtomicReference
@@ -13,7 +11,6 @@ public actual class Atomic<V> actual constructor(initialValue: V) {
     inner.value = value
   }
 
-  @IgnorableReturnValue
   public actual fun compareAndSet(expected: V, new: V): Boolean =
     inner.compareAndSet(expected, new)
 
