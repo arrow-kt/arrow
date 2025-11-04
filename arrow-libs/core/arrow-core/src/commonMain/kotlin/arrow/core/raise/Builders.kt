@@ -234,7 +234,7 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
     return this ?: raise()
   }
 
-  @RaiseDSL
+  @RaiseDSL @IgnorableReturnValue
   public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
     return value ?: raise()
