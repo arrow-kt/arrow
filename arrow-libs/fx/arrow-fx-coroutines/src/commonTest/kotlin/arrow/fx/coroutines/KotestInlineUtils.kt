@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.fx.coroutines
 
@@ -11,6 +12,7 @@ import io.kotest.matchers.types.beOfType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+@IgnorableReturnValue
 inline fun <reified T : Any> Any?.shouldBeTypeOf(): T {
   contract {
     returns() implies (this@shouldBeTypeOf is T)
@@ -20,6 +22,7 @@ inline fun <reified T : Any> Any?.shouldBeTypeOf(): T {
   return this as T
 }
 
+@IgnorableReturnValue
 inline fun <reified T : Any> Any?.shouldBeInstanceOf(): T {
   contract {
     returns() implies (this@shouldBeInstanceOf is T)
@@ -33,7 +36,7 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
   assertionCounter.inc()
   val expectedExceptionClass = T::class
   val thrownThrowable = try {
-    block()
+    val _ = block()
     null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
   } catch (thrown: Throwable) {
     thrown
