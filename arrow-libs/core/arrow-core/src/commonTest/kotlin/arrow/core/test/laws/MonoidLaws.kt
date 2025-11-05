@@ -4,7 +4,6 @@ import arrow.core.test.Law
 import arrow.core.test.LawSet
 import arrow.core.test.equalUnderTheLaw
 import arrow.core.test.unit
-import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
 import io.kotest.property.arbitrary.list
@@ -44,6 +43,6 @@ data class MonoidLaws<F>(
 
   private suspend fun combineAllOfEmptyIsEmpty(): PropertyContext =
     checkAll(1, Arb.unit()) {
-      emptyList<F>().fold(empty, combine).equalUnderTheLaw(empty, eq) shouldBe true
+      emptyList<F>().fold(empty, combine).equalUnderTheLaw(empty, eq)
     }
 }
