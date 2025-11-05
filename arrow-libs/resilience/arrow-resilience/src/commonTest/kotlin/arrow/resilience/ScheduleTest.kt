@@ -3,6 +3,7 @@
 package arrow.resilience
 
 import arrow.atomic.AtomicLong
+import arrow.atomic.update
 import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.left
@@ -239,7 +240,7 @@ class ScheduleTest {
     val iterations = 20_000L
     val l = Either.catch {
       Schedule.recurs<Throwable>(iterations).retry {
-        val _ = count.updateAndGet { it + 1 }
+        count.update { it + 1 }
         throw exception
       }
     }

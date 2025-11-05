@@ -3,6 +3,7 @@ package arrow.core.test.laws
 import arrow.core.test.Law
 import arrow.core.test.LawSet
 import arrow.core.test.equalUnderTheLaw
+import arrow.core.test.unit
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
@@ -41,7 +42,8 @@ data class MonoidLaws<F>(
       list.fold(empty, combine).equalUnderTheLaw(if (list.isEmpty()) empty else list.reduce(combine), eq)
     }
 
-  private fun combineAllOfEmptyIsEmpty() {
-    emptyList<F>().fold(empty, combine).equalUnderTheLaw(empty, eq) shouldBe true
-  }
+  private suspend fun combineAllOfEmptyIsEmpty(): PropertyContext =
+    checkAll(1, Arb.unit()) {
+      emptyList<F>().fold(empty, combine).equalUnderTheLaw(empty, eq) shouldBe true
+    }
 }
