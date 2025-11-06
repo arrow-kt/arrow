@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalStdlibApi::class)
-@file:Suppress("API_NOT_AVAILABLE")
+@file:Suppress("API_NOT_AVAILABLE", "RESERVED_MEMBER_INSIDE_VALUE_CLASS")
 
 package arrow.core
 
@@ -24,7 +24,7 @@ public value class NonEmptySet<out E> internal constructor(
 
   override fun isEmpty(): Boolean = false
 
-  @JvmExposeBoxed
+  @JvmExposeBoxed @Suppress("USELESS_JVM_EXPOSE_BOXED")
   public fun toSet(): Set<E> = elements
 
   override val head: E get() = elements.first()
@@ -33,11 +33,9 @@ public value class NonEmptySet<out E> internal constructor(
 
   override fun toString(): String = elements.toString()
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun equals(other: Any?): Boolean =
     elements == other
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =
     elements.hashCode()
 

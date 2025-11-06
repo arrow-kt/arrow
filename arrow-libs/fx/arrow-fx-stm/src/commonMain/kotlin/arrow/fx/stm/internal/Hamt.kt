@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.fx.stm.internal
 
@@ -49,6 +49,7 @@ internal fun <A> STM.pair(depth: Int, hash1: Int, branch1: Branch<A>, hash2: Int
 
 // internal fun <A> STM.clearHamt(hamt: Hamt<A>): Unit = hamt.branches.write(arrayOfNulls(ARR_SIZE))
 
+@IgnorableReturnValue @Suppress("UNCHECKED_CAST")
 internal fun <A> STM.alterHamtWithHash(
   hamt: Hamt<A>,
   hash: Int,
@@ -139,6 +140,7 @@ internal sealed class Branch<A> {
   }
 
   companion object {
+    @Suppress("UNCHECKED_CAST")
     fun <A> leaf(hash: Int, vararg value: A): Leaf<A> = Leaf(hash, value) as Leaf<A>
   }
 }

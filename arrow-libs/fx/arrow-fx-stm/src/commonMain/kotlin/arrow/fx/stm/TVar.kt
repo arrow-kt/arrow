@@ -182,7 +182,7 @@ public class TVar<A> internal constructor(a: A) {
    *  tries to unlock) it is ignored
    */
   internal fun release(frame: STMFrame, a: A) {
-    ref.compareAndSet(frame, a as Any?)
+    val _ = ref.compareAndSet(frame, a as Any?)
   }
 
   /**
