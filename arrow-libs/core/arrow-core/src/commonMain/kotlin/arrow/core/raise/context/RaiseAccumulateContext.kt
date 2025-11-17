@@ -50,7 +50,7 @@ context(raise: Raise<NonEmptyList<Error>>)
 ): Map<K, B> = raise.mapValuesOrAccumulateExt(this, transform)
 
 /**
- * Accumulate the errors from running [action1], [action2], and [action2].
+ * Accumulate the errors from running [action1] and [action2].
  *
  * See the Arrow docs for more information over
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
