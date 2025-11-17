@@ -64,7 +64,7 @@ context(raise: Raise<NonEmptyList<Error>>)
 ): C = raise.zipOrAccumulateExt(action1, action2, block)
 
 /**
- * Accumulate the errors from running [action1], [action2], [action3], and [action3].
+ * Accumulate the errors from running [action1], [action2], [action3], and [action4].
  *
  * See the Arrow docs for more information over
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
