@@ -15,6 +15,8 @@ import arrow.core.raise.ensure as ensureExt
 import arrow.core.raise.ensureNotNull as ensureNotNullExt
 import arrow.core.raise.withError as withErrorExt
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
@@ -40,7 +42,13 @@ context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, B : Any> ensure
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, OtherError, A> withError(
   transform: (OtherError) -> Error,
   @BuilderInference block: context(Raise<OtherError>) () -> A
-): A = raise.withErrorExt(transform, block)
+): A {
+  contract {
+    callsInPlace(block, EXACTLY_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  return raise.withErrorExt(transform, block)
+}
 
 context(raise: Raise<Error>) @RaiseDSL public suspend fun <Error, A> Effect<Error, A>.bind(): A =
   with(raise) { bind() }
