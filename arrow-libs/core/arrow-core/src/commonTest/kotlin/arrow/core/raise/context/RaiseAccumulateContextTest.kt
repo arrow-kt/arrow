@@ -12,7 +12,7 @@ import kotlin.test.fail
 class RaiseAccumulateContextTest {
 
   @Test
-  fun `should accumulate errors for 4 actions`() {
+  fun shouldAccumulateErrorsFourActions() {
     either {
       zipOrAccumulate(
         { raise("Error from action 1") },
@@ -33,7 +33,7 @@ class RaiseAccumulateContextTest {
   }
 
   @Test
-  fun `should return results when there are no errors for 4 actions`() {
+  fun shouldReturnWithNoErrorsFourActions() {
     either<Nel<String>, _> {
       zipOrAccumulate(
         { "a" },
