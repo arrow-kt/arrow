@@ -9,5 +9,11 @@ kotlin {
         api(projects.arrowCore)
       }
     }
+
+    commonTest {
+      dependencies {
+        implementation(libs.bundles.testing)
+      }
+    }
   }
 }
