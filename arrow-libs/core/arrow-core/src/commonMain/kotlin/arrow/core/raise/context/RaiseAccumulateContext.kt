@@ -12,7 +12,10 @@ import arrow.core.raise.ExperimentalRaiseAccumulateApi
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.raise.RaiseDSL
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import arrow.core.raise.accumulate as accumulateExt
 import arrow.core.raise.mapOrAccumulate as mapOrAccumulateExt
@@ -27,7 +30,10 @@ public typealias RaiseAccumulate<A> = arrow.core.raise.RaiseAccumulate<A>
 context(raise: Raise<NonEmptyList<Error>>)
 @ExperimentalRaiseAccumulateApi @RaiseDSL public inline fun <Error, A> accumulate(
   block: context(RaiseAccumulate<Error>) () -> A
-): A = raise.accumulateExt(block)
+): A {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  return raise.accumulateExt(block)
+}
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
@@ -42,7 +48,10 @@ context(raise: Raise<NonEmptyList<Error>>)
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B> NonEmptyList<A>.mapOrAccumulate(
   @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
-): NonEmptyList<B> = raise.mapOrAccumulateExt(this, transform)
+): NonEmptyList<B> {
+  contract { callsInPlace(transform, AT_LEAST_ONCE) }
+  return raise.mapOrAccumulateExt(this, transform)
+}
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <K, Error, A, B> Map<K, A>.mapValuesOrAccumulate(
@@ -54,7 +63,14 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
   @BuilderInference action2: context(RaiseAccumulate<Error>) () -> B,
   block: (A, B) -> C
-): C = raise.zipOrAccumulateExt(action1, action2, block)
+): C {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, block)
+}
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D> zipOrAccumulate(
@@ -62,7 +78,15 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action2: context(RaiseAccumulate<Error>) () -> B,
   @BuilderInference action3: context(RaiseAccumulate<Error>) () -> C,
   block: (A, B, C) -> D
-): D = raise.zipOrAccumulateExt(action1, action2, action3, block)
+): D {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, block)
+}
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E> zipOrAccumulate(
@@ -71,7 +95,16 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action3: context(RaiseAccumulate<Error>) () -> C,
   @BuilderInference action4: context(RaiseAccumulate<Error>) () -> D,
   block: (A, B, C, D) -> E
-): E = raise.zipOrAccumulateExt(action1, action2, action3, action4, block)
+): E {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, action4, block)
+}
 
 @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
@@ -80,8 +113,10 @@ public fun <A> EitherNel<Error, A>.bindNel(): A =
 
 @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
-public inline fun <A> withNel(block: context(Raise<NonEmptyList<Error>>) () -> A): A =
-  with(raise) { withNel(block) }
+public inline fun <A> withNel(block: context(Raise<NonEmptyList<Error>>) () -> A): A {
+  contract { callsInPlace(block, EXACTLY_ONCE) }
+  return raise.withNel { block() }
+}
 
 @ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
