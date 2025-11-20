@@ -58,6 +58,13 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference transform: context(RaiseAccumulate<Error>) (Map.Entry<K, A>) -> B
 ): Map<K, B> = raise.mapValuesOrAccumulateExt(this, transform)
 
+/**
+ * Accumulate the errors from running [action1] and [action2].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C> zipOrAccumulate(
   @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
@@ -72,6 +79,13 @@ context(raise: Raise<NonEmptyList<Error>>)
   return raise.zipOrAccumulateExt(action1, action2, block)
 }
 
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], and [action4].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D> zipOrAccumulate(
   @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
@@ -88,6 +102,13 @@ context(raise: Raise<NonEmptyList<Error>>)
   return raise.zipOrAccumulateExt(action1, action2, action3, block)
 }
 
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], and [action4].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E> zipOrAccumulate(
   @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
@@ -105,6 +126,101 @@ context(raise: Raise<NonEmptyList<Error>>)
   }
   return raise.zipOrAccumulateExt(action1, action2, action3, action4, block)
 }
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], and [action5].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+context(raise: Raise<NonEmptyList<Error>>)
+@RaiseDSL public inline fun <Error, A, B, C, D, E, F> zipOrAccumulate(
+  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  block: (A, B, C, D, E) -> F
+): F = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, block)
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+context(raise: Raise<NonEmptyList<Error>>)
+@RaiseDSL public inline fun <Error, A, B, C, D, E, F, G> zipOrAccumulate(
+  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  block: (A, B, C, D, E, F) -> G
+): G = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, block)
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+context(raise: Raise<NonEmptyList<Error>>)
+@RaiseDSL public inline fun <Error, A, B, C, D, E, F, G, H> zipOrAccumulate(
+  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
+  block: (A, B, C, D, E, F, G) -> H
+): H = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, block)
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+context(raise: Raise<NonEmptyList<Error>>)
+@RaiseDSL public inline fun <Error, A, B, C, D, E, F, G, H, I> zipOrAccumulate(
+  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
+  @BuilderInference action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
+  block: (A, B, C, D, E, F, G, H) -> I
+): I = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, action8, block)
+
+/**
+ * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9].
+ *
+ * See the Arrow docs for more information over
+ * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
+ * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
+ */
+context(raise: Raise<NonEmptyList<Error>>)
+@RaiseDSL public inline fun <Error, A, B, C, D, E, F, G, H, I, J> zipOrAccumulate(
+  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
+  @BuilderInference action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
+  @BuilderInference action9: context(arrow.core.raise.RaiseAccumulate<Error>) () -> I,
+  block: (A, B, C, D, E, F, G, H, I) -> J
+): J = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
 
 @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
