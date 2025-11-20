@@ -142,7 +142,17 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
   @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
   block: (A, B, C, D, E) -> F
-): F = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, block)
+): F {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, block)
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], and [action6].
@@ -160,7 +170,18 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
   @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
   block: (A, B, C, D, E, F) -> G
-): G = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, block)
+): G {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, block)
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], and [action7].
@@ -179,7 +200,19 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
   @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
   block: (A, B, C, D, E, F, G) -> H
-): H = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, block)
+): H {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, block)
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], and [action8].
@@ -199,7 +232,20 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
   @BuilderInference action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
   block: (A, B, C, D, E, F, G, H) -> I
-): I = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, action8, block)
+): I {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(action8, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, action8, block)
+}
 
 /**
  * Accumulate the errors from running [action1], [action2], [action3], [action4], [action5], [action6], [action7], [action8], and [action9].
@@ -220,7 +266,21 @@ context(raise: Raise<NonEmptyList<Error>>)
   @BuilderInference action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
   @BuilderInference action9: context(arrow.core.raise.RaiseAccumulate<Error>) () -> I,
   block: (A, B, C, D, E, F, G, H, I) -> J
-): J = raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
+): J {
+  contract {
+    callsInPlace(action1, EXACTLY_ONCE)
+    callsInPlace(action2, EXACTLY_ONCE)
+    callsInPlace(action3, EXACTLY_ONCE)
+    callsInPlace(action4, EXACTLY_ONCE)
+    callsInPlace(action5, EXACTLY_ONCE)
+    callsInPlace(action6, EXACTLY_ONCE)
+    callsInPlace(action7, EXACTLY_ONCE)
+    callsInPlace(action8, EXACTLY_ONCE)
+    callsInPlace(action9, EXACTLY_ONCE)
+    callsInPlace(block, EXACTLY_ONCE)
+  }
+  return raise.zipOrAccumulateExt(action1, action2, action3, action4, action5, action6, action7, action8, action9, block)
+}
 
 @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
