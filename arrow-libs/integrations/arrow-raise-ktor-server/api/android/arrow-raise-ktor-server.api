@@ -3,6 +3,7 @@ public final class arrow/raise/ktor/server/response/RespondOrRaiseKt {
 	public static final fun raise (Larrow/core/raise/Raise;Lio/ktor/http/content/OutgoingContent;)Ljava/lang/Void;
 	public static final fun respondOrRaise (Lio/ktor/server/application/ApplicationCall;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun respondOrRaise$default (Lio/ktor/server/application/ApplicationCall;Lio/ktor/http/HttpStatusCode;Lio/ktor/util/reflect/TypeInfo;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun respondSafely (Lio/ktor/server/application/ApplicationCall;Larrow/raise/ktor/server/response/Response;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun respondSafely (Lio/ktor/server/application/ApplicationCall;Lio/ktor/http/HttpStatusCode;Ljava/lang/Object;Lio/ktor/util/reflect/TypeInfo;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
