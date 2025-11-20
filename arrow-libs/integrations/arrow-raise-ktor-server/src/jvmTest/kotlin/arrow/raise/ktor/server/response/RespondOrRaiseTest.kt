@@ -5,12 +5,11 @@ import arrow.core.raise.context.ensure
 import arrow.core.raise.context.ensureNotNull
 import arrow.core.raise.context.raise
 import arrow.core.raise.context.withError
-import arrow.core.raise.ensureNotNull
-import arrow.core.raise.withError
 import arrow.raise.ktor.server.response.Response.Companion.Response
 import arrow.raise.ktor.server.response.Response.Companion.invoke
 import arrow.raise.ktor.server.routing.getOrRaise
 import arrow.raise.ktor.server.routing.postOrRaise
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -22,6 +21,7 @@ import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.serialization.*
+import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -30,6 +30,9 @@ import io.ktor.server.testing.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.charsets.*
+import org.slf4j.event.Level
+import org.slf4j.event.SubstituteLoggingEvent
+import org.slf4j.helpers.SubstituteLogger
 import kotlin.test.Test
 
 class RespondOrRaiseTest {
@@ -45,6 +48,28 @@ class RespondOrRaiseTest {
       it.status shouldBe OK
       it.bodyAsText() shouldBe "bar"
     }
+  }
+
+  @Test
+  fun `respond within respondOrRaise logs warning`() = testApplication {
+    val loggingEvents = java.util.ArrayDeque<SubstituteLoggingEvent>()
+    environment { log = SubstituteLogger("", loggingEvents, false) }
+    routing {
+      get("/foo") {
+        call.respondOrRaise {
+          call.respond("bar")
+          "baz"
+        }
+      }
+    }
+
+    client.get("/foo").let {
+      it.status shouldBe OK
+      it.bodyAsText() shouldBe "bar"
+    }
+
+    loggingEvents.map { it.level to it.message }
+      .shouldContain(Level.WARN to CallAlreadyHandledInRespondOrRaiseBody)
   }
 
   @Test

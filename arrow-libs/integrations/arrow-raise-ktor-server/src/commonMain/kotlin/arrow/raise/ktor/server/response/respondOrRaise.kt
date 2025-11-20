@@ -29,23 +29,36 @@ internal suspend inline fun <TResponse> ApplicationCall.respondOrRaise(
   body: suspend context(Raise<Response>) () -> TResponse,
 ): Unit = fold(
   block = { body(this) },
-  recover = { it.respondTo(this) },
+  recover = { respondSafely(it) },
   transform = { respondSafely(statusCode, it, responseTypeInfo) }
 )
 
 @PublishedApi
-internal suspend fun ApplicationCall.respondSafely(statusCode: HttpStatusCode?, result: Any?, typeInfo: TypeInfo) {
-  when (result) {
-    is Unit -> respond(statusCode ?: HttpStatusCode.NoContent)
-    is HttpStatusCode -> respond(result)
-    is Response -> result.respondTo(this)
-    null -> respond(result, typeInfo)
-    else -> when (statusCode) {
-      null -> respond(result, typeInfo)
-      else -> respond(statusCode, result, typeInfo)
-    }
-  }
+internal suspend fun ApplicationCall.respondSafely(response: Response) {
+  if (isHandled) application.log.warn(CallAlreadyHandledInRespondOrRaiseBody)
+  else response.respondTo(this)
 }
+
+@PublishedApi
+internal suspend fun ApplicationCall.respondSafely(statusCode: HttpStatusCode?, result: Any?, typeInfo: TypeInfo) {
+  if (isHandled) application.log.warn(CallAlreadyHandledInRespondOrRaiseBody)
+  else
+    when (result) {
+      is Unit -> respond(statusCode ?: HttpStatusCode.NoContent)
+      is HttpStatusCode -> respond(result)
+      is Response -> result.respondTo(this)
+      null -> respond(result, typeInfo)
+      else -> when (statusCode) {
+        null -> respond(result, typeInfo)
+        else -> respond(statusCode, result, typeInfo)
+      }
+    }
+}
+
+internal const val CallAlreadyHandledInRespondOrRaiseBody: String =
+  "ApplicationCall was already handled before or within call.respondOrRaise body. " +
+    "This prevents the result or raised response of the body from being sent to the client. " +
+    "When using call.respondOrRaise, do not directly respond to the call and instead either `raise` a `Response` or return the desired response from the body."
 
 context(r: Raise<Response>)
 @RaiseDSL
