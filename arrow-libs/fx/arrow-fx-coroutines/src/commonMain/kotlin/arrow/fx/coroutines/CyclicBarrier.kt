@@ -1,3 +1,5 @@
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.fx.coroutines
 
 import arrow.atomic.Atomic
@@ -125,6 +127,7 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     }
   }
 
+  @IgnorableReturnValue
   private fun countdown(original: Awaiting, ex: CyclicBarrierCancellationException): Boolean {
     state.loop { state ->
       when (state) {

@@ -18,7 +18,7 @@ import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Paths
 
-val arrowVersion = System.getProperty("arrowVersion")
+val arrowVersion: String? = System.getProperty("arrowVersion")
 const val SOURCE_FILENAME = "Source.kt"
 const val CLASS_FILENAME = "SourceKt"
 
@@ -120,7 +120,7 @@ private fun dependenciesMatch(classpath: File, dependency: String): Boolean {
 private fun sanitizeClassPathFileName(dep: String): String = buildList {
   var skip = false
   add(dep.first())
-  dep.reduce { a, b ->
+  val _ = dep.reduce { a, b ->
     if (a == '-' && b.isDigit()) skip = true
     if (!skip) add(b)
     b
