@@ -153,6 +153,22 @@ class IorAccumulateSpec {
     } shouldBe Ior.Both("Hi, World", 6)
   }
 
+  @Test fun tryCatchRecoverRaiseInsideAccumulating() = runTest {
+    iorAccumulate(String::plus) {
+      accumulating {
+        val one = try {
+          Ior.Both("Hi", Unit).bind()
+          Ior.Left("Hello").bind()
+        } catch (e: Throwable) {
+          1
+        }
+        val two = Ior.Right(2).bind()
+        val three = Ior.Both(", World", 3).bind()
+        one + two + three
+      }.value
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
   @Test fun iorNelAccumulates() = runTest {
     iorAccumulate(NonEmptyList<String>::plus) {
       val one = Ior.Both("ErrorOne", 1).toIorNel().bind()
@@ -189,6 +205,17 @@ class IorAccumulateSpec {
         "output: failed"
       }
       x
+    } shouldBe Ior.Both("nonfatal", "output: failed")
+  }
+
+  @Test fun nestedAccumulating() {
+    iorAccumulate(String::plus) {
+      accumulating {
+        // can be written as accumulate("nonfatal").value
+        val y by accumulating { raise("nonfatal") }
+        y
+      }
+      "output: failed"
     } shouldBe Ior.Both("nonfatal", "output: failed")
   }
 }

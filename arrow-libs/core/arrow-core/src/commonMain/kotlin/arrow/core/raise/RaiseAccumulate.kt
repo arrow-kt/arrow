@@ -1017,9 +1017,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @ExperimentalRaiseAccumulateApi
   public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
     contract { callsInPlace(block, AT_MOST_ONCE) }
-    return merge {
-      Ok(block(RaiseAccumulate(tolerant(this)) { raise(accumulate(it)) }))
-    }
+    return (this as Accumulate<Error>).accumulating(block)
   }
 
   @ExperimentalRaiseAccumulateApi
@@ -1029,21 +1027,19 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     recover: (error: Error) -> A,
   ): A {
     contract { callsInPlace(block, AT_MOST_ONCE) }
-    return arrow.core.raise.recover({
-      block(RaiseAccumulate(this@RaiseAccumulate, ::raise))
-    }, recover)
+    return (this as Accumulate<Error>).recover(block, recover)
   }
 
   @ExperimentalRaiseAccumulateApi
   public inline fun ensureOrAccumulate(condition: Boolean, raise: () -> Error): Value<Unit> {
     contract { callsInPlace(raise, AT_MOST_ONCE) }
-    return if (condition) Ok(Unit) else accumulate(raise())
+    return (this as Accumulate<Error>).ensureOrAccumulate(condition, raise)
   }
 
   @ExperimentalRaiseAccumulateApi
   public inline fun <B : Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
     contract { callsInPlace(raise, AT_MOST_ONCE) }
-    return if (value != null) Ok(value) else accumulate(raise())
+    return (this as Accumulate<Error>).ensureNotNullOrAccumulate(value, raise)
   }
 
   // IorRaise methods
@@ -1167,7 +1163,7 @@ public interface Accumulate<Error> {
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return merge {
-    Ok(block(RaiseAccumulate(tolerant(this)) { raise(accumulate(it)) }))
+    recover({ Ok(block(RaiseAccumulate(tolerant(this@merge), ::raise))) }, ::accumulate)
   }
 }
 
