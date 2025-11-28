@@ -89,6 +89,7 @@ public final class arrow/resilience/CircuitBreaker$State$Open : arrow/resilience
 	public fun getOpeningStrategy ()Larrow/resilience/CircuitBreaker$OpeningStrategy;
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getStartedAt ()Lkotlin/time/TimeMark;
+	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -107,7 +108,7 @@ public final class arrow/resilience/SagaBuilder : arrow/resilience/SagaScope {
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun saga (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun totalCompensation (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun totalCompensation (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/resilience/SagaDSLMarker : java/lang/annotation/Annotation {
