@@ -115,8 +115,18 @@ public suspend inline fun <A> guaranteeCase(
         finalizer(ex)
       }
     } catch (e: Throwable) {
-      e.nonFatalOrThrow()
-      throw ex.errorOrNull?.also { it.addSuppressed(e) } ?: e
+      val exError = ex.errorOrNull
+      throw when {
+        exError == null -> e
+        e is CancellationException -> {
+          exError.addSuppressed(e)
+          exError
+        }
+        else -> {
+          exError.addSuppressed(e.nonFatalOrThrow())
+          exError
+        }
+      }
     }
   }
 }

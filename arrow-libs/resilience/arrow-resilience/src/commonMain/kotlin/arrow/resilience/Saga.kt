@@ -3,9 +3,10 @@ package arrow.resilience
 import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
+import arrow.core.prependTo
+import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.resourceScope
 
 
 /**
@@ -98,26 +99,30 @@ public fun <A> saga(
  * fails then all compensating actions are guaranteed to run. When a compensating action failed it
  * will be ignored, and the other compensating actions will continue to be run.
  */
-public suspend fun <A> Saga<A>.transact(): A {
-  val builder = SagaBuilder()
-  return guaranteeCase({ invoke(builder) }) { res ->
-    when (res) {
-      null -> builder.totalCompensation()
-      else -> Unit
-    }
-  }
+public suspend fun <A> Saga<A>.transact(): A = resourceScope {
+  invoke(SagaResourceScope(this))
 }
 
 /** DSL Marker for the SagaEffect DSL */
-@DslMarker public annotation class SagaDSLMarker
+@DslMarker
+public annotation class SagaDSLMarker
 
 /**
  * Marker object to protect [SagaScope.saga] from calling [SagaScope.bind] in its `action` step.
  */
-@SagaDSLMarker
 public object SagaActionStep
 
 // Internal implementation of the `saga { }` builder.
+private class SagaResourceScope(private val scope: ResourceScope) : SagaScope {
+  override suspend fun <A> saga(
+    action: suspend SagaActionStep.() -> A,
+    compensation: suspend (A) -> Unit
+  ): A = action(SagaActionStep).also { a ->
+    scope.onRelease { if (it !is ExitCase.Completed) compensation(a) }
+  }
+}
+
+@Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
 @PublishedApi
 internal class SagaBuilder(
   private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
@@ -127,19 +132,11 @@ internal class SagaBuilder(
   override suspend fun <A> saga(
     action: suspend SagaActionStep.() -> A,
     compensation: suspend (A) -> Unit
-  ): A =
-    guaranteeCase({ action(SagaActionStep) }) { res ->
-      // This action failed, so we have no compensate to push on the stack
-      // the compensation stack will run in the `transact` stage, this is just the builder
-      when (res) {
-        null -> Unit
-        else -> stack.update(
-          function = { listOf(suspend { compensation(res) }) + it },
-          transform = { _, new -> new }
-        )
-      }
-    }
+  ): A = action(SagaActionStep).also { res ->
+    stack.update(suspend { compensation(res) }::prependTo)
+  }
 
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   @PublishedApi
   internal suspend fun totalCompensation() {
     stack
@@ -155,29 +152,4 @@ internal class SagaBuilder(
       }
       ?.let { throw it }
   }
-}
-
-private suspend fun <A> guaranteeCase(
-  fa: suspend () -> A,
-  finalizer: suspend (value: A?) -> Unit
-): A {
-  val res =
-    try {
-      fa()
-    } catch (e: CancellationException) {
-      runReleaseAndRethrow(e) { finalizer(null) }
-    } catch (t: Throwable) {
-      runReleaseAndRethrow(t) { finalizer(null) }
-    }
-  withContext(NonCancellable) { finalizer(res) }
-  return res
-}
-
-private suspend fun runReleaseAndRethrow(original: Throwable, f: suspend () -> Unit): Nothing {
-  try {
-    withContext(NonCancellable) { f() }
-  } catch (e: Throwable) {
-    original.addSuppressed(e.nonFatalOrThrow())
-  }
-  throw original
 }

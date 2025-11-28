@@ -107,11 +107,17 @@ internal class DefaultAutoCloseScope : AutoCloseScope {
     }?.let { throw it }
   }
 
-  private fun Throwable?.add(other: Throwable?): Throwable? {
-    if (other !is CancellationException) other?.throwIfFatal()
-    return this?.apply {
-      other?.let { addSuppressed(it) }
-    } ?: other
+  private fun Throwable?.add(other: Throwable?): Throwable? = when {
+    other == null -> this
+    this == null -> other
+    other is CancellationException -> {
+      this.addSuppressed(other)
+      this
+    }
+    else -> {
+      this.addSuppressed(other.throwIfFatal())
+      this
+    }
   }
 }
 

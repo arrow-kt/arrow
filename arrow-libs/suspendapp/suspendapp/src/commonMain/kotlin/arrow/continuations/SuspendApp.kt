@@ -1,5 +1,6 @@
 package arrow.continuations
 
+import arrow.autoCloseScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
@@ -25,30 +26,30 @@ public fun SuspendApp(
   uncaught: (Throwable) -> Unit = Throwable::printStackTrace,
   timeout: Duration = Duration.INFINITE,
   block: suspend CoroutineScope.() -> Unit,
-): Unit =
-  process().use { env ->
-    env.runScope(context) {
-      val result = supervisorScope {
-        val app =
-          async(start = CoroutineStart.LAZY, block = block)
-        val unregister =
-          env.onShutdown {
-            withTimeout(timeout) {
-              app.cancel(SuspendAppShutdown)
-              app.join()
-            }
+): Unit = autoCloseScope {
+  val env = process()
+  env.runScope(context) {
+    val result = supervisorScope {
+      val app =
+        async(start = CoroutineStart.LAZY, block = block)
+      val unregister =
+        env.onShutdown {
+          withTimeout(timeout) {
+            app.cancel(SuspendAppShutdown())
+            app.join()
           }
-        runCatching { app.await() }
-          .also { unregister() }
-      }
-      result.fold({ env.exit(0) }) { e ->
-        if (e !is SuspendAppShutdown) {
-          uncaught(e)
-          env.exit(-1)
         }
+      runCatching { app.await() }
+        .also { unregister() }
+    }
+    result.fold({ env.exit(0) }) { e ->
+      if (e !is SuspendAppShutdown) {
+        uncaught(e)
+        env.exit(-1)
       }
     }
   }
+}
 
-/** Marker type so track shutdown signal */
-private object SuspendAppShutdown : CancellationException("SuspendApp shutting down.")
+/** Marker type to track shutdown signal */
+private class SuspendAppShutdown : CancellationException("SuspendApp shutting down.")
