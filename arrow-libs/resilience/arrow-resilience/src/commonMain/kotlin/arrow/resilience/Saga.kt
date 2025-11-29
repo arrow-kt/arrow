@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package arrow.resilience
 
 import arrow.atomic.Atomic
@@ -76,11 +78,11 @@ public interface SagaScope {
   ): A
 
   /** Executes a [Saga] and returns its value [A] */
-  @Deprecated(SAGA_DEPRECATION, ReplaceWith("this.invoke()"))
+  @Deprecated(SAGA_DEPRECATION)
   public suspend fun <A> Saga<A>.bind(): A = invoke(this@SagaScope)
 
   /** Invoke a [Saga] and returns its value [A] */
-  @Deprecated(SAGA_DEPRECATION, ReplaceWith("this.invoke()"))
+  @Deprecated(SAGA_DEPRECATION)
   public suspend operator fun <A> Saga<A>.invoke(): A = invoke(this@SagaScope)
 }
 
@@ -127,6 +129,7 @@ public object SagaActionStep
 
 // Internal implementation of the `saga { }` builder.
 private class SagaResourceScope(private val scope: ResourceScope) : SagaScope {
+  @Deprecated(SAGA_DEPRECATION, ReplaceWith("saga(action, compensation)", "arrow.fx.coroutines.saga"))
   override suspend fun <A> saga(
     action: suspend SagaActionStep.() -> A,
     compensation: suspend (A) -> Unit
@@ -139,6 +142,7 @@ internal class SagaBuilder(
   private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
 ) : SagaScope {
 
+  @Deprecated(SAGA_DEPRECATION, ReplaceWith("saga(action, compensation)", "arrow.fx.coroutines.saga"))
   @SagaDSLMarker
   override suspend fun <A> saga(
     action: suspend SagaActionStep.() -> A,
