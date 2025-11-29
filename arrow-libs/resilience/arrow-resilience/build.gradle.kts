@@ -6,7 +6,8 @@ kotlin {
   sourceSets {
     commonMain {
       dependencies {
-        api(projects.arrowFxCoroutines)
+        api(projects.arrowCore)
+        implementation(libs.coroutines.core)
       }
     }
     commonTest {

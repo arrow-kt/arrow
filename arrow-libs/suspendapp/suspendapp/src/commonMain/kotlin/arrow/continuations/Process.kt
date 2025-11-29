@@ -1,18 +1,17 @@
 package arrow.continuations
 
-import arrow.AutoCloseScope
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 
 /** KMP constructor for [Process]. */
-internal expect fun AutoCloseScope.process(): Process
+internal expect fun process(): Process
 
 /**
  * [Process] offers a common API to work with our application's process, installing signal handlers,
  * shutdown hooks, running scopes in our process (runBlocking), and exiting the process.
  */
 @OptIn(ExperimentalStdlibApi::class)
-internal interface Process {
+internal interface Process : AutoCloseable {
   fun onSigTerm(block: suspend (code: Int) -> Unit)
 
   fun onSigInt(block: suspend (code: Int) -> Unit)
@@ -28,4 +27,6 @@ internal interface Process {
   fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit)
 
   fun exit(code: Int): Nothing
+
+  override fun close()
 }

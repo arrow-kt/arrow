@@ -7,7 +7,6 @@ kotlin {
     commonMain {
       dependencies {
         api(libs.coroutines.core)
-        implementation(projects.arrowAutoclose)
       }
     }
   }
