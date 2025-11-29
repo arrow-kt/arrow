@@ -4,10 +4,14 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
-import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ResourceScope
 import arrow.fx.coroutines.resourceScope
+import arrow.fx.coroutines.saga as resourceSaga
 
+private const val SAGA_DEPRECATION = """
+  The Saga DSL has been merged into the Resource DSL.
+  Simply use `Resource` and `ResourceScope` to achieve the same functionality.
+"""
 
 /**
  * The saga design pattern is a way to manage data consistency across microservices in distributed
@@ -52,9 +56,11 @@ import arrow.fx.coroutines.resourceScope
  * }
  * ```
  */
+@Deprecated(SAGA_DEPRECATION, ReplaceWith("Saga<A>", "arrow.fx.coroutines.Saga"))
 public typealias Saga<A> = suspend SagaScope.() -> A
 
 /** DSL that enables the [Saga] pattern in a `suspend` DSL. */
+@Deprecated(SAGA_DEPRECATION, ReplaceWith("ResourceScope", "arrow.fx.coroutines.ResourceScope"))
 @SagaDSLMarker
 public interface SagaScope {
 
@@ -63,15 +69,18 @@ public interface SagaScope {
    * action.
    */
   @SagaDSLMarker
+  @Deprecated(SAGA_DEPRECATION, ReplaceWith("saga(action, compensation)", "arrow.fx.coroutines.saga"))
   public suspend fun <A> saga(
     action: suspend SagaActionStep.() -> A,
     compensation: suspend (A) -> Unit,
   ): A
 
   /** Executes a [Saga] and returns its value [A] */
+  @Deprecated(SAGA_DEPRECATION, ReplaceWith("this.invoke()"))
   public suspend fun <A> Saga<A>.bind(): A = invoke(this@SagaScope)
 
   /** Invoke a [Saga] and returns its value [A] */
+  @Deprecated(SAGA_DEPRECATION, ReplaceWith("this.invoke()"))
   public suspend operator fun <A> Saga<A>.invoke(): A = invoke(this@SagaScope)
 }
 
@@ -86,9 +95,11 @@ public interface SagaScope {
  * guarantee that it results in the correct state.
  */
 @Suppress("NOTHING_TO_INLINE")
+@Deprecated(SAGA_DEPRECATION, ReplaceWith("saga(block)", "arrow.fx.coroutines.saga"))
 public inline fun <A> saga(noinline block: suspend SagaScope.() -> A): Saga<A> = block
 
 /** Create a lazy [Saga] that will only run when the [Saga] is invoked. */
+@Deprecated(SAGA_DEPRECATION, ReplaceWith("saga { saga(action, compensation) }", "arrow.fx.coroutines.saga"))
 public fun <A> saga(
   action: suspend SagaActionStep.() -> A,
   compensation: suspend (A) -> Unit
@@ -99,16 +110,19 @@ public fun <A> saga(
  * fails then all compensating actions are guaranteed to run. When a compensating action failed it
  * will be ignored, and the other compensating actions will continue to be run.
  */
+@Deprecated(SAGA_DEPRECATION, ReplaceWith("resourceScope(this)", "arrow.fx.coroutines.resourceScope"))
 public suspend fun <A> Saga<A>.transact(): A = resourceScope {
   invoke(SagaResourceScope(this))
 }
 
 /** DSL Marker for the SagaEffect DSL */
+@Deprecated(SAGA_DEPRECATION, ReplaceWith("ResourceDSL", "arrow.fx.coroutines.ResourceDSL"))
 @DslMarker public annotation class SagaDSLMarker
 
 /**
  * Marker object to protect [SagaScope.saga] from calling [SagaScope.bind] in its `action` step.
  */
+@Deprecated(SAGA_DEPRECATION) // no replacement since it's useless
 public object SagaActionStep
 
 // Internal implementation of the `saga { }` builder.
@@ -116,9 +130,7 @@ private class SagaResourceScope(private val scope: ResourceScope) : SagaScope {
   override suspend fun <A> saga(
     action: suspend SagaActionStep.() -> A,
     compensation: suspend (A) -> Unit
-  ): A = action(SagaActionStep).also { a ->
-    scope.onRelease { if (it !is ExitCase.Completed) compensation(a) }
-  }
+  ): A = scope.resourceSaga({ action(SagaActionStep) }, compensation)
 }
 
 @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)

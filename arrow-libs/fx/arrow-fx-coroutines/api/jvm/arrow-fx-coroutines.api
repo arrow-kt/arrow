@@ -307,6 +307,13 @@ public final class arrow/fx/coroutines/ResourceScope$DefaultImpls {
 	public static fun releaseCase (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public final class arrow/fx/coroutines/SagaKt {
+	public static final fun compensate (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function2;)V
+	public static final fun saga (Larrow/fx/coroutines/ResourceScope;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun saga (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
+	public static final fun sagaScope (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public abstract interface annotation class arrow/fx/coroutines/ScopeDSL : java/lang/annotation/Annotation {
 }
 
