@@ -51,8 +51,8 @@ private class NativeProcess : Process, AutoCloseable {
     // TODO join all jobs, and re-throw all exceptions ??
     //   All jobs should've finished when the Enviroment is closed.
     assert(job.children.none()) { "Job should not have any children anymore." }
-    listOf(kotlin.runCatching { job.cancelAndJoin() }, runCatching { SIGNAL_DISPATCHER.close() })
-      .getOrThrow()
+    val jobs = listOf(kotlin.runCatching { job.cancelAndJoin() }, runCatching { SIGNAL_DISPATCHER.close() })
+    val _ = jobs.getOrThrow()
   }
 
   override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit): Unit =

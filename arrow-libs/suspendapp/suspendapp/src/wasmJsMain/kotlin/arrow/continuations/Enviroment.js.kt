@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.continuations
 
 import kotlin.coroutines.Continuation

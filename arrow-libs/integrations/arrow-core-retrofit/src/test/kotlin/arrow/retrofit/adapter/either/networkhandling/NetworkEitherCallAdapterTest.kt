@@ -1,3 +1,5 @@
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.retrofit.adapter.either.networkhandling
 
 import arrow.core.Either.Left
@@ -227,6 +229,7 @@ class NetworkEitherCallAdapterTestKotlinxSerialization : NetworkEitherCallAdapte
 }
 
 @OptIn(ExperimentalContracts::class)
+@IgnorableReturnValue
 inline fun <reified T : Any> Any?.shouldBeInstanceOf(): T {
   contract {
     returns() implies (this@shouldBeInstanceOf is T)
