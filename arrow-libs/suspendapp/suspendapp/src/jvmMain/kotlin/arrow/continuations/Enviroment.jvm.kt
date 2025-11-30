@@ -1,5 +1,6 @@
 package arrow.continuations
 
+import arrow.AutoCloseScope
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -8,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import sun.misc.Signal
 import sun.misc.SignalHandler
 
-internal actual fun process(): Process = JvmProcess
+internal actual fun AutoCloseScope.process(): Process = JvmProcess
 
 private object JvmProcess : Process {
   override fun onShutdown(block: suspend () -> Unit): () -> Unit {
@@ -59,6 +60,4 @@ private object JvmProcess : Process {
     runBlocking(context, block)
 
   override fun exit(code: Int): Nothing = exitProcess(code)
-
-  override fun close(): Unit = Unit
 }
