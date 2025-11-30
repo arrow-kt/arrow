@@ -12,7 +12,6 @@ import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
-import kotlin.collections.unzip as stdlibUnzip
 
 public typealias Nel<A> = NonEmptyList<A>
 
@@ -180,12 +179,9 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     get() = all.first()
 
   public val tail: List<E>
-    get() = all.drop(1)
+    get() = all.subList(1, all.size)
 
-  override fun lastOrNull(): E = when {
-    tail.isNotEmpty() -> tail.last()
-    else -> head
-  }
+  override fun lastOrNull(): E = all.last()
 
   @Suppress("OVERRIDE_BY_INLINE", "NOTHING_TO_INLINE")
   public override inline fun distinct(): NonEmptyList<E> =
@@ -205,7 +201,7 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
 
   @Suppress("OVERRIDE_BY_INLINE")
   public override inline fun <T> mapIndexed(transform: (index: Int, E) -> T): NonEmptyList<T> =
-    NonEmptyList(transform(0, head), tail.mapIndexed { ix, e -> transform(ix + 1, e) })
+    NonEmptyList(all.mapIndexed(transform))
 
   public operator fun plus(l: NonEmptyList<@UnsafeVariance E>): NonEmptyList<E> =
     this + l.all
@@ -216,21 +212,19 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
   public override operator fun plus(element: @UnsafeVariance E): NonEmptyList<E> =
     NonEmptyList(all + element)
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <Acc> foldLeft(b: Acc, f: (Acc, E) -> Acc): Acc {
     contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
-    var accumulator = f(b, head)
-    for (element in tail) accumulator = f(accumulator, element)
-    return accumulator
+    return all.fold(b) { acc, e -> f(acc, e) }
   }
 
   public inline fun <T> coflatMap(f: (NonEmptyList<E>) -> T): NonEmptyList<T> {
     contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
-    var current = this
     return buildList {
-      do {
-        add(f(current))
-        current = current.drop(1).toNonEmptyListOrNull() ?: break
-      } while (true)
+      var i = 0
+      // Inv: i < size
+      do add(f(NonEmptyList(all.subList(i, all.size))))
+      while (++i < all.size)
     }.let(::NonEmptyList)
   }
 
@@ -245,9 +239,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
   public fun <T> padZip(other: NonEmptyList<T>): NonEmptyList<Pair<E?, T?>> =
     padZip(other, { it to null }, { null to it }, { a, b -> a to b })
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C> padZip(other: NonEmptyList<B>, left: (E) -> C, right: (B) -> C, both: (E, B) -> C): NonEmptyList<C> {
     contract { callsInPlace(both, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(both(head, other.head), tail.padZip(other.tail, left, right) { a, b -> both(a, b) })
+    return all.padZip(other, left, right) { e, b -> both(e, b) }.let(::NonEmptyList)
   }
 
   public companion object {
@@ -267,23 +262,26 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
   public fun <T> zip(other: NonEmptyList<T>): NonEmptyList<Pair<E, T>> =
     zip(other, ::Pair)
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, Z> zip(
     b: NonEmptyList<B>,
     map: (E, B) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head), tail.zip(b.tail) { a, bb -> map(a, bb) })
+    return all.zip(b) { a, bb -> map(a, bb) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
     map: (E, B, C) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head), tail.zip(b.tail, c.tail) { a, bb, cc -> map(a, bb, cc) })
+    return all.zip(b, c) { a, bb, cc -> map(a, bb, cc) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -291,9 +289,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head), tail.zip(b.tail, c.tail, d.tail) { a, bb, cc, dd -> map(a, bb, cc, dd) })
+    return all.zip(b, c, d) { a, bb, cc, dd -> map(a, bb, cc, dd) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, F, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -302,9 +301,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D, F) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head, e.head), tail.zip(b.tail, c.tail, d.tail, e.tail) { a, bb, cc, dd, ee -> map(a, bb, cc, dd, ee) })
+    return all.zip(b, c, d, e) { a, bb, cc, dd, ee -> map(a, bb, cc, dd, ee) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, F, G, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -314,9 +314,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D, F, G) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail) { a, bb, cc, dd, ee, ff -> map(a, bb, cc, dd, ee, ff) })
+    return all.zip(b, c, d, e, f) { a, bb, cc, dd, ee, ff -> map(a, bb, cc, dd, ee, ff) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, F, G, H, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -327,9 +328,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D, F, G, H) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail) { a, bb, cc, dd, ee, ff, gg -> map(a, bb, cc, dd, ee, ff, gg) })
+    return all.zip(b, c, d, e, f, g) { a, bb, cc, dd, ee, ff, gg -> map(a, bb, cc, dd, ee, ff, gg) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, F, G, H, I, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -341,9 +343,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D, F, G, H, I) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail) { a, bb, cc, dd, ee, ff, gg, hh -> map(a, bb, cc, dd, ee, ff, gg, hh) })
+    return all.zip(b, c, d, e, f, g, h) { a, bb, cc, dd, ee, ff, gg, hh -> map(a, bb, cc, dd, ee, ff, gg, hh) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, F, G, H, I, J, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -356,9 +359,10 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D, F, G, H, I, J) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail) { a, bb, cc, dd, ee, ff, gg, hh, ii -> map(a, bb, cc, dd, ee, ff, gg, hh, ii) })
+    return all.zip(b, c, d, e, f, g, h, i) { a, bb, cc, dd, ee, ff, gg, hh, ii -> map(a, bb, cc, dd, ee, ff, gg, hh, ii) }.let(::NonEmptyList)
   }
 
+  @Suppress("WRONG_INVOCATION_KIND")
   public inline fun <B, C, D, F, G, H, I, J, K, Z> zip(
     b: NonEmptyList<B>,
     c: NonEmptyList<C>,
@@ -372,7 +376,7 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     map: (E, B, C, D, F, G, H, I, J, K) -> Z
   ): NonEmptyList<Z> {
     contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-    return NonEmptyList(map(head, b.head, c.head, d.head, e.head, f.head, g.head, h.head, i.head, j.head), tail.zip(b.tail, c.tail, d.tail, e.tail, f.tail, g.tail, h.tail, i.tail, j.tail) { a, bb, cc, dd, ee, ff, gg, hh, ii, jj -> map(a, bb, cc, dd, ee, ff, gg, hh, ii, jj) })
+    return all.zip(b, c, d, e, f, g, h, i, j) { a, bb, cc, dd, ee, ff, gg, hh, ii, jj -> map(a, bb, cc, dd, ee, ff, gg, hh, ii, jj) }.let(::NonEmptyList)
   }
 }
 
@@ -392,18 +396,18 @@ public fun <E> NonEmptyList<NonEmptyList<E>>.flatten(): NonEmptyList<E> =
   this.flatMap(::identity)
 
 public inline fun <E, T : Comparable<T>> NonEmptyList<E>.minBy(selector: (E) -> T): E =
-  minByOrNull(selector)!!
+  all.minBy(selector)
 
 public inline fun <E, T : Comparable<T>> NonEmptyList<E>.maxBy(selector: (E) -> T): E =
-  maxByOrNull(selector)!!
+  all.maxBy(selector)
 
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <E : Comparable<E>> NonEmptyList<E>.min(): E =
-  minOrNull()!!
+  all.min()
 
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <E : Comparable<E>> NonEmptyList<E>.max(): E =
-  maxOrNull()!!
+  all.max()
 
 public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.unzip(::identity)
@@ -411,31 +415,35 @@ public fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmp
 @Suppress("WRONG_INVOCATION_KIND")
 public inline fun <A, B, E> NonEmptyList<E>.unzip(f: (E) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> {
   contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
-  return map { f(it) }.stdlibUnzip().let { (l1, l2) ->
-    l1.toNonEmptyListOrNull()!! to l2.toNonEmptyListOrNull()!!
+  val size = this.size
+  val listA = ArrayList<A>(size)
+  val listB = ArrayList<B>(size)
+  for (element in this) {
+    val (a, b) = f(element)
+    listA.add(a)
+    listB.add(b)
   }
+  return NonEmptyList(listA) to NonEmptyList(listB)
 }
 
 public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
 ): Either<Error, NonEmptyList<T>> =
-  all.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
+  all.mapOrAccumulate(combine, transform).map(::NonEmptyList)
 
 public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
 ): Either<NonEmptyList<Error>, NonEmptyList<T>> =
-  all.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptyListOrNull()) }
+  all.mapOrAccumulate(transform).map(::NonEmptyList)
 
 /**
  * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
  */
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 @JvmName("toNonEmptyListOrNull")
-public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? {
-  val iter = iterator()
-  if (!iter.hasNext()) return null
-  return NonEmptyList(Iterable { iter }.toList())
-}
+public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? =
+  toList().wrapAsNonEmptyListOrNull()
 
 /**
  * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
@@ -447,12 +455,10 @@ public fun <T> Iterable<T>.toNonEmptyListOrNone(): Option<NonEmptyList<T>> =
 /**
  * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
  */
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 @JvmName("toNonEmptyListOrThrow")
-public fun <T> Iterable<T>.toNonEmptyListOrThrow(): NonEmptyList<T> {
-  val iter = iterator()
-  require(iter.hasNext())
-  return NonEmptyList(Iterable { iter }.toList())
-}
+public fun <T> Iterable<T>.toNonEmptyListOrThrow(): NonEmptyList<T> =
+  toList().wrapAsNonEmptyListOrThrow()
 
 /**
  * Returns a [NonEmptyList] that wraps the given [this], avoiding an additional copy.

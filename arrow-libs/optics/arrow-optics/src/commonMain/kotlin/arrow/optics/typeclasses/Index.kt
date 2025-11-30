@@ -3,7 +3,6 @@ package arrow.optics.typeclasses
 import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.right
-import arrow.core.toNonEmptyListOrNull
 import arrow.optics.Optional
 import arrow.optics.PLens
 import arrow.optics.POptional
@@ -94,11 +93,7 @@ public fun interface Index<S, I, A> {
       Index { i ->
         POptional(
           getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
-          set = { l, a ->
-              l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
-                      .toNonEmptyListOrNull()
-                      ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
-          }
+          set = { l, a -> l.mapIndexed { index, aa -> if (index == i) a else aa } }
         )
       }
 
