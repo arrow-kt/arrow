@@ -491,11 +491,17 @@ internal class ResourceScopeImpl : ResourceScope {
     }?.let { throw it }
   }
 
-  private fun Throwable?.add(other: Throwable?): Throwable? {
-    if (other !is CancellationException) other?.nonFatalOrThrow()
-    return this?.apply {
-      other?.let { addSuppressed(it) }
-    } ?: other
+  private fun Throwable?.add(other: Throwable?): Throwable? = when {
+    this == null -> other
+    other == null -> this
+    other is CancellationException -> {
+      this.addSuppressed(other)
+      this
+    }
+    else -> {
+      this.addSuppressed(other.nonFatalOrThrow())
+      this
+    }
   }
 }
 
