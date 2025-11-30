@@ -16,9 +16,7 @@ import arrow.core.raise.RaiseAccumulate.Error
 import arrow.core.raise.RaiseAccumulate.Ok
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
-import arrow.core.toNonEmptyListOrThrow
-import arrow.core.toNonEmptySetOrNull
-import arrow.core.wrapAsNonEmptyListOrThrow
+import arrow.core.wrapAsNonEmptySetOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -758,6 +756,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 @RaiseDSL
 @Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
@@ -767,7 +766,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   // For a NonEmptyList to be returned, there must be a B, which can only be produced by transform
   // thus transform must be called at least once (or alternatively an error is raised or an exception is thrown etc)
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
-  return requireNotNull(mapOrAccumulate(nonEmptyList.all) { transform(it) }.toNonEmptyListOrNull())
+  return mapOrAccumulate(nonEmptyList.all) { transform(it) }.let(::NonEmptyList)
 }
 
 /**
@@ -777,6 +776,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 @RaiseDSL
 @Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
@@ -788,7 +788,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
     forEachAccumulatingImpl(nonEmptySet.iterator()) { item, hasErrors ->
       transform(item).also { if (!hasErrors) add(it) }
     }
-  }.toNonEmptySetOrNull()!!
+  }.wrapAsNonEmptySetOrThrow()
 }
 
 @RaiseDSL
@@ -880,7 +880,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   @ExperimentalRaiseAccumulateApi
   private constructor(raise: Raise<NonEmptyList<Error>>, list: MutableList<Error>) :
-    this(ListAccumulate(raise, list), { raise.raise((list + it).toNonEmptyListOrThrow()) })
+    this(ListAccumulate(raise, list), { raise.raise(NonEmptyList(list + it)) })
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
@@ -1091,8 +1091,9 @@ private class ListAccumulate<Error>(
   private val raise: Raise<NonEmptyList<Error>>,
   private val list: MutableList<Error>
 ) : Accumulate<Error> {
-  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-  private val error = Error { raise.raise(list.wrapAsNonEmptyListOrThrow()) } // only valid if list is not empty
+  // only valid if list is not empty
+  // errors are never removed from `list`, so once this is valid, it stays valid
+  private val error = Error { raise.raise(NonEmptyList(list)) }
 
   @ExperimentalRaiseAccumulateApi
   override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
@@ -1126,6 +1127,7 @@ private class TolerantAccumulate<Error>(
 @PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
   TolerantAccumulate(this, raise)
 
+@Suppress("NOTHING_TO_INLINE")
 public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
 @ExperimentalRaiseAccumulateApi
