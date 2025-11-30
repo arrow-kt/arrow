@@ -13,19 +13,14 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-data class Person(val age: Int, val name: String) : Comparable<Person> {
+// Intentionally not `data` to test stability of sorting (i.e. (a <= b && b <= a) !=> a == b)
+class Person(val age: Int, val name: String) : Comparable<Person> {
   companion object {
-    val comparator: Comparator<Person> = Comparator { a, b ->
-      val res = a.age.compareTo(b.age)
-      if (res != 0) {
-        res
-      } else {
-        a.name.compareTo(b.name)
-      }
-    }
+    val comparator: Comparator<Person> = compareBy(Person::age, Person::name)
   }
 
   override fun compareTo(other: Person): Int = comparator.compare(this, other)
+  override fun toString() = "Person(age=$age, name='$name')"
 }
 
 fun Arb.Companion.person(): Arb<Person> = Arb.bind(Arb.int(0, 100), Arb.string(0..10), ::Person)
