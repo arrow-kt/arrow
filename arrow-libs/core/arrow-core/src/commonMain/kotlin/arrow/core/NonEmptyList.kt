@@ -223,8 +223,8 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     return buildList {
       var i = 0
       // Inv: i < size
-      do add(f(NonEmptyList(all.subList(i, size))))
-      while (++i < size)
+      do add(f(NonEmptyList(all.subList(i, all.size))))
+      while (++i < all.size)
     }.let(::NonEmptyList)
   }
 
