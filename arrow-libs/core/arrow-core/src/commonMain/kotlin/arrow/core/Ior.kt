@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
+@file:OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
 
 package arrow.core
 
@@ -6,6 +7,7 @@ import arrow.core.Ior.Both
 import arrow.core.Ior.Left
 import arrow.core.Ior.Right
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
@@ -149,6 +151,9 @@ public sealed class Ior<out A, out B> {
       callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
       callsInPlace(fb, InvocationKind.AT_MOST_ONCE)
       callsInPlace(fab, InvocationKind.AT_MOST_ONCE)
+      (this@Ior is Left) holdsIn fa
+      (this@Ior is Right) holdsIn fb
+      (this@Ior is Both) holdsIn fab
     }
     return when (this) {
       is Left -> fa(value)
@@ -173,7 +178,10 @@ public sealed class Ior<out A, out B> {
    * <!--- KNIT example-ior-04.kt -->
    */
   public inline fun <D> map(f: (B) -> D): Ior<A, D> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      (this@Ior is Right || this@Ior is Both) holdsIn f
+    }
     return when (this) {
       is Left -> this
       is Right -> Right(f(value))
@@ -197,7 +205,10 @@ public sealed class Ior<out A, out B> {
    * <!--- KNIT example-ior-05.kt -->
    */
   public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> {
-    contract { callsInPlace(fa, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
+      (this@Ior is Left || this@Ior is Both) holdsIn fa
+    }
     return when (this) {
       is Left -> Left(fa(value))
       is Right -> this
@@ -338,6 +349,7 @@ public sealed class Ior<out A, out B> {
       returns(true) implies (this@Ior is Left)
       returns(false) implies (this@Ior is Right || this@Ior is Both)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+      (this@Ior is Left) holdsIn predicate
     }
     return this@Ior is Left<A> && predicate(value)
   }
@@ -364,6 +376,7 @@ public sealed class Ior<out A, out B> {
       returns(true) implies (this@Ior is Right)
       returns(false) implies (this@Ior is Left || this@Ior is Both)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+      (this@Ior is Right) holdsIn predicate
     }
     return this@Ior is Right<B> && predicate(value)
   }
@@ -392,6 +405,8 @@ public sealed class Ior<out A, out B> {
       returns(false) implies (this@Ior is Left || this@Ior is Right)
       callsInPlace(leftPredicate, InvocationKind.AT_MOST_ONCE)
       callsInPlace(rightPredicate, InvocationKind.AT_MOST_ONCE)
+      (this@Ior is Both) holdsIn leftPredicate
+      (this@Ior is Both) holdsIn rightPredicate
     }
     return this@Ior is Both<A, B> && leftPredicate(leftValue) && rightPredicate(rightValue)
   }
@@ -406,6 +421,8 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Io
   contract {
     callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    (this@flatMap is Both) holdsIn combine
+    (this@flatMap is Right || this@flatMap is Both) holdsIn f
   }
   return when (this) {
     is Left -> this
@@ -427,6 +444,8 @@ public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (
   contract {
     callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    (this@handleErrorWith is Both) holdsIn combine
+    (this@handleErrorWith is Left || this@handleErrorWith is Both) holdsIn f
   }
   return when (this) {
     is Left -> f(value)
@@ -440,7 +459,10 @@ public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (
 }
 
 public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
-  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    (this@getOrElse is Left) holdsIn default
+  }
   return when (this) {
     is Left -> default(this.value)
     is Right -> this.value
@@ -459,6 +481,8 @@ public inline fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) ->
   contract {
     callsInPlace(combineA, InvocationKind.AT_MOST_ONCE)
     callsInPlace(combineB, InvocationKind.AT_MOST_ONCE)
+    ((this@combine is Left || this@combine is Both) && (other is Left || other is Both)) holdsIn combineA
+    ((this@combine is Right || this@combine is Both) && (other is Right || other is Both)) holdsIn combineB
   }
   return when (this) {
     is Ior.Left -> when (other) {
@@ -482,7 +506,10 @@ public inline fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) ->
 }
 
 public inline fun <A, B> Ior<A, Ior<A, B>>.flatten(combine: (A, A) -> A): Ior<A, B> {
-  contract { callsInPlace(combine, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
+    (this@flatten is Both) holdsIn combine
+  }
   return flatMap(combine, ::identity)
 }
 

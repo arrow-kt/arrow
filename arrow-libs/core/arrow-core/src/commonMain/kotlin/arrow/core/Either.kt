@@ -1,6 +1,7 @@
 @file:JvmMultifileClass
 @file:JvmName("EitherKt")
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core
 
@@ -11,6 +12,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.fold
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
@@ -532,6 +534,7 @@ public sealed class Either<out A, out B> {
     contract {
       returns(true) implies (this@Either is Left)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Left) holdsIn predicate
     }
     return this@Either is Left<A> && predicate(value)
   }
@@ -561,6 +564,7 @@ public sealed class Either<out A, out B> {
     contract {
       returns(true) implies (this@Either is Right)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Right) holdsIn predicate
     }
     return this@Either is Right<B> && predicate(value)
   }
@@ -593,6 +597,8 @@ public sealed class Either<out A, out B> {
     contract {
       callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
       callsInPlace(ifRight, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Left) holdsIn ifLeft
+      (this@Either is Right) holdsIn ifRight
     }
     return when (this) {
       is Right -> ifRight(value)
@@ -636,6 +642,7 @@ public sealed class Either<out A, out B> {
   public inline fun <C> map(f: (right: B) -> C): Either<A, C> {
     contract {
       callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Right) holdsIn f
     }
     return flatMap { Right(f(it)) }
   }
@@ -657,7 +664,10 @@ public sealed class Either<out A, out B> {
    * <!--- TEST lines.isEmpty() -->
    */
   public inline fun <C> mapLeft(f: (A) -> C): Either<C, B> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Left) holdsIn f
+    }
     return when (this) {
       is Left -> Left(f(value))
       is Right -> Right(value)
@@ -682,6 +692,7 @@ public sealed class Either<out A, out B> {
   public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Right) holdsIn action
     }
     return also { if (it.isRight()) action(it.value) }
   }
@@ -704,6 +715,7 @@ public sealed class Either<out A, out B> {
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+      (this@Either is Left) holdsIn action
     }
     return also { if (it.isLeft()) action(it.value) }
   }
@@ -847,7 +859,11 @@ public sealed class Either<out A, out B> {
       b: Either<E, B>,
       transform: (A, B) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Left && b is Left) holdsIn combine
+        (a is Right && b is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
@@ -860,7 +876,10 @@ public sealed class Either<out A, out B> {
       c: Either<E, C>,
       transform: (A, B, C) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
@@ -874,7 +893,10 @@ public sealed class Either<out A, out B> {
       d: Either<E, D>,
       transform: (A, B, C, D) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
@@ -889,7 +911,10 @@ public sealed class Either<out A, out B> {
       e: Either<E, EE>,
       transform: (A, B, C, D, EE) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
@@ -905,7 +930,10 @@ public sealed class Either<out A, out B> {
       f: Either<E, FF>,
       transform: (A, B, C, D, EE, FF) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff)
       }
@@ -922,7 +950,10 @@ public sealed class Either<out A, out B> {
       g: Either<E, G>,
       transform: (A, B, C, D, EE, F, G) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg)
       }
@@ -940,7 +971,10 @@ public sealed class Either<out A, out B> {
       h: Either<E, H>,
       transform: (A, B, C, D, EE, F, G, H) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh)
       }
@@ -959,7 +993,10 @@ public sealed class Either<out A, out B> {
       i: Either<E, I>,
       transform: (A, B, C, D, EE, F, G, H, I) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right) holdsIn transform
+      }
       return zipOrAccumulate(combine, a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
       }
@@ -980,12 +1017,14 @@ public sealed class Either<out A, out B> {
       j: Either<E, J>,
       transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
     ): Either<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) holdsIn transform
+      }
       return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
         Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
       } else {
-        var accumulatedError: Any? = EmptyValue
-        accumulatedError = if (a is Left) a.value else accumulatedError
+        var accumulatedError: Any? = if (a is Left) a.value else EmptyValue
         accumulatedError = if (b is Left) EmptyValue.combine(accumulatedError, b.value, combine) else accumulatedError
         accumulatedError = if (c is Left) EmptyValue.combine(accumulatedError, c.value, combine) else accumulatedError
         accumulatedError = if (d is Left) EmptyValue.combine(accumulatedError, d.value, combine) else accumulatedError
@@ -1006,7 +1045,10 @@ public sealed class Either<out A, out B> {
       b: Either<E, B>,
       transform: (A, B) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
@@ -1018,7 +1060,10 @@ public sealed class Either<out A, out B> {
       c: Either<E, C>,
       transform: (A, B, C) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
@@ -1031,7 +1076,10 @@ public sealed class Either<out A, out B> {
       d: Either<E, D>,
       transform: (A, B, C, D) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
@@ -1045,7 +1093,10 @@ public sealed class Either<out A, out B> {
       e: Either<E, EE>,
       transform: (A, B, C, D, EE) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
@@ -1060,7 +1111,10 @@ public sealed class Either<out A, out B> {
       f: Either<E, FF>,
       transform: (A, B, C, D, EE, FF) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff)
       }
@@ -1076,7 +1130,10 @@ public sealed class Either<out A, out B> {
       g: Either<E, G>,
       transform: (A, B, C, D, EE, F, G) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg)
       }
@@ -1093,7 +1150,10 @@ public sealed class Either<out A, out B> {
       h: Either<E, H>,
       transform: (A, B, C, D, EE, F, G, H) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh)
       }
@@ -1111,7 +1171,10 @@ public sealed class Either<out A, out B> {
       i: Either<E, I>,
       transform: (A, B, C, D, EE, F, G, H, I) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
       }
@@ -1131,24 +1194,24 @@ public sealed class Either<out A, out B> {
       j: Either<E, J>,
       transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
     ): Either<NonEmptyList<E>, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-      } else {
-        val list = buildList(9) {
-          if (a is Left) add(a.value)
-          if (b is Left) add(b.value)
-          if (c is Left) add(c.value)
-          if (d is Left) add(d.value)
-          if (e is Left) add(e.value)
-          if (f is Left) add(f.value)
-          if (g is Left) add(g.value)
-          if (h is Left) add(h.value)
-          if (i is Left) add(i.value)
-          if (j is Left) add(j.value)
-        }
-        Left(NonEmptyList(list[0], list.drop(1)))
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) holdsIn transform
       }
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right)
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      else buildList(10) {
+        if (a is Left) add(a.value)
+        if (b is Left) add(b.value)
+        if (c is Left) add(c.value)
+        if (d is Left) add(d.value)
+        if (e is Left) add(e.value)
+        if (f is Left) add(f.value)
+        if (g is Left) add(g.value)
+        if (h is Left) add(h.value)
+        if (i is Left) add(i.value)
+        if (j is Left) add(j.value)
+      }.let(::NonEmptyList).left()
     }
 
     @JvmName("zipOrAccumulateNonEmptyList")
@@ -1157,7 +1220,10 @@ public sealed class Either<out A, out B> {
       b: EitherNel<E, B>,
       transform: (A, B) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _, _ ->
         transform(aa, bb)
       }
@@ -1170,7 +1236,10 @@ public sealed class Either<out A, out B> {
       c: EitherNel<E, C>,
       transform: (A, B, C) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ ->
         transform(aa, bb, cc)
       }
@@ -1184,7 +1253,10 @@ public sealed class Either<out A, out B> {
       d: EitherNel<E, D>,
       transform: (A, B, C, D) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ ->
         transform(aa, bb, cc, dd)
       }
@@ -1199,7 +1271,10 @@ public sealed class Either<out A, out B> {
       e: EitherNel<E, EE>,
       transform: (A, B, C, D, EE) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee)
       }
@@ -1215,7 +1290,10 @@ public sealed class Either<out A, out B> {
       f: EitherNel<E, FF>,
       transform: (A, B, C, D, EE, FF) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff)
       }
@@ -1232,7 +1310,10 @@ public sealed class Either<out A, out B> {
       g: EitherNel<E, G>,
       transform: (A, B, C, D, EE, F, G) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg)
       }
@@ -1250,7 +1331,10 @@ public sealed class Either<out A, out B> {
       h: EitherNel<E, H>,
       transform: (A, B, C, D, EE, F, G, H) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh)
       }
@@ -1269,7 +1353,10 @@ public sealed class Either<out A, out B> {
       i: EitherNel<E, I>,
       transform: (A, B, C, D, EE, F, G, H, I) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right) holdsIn transform
+      }
       return zipOrAccumulate(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ ->
         transform(aa, bb, cc, dd, ee, ff, gg, hh, ii)
       }
@@ -1290,24 +1377,24 @@ public sealed class Either<out A, out B> {
       j: EitherNel<E, J>,
       transform: (A, B, C, D, EE, F, G, H, I, J) -> Z,
     ): EitherNel<E, Z> {
-      contract { callsInPlace(transform, InvocationKind.AT_MOST_ONCE) }
-      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) {
-        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
-      } else {
-        val list = buildList {
-          if (a is Left) addAll(a.value)
-          if (b is Left) addAll(b.value)
-          if (c is Left) addAll(c.value)
-          if (d is Left) addAll(d.value)
-          if (e is Left) addAll(e.value)
-          if (f is Left) addAll(f.value)
-          if (g is Left) addAll(g.value)
-          if (h is Left) addAll(h.value)
-          if (i is Left) addAll(i.value)
-          if (j is Left) addAll(j.value)
-        }
-        Left(NonEmptyList(list[0], list.drop(1)))
+      contract {
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right) holdsIn transform
       }
+      return if (a is Right && b is Right && c is Right && d is Right && e is Right && f is Right && g is Right && h is Right && i is Right && j is Right)
+        Right(transform(a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value))
+      else buildList(10) {
+        if (a is Left) addAll(a.value)
+        if (b is Left) addAll(b.value)
+        if (c is Left) addAll(c.value)
+        if (d is Left) addAll(d.value)
+        if (e is Left) addAll(e.value)
+        if (f is Left) addAll(f.value)
+        if (g is Left) addAll(g.value)
+        if (h is Left) addAll(h.value)
+        if (i is Left) addAll(i.value)
+        if (j is Left) addAll(j.value)
+      }.let(::NonEmptyList).left()
     }
   }
 }
@@ -1320,7 +1407,10 @@ public sealed class Either<out A, out B> {
  * @param f The function to bind across [Right].
  */
 public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>): Either<A, C> {
-  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    (this@flatMap is Right) holdsIn f
+  }
   return when (this) {
     is Right -> f(this.value)
     is Left -> this
@@ -1335,7 +1425,10 @@ public inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>):
  * @param f The function to bind across [Left].
  */
 public inline fun <A, B, C> Either<A, B>.handleErrorWith(f: (A) -> Either<C, B>): Either<C, B> {
-  contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    (this@handleErrorWith is Left) holdsIn f
+  }
   return when (this) {
     is Left -> f(this.value)
     is Right -> this
@@ -1362,7 +1455,10 @@ public fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
  * <!--- TEST lines.isEmpty() -->
  */
 public inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
-  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    (this@getOrElse is Left) holdsIn default
+  }
   return when (this) {
     is Left -> default(this.value)
     is Right -> this.value
@@ -1408,6 +1504,8 @@ public inline fun <A, B> Either<A, B>.combine(other: Either<A, B>, combineLeft: 
   contract {
     callsInPlace(combineLeft, InvocationKind.AT_MOST_ONCE)
     callsInPlace(combineRight, InvocationKind.AT_MOST_ONCE)
+    (this@combine is Left && other is Left) holdsIn combineLeft
+    (this@combine is Right && other is Right) holdsIn combineRight
   }
   return when (val one = this) {
     is Left -> when (other) {
@@ -1477,11 +1575,11 @@ public fun <E> E.leftNel(): EitherNel<E, Nothing> =
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Raise<EE>.(E) -> A): Either<EE, A> {
-  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
-  return when (this) {
-    is Left -> either { recover(this, value) }
-    is Right -> this@recover
+  contract {
+    callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+    (this@recover is Left) holdsIn recover
   }
+  return handleErrorWith { either { recover(it) } }
 }
 
 /**
@@ -1515,6 +1613,9 @@ public inline fun <E, EE, A> Either<E, A>.recover(@BuilderInference recover: Rai
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@BuilderInference catch: Raise<E>.(T) -> A): Either<E, A> {
-  contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(catch, InvocationKind.AT_MOST_ONCE)
+    (this@catch is Left) holdsIn catch
+  }
   return recover { e -> if (e is T) catch(e) else throw e }
 }
