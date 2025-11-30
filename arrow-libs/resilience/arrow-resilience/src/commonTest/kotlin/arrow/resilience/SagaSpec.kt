@@ -15,7 +15,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-@Suppress("unused")
+@Suppress("unused", "DEPRECATION")
 class SagaSpec {
 
   @Test
