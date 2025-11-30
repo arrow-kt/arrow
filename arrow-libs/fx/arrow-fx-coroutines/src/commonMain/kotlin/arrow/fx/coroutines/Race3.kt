@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
+@file:OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
 
 package arrow.fx.coroutines
 
@@ -11,6 +12,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.selects.select
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.ContinuationInterceptor
@@ -31,6 +33,9 @@ public sealed class Race3<out A, out B, out C> {
       callsInPlace(ifA, InvocationKind.AT_MOST_ONCE)
       callsInPlace(ifB, InvocationKind.AT_MOST_ONCE)
       callsInPlace(ifC, InvocationKind.AT_MOST_ONCE)
+      (this@Race3 is First) holdsIn ifA
+      (this@Race3 is Second) holdsIn ifB
+      (this@Race3 is Third) holdsIn ifC
     }
     return when (this) {
       is First -> ifA(winner)
