@@ -7,6 +7,8 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
+import arrow.resilience.SagaActionStep
+import arrow.resilience.SagaScope
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -291,7 +293,7 @@ public typealias Resource<A> = suspend ResourceScope.() -> A
 public object AcquireStep
 
 @ResourceDSL
-public interface ResourceScope : AutoCloseScope {
+public interface ResourceScope : AutoCloseScope, SagaScope {
 
   /**
    * Compose another [Resource] program into this [ResourceScope].
@@ -326,7 +328,15 @@ public interface ResourceScope : AutoCloseScope {
 
   override fun onClose(release: (Throwable?) -> Unit): Unit = onRelease { release(it.errorOrNull) }
 
+  override suspend fun <A> saga(action: suspend SagaActionStep.() -> A, compensation: suspend (A) -> Unit): A {
+    return action(SagaActionStep).also { a -> compensate { compensation(a) } }
+  }
+
   public infix fun onRelease(release: suspend (ExitCase) -> Unit)
+}
+
+public fun ResourceScope.compensate(compensation: suspend (Throwable) -> Unit) {
+  onRelease { exit -> exit.errorOrNull?.let { compensation(it) } }
 }
 
 @ScopeDSL
