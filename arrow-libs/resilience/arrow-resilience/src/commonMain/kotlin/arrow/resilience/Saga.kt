@@ -6,7 +6,11 @@ import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ResourceScope
+import arrow.fx.coroutines.ScopeDSL
 import arrow.fx.coroutines.resourceScope
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 
 /**
@@ -99,8 +103,17 @@ public fun <A> saga(
  * fails then all compensating actions are guaranteed to run. When a compensating action failed it
  * will be ignored, and the other compensating actions will continue to be run.
  */
-public suspend fun <A> Saga<A>.transact(): A = resourceScope {
-  invoke(SagaResourceScope(this))
+public suspend fun <A> Saga<A>.transact(): A = resourceSaga {
+  val saga: suspend context(SagaScope) () -> A = this
+  saga()
+}
+
+@OptIn(ExperimentalContracts::class)
+@ScopeDSL public suspend inline fun <A> resourceSaga(action: context(ResourceScope, SagaScope) () -> A): A {
+  contract {
+    callsInPlace(action, InvocationKind.EXACTLY_ONCE)
+  }
+  return resourceScope { action(this, SagaResourceScope(this)) }
 }
 
 /** DSL Marker for the SagaEffect DSL */
@@ -112,7 +125,8 @@ public suspend fun <A> Saga<A>.transact(): A = resourceScope {
 public object SagaActionStep
 
 // Internal implementation of the `saga { }` builder.
-private class SagaResourceScope(private val scope: ResourceScope) : SagaScope {
+@PublishedApi
+internal class SagaResourceScope(private val scope: ResourceScope) : SagaScope {
   override suspend fun <A> saga(
     action: suspend SagaActionStep.() -> A,
     compensation: suspend (A) -> Unit
