@@ -945,18 +945,17 @@ class ResourceTest {
 
   @Test
   fun resourceScopeManagedCoroutineScope() = runTest {
+    lateinit var scope: CoroutineScope
     val channel = Channel<String>(Channel.UNLIMITED)
 
     val job = launch {
       resourceScope {
         channel.send("hello")
         onRelease { channel.send("goodbye") }
-
-        val scope = ManagedCoroutineScope()
+        scope = ManagedCoroutineScope()
         scope.launch {
           channel.send("start nested")
-          backgroundScope.async { delay(100) }.await()
-          fail("shouldn't be reached")
+          awaitCancellation()
         }
 
         awaitCancellation()
@@ -965,8 +964,14 @@ class ResourceTest {
 
     channel.receive() shouldBe "hello"
     channel.receive() shouldBe "start nested"
-    job.cancel()
+    val cancellationException = CancellationException("BOOM!")
+    job.cancel(cancellationException)
     channel.receive() shouldBe "goodbye"
     channel.cancel()
+    scope.coroutineContext.job.isCompleted shouldBe true
+    job.join()
+    var innerScopeCancelledWith: Throwable? = null
+    scope.coroutineContext.job.invokeOnCompletion { innerScopeCancelledWith = it }
+    innerScopeCancelledWith shouldBe cancellationException
   }
 }
