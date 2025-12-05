@@ -1,5 +1,6 @@
 package arrow.continuations
 
+import arrow.AutoCloseScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.experimental.ExperimentalNativeApi
 import kotlin.system.exitProcess
@@ -12,11 +13,21 @@ import platform.posix.SIGINT
 import platform.posix.SIGTERM
 import platform.posix.signal
 
-internal actual fun process(): Process = NativeProcess()
+@OptIn(DelicateCoroutinesApi::class, ExperimentalNativeApi::class)
+internal actual fun AutoCloseScope.process(): Process {
+  install(SIGNAL_DISPATCHER)
+  val job = SupervisorJob()
+  onClose {
+    // TODO join all jobs, and re-throw all exceptions ??
+    //   All jobs should've finished when the Enviroment is closed.
+    assert(job.children.none()) { "Job should not have any children anymore." }
+    runBlocking { job.cancelAndJoin() }
+  }
+  return NativeProcess(job)
+}
 
 @OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
-private class NativeProcess : Process, AutoCloseable {
-  private val job = SupervisorJob()
+private class NativeProcess(job: Job) : Process {
   private val scope = CoroutineScope(SIGNAL_DISPATCHER + job)
 
   override fun onShutdown(block: suspend () -> Unit): () -> Unit {
@@ -46,24 +57,9 @@ private class NativeProcess : Process, AutoCloseable {
     signal(code, handler)
   }
 
-  @OptIn(ExperimentalNativeApi::class, ExperimentalStdlibApi::class)
-  override fun close(): Unit = runBlocking {
-    // TODO join all jobs, and re-throw all exceptions ??
-    //   All jobs should've finished when the Enviroment is closed.
-    assert(job.children.none()) { "Job should not have any children anymore." }
-    listOf(kotlin.runCatching { job.cancelAndJoin() }, runCatching { SIGNAL_DISPATCHER.close() })
-      .getOrThrow()
-  }
-
   override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit): Unit =
     runBlocking(context, block)
 }
-
-private fun List<Result<Unit>>.getOrThrow() =
-  fold(null) { acc: Throwable?, result ->
-    val other = result.exceptionOrNull()
-    other?.let { acc?.apply { addSuppressed(other) } ?: other } ?: acc
-  }
 
 private val TERMINATED: CompletableDeferred<Int> = CompletableDeferred()
 
