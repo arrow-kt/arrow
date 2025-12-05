@@ -3,11 +3,13 @@ plugins {
 }
 
 kotlin {
+  compilerOptions {
+    freeCompilerArgs.add("-Xcontext-parameters")
+  }
   sourceSets {
     commonMain {
       dependencies {
-        api(projects.arrowCore)
-        implementation(libs.coroutines.core)
+        api(projects.arrowFxCoroutines)
       }
     }
     commonTest {
