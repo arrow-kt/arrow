@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseContextualKt")
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise.context
 
@@ -15,6 +16,7 @@ import arrow.core.raise.ensure as ensureExt
 import arrow.core.raise.ensureNotNull as ensureNotNullExt
 import arrow.core.raise.withError as withErrorExt
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -29,13 +31,23 @@ public typealias ResultRaise = arrow.core.raise.ResultRaise
 context(raise: Raise<Error>) @RaiseDSL public fun <Error> raise(e: Error): Nothing =
   raise.raise(e)
 
+@OptIn(ExperimentalExtendedContracts::class)
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error> ensure(condition: Boolean, otherwise: () -> Error) {
-  contract { returns() implies condition }
+  contract {
+    callsInPlace(otherwise, AT_MOST_ONCE)
+    returns() implies condition
+    !condition holdsIn otherwise
+  }
   raise.ensureExt(condition, otherwise)
 }
 
+@OptIn(ExperimentalExtendedContracts::class)
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, B : Any> ensureNotNull(value: B?, otherwise: () -> Error): B {
-  contract { returns() implies (value != null) }
+  contract {
+    returns() implies (value != null)
+    callsInPlace(otherwise, AT_MOST_ONCE)
+    (value == null) holdsIn otherwise
+  }
   return raise.ensureNotNullExt(value, otherwise)
 }
 
