@@ -1,5 +1,6 @@
 package arrow.continuations
 
+import arrow.AutoCloseScope
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
 import kotlinx.coroutines.withContext
 
-internal actual fun process(): Process = JsProcess
+internal actual fun AutoCloseScope.process(): Process = JsProcess
 
 private object JsProcess : Process {
   override fun onShutdown(block: suspend () -> Unit): () -> Unit {
@@ -65,8 +66,6 @@ private object JsProcess : Process {
     js("process.exit(code)")
     error("process.exit() should have exited...")
   }
-
-  override fun close(): Unit = Unit
 }
 
 private inline fun Process.exitAfter(code: Int, block: () -> Unit): Unit =
