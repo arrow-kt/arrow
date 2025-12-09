@@ -89,6 +89,7 @@ public final class arrow/resilience/CircuitBreaker$State$Open : arrow/resilience
 	public fun getOpeningStrategy ()Larrow/resilience/CircuitBreaker$OpeningStrategy;
 	public final fun getResetTimeout-UwyO8pc ()J
 	public final fun getStartedAt ()Lkotlin/time/TimeMark;
+	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
 
