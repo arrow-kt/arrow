@@ -474,6 +474,8 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
         open fun <get-hasAccumulatedErrors>(): kotlin/Boolean // arrow.core.raise/RaiseAccumulate.hasAccumulatedErrors.<get-hasAccumulatedErrors>|<get-hasAccumulatedErrors>(){}[0]
     open val latestError // arrow.core.raise/RaiseAccumulate.latestError|{}latestError[0]
         open fun <get-latestError>(): arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>? // arrow.core.raise/RaiseAccumulate.latestError.<get-latestError>|<get-latestError>(){}[0]
+    open val value // arrow.core.raise/RaiseAccumulate.value|@arrow.core.raise.RaiseAccumulate.Value<0:0>{0§<kotlin.Any?>}value[0]
+        open fun <#A2: kotlin/Any?> (arrow.core.raise/RaiseAccumulate.Value<#A2>).<get-value>(): #A2 // arrow.core.raise/RaiseAccumulate.value.<get-value>|<get-value>@arrow.core.raise.RaiseAccumulate.Value<0:0>(){0§<kotlin.Any?>}[0]
 
     final fun <#A1: kotlin/Any?> (arrow.core/Either<arrow.core/NonEmptyList<#A>, #A1>).bindNel(): #A1 // arrow.core.raise/RaiseAccumulate.bindNel|bindNel@arrow.core.Either<arrow.core.NonEmptyList<1:0>,0:0>(){0§<kotlin.Any?>}[0]
     final fun addErrors(kotlin.collections/Iterable<#A>) // arrow.core.raise/RaiseAccumulate.addErrors|addErrors(kotlin.collections.Iterable<1:0>){}[0]
@@ -497,22 +499,18 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
 
     final class <#A1: out kotlin/Any?> Ok : arrow.core.raise/RaiseAccumulate.Value<#A1> { // arrow.core.raise/RaiseAccumulate.Ok|null[0]
         constructor <init>(#A1) // arrow.core.raise/RaiseAccumulate.Ok.<init>|<init>(1:0){}[0]
-
-        final val value // arrow.core.raise/RaiseAccumulate.Ok.value|{}value[0]
-            final fun <get-value>(): #A1 // arrow.core.raise/RaiseAccumulate.Ok.value.<get-value>|<get-value>(){}[0]
     }
 
     final class Error : arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing> { // arrow.core.raise/RaiseAccumulate.Error|null[0]
         constructor <init>(arrow.core.raise/RaiseAccumulate<*>) // arrow.core.raise/RaiseAccumulate.Error.<init>|<init>(arrow.core.raise.RaiseAccumulate<*>){}[0]
         constructor <init>(kotlin/Function0<kotlin/Nothing>) // arrow.core.raise/RaiseAccumulate.Error.<init>|<init>(kotlin.Function0<kotlin.Nothing>){}[0]
-
-        final val value // arrow.core.raise/RaiseAccumulate.Error.value|{}value[0]
-            final fun <get-value>(): kotlin/Nothing // arrow.core.raise/RaiseAccumulate.Error.value.<get-value>|<get-value>(){}[0]
     }
 
     sealed class <#A1: out kotlin/Any?> Value { // arrow.core.raise/RaiseAccumulate.Value|null[0]
-        abstract val value // arrow.core.raise/RaiseAccumulate.Value.value|{}value[0]
-            abstract fun <get-value>(): #A1 // arrow.core.raise/RaiseAccumulate.Value.value.<get-value>|<get-value>(){}[0]
+        abstract val unsafeValue // arrow.core.raise/RaiseAccumulate.Value.unsafeValue|{}unsafeValue[0]
+            abstract fun <get-unsafeValue>(): #A1 // arrow.core.raise/RaiseAccumulate.Value.unsafeValue.<get-unsafeValue>|<get-unsafeValue>(){}[0]
+        final val value // arrow.core.raise/RaiseAccumulate.Value.value|{}value[0]
+            final fun <get-value>(): #A1 // arrow.core.raise/RaiseAccumulate.Value.value.<get-value>|<get-value>(){}[0]
 
         final inline fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
     }
