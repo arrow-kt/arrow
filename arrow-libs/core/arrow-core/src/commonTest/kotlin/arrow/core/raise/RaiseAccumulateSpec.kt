@@ -94,4 +94,14 @@ class RaiseAccumulateSpec {
     } shouldBe nonEmptyListOf("nonfatal").left()
     reachedEnd shouldBe true
   }
+
+  @Test fun toleratesValueInAccumulating() {
+    var reachedEnd = false
+    accumulate(::either) {
+      val x = accumulating { raise("nonfatal") }
+      val y by accumulating { x }
+      reachedEnd = true
+    } shouldBe nonEmptyListOf("nonfatal").left()
+    reachedEnd shouldBe true
+  }
 }

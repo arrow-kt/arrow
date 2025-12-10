@@ -993,10 +993,12 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
 
   public sealed class Value<out A> {
-    public abstract val value: A
+    @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+    public val value: A get() = unsafeValue
+    public abstract val unsafeValue: A
 
     @Suppress("NOTHING_TO_INLINE")
-    public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = value
+    public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
   }
 
   @PublishedApi
@@ -1004,14 +1006,14 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     @OptIn(ExperimentalRaiseAccumulateApi::class)
     @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
     constructor(raiseAccumulate: RaiseAccumulate<*>) : this({
-      raiseAccumulate.latestError?.value ?: error("No accumulated errors to raise")
+      raiseAccumulate.latestError?.unsafeValue ?: error("No accumulated errors to raise")
     })
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-    override val value get(): Nothing = raise()
+    override val unsafeValue get(): Nothing = raise()
   }
 
-  @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
+  @PublishedApi internal class Ok<out A>(override val unsafeValue: A): Value<A>()
 
 
   @ExperimentalRaiseAccumulateApi
@@ -1081,7 +1083,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
 @ExperimentalRaiseAccumulateApi
 private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise<NonEmptyList<Error>> {
-  override fun raise(r: NonEmptyList<Error>): Nothing {
+  override fun raise(r: NonEmptyList<Error>): Nothing = with(accumulate) {
     accumulate.accumulateAll(r).value
   }
 }
@@ -1121,6 +1123,12 @@ private class TolerantAccumulate<Error>(
     val error = underlying.latestError ?: return null
     return Error { raise.raise(error) }
   }
+
+  override val <A> Value<A>.value: A
+    get() = when (this) {
+      is Ok -> unsafeValue
+      is RaiseAccumulate.Error -> this@TolerantAccumulate.raise.raise(this)
+    }
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
@@ -1128,7 +1136,7 @@ private class TolerantAccumulate<Error>(
   TolerantAccumulate(this, raise)
 
 @Suppress("NOTHING_TO_INLINE")
-public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
+public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = getValue(thisRef, property)
 
 @ExperimentalRaiseAccumulateApi
 public interface Accumulate<Error> {
@@ -1143,6 +1151,8 @@ public interface Accumulate<Error> {
 
   @ExperimentalRaiseAccumulateApi
   public val latestError: Value<Nothing>?
+
+  public val <A> Value<A>.value: A get() = unsafeValue
 
   @ExperimentalRaiseAccumulateApi
   public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> = accumulating { bind() }
