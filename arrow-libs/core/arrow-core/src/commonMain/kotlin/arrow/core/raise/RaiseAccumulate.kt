@@ -674,9 +674,14 @@ internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImp
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ): Unit = accumulate {
+  var error: Value<Nothing>? = null
   iterator.forEach {
-    accumulating { block(it, hasAccumulatedErrors) }
+    error = accumulating {
+      block(it, error != null)
+      return@forEach // continue to next iteration since there were no errors
+    }
   }
+  error?.value
 }
 
 /**
