@@ -21,8 +21,8 @@ class RaiseAccumulateSpec {
 
   @Test fun raiseAccumulateTakesPrecedenceOverExtensionFunctionNel() {
     accumulate(::either) {
-      val x by accumulating { ensure(false) { "false" } }
-      val y by accumulating { mapOrAccumulate(1..2) { ensure(false) { "$it: IsFalse" } } }
+      accumulating { ensure(false) { "false" } }
+      accumulating { mapOrAccumulate(1..2) { ensure(false) { "$it: IsFalse" } } }
       1
     } shouldBe nonEmptyListOf("false", "1: IsFalse", "2: IsFalse").left()
   }
@@ -37,59 +37,53 @@ class RaiseAccumulateSpec {
 
   @Test fun raiseAccumulatingTwoFailures() {
     accumulate(::either) {
-      val x by accumulating {
-        raise("hello")
-        1
-      }
-      val y by accumulating {
-        raise("bye")
-        2
-      }
-      x + y
+      val x = accumulating<Int> { raise("hello") }
+      val y = accumulating<Int> { raise("bye") }
+      x.value + y.value
     } shouldBe nonEmptyListOf("hello", "bye").left()
   }
 
   @Test fun raiseAccumulatingOneFailure() {
     accumulate(::either) {
-      val x by accumulating { 1 }
-      val y by accumulating { raise("bye") ; 2 }
-      x + y
+      val x = accumulating { 1 }
+      val y = accumulating<Int> { raise("bye") }
+      x.value + y.value
     } shouldBe nonEmptyListOf("bye").left()
   }
 
   @Test fun raiseAccumulatingOneFailureEither() {
     accumulate(::either) {
-      val x: Int by 1.right().bindOrAccumulate()
-      val y: Int by "bye".left().bindOrAccumulate()
-      x + y
+      val x = 1.right().bindOrAccumulate()
+      val y = "bye".left().bindOrAccumulate<Int>()
+      x.value + y.value
     } shouldBe nonEmptyListOf("bye").left()
   }
 
   @Test fun raiseAccumulatingNoFailure() {
     accumulate<String, _, _>(::either) {
-      val x by accumulating { 1 }
-      val y by accumulating { 2 }
-      x + y
+      val x = accumulating { 1 }
+      val y = accumulating { 2 }
+      x.value + y.value
     } shouldBe (1 + 2).right()
   }
 
   @Test fun raiseAccumulatingIntermediateRaise() {
     accumulate(::either) {
-      val x by accumulating { raise("hello") ; 1 }
+      val x = accumulating<Int> { raise("hello") }
       raise("hi")
-      val y by accumulating { 2 }
-      x + y
+      val y = accumulating { 2 }
+      x.value + y.value
     } shouldBe nonEmptyListOf("hello", "hi").left()
   }
 
   @Test fun preservesAccumulatedErrorsInAccumulating() {
     var reachedEnd = false
     accumulate(::either) {
-      val x by accumulating {
+      val x = accumulating {
         accumulate("nonfatal")
         "output: failed"
       }
-      x shouldBe "output: failed"
+      x.value shouldBe "output: failed"
       reachedEnd = true
     } shouldBe nonEmptyListOf("nonfatal").left()
     reachedEnd shouldBe true
@@ -99,7 +93,7 @@ class RaiseAccumulateSpec {
     var reachedEnd = false
     accumulate(::either) {
       val x = accumulating { raise("nonfatal") }
-      val y by accumulating { x }
+      accumulating { x.value }
       reachedEnd = true
     } shouldBe nonEmptyListOf("nonfatal").left()
     reachedEnd shouldBe true

@@ -200,11 +200,10 @@ class IorAccumulateSpec {
 
   @Test fun preservesAccumulatedErrorsInAccumulating() {
     iorAccumulate(String::plus) {
-      val x by accumulating {
+      accumulating {
         accumulate("nonfatal")
         "output: failed"
-      }
-      x
+      }.value
     } shouldBe Ior.Both("nonfatal", "output: failed")
   }
 

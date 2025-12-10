@@ -995,9 +995,11 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   public sealed class Value<out A> {
     @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
     public val value: A get() = unsafeValue
-    public abstract val unsafeValue: A
+    @PublishedApi
+    internal abstract val unsafeValue: A
 
     @Suppress("NOTHING_TO_INLINE")
+    @Deprecated("Use .value instead for better tolerance behavior", level = DeprecationLevel.WARNING)
     public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
   }
 
@@ -1124,7 +1126,8 @@ private class TolerantAccumulate<Error>(
   TolerantAccumulate(this, raise)
 
 @Suppress("NOTHING_TO_INLINE")
-public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = getValue(thisRef, property)
+@Deprecated(message = "Deprecated in favor of member", level = DeprecationLevel.HIDDEN)
+public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
 
 @ExperimentalRaiseAccumulateApi
 public interface Accumulate<Error> {
