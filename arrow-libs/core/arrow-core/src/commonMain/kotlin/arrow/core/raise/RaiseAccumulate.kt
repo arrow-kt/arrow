@@ -1109,21 +1109,9 @@ private class ListAccumulate<Error>(
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
 private class TolerantAccumulate<Error>(
-  private val underlying: Accumulate<Error>,
+  underlying: Accumulate<Error>,
   private val raise: Raise<Value<Nothing>>
-) : Accumulate<Error> {
-  @ExperimentalRaiseAccumulateApi
-  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
-    val error = underlying.accumulateAll(errors)
-    return Error { raise.raise(error) }
-  }
-
-  @ExperimentalRaiseAccumulateApi
-  override val latestError: Value<Nothing>? get() {
-    val error = underlying.latestError ?: return null
-    return Error { raise.raise(error) }
-  }
-
+) : Accumulate<Error> by underlying {
   override val <A> Value<A>.value: A
     get() = when (this) {
       is Ok -> unsafeValue

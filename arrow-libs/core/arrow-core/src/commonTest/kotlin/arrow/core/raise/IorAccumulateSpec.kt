@@ -211,9 +211,7 @@ class IorAccumulateSpec {
   @Test fun nestedAccumulating() {
     iorAccumulate(String::plus) {
       accumulating {
-        // can be written as accumulate("nonfatal").value
-        val y by accumulating { raise("nonfatal") }
-        y
+        accumulating { raise("nonfatal") }.value
       }
       "output: failed"
     } shouldBe Ior.Both("nonfatal", "output: failed")
