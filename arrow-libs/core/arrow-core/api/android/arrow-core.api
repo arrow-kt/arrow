@@ -1018,16 +1018,14 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Accumulate, arr
 public final class arrow/core/raise/RaiseAccumulate$Error : arrow/core/raise/RaiseAccumulate$Value {
 	public synthetic fun <init> (Larrow/core/raise/RaiseAccumulate;)V
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V
-	public synthetic fun getUnsafeValue ()Ljava/lang/Object;
+	public synthetic fun getUnsafeValue$arrow_core ()Ljava/lang/Object;
 }
 
 public final class arrow/core/raise/RaiseAccumulate$Ok : arrow/core/raise/RaiseAccumulate$Value {
 	public fun <init> (Ljava/lang/Object;)V
-	public synthetic fun getUnsafeValue ()Ljava/lang/Object;
 }
 
 public abstract class arrow/core/raise/RaiseAccumulate$Value {
-	public abstract fun getUnsafeValue ()Ljava/lang/Object;
 	public final synthetic fun getValue ()Ljava/lang/Object;
 	public final fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 }

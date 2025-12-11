@@ -1000,12 +1000,11 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   public sealed class Value<out A> {
     @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
     public val value: A get() = unsafeValue
-    @PublishedApi
     internal abstract val unsafeValue: A
 
     @Suppress("NOTHING_TO_INLINE")
     @Deprecated("Use .value instead for better tolerance behavior", level = DeprecationLevel.WARNING)
-    public inline operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
+    public operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
   }
 
   @PublishedApi
@@ -1013,10 +1012,12 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     @OptIn(ExperimentalRaiseAccumulateApi::class)
     @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
     constructor(raiseAccumulate: RaiseAccumulate<*>) : this({
-      raiseAccumulate.latestError?.unsafeValue ?: error("No accumulated errors to raise")
+      with(raiseAccumulate) {
+        latestError?.value ?: error("No accumulated errors to raise")
+      }
     })
     // WARNING: do not turn this into a property with initializer!!
-    //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
+    //          'raise' is then executed eagerly, and leads to wrong behavior!!
     override val unsafeValue get(): Nothing = raise()
   }
 
@@ -1132,7 +1133,7 @@ private class TolerantAccumulate<Error>(
 
 @Suppress("NOTHING_TO_INLINE")
 @Deprecated(message = "Deprecated in favor of member", level = DeprecationLevel.HIDDEN)
-public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
+public operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
 
 @ExperimentalRaiseAccumulateApi
 public interface Accumulate<Error> {
