@@ -1003,7 +1003,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     internal abstract val unsafeValue: A
 
     @Suppress("NOTHING_TO_INLINE")
-    @Deprecated("Use .value instead for better tolerance behavior", level = DeprecationLevel.WARNING)
+    @Deprecated("Use .value instead for better tolerance behavior", level = DeprecationLevel.ERROR)
     public operator fun getValue(thisRef: Nothing?, property: KProperty<*>): A = unsafeValue
   }
 
