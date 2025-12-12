@@ -2,6 +2,7 @@
 
 package arrow.fx.coroutines
 
+import arrow.core.nonFatalOrThrow
 import arrow.core.throwIfFatal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable

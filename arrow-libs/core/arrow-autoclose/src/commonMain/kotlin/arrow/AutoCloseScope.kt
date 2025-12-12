@@ -90,6 +90,7 @@ public interface AutoCloseScope {
   ): A = acquire().also { a -> onClose { release(a, it) } }
 
   @OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
+  @IgnorableReturnValue
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoCloseable.also { onClose { autoCloseable.close() } }
 }

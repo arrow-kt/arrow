@@ -5,8 +5,8 @@ package arrow.fx.coroutines
 import arrow.AutoCloseScope
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.core.nonFatalOrThrow
 import arrow.core.prependTo
-import arrow.core.throwIfFatal
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
