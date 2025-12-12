@@ -2,8 +2,9 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.nonFatalOrThrow
+import arrow.core.mergeSuppressed
 import arrow.core.throwIfFatal
+import arrow.core.throwIfNotNull
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -82,7 +83,7 @@ public suspend inline fun <A> guarantee(
 ): A {
   contract {
     callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.AT_MOST_ONCE)
   }
   return guaranteeCase(fa) { finalizer() }
 }
@@ -108,7 +109,7 @@ public suspend inline fun <A> guaranteeCase(
 ): A {
   contract {
     callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.AT_MOST_ONCE)
   }
   return finalizeCase({ fa() }) { ex ->
     try {
@@ -116,18 +117,7 @@ public suspend inline fun <A> guaranteeCase(
         finalizer(ex)
       }
     } catch (e: Throwable) {
-      val exError = ex.errorOrNull
-      throw when {
-        exError == null -> e
-        e is CancellationException -> {
-          exError.addSuppressed(e)
-          exError
-        }
-        else -> {
-          exError.addSuppressed(e.nonFatalOrThrow())
-          exError
-        }
-      }
+      (ex.errorOrNull mergeSuppressed e).throwIfNotNull()
     }
   }
 }
@@ -181,7 +171,7 @@ public suspend inline fun <A, B> bracket(
   contract {
     callsInPlace(acquire, InvocationKind.EXACTLY_ONCE)
     callsInPlace(use, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(release, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(release, InvocationKind.AT_MOST_ONCE)
   }
   return bracketCase(acquire, use) { acquired, _ -> release(acquired) }
 }
@@ -257,7 +247,7 @@ public suspend inline fun <A, B> bracketCase(
   contract {
     callsInPlace(acquire, InvocationKind.EXACTLY_ONCE)
     callsInPlace(use, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(release, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(release, InvocationKind.AT_MOST_ONCE)
   }
   val acquired = withContext(NonCancellable) { acquire() }
   return guaranteeCase({ use(acquired) }) { release(acquired, it) }

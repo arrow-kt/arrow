@@ -36,6 +36,6 @@ package arrow.core
 public fun Throwable.nonFatalOrThrow(): Throwable =
   if (NonFatal(this)) this else throw this
 
-public fun Throwable.throwIfFatal() {
+public inline fun Throwable.throwIfFatal() {
   val _ = this.nonFatalOrThrow()
 }

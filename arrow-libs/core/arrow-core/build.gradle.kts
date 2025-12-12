@@ -23,6 +23,7 @@ kotlin {
       dependencies {
         api(projects.arrowAtomic)
         api(projects.arrowAnnotations)
+        implementation(projects.arrowExceptionUtils)
       }
     }
 

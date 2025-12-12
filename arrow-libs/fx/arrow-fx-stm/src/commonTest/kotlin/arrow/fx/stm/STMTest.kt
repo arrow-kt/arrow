@@ -219,12 +219,13 @@ class STMTest {
   @Test fun catchShouldWorkAsExcepted() = runTest {
     val tv = TVar.new(10)
     val ex = IllegalArgumentException("test")
-    val _ = atomically {
+    atomically {
       catch({
         tv.write(30)
         throw ex
       }) { e ->
         e shouldBe ex
+        Unit
       }
     }
     tv.unsafeRead() shouldBeExactly 10
