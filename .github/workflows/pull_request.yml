@@ -80,7 +80,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -118,7 +118,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -156,7 +156,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
