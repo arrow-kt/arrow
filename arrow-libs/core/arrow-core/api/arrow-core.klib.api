@@ -465,7 +465,7 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptySet : arrow.core/NonE
     final fun asJsReadonlySetView(): kotlin.js.collections/JsReadonlySet<#A> // arrow.core/NonEmptySet.asJsReadonlySetView|asJsReadonlySetView(){}[0]
 }
 
-open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise/Accumulate<#A>, arrow.core.raise/Raise<#A> { // arrow.core.raise/RaiseAccumulate|null[0]
+open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise/Accumulate<#A>, arrow.core.raise/Raise<#A>, arrow.core.raise/Tolerance { // arrow.core.raise/RaiseAccumulate|null[0]
     constructor <init>(arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>) // arrow.core.raise/RaiseAccumulate.<init>|<init>(arrow.core.raise.Raise<arrow.core.NonEmptyList<1:0>>){}[0]
 
     final val raise // arrow.core.raise/RaiseAccumulate.raise|{}raise[0]
@@ -474,6 +474,8 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
         open fun <get-hasAccumulatedErrors>(): kotlin/Boolean // arrow.core.raise/RaiseAccumulate.hasAccumulatedErrors.<get-hasAccumulatedErrors>|<get-hasAccumulatedErrors>(){}[0]
     open val latestError // arrow.core.raise/RaiseAccumulate.latestError|{}latestError[0]
         open fun <get-latestError>(): arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>? // arrow.core.raise/RaiseAccumulate.latestError.<get-latestError>|<get-latestError>(){}[0]
+    open val value // arrow.core.raise/RaiseAccumulate.value|@arrow.core.raise.RaiseAccumulate.Value<0:0>{0§<kotlin.Any?>}value[0]
+        open fun <#A2: kotlin/Any?> (arrow.core.raise/RaiseAccumulate.Value<#A2>).<get-value>(): #A2 // arrow.core.raise/RaiseAccumulate.value.<get-value>|<get-value>@arrow.core.raise.RaiseAccumulate.Value<0:0>(){0§<kotlin.Any?>}[0]
 
     final fun <#A1: kotlin/Any?> (arrow.core/Either<arrow.core/NonEmptyList<#A>, #A1>).bindNel(): #A1 // arrow.core.raise/RaiseAccumulate.bindNel|bindNel@arrow.core.Either<arrow.core.NonEmptyList<1:0>,0:0>(){0§<kotlin.Any?>}[0]
     final fun addErrors(kotlin.collections/Iterable<#A>) // arrow.core.raise/RaiseAccumulate.addErrors|addErrors(kotlin.collections.Iterable<1:0>){}[0]
@@ -489,6 +491,7 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
     final inline fun <#A1: kotlin/Any?, #B1: kotlin/Any?> mapOrAccumulate(kotlin.collections/Iterable<#A1>, kotlin/Function2<arrow.core.raise/RaiseAccumulate<#A>, #A1, #B1>): kotlin.collections/List<#B1> // arrow.core.raise/RaiseAccumulate.mapOrAccumulate|mapOrAccumulate(kotlin.collections.Iterable<0:0>;kotlin.Function2<arrow.core.raise.RaiseAccumulate<1:0>,0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> (arrow.core.raise/RaiseAccumulate.Value<#A1>).getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.getValue|getValue@arrow.core.raise.RaiseAccumulate.Value<0:0>(kotlin.Nothing?;kotlin.reflect.KProperty<*>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> withNel(kotlin/Function1<arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>, #A1>): #A1 // arrow.core.raise/RaiseAccumulate.withNel|withNel(kotlin.Function1<arrow.core.raise.Raise<arrow.core.NonEmptyList<1:0>>,0:0>){0§<kotlin.Any?>}[0]
+    open fun (arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>).tolerate(): kotlin/Nothing // arrow.core.raise/RaiseAccumulate.tolerate|tolerate@arrow.core.raise.RaiseAccumulate.Value<kotlin.Nothing>(){}[0]
     open fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.collections/Map<#A1, arrow.core/Either<#A, #B1>>).bindAll(): kotlin.collections/Map<#A1, #B1> // arrow.core.raise/RaiseAccumulate.bindAll|bindAll@kotlin.collections.Map<0:0,arrow.core.Either<1:0,0:1>>(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/Any?> (arrow.core/NonEmptyList<arrow.core/Either<#A, #A1>>).bindAll(): arrow.core/NonEmptyList<#A1> // arrow.core.raise/RaiseAccumulate.bindAll|bindAll@arrow.core.NonEmptyList<arrow.core.Either<1:0,0:0>>(){0§<kotlin.Any?>}[0]
     open fun <#A1: kotlin/Any?> (arrow.core/NonEmptySet<arrow.core/Either<#A, #A1>>).bindAll(): arrow.core/NonEmptySet<#A1> // arrow.core.raise/RaiseAccumulate.bindAll|bindAll@arrow.core.NonEmptySet<arrow.core.Either<1:0,0:0>>(){0§<kotlin.Any?>}[0]
@@ -497,24 +500,18 @@ open class <#A: kotlin/Any?> arrow.core.raise/RaiseAccumulate : arrow.core.raise
 
     final class <#A1: out kotlin/Any?> Ok : arrow.core.raise/RaiseAccumulate.Value<#A1> { // arrow.core.raise/RaiseAccumulate.Ok|null[0]
         constructor <init>(#A1) // arrow.core.raise/RaiseAccumulate.Ok.<init>|<init>(1:0){}[0]
-
-        final val value // arrow.core.raise/RaiseAccumulate.Ok.value|{}value[0]
-            final fun <get-value>(): #A1 // arrow.core.raise/RaiseAccumulate.Ok.value.<get-value>|<get-value>(){}[0]
     }
 
     final class Error : arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing> { // arrow.core.raise/RaiseAccumulate.Error|null[0]
         constructor <init>(arrow.core.raise/RaiseAccumulate<*>) // arrow.core.raise/RaiseAccumulate.Error.<init>|<init>(arrow.core.raise.RaiseAccumulate<*>){}[0]
         constructor <init>(kotlin/Function0<kotlin/Nothing>) // arrow.core.raise/RaiseAccumulate.Error.<init>|<init>(kotlin.Function0<kotlin.Nothing>){}[0]
-
-        final val value // arrow.core.raise/RaiseAccumulate.Error.value|{}value[0]
-            final fun <get-value>(): kotlin/Nothing // arrow.core.raise/RaiseAccumulate.Error.value.<get-value>|<get-value>(){}[0]
     }
 
     sealed class <#A1: out kotlin/Any?> Value { // arrow.core.raise/RaiseAccumulate.Value|null[0]
-        abstract val value // arrow.core.raise/RaiseAccumulate.Value.value|{}value[0]
-            abstract fun <get-value>(): #A1 // arrow.core.raise/RaiseAccumulate.Value.value.<get-value>|<get-value>(){}[0]
+        final val value // arrow.core.raise/RaiseAccumulate.Value.value|{}value[0]
+            final fun <get-value>(): #A1 // arrow.core.raise/RaiseAccumulate.Value.value.<get-value>|<get-value>(){}[0]
 
-        final inline fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
+        final fun getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A1 // arrow.core.raise/RaiseAccumulate.Value.getValue|getValue(kotlin.Nothing?;kotlin.reflect.KProperty<*>){}[0]
     }
 }
 
@@ -828,6 +825,7 @@ final fun <#A: kotlin/Any?> (#A).arrow.core/rightIor(): arrow.core/Ior<kotlin/No
 final fun <#A: kotlin/Any?> (#A).arrow.core/some(): arrow.core/Option<#A> // arrow.core/some|some@0:0(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (#A?).arrow.core/toOption(): arrow.core/Option<#A> // arrow.core/toOption|toOption@0:0?(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core.raise/Accumulate<#A>).arrow.core.raise/tolerant(arrow.core.raise/Raise<arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>>): arrow.core.raise/Accumulate<#A> // arrow.core.raise/tolerant|tolerant@arrow.core.raise.Accumulate<0:0>(arrow.core.raise.Raise<arrow.core.raise.RaiseAccumulate.Value<kotlin.Nothing>>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core.raise/RaiseAccumulate.Value<#A>).arrow.core.raise/getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A // arrow.core.raise/getValue|getValue@arrow.core.raise.RaiseAccumulate.Value<0:0>(kotlin.Nothing?;kotlin.reflect.KProperty<*>){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Either<#A, #A>).arrow.core/merge(): #A // arrow.core/merge|merge@arrow.core.Either<0:0,0:0>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/NonEmptyList<arrow.core/NonEmptyList<#A>>).arrow.core/flatten(): arrow.core/NonEmptyList<#A> // arrow.core/flatten|flatten@arrow.core.NonEmptyList<arrow.core.NonEmptyList<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Option<arrow.core/Option<#A>>).arrow.core/flatten(): arrow.core/Option<#A> // arrow.core/flatten|flatten@arrow.core.Option<arrow.core.Option<0:0>>(){0§<kotlin.Any?>}[0]
@@ -1036,7 +1034,6 @@ final inline fun <#A: kotlin/Any?, #B: reified kotlin/Any?> (kotlin.collections/
 final inline fun <#A: kotlin/Any?, #B: reified kotlin/Throwable, #C: kotlin/Any?> (arrow.core/Either<kotlin/Throwable, #C>).arrow.core/catch(kotlin/Function2<arrow.core.raise/Raise<#A>, #B, #C>): arrow.core/Either<#A, #C> // arrow.core/catch|catch@arrow.core.Either<kotlin.Throwable,0:2>(kotlin.Function2<arrow.core.raise.Raise<0:0>,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Throwable>;2§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (#A).arrow.core/nel(): arrow.core/NonEmptyList<#A> // arrow.core/nel|nel@0:0(){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (arrow.core.raise/Raise<#A>).arrow.core.raise/ensure(kotlin/Boolean, kotlin/Function0<#A>) // arrow.core.raise/ensure|ensure@arrow.core.raise.Raise<0:0>(kotlin.Boolean;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
-final inline fun <#A: kotlin/Any?> (arrow.core.raise/RaiseAccumulate.Value<#A>).arrow.core.raise/getValue(kotlin/Nothing?, kotlin.reflect/KProperty<*>): #A // arrow.core.raise/getValue|getValue@arrow.core.raise.RaiseAccumulate.Value<0:0>(kotlin.Nothing?;kotlin.reflect.KProperty<*>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (arrow.core/Option<#A>).arrow.core/combine(arrow.core/Option<#A>, kotlin/Function2<#A, #A, #A>): arrow.core/Option<#A> // arrow.core/combine|combine@arrow.core.Option<0:0>(arrow.core.Option<0:0>;kotlin.Function2<0:0,0:0,0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (arrow.core/Option<#A>).arrow.core/getOrElse(kotlin/Function0<#A>): #A // arrow.core/getOrElse|getOrElse@arrow.core.Option<0:0>(kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
 final inline fun <#A: kotlin/Any?> (arrow.core/Option<#A>).arrow.core/recover(kotlin/Function1<arrow.core.raise/SingletonRaise<arrow.core/None>, #A>): arrow.core/Option<#A> // arrow.core/recover|recover@arrow.core.Option<0:0>(kotlin.Function1<arrow.core.raise.SingletonRaise<arrow.core.None>,0:0>){0§<kotlin.Any?>}[0]
