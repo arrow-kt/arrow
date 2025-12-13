@@ -348,6 +348,7 @@ final class arrow.core.raise/ResultRaise : arrow.core.raise/Raise<kotlin/Throwab
 
 final class arrow.core.raise/Traced : arrow.core.raise/RaiseCancellationException { // arrow.core.raise/Traced|null[0]
     constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>, arrow.core.raise/Traced? = ...) // arrow.core.raise/Traced.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;arrow.core.raise.Traced?){}[0]
+    constructor <init>(kotlin/Any?, arrow.core.raise/Raise<kotlin/Any?>, kotlin/Boolean, arrow.core.raise/Traced? = ...) // arrow.core.raise/Traced.<init>|<init>(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;kotlin.Boolean;arrow.core.raise.Traced?){}[0]
 
     final val cause // arrow.core.raise/Traced.cause|{}cause[0]
         final fun <get-cause>(): arrow.core.raise/Traced? // arrow.core.raise/Traced.cause.<get-cause>|<get-cause>(){}[0]
@@ -721,6 +722,7 @@ final const val arrow.core/NicheAPI // arrow.core/NicheAPI|{}NicheAPI[0]
 final const val arrow.core/RedundantAPI // arrow.core/RedundantAPI|{}RedundantAPI[0]
     final fun <get-RedundantAPI>(): kotlin/String // arrow.core/RedundantAPI.<get-RedundantAPI>|<get-RedundantAPI>(){}[0]
 
+final fun (arrow.core.raise/RaiseCancellationException).arrow.core.raise/rethrowIfNotAccumulateError() // arrow.core.raise/rethrowIfNotAccumulateError|rethrowIfNotAccumulateError@arrow.core.raise.RaiseCancellationException(){}[0]
 final fun (arrow.core.raise/Traced).arrow.core.raise/withCause(arrow.core.raise/Traced): arrow.core.raise/Traced // arrow.core.raise/withCause|withCause@arrow.core.raise.Traced(arrow.core.raise.Traced){}[0]
 final fun (kotlin/String).arrow.core/escaped(): kotlin/String // arrow.core/escaped|escaped@kotlin.String(){}[0]
 final fun (kotlin/Throwable).arrow.core/nonFatalOrThrow(): kotlin/Throwable // arrow.core/nonFatalOrThrow|nonFatalOrThrow@kotlin.Throwable(){}[0]
@@ -1080,7 +1082,7 @@ final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.co
 final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<#A>, #B>).arrow.core.raise/getOrElse(kotlin/Function1<#A, #B>): #B // arrow.core.raise/getOrElse|getOrElse@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<0:0>,0:1>(kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
 
 // Targets: [js]
-final inline fun arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5(noinline arrow.core.raise/RaiseCancellationExceptionLike, noinline kotlin/Any? = ..., noinline arrow.core.raise/Raise<kotlin/Any?> = ...): arrow.core.raise/RaiseCancellationExceptionLike // arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5|arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5(arrow.core.raise.RaiseCancellationExceptionLike;kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]
+final inline fun arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5(noinline arrow.core.raise/RaiseCancellationExceptionLike, noinline kotlin/Any? = ..., noinline arrow.core.raise/Raise<kotlin/Any?> = ..., noinline kotlin/Boolean = ...): arrow.core.raise/RaiseCancellationExceptionLike // arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5|arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5(arrow.core.raise.RaiseCancellationExceptionLike;kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;kotlin.Boolean){}[0]
 
 // Targets: [js]
-final inline fun arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo(noinline kotlin/Any? = ..., noinline arrow.core.raise/Raise<kotlin/Any?>): arrow.core.raise/RaiseCancellationExceptionLike // arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo|arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]
+final inline fun arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo(noinline kotlin/Any? = ..., noinline arrow.core.raise/Raise<kotlin/Any?>, noinline kotlin/Boolean): arrow.core.raise/RaiseCancellationExceptionLike // arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo|arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>;kotlin.Boolean){}[0]

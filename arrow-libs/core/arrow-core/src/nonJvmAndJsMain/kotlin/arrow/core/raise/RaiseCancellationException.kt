@@ -5,5 +5,6 @@ import kotlin.coroutines.cancellation.CancellationException
 @DelicateRaiseApi
 public actual sealed class RaiseCancellationException actual constructor(
   internal actual val raised: Any?,
-  internal actual val raise: Raise<Any?>
+  internal actual val raise: Raise<Any?>,
+  internal actual val isAccumulateError: Boolean,
 ) : CancellationException(RaiseCancellationExceptionCaptured)

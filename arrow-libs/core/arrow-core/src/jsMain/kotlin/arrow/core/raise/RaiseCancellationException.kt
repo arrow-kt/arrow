@@ -13,19 +13,25 @@ import kotlin.coroutines.cancellation.CancellationException
 internal external interface RaiseCancellationExceptionLike {
   val raised: Any?
   val raise: Raise<Any?>
+  val isAccumulateError: Boolean
 }
 
 @DelicateRaiseApi
 public actual sealed class RaiseCancellationException actual constructor(
   raised: Any?,
-  raise: Raise<Any?>
+  raise: Raise<Any?>,
+  isAccumulateError: Boolean,
 ) : CancellationException(RaiseCancellationExceptionCaptured) {
   private val _raised = raised
   private val _raise = raise
+  private val _isAccumulateError = isAccumulateError
 
   internal actual val raised: Any?
     get() = unsafeCast<RaiseCancellationExceptionLike?>()?.raised ?: _raised
 
   internal actual val raise: Raise<Any?>
     get() = unsafeCast<RaiseCancellationExceptionLike?>()?.raise ?: _raise
+
+  internal actual val isAccumulateError: Boolean
+    get() = unsafeCast<RaiseCancellationExceptionLike?>()?.isAccumulateError ?: _isAccumulateError
 }

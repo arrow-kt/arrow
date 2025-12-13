@@ -674,9 +674,14 @@ internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImp
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ): Unit = accumulate {
+  var error: Value<Nothing>? = null
   iterator.forEach {
-    accumulating { block(it, hasAccumulatedErrors) }
+    error = accumulating {
+      block(it, error != null)
+      return@forEach // continue to next iteration since there were no errors
+    }
   }
+  error?.value
 }
 
 /**
@@ -1010,7 +1015,12 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     })
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-    override val value get(): Nothing = raise()
+    @OptIn(DelicateRaiseApi::class)
+    override val value get() = try {
+      raise()
+    } catch(e: RaiseCancellationException) {
+      throw e.markAccumulateError()
+    }
   }
 
   @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
@@ -1133,6 +1143,7 @@ private class TolerantAccumulate<Error>(
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
+@Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
 @PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
   TolerantAccumulate(this, raise)
 
@@ -1170,12 +1181,22 @@ public interface Accumulate<Error> {
   }
 }
 
+@OptIn(DelicateRaiseApi::class)
 @ExperimentalRaiseAccumulateApi
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  return merge {
-    recover({ Ok(block(RaiseAccumulate(tolerant(this@merge), this) { raise(it.nel()) })) }, ::accumulateAll)
+  return try {
+    recover({ Ok(block(RaiseAccumulate(this@accumulating, this) { raise(it.nel()) })) }, ::accumulateAll)
+  } catch (e: RaiseCancellationException) {
+    e.rethrowIfNotAccumulateError()
+    Error { throw e }
   }
+}
+
+@DelicateRaiseApi
+@PublishedApi
+internal fun RaiseCancellationException.rethrowIfNotAccumulateError() {
+  if (!isAccumulateError) throw this
 }
 
 @ExperimentalRaiseAccumulateApi
