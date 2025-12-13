@@ -827,7 +827,6 @@ final fun <#A: kotlin/Any?> (#A).arrow.core/right(): arrow.core/Either<kotlin/No
 final fun <#A: kotlin/Any?> (#A).arrow.core/rightIor(): arrow.core/Ior<kotlin/Nothing, #A> // arrow.core/rightIor|rightIor@0:0(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (#A).arrow.core/some(): arrow.core/Option<#A> // arrow.core/some|some@0:0(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (#A?).arrow.core/toOption(): arrow.core/Option<#A> // arrow.core/toOption|toOption@0:0?(){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core.raise/Accumulate<#A>).arrow.core.raise/tolerant(arrow.core.raise/Raise<arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>>): arrow.core.raise/Accumulate<#A> // arrow.core.raise/tolerant|tolerant@arrow.core.raise.Accumulate<0:0>(arrow.core.raise.Raise<arrow.core.raise.RaiseAccumulate.Value<kotlin.Nothing>>){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Either<#A, #A>).arrow.core/merge(): #A // arrow.core/merge|merge@arrow.core.Either<0:0,0:0>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/NonEmptyList<arrow.core/NonEmptyList<#A>>).arrow.core/flatten(): arrow.core/NonEmptyList<#A> // arrow.core/flatten|flatten@arrow.core.NonEmptyList<arrow.core.NonEmptyList<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Option<arrow.core/Option<#A>>).arrow.core/flatten(): arrow.core/Option<#A> // arrow.core/flatten|flatten@arrow.core.Option<arrow.core.Option<0:0>>(){0§<kotlin.Any?>}[0]

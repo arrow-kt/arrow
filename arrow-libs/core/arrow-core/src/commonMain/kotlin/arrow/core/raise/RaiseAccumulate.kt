@@ -674,9 +674,14 @@ internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImp
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ): Unit = accumulate {
+  var error: Value<Nothing>? = null
   iterator.forEach {
-    accumulating { block(it, hasAccumulatedErrors) }
+    error = accumulating {
+      block(it, error != null)
+      return@forEach // continue to next iteration since there were no errors
+    }
   }
+  error?.value
 }
 
 /**
@@ -846,11 +851,10 @@ public inline fun <Error, A> Raise<NonEmptyList<Error>>.accumulate(
   block: RaiseAccumulate<Error>.() -> A
 ): A {
   contract { callsInPlace(block, EXACTLY_ONCE) }
-  return with(RaiseAccumulate(this)) {
-    val result = block()
-    if (hasAccumulatedErrors) { latestError?.value }
-    result
-  }
+  val (raiseAccumulate, raiseErrorsIfAvailable) = RaiseAccumulate()
+  val result = block(raiseAccumulate)
+  raiseErrorsIfAvailable()
+  return result
 }
 
 @ExperimentalRaiseAccumulateApi
@@ -873,7 +877,7 @@ public inline fun <Error, A, R> accumulate(
 @Suppress("DEPRECATION")
 @SubclassOptInRequired(ExperimentalRaiseAccumulateApi::class)
 public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constructor(
-  accumulate: Accumulate<Error>,
+  private val accumulate: Accumulate<Error>,
   @Deprecated("use withNel instead", level = DeprecationLevel.WARNING)
   public val raise: Raise<NonEmptyList<Error>>,
   private val raiseErrorsWith: (Error) -> Nothing
@@ -886,7 +890,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   public constructor(raise: Raise<NonEmptyList<Error>>) : this(ListAccumulate(raise))
 
   @ExperimentalRaiseAccumulateApi
-  private constructor(listAccumulate: ListAccumulate<Error>) : this(listAccumulate, listAccumulate, listAccumulate::raiseSingle)
+  internal constructor(listAccumulate: ListAccumulate<Error>) : this(listAccumulate, listAccumulate, listAccumulate::raiseSingle)
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
@@ -972,23 +976,32 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     return block(raise)
   }
 
-  @OptIn(ExperimentalRaiseAccumulateApi::class)
   @PublishedApi
   @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   internal fun addErrors(newErrors: Iterable<Error>) {
     newErrors.toNonEmptyListOrNull()?.let(::accumulateAll)
   }
 
-  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  private val underlyingListAccumulate: ListAccumulate<Error> get() = accumulate as? ListAccumulate<Error>
+    ?: error("Underlying Accumulate is not a ListAccumulate. " +
+      "This should never happen since it is only called by " +
+      "old inlined bytecode from accumulate, which always uses ListAccumulate.")
+
   @PublishedApi
   @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
-  internal fun hasErrors(): Boolean = hasAccumulatedErrors
+  internal fun hasErrors(): Boolean = underlyingListAccumulate.hasErrors()
 
-  @Suppress("KotlinUnreachableCode") // wrong inspection
-  @OptIn(ExperimentalRaiseAccumulateApi::class)
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  override val hasAccumulatedErrors: Boolean
+    get() = underlyingListAccumulate.hasErrors()
+
   @PublishedApi
-  @Deprecated("Binary compatibility", level = DeprecationLevel.WARNING)
-  internal fun raiseErrors(): Nothing = latestError?.value ?: error("No accumulated errors to raise")
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  internal fun raiseErrors(): Nothing = underlyingListAccumulate.raiseErrors()
+
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  override val latestError: Value<Nothing>?
+    get() = if (underlyingListAccumulate.hasErrors()) Error { underlyingListAccumulate.raiseErrors() } else null
 
   @Suppress("NOTHING_TO_INLINE")
   @Deprecated(message = "Deprecated in favor of member", level = DeprecationLevel.HIDDEN)
@@ -1003,10 +1016,9 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   @PublishedApi
   internal class Error(private val raise: () -> Nothing) : Value<Nothing>() {
-    @OptIn(ExperimentalRaiseAccumulateApi::class)
     @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
     constructor(raiseAccumulate: RaiseAccumulate<*>) : this({
-      raiseAccumulate.latestError?.value ?: error("No accumulated errors to raise")
+      raiseAccumulate.underlyingListAccumulate.raiseErrors()
     })
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
@@ -1093,8 +1105,15 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
   }
 }
 
-@OptIn(ExperimentalRaiseAccumulateApi::class)
-private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+@ExperimentalRaiseAccumulateApi
+@PublishedApi
+internal fun <Error> Raise<NonEmptyList<Error>>.RaiseAccumulate(): Pair<RaiseAccumulate<Error>, () -> Unit> = with(ListAccumulate(this)) {
+  RaiseAccumulate(this) to { if (hasErrors()) raiseErrors() }
+}
+
+@ExperimentalRaiseAccumulateApi
+internal class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
   private val list: MutableList<Error> = mutableListOf()
 
   fun raiseSingle(r: Error): Nothing = raise.raise(NonEmptyList(list + r))
@@ -1104,35 +1123,27 @@ private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>
   // errors are never removed from `list`, so once this is valid, it stays valid
   private val error = Error { raise.raise(NonEmptyList(list)) }
 
-  @ExperimentalRaiseAccumulateApi
   override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
     list.addAll(errors)
     return error
   }
 
-  @ExperimentalRaiseAccumulateApi
-  override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
+  fun hasErrors() = list.isNotEmpty()
+  fun raiseErrors(): Nothing = error.value
 }
 
-@OptIn(ExperimentalRaiseAccumulateApi::class)
+@ExperimentalRaiseAccumulateApi
 private class TolerantAccumulate<Error>(
   private val underlying: Accumulate<Error>,
   private val raise: Raise<Value<Nothing>>
 ) : Accumulate<Error> {
-  @ExperimentalRaiseAccumulateApi
   override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
     val error = underlying.accumulateAll(errors)
     return Error { raise.raise(error) }
   }
-
-  @ExperimentalRaiseAccumulateApi
-  override val latestError: Value<Nothing>? get() {
-    val error = underlying.latestError ?: return null
-    return Error { raise.raise(error) }
-  }
 }
 
-@OptIn(ExperimentalRaiseAccumulateApi::class)
+@ExperimentalRaiseAccumulateApi
 @PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
   TolerantAccumulate(this, raise)
 
@@ -1147,11 +1158,13 @@ public interface Accumulate<Error> {
   @ExperimentalRaiseAccumulateApi
   public fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing>
 
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   @ExperimentalRaiseAccumulateApi
-  public val hasAccumulatedErrors: Boolean get() = latestError != null
+  public val hasAccumulatedErrors: Boolean get() = false
 
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   @ExperimentalRaiseAccumulateApi
-  public val latestError: Value<Nothing>?
+  public val latestError: Value<Nothing>? get() = null
 
   @ExperimentalRaiseAccumulateApi
   public fun <A> Either<Error, A>.bindOrAccumulate(): Value<A> = accumulating { bind() }
