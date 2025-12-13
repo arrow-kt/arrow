@@ -1032,7 +1032,7 @@ public abstract class arrow/core/raise/RaiseAccumulate$Value {
 }
 
 public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {
-	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
 public abstract interface annotation class arrow/core/raise/RaiseDSL : java/lang/annotation/Annotation {
@@ -1097,6 +1097,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun recover (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function1;
 	public static final fun recover (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;)Lkotlin/jvm/functions/Function2;
 	public static final fun result (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static final fun rethrowIfNotAccumulateError (Larrow/core/raise/RaiseCancellationException;)V
 	public static final fun singleton (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun toEither (Lkotlin/jvm/functions/Function1;)Larrow/core/Either;
 	public static final fun toEither (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -1108,7 +1109,7 @@ public final class arrow/core/raise/RaiseKt {
 	public static final fun toResult (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun toResult (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun tolerant (Larrow/core/raise/Accumulate;Larrow/core/raise/Raise;)Larrow/core/raise/Accumulate;
+	public static final synthetic fun tolerant (Larrow/core/raise/Accumulate;Larrow/core/raise/Raise;)Larrow/core/raise/Accumulate;
 	public static final fun withCause (Larrow/core/raise/Traced;Larrow/core/raise/Traced;)Larrow/core/raise/Traced;
 	public static final fun withError (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static final fun zipOrAccumulate (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function9;)Ljava/lang/Object;
@@ -1182,6 +1183,8 @@ public final class arrow/core/raise/SingletonRaise : arrow/core/raise/Raise {
 public final class arrow/core/raise/Traced : arrow/core/raise/RaiseCancellationException {
 	public fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Larrow/core/raise/Traced;)V
 	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Larrow/core/raise/Traced;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;ZLarrow/core/raise/Traced;)V
+	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;ZLarrow/core/raise/Traced;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getCause ()Larrow/core/raise/Traced;
 	public synthetic fun getCause ()Ljava/lang/Throwable;
 }
