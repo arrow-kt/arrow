@@ -19,7 +19,8 @@ class NonFatalTest {
       }
     }
 
-  @Test fun usingNotFatalOrThrow() {
+  @Test
+  fun usingNotFatalOrThrow() {
       nonFatals.forEach {
         it.nonFatalOrThrow() shouldBe it
       }

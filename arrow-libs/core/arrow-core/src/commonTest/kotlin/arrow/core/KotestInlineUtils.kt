@@ -4,7 +4,6 @@
 package arrow.core
 
 import io.kotest.assertions.AssertionErrorBuilder
-import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.common.reflection.bestName
 import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
@@ -54,16 +53,4 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
       .withCause(thrownThrowable)
       .build()
   }
-}
-
-inline fun shouldThrowAny(block: () -> Any?): Throwable {
-  assertionCounter.inc()
-  val thrownException = try {
-    val _ = block()
-    null
-  } catch (e: Throwable) {
-    e
-  }
-
-  return thrownException ?: fail("Expected a throwable, but nothing was thrown.")
 }
