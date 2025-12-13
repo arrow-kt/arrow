@@ -52,11 +52,11 @@ class TQueueTest {
 
   @Test fun readingFlushingShouldWorkAfterMixedReadsWrites() = runTest {
     val tq = TQueue.new<Int>()
-    atomically { tq.write(20); tq.write(30); tq.peek(); tq.write(40) }
+    atomically { tq.write(20); tq.write(30); val _ = tq.peek(); tq.write(40) }
     atomically { tq.read() } shouldBe 20
     atomically { tq.flush() } shouldBe listOf(30, 40)
 
-    atomically { tq.write(20); tq.write(30); tq.peek(); tq.write(40) }
+    atomically { tq.write(20); tq.write(30); val _ = tq.peek(); tq.write(40) }
     atomically { tq.flush() } shouldBe listOf(20, 30, 40)
     atomically { tq.flush() } shouldBe emptyList()
   }
@@ -95,7 +95,7 @@ class TQueueTest {
     atomically { tq.write(20) }
     atomically { tq.isEmpty() } shouldBe false
     atomically { tq.isNotEmpty() } shouldBe true
-    atomically { tq.peek(); tq.write(30) }
+    atomically { val _ = tq.peek(); tq.write(30) }
     atomically { tq.isEmpty() } shouldBe false
     atomically { tq.isNotEmpty() } shouldBe true
   }
@@ -106,7 +106,7 @@ class TQueueTest {
       atomically {
         for (j in 0..i) {
           // read to swap read and write lists randomly
-          if (Random.nextFloat() > 0.9) tq.tryPeek()
+          if (Random.nextFloat() > 0.9) { val _ = tq.tryPeek() }
           tq.write(j)
         }
       }

@@ -9,6 +9,7 @@ kotlin {
         api(projects.arrowCore)
         api(projects.arrowAutoclose)
         api(libs.coroutines.core)
+        implementation(projects.arrowExceptionUtils)
       }
     }
 

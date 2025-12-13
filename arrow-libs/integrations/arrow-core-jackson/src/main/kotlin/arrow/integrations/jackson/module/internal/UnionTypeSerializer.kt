@@ -17,7 +17,9 @@ public class UnionTypeSerializer<T>(clazz: Class<T>, private val fields: List<Pr
         "unexpected failure when attempting projection during serialization"
       }
     gen.writeStartObject()
-    project.getOption(value).map { provider.defaultSerializeField(project.fieldName, it, gen) }
+    project.getOption(value).onSome {
+      provider.defaultSerializeField(project.fieldName, it, gen)
+    }
     gen.writeEndObject()
   }
 }

@@ -17,7 +17,7 @@ catalog {
         library("annotations", "io.arrow-kt", "arrow-annotations").versionRef("arrow")
         library("atomic", "io.arrow-kt", "arrow-atomic").versionRef("arrow")
         library("autoclose", "io.arrow-kt", "arrow-autoclose").versionRef("arrow")
-        library("cache4k", "io.arrow-kt", "arrow-cache4k").versionRef("arrow")
+        library("exception-utils", "io.arrow-kt", "arrow-exception-utils").versionRef("arrow")
         library("collectors", "io.arrow-kt", "arrow-collectors").versionRef("arrow")
         library("core", "io.arrow-kt", "arrow-core").versionRef("arrow")
         library("core-high-arity", "io.arrow-kt", "arrow-core-high-arity").versionRef("arrow")

@@ -35,3 +35,7 @@ package arrow.core
 // https://youtrack.jetbrains.com/issue/KT-36036
 public fun Throwable.nonFatalOrThrow(): Throwable =
   if (NonFatal(this)) this else throw this
+
+public inline fun Throwable.throwIfFatal() {
+  val _ = this.nonFatalOrThrow()
+}

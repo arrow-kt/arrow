@@ -2,7 +2,9 @@ package arrow.resilience
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.core.mergeSuppressed
 import arrow.core.nonFatalOrThrow
+import arrow.core.throwIfNotNull
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
@@ -149,11 +151,9 @@ internal class SagaBuilder(
           finalizer()
           acc
         } catch (e: Throwable) {
-          e.nonFatalOrThrow()
-          acc?.apply { addSuppressed(e) } ?: e
+          acc mergeSuppressed e.nonFatalOrThrow()
         }
-      }
-      ?.let { throw it }
+      }.throwIfNotNull()
   }
 }
 

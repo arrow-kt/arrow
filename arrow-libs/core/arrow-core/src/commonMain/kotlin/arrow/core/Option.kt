@@ -1,4 +1,6 @@
 @file:OptIn(ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.core
 
 import arrow.core.raise.EagerEffect
@@ -344,6 +346,7 @@ public sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-16.kt -->
    */
+  @IgnorableReturnValue
   public inline fun onNone(action: () -> Unit): Option<A>  {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -369,6 +372,7 @@ public sealed class Option<out A> {
    * ```
    * <!--- KNIT example-option-17.kt -->
    */
+  @IgnorableReturnValue
   public inline fun onSome(action: (A) -> Unit): Option<A>  {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)

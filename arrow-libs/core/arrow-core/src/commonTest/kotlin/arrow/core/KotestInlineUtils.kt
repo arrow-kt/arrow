@@ -1,9 +1,9 @@
 @file:OptIn(ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core
 
 import io.kotest.assertions.AssertionErrorBuilder
-import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.common.reflection.bestName
 import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
@@ -12,6 +12,7 @@ import io.kotest.matchers.types.beOfType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+@IgnorableReturnValue
 inline fun <reified T : Any> Any?.shouldBeTypeOf(): T {
   contract {
     returns() implies (this@shouldBeTypeOf is T)
@@ -21,6 +22,7 @@ inline fun <reified T : Any> Any?.shouldBeTypeOf(): T {
   return this as T
 }
 
+@IgnorableReturnValue
 inline fun <reified T : Any> Any?.shouldBeInstanceOf(): T {
   contract {
     returns() implies (this@shouldBeInstanceOf is T)
@@ -34,7 +36,7 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
   assertionCounter.inc()
   val expectedExceptionClass = T::class
   val thrownThrowable = try {
-    block()
+    val _ = block()
     null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
   } catch (thrown: Throwable) {
     thrown
@@ -51,16 +53,4 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
       .withCause(thrownThrowable)
       .build()
   }
-}
-
-inline fun shouldThrowAny(block: () -> Any?): Throwable {
-  assertionCounter.inc()
-  val thrownException = try {
-    block()
-    null
-  } catch (e: Throwable) {
-    e
-  }
-
-  return thrownException ?: fail("Expected a throwable, but nothing was thrown.")
 }

@@ -8,6 +8,7 @@ kotlin {
       dependencies {
         api(projects.arrowCore)
         implementation(libs.coroutines.core)
+        implementation(projects.arrowExceptionUtils)
       }
     }
     commonTest {

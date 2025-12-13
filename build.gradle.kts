@@ -74,6 +74,7 @@ dependencies {
   kover(projects.arrowResilienceKtorClient)
   kover(projects.arrowRaiseKtorServer)
   kover(projects.arrowCoreResult4k)
+  kover(projects.arrowExceptionUtils)
   kover(projects.suspendapp)
   kover(projects.suspendappKtor)
 }
@@ -101,6 +102,7 @@ dependencies {
   dokka(projects.arrowResilienceKtorClient)
   dokka(projects.arrowRaiseKtorServer)
   dokka(projects.arrowCoreResult4k)
+  dokka(projects.arrowExceptionUtils)
   dokka(projects.suspendapp)
   dokka(projects.suspendappKtor)
 }

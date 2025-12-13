@@ -353,7 +353,7 @@ class MapKTest {
 
       found.forEach {
         xs.getOrNone(it)
-          .shouldBeInstanceOf<Some<String>>()
+          .shouldBeInstanceOf<Some<Int>>()
           .value.shouldBe(xs[it])
       }
 
