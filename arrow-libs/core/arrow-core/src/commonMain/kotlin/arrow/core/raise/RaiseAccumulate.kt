@@ -1014,12 +1014,10 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
     @OptIn(DelicateRaiseApi::class)
-    override val value get(): Nothing {
-      try {
-        raise()
-      } catch(e: RaiseCancellationException) {
-        throw e.markAccumulateError()
-      }
+    override val value get() = try {
+      raise()
+    } catch(e: RaiseCancellationException) {
+      throw e.markAccumulateError()
     }
   }
 
@@ -1118,8 +1116,27 @@ private class ListAccumulate<Error>(
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
+private class TolerantAccumulate<Error>(
+  private val underlying: Accumulate<Error>,
+  private val raise: Raise<Value<Nothing>>
+) : Accumulate<Error> {
+  @ExperimentalRaiseAccumulateApi
+  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
+    val error = underlying.accumulateAll(errors)
+    return Error { raise.raise(error) }
+  }
+
+  @ExperimentalRaiseAccumulateApi
+  override val latestError: Value<Nothing>? get() {
+    val error = underlying.latestError ?: return null
+    return Error { raise.raise(error) }
+  }
+}
+
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
-@PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> = this
+@PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
+  TolerantAccumulate(this, raise)
 
 @Suppress("NOTHING_TO_INLINE")
 public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
