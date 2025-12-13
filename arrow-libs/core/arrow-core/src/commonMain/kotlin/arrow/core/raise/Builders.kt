@@ -188,10 +188,6 @@ private class IorAccumulate<Error>(
     state.update { EmptyValue.combine(it, combined, combineError) }
     return raiseAccumulated
   }
-
-  @ExperimentalRaiseAccumulateApi
-  override val latestError: RaiseAccumulate.Value<Nothing>?
-    get() = if (state.get() === EmptyValue) null else raiseAccumulated
 }
 
 /**

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalRaiseAccumulateApi::class)
+
 package arrow.fx.coroutines
 
 import arrow.core.raise.RaiseAccumulate
@@ -7,6 +9,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.flattenOrAccumulate
 import arrow.core.raise.ExperimentalRaiseAccumulateApi
+import arrow.core.raise.accumulate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -48,11 +51,13 @@ public suspend fun <A, B> Iterable<A>.parMapNotNull(
   parMap(context, transform).filterNotNull()
 
 /** Temporary intersection type, until we have context receivers */
-@OptIn(ExperimentalRaiseAccumulateApi::class)
 public class ScopedRaiseAccumulate<Error>(
-  raise: Raise<NonEmptyList<Error>>,
+  raiseAccumulate: RaiseAccumulate<Error>,
   scope: CoroutineScope
-) : CoroutineScope by scope, RaiseAccumulate<Error>(raise)
+) : CoroutineScope by scope, RaiseAccumulate<Error>(raiseAccumulate, raiseAccumulate::raise) {
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  public constructor(raise: Raise<NonEmptyList<Error>>, scope: CoroutineScope) : this(RaiseAccumulate(raise), scope = scope)
+}
 
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
@@ -65,8 +70,10 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
     map {
       async(context) {
         either {
-          semaphore.withPermit {
-            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+          accumulate {
+            semaphore.withPermit {
+              transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+            }
           }
         }
       }
@@ -82,7 +89,9 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
     map {
       async(context) {
         either {
-          transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+          accumulate {
+            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+          }
         }
       }
     }.awaitAll().flattenOrAccumulate(combine)
@@ -98,8 +107,10 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
     map {
       async(context) {
         either {
-          semaphore.withPermit {
-            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+          accumulate {
+            semaphore.withPermit {
+              transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+            }
           }
         }
       }
@@ -114,7 +125,9 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
     map {
       async(context) {
         either {
-          transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+          accumulate {
+            transform(ScopedRaiseAccumulate(this, this@coroutineScope), it)
+          }
         }
       }
     }.awaitAll().flattenOrAccumulate()
