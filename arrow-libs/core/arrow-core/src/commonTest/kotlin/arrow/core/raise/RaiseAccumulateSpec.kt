@@ -94,4 +94,53 @@ class RaiseAccumulateSpec {
     } shouldBe nonEmptyListOf("nonfatal").left()
     reachedEnd shouldBe true
   }
+
+  @Test fun tryCatchRecoverRaise() = runTest {
+     accumulate(::merge) {
+      try {
+        accumulate(1)
+        raise(2)
+      } catch (_: Throwable) { }
+      raise(3)
+    } shouldBe nonEmptyListOf(1, 3)
+  }
+
+  @Test fun tryCatchRecoverRaiseInsideAccumulating() = runTest {
+    accumulate(::merge) {
+      accumulating {
+        try {
+          accumulate(1)
+          raise(2)
+        } catch (_: Throwable) { }
+        raise(3)
+      }
+    } shouldBe nonEmptyListOf(1, 3)
+  }
+
+  @Test fun tryCatchRecoverRaiseWithNel() = runTest {
+    accumulate(::merge) {
+      try {
+        withNel {
+          accumulate(1)
+          raise(nonEmptyListOf(2, 4))
+        }
+      } catch (_: Throwable) { }
+      raise(3)
+    } shouldBe nonEmptyListOf(1, 3)
+  }
+
+  @Test fun tryCatchRecoverRaiseWithNelInsideAccumulating() = runTest {
+    accumulate(::merge) {
+      accumulating {
+        try {
+          withNel {
+            accumulate(1)
+            raise(nonEmptyListOf(2, 4))
+          }
+        } catch (_: Throwable) {
+        }
+        raise(3)
+      }
+    } shouldBe nonEmptyListOf(1, 3)
+  }
 }
