@@ -1,7 +1,6 @@
 package arrow.integrations.jackson.module.internal
 
 import arrow.core.Option
-import arrow.core.Some
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
@@ -18,9 +17,8 @@ public class UnionTypeSerializer<T>(clazz: Class<T>, private val fields: List<Pr
         "unexpected failure when attempting projection during serialization"
       }
     gen.writeStartObject()
-    when (val projected = project.getOption(value)) {
-      is Some -> provider.defaultSerializeField(project.fieldName, projected, gen)
-      else -> { }
+    project.getOption(value).onSome {
+      provider.defaultSerializeField(project.fieldName, it, gen)
     }
     gen.writeEndObject()
   }
