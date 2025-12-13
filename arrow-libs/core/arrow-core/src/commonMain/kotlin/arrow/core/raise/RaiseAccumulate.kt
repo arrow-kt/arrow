@@ -16,7 +16,6 @@ import arrow.core.raise.RaiseAccumulate.Error
 import arrow.core.raise.RaiseAccumulate.Ok
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
-import arrow.core.wrapAsNonEmptyListOrNull
 import arrow.core.wrapAsNonEmptySetOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
@@ -1109,13 +1108,12 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 @ExperimentalRaiseAccumulateApi
 @PublishedApi
-internal fun <Error> Raise<NonEmptyList<Error>>.RaiseAccumulate(): Pair<RaiseAccumulate<Error>, () -> Unit> {
-  val errors = mutableListOf<Error>()
-  return RaiseAccumulate(this, errors) to { errors.wrapAsNonEmptyListOrNull()?.let(::raise) }
+internal fun <Error> Raise<NonEmptyList<Error>>.RaiseAccumulate(): Pair<RaiseAccumulate<Error>, () -> Unit> = with(ListAccumulate(this)) {
+  RaiseAccumulate(this) to { if (hasErrors()) raiseErrors() }
 }
 
 @ExperimentalRaiseAccumulateApi
-private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
+internal class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
   private val list: MutableList<Error> = mutableListOf()
 
   fun raiseSingle(r: Error): Nothing = raise.raise(NonEmptyList(list + r))

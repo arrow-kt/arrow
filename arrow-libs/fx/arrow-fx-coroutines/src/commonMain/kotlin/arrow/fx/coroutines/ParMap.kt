@@ -51,10 +51,11 @@ public suspend fun <A, B> Iterable<A>.parMapNotNull(
   parMap(context, transform).filterNotNull()
 
 /** Temporary intersection type, until we have context receivers */
+@Suppress("DEPRECATION")
 public class ScopedRaiseAccumulate<Error>(
   raiseAccumulate: RaiseAccumulate<Error>,
   scope: CoroutineScope
-) : CoroutineScope by scope, RaiseAccumulate<Error>(raiseAccumulate, raiseAccumulate::raise) {
+) : CoroutineScope by scope, RaiseAccumulate<Error>(raiseAccumulate, raiseAccumulate.raise, raiseAccumulate::raise) {
   @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   public constructor(raise: Raise<NonEmptyList<Error>>, scope: CoroutineScope) : this(RaiseAccumulate(raise), scope = scope)
 }
