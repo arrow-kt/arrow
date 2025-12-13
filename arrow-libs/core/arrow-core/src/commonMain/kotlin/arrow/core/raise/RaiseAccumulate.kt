@@ -878,20 +878,22 @@ public inline fun <Error, A, R> accumulate(
 @Suppress("DEPRECATION")
 @SubclassOptInRequired(ExperimentalRaiseAccumulateApi::class)
 public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constructor(
-  accumulate: Accumulate<Error>, private val raiseErrorsWith: (Error) -> Nothing
+  accumulate: Accumulate<Error>,
+  @Deprecated("use withNel instead", level = DeprecationLevel.WARNING)
+  public val raise: Raise<NonEmptyList<Error>>,
+  private val raiseErrorsWith: (Error) -> Nothing
 ) : Accumulate<Error> by accumulate, Raise<Error> {
+  @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+  @ExperimentalRaiseAccumulateApi
+  public constructor(accumulate: Accumulate<Error>, raiseErrorsWith: (Error) -> Nothing): this(accumulate, RaiseNel(accumulate), raiseErrorsWith)
+
   @OptIn(ExperimentalRaiseAccumulateApi::class)
-  public constructor(raise: Raise<NonEmptyList<Error>>) : this(raise, mutableListOf<Error>())
+  public constructor(raise: Raise<NonEmptyList<Error>>) : this(ListAccumulate(raise))
 
   @ExperimentalRaiseAccumulateApi
-  private constructor(raise: Raise<NonEmptyList<Error>>, list: MutableList<Error>) :
-    this(ListAccumulate(raise, list), { raise.raise(NonEmptyList(list + it)) })
+  private constructor(listAccumulate: ListAccumulate<Error>) : this(listAccumulate, listAccumulate, listAccumulate::raiseSingle)
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
-
-  @OptIn(ExperimentalRaiseAccumulateApi::class)
-  @Deprecated("use withNel instead", level = DeprecationLevel.WARNING)
-  public val raise: Raise<NonEmptyList<Error>> = RaiseNel(this)
 
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapValuesOrAccumulate(this) { it.value.bind() }
@@ -1037,7 +1039,12 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     recover: (error: Error) -> A,
   ): A {
     contract { callsInPlace(block, AT_MOST_ONCE) }
-    return (this as Accumulate<Error>).recover(block, recover)
+    val accumulate = this
+    return arrow.core.raise.recover({
+      withNel {
+        block(RaiseAccumulate(accumulate, this, ::raise))
+      }
+    }, recover)
   }
 
   @ExperimentalRaiseAccumulateApi
@@ -1097,10 +1104,12 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
-private class ListAccumulate<Error>(
-  private val raise: Raise<NonEmptyList<Error>>,
-  private val list: MutableList<Error>
-) : Accumulate<Error> {
+private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
+  private val list: MutableList<Error> = mutableListOf()
+
+  fun raiseSingle(r: Error): Nothing = raise.raise(NonEmptyList(list + r))
+  override fun raise(r: NonEmptyList<Error>) = raise.raise(NonEmptyList(list + r.all))
+
   // only valid if list is not empty
   // errors are never removed from `list`, so once this is valid, it stays valid
   private val error = Error { raise.raise(NonEmptyList(list)) }
@@ -1177,7 +1186,7 @@ public interface Accumulate<Error> {
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return try {
-    recover({ Ok(block(RaiseAccumulate(this@accumulating, ::raise))) }, ::accumulate)
+    recover({ Ok(block(RaiseAccumulate(this@accumulating, this) { raise(it.nel()) })) }, ::accumulateAll)
   } catch (e: RaiseCancellationException) {
     e.rethrowIfNotAccumulateError()
     Error { throw e }
@@ -1188,19 +1197,6 @@ public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumula
 @PublishedApi
 internal fun RaiseCancellationException.rethrowIfNotAccumulateError() {
   if (!isAccumulateError) throw this
-}
-
-@ExperimentalRaiseAccumulateApi
-@RaiseDSL
-public inline fun <Error, A> Accumulate<Error>.recover(
-  block: RaiseAccumulate<Error>.() -> A,
-  recover: (error: Error) -> A,
-): A {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
-  val accumulate = this
-  return arrow.core.raise.recover({
-    block(RaiseAccumulate(accumulate, ::raise))
-  }, recover)
 }
 
 @ExperimentalRaiseAccumulateApi

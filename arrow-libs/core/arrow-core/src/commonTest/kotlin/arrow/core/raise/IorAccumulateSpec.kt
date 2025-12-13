@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.left
+import arrow.core.nel
+import arrow.core.nonEmptyListOf
 import arrow.core.right
 import arrow.core.test.nonEmptyList
 import arrow.core.toIorNel
@@ -144,7 +146,7 @@ class IorAccumulateSpec {
       val one = try {
         Ior.Both("Hi", Unit).bind()
         Ior.Left("Hello").bind()
-      } catch (e: Throwable) {
+      } catch (_: Throwable) {
         1
       }
       val two = Ior.Right(2).bind()
@@ -159,7 +161,41 @@ class IorAccumulateSpec {
         val one = try {
           Ior.Both("Hi", Unit).bind()
           Ior.Left("Hello").bind()
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
+          1
+        }
+        val two = Ior.Right(2).bind()
+        val three = Ior.Both(", World", 3).bind()
+        one + two + three
+      }.value
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
+  @Test fun tryCatchRecoverRaiseWithNel() = runTest {
+    iorAccumulate(String::plus) {
+      val one = try {
+        withNel {
+          Ior.Both("Hi", Unit).bind()
+          raise(nonEmptyListOf("Hello", "Yo"))
+        }
+      } catch (_: Throwable) {
+        1
+      }
+      val two = Ior.Right(2).bind()
+      val three = Ior.Both(", World", 3).bind()
+      one + two + three
+    } shouldBe Ior.Both("Hi, World", 6)
+  }
+
+  @Test fun tryCatchRecoverRaiseWithNelInsideAccumulating() = runTest {
+    iorAccumulate(String::plus) {
+      accumulating {
+        val one = try {
+          withNel {
+            Ior.Both("Hi", Unit).bind()
+            raise("Hello".nel())
+          }
+        } catch (_: Throwable) {
           1
         }
         val two = Ior.Right(2).bind()
