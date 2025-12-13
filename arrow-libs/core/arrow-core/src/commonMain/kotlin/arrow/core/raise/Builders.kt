@@ -172,14 +172,20 @@ public inline fun <Error, A> iorAccumulate(noinline combineError: (Error, Error)
 internal fun <Error> Raise<Error>.IorRaiseAccumulate(
   state: Atomic<Any?>,
   combineError: (Error, Error) -> Error,
-): RaiseAccumulate<Error> = RaiseAccumulate(IorAccumulate(state, combineError, this)) { e -> raise(EmptyValue.combine(state.get(), e, combineError)) }
+): RaiseAccumulate<Error> {
+  val accumulate = IorAccumulate(state, combineError, this)
+  return RaiseAccumulate(accumulate, accumulate, accumulate::raiseSingle)
+}
 
 @ExperimentalRaiseAccumulateApi
 private class IorAccumulate<Error>(
   private val state: Atomic<Any?>,
   private val combineError: (Error, Error) -> Error,
   private val raise: Raise<Error>,
-) : Accumulate<Error> {
+) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
+  fun raiseSingle(e: Error): Nothing = raise.raise(EmptyValue.combine(state.get(), e, combineError))
+  override fun raise(r: NonEmptyList<Error>) = raiseSingle(r.reduce(combineError))
+
   private val raiseAccumulated = RaiseAccumulate.Error { raise.raise(EmptyValue.unbox(state.get())) }
 
   @ExperimentalRaiseAccumulateApi
