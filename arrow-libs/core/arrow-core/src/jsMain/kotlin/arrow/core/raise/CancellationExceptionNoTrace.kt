@@ -3,8 +3,8 @@ package arrow.core.raise
 import js.reflect.Reflect
 
 @OptIn(DelicateRaiseApi::class)
-internal actual fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException {
-  val surrogateError = RaiseCancellationExceptionLike(raised, raise)
+internal actual fun NoTrace(raised: Any?, raise: Raise<Any?>, isAccumulateError: Boolean): RaiseCancellationException {
+  val surrogateError = RaiseCancellationExceptionLike(raised, raise, isAccumulateError)
 
   val cancellationExceptionPrototype = RaiseCancellationException::class.js.asDynamic().prototype
   require(Reflect.setPrototypeOf(surrogateError, cancellationExceptionPrototype)) {

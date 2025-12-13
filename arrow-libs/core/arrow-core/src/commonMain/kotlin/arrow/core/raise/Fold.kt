@@ -236,6 +236,12 @@ public inline fun <Error, OtherError, A> Raise<Error>.withErrorTraced(
 internal fun Traced.withCause(cause: Traced): Traced =
   Traced(raised, raise, cause)
 
+@DelicateRaiseApi
+internal fun RaiseCancellationException.markAccumulateError(): RaiseCancellationException = when (this) {
+  is Traced -> Traced(raised, raise, true, cause)
+  else -> NoTrace(raised, raise, true)
+}
+
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
 @DelicateRaiseApi
@@ -273,17 +279,21 @@ public annotation class DelicateRaiseApi
 @DelicateRaiseApi
 public expect sealed class RaiseCancellationException(
   raised: Any?,
-  raise: Raise<Any?>
+  raise: Raise<Any?>,
+  isAccumulateError: Boolean
 ) : CancellationException {
   internal val raised: Any?
   internal val raise: Raise<Any?>
+  internal val isAccumulateError: Boolean
 }
 
 @DelicateRaiseApi
-internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException
+internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>, isAccumulateError: Boolean = false): RaiseCancellationException
 
 @DelicateRaiseApi @PublishedApi
-internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)
+internal class Traced(raised: Any?, raise: Raise<Any?>, isAccumulateError: Boolean, override val cause: Traced? = null) : RaiseCancellationException(raised, raise, isAccumulateError) {
+  constructor(raised: Any?, raise: Raise<Any?>, cause: Traced? = null): this(raised, raise, false, cause)
+}
 
 private class RaiseLeakedException : IllegalStateException(
   """

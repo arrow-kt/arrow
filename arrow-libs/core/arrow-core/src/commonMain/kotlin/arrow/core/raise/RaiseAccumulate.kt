@@ -674,9 +674,14 @@ internal inline fun <Error, A> Raise<NonEmptyList<Error>>.forEachAccumulatingImp
   iterator: Iterator<A>,
   @BuilderInference block: RaiseAccumulate<Error>.(item: A, hasErrors: Boolean) -> Unit
 ): Unit = accumulate {
+  var error: Value<Nothing>? = null
   iterator.forEach {
-    accumulating { block(it, hasAccumulatedErrors) }
+    error = accumulating {
+      block(it, error != null)
+      return@forEach // continue to next iteration since there were no errors
+    }
   }
+  error?.value
 }
 
 /**
@@ -1008,7 +1013,14 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     })
     // WARNING: do not turn this into a property with initializer!!
     //          'raiseErrors' is then executed eagerly, and leads to wrong behavior!!
-    override val value get(): Nothing = raise()
+    @OptIn(DelicateRaiseApi::class)
+    override val value get(): Nothing {
+      try {
+        raise()
+      } catch(e: RaiseCancellationException) {
+        throw e.markAccumulateError()
+      }
+    }
   }
 
   @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
@@ -1106,26 +1118,8 @@ private class ListAccumulate<Error>(
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
-private class TolerantAccumulate<Error>(
-  private val underlying: Accumulate<Error>,
-  private val raise: Raise<Value<Nothing>>
-) : Accumulate<Error> {
-  @ExperimentalRaiseAccumulateApi
-  override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
-    val error = underlying.accumulateAll(errors)
-    return Error { raise.raise(error) }
-  }
-
-  @ExperimentalRaiseAccumulateApi
-  override val latestError: Value<Nothing>? get() {
-    val error = underlying.latestError ?: return null
-    return Error { raise.raise(error) }
-  }
-}
-
-@OptIn(ExperimentalRaiseAccumulateApi::class)
-@PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> =
-  TolerantAccumulate(this, raise)
+@Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
+@PublishedApi internal fun <Error> Accumulate<Error>.tolerant(raise: Raise<Value<Nothing>>): Accumulate<Error> = this
 
 @Suppress("NOTHING_TO_INLINE")
 public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KProperty<*>): A = value
@@ -1161,12 +1155,22 @@ public interface Accumulate<Error> {
   }
 }
 
+@OptIn(DelicateRaiseApi::class)
 @ExperimentalRaiseAccumulateApi
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
-  return merge {
-    recover({ Ok(block(RaiseAccumulate(tolerant(this@merge), ::raise))) }, ::accumulate)
+  return try {
+    recover({ Ok(block(RaiseAccumulate(this@accumulating, ::raise))) }, ::accumulate)
+  } catch (e: RaiseCancellationException) {
+    e.rethrowIfNotAccumulateError()
+    Error { throw e }
   }
+}
+
+@DelicateRaiseApi
+@PublishedApi
+internal fun RaiseCancellationException.rethrowIfNotAccumulateError() {
+  if (!isAccumulateError) throw this
 }
 
 @ExperimentalRaiseAccumulateApi

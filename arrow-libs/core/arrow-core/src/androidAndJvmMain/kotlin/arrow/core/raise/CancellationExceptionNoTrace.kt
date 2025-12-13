@@ -5,7 +5,7 @@ package arrow.core.raise
  * https://github.com/Kotlin/kotlinx.coroutines/blob/3788889ddfd2bcfedbff1bbca10ee56039e024a2/kotlinx-coroutines-core/jvm/src/Exceptions.kt#L29
  */
 @OptIn(DelicateRaiseApi::class)
-private class NoTraceImpl(raised: Any?, raise: Raise<Any?>) : RaiseCancellationException(raised, raise) {
+private class NoTraceImpl(raised: Any?, raise: Raise<Any?>, isAccumulateError: Boolean) : RaiseCancellationException(raised, raise, isAccumulateError) {
   override fun fillInStackTrace(): Throwable {
     // Prevent Android <= 6.0 bug.
     stackTrace = emptyArray()
@@ -15,5 +15,5 @@ private class NoTraceImpl(raised: Any?, raise: Raise<Any?>) : RaiseCancellationE
 }
 
 @OptIn(DelicateRaiseApi::class)
-internal actual fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException =
-  NoTraceImpl(raised, raise)
+internal actual fun NoTrace(raised: Any?, raise: Raise<Any?>, isAccumulateError: Boolean): RaiseCancellationException =
+  NoTraceImpl(raised, raise, isAccumulateError)

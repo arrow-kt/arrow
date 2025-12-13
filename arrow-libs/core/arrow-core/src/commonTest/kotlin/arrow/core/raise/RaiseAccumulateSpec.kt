@@ -94,4 +94,29 @@ class RaiseAccumulateSpec {
     } shouldBe nonEmptyListOf("nonfatal").left()
     reachedEnd shouldBe true
   }
+
+  @Test fun toleratesValueInAccumulating() {
+    var reachedEnd = false
+    accumulate(::either) {
+      val x = accumulating { raise("nonfatal") }
+      accumulating { x.value }
+      reachedEnd = true
+    } shouldBe nonEmptyListOf("nonfatal").left()
+    reachedEnd shouldBe true
+  }
+
+  @Test fun toleratesValueInForEachAccumulating() {
+    val visited = mutableListOf<Int>()
+    either {
+      accumulate<String, _> {
+        val x = accumulate("nonfatal")
+        forEachAccumulating(listOf(1, 2, 3)) { a ->
+          visited += a
+          x.value
+        }
+        error("Should not reach here")
+      }
+    } shouldBe nonEmptyListOf("nonfatal").left()
+    visited shouldBe listOf(1, 2, 3)
+  }
 }
