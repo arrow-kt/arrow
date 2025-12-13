@@ -311,7 +311,8 @@ public abstract interface annotation class arrow/fx/coroutines/ScopeDSL : java/l
 }
 
 public final class arrow/fx/coroutines/ScopedRaiseAccumulate : arrow/core/raise/RaiseAccumulate, kotlinx/coroutines/CoroutineScope {
-	public fun <init> (Larrow/core/raise/Raise;Lkotlinx/coroutines/CoroutineScope;)V
+	public synthetic fun <init> (Larrow/core/raise/Raise;Lkotlinx/coroutines/CoroutineScope;)V
+	public fun <init> (Larrow/core/raise/RaiseAccumulate;Lkotlinx/coroutines/CoroutineScope;)V
 	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
 }
 
