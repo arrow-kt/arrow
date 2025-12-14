@@ -745,7 +745,7 @@ public fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> =
 private tailrec fun <T> Iterator<T>.skip(count: Int): Iterator<T> =
   when {
     count > 0 && hasNext() -> {
-      next()
+      val _ = next()
       skip(count - 1)
     }
 

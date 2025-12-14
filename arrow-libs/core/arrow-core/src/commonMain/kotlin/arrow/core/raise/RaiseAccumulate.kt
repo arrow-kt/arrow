@@ -1,6 +1,8 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.core.raise
 
 import arrow.core.Either
@@ -1015,8 +1017,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   @PublishedApi internal class Ok<out A>(override val value: A): Value<A>()
 
-
-  @ExperimentalRaiseAccumulateApi
+  @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
     contract { callsInPlace(block, AT_MOST_ONCE) }
     return (this as Accumulate<Error>).accumulating(block)
@@ -1141,7 +1142,7 @@ public inline operator fun <A> Value<A>.getValue(thisRef: Nothing?, property: KP
 
 @ExperimentalRaiseAccumulateApi
 public interface Accumulate<Error> {
-  @ExperimentalRaiseAccumulateApi
+  @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public fun accumulate(error: Error): Value<Nothing> = accumulateAll(error.nel())
 
   @ExperimentalRaiseAccumulateApi

@@ -5,7 +5,7 @@ package arrow.fx.coroutines
 import arrow.AutoCloseScope
 import arrow.atomic.Atomic
 import arrow.atomic.update
-import arrow.core.nonFatalOrThrow
+import arrow.core.mergeSuppressed
 import arrow.core.prependTo
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +22,6 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
 
 @DslMarker
 public annotation class ScopeDSL
@@ -486,22 +485,9 @@ internal class ResourceScopeImpl : ResourceScope {
   suspend fun cancelAll(exitCase: ExitCase) {
     withContext(NonCancellable) {
       finalizers.getAndSet(emptyList()).fold(exitCase.errorOrNull) { acc, finalizer ->
-        acc.add(runCatching { finalizer(exitCase) }.exceptionOrNull())
+        acc mergeSuppressed runCatching { finalizer(exitCase) }.exceptionOrNull()
       }
     }?.let { throw it }
-  }
-
-  private fun Throwable?.add(other: Throwable?): Throwable? = when {
-    this == null -> other
-    other == null -> this
-    other is CancellationException -> {
-      this.addSuppressed(other)
-      this
-    }
-    else -> {
-      this.addSuppressed(other.nonFatalOrThrow())
-      this
-    }
   }
 }
 

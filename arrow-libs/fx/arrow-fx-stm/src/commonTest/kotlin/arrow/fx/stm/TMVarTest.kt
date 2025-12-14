@@ -126,7 +126,7 @@ class TMVarTest {
   @Test fun tryPutBehavesLikePutIfThereIsNoValue() = runTest {
     val tm = TMVar.empty<Int>()
     atomically {
-      tm.tryPut(100)
+      val _ = tm.tryPut(100)
       tm.tryTake()
     } shouldBe atomically {
       tm.put(100)
