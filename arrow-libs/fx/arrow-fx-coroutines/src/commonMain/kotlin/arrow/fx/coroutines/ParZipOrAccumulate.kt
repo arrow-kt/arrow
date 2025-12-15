@@ -1,11 +1,9 @@
-@file:OptIn(ExperimentalContracts::class, ExperimentalRaiseAccumulateApi::class)
+@file:OptIn(ExperimentalContracts::class)
 
 package arrow.fx.coroutines
 
 import arrow.core.NonEmptyList
-import arrow.core.raise.ExperimentalRaiseAccumulateApi
 import arrow.core.raise.Raise
-import arrow.core.raise.accumulate
 import arrow.core.raise.either
 import arrow.core.raise.zipOrAccumulate
 import kotlin.coroutines.CoroutineContext
@@ -44,8 +42,8 @@ public suspend inline fun <E, A, B, C> Raise<E>.parZipOrAccumulate(
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }) { aa, bb -> transform(aa, bb) }
   }
@@ -77,8 +75,8 @@ public suspend inline fun <E, A, B, C> Raise<NonEmptyList<E>>.parZipOrAccumulate
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }) { aa, bb -> transform(aa, bb) }
   }
@@ -120,9 +118,9 @@ public suspend inline fun <E, A, B, C, D> Raise<E>.parZipOrAccumulate(
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }) { aa, bb, cc -> transform(aa, bb, cc) }
   }
@@ -158,9 +156,9 @@ public suspend inline fun <E, A, B, C, D> Raise<NonEmptyList<E>>.parZipOrAccumul
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }) { aa, bb, cc -> transform(aa, bb, cc) }
   }
@@ -204,10 +202,10 @@ public suspend inline fun <E, A, B, C, D, F> Raise<E>.parZipOrAccumulate(
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }) { aa, bb, cc, dd -> transform(aa, bb, cc, dd) }
   }
@@ -247,10 +245,10 @@ public suspend inline fun <E, A, B, C, D, F> Raise<NonEmptyList<E>>.parZipOrAccu
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }) { aa, bb, cc, dd -> transform(aa, bb, cc, dd) }
   }
@@ -298,11 +296,11 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<E>.parZipOrAccumulate(
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }) { aa, bb, cc, dd, ff -> transform(aa, bb, cc, dd, ff) }
   }
@@ -346,11 +344,11 @@ public suspend inline fun <E, A, B, C, D, F, G> Raise<NonEmptyList<E>>.parZipOrA
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }) { aa, bb, cc, dd, ff -> transform(aa, bb, cc, dd, ff) }
   }
@@ -402,12 +400,12 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<E>.parZipOrAccumulate(
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }) { aa, bb, cc, dd, ff, gg -> transform(aa, bb, cc, dd, ff, gg) }
   }
@@ -455,12 +453,12 @@ public suspend inline fun <E, A, B, C, D, F, G, H> Raise<NonEmptyList<E>>.parZip
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }) { aa, bb, cc, dd, ff, gg -> transform(aa, bb, cc, dd, ff, gg) }
   }
@@ -516,13 +514,13 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<E>.parZipOrAccumulat
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fh(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }, { h.bindNel() }) { aa, bb, cc, dd, ff, gg, hh -> transform(aa, bb, cc, dd, ff, gg, hh) }
   }
@@ -574,13 +572,13 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I> Raise<NonEmptyList<E>>.par
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fh(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }, { h.bindNel() }) { aa, bb, cc, dd, ff, gg, hh -> transform(aa, bb, cc, dd, ff, gg, hh) }
   }
@@ -640,14 +638,14 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<E>.parZipOrAccumu
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fh(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fi(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h, i ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }, { h.bindNel() }, { i.bindNel() }) { aa, bb, cc, dd, ff, gg, hh, ii -> transform(aa, bb, cc, dd, ff, gg, hh, ii) }
   }
@@ -703,14 +701,14 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J> Raise<NonEmptyList<E>>.
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fh(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fi(ScopedRaiseAccumulate(this, this@parZip)) } } },
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
   ) { a, b, c, d, f, g, h, i ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }, { h.bindNel() }, { i.bindNel() }) { aa, bb, cc, dd, ff, gg, hh, ii -> transform(aa, bb, cc, dd, ff, gg, hh, ii) }
   }
@@ -774,15 +772,15 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<E>.parZipOrAcc
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fh(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fi(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fj(ScopedRaiseAccumulate(this, this@parZip)) } } }
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fj(ScopedRaiseAccumulate(this, this@parZip)) } }
   ) { a, b, c, d, f, g, h, i, j ->
     zipOrAccumulate(combine, { a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }, { h.bindNel() }, { i.bindNel() }, { j.bindNel() }) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> transform(aa, bb, cc, dd, ff, gg, hh, ii, jj) }
   }
@@ -842,15 +840,15 @@ public suspend inline fun <E, A, B, C, D, F, G, H, I, J, K> Raise<NonEmptyList<E
   }
   return parZip(
     context,
-    { either { accumulate { fa(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fb(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fc(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fd(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { ff(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fg(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fh(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fi(ScopedRaiseAccumulate(this, this@parZip)) } } },
-    { either { accumulate { fj(ScopedRaiseAccumulate(this, this@parZip)) } } },
+    { either { fa(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fb(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fc(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fd(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { ff(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fg(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fh(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fi(ScopedRaiseAccumulate(this, this@parZip)) } },
+    { either { fj(ScopedRaiseAccumulate(this, this@parZip)) } },
   ) { a, b, c, d, f, g, h, i, j ->
     zipOrAccumulate({ a.bindNel() }, { b.bindNel() }, { c.bindNel() }, { d.bindNel() }, { f.bindNel() }, { g.bindNel() }, { h.bindNel() }, { i.bindNel() }, { j.bindNel() }) { aa, bb, cc, dd, ff, gg, hh, ii, jj -> transform(aa, bb, cc, dd, ff, gg, hh, ii, jj) }
   }
