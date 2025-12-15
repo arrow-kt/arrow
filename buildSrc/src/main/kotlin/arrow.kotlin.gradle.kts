@@ -89,11 +89,14 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  apiVersion = KotlinVersion.KOTLIN_2_0
-  languageVersion = KotlinVersion.KOTLIN_2_0
+  apiVersion = KotlinVersion.KOTLIN_2_1
+  languageVersion = KotlinVersion.KOTLIN_2_1
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
+    "-Xreturn-value-checker=full",
+    "-Xwarning-level=ERROR_SUPPRESSION:disabled",
+    "-Xwarning-level=NOTHING_TO_INLINE:disabled",
   )
   // required to be part of the Kotlin User Projects repository
   providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
@@ -265,7 +268,10 @@ if (isKotlinJvm) {
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
   kotlin {
-    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
+    ktlint().editorConfigOverride(mapOf(
+      "ktlint_standard_filename" to "disabled",
+      "ktlint_standard_backing-property-naming" to "disabled"
+    ))
   }
 }
 

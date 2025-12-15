@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalStdlibApi::class)
-@file:Suppress("API_NOT_AVAILABLE")
+@file:Suppress("API_NOT_AVAILABLE", "RESERVED_MEMBER_INSIDE_VALUE_CLASS")
 
 package arrow.core
 
@@ -161,18 +161,16 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
 
   public constructor(head: E, tail: List<E>): this(listOf(head) + tail)
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun equals(other: Any?): Boolean = when (other) {
     is NonEmptyList<*> -> this.all == other.all
     else -> this.all == other
   }
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int = all.hashCode()
 
   override fun isEmpty(): Boolean = false
 
-  @JvmExposeBoxed
+  @JvmExposeBoxed @Suppress("USELESS_JVM_EXPOSE_BOXED")
   public fun toList(): List<E> = all
 
   public override val head: E

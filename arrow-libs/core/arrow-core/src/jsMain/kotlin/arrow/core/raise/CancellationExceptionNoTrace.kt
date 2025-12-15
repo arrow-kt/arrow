@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.core.raise
 
 import js.reflect.Reflect
