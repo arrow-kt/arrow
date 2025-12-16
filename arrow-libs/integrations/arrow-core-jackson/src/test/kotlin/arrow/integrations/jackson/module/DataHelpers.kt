@@ -1,5 +1,7 @@
 package arrow.integrations.jackson.module
 
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.int
@@ -11,7 +13,7 @@ data class SomeObject(val someString: String, val someInt: Int)
 
 fun Arb.Companion.someObject(): Arb<SomeObject> = Arb.bind(Arb.string(), Arb.int()) { str, int -> SomeObject(str, int) }
 
-data class MapContainer<V>(val value: Map<Key, V>) {
+data class MapContainer<V>(@all:JsonSetter(contentNulls = Nulls.AS_EMPTY) val value: Map<Key, V>) {
   enum class Key { First, Second }
 }
 

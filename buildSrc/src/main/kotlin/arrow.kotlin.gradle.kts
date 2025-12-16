@@ -33,6 +33,9 @@ val Project.needsAndroidCoreLibraryDesugaring
 val Project.needsJava11
   get() = project.name.endsWith("-compose") || project.name.endsWith("-result4k")
 
+val Project.needsJava17
+  get() = project.name.endsWith("-jackson")
+
 val Project.needsAbiValidation
   get() = project.name !in listOf(
     "arrow-optics-ksp-plugin",
@@ -64,7 +67,8 @@ tasks {
     maxParallelForks = Runtime.getRuntime().availableProcessors()
     // always use Java 11, because Kotest requires it
     javaLauncher.set(javaToolchains.launcherFor {
-      languageVersion.set(JavaLanguageVersion.of(11))
+      val requiredVersion = if (needsJava17) 17 else 11
+      languageVersion.set(JavaLanguageVersion.of(requiredVersion))
     })
     useJUnitPlatform()
     testLogging {
@@ -81,7 +85,11 @@ configure<KotlinProjectExtension> {
 configure<JavaPluginExtension> {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
-    targetCompatibility = if (needsJava11) JavaVersion.VERSION_11 else JavaVersion.VERSION_1_8
+    targetCompatibility = when {
+      needsJava17 -> JavaVersion.VERSION_17
+      needsJava11 -> JavaVersion.VERSION_11
+      else -> JavaVersion.VERSION_1_8
+    }
   }
 }
 
@@ -132,7 +140,11 @@ if (isKotlinMultiplatform) {
 
     jvm {
       compilerOptions {
-        jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
+        jvmTarget = when {
+          needsJava17 -> JvmTarget.JVM_17
+          needsJava11 -> JvmTarget.JVM_11
+          else -> JvmTarget.JVM_1_8
+        }
       }
       tasks.named<Jar>("jvmJar") {
         manifest {
@@ -176,7 +188,11 @@ if (isKotlinMultiplatform) {
         compileSdk = 36
         minSdk = 21
         compilerOptions {
-          jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
+          jvmTarget = when {
+            needsJava17 -> JvmTarget.JVM_17
+            needsJava11 -> JvmTarget.JVM_11
+            else -> JvmTarget.JVM_1_8
+          }
         }
         withHostTestBuilder {}
       }
@@ -250,7 +266,11 @@ if (isKotlinJvm) {
 
   configure<KotlinJvmExtension> {
     compilerOptions {
-      jvmTarget = if (needsJava11) JvmTarget.JVM_11 else JvmTarget.JVM_1_8
+      jvmTarget = when {
+        needsJava17 -> JvmTarget.JVM_17
+        needsJava11 -> JvmTarget.JVM_11
+        else -> JvmTarget.JVM_1_8
+      }
       commonCompilerOptions()
     }
   }

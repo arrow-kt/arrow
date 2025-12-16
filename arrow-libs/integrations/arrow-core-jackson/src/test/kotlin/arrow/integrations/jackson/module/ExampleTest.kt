@@ -9,11 +9,10 @@ import arrow.core.right
 import arrow.core.some
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonValue
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.kotlin.kotlinModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.kotest.matchers.shouldBe
+import tools.jackson.databind.ObjectWriter
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.kotlinModule
 import java.net.URI
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -38,14 +37,13 @@ class ExampleTest {
     val organization: Option<Organization>,
   )
 
-  val mapper =
-    JsonMapper.builder()
-      .addArrowModule().addModule(kotlinModule())
-      // will not serialize None as nulls
-      .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT))
-      .build()
+  val mapper: JsonMapper = JsonMapper.builder()
+    .addArrowModule().addModule(kotlinModule())
+    // will not serialize None as nulls
+    .changeDefaultPropertyInclusion { JsonInclude.Value.construct(JsonInclude.Include.NON_ABSENT, JsonInclude.Include.NON_ABSENT) }
+    .build()
 
-  val prettyPrinter = mapper.writerWithDefaultPrettyPrinter()
+  val prettyPrinter: ObjectWriter = mapper.writerWithDefaultPrettyPrinter()
 
   @Test
   fun `example #1 - data structure serialization`() {
@@ -139,10 +137,7 @@ class ExampleTest {
     data class Fruit(@get:JsonValue val name: String)
     data class Vegetable(val name: String, val kind: String)
 
-    val customMapper =
-      ObjectMapper()
-        .registerKotlinModule()
-        .registerArrowModule(iorModuleConfig = IorModuleConfig("l", "r"))
+    val customMapper = basicKotlinArrowMapper(iorModuleConfig = IorModuleConfig("l", "r"))
 
     val starfruit = Fruit("starfruit")
     val spinach = Vegetable("spinach", "leafy greens")
