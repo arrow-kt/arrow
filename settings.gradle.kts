@@ -135,6 +135,9 @@ project(":arrow-core-retrofit").projectDir = file("arrow-libs/integrations/arrow
 include("arrow-core-jackson")
 project(":arrow-core-jackson").projectDir = file("arrow-libs/integrations/arrow-core-jackson")
 
+include("arrow-core-jackson2")
+project(":arrow-core-jackson2").projectDir = file("arrow-libs/integrations/arrow-core-jackson2")
+
 include("arrow-core-serialization")
 project(":arrow-core-serialization").projectDir = file("arrow-libs/integrations/arrow-core-serialization")
 
