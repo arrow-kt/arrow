@@ -103,6 +103,7 @@ public final class arrow/integrations/jackson/module/OptionDeserializer : tools/
 
 public final class arrow/integrations/jackson/module/OptionDeserializerResolver : tools/jackson/databind/deser/Deserializers$Base {
 	public static final field INSTANCE Larrow/integrations/jackson/module/OptionDeserializerResolver;
+	public fun findBeanDeserializer (Ltools/jackson/databind/JavaType;Ltools/jackson/databind/DeserializationConfig;Ltools/jackson/databind/BeanDescription$Supplier;)Ltools/jackson/databind/ValueDeserializer;
 	public fun findReferenceDeserializer (Ltools/jackson/databind/type/ReferenceType;Ltools/jackson/databind/DeserializationConfig;Ltools/jackson/databind/BeanDescription$Supplier;Ltools/jackson/databind/jsontype/TypeDeserializer;Ltools/jackson/databind/ValueDeserializer;)Ltools/jackson/databind/ValueDeserializer;
 	public fun hasDeserializerFor (Ltools/jackson/databind/DeserializationConfig;Ljava/lang/Class;)Z
 }
