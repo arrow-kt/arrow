@@ -1,7 +1,7 @@
 import arrow.optics.plugin.arrowOptics
 
 plugins {
-  kotlin("jvm") version "2.3.0-RC3"
+  kotlin("jvm") version "2.3.0"
   id("io.arrow-kt.optics") version "10.0-test"
 }
 
