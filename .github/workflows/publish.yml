@@ -15,7 +15,7 @@ env:
 
 jobs:
   publish:
-    timeout-minutes: 90
+    timeout-minutes: 120
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
