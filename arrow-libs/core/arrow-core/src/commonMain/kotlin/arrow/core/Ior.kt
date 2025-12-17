@@ -511,11 +511,21 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(o
  *
  * @return the [Left] value if this is [Ior.Left] or [Ior.Both], otherwise `null`.
  */
-public operator fun <A, B> Ior<A, B>.component1(): A? = leftOrNull()
+public operator fun <A, B> Ior<A, B>.component1(): A? {
+  contract {
+    returnsNotNull() implies (this@component1 is Left || this@component1 is Both)
+  }
+  return leftOrNull()
+}
 
 /**
  * Enables destructuring declarations for [Ior].
  *
  * @return the [Right] value if this is [Ior.Right] or [Ior.Both], otherwise `null`.
  */
-public operator fun <A, B> Ior<A, B>.component2(): B? = getOrNull()
+public operator fun <A, B> Ior<A, B>.component2(): B? {
+  contract {
+    returnsNotNull() implies (this@component2 is Right || this@component2 is Both)
+  }
+  return getOrNull()
+}

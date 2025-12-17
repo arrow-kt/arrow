@@ -1527,11 +1527,21 @@ public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@Buil
  *
  * @return the [Left] value if present, otherwise `null`.
  */
-public operator fun <A, B> Either<A, B>.component1(): A? = leftOrNull()
+public operator fun <A, B> Either<A, B>.component1(): A? {
+  contract {
+    returnsNotNull() implies (this@component1 is Left)
+  }
+  return leftOrNull()
+}
 
 /**
  * Enables destructuring declarations for [Either].
  *
  * @return the [Right] value if present, otherwise `null`.
  */
-public operator fun <A, B> Either<A, B>.component2(): B? = getOrNull()
+public operator fun <A, B> Either<A, B>.component2(): B? {
+  contract {
+    returnsNotNull() implies (this@component2 is Right)
+  }
+  return getOrNull()
+}
