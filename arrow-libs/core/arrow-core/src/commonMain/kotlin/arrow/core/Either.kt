@@ -1521,3 +1521,17 @@ public inline fun <E, reified T : Throwable, A> Either<Throwable, A>.catch(@Buil
   contract { callsInPlace(catch, InvocationKind.AT_MOST_ONCE) }
   return recover { e -> if (e is T) catch(e) else throw e }
 }
+
+/**
+ * Enables destructuring declarations for [Either].
+ *
+ * @return the [Left] value if present, otherwise `null`.
+ */
+public operator fun <A, B> Either<A, B>.component1(): A? = leftOrNull()
+
+/**
+ * Enables destructuring declarations for [Either].
+ *
+ * @return the [Right] value if present, otherwise `null`.
+ */
+public operator fun <A, B> Either<A, B>.component2(): B? = getOrNull()

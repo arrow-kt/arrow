@@ -505,3 +505,17 @@ public operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(o
     )
   }
 )
+
+/**
+ * Enables destructuring declarations for [Ior].
+ *
+ * @return the [Left] value if this is [Ior.Left] or [Ior.Both], otherwise `null`.
+ */
+public operator fun <A, B> Ior<A, B>.component1(): A? = leftOrNull()
+
+/**
+ * Enables destructuring declarations for [Ior].
+ *
+ * @return the [Right] value if this is [Ior.Right] or [Ior.Both], otherwise `null`.
+ */
+public operator fun <A, B> Ior<A, B>.component2(): B? = getOrNull()
