@@ -39,7 +39,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.2.0
+        <div class="library-version" id="library-version">2.2.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -111,7 +111,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-closed/index.html">Closed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>openingStrategy<span class="token operator">: </span><a href="../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></span></span><span class="token punctuation">)</span> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph"><a href="-closed/index.html">Closed</a> is the normal state of the <a href="../index.html">CircuitBreaker</a>, where requests are being made. The state in which <a href="../index.html">CircuitBreaker</a> starts.     - When an exception occurs it increments the failure counter     - A successful request will reset the failure counter to zero     - When the failure counter reaches the maxFailures threshold, the breaker is tripped into the Open state</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-closed/index.html">Closed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>openingStrategy<span class="token operator">: </span><a href="../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></span></span><span class="token punctuation">)</span> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph"><a href="-closed/index.html">Closed</a> is the normal state of the <a href="../index.html">CircuitBreaker</a>, where requests are being made. The state in which <a href="../index.html">CircuitBreaker</a> starts.     - When an exception occurs it increments the failure counter     - A successful request will reset the failure counter to zero     - When the failure counter reaches the OpeningStrategy.Count.maxFailures threshold, the breaker is tripped into the Open state</p></div></div></div>
                 </div>
               </div>
             </div>

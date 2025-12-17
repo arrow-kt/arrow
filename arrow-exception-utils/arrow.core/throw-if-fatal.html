@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <title>registerArrowModule</title>
+    <title>throwIfFatal</title>
 <link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
     <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
@@ -39,11 +39,11 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.2.0
+        <div class="library-version" id="library-version">2.2.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
-                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":arrow-core-jackson/main">jvm</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-exception-utils/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
@@ -52,11 +52,11 @@
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
-                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":arrow-core-jackson/main" data-filter=":arrow-core-jackson/main">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-exception-utils/commonMain" data-filter=":arrow-exception-utils/commonMain">
                                 <span class="checkbox--icon"></span>
-                                jvm
+                                common
                             </label>
                         </li>
                 </ul>
@@ -90,12 +90,12 @@
         </nav>
         <div id="resizer" class="resizer" data-item-type="BAR"></div>
         <div id="main" data-item-type="SECTION" role="main">
-<div class="main-content" data-page-type="member" id="content" pageids="arrow-core-jackson::arrow.integrations.jackson.module//registerArrowModule/com.fasterxml.jackson.databind.ObjectMapper#arrow.integrations.jackson.module.EitherModuleConfig#arrow.integrations.jackson.module.IorModuleConfig/PointingToDeclaration//-1167666519">
-  <div class="breadcrumbs"><a href="../index.html">arrow-core-jackson</a><span class="delimiter">/</span><a href="index.html">arrow.integrations.jackson.module</a><span class="delimiter">/</span><span class="current">registerArrowModule</span></div>
+<div class="main-content" data-page-type="member" id="content" pageids="arrow-exception-utils::arrow.core//throwIfFatal/kotlin.Throwable#/PointingToDeclaration//2102696744">
+  <div class="breadcrumbs"><a href="../index.html">arrow-exception-utils</a><span class="delimiter">/</span><a href="index.html">arrow.core</a><span class="delimiter">/</span><span class="current">throwIfFatal</span></div>
   <div class="cover ">
-    <h1 class="cover"><span>register</span><wbr><span>Arrow</span><wbr><span><span>Module</span></span></h1>
+    <h1 class="cover"><span>throw</span><wbr><span>If</span><wbr><span><span>Fatal</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-core-jackson/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="com.fasterxml.jackson.databind/ObjectMapper///PointingToDeclaration/">ObjectMapper</span><span class="token punctuation">.</span><a href="register-arrow-module.html"><span class="token function">registerArrowModule</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eitherModuleConfig<span class="token operator">: </span><a href="-either-module-config/index.html">EitherModuleConfig</a><span class="token operator"> = </span>EitherModuleConfig("left", "right")<span class="token punctuation">, </span></span><span class="parameter ">iorModuleConfig<span class="token operator">: </span><a href="-ior-module-config/index.html">IorModuleConfig</a><span class="token operator"> = </span>IorModuleConfig("left", "right")</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.fasterxml.jackson.databind/ObjectMapper///PointingToDeclaration/">ObjectMapper</span></div></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-exception-utils/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">.</span><a href="throw-if-fatal.html"><span class="token function">throwIfFatal</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
 </div>
     <div class="footer">
         <div class="footer--container">

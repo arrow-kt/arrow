@@ -27,6 +27,9 @@ arrow.core.raise
 module:arrow-core-jackson
 arrow.integrations.jackson.module
 arrow.integrations.jackson.module.internal
+module:arrow-core-jackson2
+arrow.integrations.jackson.module
+arrow.integrations.jackson.module.internal
 module:arrow-core-result4k
 arrow.core.raise
 module:arrow-core-retrofit
@@ -36,6 +39,8 @@ module:arrow-core-serialization
 arrow.core.serialization
 module:arrow-eval
 arrow.eval
+module:arrow-exception-utils
+arrow.core
 module:arrow-functions
 arrow.core
 module:arrow-fx-coroutines
