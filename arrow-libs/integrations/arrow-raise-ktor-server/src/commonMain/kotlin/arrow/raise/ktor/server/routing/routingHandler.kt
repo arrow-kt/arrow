@@ -4,7 +4,6 @@ import arrow.core.raise.Raise
 import arrow.raise.ktor.server.response.Response
 import arrow.raise.ktor.server.response.respondOrRaise
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.util.reflect.*
