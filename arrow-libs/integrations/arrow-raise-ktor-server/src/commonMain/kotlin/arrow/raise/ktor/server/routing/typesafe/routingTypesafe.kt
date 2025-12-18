@@ -1,10 +1,11 @@
 @file:Suppress("API_NOT_AVAILABLE")
 
-package arrow.raise.ktor.server.routing
+package arrow.raise.ktor.server.routing.typesafe
 
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseDSL
 import arrow.raise.ktor.server.response.Response
+import arrow.raise.ktor.server.routing.respondOrRaise
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get

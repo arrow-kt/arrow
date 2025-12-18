@@ -3,9 +3,9 @@ package arrow.raise.ktor.server.response
 import arrow.core.raise.context.ensure
 import arrow.core.raise.context.raise
 import arrow.raise.ktor.server.response.Response.Companion.invoke
-import arrow.raise.ktor.server.routing.getOrRaise
-import arrow.raise.ktor.server.routing.patchOrRaise
-import arrow.raise.ktor.server.routing.postOrRaise
+import arrow.raise.ktor.server.routing.typesafe.getOrRaise
+import arrow.raise.ktor.server.routing.typesafe.patchOrRaise
+import arrow.raise.ktor.server.routing.typesafe.postOrRaise
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
