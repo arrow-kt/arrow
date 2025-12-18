@@ -24,7 +24,7 @@ jackson = "3.0.3"
 jacksonAnnotations = "2.20"
 shadow = "9.3.0"
 kotlinWrappers = "2025.12.7"
-result4k="2.25.0.0"
+result4k = "2.25.0.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -34,7 +34,7 @@ kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest"
 kotlinx-knit = { module = "org.jetbrains.kotlinx:kotlinx-knit", version.ref = "knit" }
 kotlinx-serializationCore = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kotlinx-serializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
-kotlinWrappers-js = { module = "org.jetbrains.kotlin-wrappers:kotlin-js",  version.ref = "kotlinWrappers" }
+kotlinWrappers-js = { module = "org.jetbrains.kotlin-wrappers:kotlin-js", version.ref = "kotlinWrappers" }
 squareup-okhttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockWebServer" }
 squareup-retrofit-lib = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squareup-retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
@@ -60,7 +60,7 @@ ktor-serialization-kotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-
 result4k = { module = "dev.forkhandles:result4k", version.ref = "result4k" }
 # required for the convention plugin
 gradlePlugin-kotlin-base = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin"}
+gradlePlugin-kotlin-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 gradlePlugin-android-kmp = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessVersion" }
 gradlePlugin-animalSniffer = { module = "ru.vyarus.animalsniffer:ru.vyarus.animalsniffer.gradle.plugin", version.ref = "animalSniffer" }
@@ -69,11 +69,11 @@ gradlePlugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", versi
 gradlePlugin-publish = { module = "com.vanniktech.maven.publish.base:com.vanniktech.maven.publish.base.gradle.plugin", version.ref = "publish" }
 
 [bundles]
-testing = [ "coroutines-test", "kotest-assertionsCore", "kotest-property" ]
+testing = ["coroutines-test", "kotest-assertionsCore", "kotest-property"]
 
 [plugins]
 animalSniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalSniffer" }
-publish = { id = "com.vanniktech.maven.publish.base", version.ref="publish" }
+publish = { id = "com.vanniktech.maven.publish.base", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -84,5 +84,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 compose-jetbrains = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-android-kmp = { id ="com.android.kotlin.multiplatform.library", version.ref ="agp" }
+android-kmp = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
