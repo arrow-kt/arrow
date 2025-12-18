@@ -3,9 +3,9 @@ package arrow.raise.ktor.server.response
 import arrow.core.raise.context.ensure
 import arrow.core.raise.context.raise
 import arrow.raise.ktor.server.response.Response.Companion.invoke
-import arrow.raise.ktor.server.routing.getOrError
-import arrow.raise.ktor.server.routing.patchOrError
-import arrow.raise.ktor.server.routing.postOrError
+import arrow.raise.ktor.server.routing.getOrRaise
+import arrow.raise.ktor.server.routing.patchOrRaise
+import arrow.raise.ktor.server.routing.postOrRaise
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
@@ -37,7 +37,7 @@ class RespondOrRaiseTypedTest {
   fun `respond result of getOrError`() = testApplication {
     install(Resources)
     routing {
-      getOrError<Foo, _> { "bar" }
+      getOrRaise<Foo, _> { "bar" }
     }
 
     client.get("/foo").let {
@@ -50,7 +50,7 @@ class RespondOrRaiseTypedTest {
   fun `respond result with params of getOrError`() = testApplication {
     install(Resources)
     routing {
-      getOrError<Foo.Id, _> { it.name.uppercase() }
+      getOrRaise<Foo.Id, _> { it.name.uppercase() }
     }
 
     client.get("/foo/bar").let {
@@ -63,7 +63,7 @@ class RespondOrRaiseTypedTest {
   fun `receive and respond typed success with string body and params`() = testApplication {
     install(Resources)
     routing {
-      patchOrError<Foo.Id, _, _> { route, body: String ->
+      patchOrRaise<Foo.Id, _, _> { route, body: String ->
         call.respond(body + route.name)
       }
     }
@@ -79,7 +79,7 @@ class RespondOrRaiseTypedTest {
   fun `receive and respond typed with raise`() = testApplication {
     install(Resources)
     routing {
-      postOrError<Foo, _, String> { _, body: String ->
+      postOrRaise<Foo, _, String> { _, body: String ->
         raise(HttpStatusCode.BadRequest(body))
       }
     }
@@ -106,7 +106,7 @@ class RespondOrRaiseTypedTest {
 
     val defaultBody = Body("1", 1)
     routing {
-      postOrError { route: Foo, body: Body ->
+      postOrRaise { _: Foo, body: Body ->
         ensure(body.num > 0) { HttpStatusCode.Conflict("Bad") }
         body
       }

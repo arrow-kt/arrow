@@ -22,7 +22,7 @@ public typealias TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse> = susp
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.deleteOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.deleteOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = delete<TRoute> {
@@ -32,7 +32,7 @@ public inline fun <reified TRoute : Any, reified TResponse> Route.deleteOrError(
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.getOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.getOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = get<TRoute> { respondOrRaise(statusCode) { body(it) } }
@@ -40,7 +40,7 @@ public inline fun <reified TRoute : Any, reified TResponse> Route.getOrError(
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.headOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.headOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = head<TRoute> { respondOrRaise(statusCode) { body(it) } }
@@ -48,7 +48,7 @@ public inline fun <reified TRoute : Any, reified TResponse> Route.headOrError(
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.optionsOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.optionsOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = options<TRoute> { respondOrRaise(statusCode) { body(it) } }
@@ -56,7 +56,7 @@ public inline fun <reified TRoute : Any, reified TResponse> Route.optionsOrError
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.patchOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.patchOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = patch<TRoute> { respondOrRaise(statusCode) { body(it) } }
@@ -64,7 +64,7 @@ public inline fun <reified TRoute : Any, reified TResponse> Route.patchOrError(
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.postOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.postOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = post<TRoute> { respondOrRaise(statusCode) { body(it) } }
@@ -72,7 +72,7 @@ public inline fun <reified TRoute : Any, reified TResponse> Route.postOrError(
 @KtorDsl
 @RaiseDSL
 @IgnorableReturnValue
-public inline fun <reified TRoute : Any, reified TResponse> Route.putOrError(
+public inline fun <reified TRoute : Any, reified TResponse> Route.putOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: TypeSafeRespondingRaiseRoutingHandler<TRoute, TResponse>,
 ): Route = put<TRoute> { respondOrRaise(statusCode) { body(it) } }
