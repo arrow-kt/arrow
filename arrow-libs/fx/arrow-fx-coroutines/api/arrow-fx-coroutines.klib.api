@@ -39,7 +39,6 @@ abstract interface arrow.fx.coroutines/ResourceScope : arrow/AutoCloseScope { //
 
 final class <#A: kotlin/Any?> arrow.fx.coroutines/ScopedRaiseAccumulate : arrow.core.raise/RaiseAccumulate<#A>, kotlinx.coroutines/CoroutineScope { // arrow.fx.coroutines/ScopedRaiseAccumulate|null[0]
     constructor <init>(arrow.core.raise/Raise<arrow.core/NonEmptyList<#A>>, kotlinx.coroutines/CoroutineScope) // arrow.fx.coroutines/ScopedRaiseAccumulate.<init>|<init>(arrow.core.raise.Raise<arrow.core.NonEmptyList<1:0>>;kotlinx.coroutines.CoroutineScope){}[0]
-    constructor <init>(arrow.core.raise/RaiseAccumulate<#A>, kotlinx.coroutines/CoroutineScope) // arrow.fx.coroutines/ScopedRaiseAccumulate.<init>|<init>(arrow.core.raise.RaiseAccumulate<1:0>;kotlinx.coroutines.CoroutineScope){}[0]
 
     final val coroutineContext // arrow.fx.coroutines/ScopedRaiseAccumulate.coroutineContext|{}coroutineContext[0]
         final fun <get-coroutineContext>(): kotlin.coroutines/CoroutineContext // arrow.fx.coroutines/ScopedRaiseAccumulate.coroutineContext.<get-coroutineContext>|<get-coroutineContext>(){}[0]
