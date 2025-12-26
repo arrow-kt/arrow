@@ -667,7 +667,7 @@ public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> E
  * @param raise a lambda that produces an error of type [Error] when the [value] is null.
  */
 @OptIn(ExperimentalExtendedContracts::class)
-@RaiseDSL
+@RaiseDSL @IgnorableReturnValue
 public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: () -> Error): B {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)

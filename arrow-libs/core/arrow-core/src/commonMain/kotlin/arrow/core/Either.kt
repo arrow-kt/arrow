@@ -689,6 +689,7 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-27.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
+  @IgnorableReturnValue
   public inline fun onRight(action: (right: B) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
@@ -712,6 +713,7 @@ public sealed class Either<out A, out B> {
    * <!--- KNIT example-either-28.kt -->
    * <!--- TEST lines.isEmpty() -->
    */
+  @IgnorableReturnValue
   public inline fun onLeft(action: (left: A) -> Unit): Either<A, B> {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)

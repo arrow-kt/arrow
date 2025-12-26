@@ -1,6 +1,9 @@
+@file:Suppress("API_NOT_AVAILABLE")
+
 package arrow.resilience
 
 import arrow.atomic.AtomicLong
+import arrow.atomic.update
 import arrow.atomic.updateAndGet
 import arrow.core.Either
 import arrow.core.left
@@ -104,7 +107,7 @@ class ScheduleTest {
   fun repeatScheduledRepeatRepeatsTheWholeNumber(): TestResult = runTest {
     val n = 42L
     var count = 0L
-    Schedule.recurs<Long>(1).repeat {
+    val _ = Schedule.recurs<Long>(1).repeat {
       Schedule.recurs<Long>(n).repeat {
         count++
       }
@@ -237,7 +240,7 @@ class ScheduleTest {
     val iterations = 20_000L
     val l = Either.catch {
       Schedule.recurs<Throwable>(iterations).retry {
-        count.updateAndGet { it + 1 }
+        count.update { it + 1 }
         throw exception
       }
     }
@@ -368,7 +371,7 @@ class ScheduleTest {
     val iterations = stackSafeIteration().toLong()
 
     suspend fun increment() {
-      count.incrementAndGet()
+      val _ = count.incrementAndGet()
     }
 
     val result = Schedule.recurs<CustomError>(iterations).retryRaise {
@@ -393,7 +396,7 @@ class ScheduleTest {
     val iterations = stackSafeIteration().toLong()
 
     suspend fun increment() {
-      count.incrementAndGet()
+      val _ = count.incrementAndGet()
     }
 
     val result = Schedule.recurs<CustomError>(iterations).retryEither {
@@ -440,7 +443,7 @@ private fun linear(base: Duration): Sequence<Duration> =
 private suspend fun <I, A> Schedule<I, A>.calculateSchedule(input: I, n: Long): List<Schedule.Decision<I, A>> =
   buildList {
     var step = this@calculateSchedule.step
-    for (i in 0 until n) {
+    for (_ in 0 until n) {
       when (val decision = step(input)) {
         is Continue -> {
           add(decision)
@@ -486,6 +489,7 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Long, List<B>>, expected:
 
 private object CustomError
 
+@IgnorableReturnValue
 inline fun <reified A : Throwable> assertThrows(executable: () -> Unit): A {
   val a = try {
     executable.invoke()

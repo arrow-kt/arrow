@@ -1,6 +1,7 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise
 
@@ -172,14 +173,20 @@ public inline fun <Error, A> iorAccumulate(noinline combineError: (Error, Error)
 internal fun <Error> Raise<Error>.IorRaiseAccumulate(
   state: Atomic<Any?>,
   combineError: (Error, Error) -> Error,
-): RaiseAccumulate<Error> = RaiseAccumulate(IorAccumulate(state, combineError, this)) { e -> raise(EmptyValue.combine(state.get(), e, combineError)) }
+): RaiseAccumulate<Error> {
+  val accumulate = IorAccumulate(state, combineError, this)
+  return RaiseAccumulate(accumulate, accumulate, accumulate::raiseSingle)
+}
 
 @ExperimentalRaiseAccumulateApi
 private class IorAccumulate<Error>(
   private val state: Atomic<Any?>,
   private val combineError: (Error, Error) -> Error,
   private val raise: Raise<Error>,
-) : Accumulate<Error> {
+) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
+  fun raiseSingle(e: Error): Nothing = raise.raise(EmptyValue.combine(state.get(), e, combineError))
+  override fun raise(r: NonEmptyList<Error>) = raiseSingle(r.reduce(combineError))
+
   private val raiseAccumulated = RaiseAccumulate.Error { raise.raise(EmptyValue.unbox(state.get())) }
 
   @ExperimentalRaiseAccumulateApi
@@ -233,7 +240,7 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
     return this ?: raise()
   }
 
-  @RaiseDSL
+  @RaiseDSL @IgnorableReturnValue
   public fun <A> ensureNotNull(value: A?): A {
     contract { returns() implies (value != null) }
     return value ?: raise()
@@ -346,7 +353,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   private val state: Atomic<Any?>,
   private val raise: Raise<Error>,
 ) : Raise<Error> by raise {
-  @PublishedApi
+  @PublishedApi @IgnorableReturnValue
   internal fun combine(e: Error): Error = state.update(
     function = { EmptyValue.combine(it, e, combineError) },
     transform = { _, new -> new },

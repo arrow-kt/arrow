@@ -36,7 +36,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-check'
           path: '**/build/reports/**'
@@ -80,7 +80,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-ios_watchos'
           path: '**/build/reports/**'
@@ -118,7 +118,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -141,7 +141,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-macos_tvos'
           path: '**/build/reports/**'
@@ -156,7 +156,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache Kotlin Native dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/gradle-wrapper.properties') }}
@@ -179,7 +179,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-windows'
           path: '**/build/reports/**'
@@ -223,7 +223,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-jvmTest'
           path: '**/build/reports/**'
@@ -253,7 +253,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-linux'
           path: '**/build/reports/**'
@@ -263,7 +263,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-android'
           path: '**/build/reports/**'
@@ -277,7 +277,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-js'
           path: '**/build/reports/**'
@@ -287,7 +287,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-wasm'
           path: '**/build/reports/**'
@@ -326,7 +326,7 @@ jobs:
 
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: 'reports-gradle'
           path: '**/build/reports/**'

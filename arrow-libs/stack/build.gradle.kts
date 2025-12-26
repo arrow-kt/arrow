@@ -54,6 +54,7 @@ dependencies {
     api("io.arrow-kt:arrow-resilience-ktor-client:${version}")
     api("io.arrow-kt:arrow-resilience-ktor-client-jvm:${version}")
     api("io.arrow-kt:arrow-core-result4k:${version}")
+    api("io.arrow-kt:arrow-exception-utils:${version}")
     api("io.arrow-kt:suspendapp:${version}")
     api("io.arrow-kt:suspendapp-jvm:${version}")
     api("io.arrow-kt:suspendapp-ktor:${version}")

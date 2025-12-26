@@ -14,7 +14,7 @@ public class ProductTypeSerializer<T>(clazz: Class<T>, private val fields: List<
   override fun serialize(value: T, gen: JsonGenerator, provider: SerializerProvider) {
     gen.writeStartObject()
     for (projector in fields) {
-      projector.getOption(value).map {
+      projector.getOption(value).onSome {
         provider.defaultSerializeField(projector.fieldName, it, gen)
       }
     }

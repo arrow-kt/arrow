@@ -3,7 +3,9 @@
 
 package arrow.fx.coroutines
 
+import arrow.core.mergeSuppressed
 import arrow.core.nonFatalOrThrow
+import arrow.core.throwIfNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -120,5 +122,5 @@ internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>) {
   } catch (e: Throwable) {
     e.nonFatalOrThrow()
   }
-  (e1?.apply { e2?.let(::addSuppressed) } ?: e2)?.let { throw it }
+  (e1 mergeSuppressed e2).throwIfNotNull()
 }

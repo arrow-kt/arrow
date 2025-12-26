@@ -1,9 +1,12 @@
 @file:OptIn(ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.core.mergeSuppressed
+import arrow.core.throwIfFatal
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -88,6 +91,7 @@ public interface AutoCloseScope {
     release: (A, Throwable?) -> Unit
   ): A = acquire().also { a -> onClose { release(a, it) } }
 
+  @IgnorableReturnValue
   @OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
   public fun <A : AutoCloseable> install(autoCloseable: A): A =
     autoCloseable.also { onClose { autoCloseable.close() } }
@@ -103,17 +107,7 @@ internal class DefaultAutoCloseScope : AutoCloseScope {
 
   fun close(error: Throwable?): Nothing? {
     return finalizers.getAndSet(emptyList()).asReversed().fold(error) { acc, finalizer ->
-      acc.add(runCatching { finalizer(error) }.exceptionOrNull())
+      acc mergeSuppressed runCatching { finalizer(error) }.exceptionOrNull()
     }?.let { throw it }
   }
-
-  private fun Throwable?.add(other: Throwable?): Throwable? {
-    if (other !is CancellationException) other?.throwIfFatal()
-    return this?.apply {
-      other?.let { addSuppressed(it) }
-    } ?: other
-  }
 }
-
-@PublishedApi
-internal expect fun Throwable.throwIfFatal(): Throwable

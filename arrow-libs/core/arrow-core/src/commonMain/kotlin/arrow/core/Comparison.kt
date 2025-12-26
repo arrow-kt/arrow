@@ -1,85 +1,69 @@
 package arrow.core
 
-public fun <A : Comparable<A>> sort(a: A, b: A): Pair<A, A> =
-  if (a <= b) Pair(a, b) else Pair(b, a)
+// It's important that leq is only used with in-order arguments to ensure sort stability
+private inline fun <A> sort2(a: A, b: A, leq: (A, A) -> Boolean) = if (leq(a, b)) Pair(a, b) else Pair(b, a)
 
-public fun <A : Comparable<A>> sort(a: A, b: A, c: A): Triple<A, A, A> =
-  when {
-    a <= b && b <= c -> Triple(a, b, c)
-    a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
-    else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
+private inline fun <A> sort3(a: A, b: A, c: A, leq: (A, A) -> Boolean): Triple<A, A, A> = when {
+  leq(a, b) -> when {
+    leq(b, c) -> Triple(a, b, c)
+    // so a <= b && c < b (i.e b is largest)
+    leq(a, c) -> Triple(a, c, b)
+    // so c < a < b
+    else -> Triple(c, a, b)
   }
+  // so b < a
+  leq(a, c) -> Triple(b, a, c)
+  // so b < a && c < a (i.e a is largest)
+  leq(b, c) -> Triple(b, c, a)
+  // so c < b < a
+  else -> Triple(c, b, a)
+}
 
-public fun <A : Comparable<A>> sort(a: A, vararg aas: A): List<A> =
-  (listOf(a) + aas).sorted()
+public fun <A : Comparable<A>> sort(a: A, b: A): Pair<A, A> = sort2(a, b) { x, y -> x <= y }
 
-public fun <A> sort(a: A, b: A, comparator: Comparator<A>): Pair<A, A> =
-  if (comparator.compare(a, b) <= 0) Pair(a, b) else Pair(b, a)
+public fun <A : Comparable<A>> sort(a: A, b: A, c: A): Triple<A, A, A> = sort3(a, b, c) { x, y -> x <= y }
 
-public fun <A> sort(a: A, b: A, c: A, comparator: Comparator<A>): Triple<A, A, A> =
-  when {
-    comparator.compare(a, b) <= 0 && comparator.compare(b, c) <= 0 -> Triple(a, b, c)
-    comparator.compare(a, b) <= 0 -> if (comparator.compare(c, a) <= 0) Triple(c, a, b) else Triple(a, c, b)
-    comparator.compare(b, a) <= 0 && comparator.compare(a, c) <= 0 -> Triple(b, a, c)
-    else -> if (comparator.compare(c, b) <= 0) Triple(c, b, a) else Triple(b, c, a)
-  }
+public fun <A : Comparable<A>> sort(a: A, vararg aas: A): List<A> = buildList(aas.size + 1) {
+  add(a)
+  addAll(aas)
+  sort()
+}
 
-public fun <A> sort(a: A, vararg aas: A, comparator: Comparator<A>): List<A> =
-  (listOf(a) + aas).sortedWith(comparator)
+context(c: Comparator<T>)
+private operator fun <T> T.compareTo(other: T): Int = c.compare(this, other)
 
-public fun sort(a: Byte, b: Byte): Pair<Byte, Byte> =
-  if (a <= b) Pair(a, b) else Pair(b, a)
+public fun <A> sort(a: A, b: A, comparator: Comparator<A>): Pair<A, A> = sort2(a, b) { x, y -> with(comparator) { x <= y } }
 
-public fun sort(a: Byte, b: Byte, c: Byte): Triple<Byte, Byte, Byte> =
-  when {
-    a <= b && b <= c -> Triple(a, b, c)
-    a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
-    else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
-  }
+public fun <A> sort(a: A, b: A, c: A, comparator: Comparator<A>): Triple<A, A, A> = sort3(a, b, c) { x, y -> with(comparator) { x <= y } }
 
-public fun sort(a: Byte, vararg aas: Byte): List<Byte> =
-  (arrayOf(a) + aas.toTypedArray()).sorted()
+public fun <A> sort(a: A, vararg aas: A, comparator: Comparator<A>): List<A> = buildList(aas.size + 1) {
+  add(a)
+  addAll(aas)
+  sortWith(comparator)
+}
 
-public fun sort(a: Short, b: Short): Pair<Short, Short> =
-  if (a <= b) Pair(a, b) else Pair(b, a)
+// Don't use xArrayOf(...).sorted() as it boxes values unnecessarily
 
-public fun sort(a: Short, b: Short, c: Short): Triple<Short, Short, Short> =
-  when {
-    a <= b && b <= c -> Triple(a, b, c)
-    a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
-    else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
-  }
+public fun sort(a: Byte, b: Byte): Pair<Byte, Byte> = sort2(a, b) { x, y -> x <= y }
 
-public fun sort(a: Short, vararg aas: Short): List<Short> =
-  (arrayOf(a) + aas.toTypedArray()).sorted()
+public fun sort(a: Byte, b: Byte, c: Byte): Triple<Byte, Byte, Byte> = sort3(a, b, c) { x, y -> x <= y }
 
-public fun sort(a: Int, b: Int): Pair<Int, Int> =
-  if (a <= b) Pair(a, b) else Pair(b, a)
+public fun sort(a: Byte, vararg aas: Byte): List<Byte> = byteArrayOf(a, *aas).apply { sort() }.asList()
 
-public fun sort(a: Int, b: Int, c: Int): Triple<Int, Int, Int> =
-  when {
-    a <= b && b <= c -> Triple(a, b, c)
-    a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
-    else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
-  }
+public fun sort(a: Short, b: Short): Pair<Short, Short> = sort2(a, b) { x, y -> x <= y }
 
-public fun sort(a: Int, vararg aas: Int): List<Int> =
-  (arrayOf(a) + aas.toTypedArray()).sorted()
+public fun sort(a: Short, b: Short, c: Short): Triple<Short, Short, Short> = sort3(a, b, c) { x, y -> x <= y }
 
-public fun sort(a: Long, b: Long): Pair<Long, Long> =
-  if (a <= b) Pair(a, b) else Pair(b, a)
+public fun sort(a: Short, vararg aas: Short): List<Short> = shortArrayOf(a, *aas).apply { sort() }.asList()
 
-public fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> =
-  when {
-    a <= b && b <= c -> Triple(a, b, c)
-    a <= b -> if (c <= a) Triple(c, a, b) else Triple(a, c, b)
-    b <= a && a <= c -> Triple(b, a, c)
-    else -> if (c <= b) Triple(c, b, a) else Triple(b, c, a)
-  }
+public fun sort(a: Int, b: Int): Pair<Int, Int> = sort2(a, b) { x, y -> x <= y }
 
-public fun sort(a: Long, vararg aas: Long): List<Long> =
-  (arrayOf(a) + aas.toTypedArray()).sorted()
+public fun sort(a: Int, b: Int, c: Int): Triple<Int, Int, Int> = sort3(a, b, c) { x, y -> x <= y }
+
+public fun sort(a: Int, vararg aas: Int): List<Int> = intArrayOf(a, *aas).apply { sort() }.asList()
+
+public fun sort(a: Long, b: Long): Pair<Long, Long> = sort2(a, b) { x, y -> x <= y }
+
+public fun sort(a: Long, b: Long, c: Long): Triple<Long, Long, Long> = sort3(a, b, c) { x, y -> x <= y }
+
+public fun sort(a: Long, vararg aas: Long): List<Long> = longArrayOf(a, *aas).apply { sort() }.asList()

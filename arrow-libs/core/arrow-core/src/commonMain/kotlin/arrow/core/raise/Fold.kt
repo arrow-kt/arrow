@@ -1,6 +1,7 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise
 
@@ -251,7 +252,7 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Raise<Any?> {
   private val isActive = AtomicBoolean(true)
 
-  @PublishedApi
+  @PublishedApi @IgnorableReturnValue
   internal fun complete(): Boolean = isActive.getAndSet(false)
 
   @OptIn(DelicateRaiseApi::class)

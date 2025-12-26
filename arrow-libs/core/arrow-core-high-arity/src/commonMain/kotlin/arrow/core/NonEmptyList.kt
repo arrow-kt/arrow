@@ -1,5 +1,6 @@
 @file:JvmName("NonEmptyListHighArityKt")
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, PotentiallyUnsafeNonEmptyOperation::class)
+@file:Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
 
 package arrow.core
 
@@ -22,12 +23,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> NonEmptyList<A
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> NonEmptyList<A>.zip(
@@ -45,12 +41,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> NonEmptyL
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> NonEmptyList<A>.zip(
@@ -69,12 +60,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R> NonE
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R> NonEmptyList<A>.zip(
@@ -94,12 +80,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R>
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, R> NonEmptyList<A>.zip(
@@ -120,12 +101,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, R> NonEmptyList<A>.zip(
@@ -147,12 +123,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, t15.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, R> NonEmptyList<A>.zip(
@@ -175,12 +146,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, t15.all, t16.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, R> NonEmptyList<A>.zip(
@@ -204,12 +170,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, t15.all, t16.all, t17.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, R> NonEmptyList<A>.zip(
@@ -234,12 +195,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head, t18.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, t15.all, t16.all, t17.all, t18.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, R> NonEmptyList<A>.zip(
@@ -265,12 +221,7 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head, t18.head, t19.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, t19.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, t15.all, t16.all, t17.all, t18.all, t19.all, map).wrapAsNonEmptyListOrThrow()
 }
 
 public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, R> NonEmptyList<A>.zip(
@@ -297,10 +248,5 @@ public inline fun <A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T1
   map: (A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) -> R,
 ): NonEmptyList<R> {
   contract { callsInPlace(map, InvocationKind.AT_LEAST_ONCE) }
-  return NonEmptyList(
-    map(head, t1.head, t2.head, t3.head, t4.head, t5.head, t6.head, t7.head, t8.head, t9.head, t10.head, t11.head, t12.head, t13.head, t14.head, t15.head, t16.head, t17.head, t18.head, t19.head, t20.head),
-    tail.zip(t1.tail, t2.tail, t3.tail, t4.tail, t5.tail, t6.tail, t7.tail, t8.tail, t9.tail, t10.tail, t11.tail, t12.tail, t13.tail, t14.tail, t15.tail, t16.tail, t17.tail, t18.tail, t19.tail, t20.tail) { t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20 ->
-      map(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)
-    }
-  )
+  return all.zip(t1.all, t2.all, t3.all, t4.all, t5.all, t6.all, t7.all, t8.all, t9.all, t10.all, t11.all, t12.all, t13.all, t14.all, t15.all, t16.all, t17.all, t18.all, t19.all, t20.all, map).wrapAsNonEmptyListOrThrow()
 }

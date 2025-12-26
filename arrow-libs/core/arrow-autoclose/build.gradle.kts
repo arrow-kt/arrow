@@ -7,6 +7,7 @@ kotlin {
     commonMain {
       dependencies {
         implementation(projects.arrowAtomic)
+        implementation(projects.arrowExceptionUtils)
       }
     }
     commonTest {
