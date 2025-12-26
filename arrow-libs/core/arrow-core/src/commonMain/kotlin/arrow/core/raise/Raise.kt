@@ -13,6 +13,7 @@ import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.core.recover
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -618,11 +619,13 @@ public inline fun <reified T : Throwable, A, B> catch(block: () -> A, transform:
  * @param raise a lambda that produces an error of type [Error] when the [condition] is false.
  *
  */
+@OptIn(ExperimentalExtendedContracts::class)
 @RaiseDSL
 public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> Error) {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
     returns() implies condition
+    !condition holdsIn raise
   }
   return if (condition) Unit else raise(raise())
 }
@@ -663,11 +666,13 @@ public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> E
  * @param value the value that must be non-null.
  * @param raise a lambda that produces an error of type [Error] when the [value] is null.
  */
+@OptIn(ExperimentalExtendedContracts::class)
 @RaiseDSL @IgnorableReturnValue
 public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: () -> Error): B {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
     returns() implies (value != null)
+    (value == null) holdsIn raise
   }
   return value ?: raise(raise())
 }
