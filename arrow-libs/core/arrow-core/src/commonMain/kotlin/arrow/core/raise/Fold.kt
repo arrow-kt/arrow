@@ -126,7 +126,7 @@ public inline fun <Error, A, B> fold(
  * This method should never be wrapped in `try`/`catch` as it will not throw any unexpected errors,
  * it will only result in [CancellationException], or fatal exceptions such as `OutOfMemoryError`.
  */
-@OptIn(DelicateRaiseApi::class)
+@OptIn(DelicateRaiseApi::class, ExperimentalTraceApi::class) // Trace-y things only happen if user opts in elsewhere
 @JvmName("_fold")
 public inline fun <Error, A, B> fold(
   @BuilderInference block: Raise<Error>.() -> A,
@@ -140,14 +140,39 @@ public inline fun <Error, A, B> fold(
     callsInPlace(recover, AT_MOST_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  val raise = DefaultRaise(false)
+  return foldTraced(block, catch, { _, e -> recover(e) }, transform, isTraced = false)
+}
+
+@OptIn(DelicateRaiseApi::class)
+@ExperimentalTraceApi
+@JvmName("_fold")
+public inline fun <Error, A, B> foldTraced(
+  @BuilderInference block: Raise<Error>.() -> A,
+  catch: (throwable: Throwable) -> B,
+  recover: (trace: Trace, error: Error) -> B,
+  transform: (value: A) -> B,
+  isTraced: Boolean = true,
+): B {
+  contract {
+    callsInPlace(block, AT_MOST_ONCE)
+    callsInPlace(catch, AT_MOST_ONCE)
+    callsInPlace(recover, AT_MOST_ONCE)
+    callsInPlace(transform, AT_MOST_ONCE)
+  }
+  val raise = DefaultRaise(isTraced)
   return try {
     val res = block(raise)
     raise.complete()
     transform(res)
   } catch (e: RaiseCancellationException) {
     raise.complete()
-    recover(e.raisedOrRethrow(raise))
+    try {
+      recover(Trace(e), e.raisedOrRethrow(raise))
+    } catch (rethrown: Traced) {
+      // If our outer Raise happens to be traced
+      // Then we want the stack trace to match the inner one
+      throw if (e is Traced) rethrown.withCause(e) else rethrown
+    }
   } catch (e: Throwable) {
     raise.complete()
     catch(e.nonFatalOrThrow())
@@ -203,37 +228,32 @@ public inline fun <Error, A> Raise<Error>.traced(
     callsInPlace(trace, AT_MOST_ONCE)
     callsInPlace(block, EXACTLY_ONCE)
   }
-  return withErrorTraced({ t, error -> error.also { trace(t, error) } }, block)
+  return withErrorTraced({ t, error -> error.also { trace(t, error) } }, block = block)
 }
 
 @OptIn(DelicateRaiseApi::class)
 @ExperimentalTraceApi
 public inline fun <Error, OtherError, A> Raise<Error>.withErrorTraced(
   transform: (Trace, OtherError) -> Error,
-  block: Raise<OtherError>.() -> A
+  isTraced: Boolean = true,
+  block: Raise<OtherError>.() -> A,
 ): A {
   contract {
     callsInPlace(transform, AT_MOST_ONCE)
     callsInPlace(block, EXACTLY_ONCE)
   }
-  val nested = DefaultRaise(true)
-  return try {
-    block(nested).also { nested.complete() }
-  } catch (e: Traced) {
-    nested.complete()
-    val error = transform(Trace(e), e.raisedOrRethrow(nested))
-    // If our outer Raise happens to be traced
-    // Then we want the stack trace to match the inner one
-    try {
-      raise(error)
-    } catch (rethrown: Traced) {
-      throw rethrown.withCause(e)
-    }
-  }
+  foldTraced(
+    block = { return block() },
+    catch = { throw it },
+    recover = { t, e -> raise(transform(t, e)) },
+    transform = { it },
+    isTraced = isTraced
+  )
 }
 
 @PublishedApi
 @DelicateRaiseApi
+@ExperimentalTraceApi
 internal fun Traced.withCause(cause: Traced): Traced =
   Traced(raised, raise, cause)
 
@@ -249,13 +269,16 @@ internal fun <R> CancellationException.raisedOrRethrow(raise: DefaultRaise): R =
 
 /** Serves as both purposes of a scope-reference token, and a default implementation for Raise. */
 @PublishedApi
-internal class DefaultRaise(@PublishedApi internal val isTraced: Boolean) : Raise<Any?> {
+internal class DefaultRaise(
+  @property:ExperimentalTraceApi
+  override val isTraced: Boolean
+) : Raise<Any?> {
   private val isActive = AtomicBoolean(true)
 
   @PublishedApi @IgnorableReturnValue
   internal fun complete(): Boolean = isActive.getAndSet(false)
 
-  @OptIn(DelicateRaiseApi::class)
+  @OptIn(DelicateRaiseApi::class, ExperimentalTraceApi::class)
   override fun raise(r: Any?): Nothing = when {
     isActive.value -> throw if (isTraced) Traced(r, this) else NoTrace(r, this)
     else -> throw RaiseLeakedException()
@@ -283,7 +306,7 @@ public expect sealed class RaiseCancellationException(
 @DelicateRaiseApi
 internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException
 
-@DelicateRaiseApi @PublishedApi
+@DelicateRaiseApi @ExperimentalTraceApi @PublishedApi
 internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
