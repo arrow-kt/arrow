@@ -2,7 +2,9 @@
 
 package arrow.fx.coroutines
 
-import arrow.core.nonFatalOrThrow
+import arrow.core.mergeSuppressed
+import arrow.core.throwIfFatal
+import arrow.core.throwIfNotNull
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -81,7 +83,7 @@ public suspend inline fun <A> guarantee(
 ): A {
   contract {
     callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.AT_MOST_ONCE)
   }
   return guaranteeCase(fa) { finalizer() }
 }
@@ -107,7 +109,7 @@ public suspend inline fun <A> guaranteeCase(
 ): A {
   contract {
     callsInPlace(fa, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(finalizer, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(finalizer, InvocationKind.AT_MOST_ONCE)
   }
   return finalizeCase({ fa() }) { ex ->
     try {
@@ -115,8 +117,7 @@ public suspend inline fun <A> guaranteeCase(
         finalizer(ex)
       }
     } catch (e: Throwable) {
-      e.nonFatalOrThrow()
-      throw ex.errorOrNull?.also { it.addSuppressed(e) } ?: e
+      (ex.errorOrNull mergeSuppressed e).throwIfNotNull()
     }
   }
 }
@@ -170,7 +171,7 @@ public suspend inline fun <A, B> bracket(
   contract {
     callsInPlace(acquire, InvocationKind.EXACTLY_ONCE)
     callsInPlace(use, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(release, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(release, InvocationKind.AT_MOST_ONCE)
   }
   return bracketCase(acquire, use) { acquired, _ -> release(acquired) }
 }
@@ -246,7 +247,7 @@ public suspend inline fun <A, B> bracketCase(
   contract {
     callsInPlace(acquire, InvocationKind.EXACTLY_ONCE)
     callsInPlace(use, InvocationKind.EXACTLY_ONCE)
-    callsInPlace(release, InvocationKind.EXACTLY_ONCE)
+    callsInPlace(release, InvocationKind.AT_MOST_ONCE)
   }
   val acquired = withContext(NonCancellable) { acquire() }
   return guaranteeCase({ use(acquired) }) { release(acquired, it) }
@@ -265,7 +266,7 @@ internal inline fun <R> finalizeCase(block: () -> R, finalizer: (ExitCase) -> Un
     exitCase = ExitCase.ExitCase(e)
     throw e
   } finally {
-    if (exitCase is ExitCase.Failure) exitCase.failure.nonFatalOrThrow()
+    if (exitCase is ExitCase.Failure) exitCase.failure.throwIfFatal()
     finalizer(exitCase)
   }
 }

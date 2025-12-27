@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise
 
@@ -662,7 +663,7 @@ public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> E
  * @param value the value that must be non-null.
  * @param raise a lambda that produces an error of type [Error] when the [value] is null.
  */
-@RaiseDSL
+@RaiseDSL @IgnorableReturnValue
 public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: () -> Error): B {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)

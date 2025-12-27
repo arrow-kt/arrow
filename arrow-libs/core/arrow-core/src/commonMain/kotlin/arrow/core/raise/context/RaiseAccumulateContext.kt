@@ -12,7 +12,6 @@ import arrow.core.raise.ExperimentalRaiseAccumulateApi
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.raise.RaiseDSL
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
@@ -80,7 +79,7 @@ context(raise: Raise<NonEmptyList<Error>>)
 }
 
 /**
- * Accumulate the errors from running [action1], [action2], [action3], and [action4].
+ * Accumulate the errors from running [action1], [action2], and [action3]
  *
  * See the Arrow docs for more information over
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
@@ -284,12 +283,12 @@ context(raise: Raise<NonEmptyList<Error>>)
 
 @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
-public fun <A> EitherNel<Error, A>.bindNel(): A =
+public fun <Error, A> EitherNel<Error, A>.bindNel(): A =
   with(raise) { this@bindNel.bindNel() }
 
 @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
-public inline fun <A> withNel(block: context(Raise<NonEmptyList<Error>>) () -> A): A {
+public inline fun <Error, A> withNel(block: context(Raise<NonEmptyList<Error>>) () -> A): A {
   contract { callsInPlace(block, EXACTLY_ONCE) }
   return raise.withNel { block() }
 }

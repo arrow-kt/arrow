@@ -1,9 +1,12 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalStdlibApi::class)
-@file:Suppress("API_NOT_AVAILABLE")
+@file:Suppress("API_NOT_AVAILABLE", "RESERVED_MEMBER_INSIDE_VALUE_CLASS")
 
 package arrow.core
 
 import arrow.core.raise.RaiseAccumulate
+import arrow.core.raise.either
+import arrow.core.raise.mapOrAccumulate
+import arrow.core.raise.withError
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
@@ -24,7 +27,7 @@ public value class NonEmptySet<out E> internal constructor(
 
   override fun isEmpty(): Boolean = false
 
-  @JvmExposeBoxed
+  @JvmExposeBoxed @Suppress("USELESS_JVM_EXPOSE_BOXED")
   public fun toSet(): Set<E> = elements
 
   override val head: E get() = elements.first()
@@ -33,11 +36,9 @@ public value class NonEmptySet<out E> internal constructor(
 
   override fun toString(): String = elements.toString()
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun equals(other: Any?): Boolean =
     elements == other
 
-  @Suppress("RESERVED_MEMBER_INSIDE_VALUE_CLASS")
   override fun hashCode(): Int =
     elements.hashCode()
 
@@ -73,13 +74,15 @@ public value class NonEmptySet<out E> internal constructor(
 public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
-): Either<Error, NonEmptySet<T>> =
-  elements.mapOrAccumulate(combine, transform).map { requireNotNull(it.toNonEmptySetOrNull()) }
+): Either<Error, NonEmptySet<T>> = either {
+  withError({ it.reduce(combine) }) { mapOrAccumulate(this@mapOrAccumulate, transform) }
+}
 
 public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
-): Either<NonEmptyList<Error>, NonEmptySet<T>> =
-  elements.mapOrAccumulate(transform).map { requireNotNull(it.toNonEmptySetOrNull()) }
+): Either<NonEmptyList<Error>, NonEmptySet<T>> = either {
+  mapOrAccumulate(this@mapOrAccumulate, transform)
+}
 
 public fun <E> nonEmptySetOf(first: E, vararg rest: E): NonEmptySet<E> =
   NonEmptySet(first, rest.asIterable())
@@ -87,11 +90,9 @@ public fun <E> nonEmptySetOf(first: E, vararg rest: E): NonEmptySet<E> =
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
  */
-public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? {
-  val iter = iterator()
-  if (!iter.hasNext()) return null
-  return NonEmptySet(Iterable { iter }.toSet())
-}
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? =
+  toSet().wrapAsNonEmptySetOrNull()
 
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
@@ -102,11 +103,9 @@ public fun <T> Iterable<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
  */
-public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T> {
-  val iter = iterator()
-  require(iter.hasNext())
-  return NonEmptySet(Iterable { iter }.toSet())
-}
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T> =
+  toSet().wrapAsNonEmptySetOrThrow()
 
 @Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
 public fun <E> Set<E>.toNonEmptySetOrNull(): NonEmptySet<E>? =

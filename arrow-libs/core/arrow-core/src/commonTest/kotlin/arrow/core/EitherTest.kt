@@ -948,7 +948,7 @@ class EitherTest {
         }
         res.fold(
           { fail("Should not catch CancellationException") },
-          { it shouldBe e.getOrNull() },
+          { it shouldBe e.getOrNull() ; Unit },
         )
       } catch (e: Throwable) {
         e::class shouldBe CancellationException::class

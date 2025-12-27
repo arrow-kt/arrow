@@ -1,0 +1,14 @@
+public final class arrow/core/NonFatalKt {
+	public static final fun NonFatal (Ljava/lang/Throwable;)Z
+}
+
+public final class arrow/core/NonFatalOrThrowKt {
+	public static final fun nonFatalOrThrow (Ljava/lang/Throwable;)Ljava/lang/Throwable;
+	public static final fun throwIfFatal (Ljava/lang/Throwable;)V
+}
+
+public final class arrow/core/ThrowableUtilsKt {
+	public static final fun mergeSuppressed (Ljava/lang/Throwable;Ljava/lang/Throwable;)Ljava/lang/Throwable;
+	public static final fun throwIfNotNull (Ljava/lang/Throwable;)V
+}
+

@@ -1,9 +1,9 @@
 package arrow.integrations.jackson.module.internal
 
 import arrow.core.Option
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ser.std.StdSerializer
 
 public class ProductTypeSerializer<T>(clazz: Class<T>, private val fields: List<ProjectField<T>>) : StdSerializer<T>(clazz) {
   public class ProjectField<T>(
@@ -11,11 +11,11 @@ public class ProductTypeSerializer<T>(clazz: Class<T>, private val fields: List<
     public val getOption: (T) -> Option<*>,
   )
 
-  override fun serialize(value: T, gen: JsonGenerator, provider: SerializerProvider) {
+  override fun serialize(value: T, gen: JsonGenerator, provider: SerializationContext) {
     gen.writeStartObject()
     for (projector in fields) {
-      projector.getOption(value).map {
-        provider.defaultSerializeField(projector.fieldName, it, gen)
+      projector.getOption(value).onSome {
+        provider.defaultSerializeProperty(projector.fieldName, it, gen)
       }
     }
     gen.writeEndObject()

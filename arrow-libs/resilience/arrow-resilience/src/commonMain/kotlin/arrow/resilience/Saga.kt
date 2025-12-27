@@ -2,7 +2,9 @@ package arrow.resilience
 
 import arrow.atomic.Atomic
 import arrow.atomic.update
+import arrow.core.mergeSuppressed
 import arrow.core.nonFatalOrThrow
+import arrow.core.throwIfNotNull
 import arrow.core.prependTo
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ResourceScope
@@ -145,10 +147,8 @@ internal class SagaBuilder(
           finalizer()
           acc
         } catch (e: Throwable) {
-          e.nonFatalOrThrow()
-          acc?.apply { addSuppressed(e) } ?: e
+          acc mergeSuppressed e.nonFatalOrThrow()
         }
-      }
-      ?.let { throw it }
+      }.throwIfNotNull()
   }
 }

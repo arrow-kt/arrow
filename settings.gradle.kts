@@ -17,7 +17,7 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.2.2"
+  id("com.gradle.develocity") version "4.3"
   id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
 }
 
@@ -58,6 +58,9 @@ project(":arrow-annotations").projectDir = file("arrow-libs/core/arrow-annotatio
 
 include("arrow-platform")
 project(":arrow-platform").projectDir = file("arrow-libs/core/arrow-platform")
+
+include("arrow-exception-utils")
+project(":arrow-exception-utils").projectDir = file("arrow-libs/core/arrow-exception-utils")
 
 include("arrow-core")
 project(":arrow-core").projectDir = file("arrow-libs/core/arrow-core")
@@ -131,6 +134,9 @@ project(":arrow-core-retrofit").projectDir = file("arrow-libs/integrations/arrow
 
 include("arrow-core-jackson")
 project(":arrow-core-jackson").projectDir = file("arrow-libs/integrations/arrow-core-jackson")
+
+include("arrow-core-jackson2")
+project(":arrow-core-jackson2").projectDir = file("arrow-libs/integrations/arrow-core-jackson2")
 
 include("arrow-core-serialization")
 project(":arrow-core-serialization").projectDir = file("arrow-libs/integrations/arrow-core-serialization")

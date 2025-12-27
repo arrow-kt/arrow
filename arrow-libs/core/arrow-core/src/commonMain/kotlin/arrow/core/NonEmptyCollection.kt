@@ -11,8 +11,8 @@ public interface NonEmptyCollection<out E> : Collection<E> {
   public operator fun plus(element: @UnsafeVariance E): NonEmptyCollection<E>
   public operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptyCollection<E>
 
-  public fun toNonEmptySet(): NonEmptySet<E> = toNonEmptySetOrNull()!!
-  public fun toNonEmptyList(): NonEmptyList<E> = toNonEmptyListOrNull()!!
+  public fun toNonEmptySet(): NonEmptySet<E> = toNonEmptySetOrThrow()
+  public fun toNonEmptyList(): NonEmptyList<E> = toNonEmptyListOrThrow()
 
   // These functions take precedence over the extensions in [Collection].
   // This way non-emptiness is tracked by the type system.
@@ -37,8 +37,9 @@ public interface NonEmptyCollection<out E> : Collection<E> {
    * Convenience method which delegates the implementation to [Collection],
    * and wraps the resulting [List] as a non-empty one.
    */
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   private inline fun <T> delegate(crossinline f: (Collection<E>) -> List<T>): NonEmptyList<T> =
-    f(this as Collection<E>).toNonEmptyListOrNull()!!
+    f(this as Collection<E>).wrapAsNonEmptyListOrThrow()
 }
 
 /**

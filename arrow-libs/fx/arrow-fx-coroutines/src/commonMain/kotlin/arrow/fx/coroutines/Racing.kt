@@ -1,8 +1,8 @@
 package arrow.fx.coroutines
 
-import arrow.core.nonFatalOrThrow
 import arrow.core.raise.DelicateRaiseApi
 import arrow.core.raise.RaiseCancellationException
+import arrow.core.throwIfFatal
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -72,7 +72,7 @@ public fun <Result> RacingScope<Result>.race(
     if (!condition(result)) awaitCancellation()
     result
   } catch (t: Throwable) {
-    if (t !is RaiseCancellationException) t.nonFatalOrThrow()
+    if (t !is RaiseCancellationException) t.throwIfFatal()
     (coroutineContext[CoroutineExceptionHandler] ?: defaultCoroutineExceptionHandler).handleException(currentCoroutineContext(), t)
     awaitCancellation()
   }

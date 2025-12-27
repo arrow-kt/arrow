@@ -1,17 +1,7 @@
 package arrow.integrations.jackson.module
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.cfg.MapperBuilder
-
-public fun ObjectMapper.registerArrowModule(
-  eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),
-  iorModuleConfig: IorModuleConfig = IorModuleConfig("left", "right"),
-): ObjectMapper = registerModules(
-  NonEmptyCollectionsModule(),
-  OptionModule,
-  EitherModule(eitherModuleConfig.leftFieldName, eitherModuleConfig.rightFieldName),
-  IorModule(iorModuleConfig.leftFieldName, iorModuleConfig.rightFieldName),
-)
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.cfg.MapperBuilder
 
 public fun <M : ObjectMapper, B : MapperBuilder<M, B>> MapperBuilder<M, B>.addArrowModule(
   eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),

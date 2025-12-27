@@ -8,10 +8,12 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
+private const val PLUGIN_ID = "arrow.optics.plugin"
+
 @Suppress("unused") // Used via reflection.
 class OpticsCommandLineProcessor : CommandLineProcessor {
-  override val pluginId: String = "arrow.optics.plugin"
-  override val pluginOptions: Collection<CliOption> = emptyList()
+  override val pluginId: String get() = PLUGIN_ID
+  override val pluginOptions: Collection<CliOption> get() = emptyList()
 
   override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
     error("Unexpected config option: '${option.optionName}'")
@@ -19,8 +21,8 @@ class OpticsCommandLineProcessor : CommandLineProcessor {
 }
 
 class OpticsPluginComponentRegistrar : CompilerPluginRegistrar() {
-  override val supportsK2: Boolean
-    get() = true
+  override val supportsK2: Boolean get() = true
+  override val pluginId: String get() = PLUGIN_ID
 
   override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
     FirExtensionRegistrarAdapter.registerExtension(OpticsPluginRegistrar())

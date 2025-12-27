@@ -3,26 +3,28 @@ animalSniffer = "2.0.1"
 coroutines = "1.10.2"
 classgraph = "4.8.184"
 dokka = "2.1.0"
-kotest = "6.0.4"
-kover = "0.9.3"
-kotlin = "2.2.21"
-kotlinCompileTesting = "0.11.1"
+kotest = "6.0.7"
+kover = "0.9.4"
+kotlin = "2.3.0"
+kotlinCompileTesting = "0.12.0"
 knit = "0.5.0"
-kspVersion = "2.3.3"
+kspVersion = "2.3.4"
 kotlinxSerialization = "1.9.0"
-ktor = "3.3.2"
+ktor = "3.3.3"
 mockWebServer = "5.3.2"
 retrofit = "3.0.0"
 moshi = "1.15.2"
 spotlessVersion = "8.1.0"
 composePlugin = "1.9.3"
-agp = "8.13.1"
+agp = "8.13.2"
 cache4k = "0.14.0"
 publish = "0.35.0"
-jacksonModuleKotlin = "2.20.1"
-shadow = "9.2.2"
-kotlinWrappers = "2025.11.12"
-result4k="2.23.0.0"
+jackson2 = "2.20.1"
+jackson = "3.0.3"
+jacksonAnnotations = "2.20"
+shadow = "9.3.0"
+kotlinWrappers = "2025.12.8"
+result4k="2.25.0.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -44,7 +46,10 @@ classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classg
 kotlinCompileTesting = { module = "dev.zacsweers.kctfork:core", version.ref = "kotlinCompileTesting" }
 kotlinCompileTestingKsp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kotlinCompileTesting" }
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
-jacksonModuleKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonModuleKotlin" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jacksonAnnotations" }
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson2-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson2" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-test = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 ktor-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
