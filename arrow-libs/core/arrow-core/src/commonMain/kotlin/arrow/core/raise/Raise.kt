@@ -713,13 +713,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
     callsInPlace(block, EXACTLY_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  foldTraced(
-    block = { return block() },
-    catch = { throw it },
-    recover = { _, e -> raise(transform(e)) },
-    transform = { it },
-    isTraced = this.isTraced,
-  )
+  return withErrorTraced({ _, e -> transform(e) }, this.isTraced, block)
 }
 
 /**

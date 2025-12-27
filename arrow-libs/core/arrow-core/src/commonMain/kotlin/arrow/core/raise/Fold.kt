@@ -166,13 +166,7 @@ public inline fun <Error, A, B> foldTraced(
     transform(res)
   } catch (e: RaiseCancellationException) {
     raise.complete()
-    try {
-      recover(Trace(e), e.raisedOrRethrow(raise))
-    } catch (rethrown: Traced) {
-      // If our outer Raise happens to be traced
-      // Then we want the stack trace to match the inner one
-      throw if (e is Traced) rethrown.withCause(e) else rethrown
-    }
+    recover(Trace(e), e.raisedOrRethrow(raise))
   } catch (e: Throwable) {
     raise.complete()
     catch(e.nonFatalOrThrow())
@@ -245,7 +239,13 @@ public inline fun <Error, OtherError, A> Raise<Error>.withErrorTraced(
   foldTraced(
     block = { return block() },
     catch = { throw it },
-    recover = { t, e -> raise(transform(t, e)) },
+    recover = { t, e ->
+      try {
+        raise(transform(t, e))
+      } catch (rethrown: Traced) {
+        throw rethrown.withTrace(t)
+      }
+    },
     transform = { it },
     isTraced = isTraced
   )
@@ -254,8 +254,8 @@ public inline fun <Error, OtherError, A> Raise<Error>.withErrorTraced(
 @PublishedApi
 @DelicateRaiseApi
 @ExperimentalTraceApi
-internal fun Traced.withCause(cause: Traced): Traced =
-  Traced(raised, raise, cause)
+internal fun Traced.withTrace(trace: Trace): Traced =
+  if (trace.isTrulyTraced()) Traced(raised, raise, trace) else this
 
 /** Returns the raised value, rethrows the CancellationException if not our scope */
 @PublishedApi
@@ -307,7 +307,7 @@ public expect sealed class RaiseCancellationException(
 internal expect fun NoTrace(raised: Any?, raise: Raise<Any?>): RaiseCancellationException
 
 @DelicateRaiseApi @ExperimentalTraceApi @PublishedApi
-internal class Traced(raised: Any?, raise: Raise<Any?>, override val cause: Traced? = null) : RaiseCancellationException(raised, raise)
+internal class Traced(raised: Any?, raise: Raise<Any?>, val trace: Trace? = null) : RaiseCancellationException(raised, raise)
 
 private class RaiseLeakedException : IllegalStateException(
   """
