@@ -8,17 +8,22 @@ package arrow.core.raise
 import arrow.core.Either
 import arrow.core.EitherNel
 import arrow.core.Ior
+import arrow.core.MonotoneMutableList
+import arrow.core.MonotoneMutableSet
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.PotentiallyUnsafeNonEmptyOperation
+import arrow.core.add
+import arrow.core.addAll
+import arrow.core.asNonEmptyList
+import arrow.core.asNonEmptySet
 import arrow.core.collectionSizeOrDefault
 import arrow.core.getOrElse
+import arrow.core.isNonEmpty
 import arrow.core.nel
 import arrow.core.raise.RaiseAccumulate.Error
 import arrow.core.raise.RaiseAccumulate.Ok
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
-import arrow.core.wrapAsNonEmptySetOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -768,7 +773,21 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   // For a NonEmptyList to be returned, there must be a B, which can only be produced by transform
   // thus transform must be called at least once (or alternatively an error is raised or an exception is thrown etc)
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
-  return mapOrAccumulate(nonEmptyList.all) { transform(it) }.let(::NonEmptyList)
+  val list = MonotoneMutableList<B>(nonEmptyList.size)
+  return accumulate {
+    var result: Value<NonEmptyList<B>>? = null
+    val iterator = nonEmptyList.iterator()
+    do result = run { // Once language version is 2.2, we can use continue instead of return@run here
+      accumulating {
+        val transformed = transform(iterator.next())
+        if (result is RaiseAccumulate.Error) return@run result
+        list.add(transformed)
+        if (result != null) return@run result
+        list.asNonEmptyList()
+      }
+    } while (iterator.hasNext())
+    result.value
+  }
 }
 
 /**
@@ -778,7 +797,7 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
  * [error accumulation](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#accumulating-errors)
  * and how to use it in [validation](https://arrow-kt.io/learn/typed-errors/validation/).
  */
-@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 @RaiseDSL
 @Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
@@ -786,11 +805,20 @@ public inline fun <Error, A, B> Raise<NonEmptyList<Error>>.mapOrAccumulate(
   @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
 ): NonEmptySet<B> {
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
-  return buildSet(nonEmptySet.size) {
-    forEachAccumulatingImpl(nonEmptySet.iterator()) { item, hasErrors ->
-      transform(item).also { if (!hasErrors) add(it) }
-    }
-  }.wrapAsNonEmptySetOrThrow()
+  val set = MonotoneMutableSet<B>(nonEmptySet.size)
+  return accumulate {
+    var result: Value<NonEmptySet<B>>? = null
+    val iterator = nonEmptySet.iterator()
+    do result = run { // Once language version is 2.2, we can use continue instead of return@run here
+      accumulating {
+        val transformed = transform(iterator.next())
+        if (result is RaiseAccumulate.Error) return@run result
+        set.add(transformed)
+        set.asNonEmptySet()
+      }
+    } while (iterator.hasNext())
+    result.value
+  }
 }
 
 @RaiseDSL
@@ -1096,23 +1124,19 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
 private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
-  private val list: MutableList<Error> = mutableListOf()
+  private val list = MonotoneMutableList<Error>()
 
-  fun raiseSingle(r: Error): Nothing = raise.raise(NonEmptyList(list + r))
-  override fun raise(r: NonEmptyList<Error>) = raise.raise(NonEmptyList(list + r.all))
-
-  // only valid if list is not empty
-  // errors are never removed from `list`, so once this is valid, it stays valid
-  private val error = Error { raise.raise(NonEmptyList(list)) }
+  fun raiseSingle(r: Error): Nothing = raise.raise(if (list.isNonEmpty()) list.asNonEmptyList() + r else r.nel())
+  override fun raise(r: NonEmptyList<Error>) = raise.raise(if (list.isNonEmpty()) list.asNonEmptyList() + r else r)
 
   @ExperimentalRaiseAccumulateApi
   override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
     list.addAll(errors)
-    return error
+    return Error { raise.raise(list.asNonEmptyList()) }
   }
 
   @ExperimentalRaiseAccumulateApi
-  override val latestError: Value<Nothing>? get() = error.takeIf { list.isNotEmpty() }
+  override val latestError: Value<Nothing>? get() = if (list.isNonEmpty()) Error { raise.raise(list.asNonEmptyList()) } else null
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)
