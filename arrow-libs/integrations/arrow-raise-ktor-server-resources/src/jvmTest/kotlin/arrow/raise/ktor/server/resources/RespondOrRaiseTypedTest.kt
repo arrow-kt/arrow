@@ -1,4 +1,4 @@
-package arrow.raise.ktor.server.routing.resources
+package arrow.raise.ktor.server.resources
 
 import arrow.core.raise.context.ensure
 import arrow.core.raise.context.raise
@@ -93,7 +93,7 @@ class RespondOrRaiseTypedTest {
   fun `receive with typed body`() = testApplication {
     install(Resources)
     install(ContentNegotiation) {
-      json(Json)
+      json(Json.Default)
     }
     @Serializable
     data class Body(val id: String, val num: Int)
@@ -109,20 +109,30 @@ class RespondOrRaiseTypedTest {
       }
     }
     // installing content negotiation on the test client wouldnt work, manually encode and decode
-    client.post("/foo") { contentType(ContentType.Application.Json); setBody(Json.encodeToString(defaultBody)) }.let {
-      it.status shouldBe HttpStatusCode.OK
-      Json.decodeFromString<Body>(it.bodyAsText()) shouldBe defaultBody
-    }
+    client.post("/foo") { contentType(ContentType.Application.Json); setBody(Json.encodeToString(defaultBody)) }
+      .let {
+        it.status shouldBe HttpStatusCode.OK
+        Json.decodeFromString<Body>(it.bodyAsText()) shouldBe defaultBody
+      }
     // Ensure raising error in response returns bad code
-    client.post("/foo") { contentType(ContentType.Application.Json); setBody(Json.encodeToString(Body("", -1))) }.let {
+    client.post("/foo") {
+      contentType(ContentType.Application.Json); setBody(
+      Json.encodeToString(
+        Body(
+          "",
+          -1
+        )
+      )
+    )
+    }.let {
       it.bodyAsText() shouldBe "Bad"
       it.status shouldBe HttpStatusCode.Conflict
     }
     // Ensures sending wrong body type is handled
-    client.post("/foo") { contentType(ContentType.Application.Json); setBody(Json.encodeToString(OtherBody("name"))) }.let {
-      it.bodyAsText() shouldBe ""
-      it.status shouldBe HttpStatusCode.BadRequest
-    }
+    client.post("/foo") { contentType(ContentType.Application.Json); setBody(Json.encodeToString(OtherBody("name"))) }
+      .let {
+        it.bodyAsText() shouldBe ""
+        it.status shouldBe HttpStatusCode.BadRequest
+      }
   }
 }
-

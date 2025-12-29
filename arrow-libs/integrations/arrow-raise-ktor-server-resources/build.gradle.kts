@@ -10,7 +10,9 @@ kotlin {
     commonMain {
       dependencies {
         api(libs.ktor.server.core)
+        implementation(libs.ktor.server.resources)
         api(projects.arrowCore)
+        api(projects.arrowRaiseKtorServer)
       }
     }
 

@@ -1,6 +1,6 @@
 @file:Suppress("API_NOT_AVAILABLE")
 
-package arrow.raise.ktor.server.routing.resources
+package arrow.raise.ktor.server.resources
 
 import arrow.core.raise.Raise
 import arrow.core.raise.RaiseDSL
