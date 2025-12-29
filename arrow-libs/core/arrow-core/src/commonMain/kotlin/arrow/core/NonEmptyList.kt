@@ -625,8 +625,6 @@ public interface MonotoneMutableList<E>: MonotoneMutableCollection<E>, List<E> {
     public operator fun <E> invoke(): MonotoneMutableList<E> = Impl()
 
     public operator fun <E> invoke(initialCapacity: Int): MonotoneMutableList<E> = Impl(initialCapacity)
-
-    public operator fun <E> invoke(elements: Collection<E>): MonotoneMutableList<E> = Impl(elements)
   }
 
   public interface Iterator<T> : ListIterator<T> {
@@ -645,7 +643,6 @@ public interface MonotoneMutableList<E>: MonotoneMutableCollection<E>, List<E> {
   private class Impl<E> private constructor(private val underlying: MutableList<E>) : MonotoneMutableList<E>, NonEmptyCollection<E>, List<E> by underlying {
     constructor() : this(ArrayList())
     constructor(initialCapacity: Int) : this(ArrayList(initialCapacity))
-    constructor(elements: Collection<E>) : this(ArrayList(elements))
 
     override fun isEmpty(): Boolean = underlying.isEmpty()
 
@@ -663,8 +660,10 @@ public interface MonotoneMutableList<E>: MonotoneMutableCollection<E>, List<E> {
     override fun listIterator(index: Int) = IteratorImpl(underlying.listIterator(index))
     override fun subList(fromIndex: Int, toIndex: Int) = Impl(underlying.subList(fromIndex, toIndex))
     override fun plus(element: E) = asNonEmptyList() + element
-
     override fun plus(elements: Iterable<E>) = asNonEmptyList() + elements
+    override fun equals(other: Any?) = underlying == other
+    override fun hashCode() = underlying.hashCode()
+    override fun toString() = underlying.toString()
   }
 }
 

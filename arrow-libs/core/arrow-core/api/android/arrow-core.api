@@ -367,7 +367,6 @@ public abstract interface class arrow/core/MonotoneMutableList : arrow/core/Mono
 public final class arrow/core/MonotoneMutableList$Companion {
 	public final fun invoke ()Larrow/core/MonotoneMutableList;
 	public final fun invoke (I)Larrow/core/MonotoneMutableList;
-	public final fun invoke (Ljava/util/Collection;)Larrow/core/MonotoneMutableList;
 }
 
 public abstract interface class arrow/core/MonotoneMutableList$Iterator : java/util/ListIterator, kotlin/jvm/internal/markers/KMappedMarker {
@@ -380,12 +379,8 @@ public abstract interface class arrow/core/MonotoneMutableSet : arrow/core/Monot
 }
 
 public final class arrow/core/MonotoneMutableSet$Companion {
-	public final fun hash ()Larrow/core/MonotoneMutableSet;
-	public final fun hash (I)Larrow/core/MonotoneMutableSet;
-	public final fun hash (Ljava/util/Collection;)Larrow/core/MonotoneMutableSet;
 	public final fun invoke ()Larrow/core/MonotoneMutableSet;
 	public final fun invoke (I)Larrow/core/MonotoneMutableSet;
-	public final fun invoke (Ljava/util/Collection;)Larrow/core/MonotoneMutableSet;
 }
 
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
@@ -646,6 +641,7 @@ public final class arrow/core/NonEmptySetKt {
 	public static final fun asNonEmptySet (Ljava/util/Set;)Ljava/util/Set;
 	public static final fun buildNonEmptySet (ILkotlin/jvm/functions/Function1;)Ljava/util/Set;
 	public static final fun buildNonEmptySet (Lkotlin/jvm/functions/Function1;)Ljava/util/Set;
+	public static synthetic fun buildNonEmptySet$default (ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/util/Set;
 	public static final fun mapOrAccumulate-EyVDDLY (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun mapOrAccumulate-jkbboic (Ljava/util/Set;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/Set;

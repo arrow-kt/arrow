@@ -142,21 +142,14 @@ public fun <T> Set<T>.wrapAsNonEmptySetOrNull(): NonEmptySet<T>? = when {
 @SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
 public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
   public companion object {
-    // linked by default to match mutableSetOf behavior
-    public operator fun <E> invoke(): MonotoneMutableSet<E> = Impl(isLinked = true)
-    public operator fun <E> invoke(initialCapacity: Int): MonotoneMutableSet<E> = Impl(initialCapacity, isLinked = true)
-    public operator fun <E> invoke(elements: Collection<E>): MonotoneMutableSet<E> = Impl(elements, isLinked = true)
-
-    public fun <E> hash(): MonotoneMutableSet<E> = Impl(isLinked = false)
-    public fun <E> hash(initialCapacity: Int): MonotoneMutableSet<E> = Impl(initialCapacity, isLinked = false)
-    public fun <E> hash(elements: Collection<E>): MonotoneMutableSet<E> = Impl(elements, isLinked = false)
+    public operator fun <E> invoke(): MonotoneMutableSet<E> = Impl()
+    public operator fun <E> invoke(initialCapacity: Int): MonotoneMutableSet<E> = Impl(initialCapacity)
   }
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   private class Impl<E> private constructor(private val underlying: MutableSet<E>) : MonotoneMutableSet<E>, NonEmptyCollection<E>, Set<E> by underlying {
-    constructor(isLinked: Boolean) : this(if(isLinked) LinkedHashSet() else HashSet())
-    constructor(initialCapacity: Int, isLinked: Boolean) : this(if(isLinked) LinkedHashSet(initialCapacity) else HashSet(initialCapacity))
-    constructor(elements: Collection<E>, isLinked: Boolean) : this(if(isLinked) LinkedHashSet(elements) else HashSet(elements))
+    constructor() : this(LinkedHashSet())
+    constructor(initialCapacity: Int) : this(LinkedHashSet(initialCapacity))
 
     override fun isEmpty(): Boolean = underlying.isEmpty()
 
@@ -189,7 +182,7 @@ public inline fun <E, S> buildNonEmptySet(
 }
 
 public inline fun <E, S> buildNonEmptySet(
-  capacity: Int,
+  capacity: Int = 0,
   builderAction: MonotoneMutableSet<E>.() -> S
 ): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
