@@ -168,6 +168,10 @@ public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
       addAll(elements)
       this
     }
+
+    override fun equals(other: Any?) = underlying == other
+    override fun hashCode() = underlying.hashCode()
+    override fun toString() = underlying.toString()
   }
 }
 
