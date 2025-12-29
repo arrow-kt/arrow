@@ -4,6 +4,7 @@ import arrow.raise.ktor.server.response.raise
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.head
 import io.ktor.client.request.options
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
@@ -78,6 +79,7 @@ class RoutingResourcesTest {
     install(Resources)
     routing {
       getOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
+      headOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
       deleteOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
       optionsOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
       patchOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
@@ -86,6 +88,7 @@ class RoutingResourcesTest {
     }
     listOf(
       client.get("/foo/bar"),
+      client.head("/foo/bar"),
       client.delete("/foo/bar"),
       client.options("/foo/bar"),
       client.patch("/foo/bar"),
