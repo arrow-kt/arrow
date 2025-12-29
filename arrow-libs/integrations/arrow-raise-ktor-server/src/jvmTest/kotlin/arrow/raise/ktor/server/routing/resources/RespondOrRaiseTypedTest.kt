@@ -1,11 +1,8 @@
-package arrow.raise.ktor.server.response
+package arrow.raise.ktor.server.routing.resources
 
 import arrow.core.raise.context.ensure
 import arrow.core.raise.context.raise
 import arrow.raise.ktor.server.response.Response.Companion.invoke
-import arrow.raise.ktor.server.routing.typesafe.getOrRaise
-import arrow.raise.ktor.server.routing.typesafe.patchOrRaise
-import arrow.raise.ktor.server.routing.typesafe.postOrRaise
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
@@ -28,7 +25,7 @@ import kotlin.test.Test
 class RespondOrRaiseTypedTest {
 
   @Resource("/foo")
-  class Foo() {
+  class Foo {
     @Resource("/{name}")
     data class Id(val parent: Foo = Foo(), val name: String)
   }
