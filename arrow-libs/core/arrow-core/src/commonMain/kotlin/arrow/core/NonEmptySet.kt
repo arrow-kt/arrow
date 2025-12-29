@@ -53,6 +53,13 @@ public value class NonEmptySet<out E> @PotentiallyUnsafeNonEmptyOperation intern
 
   public override fun distinct(): NonEmptyList<E> = toNonEmptyList()
 
+  override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> = buildNonEmptyList(minOf(size, other.size)) {
+    val first = this@NonEmptySet.iterator()
+    val second = other.iterator()
+    do add(first.next() to second.next()) while (first.hasNext() && second.hasNext())
+    this
+  }
+
   public companion object {
     @JvmStatic @JvmExposeBoxed
     public fun <E> of(head: E, vararg t: E): NonEmptySet<E> =
@@ -172,19 +179,19 @@ public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
 }
 
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <L, E> L.asNonEmptySet(): NonEmptySet<E> where L : Set<E>, L : NonEmptyCollection<E> = NonEmptySet(this)
+public fun <E, S> S.asNonEmptySet(): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> = NonEmptySet(this)
 
-public inline fun <E, L> buildNonEmptySet(
-  builderAction: MonotoneMutableSet<E>.() -> L
-): NonEmptySet<E> where L : MonotoneMutableSet<E>, L : NonEmptyCollection<E> {
+public inline fun <E, S> buildNonEmptySet(
+  builderAction: MonotoneMutableSet<E>.() -> S
+): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableSet()).asNonEmptySet()
 }
 
-public inline fun <E, L> buildNonEmptySet(
+public inline fun <E, S> buildNonEmptySet(
   capacity: Int,
-  builderAction: MonotoneMutableSet<E>.() -> L
-): NonEmptySet<E> where L : MonotoneMutableSet<E>, L : NonEmptyCollection<E> {
+  builderAction: MonotoneMutableSet<E>.() -> S
+): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableSet(capacity)).asNonEmptySet()
 }

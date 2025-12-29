@@ -60,7 +60,7 @@ public interface NonEmptyCollection<out E> : Collection<E> {
     do add(transform(i++, iterator.next())) while (iterator.hasNext())
     this
   }
-  public fun <T> zip(other: NonEmptyCollection<T>): NonEmptyCollection<Pair<E, T>> = buildNonEmptyList(minOf(collectionSizeOrDefault(10), other.collectionSizeOrDefault(10))) {
+  public fun <T> zip(other: NonEmptyCollection<T>): NonEmptyCollection<Pair<E, T>> = buildNonEmptyList(minOf(size, other.size)) {
     val first = this@NonEmptyCollection.iterator()
     val second = other.iterator()
     do add(first.next() to second.next()) while (first.hasNext() && second.hasNext())

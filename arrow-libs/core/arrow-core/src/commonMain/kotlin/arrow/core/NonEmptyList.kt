@@ -273,7 +273,7 @@ public value class NonEmptyList<out E> @PotentiallyUnsafeNonEmptyOperation @Publ
     contract { callsInPlace(both, InvocationKind.AT_LEAST_ONCE) }
     val first = iterator()
     val second = other.iterator()
-    return buildNonEmptyList(maxOf(this.collectionSizeOrDefault(10), other.collectionSizeOrDefault(10))) {
+    return buildNonEmptyList(maxOf(size, other.size)) {
       do add(both(first.next(), second.next())) while (first.hasNext() && second.hasNext())
       while (first.hasNext()) add(left(first.next()))
       while (second.hasNext()) add(right(second.next()))
@@ -683,11 +683,11 @@ public fun <E> MonotoneMutableList<E>.add(index: Int, element: E) {
 }
 
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <L, E> L.asNonEmptyList(): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> = NonEmptyList(this)
+public fun <E, L> L.asNonEmptyList(): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> = NonEmptyList(this)
 
 public inline fun <E, L> buildNonEmptyList(
   builderAction: MonotoneMutableList<E>.() -> L
-): NonEmptyList<E> where L : MonotoneMutableList<E>, L : NonEmptyCollection<E> {
+): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableList()).asNonEmptyList()
 }
@@ -695,7 +695,7 @@ public inline fun <E, L> buildNonEmptyList(
 public inline fun <E, L> buildNonEmptyList(
   capacity: Int,
   builderAction: MonotoneMutableList<E>.() -> L
-): NonEmptyList<E> where L : MonotoneMutableList<E>, L : NonEmptyCollection<E> {
+): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableList(capacity)).asNonEmptyList()
 }
