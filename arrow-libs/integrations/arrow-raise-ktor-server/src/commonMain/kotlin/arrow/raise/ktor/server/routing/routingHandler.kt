@@ -4,7 +4,6 @@ import arrow.core.raise.Raise
 import arrow.raise.ktor.server.response.Response
 import arrow.raise.ktor.server.response.respondOrRaise
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.util.reflect.*
@@ -19,14 +18,12 @@ public fun interface ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>
   public suspend fun RoutingContext.handle(request: TRequest): TResponse
 }
 
-@PublishedApi
-internal suspend inline fun <reified TResponse> RoutingContext.respondOrRaise(
+public suspend inline fun <reified TResponse> RoutingContext.respondOrRaise(
   statusCode: HttpStatusCode? = null,
   body: RespondingRaiseRoutingHandler<TResponse>,
 ): Unit = call.respondOrRaise(statusCode, typeInfo<TResponse>()) { body() }
 
-@PublishedApi
-internal suspend inline fun <reified TRequest : Any, reified TResponse> RoutingContext.respondOrRaise(
+public suspend inline fun <reified TRequest : Any, reified TResponse> RoutingContext.respondOrRaise(
   statusCode: HttpStatusCode? = null,
   body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
 ): Unit = call.respondOrRaise(statusCode, typeInfo<TResponse>()) {
