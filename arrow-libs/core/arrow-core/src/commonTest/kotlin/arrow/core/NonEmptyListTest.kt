@@ -3,7 +3,6 @@ package arrow.core
 import arrow.core.test.nonEmptyList
 import arrow.core.test.nonEmptySet
 import arrow.platform.stackSafeIteration
-import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -530,7 +529,7 @@ class NonEmptyListTest {
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   @Test
   fun wrapAsNonEmptyListOrThrowEmpty() = runTest {
-    shouldThrowAny { emptyList<Int>().wrapAsNonEmptyListOrThrow() }
+    runCatching { emptyList<Int>().wrapAsNonEmptyListOrThrow() }.isFailure.shouldBeTrue()
   }
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
