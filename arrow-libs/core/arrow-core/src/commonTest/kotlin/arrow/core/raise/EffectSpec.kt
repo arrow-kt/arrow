@@ -603,10 +603,8 @@ class EffectSpec {
   }
 
   @Test fun accumulateReturnsEveryError() = runTest {
-    checkAll(Arb.list(Arb.int(), range = 2..20)) { errors ->
-      either<NonEmptyList<Int>, List<String>> {
-        mapOrAccumulate(errors) { raise(it) }
-      } shouldBe errors.toNonEmptyListOrNull()!!.left()
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 2..20)) { errors ->
+      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors
     }
   }
 
@@ -620,9 +618,7 @@ class EffectSpec {
 
   @Test fun nonEmptyListMapOrAccumulateReturnsEveryError() = runTest {
     checkAll(Arb.nonEmptyList(Arb.int(), range = 2..20)) { errors ->
-      either<NonEmptyList<Int>, NonEmptyList<String>> {
-        mapOrAccumulate(errors) { raise(it) }
-      } shouldBe errors.toNonEmptyListOrNull()!!.left()
+      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors
     }
   }
 
@@ -636,9 +632,7 @@ class EffectSpec {
 
   @Test fun nonEmptySetMapOrAccumulateReturnsEveryError() = runTest {
     checkAll(Arb.nonEmptySet(Arb.int(), range = 2..20)) { errors ->
-      either<NonEmptyList<Int>, NonEmptySet<String>> {
-        mapOrAccumulate(errors) { raise(it) }
-      } shouldBe errors.toNonEmptyListOrNull()!!.left()
+      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors
     }
   }
 
@@ -664,10 +658,10 @@ class EffectSpec {
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
-      either<NonEmptyList<Int>, List<Int>> {
+      either {
         zipOrAccumulate(
           { eithers.bindAll() },
-          { emptyList<Int>() }
+          { emptyList() }
         ) { a, b -> a + b }
       } shouldBe expected
     }
@@ -687,10 +681,10 @@ class EffectSpec {
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.right()
 
-      either<NonEmptyList<Int>, NonEmptyList<Int>> {
+      either {
         zipOrAccumulate(
           { eithers.bindAll() },
-          { emptyList<Int>() }
+          { emptyList() }
         ) { a, b -> a + b }
       } shouldBe expected
     }
@@ -710,10 +704,10 @@ class EffectSpec {
       val expected =
         eithers.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left() ?: eithers.mapNotNull { it.getOrNull() }.toSet().right()
 
-      either<NonEmptyList<Int>, NonEmptySet<Int>> {
+      either {
         zipOrAccumulate(
           { eithers.bindAll() },
-          { emptySet<Int>() }
+          { emptySet() }
         ) { a, b -> a + b }
       } shouldBe expected
     }
