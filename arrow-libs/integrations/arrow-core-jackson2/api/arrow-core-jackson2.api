@@ -61,12 +61,6 @@ public final class arrow/integrations/jackson/module/IorSerializerResolver : com
 	public fun findSerializer (Lcom/fasterxml/jackson/databind/SerializationConfig;Lcom/fasterxml/jackson/databind/JavaType;Lcom/fasterxml/jackson/databind/BeanDescription;)Lcom/fasterxml/jackson/databind/JsonSerializer;
 }
 
-public final class arrow/integrations/jackson/module/NonEmptyCollectionDeserializer : com/fasterxml/jackson/databind/deser/std/StdDeserializer {
-	public fun <init> (Lcom/fasterxml/jackson/databind/JavaType;Ljava/lang/Class;Lkotlin/jvm/functions/Function1;)V
-	public fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Larrow/core/NonEmptyCollection;
-	public synthetic fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
-}
-
 public final class arrow/integrations/jackson/module/NonEmptyCollectionDeserializerResolver : com/fasterxml/jackson/databind/deser/Deserializers$Base {
 	public static final field INSTANCE Larrow/integrations/jackson/module/NonEmptyCollectionDeserializerResolver;
 	public fun findCollectionDeserializer (Lcom/fasterxml/jackson/databind/type/CollectionType;Lcom/fasterxml/jackson/databind/DeserializationConfig;Lcom/fasterxml/jackson/databind/BeanDescription;Lcom/fasterxml/jackson/databind/jsontype/TypeDeserializer;Lcom/fasterxml/jackson/databind/JsonDeserializer;)Lcom/fasterxml/jackson/databind/JsonDeserializer;
@@ -86,6 +80,18 @@ public final class arrow/integrations/jackson/module/NonEmptyCollectionSerialize
 public final class arrow/integrations/jackson/module/NonEmptyCollectionsModule : com/fasterxml/jackson/databind/module/SimpleModule {
 	public fun <init> ()V
 	public fun setupModule (Lcom/fasterxml/jackson/databind/Module$SetupContext;)V
+}
+
+public final class arrow/integrations/jackson/module/NonEmptyListDeserializer : com/fasterxml/jackson/databind/deser/std/StdDeserializer {
+	public fun <init> (Lcom/fasterxml/jackson/databind/JavaType;)V
+	public synthetic fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun deserialize-L4fWQpE (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/util/List;
+}
+
+public final class arrow/integrations/jackson/module/NonEmptySetDeserializer : com/fasterxml/jackson/databind/deser/std/StdDeserializer {
+	public fun <init> (Lcom/fasterxml/jackson/databind/JavaType;)V
+	public synthetic fun deserialize (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun deserialize-OZgIoXQ (Lcom/fasterxml/jackson/core/JsonParser;Lcom/fasterxml/jackson/databind/DeserializationContext;)Ljava/util/Set;
 }
 
 public final class arrow/integrations/jackson/module/OptionDeserializer : com/fasterxml/jackson/databind/deser/std/ReferenceTypeDeserializer {
