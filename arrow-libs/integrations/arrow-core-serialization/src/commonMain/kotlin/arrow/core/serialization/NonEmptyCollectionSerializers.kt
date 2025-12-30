@@ -2,8 +2,9 @@ package arrow.core.serialization
 
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.toNonEmptyListOrNull
-import arrow.core.toNonEmptySetOrNull
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
+import arrow.core.wrapAsNonEmptyListOrNull
+import arrow.core.wrapAsNonEmptySetOrNull
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
@@ -24,8 +25,9 @@ public class NonEmptyListSerializer<T>(
   override fun serialize(encoder: Encoder, value: NonEmptyList<T>) {
     listSerializer.serialize(encoder, value.toList())
   }
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(decoder: Decoder): NonEmptyList<T> =
-    listSerializer.deserialize(decoder).toNonEmptyListOrNull()
+    listSerializer.deserialize(decoder).wrapAsNonEmptyListOrNull()
       ?: throw SerializationException("expected non-empty list")
 }
 
@@ -40,7 +42,8 @@ public class NonEmptySetSerializer<T>(
   override fun serialize(encoder: Encoder, value: NonEmptySet<T>) {
     setSerializer.serialize(encoder, value.toSet())
   }
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(decoder: Decoder): NonEmptySet<T> =
-    setSerializer.deserialize(decoder).toNonEmptySetOrNull()
+    setSerializer.deserialize(decoder).wrapAsNonEmptySetOrNull()
       ?: throw SerializationException("expected non-empty set")
 }
