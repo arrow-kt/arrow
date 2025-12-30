@@ -463,6 +463,10 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptySet : arrow.core/NonE
     final val size // arrow.core/NonEmptySet.size|{}size[0]
         final fun <get-size>(): kotlin/Int // arrow.core/NonEmptySet.size.<get-size>|<get-size>(){}[0]
 
+    final fun <#A1: kotlin/Any?> distinctBy(kotlin/Function1<#A, #A1>): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptySet.distinctBy|distinctBy(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> flatMap(kotlin/Function1<#A, arrow.core/NonEmptyCollection<#A1>>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptySet.flatMap|flatMap(kotlin.Function1<1:0,arrow.core.NonEmptyCollection<0:0>>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> map(kotlin/Function1<#A, #A1>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptySet.map|map(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> mapIndexed(kotlin/Function2<kotlin/Int, #A, #A1>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptySet.mapIndexed|mapIndexed(kotlin.Function2<kotlin.Int,1:0,0:0>){0§<kotlin.Any?>}[0]
     final fun <#A1: kotlin/Any?> zip(arrow.core/NonEmptyCollection<#A1>): arrow.core/NonEmptyList<kotlin/Pair<#A, #A1>> // arrow.core/NonEmptySet.zip|zip(arrow.core.NonEmptyCollection<0:0>){0§<kotlin.Any?>}[0]
     final fun contains(#A): kotlin/Boolean // arrow.core/NonEmptySet.contains|contains(1:0){}[0]
     final fun containsAll(kotlin.collections/Collection<#A>): kotlin/Boolean // arrow.core/NonEmptySet.containsAll|containsAll(kotlin.collections.Collection<1:0>){}[0]
