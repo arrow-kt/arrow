@@ -9,6 +9,7 @@ plugins {
 kotlin {
   compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
   compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
+  compilerOptions.freeCompilerArgs.add("-Xallow-contracts-on-more-functions")
 
   sourceSets {
     val nonJvmAndJsMain by creating { dependsOn(nonJvmMain.get()) }
