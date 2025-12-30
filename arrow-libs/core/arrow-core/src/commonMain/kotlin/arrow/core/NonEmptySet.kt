@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalStdlibApi::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalTypeInference::class, ExperimentalStdlibApi::class)
 @file:Suppress("API_NOT_AVAILABLE", "RESERVED_MEMBER_INSIDE_VALUE_CLASS")
 
 package arrow.core
@@ -7,9 +7,6 @@ import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.either
 import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.withError
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
@@ -161,62 +158,4 @@ public fun <T> Set<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> = wrapAsNonEmpt
 public fun <T> Set<T>.wrapAsNonEmptySetOrNull(): NonEmptySet<T>? = when {
   isEmpty() -> null
   else -> NonEmptySet(this)
-}
-
-/**
- * A mutable list that can only grow by adding elements.
- * Removing elements is not supported to preserve monotonicity.
- */
-@SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
-public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
-  public companion object {
-    public operator fun <E> invoke(): MonotoneMutableSet<E> = Impl()
-    public operator fun <E> invoke(initialCapacity: Int): MonotoneMutableSet<E> = Impl(initialCapacity)
-  }
-
-  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-  private class Impl<E> private constructor(private val underlying: MutableSet<E>) : MonotoneMutableSet<E>, NonEmptyCollection<E>, Set<E> by underlying {
-    constructor() : this(LinkedHashSet())
-    constructor(initialCapacity: Int) : this(LinkedHashSet(initialCapacity))
-
-    override fun isEmpty(): Boolean = underlying.isEmpty()
-
-    override fun _addAll(elements: Collection<E>) = underlying.addAll(elements)
-
-    override fun _add(element: E) = underlying.add(element)
-
-    override fun plus(element: E) = buildNonEmptySet<E, _>(size + 1) {
-      addAll(this@Impl)
-      add(element)
-      this
-    }
-
-    override fun plus(elements: Iterable<E>) = buildNonEmptySet<E, _>(size) {
-      addAll(this@Impl)
-      addAll(elements)
-      this
-    }
-
-    override fun equals(other: Any?) = underlying == other
-    override fun hashCode() = underlying.hashCode()
-    override fun toString() = underlying.toString()
-  }
-}
-
-@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <E, S> S.asNonEmptySet(): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> = NonEmptySet(this)
-
-public inline fun <E, S> buildNonEmptySet(
-  builderAction: MonotoneMutableSet<E>.() -> S
-): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
-  contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
-  return builderAction(MonotoneMutableSet()).asNonEmptySet()
-}
-
-public inline fun <E, S> buildNonEmptySet(
-  capacity: Int = 0,
-  builderAction: MonotoneMutableSet<E>.() -> S
-): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
-  contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
-  return builderAction(MonotoneMutableSet(capacity)).asNonEmptySet()
 }

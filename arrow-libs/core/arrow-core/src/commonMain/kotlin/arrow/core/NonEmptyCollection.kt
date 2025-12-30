@@ -1,9 +1,4 @@
-@file:Suppress("API_NOT_AVAILABLE")
-@file:OptIn(ExperimentalContracts::class)
 package arrow.core
-
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 /**
  * Common interface for collections that always have
@@ -76,49 +71,3 @@ public interface NonEmptyCollection<out E> : Collection<E> {
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
 public annotation class PotentiallyUnsafeNonEmptyOperation
-
-/**
- * A mutable collection that can only grow by adding elements.
- * Removing elements is not supported to preserve monotonicity.
- */
-@SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
-public interface MonotoneMutableCollection<E>: Collection<E> {
-  // underscored so that addAll(Nec<E>) extension overload takes precedence
-  @IgnorableReturnValue
-  public fun _addAll(elements: Collection<E>): Boolean
-
-  @IgnorableReturnValue
-  public fun _add(element: E): Boolean
-}
-
-@IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.add(element: E): Boolean {
-  contract { returns() implies (this@add is NonEmptyCollection<E>) }
-  return _add(element)
-}
-
-@IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.addAll(elements: Iterable<E>): Boolean = when (elements) {
-  is Collection -> addAll(elements)
-  else -> {
-    var result = false
-    for (item in elements) if (add(item)) result = true
-    result
-  }
-}
-
-@OptIn(ExperimentalContracts::class)
-@IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.addAll(elements: NonEmptyCollection<E>): Boolean {
-  contract { returns() implies (this@addAll is NonEmptyCollection<E>) }
-  return _addAll(elements)
-}
-
-@OptIn(ExperimentalContracts::class)
-@IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.addAll(elements: Collection<E>): Boolean = _addAll(elements)
-
-public fun <E> MonotoneMutableCollection<E>.isNonEmpty(): Boolean {
-  contract { returns(true) implies (this@isNonEmpty is NonEmptyCollection<E>) }
-  return isNotEmpty()
-}
