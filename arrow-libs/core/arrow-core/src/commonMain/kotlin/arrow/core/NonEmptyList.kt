@@ -165,6 +165,7 @@ public typealias Nel<A> = NonEmptyList<A>
 public value class NonEmptyList<out E> @PotentiallyUnsafeNonEmptyOperation @PublishedApi internal constructor(
   public val all: List<E>
 ) : List<E> by all, NonEmptyCollection<E> {
+
   public constructor(head: E, tail: List<E>): this(buildNonEmptyList<E, _>(tail.size + 1) {
     add(head)
     addAll(tail)
