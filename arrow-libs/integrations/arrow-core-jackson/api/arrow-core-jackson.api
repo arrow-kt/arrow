@@ -61,6 +61,12 @@ public final class arrow/integrations/jackson/module/IorSerializerResolver : too
 	public fun findSerializer (Ltools/jackson/databind/SerializationConfig;Ltools/jackson/databind/JavaType;Ltools/jackson/databind/BeanDescription$Supplier;Lcom/fasterxml/jackson/annotation/JsonFormat$Value;)Ltools/jackson/databind/ValueSerializer;
 }
 
+public final class arrow/integrations/jackson/module/NonEmptyCollectionDeserializer : tools/jackson/databind/deser/std/StdDeserializer {
+	public fun <init> (Ltools/jackson/databind/JavaType;Ljava/lang/Class;Lkotlin/jvm/functions/Function1;)V
+	public fun deserialize (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Larrow/core/NonEmptyCollection;
+	public synthetic fun deserialize (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+}
+
 public final class arrow/integrations/jackson/module/NonEmptyCollectionDeserializerResolver : tools/jackson/databind/deser/Deserializers$Base {
 	public static final field INSTANCE Larrow/integrations/jackson/module/NonEmptyCollectionDeserializerResolver;
 	public fun findCollectionDeserializer (Ltools/jackson/databind/type/CollectionType;Ltools/jackson/databind/DeserializationConfig;Ltools/jackson/databind/BeanDescription$Supplier;Ltools/jackson/databind/jsontype/TypeDeserializer;Ltools/jackson/databind/ValueDeserializer;)Ltools/jackson/databind/ValueDeserializer;

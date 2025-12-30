@@ -90,3 +90,17 @@ public class NonEmptySetDeserializer(private val contentType: JavaType) : StdDes
     return ctxt.readValue<Set<*>>(p, collection).wrapAsNonEmptySetOrNull()
   }
 }
+
+@Deprecated("Use NonEmptyListDeserializer or NonEmptySetDeserializer instead")
+public class NonEmptyCollectionDeserializer<T : NonEmptyCollection<*>>(
+  private val contentType: JavaType,
+  klass: Class<T>,
+  private val converter: (List<*>) -> T?,
+) : StdDeserializer<T>(klass) {
+  override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T? {
+    val bindings = TypeBindings.create(ArrayList::class.java, contentType)
+    val superClass = TypeFactory.defaultInstance().constructParametricType(List::class.java, contentType)
+    val collection = CollectionType.construct(ArrayList::class.java, bindings, superClass, null, contentType)
+    return converter(ctxt.readValue(p, collection))
+  }
+}
