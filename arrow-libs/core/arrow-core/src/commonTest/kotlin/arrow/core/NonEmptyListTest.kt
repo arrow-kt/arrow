@@ -535,7 +535,7 @@ class NonEmptyListTest {
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   @Test
   fun wrapAsNonEmptyListOrThrow() = runTest {
-    checkAll(Arb.nonEmptyList(Arb.int(), 1..10)) { a ->
+    checkAll(Arb.list(Arb.int(), 1..10)) { a ->
       a.wrapAsNonEmptyListOrThrow().all shouldBeSameInstanceAs a
     }
   }

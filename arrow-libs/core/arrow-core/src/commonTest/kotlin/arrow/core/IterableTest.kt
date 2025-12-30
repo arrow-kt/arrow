@@ -461,7 +461,7 @@ class IterableTest {
         0..10,
       ),
     ) { list ->
-      val expected = list.flatMap { it.leftOrNull().orEmpty() }.toNonEmptyListOrNull()
+      val expected = list.flatMap { it.leftOrNull().orEmpty() }.toNonEmptyListOrNull()?.left()
         ?: list.mapNotNull { it.getOrNull() }.right()
 
       list.flattenOrAccumulate() shouldBe expected
@@ -479,7 +479,7 @@ class IterableTest {
         0..10,
       ),
     ) { list ->
-      val expected = list.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.flatten()?.left()
+      val expected = list.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.flatten()?.reduce(String::plus)?.left()
         ?: list.mapNotNull { it.getOrNull() }.right()
 
       list.flattenOrAccumulate(String::plus) shouldBe expected

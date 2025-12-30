@@ -632,7 +632,7 @@ class EffectSpec {
 
   @Test fun nonEmptySetMapOrAccumulateReturnsEveryError() = runTest {
     checkAll(Arb.nonEmptySet(Arb.int(), range = 2..20)) { errors ->
-      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors
+      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors.toNonEmptyList()
     }
   }
 

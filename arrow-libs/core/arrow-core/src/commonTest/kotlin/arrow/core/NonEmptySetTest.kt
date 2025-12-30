@@ -139,7 +139,7 @@ class NonEmptySetTest {
 
   @Test
   fun distinct() = runTest {
-    checkAll(Arb.nonEmptySet(Arb.int(0..5), 1..30)) { a ->
+    checkAll(Arb.nonEmptySet(Arb.int(0..5), 1..5)) { a ->
       val expected = a.elements.distinct()
       a.distinct() shouldBe expected
       a.toList() shouldBe expected // the same as distinct
