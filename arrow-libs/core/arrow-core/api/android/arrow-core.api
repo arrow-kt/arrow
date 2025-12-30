@@ -354,6 +354,24 @@ public abstract interface class arrow/core/MonotoneMutableCollection : java/util
 	public abstract fun _addAll (Ljava/util/Collection;)Z
 }
 
+public final class arrow/core/MonotoneMutableCollectionKt {
+	public static final fun add (Larrow/core/MonotoneMutableCollection;Ljava/lang/Object;)Z
+	public static final fun add (Larrow/core/MonotoneMutableList;ILjava/lang/Object;)V
+	public static final fun addAll (Larrow/core/MonotoneMutableCollection;Larrow/core/NonEmptyCollection;)Z
+	public static final fun addAll (Larrow/core/MonotoneMutableCollection;Ljava/lang/Iterable;)Z
+	public static final fun addAll (Larrow/core/MonotoneMutableCollection;Ljava/util/Collection;)Z
+	public static final fun addAll (Larrow/core/MonotoneMutableList;ILarrow/core/NonEmptyCollection;)Z
+	public static final fun addAll (Larrow/core/MonotoneMutableList;ILjava/util/Collection;)Z
+	public static final fun asNonEmptyList (Ljava/util/List;)Ljava/util/List;
+	public static final fun asNonEmptySet (Ljava/util/Set;)Ljava/util/Set;
+	public static final fun buildNonEmptyList (ILkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun buildNonEmptyList (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public static final fun buildNonEmptySet (ILkotlin/jvm/functions/Function1;)Ljava/util/Set;
+	public static final fun buildNonEmptySet (Lkotlin/jvm/functions/Function1;)Ljava/util/Set;
+	public static synthetic fun buildNonEmptySet$default (ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/util/Set;
+	public static final fun isNonEmpty (Larrow/core/MonotoneMutableCollection;)Z
+}
+
 public abstract interface class arrow/core/MonotoneMutableList : arrow/core/MonotoneMutableCollection, java/util/List, kotlin/jvm/internal/markers/KMappedMarker {
 	public static final field Companion Larrow/core/MonotoneMutableList$Companion;
 	public abstract fun _add (ILjava/lang/Object;)V
@@ -413,14 +431,6 @@ public final class arrow/core/NonEmptyCollection$DefaultImpls {
 	public static fun toNonEmptyList-1X0FA-Y (Larrow/core/NonEmptyCollection;)Ljava/util/List;
 	public static fun toNonEmptySet-5sCjGKo (Larrow/core/NonEmptyCollection;)Ljava/util/Set;
 	public static fun zip (Larrow/core/NonEmptyCollection;Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
-}
-
-public final class arrow/core/NonEmptyCollectionKt {
-	public static final fun add (Larrow/core/MonotoneMutableCollection;Ljava/lang/Object;)Z
-	public static final fun addAll (Larrow/core/MonotoneMutableCollection;Larrow/core/NonEmptyCollection;)Z
-	public static final fun addAll (Larrow/core/MonotoneMutableCollection;Ljava/lang/Iterable;)Z
-	public static final fun addAll (Larrow/core/MonotoneMutableCollection;Ljava/util/Collection;)Z
-	public static final fun isNonEmpty (Larrow/core/MonotoneMutableCollection;)Z
 }
 
 public final class arrow/core/NonEmptyList : arrow/core/NonEmptyCollection, java/util/List, kotlin/jvm/internal/markers/KMappedMarker {
@@ -537,12 +547,6 @@ public final class arrow/core/NonEmptyList$Companion {
 }
 
 public final class arrow/core/NonEmptyListKt {
-	public static final fun add (Larrow/core/MonotoneMutableList;ILjava/lang/Object;)V
-	public static final fun addAll (Larrow/core/MonotoneMutableList;ILarrow/core/NonEmptyCollection;)Z
-	public static final fun addAll (Larrow/core/MonotoneMutableList;ILjava/util/Collection;)Z
-	public static final fun asNonEmptyList (Ljava/util/List;)Ljava/util/List;
-	public static final fun buildNonEmptyList (ILkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public static final fun buildNonEmptyList (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun compareTo-8QhqC-A (Ljava/util/List;Ljava/util/List;)I
 	public static final fun flatten-GZgkXh4 (Ljava/util/List;)Ljava/util/List;
 	public static final fun mapOrAccumulate-ZALtuoE (Ljava/util/List;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
@@ -638,10 +642,6 @@ public final class arrow/core/NonEmptySet$Companion {
 }
 
 public final class arrow/core/NonEmptySetKt {
-	public static final fun asNonEmptySet (Ljava/util/Set;)Ljava/util/Set;
-	public static final fun buildNonEmptySet (ILkotlin/jvm/functions/Function1;)Ljava/util/Set;
-	public static final fun buildNonEmptySet (Lkotlin/jvm/functions/Function1;)Ljava/util/Set;
-	public static synthetic fun buildNonEmptySet$default (ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/util/Set;
 	public static final fun mapOrAccumulate-EyVDDLY (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun mapOrAccumulate-jkbboic (Ljava/util/Set;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Larrow/core/Either;
 	public static final fun nonEmptySetOf (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/util/Set;
