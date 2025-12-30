@@ -64,7 +64,8 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
 }
 
 public object NonEmptyCollectionSerializer : StdSerializer<NonEmptyCollection<*>>(NonEmptyCollection::class.java) {
-  @Suppress("unused") private fun readResolve(): Any = NonEmptyCollectionSerializer
+  @Suppress("unused")
+  private fun readResolve(): Any = NonEmptyCollectionSerializer
   override fun serialize(value: NonEmptyCollection<*>, gen: JsonGenerator, provider: SerializerProvider) {
     provider.defaultSerializeValue(value.toList(), gen)
   }
