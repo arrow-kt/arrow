@@ -50,6 +50,16 @@ public value class NonEmptySet<out E> @PotentiallyUnsafeNonEmptyOperation intern
 
   public override fun distinct(): NonEmptyList<E> = toNonEmptyList()
 
+  // BEGIN: overrides due to KT-80101 NoSuchMethodError when inheriting function implementations in interfaces
+  public override fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> = super.distinctBy(selector)
+
+  public override fun <T> map(transform: (E) -> T): NonEmptyList<T> = super.map(transform)
+
+  public override fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> = super.flatMap(transform)
+
+  public override fun <T> mapIndexed(transform: (index: Int, E) -> T): NonEmptyList<T> = super.mapIndexed(transform)
+  // END
+
   override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> = buildNonEmptyList(minOf(size, other.size)) {
     val first = this@NonEmptySet.iterator()
     val second = other.iterator()
