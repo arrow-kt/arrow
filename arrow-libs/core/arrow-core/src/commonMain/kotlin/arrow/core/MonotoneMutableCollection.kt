@@ -98,21 +98,16 @@ public interface MonotoneMutableList<E>: MonotoneMutableCollection<E>, List<E> {
 
     override fun isEmpty(): Boolean = underlying.isEmpty()
 
-    override fun _addAll(index: Int, elements: Collection<E>) = underlying.addAll(index, elements)
-
-    override fun set(index: Int, element: E) = underlying.set(index, element)
-
-    override fun _add(index: Int, element: E) = underlying.add(index, element)
-
     override fun _addAll(elements: Collection<E>) = underlying.addAll(elements)
-
     override fun _add(element: E) = underlying.add(element)
+    override fun _addAll(index: Int, elements: Collection<E>) = underlying.addAll(index, elements)
+    override fun set(index: Int, element: E) = underlying.set(index, element)
+    override fun _add(index: Int, element: E) = underlying.add(index, element)
 
     override fun listIterator() = IteratorImpl(underlying.listIterator())
     override fun listIterator(index: Int) = IteratorImpl(underlying.listIterator(index))
     override fun subList(fromIndex: Int, toIndex: Int) = Impl(underlying.subList(fromIndex, toIndex))
-    override fun plus(element: E) = asNonEmptyList() + element
-    override fun plus(elements: Iterable<E>) = asNonEmptyList() + elements
+
     override fun equals(other: Any?) = underlying == other
     override fun hashCode() = underlying.hashCode()
     override fun toString() = underlying.toString()
@@ -170,20 +165,7 @@ public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
     override fun isEmpty(): Boolean = underlying.isEmpty()
 
     override fun _addAll(elements: Collection<E>) = underlying.addAll(elements)
-
     override fun _add(element: E) = underlying.add(element)
-
-    override fun plus(element: E) = buildNonEmptySet<E, _>(size + 1) {
-      addAll(this@Impl)
-      add(element)
-      this
-    }
-
-    override fun plus(elements: Iterable<E>) = buildNonEmptySet<E, _>(size) {
-      addAll(this@Impl)
-      addAll(elements)
-      this
-    }
 
     override fun equals(other: Any?) = underlying == other
     override fun hashCode() = underlying.hashCode()
@@ -202,7 +184,7 @@ public inline fun <E, S> buildNonEmptySet(
 }
 
 public inline fun <E, S> buildNonEmptySet(
-  capacity: Int = 0,
+  capacity: Int,
   builderAction: MonotoneMutableSet<E>.() -> S
 ): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
