@@ -2,33 +2,42 @@
 @file:OptIn(ExperimentalContracts::class)
 package arrow.core
 
+import arrow.core.MonotoneCollectionBuilder.NonEmpty
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-
 /**
- * A mutable collection that can only grow by adding elements.
+ * A builder for collections that can only grow by adding elements.
  * Removing elements is not supported to preserve monotonicity.
  */
 @SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
-public interface MonotoneMutableCollection<E>: Collection<E> {
+public interface MonotoneCollectionBuilder<in E> {
   // underscored so that addAll(Nec<E>) extension overload takes precedence
+  // Turning this into an abstract class doesn't work well because
+  // contracts on methods don't work well for some reason?
   @IgnorableReturnValue
   public fun _addAll(elements: Collection<E>): Boolean
 
   @IgnorableReturnValue
   public fun _add(element: E): Boolean
+
+  /**
+   * Marker interface for builders that guarantee at least one element has been added.
+   * @see MonotoneCollectionBuilder
+   * @see buildNonEmptyList
+   */
+  public interface NonEmpty
 }
 
 @IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.add(element: E): Boolean {
-  contract { returns() implies (this@add is NonEmptyCollection<E>) }
+public fun <E> MonotoneCollectionBuilder<E>.add(element: E): Boolean {
+  contract { returns() implies (this@add is NonEmpty) }
   return _add(element)
 }
 
 @IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.addAll(elements: Iterable<E>): Boolean = when (elements) {
+public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: Iterable<E>): Boolean = when (elements) {
   is Collection -> addAll(elements)
   else -> {
     var result = false
@@ -38,16 +47,16 @@ public fun <E> MonotoneMutableCollection<E>.addAll(elements: Iterable<E>): Boole
 }
 
 @IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.addAll(elements: NonEmptyCollection<E>): Boolean {
-  contract { returns() implies (this@addAll is NonEmptyCollection<E>) }
+public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: NonEmptyCollection<E>): Boolean {
+  contract { returns() implies (this@addAll is NonEmpty) }
   return _addAll(elements)
 }
 
 @IgnorableReturnValue
-public fun <E> MonotoneMutableCollection<E>.addAll(elements: Collection<E>): Boolean = _addAll(elements)
+public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: Collection<E>): Boolean = _addAll(elements)
 
-public fun <E> MonotoneMutableCollection<E>.isNonEmpty(): Boolean {
-  contract { returns(true) implies (this@isNonEmpty is NonEmptyCollection<E>) }
+public fun <C> C.isNonEmpty(): Boolean where C : Collection<*>, C : MonotoneCollectionBuilder<*> {
+  contract { returns(true) implies (this@isNonEmpty is NonEmpty) }
   return isNotEmpty()
 }
 
@@ -56,7 +65,7 @@ public fun <E> MonotoneMutableCollection<E>.isNonEmpty(): Boolean {
  * Removing elements is not supported to preserve monotonicity.
  */
 @SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
-public interface MonotoneMutableList<E>: MonotoneMutableCollection<E>, List<E> {
+public interface MonotoneMutableList<E>: MonotoneCollectionBuilder<E>, List<E> {
   @IgnorableReturnValue
   public fun _addAll(index: Int, elements: Collection<E>): Boolean
 
@@ -90,7 +99,7 @@ public interface MonotoneMutableList<E>: MonotoneMutableCollection<E>, List<E> {
   }
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-  private class Impl<E> private constructor(private val underlying: MutableList<E>) : MonotoneMutableList<E>, NonEmptyCollection<E>, List<E> by underlying {
+  private class Impl<E> private constructor(private val underlying: MutableList<E>) : MonotoneMutableList<E>, NonEmpty, List<E> by underlying {
     constructor() : this(ArrayList())
     constructor(initialCapacity: Int) : this(ArrayList(initialCapacity))
 
@@ -117,21 +126,21 @@ public fun <E> MonotoneMutableList<E>.addAll(index: Int, elements: Collection<E>
 
 @IgnorableReturnValue
 public fun <E> MonotoneMutableList<E>.addAll(index: Int, elements: NonEmptyCollection<E>): Boolean {
-  contract { returns() implies (this@addAll is NonEmptyCollection<E>) }
+  contract { returns() implies (this@addAll is NonEmpty) }
   return _addAll(index, elements)
 }
 
 public fun <E> MonotoneMutableList<E>.add(index: Int, element: E) {
-  contract { returns() implies (this@add is NonEmptyCollection<E>) }
+  contract { returns() implies (this@add is NonEmpty) }
   _add(index, element)
 }
 
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <E, L> L.asNonEmptyList(): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> = NonEmptyList(this)
+public fun <E, L> L.asNonEmptyList(): NonEmptyList<E> where L : List<E>, L : NonEmpty = NonEmptyList(this)
 
 public inline fun <E, L> buildNonEmptyList(
   builderAction: MonotoneMutableList<E>.() -> L
-): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> {
+): NonEmptyList<E> where L : List<E>, L : NonEmpty {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableList()).asNonEmptyList()
 }
@@ -139,7 +148,7 @@ public inline fun <E, L> buildNonEmptyList(
 public inline fun <E, L> buildNonEmptyList(
   capacity: Int,
   builderAction: MonotoneMutableList<E>.() -> L
-): NonEmptyList<E> where L : List<E>, L : NonEmptyCollection<E> {
+): NonEmptyList<E> where L : List<E>, L : NonEmpty {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableList(capacity)).asNonEmptyList()
 }
@@ -149,14 +158,14 @@ public inline fun <E, L> buildNonEmptyList(
  * Removing elements is not supported to preserve monotonicity.
  */
 @SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
-public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
+public interface MonotoneMutableSet<E>: MonotoneCollectionBuilder<E>, Set<E> {
   public companion object {
     public operator fun <E> invoke(): MonotoneMutableSet<E> = Impl()
     public operator fun <E> invoke(initialCapacity: Int): MonotoneMutableSet<E> = Impl(initialCapacity)
   }
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-  private class Impl<E> private constructor(private val underlying: MutableSet<E>) : MonotoneMutableSet<E>, NonEmptyCollection<E>, Set<E> by underlying {
+  private class Impl<E> private constructor(private val underlying: MutableSet<E>) : MonotoneMutableSet<E>, NonEmpty, Set<E> by underlying {
     constructor() : this(LinkedHashSet())
     constructor(initialCapacity: Int) : this(LinkedHashSet(initialCapacity))
 
@@ -172,11 +181,11 @@ public interface MonotoneMutableSet<E>: MonotoneMutableCollection<E>, Set<E> {
 }
 
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <E, S> S.asNonEmptySet(): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> = NonEmptySet(this)
+public fun <E, S> S.asNonEmptySet(): NonEmptySet<E> where S : Set<E>, S : NonEmpty = NonEmptySet(this)
 
 public inline fun <E, S> buildNonEmptySet(
   builderAction: MonotoneMutableSet<E>.() -> S
-): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
+): NonEmptySet<E> where S : Set<E>, S : NonEmpty {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableSet()).asNonEmptySet()
 }
@@ -184,7 +193,7 @@ public inline fun <E, S> buildNonEmptySet(
 public inline fun <E, S> buildNonEmptySet(
   capacity: Int,
   builderAction: MonotoneMutableSet<E>.() -> S
-): NonEmptySet<E> where S : Set<E>, S : NonEmptyCollection<E> {
+): NonEmptySet<E> where S : Set<E>, S : NonEmpty {
   contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
   return builderAction(MonotoneMutableSet(capacity)).asNonEmptySet()
 }
