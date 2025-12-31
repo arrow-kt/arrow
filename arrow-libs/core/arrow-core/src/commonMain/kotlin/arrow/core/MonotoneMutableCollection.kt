@@ -37,14 +37,12 @@ public fun <E> MonotoneMutableCollection<E>.addAll(elements: Iterable<E>): Boole
   }
 }
 
-@OptIn(ExperimentalContracts::class)
 @IgnorableReturnValue
 public fun <E> MonotoneMutableCollection<E>.addAll(elements: NonEmptyCollection<E>): Boolean {
   contract { returns() implies (this@addAll is NonEmptyCollection<E>) }
   return _addAll(elements)
 }
 
-@OptIn(ExperimentalContracts::class)
 @IgnorableReturnValue
 public fun <E> MonotoneMutableCollection<E>.addAll(elements: Collection<E>): Boolean = _addAll(elements)
 
