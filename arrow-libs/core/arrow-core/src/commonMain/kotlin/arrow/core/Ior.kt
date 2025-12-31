@@ -180,7 +180,7 @@ public sealed class Ior<out A, out B> {
   public inline fun <D> map(f: (B) -> D): Ior<A, D> {
     contract {
       callsInPlace(f, InvocationKind.AT_MOST_ONCE)
-      (this@Ior is Right || this@Ior is Both) holdsIn f
+      (this@Ior !is Left) holdsIn f
     }
     return when (this) {
       is Left -> this
@@ -207,7 +207,7 @@ public sealed class Ior<out A, out B> {
   public inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> {
     contract {
       callsInPlace(fa, InvocationKind.AT_MOST_ONCE)
-      (this@Ior is Left || this@Ior is Both) holdsIn fa
+      (this@Ior !is Right) holdsIn fa
     }
     return when (this) {
       is Left -> Left(fa(value))
@@ -422,7 +422,7 @@ public inline fun <A, B, D> Ior<A, B>.flatMap(combine: (A, A) -> A, f: (B) -> Io
     callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.AT_MOST_ONCE)
     (this@flatMap is Both) holdsIn combine
-    (this@flatMap is Right || this@flatMap is Both) holdsIn f
+    (this@flatMap !is Left) holdsIn f
   }
   return when (this) {
     is Left -> this
@@ -445,7 +445,7 @@ public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (
     callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
     callsInPlace(f, InvocationKind.AT_MOST_ONCE)
     (this@handleErrorWith is Both) holdsIn combine
-    (this@handleErrorWith is Left || this@handleErrorWith is Both) holdsIn f
+    (this@handleErrorWith !is Right) holdsIn f
   }
   return when (this) {
     is Left -> f(value)
@@ -481,8 +481,8 @@ public inline fun <A, B> Ior<A, B>.combine(other: Ior<A, B>, combineA: (A, A) ->
   contract {
     callsInPlace(combineA, InvocationKind.AT_MOST_ONCE)
     callsInPlace(combineB, InvocationKind.AT_MOST_ONCE)
-    ((this@combine is Left || this@combine is Both) && (other is Left || other is Both)) holdsIn combineA
-    ((this@combine is Right || this@combine is Both) && (other is Right || other is Both)) holdsIn combineB
+    ((this@combine !is Right) && (other !is Right)) holdsIn combineA
+    ((this@combine !is Left) && (other !is Left)) holdsIn combineB
   }
   return when (this) {
     is Ior.Left -> when (other) {
