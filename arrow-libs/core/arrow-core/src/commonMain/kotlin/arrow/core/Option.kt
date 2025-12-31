@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
 @file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core
@@ -9,6 +9,7 @@ import arrow.core.raise.SingletonRaise
 import arrow.core.raise.option
 import arrow.core.raise.recover
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmName
@@ -350,6 +351,7 @@ public sealed class Option<out A> {
   public inline fun onNone(action: () -> Unit): Option<A>  {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+      (this@Option is None) holdsIn action
     }
     return also { if (it.isNone()) action() }
   }
@@ -376,6 +378,7 @@ public sealed class Option<out A> {
   public inline fun onSome(action: (A) -> Unit): Option<A>  {
     contract {
       callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+      (this@Option is Some) holdsIn action
     }
     return also { if (it.isSome()) action(it.value) }
   }
@@ -431,6 +434,7 @@ public sealed class Option<out A> {
     contract {
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
       returns(true) implies (this@Option is Some)
+      (this@Option is Some) holdsIn predicate
     }
     return this@Option is Some<A> && predicate(value)
   }
@@ -473,7 +477,10 @@ public sealed class Option<out A> {
    * @see flatMap
    */
   public inline fun <B> map(f: (A) -> B): Option<B> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      (this@Option is Some) holdsIn f
+    }
     return flatMap { a -> Some(f(a)) }
   }
 
@@ -481,6 +488,8 @@ public sealed class Option<out A> {
     contract {
       callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE)
       callsInPlace(ifSome, InvocationKind.AT_MOST_ONCE)
+      (this@Option is None) holdsIn ifEmpty
+      (this@Option is Some) holdsIn ifSome
     }
     return when (this) {
       is None -> ifEmpty()
@@ -499,7 +508,10 @@ public sealed class Option<out A> {
    * @see map
    */
   public inline fun <B> flatMap(f: (A) -> Option<B>): Option<B> {
-    contract { callsInPlace(f, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+      (this@Option is Some) holdsIn f
+    }
     return when (this) {
       is None -> this
       is Some -> f(value)
@@ -513,7 +525,10 @@ public sealed class Option<out A> {
    *  @param predicate the predicate used for testing.
    */
   public inline fun filter(predicate: (A) -> Boolean): Option<A> {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+      (this@Option is Some) holdsIn predicate
+    }
     return flatMap { a -> if (predicate(a)) Some(a) else None }
   }
 
@@ -524,12 +539,18 @@ public sealed class Option<out A> {
    * @param predicate the predicate used for testing.
    */
   public inline fun filterNot(predicate: (A) -> Boolean): Option<A> {
-    contract { callsInPlace(predicate, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
+      (this@Option is Some) holdsIn predicate
+    }
     return flatMap { a -> if (!predicate(a)) Some(a) else None }
   }
 
   public inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> {
-    contract { callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE) }
+    contract {
+      callsInPlace(ifEmpty, InvocationKind.AT_MOST_ONCE)
+      (this@Option is None) holdsIn ifEmpty
+    }
     return fold({ ifEmpty().left() }, { it.right() })
   }
 
@@ -558,7 +579,10 @@ public data class Some<out T>(val value: T) : Option<T>() {
  * @param default the default expression.
  */
 public inline fun <T> Option<T>.getOrElse(default: () -> T): T {
-  contract { callsInPlace(default, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(default, InvocationKind.AT_MOST_ONCE)
+    (this@getOrElse is None) holdsIn default
+  }
   return when (this) {
     is Some -> value
     else -> default()
@@ -594,7 +618,10 @@ public fun <A> Option<Option<A>>.flatten(): Option<A> =
 public fun <K, V> Option<Pair<K, V>>.toMap(): Map<K, V> = this.toList().toMap()
 
 public inline fun <A> Option<A>.combine(other: Option<A>, combine: (A, A) -> A): Option<A> {
-  contract { callsInPlace(combine, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(combine, InvocationKind.AT_MOST_ONCE)
+    (this@combine is Some && other is Some) holdsIn combine
+  }
   return when (this) {
     is Some -> when (other) {
       is Some -> Some(combine(value, other.value))
@@ -657,7 +684,10 @@ public operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): I
  * <!--- TEST lines.isEmpty() -->
  */
 public inline fun <A> Option<A>.recover(recover: SingletonRaise<None>.() -> A): Option<A> {
-  contract { callsInPlace(recover, InvocationKind.AT_MOST_ONCE) }
+  contract {
+    callsInPlace(recover, InvocationKind.AT_MOST_ONCE)
+    (this@recover is None) holdsIn recover
+  }
   return when (this@recover) {
     is None -> option { recover() }
     is Some -> this@recover

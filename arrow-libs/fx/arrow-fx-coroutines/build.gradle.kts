@@ -3,6 +3,9 @@ plugins {
 }
 
 kotlin {
+  compilerOptions {
+    freeCompilerArgs.addAll("-Xallow-holdsin-contract")
+  }
   sourceSets {
     commonMain {
       dependencies {
