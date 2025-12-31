@@ -50,36 +50,6 @@ public value class NonEmptySet<out E> @PotentiallyUnsafeNonEmptyOperation intern
 
   public override fun distinct(): NonEmptyList<E> = toNonEmptyList()
 
-  override fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> = buildNonEmptyList(size) {
-    add(head) // head is always distinct
-    val seen = hashSetOf<K>()
-    var isFirst = true
-    for (e in elements) {
-      if (seen.add(selector(e)) && !isFirst) add(e)
-      isFirst = false
-    }
-    this
-  }
-
-  override fun <T> map(transform: (E) -> T): NonEmptyList<T> = buildNonEmptyList(size) {
-    val iterator = elements.iterator()
-    do add(transform(iterator.next())) while (iterator.hasNext())
-    this
-  }
-
-  override fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> = buildNonEmptyList(size) {
-    val iterator = elements.iterator()
-    do addAll(transform(iterator.next())) while (iterator.hasNext())
-    this
-  }
-
-  override fun <T> mapIndexed(transform: (index:Int, E) -> T): NonEmptyList<T> = buildNonEmptyList(size) {
-    var i = 0
-    val iterator = elements.iterator()
-    do add(transform(i++, iterator.next())) while (iterator.hasNext())
-    this
-  }
-
   override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> = buildNonEmptyList(minOf(size, other.size)) {
     val first = this@NonEmptySet.iterator()
     val second = other.iterator()

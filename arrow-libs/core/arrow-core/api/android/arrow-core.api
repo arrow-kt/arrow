@@ -430,8 +430,6 @@ public final class arrow/core/NonEmptyCollection$DefaultImpls {
 	public static fun lastOrNull (Larrow/core/NonEmptyCollection;)Ljava/lang/Object;
 	public static fun map-0-xjo5U (Larrow/core/NonEmptyCollection;Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static fun mapIndexed-0-xjo5U (Larrow/core/NonEmptyCollection;Lkotlin/jvm/functions/Function2;)Ljava/util/List;
-	public static fun plus (Larrow/core/NonEmptyCollection;Ljava/lang/Iterable;)Larrow/core/NonEmptyCollection;
-	public static fun plus (Larrow/core/NonEmptyCollection;Ljava/lang/Object;)Larrow/core/NonEmptyCollection;
 	public static fun toNonEmptyList-1X0FA-Y (Larrow/core/NonEmptyCollection;)Ljava/util/List;
 	public static fun toNonEmptySet-5sCjGKo (Larrow/core/NonEmptyCollection;)Ljava/util/Set;
 	public static fun zip (Larrow/core/NonEmptyCollection;Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;

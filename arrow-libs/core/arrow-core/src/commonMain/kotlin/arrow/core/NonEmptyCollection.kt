@@ -9,17 +9,9 @@ public interface NonEmptyCollection<out E> : Collection<E> {
   override fun isEmpty(): Boolean = false
   public val head: E get() = first()
 
-  public operator fun plus(element: @UnsafeVariance E): NonEmptyCollection<E> = buildNonEmptyList(size + 1) {
-    addAll(this@NonEmptyCollection)
-    add(element)
-    this
-  }
+  public operator fun plus(element: @UnsafeVariance E): NonEmptyCollection<E>
 
-  public operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptyCollection<E> = buildNonEmptyList(size + elements.collectionSizeOrDefault(10)) {
-    addAll(this@NonEmptyCollection)
-    addAll(elements)
-    this
-  }
+  public operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptyCollection<E>
 
   public fun toNonEmptySet(): NonEmptySet<E> = buildNonEmptySet(size) {
     addAll(this@NonEmptyCollection)
