@@ -52,7 +52,7 @@ public sealed class Ior<out A, out B> {
   public fun isLeft(): Boolean {
     contract {
       returns(true) implies (this@Ior is Left)
-      returns(false) implies (this@Ior is Right || this@Ior is Both)
+      returns(false) implies (this@Ior !is Left)
     }
     return this@Ior is Ior.Left<A>
   }
@@ -76,7 +76,7 @@ public sealed class Ior<out A, out B> {
   public fun isRight(): Boolean {
     contract {
       returns(true) implies (this@Ior is Right)
-      returns(false) implies (this@Ior is Left || this@Ior is Both)
+      returns(false) implies (this@Ior !is Right)
     }
     return this@Ior is Ior.Right<B>
   }
@@ -98,8 +98,8 @@ public sealed class Ior<out A, out B> {
    */
   public fun isBoth(): Boolean {
     contract {
-      returns(false) implies (this@Ior is Right || this@Ior is Left)
       returns(true) implies (this@Ior is Both)
+      returns(false) implies (this@Ior !is Both)
     }
     return this@Ior is Ior.Both<A, B>
   }
@@ -263,7 +263,7 @@ public sealed class Ior<out A, out B> {
 
   public fun getOrNull(): B? {
     contract {
-      returnsNotNull() implies (this@Ior is Right || this@Ior is Both)
+      returnsNotNull() implies (this@Ior !is Left)
     }
     return fold({ null }, { it }, { _, b -> b })
   }
@@ -289,7 +289,7 @@ public sealed class Ior<out A, out B> {
    */
   public fun leftOrNull(): A? {
     contract {
-      returnsNotNull() implies (this@Ior is Left || this@Ior is Both)
+      returnsNotNull() implies (this@Ior !is Right)
     }
     return fold({ it }, { null }, { a, _ -> a })
   }
@@ -336,7 +336,6 @@ public sealed class Ior<out A, out B> {
   public inline fun isLeft(predicate: (A) -> Boolean): Boolean {
     contract {
       returns(true) implies (this@Ior is Left)
-      returns(false) implies (this@Ior is Right || this@Ior is Both)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Ior is Left<A> && predicate(value)
@@ -362,7 +361,6 @@ public sealed class Ior<out A, out B> {
   public inline fun isRight(predicate: (B) -> Boolean): Boolean {
     contract {
       returns(true) implies (this@Ior is Right)
-      returns(false) implies (this@Ior is Left || this@Ior is Both)
       callsInPlace(predicate, InvocationKind.AT_MOST_ONCE)
     }
     return this@Ior is Right<B> && predicate(value)
@@ -389,7 +387,6 @@ public sealed class Ior<out A, out B> {
   public inline fun isBoth(leftPredicate: (A) -> Boolean, rightPredicate: (B) -> Boolean): Boolean {
     contract {
       returns(true) implies (this@Ior is Both)
-      returns(false) implies (this@Ior is Left || this@Ior is Right)
       callsInPlace(leftPredicate, InvocationKind.AT_MOST_ONCE)
       callsInPlace(rightPredicate, InvocationKind.AT_MOST_ONCE)
     }
