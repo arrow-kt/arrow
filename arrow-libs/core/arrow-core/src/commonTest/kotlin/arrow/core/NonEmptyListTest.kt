@@ -457,16 +457,10 @@ class NonEmptyListTest {
 
   @Test
   fun flatMap() = runTest {
-    fun transform(i: Int) = listOf(i) + 1
+    fun transform(i: Int) = nonEmptyListOf(i, 1)
 
-    checkAll(Arb.list(Arb.int(), range = 0..20)) { a ->
-      val expected = a.flatMap(::transform)
-
-      a.toNonEmptyListOrNull()
-        ?.flatMap {
-          transform(it).let(::NonEmptyList)
-        }
-        ?.shouldBe(expected)
+    checkAll(Arb.nonEmptyList(Arb.int(), range = 0..20)) { a ->
+      a.flatMap(::transform) shouldBe (a as List<Int>).flatMap(::transform)
     }
   }
 
