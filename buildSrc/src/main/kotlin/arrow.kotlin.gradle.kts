@@ -215,9 +215,13 @@ if (isKotlinMultiplatform) {
     tvosX64()
     tvosArm64()
     iosArm64()
+    if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
+      androidNativeArm64()
+      androidNativeX64()
+    }
     // -- Tier 3 --
     mingwX64()
-    // Android Native and watchOS not included
+    // watchOS not included
 
     applyDefaultHierarchyTemplate()
 
