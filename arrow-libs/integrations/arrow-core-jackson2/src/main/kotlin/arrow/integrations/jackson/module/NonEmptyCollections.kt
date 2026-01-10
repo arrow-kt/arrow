@@ -3,8 +3,9 @@ package arrow.integrations.jackson.module
 import arrow.core.NonEmptyCollection
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
-import arrow.core.toNonEmptyListOrNull
-import arrow.core.toNonEmptySetOrNull
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
+import arrow.core.wrapAsNonEmptyListOrNull
+import arrow.core.wrapAsNonEmptySetOrNull
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.json.PackageVersion
@@ -56,20 +57,41 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
     elementTypeDeserializer: TypeDeserializer?,
     elementDeserializer: JsonDeserializer<*>?,
   ): JsonDeserializer<*>? = when {
-    NonEmptyList::class.java.isAssignableFrom(type.rawClass) ->
-      NonEmptyCollectionDeserializer(type.contentType, NonEmptyList::class.java) { it.toNonEmptyListOrNull() }
-    NonEmptySet::class.java.isAssignableFrom(type.rawClass) ->
-      NonEmptyCollectionDeserializer(type.contentType, NonEmptySet::class.java) { it.toNonEmptySetOrNull() }
+    NonEmptyList::class.java.isAssignableFrom(type.rawClass) -> NonEmptyListDeserializer(type.contentType)
+    NonEmptySet::class.java.isAssignableFrom(type.rawClass) -> NonEmptySetDeserializer(type.contentType)
     else -> null
   }
 }
 
 public object NonEmptyCollectionSerializer : StdSerializer<NonEmptyCollection<*>>(NonEmptyCollection::class.java) {
+  @Suppress("unused")
+  private fun readResolve(): Any = NonEmptyCollectionSerializer
   override fun serialize(value: NonEmptyCollection<*>, gen: JsonGenerator, provider: SerializerProvider) {
     provider.defaultSerializeValue(value.toList(), gen)
   }
 }
 
+public class NonEmptyListDeserializer(private val contentType: JavaType) : StdDeserializer<NonEmptyList<*>>(NonEmptyList::class.java) {
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptyList<*>? {
+    val bindings = TypeBindings.create(ArrayList::class.java, contentType)
+    val superClass = TypeFactory.defaultInstance().constructParametricType(List::class.java, contentType)
+    val collection = CollectionType.construct(ArrayList::class.java, bindings, superClass, null, contentType)
+    return ctxt.readValue<List<*>>(p, collection).wrapAsNonEmptyListOrNull()
+  }
+}
+
+public class NonEmptySetDeserializer(private val contentType: JavaType) : StdDeserializer<NonEmptySet<*>>(NonEmptySet::class.java) {
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptySet<*>? {
+    val bindings = TypeBindings.create(LinkedHashSet::class.java, contentType)
+    val superClass = TypeFactory.createDefaultInstance().constructParametricType(Set::class.java, contentType)
+    val collection = CollectionType.construct(LinkedHashSet::class.java, bindings, superClass, null, contentType)
+    return ctxt.readValue<Set<*>>(p, collection).wrapAsNonEmptySetOrNull()
+  }
+}
+
+@Deprecated("Use NonEmptyListDeserializer or NonEmptySetDeserializer instead")
 public class NonEmptyCollectionDeserializer<T : NonEmptyCollection<*>>(
   private val contentType: JavaType,
   klass: Class<T>,
