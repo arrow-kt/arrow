@@ -2,7 +2,6 @@ package arrow.optics.typeclasses
 
 import arrow.core.NonEmptyList
 import arrow.core.Predicate
-import arrow.core.toNonEmptyListOrNull
 import arrow.optics.Every
 import arrow.optics.PLens
 import arrow.optics.Traversal
@@ -66,8 +65,7 @@ public fun interface FilterIndex<S, I, A> {
                 }
 
               override fun modify(source: NonEmptyList<A>, map: (focus: A) -> A): NonEmptyList<A> =
-                source.mapIndexed { index, a -> if (p(index)) map(a) else a }.toNonEmptyListOrNull()
-                        ?: throw IndexOutOfBoundsException("Empty list doesn't contain element at index 0.")
+                source.mapIndexed { index, a -> if (p(index)) map(a) else a }
           }
       }
 
