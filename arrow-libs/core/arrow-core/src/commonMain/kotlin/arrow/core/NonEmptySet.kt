@@ -97,10 +97,8 @@ public fun <E> nonEmptySetOf(first: E, vararg rest: E): NonEmptySet<E> =
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
  */
-public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? = MonotoneMutableSet<T>(collectionSizeOrDefault(10)).run {
-  addAll(this@toNonEmptySetOrNull)
-  if (isNonEmpty()) asNonEmptySet() else null
-}
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? = toSet().wrapAsNonEmptySetOrNull()
 
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].

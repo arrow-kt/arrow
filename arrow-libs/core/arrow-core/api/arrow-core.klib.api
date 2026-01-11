@@ -40,8 +40,8 @@ abstract interface <#A: in kotlin/Any?> arrow.core.raise/Raise { // arrow.core.r
 }
 
 abstract interface <#A: in kotlin/Any?> arrow.core/MonotoneCollectionBuilder { // arrow.core/MonotoneCollectionBuilder|null[0]
-    abstract fun _add(#A): kotlin/Boolean // arrow.core/MonotoneCollectionBuilder._add|_add(1:0){}[0]
-    abstract fun _addAll(kotlin.collections/Collection<#A>): kotlin/Boolean // arrow.core/MonotoneCollectionBuilder._addAll|_addAll(kotlin.collections.Collection<1:0>){}[0]
+    abstract fun _add(#A) // arrow.core/MonotoneCollectionBuilder._add|_add(1:0){}[0]
+    abstract fun _addAll(kotlin.collections/Collection<#A>) // arrow.core/MonotoneCollectionBuilder._addAll|_addAll(kotlin.collections.Collection<1:0>){}[0]
 
     abstract interface NonEmpty // arrow.core/MonotoneCollectionBuilder.NonEmpty|null[0]
 }
@@ -52,18 +52,6 @@ abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/MemoizationCach
 }
 
 abstract interface <#A: kotlin/Any?> arrow.core/MonotoneMutableList : arrow.core/MonotoneCollectionBuilder<#A>, kotlin.collections/List<#A> { // arrow.core/MonotoneMutableList|null[0]
-    abstract fun _add(kotlin/Int, #A) // arrow.core/MonotoneMutableList._add|_add(kotlin.Int;1:0){}[0]
-    abstract fun _addAll(kotlin/Int, kotlin.collections/Collection<#A>): kotlin/Boolean // arrow.core/MonotoneMutableList._addAll|_addAll(kotlin.Int;kotlin.collections.Collection<1:0>){}[0]
-    abstract fun listIterator(): arrow.core/MonotoneMutableList.Iterator<#A> // arrow.core/MonotoneMutableList.listIterator|listIterator(){}[0]
-    abstract fun listIterator(kotlin/Int): arrow.core/MonotoneMutableList.Iterator<#A> // arrow.core/MonotoneMutableList.listIterator|listIterator(kotlin.Int){}[0]
-    abstract fun set(kotlin/Int, #A): #A // arrow.core/MonotoneMutableList.set|set(kotlin.Int;1:0){}[0]
-    abstract fun subList(kotlin/Int, kotlin/Int): arrow.core/MonotoneMutableList<#A> // arrow.core/MonotoneMutableList.subList|subList(kotlin.Int;kotlin.Int){}[0]
-
-    abstract interface <#A1: kotlin/Any?> Iterator : kotlin.collections/ListIterator<#A1> { // arrow.core/MonotoneMutableList.Iterator|null[0]
-        abstract fun add(#A1) // arrow.core/MonotoneMutableList.Iterator.add|add(1:0){}[0]
-        abstract fun set(#A1) // arrow.core/MonotoneMutableList.Iterator.set|set(1:0){}[0]
-    }
-
     final object Companion { // arrow.core/MonotoneMutableList.Companion|null[0]
         final fun <#A2: kotlin/Any?> invoke(): arrow.core/MonotoneMutableList<#A2> // arrow.core/MonotoneMutableList.Companion.invoke|invoke(){0§<kotlin.Any?>}[0]
         final fun <#A2: kotlin/Any?> invoke(kotlin/Int): arrow.core/MonotoneMutableList<#A2> // arrow.core/MonotoneMutableList.Companion.invoke|invoke(kotlin.Int){0§<kotlin.Any?>}[0]
@@ -749,7 +737,6 @@ final const val arrow.core/RedundantAPI // arrow.core/RedundantAPI|{}RedundantAP
 
 final fun (arrow.core.raise/Traced).arrow.core.raise/withCause(arrow.core.raise/Traced): arrow.core.raise/Traced // arrow.core.raise/withCause|withCause@arrow.core.raise.Traced(arrow.core.raise.Traced){}[0]
 final fun (kotlin/String).arrow.core/escaped(): kotlin/String // arrow.core/escaped|escaped@kotlin.String(){}[0]
-final fun <#A: arrow.core/MonotoneCollectionBuilder<*> & kotlin.collections/Collection<*>> (#A).arrow.core/isNonEmpty(): kotlin/Boolean // arrow.core/isNonEmpty|isNonEmpty@0:0(){0§<kotlin.collections.Collection<*>&arrow.core.MonotoneCollectionBuilder<*>>}[0]
 final fun <#A: kotlin/Any> (kotlin/Function1<#A, kotlin/Boolean>).arrow.core/mapNullable(): kotlin/Function1<#A?, kotlin/Boolean> // arrow.core/mapNullable|mapNullable@kotlin.Function1<0:0,kotlin.Boolean>(){0§<kotlin.Any>}[0]
 final fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/List<#A>> (#B).arrow.core/asNonEmptyList(): arrow.core/NonEmptyList<#A> // arrow.core/asNonEmptyList|asNonEmptyList@0:1(){0§<kotlin.Any?>;1§<kotlin.collections.List<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
 final fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/Set<#A>> (#B).arrow.core/asNonEmptySet(): arrow.core/NonEmptySet<#A> // arrow.core/asNonEmptySet|asNonEmptySet@0:1(){0§<kotlin.Any?>;1§<kotlin.collections.Set<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
@@ -857,13 +844,10 @@ final fun <#A: kotlin/Any?> (#A).arrow.core/some(): arrow.core/Option<#A> // arr
 final fun <#A: kotlin/Any?> (#A?).arrow.core/toOption(): arrow.core/Option<#A> // arrow.core/toOption|toOption@0:0?(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core.raise/Accumulate<#A>).arrow.core.raise/tolerant(arrow.core.raise/Raise<arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>>): arrow.core.raise/Accumulate<#A> // arrow.core.raise/tolerant|tolerant@arrow.core.raise.Accumulate<0:0>(arrow.core.raise.Raise<arrow.core.raise.RaiseAccumulate.Value<kotlin.Nothing>>){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Either<#A, #A>).arrow.core/merge(): #A // arrow.core/merge|merge@arrow.core.Either<0:0,0:0>(){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/add(#A): kotlin/Boolean // arrow.core/add|add@arrow.core.MonotoneCollectionBuilder<0:0>(0:0){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(arrow.core/NonEmptyCollection<#A>): kotlin/Boolean // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(arrow.core.NonEmptyCollection<0:0>){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(kotlin.collections/Collection<#A>): kotlin/Boolean // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(kotlin.collections/Iterable<#A>): kotlin/Boolean // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneMutableList<#A>).arrow.core/add(kotlin/Int, #A) // arrow.core/add|add@arrow.core.MonotoneMutableList<0:0>(kotlin.Int;0:0){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneMutableList<#A>).arrow.core/addAll(kotlin/Int, arrow.core/NonEmptyCollection<#A>): kotlin/Boolean // arrow.core/addAll|addAll@arrow.core.MonotoneMutableList<0:0>(kotlin.Int;arrow.core.NonEmptyCollection<0:0>){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> (arrow.core/MonotoneMutableList<#A>).arrow.core/addAll(kotlin/Int, kotlin.collections/Collection<#A>): kotlin/Boolean // arrow.core/addAll|addAll@arrow.core.MonotoneMutableList<0:0>(kotlin.Int;kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/add(#A) // arrow.core/add|add@arrow.core.MonotoneCollectionBuilder<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(arrow.core/NonEmptyCollection<#A>) // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(arrow.core.NonEmptyCollection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(kotlin.collections/Collection<#A>) // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(kotlin.collections/Iterable<#A>) // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/NonEmptyList<arrow.core/NonEmptyList<#A>>).arrow.core/flatten(): arrow.core/NonEmptyList<#A> // arrow.core/flatten|flatten@arrow.core.NonEmptyList<arrow.core.NonEmptyList<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Option<arrow.core/Option<#A>>).arrow.core/flatten(): arrow.core/Option<#A> // arrow.core/flatten|flatten@arrow.core.Option<arrow.core.Option<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (context(arrow.core.raise/Raise<#A>)).arrow.core.raise.context/raise(#A): kotlin/Nothing // arrow.core.raise.context/raise|raise(arrow.core.raise.Raise<0:0>)(0:0){0§<kotlin.Any?>}[0]

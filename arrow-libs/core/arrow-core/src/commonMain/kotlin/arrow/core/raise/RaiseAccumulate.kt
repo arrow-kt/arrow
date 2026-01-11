@@ -12,18 +12,20 @@ import arrow.core.MonotoneMutableList
 import arrow.core.MonotoneMutableSet
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.add
 import arrow.core.addAll
 import arrow.core.asNonEmptyList
 import arrow.core.asNonEmptySet
+import arrow.core.buildNonEmptyList
 import arrow.core.collectionSizeOrDefault
 import arrow.core.getOrElse
-import arrow.core.isNonEmpty
 import arrow.core.nel
 import arrow.core.raise.RaiseAccumulate.Error
 import arrow.core.raise.RaiseAccumulate.Ok
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
+import arrow.core.wrapAsNonEmptyListOrNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -1126,8 +1128,16 @@ private class RaiseNel<Error>(private val accumulate: Accumulate<Error>) : Raise
 private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>>) : Accumulate<Error>, Raise<NonEmptyList<Error>> {
   private val list = MonotoneMutableList<Error>()
 
-  fun raiseSingle(r: Error): Nothing = raise.raise(if (list.isNonEmpty()) list.asNonEmptyList() + r else r.nel())
-  override fun raise(r: NonEmptyList<Error>) = raise.raise(if (list.isNonEmpty()) list.asNonEmptyList() + r else r)
+  fun raiseSingle(r: Error): Nothing = raise.raise(buildNonEmptyList(list.size + 1) {
+    addAll(list)
+    add(r)
+    this
+  })
+  override fun raise(r: NonEmptyList<Error>) = raise.raise(buildNonEmptyList(list.size + r.size) {
+    addAll(list)
+    addAll(r)
+    this
+  })
 
   @ExperimentalRaiseAccumulateApi
   override fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing> {
@@ -1135,8 +1145,9 @@ private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>
     return Error { raise.raise(list.asNonEmptyList()) }
   }
 
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   @ExperimentalRaiseAccumulateApi
-  override val latestError: Value<Nothing>? get() = if (list.isNonEmpty()) Error { raise.raise(list.asNonEmptyList()) } else null
+  override val latestError: Value<Nothing>? get() = list.wrapAsNonEmptyListOrNull()?.let { Error { raise.raise(it) } }
 }
 
 @OptIn(ExperimentalRaiseAccumulateApi::class)

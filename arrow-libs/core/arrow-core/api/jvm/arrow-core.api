@@ -350,48 +350,33 @@ public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
 }
 
 public abstract interface class arrow/core/MonotoneCollectionBuilder {
-	public abstract fun _add (Ljava/lang/Object;)Z
-	public abstract fun _addAll (Ljava/util/Collection;)Z
+	public abstract fun _add (Ljava/lang/Object;)V
+	public abstract fun _addAll (Ljava/util/Collection;)V
 }
 
 public abstract interface class arrow/core/MonotoneCollectionBuilder$NonEmpty {
 }
 
 public final class arrow/core/MonotoneCollectionBuilderKt {
-	public static final fun add (Larrow/core/MonotoneCollectionBuilder;Ljava/lang/Object;)Z
-	public static final fun add (Larrow/core/MonotoneMutableList;ILjava/lang/Object;)V
-	public static final fun addAll (Larrow/core/MonotoneCollectionBuilder;Larrow/core/NonEmptyCollection;)Z
-	public static final fun addAll (Larrow/core/MonotoneCollectionBuilder;Ljava/lang/Iterable;)Z
-	public static final fun addAll (Larrow/core/MonotoneCollectionBuilder;Ljava/util/Collection;)Z
-	public static final fun addAll (Larrow/core/MonotoneMutableList;ILarrow/core/NonEmptyCollection;)Z
-	public static final fun addAll (Larrow/core/MonotoneMutableList;ILjava/util/Collection;)Z
+	public static final fun add (Larrow/core/MonotoneCollectionBuilder;Ljava/lang/Object;)V
+	public static final fun addAll (Larrow/core/MonotoneCollectionBuilder;Larrow/core/NonEmptyCollection;)V
+	public static final fun addAll (Larrow/core/MonotoneCollectionBuilder;Ljava/lang/Iterable;)V
+	public static final fun addAll (Larrow/core/MonotoneCollectionBuilder;Ljava/util/Collection;)V
 	public static final fun asNonEmptyList (Ljava/util/List;)Ljava/util/List;
 	public static final fun asNonEmptySet (Ljava/util/Set;)Ljava/util/Set;
 	public static final fun buildNonEmptyList (ILkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun buildNonEmptyList (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public static final fun buildNonEmptySet (ILkotlin/jvm/functions/Function1;)Ljava/util/Set;
 	public static final fun buildNonEmptySet (Lkotlin/jvm/functions/Function1;)Ljava/util/Set;
-	public static final fun isNonEmpty (Ljava/util/Collection;)Z
 }
 
 public abstract interface class arrow/core/MonotoneMutableList : arrow/core/MonotoneCollectionBuilder, java/util/List, kotlin/jvm/internal/markers/KMappedMarker {
 	public static final field Companion Larrow/core/MonotoneMutableList$Companion;
-	public abstract fun _add (ILjava/lang/Object;)V
-	public abstract fun _addAll (ILjava/util/Collection;)Z
-	public abstract fun listIterator ()Larrow/core/MonotoneMutableList$Iterator;
-	public abstract fun listIterator (I)Larrow/core/MonotoneMutableList$Iterator;
-	public abstract fun set (ILjava/lang/Object;)Ljava/lang/Object;
-	public abstract fun subList (II)Larrow/core/MonotoneMutableList;
 }
 
 public final class arrow/core/MonotoneMutableList$Companion {
 	public final fun invoke ()Larrow/core/MonotoneMutableList;
 	public final fun invoke (I)Larrow/core/MonotoneMutableList;
-}
-
-public abstract interface class arrow/core/MonotoneMutableList$Iterator : java/util/ListIterator, kotlin/jvm/internal/markers/KMappedMarker {
-	public abstract fun add (Ljava/lang/Object;)V
-	public abstract fun set (Ljava/lang/Object;)V
 }
 
 public abstract interface class arrow/core/MonotoneMutableSet : arrow/core/MonotoneCollectionBuilder, java/util/Set, kotlin/jvm/internal/markers/KMappedMarker {

@@ -563,11 +563,9 @@ public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
 /**
  * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].
  */
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 @JvmName("toNonEmptyListOrNull")
-public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? = MonotoneMutableList<T>(collectionSizeOrDefault(10)).run {
-  addAll(this@toNonEmptyListOrNull)
-  if (isNonEmpty()) asNonEmptyList() else null
-}
+public fun <T> Iterable<T>.toNonEmptyListOrNull(): NonEmptyList<T>? = toList().wrapAsNonEmptyListOrNull()
 
 /**
  * Returns a [NonEmptyList] that contains a **copy** of the elements in [this].

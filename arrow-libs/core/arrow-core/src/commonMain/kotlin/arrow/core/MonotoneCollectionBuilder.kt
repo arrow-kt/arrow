@@ -14,13 +14,10 @@ import kotlin.contracts.contract
 @SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
 public interface MonotoneCollectionBuilder<in E> {
   // underscored so that addAll(Nec<E>) extension overload takes precedence
-  // Turning this into an abstract class doesn't work well because
-  // contracts on methods don't work well for some reason?
-  @IgnorableReturnValue
-  public fun _addAll(elements: Collection<E>): Boolean
+  // Turning this into an abstract class doesn't work well because of KT-83602
+  public fun _addAll(elements: Collection<E>)
 
-  @IgnorableReturnValue
-  public fun _add(element: E): Boolean
+  public fun _add(element: E)
 
   /**
    * Marker interface for builders that guarantee at least one element has been added.
@@ -30,34 +27,31 @@ public interface MonotoneCollectionBuilder<in E> {
   public interface NonEmpty
 }
 
-@IgnorableReturnValue
-public fun <E> MonotoneCollectionBuilder<E>.add(element: E): Boolean {
+public fun <E> MonotoneCollectionBuilder<E>.add(element: E) {
   contract { returns() implies (this@add is NonEmpty) }
   return _add(element)
 }
 
-@IgnorableReturnValue
-public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: Iterable<E>): Boolean = when (elements) {
+public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: Iterable<E>): Unit = when (elements) {
   is Collection -> addAll(elements)
-  else -> {
-    var result = false
-    for (item in elements) if (add(item)) result = true
-    result
-  }
+  else -> for (item in elements) add(item)
 }
 
-@IgnorableReturnValue
-public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: NonEmptyCollection<E>): Boolean {
+public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: NonEmptyCollection<E>) {
   contract { returns() implies (this@addAll is NonEmpty) }
-  return _addAll(elements)
+  _addAll(elements)
 }
 
-@IgnorableReturnValue
-public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: Collection<E>): Boolean = _addAll(elements)
+public fun <E> MonotoneCollectionBuilder<E>.addAll(elements: Collection<E>): Unit = _addAll(elements)
 
-public fun <C> C.isNonEmpty(): Boolean where C : Collection<*>, C : MonotoneCollectionBuilder<*> {
-  contract { returns(true) implies (this@isNonEmpty is NonEmpty) }
-  return isNotEmpty()
+@SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
+private abstract class MonotoneMutableCollectionImpl<E>(private val underlying: MutableCollection<E>) : MonotoneCollectionBuilder<E>, NonEmpty {
+  final override fun _addAll(elements: Collection<E>) { underlying.addAll(elements) }
+  final override fun _add(element: E) { underlying.add(element) }
+
+  final override fun equals(other: Any?) = underlying == other
+  final override fun hashCode() = underlying.hashCode()
+  final override fun toString() = underlying.toString()
 }
 
 /**
@@ -66,73 +60,17 @@ public fun <C> C.isNonEmpty(): Boolean where C : Collection<*>, C : MonotoneColl
  */
 @SubclassOptInRequired(PotentiallyUnsafeNonEmptyOperation::class)
 public interface MonotoneMutableList<E>: MonotoneCollectionBuilder<E>, List<E> {
-  @IgnorableReturnValue
-  public fun _addAll(index: Int, elements: Collection<E>): Boolean
-
-  @IgnorableReturnValue
-  public operator fun set(index: Int, element: E): E
-
-  public fun _add(index: Int, element: E)
-
-  override fun listIterator(): Iterator<E>
-
-  override fun listIterator(index: Int): Iterator<E>
-
-  override fun subList(fromIndex: Int, toIndex: Int): MonotoneMutableList<E>
-
   public companion object {
     public operator fun <E> invoke(): MonotoneMutableList<E> = Impl()
 
     public operator fun <E> invoke(initialCapacity: Int): MonotoneMutableList<E> = Impl(initialCapacity)
   }
 
-  public interface Iterator<T> : ListIterator<T> {
-    public fun set(element: T)
-
-    public fun add(element: T)
-  }
-
-  private class IteratorImpl<T>(private val underlying: MutableListIterator<T>) : Iterator<T>, ListIterator<T> by underlying {
-    override fun set(element: T) = underlying.set(element)
-
-    override fun add(element: T) = underlying.add(element)
-  }
-
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-  private class Impl<E> private constructor(private val underlying: MutableList<E>) : MonotoneMutableList<E>, NonEmpty, List<E> by underlying {
+  private class Impl<E> private constructor(underlying: MutableList<E>) : MonotoneMutableCollectionImpl<E>(underlying), MonotoneMutableList<E>, List<E> by underlying {
     constructor() : this(ArrayList())
     constructor(initialCapacity: Int) : this(ArrayList(initialCapacity))
-
-    override fun isEmpty(): Boolean = underlying.isEmpty()
-
-    override fun _addAll(elements: Collection<E>) = underlying.addAll(elements)
-    override fun _add(element: E) = underlying.add(element)
-    override fun _addAll(index: Int, elements: Collection<E>) = underlying.addAll(index, elements)
-    override fun set(index: Int, element: E) = underlying.set(index, element)
-    override fun _add(index: Int, element: E) = underlying.add(index, element)
-
-    override fun listIterator() = IteratorImpl(underlying.listIterator())
-    override fun listIterator(index: Int) = IteratorImpl(underlying.listIterator(index))
-    override fun subList(fromIndex: Int, toIndex: Int) = Impl(underlying.subList(fromIndex, toIndex))
-
-    override fun equals(other: Any?) = underlying == other
-    override fun hashCode() = underlying.hashCode()
-    override fun toString() = underlying.toString()
   }
-}
-
-@IgnorableReturnValue
-public fun <E> MonotoneMutableList<E>.addAll(index: Int, elements: Collection<E>): Boolean = _addAll(index, elements)
-
-@IgnorableReturnValue
-public fun <E> MonotoneMutableList<E>.addAll(index: Int, elements: NonEmptyCollection<E>): Boolean {
-  contract { returns() implies (this@addAll is NonEmpty) }
-  return _addAll(index, elements)
-}
-
-public fun <E> MonotoneMutableList<E>.add(index: Int, element: E) {
-  contract { returns() implies (this@add is NonEmpty) }
-  _add(index, element)
 }
 
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
@@ -165,18 +103,9 @@ public interface MonotoneMutableSet<E>: MonotoneCollectionBuilder<E>, Set<E> {
   }
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-  private class Impl<E> private constructor(private val underlying: MutableSet<E>) : MonotoneMutableSet<E>, NonEmpty, Set<E> by underlying {
+  private class Impl<E> private constructor(underlying: MutableSet<E>) : MonotoneMutableCollectionImpl<E>(underlying), MonotoneMutableSet<E>, NonEmpty, Set<E> by underlying {
     constructor() : this(LinkedHashSet())
     constructor(initialCapacity: Int) : this(LinkedHashSet(initialCapacity))
-
-    override fun isEmpty(): Boolean = underlying.isEmpty()
-
-    override fun _addAll(elements: Collection<E>) = underlying.addAll(elements)
-    override fun _add(element: E) = underlying.add(element)
-
-    override fun equals(other: Any?) = underlying == other
-    override fun hashCode() = underlying.hashCode()
-    override fun toString() = underlying.toString()
   }
 }
 
