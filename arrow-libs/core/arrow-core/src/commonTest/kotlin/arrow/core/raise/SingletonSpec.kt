@@ -1,5 +1,8 @@
 package arrow.core.raise
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.shouldBeTypeOf
 import arrow.core.test.nonEmptyList
@@ -125,15 +128,15 @@ class SingletonSpec {
   fun mapNullableBindAll() = runTest {
     checkAll(iterations, Arb.map(Arb.int(), Arb.int().orNull(), range.first, range.last)) { a ->
       val recovered = emptyMap<Int, Int>()
-      singleton({ recovered }) { a.bindAll() } shouldBe run { a.mapValues { (_, v) -> v ?: return@run recovered } }
+      singleton({ recovered }) { a.bindAll() } shouldBe if (a.containsValue(null)) recovered else a
     }
   }
 
   @Test
   fun mapOptionBindAll() = runTest {
-    checkAll(iterations, Arb.map(Arb.int(), Arb.option(Arb.int()), range.first, range.last)) { a ->
-      val recovered = emptyMap<Int, Int>()
-      singleton({ recovered }) { a.bindAll() } shouldBe run { a.mapValues { (_, v) -> v.getOrElse { return@run recovered } } }
+    checkAll(iterations, Arb.map(Arb.int(), Arb.option(Arb.int().orNull()), range.first, range.last)) { a ->
+      val recovered = emptyMap<Int, Int?>()
+      singleton({ recovered }) { a.bindAll() } shouldBe if (a.containsValue(None)) recovered else a.mapValues { (_, v) -> v.shouldBeSome() }
     }
   }
 
@@ -141,43 +144,43 @@ class SingletonSpec {
   fun iterableNullableBindAll() = runTest {
     checkAll(iterations, Arb.list(Arb.int().orNull(), range)) { a ->
       val recovered = emptyList<Int>()
-      singleton({ recovered }) { a.bindAll() } shouldBe run { a.map { it ?: return@run recovered } }
+      singleton({ recovered }) { a.bindAll() } shouldBe if (a.contains(null)) recovered else a
     }
   }
 
   @Test
   fun iterableOptionBindAll() = runTest {
-    checkAll(iterations, Arb.list(Arb.option(Arb.int()), range)) { a ->
-      val recovered = emptyList<Int>()
-      singleton({ recovered }) { a.bindAll() } shouldBe run { a.map { it.getOrElse { return@run recovered } } }
+    checkAll(iterations, Arb.list(Arb.option(Arb.int().orNull()), range)) { a ->
+      val recovered = emptyList<Int?>()
+      singleton({ recovered }) { a.bindAll() } shouldBe if (a.contains(None)) recovered else a.map { it.shouldBeSome() }
     }
   }
 
   @Test
   fun nelNullableBindAll() = runTest {
     checkAll(iterations, Arb.nonEmptyList(Arb.int().orNull(), nelRange)) { a ->
-      nullable { a.bindAll() } shouldBe run { a.map { it ?: return@run null } }
+      nullable { a.bindAll() } shouldBe if (a.contains(null)) null else a
     }
   }
 
   @Test
   fun nelOptionBindAll() = runTest {
-    checkAll(iterations, Arb.nonEmptyList(Arb.option(Arb.int()), nelRange)) { a ->
-      nullable { a.bindAll() } shouldBe run { a.map { it.getOrElse { return@run null } } }
+    checkAll(iterations, Arb.nonEmptyList(Arb.option(Arb.int().orNull()), nelRange)) { a ->
+      nullable { a.bindAll() } shouldBe if (a.contains(None)) null else a.map { it.shouldBeSome() }
     }
   }
 
   @Test
   fun nesNullableBindAll() = runTest {
     checkAll(iterations, Arb.nonEmptySet(Arb.int().orNull(), nelRange)) { a ->
-      nullable { a.bindAll() } shouldBe run { a.toNonEmptyList().map { it ?: return@run null }.toNonEmptySet() }
+      nullable { a.bindAll() } shouldBe if (a.contains(null)) null else a
     }
   }
 
   @Test
   fun nesOptionBindAll() = runTest {
-    checkAll(iterations, Arb.nonEmptySet(Arb.option(Arb.int()), nelRange)) { a ->
-      nullable { a.bindAll() } shouldBe run { a.toNonEmptyList().map { it.getOrElse { return@run null } }.toNonEmptySet() }
+    checkAll(iterations, Arb.nonEmptySet(Arb.option(Arb.int().orNull()), nelRange)) { a ->
+      nullable { a.bindAll() } shouldBe if (a.contains(None)) null else a.map { it.shouldBeSome() }.toNonEmptySet()
     }
   }
 
@@ -195,3 +198,5 @@ class SingletonSpec {
     }
   }
 }
+
+private fun <A> Option<A>.shouldBeSome(): A = shouldBeTypeOf<Some<A>>().value

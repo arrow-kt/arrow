@@ -604,7 +604,7 @@ class EffectSpec {
 
   @Test fun accumulateReturnsEveryError() = runTest {
     checkAll(Arb.nonEmptyList(Arb.int(), range = 2..20)) { errors ->
-      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors
+      either { mapOrAccumulate(errors) { raise(it) } } shouldBe errors.left()
     }
   }
 
@@ -618,7 +618,7 @@ class EffectSpec {
 
   @Test fun nonEmptyListMapOrAccumulateReturnsEveryError() = runTest {
     checkAll(Arb.nonEmptyList(Arb.int(), range = 2..20)) { errors ->
-      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors
+      either { mapOrAccumulate(errors) { raise(it) } } shouldBe errors.left()
     }
   }
 
@@ -632,7 +632,7 @@ class EffectSpec {
 
   @Test fun nonEmptySetMapOrAccumulateReturnsEveryError() = runTest {
     checkAll(Arb.nonEmptySet(Arb.int(), range = 2..20)) { errors ->
-      merge { mapOrAccumulate(errors) { raise(it) }.head } shouldBe errors.toNonEmptyList()
+      either { mapOrAccumulate(errors) { raise(it) } } shouldBe errors.toNonEmptyList().left()
     }
   }
 

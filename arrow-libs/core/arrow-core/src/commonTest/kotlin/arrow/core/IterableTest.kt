@@ -23,20 +23,14 @@ class IterableTest {
   @Test
   fun flattenOrAccumulateCombine() = runTest(timeout = 30.seconds) {
     checkAll(Arb.list(Arb.either(Arb.string(maxSize = 10), Arb.int()), range = 0..20)) { list ->
-      val expected = list.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.reduce(String::plus)?.left()
-        ?: list.mapNotNull { it.getOrNull() }.right()
-
-      list.flattenOrAccumulate(String::plus) shouldBe expected
+      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulate().mapLeft { it.reduce(String::plus) }
     }
   }
 
   @Test
   fun flattenOrAccumulateOk() = runTest {
     checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { list ->
-      val expected = list.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.left()
-        ?: list.mapNotNull { it.getOrNull() }.right()
-
-      list.flattenOrAccumulate() shouldBe expected
+      list.flattenOrAccumulate() shouldBe list.simpleFlattenOrAccumulate()
     }
   }
 
@@ -461,10 +455,7 @@ class IterableTest {
         0..10,
       ),
     ) { list ->
-      val expected = list.flatMap { it.leftOrNull().orEmpty() }.toNonEmptyListOrNull()?.left()
-        ?: list.mapNotNull { it.getOrNull() }.right()
-
-      list.flattenOrAccumulate() shouldBe expected
+      list.flattenOrAccumulate() shouldBe list.simpleFlattenOrAccumulate().mapLeft { it.flatten() }
     }
   }
 
@@ -479,10 +470,7 @@ class IterableTest {
         0..10,
       ),
     ) { list ->
-      val expected = list.mapNotNull { it.leftOrNull() }.toNonEmptyListOrNull()?.flatten()?.reduce(String::plus)?.left()
-        ?: list.mapNotNull { it.getOrNull() }.right()
-
-      list.flattenOrAccumulate(String::plus) shouldBe expected
+      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulate().mapLeft { it.flatten().reduce(String::plus) }
     }
   }
 
@@ -576,4 +564,9 @@ class IterableTest {
       a.compareTo(b) shouldBe expected
     }
   }
+}
+
+private fun <A, B> List<Either<A, B>>.simpleFlattenOrAccumulate(): Either<NonEmptyList<A>, List<B>> {
+  val (lefts, rights) = this.separateEither()
+  return lefts.toNonEmptyListOrNull()?.left() ?: rights.right()
 }
