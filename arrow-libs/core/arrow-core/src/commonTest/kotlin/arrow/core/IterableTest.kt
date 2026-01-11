@@ -23,7 +23,7 @@ class IterableTest {
   @Test
   fun flattenOrAccumulateCombine() = runTest(timeout = 30.seconds) {
     checkAll(Arb.list(Arb.either(Arb.string(maxSize = 10), Arb.int()), range = 0..20)) { list ->
-      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulate().mapLeft { it.reduce(String::plus) }
+      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulateCombine()
     }
   }
 
@@ -455,7 +455,7 @@ class IterableTest {
         0..10,
       ),
     ) { list ->
-      list.flattenOrAccumulate() shouldBe list.simpleFlattenOrAccumulate().mapLeft { it.flatten() }
+      list.flattenOrAccumulate() shouldBe list.simpleFlattenOrAccumulateNel()
     }
   }
 
@@ -470,7 +470,7 @@ class IterableTest {
         0..10,
       ),
     ) { list ->
-      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulate().mapLeft { it.flatten().reduce(String::plus) }
+      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulateNel().mapLeft { it.reduce(String::plus) }
     }
   }
 
@@ -566,7 +566,14 @@ class IterableTest {
   }
 }
 
-private fun <A, B> List<Either<A, B>>.simpleFlattenOrAccumulate(): Either<NonEmptyList<A>, List<B>> {
+fun <A, B> List<Either<A, B>>.simpleFlattenOrAccumulate(): Either<NonEmptyList<A>, List<B>> {
   val (lefts, rights) = this.separateEither()
   return lefts.toNonEmptyListOrNull()?.left() ?: rights.right()
 }
+
+fun <A, B> List<Either<NonEmptyList<A>, B>>.simpleFlattenOrAccumulateNel(): Either<NonEmptyList<A>, List<B>> =
+  simpleFlattenOrAccumulate().mapLeft { it.flatten() }
+
+
+fun <B> List<Either<String, B>>.simpleFlattenOrAccumulateCombine(): Either<String, List<B>> =
+  simpleFlattenOrAccumulate().mapLeft { it.reduce(String::plus) }
