@@ -18,12 +18,14 @@ public fun interface ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>
   public suspend fun RoutingContext.handle(request: TRequest): TResponse
 }
 
-public suspend inline fun <reified TResponse> RoutingContext.respondOrRaise(
+@PublishedApi
+internal suspend inline fun <reified TResponse> RoutingContext.respondOrRaise(
   statusCode: HttpStatusCode? = null,
   body: RespondingRaiseRoutingHandler<TResponse>,
 ): Unit = call.respondOrRaise(statusCode, typeInfo<TResponse>()) { body() }
 
-public suspend inline fun <reified TRequest : Any, reified TResponse> RoutingContext.respondOrRaise(
+@PublishedApi
+internal suspend inline fun <reified TRequest : Any, reified TResponse> RoutingContext.respondOrRaise(
   statusCode: HttpStatusCode? = null,
   body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
 ): Unit = call.respondOrRaise(statusCode, typeInfo<TResponse>()) {
