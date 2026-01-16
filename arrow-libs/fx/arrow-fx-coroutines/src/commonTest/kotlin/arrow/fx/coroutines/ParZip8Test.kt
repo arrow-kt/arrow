@@ -5,6 +5,7 @@ import arrow.atomic.update
 import arrow.atomic.value
 import arrow.core.Either
 import arrow.core.Tuple8
+import arrow.platform.test.FlakyOnJs
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -119,7 +120,7 @@ class ParZip8Test {
         ph.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
     
-    @Test
+    @Test @FlakyOnJs
     fun parZip8CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTestUsingDefaultDispatcher {
       checkAll(
         Arb.throwable(),

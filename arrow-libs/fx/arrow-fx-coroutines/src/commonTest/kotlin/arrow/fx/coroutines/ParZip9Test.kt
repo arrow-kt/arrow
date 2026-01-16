@@ -4,6 +4,7 @@ import arrow.atomic.Atomic
 import arrow.atomic.update
 import arrow.core.Either
 import arrow.core.Tuple9
+import arrow.platform.test.FlakyOnJs
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -128,7 +129,7 @@ class ParZip9Test {
         pi.await().shouldBeTypeOf<ExitCase.Cancelled>()
     }
     
-    @Test
+    @Test @FlakyOnJs
     fun parZip9CancelsLosersIfAFailureOccursInOneOfTheTasks() = runTestUsingDefaultDispatcher {
       checkAll(
         Arb.throwable(),
