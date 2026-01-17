@@ -308,4 +308,21 @@ class LensTests {
       |val r = l != null
       """.compilationFails()
   }
+
+  @Test
+  fun `Lenses will be generated for data class with property named arrow (issue #3789)`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class AutoLambdaData(
+      |  val leftBrace: String = "",
+      |  val arrow: String = "->",
+      |  val rightBrace: String = ""
+      |) { companion object }
+      |
+      |val lens: Lens<AutoLambdaData, String> = AutoLambdaData.arrow
+      |val r = lens != null
+      """.evals("r" to true)
+  }
 }

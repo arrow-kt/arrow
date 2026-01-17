@@ -89,6 +89,18 @@ public final class arrow/integrations/jackson/module/NonEmptyCollectionsModule :
 	public fun setupModule (Ltools/jackson/databind/JacksonModule$SetupContext;)V
 }
 
+public final class arrow/integrations/jackson/module/NonEmptyListDeserializer : tools/jackson/databind/deser/std/StdDeserializer {
+	public fun <init> (Ltools/jackson/databind/JavaType;)V
+	public synthetic fun deserialize (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun deserialize-L4fWQpE (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/util/List;
+}
+
+public final class arrow/integrations/jackson/module/NonEmptySetDeserializer : tools/jackson/databind/deser/std/StdDeserializer {
+	public fun <init> (Ltools/jackson/databind/JavaType;)V
+	public synthetic fun deserialize (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/lang/Object;
+	public fun deserialize-OZgIoXQ (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/util/Set;
+}
+
 public final class arrow/integrations/jackson/module/OptionDeserializer : tools/jackson/databind/deser/std/ReferenceTypeDeserializer {
 	public fun <init> (Ltools/jackson/databind/JavaType;Ltools/jackson/databind/deser/ValueInstantiator;Ltools/jackson/databind/jsontype/TypeDeserializer;Ltools/jackson/databind/ValueDeserializer;)V
 	public fun getNullValue (Ltools/jackson/databind/DeserializationContext;)Larrow/core/Option;
