@@ -1,4 +1,4 @@
-import com.android.build.api.dsl.androidLibrary
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import groovy.util.Node
 import groovy.util.NodeList
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -183,7 +183,9 @@ if (isKotlinMultiplatform) {
     }
 
     if (multiplatformWithAndroid) {
-      androidLibrary {
+      // this line is required to make AnimalSniffer happy
+      tasks.register("androidMainClasses")
+      extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()!!.apply {
         namespace = projectNameWithDots
         compileSdk = 36
         minSdk = 21
@@ -194,7 +196,7 @@ if (isKotlinMultiplatform) {
             else -> JvmTarget.JVM_1_8
           }
         }
-        withHostTestBuilder {}
+        withHostTest {}
       }
     }
 
