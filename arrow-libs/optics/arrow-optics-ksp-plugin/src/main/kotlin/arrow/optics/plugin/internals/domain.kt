@@ -3,6 +3,7 @@
 package arrow.optics.plugin.internals
 
 import arrow.optics.plugin.companionObject
+import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
@@ -119,6 +120,20 @@ const val Iso = "arrow.optics.Iso"
 const val Optional = "arrow.optics.Optional"
 const val Prism = "arrow.optics.Prism"
 const val Traversal = "arrow.optics.Traversal"
+
+fun ADT.resolveTypeName(type: String): Pair<String, String> = if (hasTypeCollisions(type)) {
+  val typeName = type.substringAfterLast('.')
+  val typeAlias = "ArrowOptics$typeName"
+  val aliasImport = "import $type as $typeAlias"
+  typeAlias to aliasImport
+} else {
+  type to ""
+}
+
+private fun ADT.hasTypeCollisions(type: String): Boolean = declaration.getDeclaredProperties().let { properties ->
+  val firstSegment = type.substringBefore('.')
+  properties.any { it.simpleName.asString() == firstSegment }
+}
 
 data class Snippet(
   val `package`: String,
