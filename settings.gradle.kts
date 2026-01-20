@@ -18,7 +18,7 @@ pluginManagement {
 
 plugins {
   id("com.gradle.develocity") version "4.3.1"
-  id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 val kotlin_repo_url: String? by settings
@@ -146,6 +146,9 @@ project(":arrow-resilience-ktor-client").projectDir = file("arrow-libs/integrati
 
 include("arrow-raise-ktor-server")
 project(":arrow-raise-ktor-server").projectDir = file("arrow-libs/integrations/arrow-raise-ktor-server")
+
+include("arrow-raise-ktor-server-resources")
+project(":arrow-raise-ktor-server-resources").projectDir = file("arrow-libs/integrations/arrow-raise-ktor-server-resources")
 
 include("arrow-core-result4k")
 project(":arrow-core-result4k").projectDir = file("arrow-libs/integrations/arrow-core-result4k")
