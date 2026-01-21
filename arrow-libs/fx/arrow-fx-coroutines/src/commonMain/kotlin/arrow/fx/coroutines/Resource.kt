@@ -2,6 +2,7 @@
 
 package arrow.fx.coroutines
 
+import arrow.AutoCloseImplementation
 import arrow.AutoCloseScope
 import arrow.atomic.Atomic
 import arrow.atomic.update
@@ -289,6 +290,7 @@ public typealias Resource<A> = suspend ResourceScope.() -> A
 @Deprecated("Don't refer to this type. It'll be removed in the future.", level = DeprecationLevel.WARNING)
 public object AcquireStep
 
+@SubclassOptInRequired(AutoCloseImplementation::class)
 @ResourceDSL
 public interface ResourceScope : AutoCloseScope {
 
@@ -476,6 +478,7 @@ public suspend fun <A> Resource<A>.allocate(): Pair<A, suspend (ExitCase) -> Uni
   bind() to this::cancelAll
 }
 
+@OptIn(AutoCloseImplementation::class)
 internal class ResourceScopeImpl : ResourceScope {
   private val finalizers: Atomic<List<suspend (ExitCase) -> Unit>> = Atomic(emptyList())
   override fun onRelease(release: suspend (ExitCase) -> Unit) {

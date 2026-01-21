@@ -10,6 +10,10 @@ open annotation class arrow.resilience/SagaDSLMarker : kotlin/Annotation { // ar
     constructor <init>() // arrow.resilience/SagaDSLMarker.<init>|<init>(){}[0]
 }
 
+open annotation class arrow.resilience/SagaImplementation : kotlin/Annotation { // arrow.resilience/SagaImplementation|null[0]
+    constructor <init>() // arrow.resilience/SagaImplementation.<init>|<init>(){}[0]
+}
+
 abstract fun interface <#A: in kotlin/Any?, #B: out kotlin/Any?> arrow.resilience/Schedule { // arrow.resilience/Schedule|null[0]
     open val step // arrow.resilience/Schedule.step|{}step[0]
         open fun <get-step>(): kotlin.coroutines/SuspendFunction1<#A, arrow.resilience/Schedule.Decision<#A, #B>> // arrow.resilience/Schedule.step.<get-step>|<get-step>(){}[0]

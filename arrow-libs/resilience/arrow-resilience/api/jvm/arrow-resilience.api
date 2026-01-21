@@ -114,6 +114,9 @@ public final class arrow/resilience/SagaBuilder : arrow/resilience/SagaScope {
 public abstract interface annotation class arrow/resilience/SagaDSLMarker : java/lang/annotation/Annotation {
 }
 
+public abstract interface annotation class arrow/resilience/SagaImplementation : java/lang/annotation/Annotation {
+}
+
 public final class arrow/resilience/SagaKt {
 	public static final fun saga (Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
 	public static final fun saga (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;)Lkotlin/jvm/functions/Function2;
