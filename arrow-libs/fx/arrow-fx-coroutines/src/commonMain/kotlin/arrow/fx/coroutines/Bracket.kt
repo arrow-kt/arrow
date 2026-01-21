@@ -18,8 +18,15 @@ public sealed class ExitCase {
       "ExitCase.Completed"
   }
 
-  public data class Cancelled(val exception: CancellationException) : ExitCase()
-  public data class Failure(val failure: Throwable) : ExitCase()
+  @ConsistentCopyVisibility
+  public data class Cancelled internal constructor(val exception: CancellationException) : ExitCase()
+
+  @ConsistentCopyVisibility
+  public data class Failure internal constructor(val failure: Throwable) : ExitCase() {
+    init {
+      require(failure !is CancellationException) { "Failure must not wrap a CancellationException" }
+    }
+  }
 
   public companion object {
     public fun ExitCase(error: Throwable): ExitCase =

@@ -36,10 +36,7 @@ public abstract class arrow/fx/coroutines/ExitCase {
 }
 
 public final class arrow/fx/coroutines/ExitCase$Cancelled : arrow/fx/coroutines/ExitCase {
-	public fun <init> (Ljava/util/concurrent/CancellationException;)V
 	public final fun component1 ()Ljava/util/concurrent/CancellationException;
-	public final fun copy (Ljava/util/concurrent/CancellationException;)Larrow/fx/coroutines/ExitCase$Cancelled;
-	public static synthetic fun copy$default (Larrow/fx/coroutines/ExitCase$Cancelled;Ljava/util/concurrent/CancellationException;ILjava/lang/Object;)Larrow/fx/coroutines/ExitCase$Cancelled;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getException ()Ljava/util/concurrent/CancellationException;
 	public fun hashCode ()I
@@ -56,10 +53,7 @@ public final class arrow/fx/coroutines/ExitCase$Completed : arrow/fx/coroutines/
 }
 
 public final class arrow/fx/coroutines/ExitCase$Failure : arrow/fx/coroutines/ExitCase {
-	public fun <init> (Ljava/lang/Throwable;)V
 	public final fun component1 ()Ljava/lang/Throwable;
-	public final fun copy (Ljava/lang/Throwable;)Larrow/fx/coroutines/ExitCase$Failure;
-	public static synthetic fun copy$default (Larrow/fx/coroutines/ExitCase$Failure;Ljava/lang/Throwable;ILjava/lang/Object;)Larrow/fx/coroutines/ExitCase$Failure;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getFailure ()Ljava/lang/Throwable;
 	public fun hashCode ()I

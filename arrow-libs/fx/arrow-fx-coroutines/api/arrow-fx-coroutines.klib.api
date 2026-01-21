@@ -111,26 +111,20 @@ sealed class <#A: out kotlin/Any?, #B: out kotlin/Any?, #C: out kotlin/Any?> arr
 
 sealed class arrow.fx.coroutines/ExitCase { // arrow.fx.coroutines/ExitCase|null[0]
     final class Cancelled : arrow.fx.coroutines/ExitCase { // arrow.fx.coroutines/ExitCase.Cancelled|null[0]
-        constructor <init>(kotlin.coroutines.cancellation/CancellationException) // arrow.fx.coroutines/ExitCase.Cancelled.<init>|<init>(kotlin.coroutines.cancellation.CancellationException){}[0]
-
         final val exception // arrow.fx.coroutines/ExitCase.Cancelled.exception|{}exception[0]
             final fun <get-exception>(): kotlin.coroutines.cancellation/CancellationException // arrow.fx.coroutines/ExitCase.Cancelled.exception.<get-exception>|<get-exception>(){}[0]
 
         final fun component1(): kotlin.coroutines.cancellation/CancellationException // arrow.fx.coroutines/ExitCase.Cancelled.component1|component1(){}[0]
-        final fun copy(kotlin.coroutines.cancellation/CancellationException = ...): arrow.fx.coroutines/ExitCase.Cancelled // arrow.fx.coroutines/ExitCase.Cancelled.copy|copy(kotlin.coroutines.cancellation.CancellationException){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.coroutines/ExitCase.Cancelled.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // arrow.fx.coroutines/ExitCase.Cancelled.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // arrow.fx.coroutines/ExitCase.Cancelled.toString|toString(){}[0]
     }
 
     final class Failure : arrow.fx.coroutines/ExitCase { // arrow.fx.coroutines/ExitCase.Failure|null[0]
-        constructor <init>(kotlin/Throwable) // arrow.fx.coroutines/ExitCase.Failure.<init>|<init>(kotlin.Throwable){}[0]
-
         final val failure // arrow.fx.coroutines/ExitCase.Failure.failure|{}failure[0]
             final fun <get-failure>(): kotlin/Throwable // arrow.fx.coroutines/ExitCase.Failure.failure.<get-failure>|<get-failure>(){}[0]
 
         final fun component1(): kotlin/Throwable // arrow.fx.coroutines/ExitCase.Failure.component1|component1(){}[0]
-        final fun copy(kotlin/Throwable = ...): arrow.fx.coroutines/ExitCase.Failure // arrow.fx.coroutines/ExitCase.Failure.copy|copy(kotlin.Throwable){}[0]
         final fun equals(kotlin/Any?): kotlin/Boolean // arrow.fx.coroutines/ExitCase.Failure.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // arrow.fx.coroutines/ExitCase.Failure.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // arrow.fx.coroutines/ExitCase.Failure.toString|toString(){}[0]
