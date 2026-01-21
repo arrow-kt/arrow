@@ -4,10 +4,18 @@ import arrow.resilience.CircuitBreaker
 import arrow.resilience.CircuitBreaker.OpeningStrategy.Count
 import arrow.resilience.CircuitBreaker.OpeningStrategy.SlidingWindow
 import io.ktor.client.HttpClient
+import io.ktor.client.call.save
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpClientPlugin
 import io.ktor.client.plugins.HttpSend
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.isSuccess
 import io.ktor.util.AttributeKey
 import io.ktor.utils.io.KtorDsl
 import kotlin.time.Duration
@@ -60,10 +68,21 @@ public class HttpCircuitBreaker internal constructor(configuration: Configuratio
 
   internal fun intercept(client: HttpClient) {
     client.plugin(HttpSend).intercept { request ->
-      val call = circuitBreaker.protectOrThrow {
-        execute(prepareRequest(request))
+      circuitBreaker.protectOrThrow {
+        val call = execute(prepareRequest(request))
+        val response = call.save().response
+        val status = response.status
+        if (request.expectSuccess && !status.isSuccess()) {
+          val text = response.bodyAsText()
+          throw when (status.value) {
+            in 300..399 -> RedirectResponseException(response, text)
+            in 400..499 -> ClientRequestException(response, text)
+            in 500..599 -> ServerResponseException(response, text)
+            else -> ResponseException(response, text)
+          }
+        }
+        call
       }
-      call
     }
   }
 
