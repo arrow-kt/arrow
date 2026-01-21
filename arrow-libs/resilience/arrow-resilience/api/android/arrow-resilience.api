@@ -108,7 +108,7 @@ public final class arrow/resilience/SagaBuilder : arrow/resilience/SagaScope {
 	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun saga (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun totalCompensation (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun totalCompensation (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface annotation class arrow/resilience/SagaDSLMarker : java/lang/annotation/Annotation {
