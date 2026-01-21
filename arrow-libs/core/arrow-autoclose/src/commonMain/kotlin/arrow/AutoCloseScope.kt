@@ -83,6 +83,11 @@ public inline fun <A> autoCloseScope(block: AutoCloseScope.() -> A): A {
   }
 }
 
+@Target(AnnotationTarget.CLASS)
+@RequiresOptIn
+public annotation class AutoCloseImplementation
+
+@SubclassOptInRequired(AutoCloseImplementation::class)
 public interface AutoCloseScope {
   public fun onClose(release: (Throwable?) -> Unit)
 
@@ -97,6 +102,7 @@ public interface AutoCloseScope {
     autoCloseable.also { onClose { autoCloseable.close() } }
 }
 
+@OptIn(AutoCloseImplementation::class)
 @PublishedApi
 internal class DefaultAutoCloseScope : AutoCloseScope {
   private val finalizers = Atomic(emptyList<(Throwable?) -> Unit>())

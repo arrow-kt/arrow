@@ -6,6 +6,10 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-autoclose>
+open annotation class arrow/AutoCloseImplementation : kotlin/Annotation { // arrow/AutoCloseImplementation|null[0]
+    constructor <init>() // arrow/AutoCloseImplementation.<init>|<init>(){}[0]
+}
+
 abstract interface arrow/AutoCloseScope { // arrow/AutoCloseScope|null[0]
     abstract fun onClose(kotlin/Function1<kotlin/Throwable?, kotlin/Unit>) // arrow/AutoCloseScope.onClose|onClose(kotlin.Function1<kotlin.Throwable?,kotlin.Unit>){}[0]
     open fun <#A1: kotlin/Any?> autoClose(kotlin/Function0<#A1>, kotlin/Function2<#A1, kotlin/Throwable?, kotlin/Unit>): #A1 // arrow/AutoCloseScope.autoClose|autoClose(kotlin.Function0<0:0>;kotlin.Function2<0:0,kotlin.Throwable?,kotlin.Unit>){0§<kotlin.Any?>}[0]

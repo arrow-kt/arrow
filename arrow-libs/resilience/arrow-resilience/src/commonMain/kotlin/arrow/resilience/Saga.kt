@@ -55,7 +55,12 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 public typealias Saga<A> = suspend SagaScope.() -> A
 
+@Target(AnnotationTarget.CLASS)
+@RequiresOptIn
+public annotation class SagaImplementation
+
 /** DSL that enables the [Saga] pattern in a `suspend` DSL. */
+@SubclassOptInRequired(SagaImplementation::class)
 @SagaDSLMarker
 public interface SagaScope {
 
@@ -120,6 +125,7 @@ public suspend fun <A> Saga<A>.transact(): A {
 public object SagaActionStep
 
 // Internal implementation of the `saga { }` builder.
+@OptIn(SagaImplementation::class)
 @PublishedApi
 internal class SagaBuilder(
   private val stack: Atomic<List<suspend () -> Unit>> = Atomic(emptyList())
