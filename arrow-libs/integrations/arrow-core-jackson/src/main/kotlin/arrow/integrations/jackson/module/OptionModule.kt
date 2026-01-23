@@ -88,8 +88,10 @@ public object OptionTypeModifier : TypeModifier() {
     typeFactory: TypeFactory?,
   ): JavaType = when {
     type.isReferenceType || type.isContainerType -> type
+
     type.rawClass == Option::class.java ->
       ReferenceType.upgradeFrom(type, type.containedTypeOrUnknown(0))
+
     else -> type
   }
 }

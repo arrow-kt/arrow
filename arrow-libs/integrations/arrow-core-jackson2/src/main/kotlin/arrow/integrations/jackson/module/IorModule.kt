@@ -79,6 +79,7 @@ public class IorDeserializerResolver(
           first.combine(second, { x, y -> y ?: x }, { x, y -> x ?: y })
         }
       }
+
     else -> null
   }
 }

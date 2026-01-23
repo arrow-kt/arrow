@@ -42,6 +42,7 @@ public class ProductTypeDeserializer<T>(
             ctxt.handleUnexpectedToken(clazz, parser.currentToken, parser, message)
           }
         }
+
         is arrow.core.None -> {
           val validFields = fields.map { it.fieldName }
           val message =

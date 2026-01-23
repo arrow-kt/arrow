@@ -29,6 +29,7 @@ public class UnionTypeDeserializer<T>(
         parser.nextToken()
         injectField.point(value)
       }
+
       is arrow.core.None -> {
         val validFields = fields.map { it.fieldName }
         val message = "Cannot deserialize $javaType. Make sure json fields are valid: $validFields."

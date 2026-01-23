@@ -102,10 +102,12 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
           ArrowEitherCallAdapter<Any, Type>(retrofit, errorType, bodyType)
         }
       }
+
       ResponseE::class.java -> {
         val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
         ArrowResponseECallAdapter<Any?, Type>(retrofit, errorType, bodyType)
       }
+
       else -> null
     }
   }
