@@ -71,6 +71,7 @@ public class EitherDeserializerResolver(
           UnionTypeDeserializer.InjectField(rightFieldName) { rightValue -> rightValue.right() },
         ),
       )
+
     else -> null
   }
 }

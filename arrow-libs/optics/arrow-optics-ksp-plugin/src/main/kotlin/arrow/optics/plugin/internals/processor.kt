@@ -89,6 +89,7 @@ internal fun evalAnnotatedPrismElement(
       )
     }
   }
+
   else -> {
     logger.error(errorMessage, element)
     emptyList()
@@ -114,6 +115,7 @@ internal fun evalAnnotatedDataClass(
       element
         .getConstructorTypesNames()
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke)
+
     element.isSealed -> {
       val properties = element
         .getDeclaredProperties()
@@ -162,6 +164,7 @@ internal fun evalAnnotatedDataClass(
         }
         .toList()
     }
+
     else -> {
       logger.error(errorMessage, element)
       emptyList()
@@ -184,6 +187,7 @@ internal fun evalAnnotatedValueClass(
 ): List<Focus> = when {
   element.isValue ->
     listOf(Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()))
+
   else -> {
     logger.error(errorMessage, element)
     emptyList()
@@ -197,12 +201,15 @@ internal fun evalAnnotatedDslElement(element: KSClassDeclaration, logger: KSPLog
         .getConstructorTypesNames()
         .zip(element.getConstructorParamNames(), Focus.Companion::invoke),
     )
+
   element.isValue ->
     ValueClassDsl(
       Focus(element.getConstructorTypesNames().first(), element.getConstructorParamNames().first()),
     )
+
   element.isSealed ->
     SealedClassDsl(evalAnnotatedPrismElement(element, element.qualifiedNameOrSimpleName.prismErrorMessage, logger))
+
   else -> throw IllegalStateException("should only be sealed, data, or value by now")
 }
 
@@ -213,8 +220,10 @@ internal fun KSType.qualifiedString(prefix: String = ""): String = when (declara
     val n = declaration.simpleName.asSanitizedString(prefix = prefix)
     if (isMarkedNullable) "$n?" else n
   }
+
   else -> when (val qname = declaration.qualifiedName?.asSanitizedString(prefix = prefix)) {
     null -> toString()
+
     else -> {
       val withArgs = when {
         arguments.isEmpty() -> qname

@@ -126,6 +126,7 @@ class IorModuleTest {
       """
           .trimIndent()
       }
+
       IorPolarity.Both -> {
         val foo = arbFoo.bind()
         val bar = arbBar.bind()
@@ -146,6 +147,7 @@ class IorModuleTest {
         """
           .trimIndent()
       }
+
       IorPolarity.Right -> {
         val bar = arbBar.bind()
         """

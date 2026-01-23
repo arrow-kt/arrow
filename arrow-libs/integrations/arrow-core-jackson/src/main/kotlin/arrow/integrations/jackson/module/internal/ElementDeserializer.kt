@@ -38,10 +38,13 @@ public data class ElementDeserializer(
     context: DeserializationContext,
   ): Any? = when {
     token == JsonToken.VALUE_NULL -> null
+
     deserializer is Some && typeDeserializer is Some ->
       deserializer.value.deserializeWithType(parser, context, typeDeserializer.value)
+
     deserializer is Some && typeDeserializer is None ->
       deserializer.value.deserialize(parser, context)
+
     else ->
       context.handleUnexpectedToken(
         javaType,

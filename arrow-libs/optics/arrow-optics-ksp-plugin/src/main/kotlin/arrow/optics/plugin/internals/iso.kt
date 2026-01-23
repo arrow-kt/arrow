@@ -9,6 +9,7 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, focus: Focus): Strin
   val firstLine = when {
     adt.typeParameters.isEmpty() ->
       "${adt.visibilityModifierName} $inlineText val ${adt.sourceClassName}.Companion.${focus.escapedParamName}: $Iso<${adt.sourceClassName}, ${focus.className}> $inlineText get()"
+
     else ->
       "${adt.visibilityModifierName} $inlineText fun ${adt.angledTypeParameters} ${adt.sourceClassName}.Companion.${focus.escapedParamName}(): $Iso<$sourceClassNameWithParams, ${focus.className}>"
   }
