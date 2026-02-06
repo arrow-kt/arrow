@@ -106,7 +106,7 @@ private suspend fun EmbeddedServer<*, *>.release(
     delay(preWait.inWholeMilliseconds)
   }
   environment.log.info("Shutting down HTTP server...")
-  stopSuspend(grace.inWholeMilliseconds, timeout.inWholeMicroseconds)
+  stopSuspend(grace.inWholeMilliseconds, timeout.inWholeMilliseconds)
   environment.log.info("HTTP server shutdown!")
 }
 
