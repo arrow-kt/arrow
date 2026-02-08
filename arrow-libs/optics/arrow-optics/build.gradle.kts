@@ -3,8 +3,6 @@ plugins {
 }
 
 kotlin {
-  compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
-
   sourceSets {
     commonMain {
       dependencies {

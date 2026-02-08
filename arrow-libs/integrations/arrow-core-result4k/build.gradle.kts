@@ -3,10 +3,6 @@ plugins {
   id("arrow.kotlin")
 }
 
-kotlin {
-  compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
-}
-
 dependencies {
   api(projects.arrowCore)
   api(libs.result4k)
