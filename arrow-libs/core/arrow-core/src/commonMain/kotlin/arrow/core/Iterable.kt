@@ -817,6 +817,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  * ```
  * <!--- KNIT example-iterable-15.kt -->
  */
+@Deprecated("To be removed due to unclear semantics. Please report use cases at https://github.com/arrow-kt/arrow/issues/3675.")
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
     ffa(a).interleave(fa.unweave(ffa))

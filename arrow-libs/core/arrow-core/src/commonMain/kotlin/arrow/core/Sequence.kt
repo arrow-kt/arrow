@@ -681,6 +681,7 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
  * ```
  * <!--- KNIT example-sequence-13.kt -->
  */
+@Deprecated("To be removed due to unclear semantics. Please report use cases at https://github.com/arrow-kt/arrow/issues/3675.")
 public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
     ffa(a).interleave(fa.unweave(ffa))
