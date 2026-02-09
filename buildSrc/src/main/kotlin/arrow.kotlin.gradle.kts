@@ -103,6 +103,8 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
     "-Xreturn-value-checker=full",
+    "-Xexpect-actual-classes",
+    "-Xcontext-parameters",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
   )
@@ -202,28 +204,30 @@ if (isKotlinMultiplatform) {
 
     // Native: https://kotlinlang.org/docs/native-target-support.html
     // -- Tier 1 --
-    linuxX64()
-    macosX64()
     macosArm64()
     iosSimulatorArm64()
-    iosX64()
+    iosArm64()
     // -- Tier 2 --
+    linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    watchosX64()
     if (project.name != "arrow-cache4k") watchosArm32()
     watchosArm64()
     tvosSimulatorArm64()
-    tvosX64()
     tvosArm64()
-    iosArm64()
-    if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
-      androidNativeArm64()
-      androidNativeX64()
-    }
     // -- Tier 3 --
     mingwX64()
-    // watchOS not included
+    macosX64()
+    iosX64()
+    watchosX64()
+    tvosX64()
+    if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
+      androidNativeX86()
+      androidNativeX64()
+      androidNativeArm32()
+      androidNativeArm64()
+      watchosDeviceArm64()
+    }
 
     applyDefaultHierarchyTemplate()
 
