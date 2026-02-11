@@ -10,7 +10,7 @@ kotlin {
       dependencies {
         api(projects.arrowOptics)
         api(libs.coroutines.core)
-        api("org.jetbrains.compose.runtime:runtime:1.10.0")
+        api("org.jetbrains.compose.runtime:runtime:1.10.1")
       }
     }
 
