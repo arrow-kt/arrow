@@ -245,6 +245,7 @@ public final class arrow/fx/coroutines/RaiseScope$DefaultImpls {
 	public static fun bindAll-vcjLgH4 (Larrow/fx/coroutines/RaiseScope;Ljava/util/List;)Ljava/util/List;
 	public static fun invoke (Larrow/fx/coroutines/RaiseScope;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun invoke (Larrow/fx/coroutines/RaiseScope;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun isTraced (Larrow/fx/coroutines/RaiseScope;)Z
 }
 
 public abstract interface annotation class arrow/fx/coroutines/ResourceDSL : java/lang/annotation/Annotation {

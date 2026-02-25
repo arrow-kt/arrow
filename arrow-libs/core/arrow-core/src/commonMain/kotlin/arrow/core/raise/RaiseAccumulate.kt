@@ -892,6 +892,10 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   override fun raise(r: Error): Nothing = raiseErrorsWith(r)
 
+  @ExperimentalTraceApi
+  override val isTraced: Boolean
+    get() = raise.isTraced
+
   public override fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
     raise.mapValuesOrAccumulate(this) { it.value.bind() }
 
@@ -1100,6 +1104,10 @@ private class ListAccumulate<Error>(private val raise: Raise<NonEmptyList<Error>
 
   fun raiseSingle(r: Error): Nothing = raise.raise(NonEmptyList(list + r))
   override fun raise(r: NonEmptyList<Error>) = raise.raise(NonEmptyList(list + r.all))
+
+  @ExperimentalTraceApi
+  override val isTraced: Boolean
+    get() = raise.isTraced
 
   // only valid if list is not empty
   // errors are never removed from `list`, so once this is valid, it stays valid

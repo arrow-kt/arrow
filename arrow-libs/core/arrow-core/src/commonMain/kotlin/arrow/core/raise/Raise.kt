@@ -209,6 +209,15 @@ public interface Raise<in Error> {
   public fun raise(r: Error): Nothing
 
   /**
+   * Indicates whether this [Raise] context is traced.
+   * This is used in `withError` to propagate tracing information.
+   * You should override this property if your [Raise] implementation is based on another.
+   */
+  @ExperimentalTraceApi
+  public val isTraced: Boolean
+    get() = false
+
+  /**
    * Invoke an [EagerEffect] inside `this` [Raise] context.
    * Any _logical failure_ is raised in `this` [Raise] context,
    * and thus short-circuits the computation.
@@ -694,6 +703,7 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
  * <!--- KNIT example-raise-dsl-11.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
+@OptIn(ExperimentalTraceApi::class)
 @RaiseDSL
 public inline fun <Error, OtherError, A> Raise<Error>.withError(
   transform: (OtherError) -> Error,
@@ -703,7 +713,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
     callsInPlace(block, EXACTLY_ONCE)
     callsInPlace(transform, AT_MOST_ONCE)
   }
-  recover({ return block() }) { raise(transform(it)) }
+  return withErrorTraced({ _, e -> transform(e) }, this.isTraced, block)
 }
 
 /**
