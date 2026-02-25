@@ -9,7 +9,7 @@ import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.nonEmptyList
 import arrow.core.test.testLaws
 import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
@@ -241,18 +241,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.string()),
       Arb.either(Arb.string(), Arb.boolean()),
     ) { a, b, c, d, e, f, g, h, i ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, e, f, g, h, i, ::Tuple9)
-      val all = listOf(a, b, c, d, e, f, g, h, i)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g, h, i).simpleFlattenOrAccumulateCombine().map { it.shouldHave9Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, d, e, f, g, h, i, ::Tuple9) shouldBe expected
     }
   }
 
@@ -269,21 +259,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.string()),
       Arb.either(Arb.string(), Arb.boolean()),
     ) { a, b, c, d, e, f, g, h, i ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9)
-      val all = listOf(a, b, c, d, e, f, g, h, i)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g, h, i).simpleFlattenOrAccumulate().map { it.shouldHave9Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9) shouldBe expected
     }
   }
 
@@ -300,22 +277,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.string()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.boolean()),
     ) { a, b, c, d, e, f, g, h, i ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9)
-      val all = listOf(a, b, c, d, e, f, g, h, i)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple9(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7], it[8]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g, h, i).simpleFlattenOrAccumulateNel().map { it.shouldHave9Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, g, h, i, ::Tuple9) shouldBe expected
     }
   }
 
@@ -325,18 +288,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.short()),
       Arb.either(Arb.string(), Arb.byte()),
     ) { a, b ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, ::Pair)
-      val all = listOf(a, b)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Pair(it[0], it[1]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b).simpleFlattenOrAccumulateCombine().map { it.shouldHave2Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, ::Pair) shouldBe expected
     }
   }
 
@@ -347,18 +300,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.byte()),
       Arb.either(Arb.string(), Arb.int()),
     ) { a, b, c ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, ::Triple)
-      val all = listOf(a, b, c)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Triple(it[0], it[1], it[2]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c).simpleFlattenOrAccumulateCombine().map { it.shouldHave3Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, ::Triple) shouldBe expected
     }
   }
 
@@ -370,18 +313,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.int()),
       Arb.either(Arb.string(), Arb.long()),
     ) { a, b, c, d ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, ::Tuple4)
-      val all = listOf(a, b, c, d)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple4(it[0], it[1], it[2], it[3]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d).simpleFlattenOrAccumulateCombine().map { it.shouldHave4Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, d, ::Tuple4) shouldBe expected
     }
   }
 
@@ -394,18 +327,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.long()),
       Arb.either(Arb.string(), Arb.float()),
     ) { a, b, c, d, e ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, e, ::Tuple5)
-      val all = listOf(a, b, c, d, e)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple5(it[0], it[1], it[2], it[3], it[4]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e).simpleFlattenOrAccumulateCombine().map { it.shouldHave5Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, d, e, ::Tuple5) shouldBe expected
     }
   }
 
@@ -419,18 +342,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.float()),
       Arb.either(Arb.string(), Arb.double()),
     ) { a, b, c, d, e, f ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, e, f, ::Tuple6)
-      val all = listOf(a, b, c, d, e, f)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple6(it[0], it[1], it[2], it[3], it[4], it[5]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f).simpleFlattenOrAccumulateCombine().map { it.shouldHave6Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, d, e, f, ::Tuple6) shouldBe expected
     }
   }
 
@@ -445,18 +358,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.double()),
       Arb.either(Arb.string(), Arb.char()),
     ) { a, b, c, d, e, f, g ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, e, f, g, ::Tuple7)
-      val all = listOf(a, b, c, d, e, f, g)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple7(it[0], it[1], it[2], it[3], it[4], it[5], it[6]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g).simpleFlattenOrAccumulateCombine().map { it.shouldHave7Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, d, e, f, g, ::Tuple7) shouldBe expected
     }
   }
 
@@ -472,18 +375,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.char()),
       Arb.either(Arb.string(), Arb.string()),
     ) { a, b, c, d, e, f, g, h ->
-      val res = Either.zipOrAccumulate({ e1, e2 -> "$e1$e2" }, a, b, c, d, e, f, g, h, ::Tuple8)
-      val all = listOf(a, b, c, d, e, f, g, h)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().fold("") { acc, t -> "$acc${t.value}" }.left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple8(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g, h).simpleFlattenOrAccumulateCombine().map { it.shouldHave8Elements() }
+      Either.zipOrAccumulate(String::plus, a, b, c, d, e, f, g, h, ::Tuple8) shouldBe expected
     }
   }
 
@@ -493,21 +386,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.short()),
       Arb.either(Arb.string(), Arb.byte()),
     ) { a, b ->
-      val res = Either.zipOrAccumulate(a, b, ::Pair)
-      val all = listOf(a, b)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Pair(it[0], it[1]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b).simpleFlattenOrAccumulate().map { it.shouldHave2Elements() }
+      Either.zipOrAccumulate(a, b, ::Pair) shouldBe expected
     }
   }
 
@@ -518,21 +398,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.byte()),
       Arb.either(Arb.string(), Arb.int()),
     ) { a, b, c ->
-      val res = Either.zipOrAccumulate(a, b, c, ::Triple)
-      val all = listOf(a, b, c)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Triple(it[0], it[1], it[2]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c).simpleFlattenOrAccumulate().map { it.shouldHave3Elements() }
+      Either.zipOrAccumulate(a, b, c, ::Triple) shouldBe expected
     }
   }
 
@@ -544,21 +411,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.int()),
       Arb.either(Arb.string(), Arb.long()),
     ) { a, b, c, d ->
-      val res = Either.zipOrAccumulate(a, b, c, d, ::Tuple4)
-      val all = listOf(a, b, c, d)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple4(it[0], it[1], it[2], it[3]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d).simpleFlattenOrAccumulate().map { it.shouldHave4Elements() }
+      Either.zipOrAccumulate(a, b, c, d, ::Tuple4) shouldBe expected
     }
   }
 
@@ -571,21 +425,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.long()),
       Arb.either(Arb.string(), Arb.float()),
     ) { a, b, c, d, e ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, ::Tuple5)
-      val all = listOf(a, b, c, d, e)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple5(it[0], it[1], it[2], it[3], it[4]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e).simpleFlattenOrAccumulate().map { it.shouldHave5Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, ::Tuple5) shouldBe expected
     }
   }
 
@@ -599,21 +440,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.float()),
       Arb.either(Arb.string(), Arb.double()),
     ) { a, b, c, d, e, f ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, ::Tuple6)
-      val all = listOf(a, b, c, d, e, f)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple6(it[0], it[1], it[2], it[3], it[4], it[5]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f).simpleFlattenOrAccumulate().map { it.shouldHave6Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, ::Tuple6) shouldBe expected
     }
   }
 
@@ -628,21 +456,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.double()),
       Arb.either(Arb.string(), Arb.char()),
     ) { a, b, c, d, e, f, g ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, ::Tuple7)
-      val all = listOf(a, b, c, d, e, f, g)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple7(it[0], it[1], it[2], it[3], it[4], it[5], it[6]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g).simpleFlattenOrAccumulate().map { it.shouldHave7Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, g, ::Tuple7) shouldBe expected
     }
   }
 
@@ -658,21 +473,8 @@ class EitherTest {
       Arb.either(Arb.string(), Arb.char()),
       Arb.either(Arb.string(), Arb.string()),
     ) { a, b, c, d, e, f, g, h ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, ::Tuple8)
-      val all = listOf(a, b, c, d, e, f, g, h)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<String>>().map { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple8(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g, h).simpleFlattenOrAccumulate().map { it.shouldHave8Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, g, h, ::Tuple8) shouldBe expected
     }
   }
 
@@ -682,22 +484,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.short()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.byte()),
     ) { a, b ->
-      val res = Either.zipOrAccumulate(a, b, ::Pair)
-      val all = listOf(a, b)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Pair(it[0], it[1]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b).simpleFlattenOrAccumulateNel().map { it.shouldHave2Elements() }
+      Either.zipOrAccumulate(a, b, ::Pair) shouldBe expected
     }
   }
 
@@ -708,22 +496,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.byte()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.int()),
     ) { a, b, c ->
-      val res = Either.zipOrAccumulate(a, b, c, ::Triple)
-      val all = listOf(a, b, c)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Triple(it[0], it[1], it[2]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c).simpleFlattenOrAccumulateNel().map { it.shouldHave3Elements() }
+      Either.zipOrAccumulate(a, b, c, ::Triple) shouldBe expected
     }
   }
 
@@ -735,22 +509,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.int()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.long()),
     ) { a, b, c, d ->
-      val res = Either.zipOrAccumulate(a, b, c, d, ::Tuple4)
-      val all = listOf(a, b, c, d)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple4(it[0], it[1], it[2], it[3]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d).simpleFlattenOrAccumulateNel().map { it.shouldHave4Elements() }
+      Either.zipOrAccumulate(a, b, c, d, ::Tuple4) shouldBe expected
     }
   }
 
@@ -763,22 +523,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.long()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.float()),
     ) { a, b, c, d, e ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, ::Tuple5)
-      val all = listOf(a, b, c, d, e)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple5(it[0], it[1], it[2], it[3], it[4]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e).simpleFlattenOrAccumulateNel().map { it.shouldHave5Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, ::Tuple5) shouldBe expected
     }
   }
 
@@ -792,22 +538,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.float()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.double()),
     ) { a, b, c, d, e, f ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, ::Tuple6)
-      val all = listOf(a, b, c, d, e, f)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple6(it[0], it[1], it[2], it[3], it[4], it[5]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f).simpleFlattenOrAccumulateNel().map { it.shouldHave6Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, ::Tuple6) shouldBe expected
     }
   }
 
@@ -822,22 +554,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.double()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.char()),
     ) { a, b, c, d, e, f, g ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, ::Tuple7)
-      val all = listOf(a, b, c, d, e, f, g)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple7(it[0], it[1], it[2], it[3], it[4], it[5], it[6]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g).simpleFlattenOrAccumulateNel().map { it.shouldHave7Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, g, ::Tuple7) shouldBe expected
     }
   }
 
@@ -853,22 +571,8 @@ class EitherTest {
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.char()),
       Arb.either(Arb.nonEmptyList(Arb.int()), Arb.string()),
     ) { a, b, c, d, e, f, g, h ->
-      val res = Either.zipOrAccumulate(a, b, c, d, e, f, g, h, ::Tuple8)
-      val all = listOf(a, b, c, d, e, f, g, h)
-
-      val expected = if (all.any { it.isLeft() }) {
-        all.filterIsInstance<Left<NonEmptyList<String>>>()
-          .flatMap { it.value }
-          .toNonEmptyListOrNull()
-          .shouldNotBeNull()
-          .left()
-      } else {
-        all.filterIsInstance<Right<Any?>>().map { it.value }.let {
-          Tuple8(it[0], it[1], it[2], it[3], it[4], it[5], it[6], it[7]).right()
-        }
-      }
-
-      res shouldBe expected
+      val expected = listOf(a, b, c, d, e, f, g, h).simpleFlattenOrAccumulateNel().map { it.shouldHave8Elements() }
+      Either.zipOrAccumulate(a, b, c, d, e, f, g, h, ::Tuple8) shouldBe expected
     }
   }
 
@@ -1016,16 +720,7 @@ class EitherTest {
   @Test
   fun toEitherNel() = runTest {
     checkAll(Arb.either(Arb.string(), Arb.int())) { e ->
-      e.toEitherNel().let { enel ->
-        when (e) {
-          is Left -> {
-            enel shouldBe listOf(e.value).toNonEmptyListOrNull().left()
-          }
-          is Right -> {
-            enel shouldBe e
-          }
-        }
-      }
+      e.toEitherNel() shouldBe e.mapLeft { it.nel() }
     }
   }
 
@@ -1040,4 +735,44 @@ class EitherTest {
       }
     }
   }
+}
+
+private fun List<*>.shouldHave2Elements(): Pair<*, *> {
+  shouldHaveSize(2)
+  return this[0] to this[1]
+}
+
+private fun List<*>.shouldHave3Elements(): Triple<*, *, *> {
+  shouldHaveSize(3)
+  return Triple(this[0], this[1], this[2])
+}
+
+private fun List<*>.shouldHave4Elements(): Tuple4<*, *, *, *> {
+  shouldHaveSize(4)
+  return Tuple4(this[0], this[1], this[2], this[3])
+}
+
+private fun List<*>.shouldHave5Elements(): Tuple5<*, *, *, *, *> {
+  shouldHaveSize(5)
+  return Tuple5(this[0], this[1], this[2], this[3], this[4])
+}
+
+private fun List<*>.shouldHave6Elements(): Tuple6<*, *, *, *, *, *> {
+  shouldHaveSize(6)
+  return Tuple6(this[0], this[1], this[2], this[3], this[4], this[5])
+}
+
+private fun List<*>.shouldHave7Elements(): Tuple7<*, *, *, *, *, *, *> {
+  shouldHaveSize(7)
+  return Tuple7(this[0], this[1], this[2], this[3], this[4], this[5], this[6])
+}
+
+private fun List<*>.shouldHave8Elements(): Tuple8<*, *, *, *, *, *, *, *> {
+  shouldHaveSize(8)
+  return Tuple8(this[0], this[1], this[2], this[3], this[4], this[5], this[6], this[7])
+}
+
+private fun List<*>.shouldHave9Elements(): Tuple9<*, *, *, *, *, *, *, *, *> {
+  shouldHaveSize(9)
+  return Tuple9(this[0], this[1], this[2], this[3], this[4], this[5], this[6], this[7], this[8])
 }
