@@ -12,27 +12,33 @@ import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
 
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 @JvmInline
-public value class NonEmptySet<out E> internal constructor(
+public value class NonEmptySet<out E> @PotentiallyUnsafeNonEmptyOperation internal constructor(
   @PublishedApi internal val elements: Set<E>
 ) : Set<E> by elements, NonEmptyCollection<E> {
+  public constructor(first: E, rest: Iterable<E>) : this(buildNonEmptySet<E, _>(rest.collectionSizeOrDefault(10) + 1) {
+    add(first)
+    addAll(rest)
+    this
+  }.elements)
 
-  public constructor(first: E, rest: Iterable<E>) : this(setOf(first) + rest)
+  public override operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptySet<E> = buildNonEmptySet(size + elements.collectionSizeOrDefault(10)) {
+    addAll(this@NonEmptySet)
+    addAll(elements)
+    this
+  }
 
-  public override operator fun plus(elements: Iterable<@UnsafeVariance E>): NonEmptySet<E> =
-    NonEmptySet(this.elements + elements)
-
-  public override operator fun plus(element: @UnsafeVariance E): NonEmptySet<E> =
-    NonEmptySet(this.elements + element)
+  public override operator fun plus(element: @UnsafeVariance E): NonEmptySet<E> = buildNonEmptySet(size + 1) {
+    addAll(elements)
+    add(element)
+    this
+  }
 
   override fun isEmpty(): Boolean = false
 
   @JvmExposeBoxed @Suppress("USELESS_JVM_EXPOSE_BOXED")
   public fun toSet(): Set<E> = elements
-
-  override val head: E get() = elements.first()
-
-  override fun lastOrNull(): E = elements.last()
 
   override fun toString(): String = elements.toString()
 
@@ -42,23 +48,24 @@ public value class NonEmptySet<out E> internal constructor(
   override fun hashCode(): Int =
     elements.hashCode()
 
-  public override fun distinct(): NonEmptyList<E> =
-    NonEmptyList(elements.toList())
+  public override fun distinct(): NonEmptyList<E> = toNonEmptyList()
 
-  public override fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> =
-    NonEmptyList(elements.distinctBy(selector))
+  // BEGIN: overrides due to KT-80101 NoSuchMethodError when inheriting function implementations in interfaces
+  public override fun <K> distinctBy(selector: (E) -> K): NonEmptyList<E> = super.distinctBy(selector)
 
-  public override fun <T> map(transform: (E) -> T): NonEmptyList<T> =
-    NonEmptyList(elements.map(transform))
+  public override fun <T> map(transform: (E) -> T): NonEmptyList<T> = super.map(transform)
 
-  public override fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> =
-    NonEmptyList(elements.flatMap(transform))
+  public override fun <T> flatMap(transform: (E) -> NonEmptyCollection<T>): NonEmptyList<T> = super.flatMap(transform)
 
-  public override fun <T> mapIndexed(transform: (index: Int, E) -> T): NonEmptyList<T> =
-    NonEmptyList(elements.mapIndexed(transform))
+  public override fun <T> mapIndexed(transform: (index: Int, E) -> T): NonEmptyList<T> = super.mapIndexed(transform)
+  // END
 
-  override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> =
-    NonEmptyList(elements.zip(other))
+  override fun <T> zip(other: NonEmptyCollection<T>): NonEmptyList<Pair<E, T>> = buildNonEmptyList(minOf(size, other.size)) {
+    val first = this@NonEmptySet.iterator()
+    val second = other.iterator()
+    do add(first.next() to second.next()) while (first.hasNext() && second.hasNext())
+    this
+  }
 
   public companion object {
     @JvmStatic @JvmExposeBoxed
@@ -91,8 +98,7 @@ public fun <E> nonEmptySetOf(first: E, vararg rest: E): NonEmptySet<E> =
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
  */
 @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? =
-  toSet().wrapAsNonEmptySetOrNull()
+public fun <T> Iterable<T>.toNonEmptySetOrNull(): NonEmptySet<T>? = toSet().wrapAsNonEmptySetOrNull()
 
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
@@ -103,9 +109,7 @@ public fun <T> Iterable<T>.toNonEmptySetOrNone(): Option<NonEmptySet<T>> =
 /**
  * Returns a [NonEmptySet] that contains a **copy** of the elements in [this].
  */
-@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
-public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T> =
-  toSet().wrapAsNonEmptySetOrThrow()
+public fun <T> Iterable<T>.toNonEmptySetOrThrow(): NonEmptySet<T> = toNonEmptySetOrNull() ?: throw IllegalArgumentException("Cannot create NonEmptySet from empty Iterable")
 
 @Deprecated("Same as Iterable extension", level = DeprecationLevel.HIDDEN)
 public fun <E> Set<E>.toNonEmptySetOrNull(): NonEmptySet<E>? =
@@ -122,10 +126,7 @@ public fun <E> Set<E>.toNonEmptySetOrNone(): Option<NonEmptySet<E>> =
  * You are responsible for keeping the non-emptiness invariant at all times.
  */
 @PotentiallyUnsafeNonEmptyOperation
-public fun <T> Set<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> {
-  require(isNotEmpty())
-  return NonEmptySet(this)
-}
+public fun <T> Set<T>.wrapAsNonEmptySetOrThrow(): NonEmptySet<T> = wrapAsNonEmptySetOrNull() ?: throw IllegalArgumentException("Cannot create NonEmptySet from empty Set")
 
 /**
  * Returns a [NonEmptySet] that wraps the given [this], avoiding an additional copy.

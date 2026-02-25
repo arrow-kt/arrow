@@ -39,16 +39,36 @@ abstract interface <#A: in kotlin/Any?> arrow.core.raise/Raise { // arrow.core.r
     open suspend fun <#A1: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<#A>, #A1>).invoke(): #A1 // arrow.core.raise/Raise.invoke|invoke@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<1:0>,0:0>(){0§<kotlin.Any?>}[0]
 }
 
+abstract interface <#A: in kotlin/Any?> arrow.core/MonotoneCollectionBuilder { // arrow.core/MonotoneCollectionBuilder|null[0]
+    abstract fun _add(#A) // arrow.core/MonotoneCollectionBuilder._add|_add(1:0){}[0]
+    abstract fun _addAll(kotlin.collections/Collection<#A>) // arrow.core/MonotoneCollectionBuilder._addAll|_addAll(kotlin.collections.Collection<1:0>){}[0]
+
+    abstract interface NonEmpty // arrow.core/MonotoneCollectionBuilder.NonEmpty|null[0]
+}
+
 abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> arrow.core/MemoizationCache { // arrow.core/MemoizationCache|null[0]
     abstract fun get(#A): #B? // arrow.core/MemoizationCache.get|get(1:0){}[0]
     abstract fun set(#A, #B): #B // arrow.core/MemoizationCache.set|set(1:0;1:1){}[0]
 }
 
-abstract interface <#A: out kotlin/Any?> arrow.core/NonEmptyCollection : kotlin.collections/Collection<#A> { // arrow.core/NonEmptyCollection|null[0]
-    abstract val head // arrow.core/NonEmptyCollection.head|{}head[0]
-        abstract fun <get-head>(): #A // arrow.core/NonEmptyCollection.head.<get-head>|<get-head>(){}[0]
+abstract interface <#A: kotlin/Any?> arrow.core/MonotoneMutableList : arrow.core/MonotoneCollectionBuilder<#A>, kotlin.collections/List<#A> { // arrow.core/MonotoneMutableList|null[0]
+    final object Companion { // arrow.core/MonotoneMutableList.Companion|null[0]
+        final fun <#A2: kotlin/Any?> invoke(): arrow.core/MonotoneMutableList<#A2> // arrow.core/MonotoneMutableList.Companion.invoke|invoke(){0§<kotlin.Any?>}[0]
+        final fun <#A2: kotlin/Any?> invoke(kotlin/Int): arrow.core/MonotoneMutableList<#A2> // arrow.core/MonotoneMutableList.Companion.invoke|invoke(kotlin.Int){0§<kotlin.Any?>}[0]
+    }
+}
 
-    abstract fun lastOrNull(): #A // arrow.core/NonEmptyCollection.lastOrNull|lastOrNull(){}[0]
+abstract interface <#A: kotlin/Any?> arrow.core/MonotoneMutableSet : arrow.core/MonotoneCollectionBuilder<#A>, kotlin.collections/Set<#A> { // arrow.core/MonotoneMutableSet|null[0]
+    final object Companion { // arrow.core/MonotoneMutableSet.Companion|null[0]
+        final fun <#A2: kotlin/Any?> invoke(): arrow.core/MonotoneMutableSet<#A2> // arrow.core/MonotoneMutableSet.Companion.invoke|invoke(){0§<kotlin.Any?>}[0]
+        final fun <#A2: kotlin/Any?> invoke(kotlin/Int): arrow.core/MonotoneMutableSet<#A2> // arrow.core/MonotoneMutableSet.Companion.invoke|invoke(kotlin.Int){0§<kotlin.Any?>}[0]
+    }
+}
+
+abstract interface <#A: out kotlin/Any?> arrow.core/NonEmptyCollection : kotlin.collections/Collection<#A> { // arrow.core/NonEmptyCollection|null[0]
+    open val head // arrow.core/NonEmptyCollection.head|{}head[0]
+        open fun <get-head>(): #A // arrow.core/NonEmptyCollection.head.<get-head>|<get-head>(){}[0]
+
     abstract fun plus(#A): arrow.core/NonEmptyCollection<#A> // arrow.core/NonEmptyCollection.plus|plus(1:0){}[0]
     abstract fun plus(kotlin.collections/Iterable<#A>): arrow.core/NonEmptyCollection<#A> // arrow.core/NonEmptyCollection.plus|plus(kotlin.collections.Iterable<1:0>){}[0]
     open fun <#A1: kotlin/Any?> distinctBy(kotlin/Function1<#A, #A1>): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptyCollection.distinctBy|distinctBy(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
@@ -59,6 +79,7 @@ abstract interface <#A: out kotlin/Any?> arrow.core/NonEmptyCollection : kotlin.
     open fun distinct(): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptyCollection.distinct|distinct(){}[0]
     open fun firstOrNull(): #A // arrow.core/NonEmptyCollection.firstOrNull|firstOrNull(){}[0]
     open fun isEmpty(): kotlin/Boolean // arrow.core/NonEmptyCollection.isEmpty|isEmpty(){}[0]
+    open fun lastOrNull(): #A // arrow.core/NonEmptyCollection.lastOrNull|lastOrNull(){}[0]
     open fun toNonEmptyList(): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptyCollection.toNonEmptyList|toNonEmptyList(){}[0]
     open fun toNonEmptySet(): arrow.core/NonEmptySet<#A> // arrow.core/NonEmptyCollection.toNonEmptySet|toNonEmptySet(){}[0]
 }
@@ -369,8 +390,6 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptyList : arrow.core/Non
 
     final val all // arrow.core/NonEmptyList.all|{}all[0]
         final fun <get-all>(): kotlin.collections/List<#A> // arrow.core/NonEmptyList.all.<get-all>|<get-all>(){}[0]
-    final val head // arrow.core/NonEmptyList.head|{}head[0]
-        final fun <get-head>(): #A // arrow.core/NonEmptyList.head.<get-head>|<get-head>(){}[0]
     final val size // arrow.core/NonEmptyList.size|{}size[0]
         final fun <get-size>(): kotlin/Int // arrow.core/NonEmptyList.size.<get-size>|<get-size>(){}[0]
     final val tail // arrow.core/NonEmptyList.tail|{}tail[0]
@@ -389,7 +408,6 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptyList : arrow.core/Non
     final fun isEmpty(): kotlin/Boolean // arrow.core/NonEmptyList.isEmpty|isEmpty(){}[0]
     final fun iterator(): kotlin.collections/Iterator<#A> // arrow.core/NonEmptyList.iterator|iterator(){}[0]
     final fun lastIndexOf(#A): kotlin/Int // arrow.core/NonEmptyList.lastIndexOf|lastIndexOf(1:0){}[0]
-    final fun lastOrNull(): #A // arrow.core/NonEmptyList.lastOrNull|lastOrNull(){}[0]
     final fun listIterator(): kotlin.collections/ListIterator<#A> // arrow.core/NonEmptyList.listIterator|listIterator(){}[0]
     final fun listIterator(kotlin/Int): kotlin.collections/ListIterator<#A> // arrow.core/NonEmptyList.listIterator|listIterator(kotlin.Int){}[0]
     final fun plus(#A): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptyList.plus|plus(1:0){}[0]
@@ -414,7 +432,6 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptyList : arrow.core/Non
     final inline fun <#A1: kotlin/Any?> foldLeft(#A1, kotlin/Function2<#A1, #A, #A1>): #A1 // arrow.core/NonEmptyList.foldLeft|foldLeft(0:0;kotlin.Function2<0:0,1:0,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> map(kotlin/Function1<#A, #A1>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptyList.map|map(kotlin.Function1<1:0,0:0>){0§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> mapIndexed(kotlin/Function2<kotlin/Int, #A, #A1>): arrow.core/NonEmptyList<#A1> // arrow.core/NonEmptyList.mapIndexed|mapIndexed(kotlin.Function2<kotlin.Int,1:0,0:0>){0§<kotlin.Any?>}[0]
-    final inline fun distinct(): arrow.core/NonEmptyList<#A> // arrow.core/NonEmptyList.distinct|distinct(){}[0]
 
     final object Companion { // arrow.core/NonEmptyList.Companion|null[0]
         final val unit // arrow.core/NonEmptyList.Companion.unit|{}unit[0]
@@ -433,8 +450,6 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptySet : arrow.core/NonE
 
     final val elements // arrow.core/NonEmptySet.elements|{}elements[0]
         final fun <get-elements>(): kotlin.collections/Set<#A> // arrow.core/NonEmptySet.elements.<get-elements>|<get-elements>(){}[0]
-    final val head // arrow.core/NonEmptySet.head|{}head[0]
-        final fun <get-head>(): #A // arrow.core/NonEmptySet.head.<get-head>|<get-head>(){}[0]
     final val size // arrow.core/NonEmptySet.size|{}size[0]
         final fun <get-size>(): kotlin/Int // arrow.core/NonEmptySet.size.<get-size>|<get-size>(){}[0]
 
@@ -450,7 +465,6 @@ final value class <#A: out kotlin/Any?> arrow.core/NonEmptySet : arrow.core/NonE
     final fun hashCode(): kotlin/Int // arrow.core/NonEmptySet.hashCode|hashCode(){}[0]
     final fun isEmpty(): kotlin/Boolean // arrow.core/NonEmptySet.isEmpty|isEmpty(){}[0]
     final fun iterator(): kotlin.collections/Iterator<#A> // arrow.core/NonEmptySet.iterator|iterator(){}[0]
-    final fun lastOrNull(): #A // arrow.core/NonEmptySet.lastOrNull|lastOrNull(){}[0]
     final fun plus(#A): arrow.core/NonEmptySet<#A> // arrow.core/NonEmptySet.plus|plus(1:0){}[0]
     final fun plus(kotlin.collections/Iterable<#A>): arrow.core/NonEmptySet<#A> // arrow.core/NonEmptySet.plus|plus(kotlin.collections.Iterable<1:0>){}[0]
     final fun toSet(): kotlin.collections/Set<#A> // arrow.core/NonEmptySet.toSet|toSet(){}[0]
@@ -724,6 +738,8 @@ final const val arrow.core/RedundantAPI // arrow.core/RedundantAPI|{}RedundantAP
 final fun (arrow.core.raise/Traced).arrow.core.raise/withCause(arrow.core.raise/Traced): arrow.core.raise/Traced // arrow.core.raise/withCause|withCause@arrow.core.raise.Traced(arrow.core.raise.Traced){}[0]
 final fun (kotlin/String).arrow.core/escaped(): kotlin/String // arrow.core/escaped|escaped@kotlin.String(){}[0]
 final fun <#A: kotlin/Any> (kotlin/Function1<#A, kotlin/Boolean>).arrow.core/mapNullable(): kotlin/Function1<#A?, kotlin/Boolean> // arrow.core/mapNullable|mapNullable@kotlin.Function1<0:0,kotlin.Boolean>(){0§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/List<#A>> (#B).arrow.core/asNonEmptyList(): arrow.core/NonEmptyList<#A> // arrow.core/asNonEmptyList|asNonEmptyList@0:1(){0§<kotlin.Any?>;1§<kotlin.collections.List<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
+final fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/Set<#A>> (#B).arrow.core/asNonEmptySet(): arrow.core/NonEmptySet<#A> // arrow.core/asNonEmptySet|asNonEmptySet@0:1(){0§<kotlin.Any?>;1§<kotlin.collections.Set<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?, #J: kotlin/Any?, #K: kotlin/Any?> (kotlin.sequences/Sequence<#A>).arrow.core/zip(kotlin.sequences/Sequence<#B>, kotlin.sequences/Sequence<#C>, kotlin.sequences/Sequence<#D>, kotlin.sequences/Sequence<#E>, kotlin.sequences/Sequence<#F>, kotlin.sequences/Sequence<#G>, kotlin.sequences/Sequence<#H>, kotlin.sequences/Sequence<#I>, kotlin.sequences/Sequence<#J>, kotlin/Function10<#A, #B, #C, #D, #E, #F, #G, #H, #I, #J, #K>): kotlin.sequences/Sequence<#K> // arrow.core/zip|zip@kotlin.sequences.Sequence<0:0>(kotlin.sequences.Sequence<0:1>;kotlin.sequences.Sequence<0:2>;kotlin.sequences.Sequence<0:3>;kotlin.sequences.Sequence<0:4>;kotlin.sequences.Sequence<0:5>;kotlin.sequences.Sequence<0:6>;kotlin.sequences.Sequence<0:7>;kotlin.sequences.Sequence<0:8>;kotlin.sequences.Sequence<0:9>;kotlin.Function10<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>;9§<kotlin.Any?>;10§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?, #J: kotlin/Any?> (kotlin.sequences/Sequence<#A>).arrow.core/zip(kotlin.sequences/Sequence<#B>, kotlin.sequences/Sequence<#C>, kotlin.sequences/Sequence<#D>, kotlin.sequences/Sequence<#E>, kotlin.sequences/Sequence<#F>, kotlin.sequences/Sequence<#G>, kotlin.sequences/Sequence<#H>, kotlin.sequences/Sequence<#I>, kotlin/Function9<#A, #B, #C, #D, #E, #F, #G, #H, #I, #J>): kotlin.sequences/Sequence<#J> // arrow.core/zip|zip@kotlin.sequences.Sequence<0:0>(kotlin.sequences.Sequence<0:1>;kotlin.sequences.Sequence<0:2>;kotlin.sequences.Sequence<0:3>;kotlin.sequences.Sequence<0:4>;kotlin.sequences.Sequence<0:5>;kotlin.sequences.Sequence<0:6>;kotlin.sequences.Sequence<0:7>;kotlin.sequences.Sequence<0:8>;kotlin.Function9<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>;9§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?> (arrow.core/Tuple8<#A, #B, #C, #D, #E, #F, #G, #H>).arrow.core/plus(#I): arrow.core/Tuple9<#A, #B, #C, #D, #E, #F, #G, #H, #I> // arrow.core/plus|plus@arrow.core.Tuple8<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7>(0:8){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>}[0]
@@ -828,6 +844,10 @@ final fun <#A: kotlin/Any?> (#A).arrow.core/some(): arrow.core/Option<#A> // arr
 final fun <#A: kotlin/Any?> (#A?).arrow.core/toOption(): arrow.core/Option<#A> // arrow.core/toOption|toOption@0:0?(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core.raise/Accumulate<#A>).arrow.core.raise/tolerant(arrow.core.raise/Raise<arrow.core.raise/RaiseAccumulate.Value<kotlin/Nothing>>): arrow.core.raise/Accumulate<#A> // arrow.core.raise/tolerant|tolerant@arrow.core.raise.Accumulate<0:0>(arrow.core.raise.Raise<arrow.core.raise.RaiseAccumulate.Value<kotlin.Nothing>>){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Either<#A, #A>).arrow.core/merge(): #A // arrow.core/merge|merge@arrow.core.Either<0:0,0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/add(#A) // arrow.core/add|add@arrow.core.MonotoneCollectionBuilder<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(arrow.core/NonEmptyCollection<#A>) // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(arrow.core.NonEmptyCollection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(kotlin.collections/Collection<#A>) // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (arrow.core/MonotoneCollectionBuilder<#A>).arrow.core/addAll(kotlin.collections/Iterable<#A>) // arrow.core/addAll|addAll@arrow.core.MonotoneCollectionBuilder<0:0>(kotlin.collections.Iterable<0:0>){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/NonEmptyList<arrow.core/NonEmptyList<#A>>).arrow.core/flatten(): arrow.core/NonEmptyList<#A> // arrow.core/flatten|flatten@arrow.core.NonEmptyList<arrow.core.NonEmptyList<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (arrow.core/Option<arrow.core/Option<#A>>).arrow.core/flatten(): arrow.core/Option<#A> // arrow.core/flatten|flatten@arrow.core.Option<arrow.core.Option<0:0>>(){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (context(arrow.core.raise/Raise<#A>)).arrow.core.raise.context/raise(#A): kotlin/Nothing // arrow.core.raise.context/raise|raise(arrow.core.raise.Raise<0:0>)(0:0){0§<kotlin.Any?>}[0]
@@ -905,6 +925,10 @@ final fun arrow.core/sort(kotlin/Long, kotlin/LongArray...): kotlin.collections/
 final fun arrow.core/sort(kotlin/Short, kotlin/Short): kotlin/Pair<kotlin/Short, kotlin/Short> // arrow.core/sort|sort(kotlin.Short;kotlin.Short){}[0]
 final fun arrow.core/sort(kotlin/Short, kotlin/Short, kotlin/Short): kotlin/Triple<kotlin/Short, kotlin/Short, kotlin/Short> // arrow.core/sort|sort(kotlin.Short;kotlin.Short;kotlin.Short){}[0]
 final fun arrow.core/sort(kotlin/Short, kotlin/ShortArray...): kotlin.collections/List<kotlin/Short> // arrow.core/sort|sort(kotlin.Short;kotlin.ShortArray...){}[0]
+final inline fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/List<#A>> arrow.core/buildNonEmptyList(kotlin/Function1<arrow.core/MonotoneMutableList<#A>, #B>): arrow.core/NonEmptyList<#A> // arrow.core/buildNonEmptyList|buildNonEmptyList(kotlin.Function1<arrow.core.MonotoneMutableList<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.collections.List<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
+final inline fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/List<#A>> arrow.core/buildNonEmptyList(kotlin/Int, kotlin/Function1<arrow.core/MonotoneMutableList<#A>, #B>): arrow.core/NonEmptyList<#A> // arrow.core/buildNonEmptyList|buildNonEmptyList(kotlin.Int;kotlin.Function1<arrow.core.MonotoneMutableList<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.collections.List<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
+final inline fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/Set<#A>> arrow.core/buildNonEmptySet(kotlin/Function1<arrow.core/MonotoneMutableSet<#A>, #B>): arrow.core/NonEmptySet<#A> // arrow.core/buildNonEmptySet|buildNonEmptySet(kotlin.Function1<arrow.core.MonotoneMutableSet<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.collections.Set<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
+final inline fun <#A: kotlin/Any?, #B: arrow.core/MonotoneCollectionBuilder.NonEmpty & kotlin.collections/Set<#A>> arrow.core/buildNonEmptySet(kotlin/Int, kotlin/Function1<arrow.core/MonotoneMutableSet<#A>, #B>): arrow.core/NonEmptySet<#A> // arrow.core/buildNonEmptySet|buildNonEmptySet(kotlin.Int;kotlin.Function1<arrow.core.MonotoneMutableSet<0:0>,0:1>){0§<kotlin.Any?>;1§<kotlin.collections.Set<0:0>&arrow.core.MonotoneCollectionBuilder.NonEmpty>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any> (arrow.core.raise/Raise<#A>).arrow.core.raise/ensureNotNull(#B?, kotlin/Function0<#A>): #B // arrow.core.raise/ensureNotNull|ensureNotNull@arrow.core.raise.Raise<0:0>(0:1?;kotlin.Function0<0:0>){0§<kotlin.Any?>;1§<kotlin.Any>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any> (context(arrow.core.raise/Raise<#A>)).arrow.core.raise.context/ensureNotNull(#B?, kotlin/Function0<#A>): #B // arrow.core.raise.context/ensureNotNull|ensureNotNull(arrow.core.raise.Raise<0:0>)(0:1?;kotlin.Function0<0:0>){0§<kotlin.Any?>;1§<kotlin.Any>}[0]
 final inline fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?, #G: kotlin/Any?, #H: kotlin/Any?, #I: kotlin/Any?, #J: kotlin/Any?, #K: kotlin/Any?, #L: kotlin/Any?> (kotlin.collections/Map<#A, #B>).arrow.core/zip(kotlin.collections/Map<#A, #C>, kotlin.collections/Map<#A, #D>, kotlin.collections/Map<#A, #E>, kotlin.collections/Map<#A, #F>, kotlin.collections/Map<#A, #G>, kotlin.collections/Map<#A, #H>, kotlin.collections/Map<#A, #I>, kotlin.collections/Map<#A, #J>, kotlin.collections/Map<#A, #K>, kotlin/Function11<#A, #B, #C, #D, #E, #F, #G, #H, #I, #J, #K, #L>): kotlin.collections/Map<#A, #L> // arrow.core/zip|zip@kotlin.collections.Map<0:0,0:1>(kotlin.collections.Map<0:0,0:2>;kotlin.collections.Map<0:0,0:3>;kotlin.collections.Map<0:0,0:4>;kotlin.collections.Map<0:0,0:5>;kotlin.collections.Map<0:0,0:6>;kotlin.collections.Map<0:0,0:7>;kotlin.collections.Map<0:0,0:8>;kotlin.collections.Map<0:0,0:9>;kotlin.collections.Map<0:0,0:10>;kotlin.Function11<0:0,0:1,0:2,0:3,0:4,0:5,0:6,0:7,0:8,0:9,0:10,0:11>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>;6§<kotlin.Any?>;7§<kotlin.Any?>;8§<kotlin.Any?>;9§<kotlin.Any?>;10§<kotlin.Any?>;11§<kotlin.Any?>}[0]

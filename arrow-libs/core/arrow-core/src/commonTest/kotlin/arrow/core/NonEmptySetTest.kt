@@ -237,8 +237,8 @@ class NonEmptySetTest {
   @Test
   fun toStringUsesUnderlyingImplementation() = runTest {
     checkAll(Arb.set(Arb.int(), 1..100)) {
-      NonEmptySet(it).toString() shouldBe it.toString()
-      NonEmptySet(MyVerySpecialSet(it)).toString() shouldBe "MyVerySpecialSet(${it.reversed()})"
+      it.wrapAsNonEmptySetOrThrow().toString() shouldBe it.toString()
+      MyVerySpecialSet(it).wrapAsNonEmptySetOrThrow().toString() shouldBe "MyVerySpecialSet(${it.reversed()})"
     }
   }
 }
