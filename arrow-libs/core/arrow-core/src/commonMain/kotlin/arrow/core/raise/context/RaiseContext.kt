@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseContextualKt")
+@file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise.context
 
@@ -34,7 +35,7 @@ context(raise: Raise<Error>) @RaiseDSL public inline fun <Error> ensure(conditio
   raise.ensureExt(condition, otherwise)
 }
 
-context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, B : Any> ensureNotNull(value: B?, otherwise: () -> Error): B {
+context(raise: Raise<Error>) @RaiseDSL @IgnorableReturnValue public inline fun <Error, B : Any> ensureNotNull(value: B?, otherwise: () -> Error): B {
   contract { returns() implies (value != null) }
   return raise.ensureNotNullExt(value, otherwise)
 }
