@@ -46,6 +46,7 @@ arrow.core
 module:arrow-fx-coroutines
 arrow.fx.coroutines
 arrow.fx.coroutines.await
+arrow.fx.coroutines.resource.context
 module:arrow-fx-stm
 arrow.fx.stm
 arrow.fx.stm.internal
@@ -65,6 +66,8 @@ arrow.platform.test
 module:arrow-raise-ktor-server
 arrow.raise.ktor.server.response
 arrow.raise.ktor.server.routing
+module:arrow-raise-ktor-server-resources
+arrow.raise.ktor.server.resources
 module:arrow-resilience
 arrow.resilience
 module:arrow-resilience-ktor-client
