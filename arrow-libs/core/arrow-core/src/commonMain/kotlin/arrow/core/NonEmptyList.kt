@@ -70,9 +70,14 @@ public typealias Nel<A> = NonEmptyList<A>
  * fun sumNel(nel: NonEmptyList<Int>): Int =
  *  nel.foldLeft(0) { acc, n -> acc + n }
  * val value = sumNel(nonEmptyListOf(1, 1, 1, 1))
+ * // generalized version
+ * fun sumNelWithNull(nel: NonEmptyList<Int>): Int =
+ *  nel.foldLeft2(null) { acc, n -> (acc ?: 0) + n }
+ * val valueWithNull = sumNelWithNull(nonEmptyListOf(1, 1, 1, 1))
  * //sampleEnd
  * fun main() {
  *  println("value = $value")
+ *  println("valueWithNull = $valueWithNull")
  * }
  * ```
  * <!--- KNIT example-nonemptylist-03.kt -->
@@ -211,9 +216,22 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
     NonEmptyList(all + element)
 
   @Suppress("WRONG_INVOCATION_KIND")
+  @Deprecated(
+    message = "Use the version with two type arguments",
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith("foldLeft2(b, f)")
+  )
   public inline fun <Acc> foldLeft(b: Acc, f: (Acc, E) -> Acc): Acc {
     contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
     return all.fold(b) { acc, e -> f(acc, e) }
+  }
+
+  @Suppress("WRONG_INVOCATION_KIND")
+  public inline fun <Acc, Res: Acc> foldLeft2(b: Acc, f: (Acc, E) -> Res): Res {
+    contract { callsInPlace(f, InvocationKind.AT_LEAST_ONCE) }
+    // this unchecked cast is correct since we know this is called at least once
+    @Suppress("UNCHECKED_CAST")
+    return all.fold(b) { acc, e -> f(acc, e) } as Res
   }
 
   public inline fun <T> coflatMap(f: (NonEmptyList<E>) -> T): NonEmptyList<T> {

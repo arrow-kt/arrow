@@ -7,6 +7,11 @@ import arrow.core.nonEmptyListOf
 fun sumNel(nel: NonEmptyList<Int>): Int =
  nel.foldLeft(0) { acc, n -> acc + n }
 val value = sumNel(nonEmptyListOf(1, 1, 1, 1))
+// generalized version
+fun sumNelWithNull(nel: NonEmptyList<Int>): Int =
+ nel.foldLeft2(null) { acc, n -> (acc ?: 0) + n }
+val valueWithNull = sumNelWithNull(nonEmptyListOf(1, 1, 1, 1))
 fun main() {
  println("value = $value")
+ println("valueWithNull = $valueWithNull")
 }
