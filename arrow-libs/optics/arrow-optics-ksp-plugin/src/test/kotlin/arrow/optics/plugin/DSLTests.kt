@@ -286,4 +286,24 @@ class DSLTests {
     )
     compilationSucceeds(allWarningsAsErrors = false, contextParameters = false, source1, source2)
   }
+
+  @Test
+  fun `Complicated hierarchy with generics (#3735)`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |@optics
+      |sealed interface Test<T> {
+      |    val value: String
+      |
+      |    data class Test1<T>(override val value: String) : Test<T>
+      |    data class Test2(override val value: String) : Test<Int>
+      |    data class Test3<T, A>(override val value: String) : Test<T>
+      |    data class Test4<B>(override val value: String) : Test<List<B>>
+      
+      |    companion object
+      |}
+      """.compilationSucceeds()
+  }
 }

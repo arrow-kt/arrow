@@ -21,9 +21,14 @@ private fun OpticsProcessorOptions.processElement(adt: ADT, foci: List<Focus>, l
     } = value)"""
     when {
       focus.subclasses.isNotEmpty() -> {
-        """when(${adt.sourceName}) {
+        // there's a cast with generics
+        val needsCast = focus.subclasses.any { it.contains("<*") }
+        val suppress = if (needsCast) """@Suppress("UNCHECKED_CAST")""" else ""
+        val cast = if (needsCast) " as $sourceClassNameWithParams" else ""
+        """$suppress
+        |when(${adt.sourceName}) {
         |${focus.subclasses.joinToString(separator = "\n") { "is $it -> $setBodyCopy" }}
-        |}
+        |}$cast
         |
         """.trimMargin()
       }

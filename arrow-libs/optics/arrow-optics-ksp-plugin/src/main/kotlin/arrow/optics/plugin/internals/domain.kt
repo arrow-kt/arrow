@@ -128,7 +128,8 @@ data class Focus(
   val refinedType: KSType?,
   val onlyOneSealedSubclass: Boolean = false,
   val subclasses: List<String> = emptyList(),
-  val classNameWithParameters: String? = className,
+  val targetClassNameWithParameters: String? = className,
+  val targetTypeParameters: List<String>? = emptyList(),
 ) {
   val escapedParamName = paramName.plusIfNotBlank(
     prefix = "`",
