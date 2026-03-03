@@ -6,9 +6,11 @@ import arrow.optics.plugin.companionObject
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.getVisibility
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Variance
+import com.google.devtools.ksp.symbol.Visibility
 import java.util.*
 
 data class ADT(val declaration: KSClassDeclaration, val targets: List<Target>) {
@@ -16,8 +18,7 @@ data class ADT(val declaration: KSClassDeclaration, val targets: List<Target>) {
   val sourceName = declaration.simpleName.asString().replaceFirstChar { it.lowercase(Locale.getDefault()) }.sanitize()
   val simpleName = declaration.nameWithParentClass
   val packageName = declaration.packageName.asSanitizedString()
-  val visibilityModifierName =
-    (declaration.companionObject?.getVisibility() ?: declaration.getVisibility()).name.lowercase()
+  val visibilityModifierName = declaration.effectiveCompanionVisibility.name.lowercase()
   val typeParameters: List<String> = declaration.typeParameters.map { tyParam ->
     if (tyParam.variance == Variance.STAR) return@map "*"
     // val prefix = when (it.variance) {
@@ -51,6 +52,36 @@ val KSClassDeclaration.nameWithParentClass: String
     is KSClassDeclaration -> parent.nameWithParentClass + "." + simpleName.asString()
     else -> simpleName.asString()
   }
+
+val KSClassDeclaration.effectiveCompanionVisibility: Visibility
+  get() {
+    val visibilities =
+      listOfNotNull(companionObject?.getVisibility(), getVisibility()) +
+        allParentDeclarations().filterIsInstance<KSClassDeclaration>().map { it.getVisibility() }
+    return visibilities.foldRight(Visibility.PUBLIC, Visibility::plus)
+  }
+
+fun KSDeclaration.allParentDeclarations(): List<KSDeclaration> = when (val parent = parentDeclaration) {
+  null -> emptyList()
+  else -> listOfNotNull(parent) + parent.allParentDeclarations()
+}
+
+operator fun Visibility.plus(other: Visibility): Visibility = when {
+  this == other -> this
+
+  this == Visibility.PUBLIC -> other
+
+  other == Visibility.PUBLIC -> this
+
+  this == Visibility.LOCAL || other == Visibility.LOCAL -> Visibility.LOCAL
+
+  this == Visibility.PRIVATE || other == Visibility.PRIVATE -> Visibility.PRIVATE
+
+  (this == Visibility.INTERNAL || this == Visibility.PROTECTED) &&
+    (other == Visibility.INTERNAL || other == Visibility.PROTECTED) -> Visibility.PRIVATE
+
+  else -> Visibility.PRIVATE
+}
 
 enum class OpticsTarget {
   ISO,

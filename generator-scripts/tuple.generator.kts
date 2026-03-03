@@ -28,15 +28,15 @@ for (i in 2..maxTuple) {
 
   val letters = availableLetters.take(i + 1)
 
-  val diamond1 = "<${letters.joinToString { it.toUpperCase() }}>"
-  val diamond2 = "<${letters.dropLast(1).joinToString { it.toUpperCase() }}>"
+  val diamond1 = "<${letters.joinToString { it.uppercase() }}>"
+  val diamond2 = "<${letters.dropLast(1).joinToString { it.uppercase() }}>"
 
   val newLetter = availableLetters[i]
 
   val constructor = (letters.dropLast(1).map { "this.$it" } + newLetter).joinToString()
 
   fileContent.append(
-          "operator fun $diamond1 Tuple$i$diamond2.plus($newLetter: ${newLetter.toUpperCase()}): Tuple${i+1}$diamond1 = Tuple${i + 1}($constructor)"
+          "operator fun $diamond1 Tuple$i$diamond2.plus($newLetter: ${newLetter.uppercase()}): Tuple${i+1}$diamond1 = Tuple${i + 1}($constructor)"
   )
   fileContent.append("\n")
 

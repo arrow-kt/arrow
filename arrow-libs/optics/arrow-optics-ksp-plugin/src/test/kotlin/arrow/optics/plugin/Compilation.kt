@@ -89,7 +89,7 @@ fun buildCompilation(
   this.sources = sources.toList()
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
-  this.languageVersion = "2.0"
+  this.languageVersion = "2.1"
   if (contextParameters) {
     this.kotlincArguments = listOf("-Xcontext-parameters")
   }

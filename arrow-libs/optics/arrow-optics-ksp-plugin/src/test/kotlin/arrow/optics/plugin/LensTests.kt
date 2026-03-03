@@ -325,4 +325,23 @@ class LensTests {
       |val r = lens != null
       """.evals("r" to true)
   }
+
+  @Test
+  fun `Visibilities are correctly computed (#3869)`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |internal sealed interface Interface {
+      |  @optics
+      |  data class DataClass(val value: Int) : Interface {
+      |    companion object
+      |  }
+      |  companion object
+      |}
+      |
+      |internal val lens: Lens<Interface.DataClass, Int> = Interface.DataClass.value
+      |internal val r = lens != null
+      """.evals("r" to true)
+  }
 }
