@@ -85,7 +85,8 @@ internal fun evalAnnotatedPrismElement(
         subclass.simpleName.asString().replaceFirstChar { c -> c.lowercase(Locale.getDefault()) },
         subclass.superTypes.first().resolve(),
         onlyOneSealedSubclass = sealedSubclasses.size == 1,
-        classNameWithParameters = subclass.qualifiedNameOrSimpleNameWithTypeParameters,
+        targetClassNameWithParameters = subclass.qualifiedNameOrSimpleNameWithTypeParameters,
+        targetTypeParameters = subclass.typeParameters.map { it.simpleName.asString() },
       )
     }
   }
@@ -103,6 +104,12 @@ internal val KSClassDeclaration.qualifiedNameOrSimpleNameWithTypeParameters: Str
   get() = when {
     typeParameters.isEmpty() -> qualifiedNameOrSimpleName
     else -> "$qualifiedNameOrSimpleName<${typeParameters.joinToString { it.simpleName.asString() }}>"
+  }
+
+internal val KSClassDeclaration.qualifiedNameOrSimpleNameWithStars: String
+  get() = when {
+    typeParameters.isEmpty() -> qualifiedNameOrSimpleName
+    else -> "$qualifiedNameOrSimpleName<${typeParameters.joinToString { "*" }}>"
   }
 
 internal fun evalAnnotatedDataClass(
@@ -159,7 +166,7 @@ internal fun evalAnnotatedDataClass(
           Focus(
             fullName = type,
             paramName = name,
-            subclasses = subclasses.map { it.qualifiedNameOrSimpleName }.toList(),
+            subclasses = subclasses.map { it.qualifiedNameOrSimpleNameWithStars }.toList(),
           )
         }
         .toList()
