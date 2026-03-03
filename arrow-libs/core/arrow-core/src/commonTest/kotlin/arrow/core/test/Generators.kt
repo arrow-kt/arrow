@@ -7,7 +7,6 @@ import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.set
@@ -29,13 +28,14 @@ import kotlin.coroutines.startCoroutine
 
 // copied from kotest-extensions-arrow
 
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
   Arb.list(arb, max(range.first, 1) .. range.last)
-    .filter { it.isNotEmpty() }
-    .map { NonEmptyList(it) }
+    .map { it.wrapAsNonEmptyListOrThrow() }
 
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
-  Arb.set(arb, max(range.first, 1) .. range.last).map { it.toNonEmptySetOrNull()!! }
+  Arb.set(arb, max(range.first, 1) .. range.last).map { it.wrapAsNonEmptySetOrThrow() }
 
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
