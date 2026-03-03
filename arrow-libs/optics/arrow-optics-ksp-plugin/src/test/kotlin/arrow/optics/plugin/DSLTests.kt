@@ -13,7 +13,7 @@ class DSLTests {
       |$dslModel
       |$dslValues
       |val modify = Employees.employees.every.company.notNull.address
-      |  .street.name.modify(employees, String::toUpperCase)
+      |  .street.name.modify(employees, String::uppercase)
       |val r = modify.employees.map { it.company?.address?.street?.name }.toString()
       """.evals("r" to "[LAMBDA STREET, LAMBDA STREET]")
   }
