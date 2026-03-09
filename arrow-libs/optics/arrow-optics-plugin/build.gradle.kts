@@ -1,10 +1,10 @@
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   id("java-gradle-plugin")
-  id("com.github.gmazzo.buildconfig") version "6.0.7"
+  id("com.github.gmazzo.buildconfig") version "6.0.9"
   id("com.diffplug.spotless")
   // id("com.vanniktech.maven.publish.base")
-  id("com.gradle.plugin-publish") version "2.0.0"
+  id("com.gradle.plugin-publish") version "2.1.0"
 }
 
 group = property("projects.group").toString()
