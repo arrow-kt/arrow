@@ -196,6 +196,7 @@ private class IorAccumulate<Error>(
     return raiseAccumulated
   }
 
+  @Deprecated("Binary compatibility", level = DeprecationLevel.ERROR)
   @ExperimentalRaiseAccumulateApi
   override val latestError: RaiseAccumulate.Value<Nothing>?
     get() = if (state.get() === EmptyValue) null else raiseAccumulated
