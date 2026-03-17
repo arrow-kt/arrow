@@ -117,7 +117,7 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
 @OptIn(ExperimentalAbiValidation::class)
 fun AbiValidationVariantSpec.commonValidationOptions() {
   filters {
-    excluded {
+    exclude {
       annotatedWith.addAll(
         "arrow.fx.coroutines.await.ExperimentalAwaitAllApi",
         "arrow.core.raise.ExperimentalRaiseAccumulateApi",
@@ -217,10 +217,7 @@ if (isKotlinMultiplatform) {
     tvosArm64()
     // -- Tier 3 --
     mingwX64()
-    macosX64()
     iosX64()
-    watchosX64()
-    tvosX64()
     if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
       androidNativeX86()
       androidNativeX64()
@@ -228,6 +225,10 @@ if (isKotlinMultiplatform) {
       androidNativeArm64()
       watchosDeviceArm64()
     }
+    // deprecated in 2.3.20
+    // macosX64()
+    // watchosX64()
+    // tvosX64()
 
     applyDefaultHierarchyTemplate()
 
