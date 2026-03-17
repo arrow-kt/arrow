@@ -1019,7 +1019,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
 
   @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public inline fun <A> accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
-    contract { callsInPlace(block, AT_MOST_ONCE) }
+    contract { callsInPlace(block, EXACTLY_ONCE) }
     return (this as Accumulate<Error>).accumulating(block)
   }
 
@@ -1172,8 +1172,9 @@ public interface Accumulate<Error> {
 }
 
 @ExperimentalRaiseAccumulateApi
+@Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
-  contract { callsInPlace(block, AT_MOST_ONCE) }
+  contract { callsInPlace(block, EXACTLY_ONCE) }
   return merge {
     recover({ Ok(block(RaiseAccumulate(tolerant(this@merge), this) { raise(it.nel()) })) }, ::accumulateAll)
   }
