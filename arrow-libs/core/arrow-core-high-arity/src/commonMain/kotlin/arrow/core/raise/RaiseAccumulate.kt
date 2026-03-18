@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalRaiseAccumulateApi::class)
-@file:JvmMultifileClass
 @file:JvmName("RaiseHighArityKt")
 
 package arrow.core.raise
@@ -9,7 +8,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
-import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 @RaiseDSL
