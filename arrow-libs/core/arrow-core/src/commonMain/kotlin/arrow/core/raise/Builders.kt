@@ -187,6 +187,9 @@ private class IorAccumulate<Error>(
   fun raiseSingle(e: Error): Nothing = raise.raise(EmptyValue.combine(state.get(), e, combineError))
   override fun raise(r: NonEmptyList<Error>) = raiseSingle(r.reduce(combineError))
 
+  @ExperimentalTraceApi
+  override val isTraced: Boolean
+    get() = raise.isTraced
   private val raiseAccumulated = RaiseAccumulate.Error { raise.raise(EmptyValue.unbox(state.get())) }
 
   @ExperimentalRaiseAccumulateApi
@@ -220,6 +223,10 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
 
   @RaiseDSL
   override fun raise(r: E): Nothing = raise()
+
+  @ExperimentalTraceApi
+  override val isTraced: Boolean
+    get() = raise.isTraced
 
   @RaiseDSL
   public fun ensure(condition: Boolean) {
