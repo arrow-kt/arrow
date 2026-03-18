@@ -38,3 +38,10 @@ public suspend fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
 ): A = resources.autoCloseable(closingDispatcher, autoCloseable)
+
+@ResourceDSL
+context(resources: ResourceScope)
+public suspend fun <A> install(
+  acquire: suspend () -> A,
+  release: suspend (A, ExitCase) -> Unit,
+): A = resources.install({ acquire() }, release)
