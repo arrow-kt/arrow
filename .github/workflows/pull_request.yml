@@ -214,7 +214,7 @@ jobs:
       - name: Add code coverage report
         if: "! github.event.pull_request.head.repo.fork "
         id: kover
-        uses: mi-kas/kover-report@v1
+        uses: mi-kas/kover-report@v2
         with:
           path: build/reports/kover/report.xml
           token: ${{ secrets.GITHUB_TOKEN }}
