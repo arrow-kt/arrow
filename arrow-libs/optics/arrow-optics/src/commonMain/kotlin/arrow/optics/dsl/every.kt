@@ -2,9 +2,9 @@ package arrow.optics.dsl
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.Option
 import arrow.optics.Every
-import arrow.optics.Optional
 import arrow.optics.Traversal
 import kotlin.jvm.JvmName
 
@@ -20,6 +20,10 @@ public fun <T, S, A> Traversal<T, S>.every(tr: Traversal<S, A>): Traversal<T, A>
 public val <T, A> Traversal<T, List<A>>.every: Traversal<T, A>
   get() = this.compose(Every.list())
 
+@get:JvmName("everySet")
+public val <T, A> Traversal<T, Set<A>>.every: Traversal<T, A>
+  get() = this.compose(Every.set())
+
 @get:JvmName("everyRight")
 public val <T, Error, A> Traversal<T, Either<Error, A>>.every: Traversal<T, A>
   get() = this.compose(Every.either())
@@ -31,6 +35,10 @@ public val <T, K, V> Traversal<T, Map<K, V>>.every: Traversal<T, V>
 @get:JvmName("everyNonEmptyList")
 public val <T, A> Traversal<T, NonEmptyList<A>>.every: Traversal<T, A>
   get() = this.compose(Every.nonEmptyList())
+
+@get:JvmName("everyNonEmptySet")
+public val <T, A> Traversal<T, NonEmptySet<A>>.every: Traversal<T, A>
+  get() = this.compose(Every.nonEmptySet())
 
 @get:JvmName("everySome")
 public val <T, A> Traversal<T, Option<A>>.every: Traversal<T, A>

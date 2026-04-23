@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.Option
 import arrow.core.Tuple4
 import arrow.core.Tuple5
@@ -422,6 +423,13 @@ public interface PTraversal<S, T, A, B> {
       Every.list()
 
     /**
+     * [Traversal] for [Set] that focuses in each [A] of the source [Set].
+     */
+    @JvmStatic
+    public fun <A> set(): Traversal<Set<A>, A> =
+      Every.set()
+
+    /**
      * [Traversal] for [Either] that has focus in each [Either.Right].
      *
      * @receiver [PTraversal.Companion] to make it statically available.
@@ -444,6 +452,16 @@ public interface PTraversal<S, T, A, B> {
     @JvmStatic
     public fun <A> nonEmptyList(): Traversal<NonEmptyList<A>, A> =
       Every.nonEmptyList()
+
+    /**
+     * [Traversal] for [NonEmptySet] that has focus in each [A].
+     *
+     * @receiver [PTraversal.Companion] to make it statically available.
+     * @return [Traversal] with source [NonEmptySet] and focus every [A] of the source.
+     */
+    @JvmStatic
+    public fun <A> nonEmptySet(): Traversal<NonEmptySet<A>, A> =
+      Every.nonEmptySet()
 
     /**
      * [Traversal] for [Option] that has focus in each [arrow.core.Some].
