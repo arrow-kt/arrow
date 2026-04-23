@@ -28,9 +28,11 @@ public final class arrow/optics/Every {
 	public static final fun list ()Larrow/optics/PTraversal;
 	public static final fun map ()Larrow/optics/PTraversal;
 	public static final fun nonEmptyList ()Larrow/optics/PTraversal;
+	public static final fun nonEmptySet ()Larrow/optics/PTraversal;
 	public static final fun option ()Larrow/optics/PTraversal;
 	public static final fun pair ()Larrow/optics/PTraversal;
 	public static final fun sequence ()Larrow/optics/PTraversal;
+	public static final fun set ()Larrow/optics/PTraversal;
 	public static final fun string ()Larrow/optics/PTraversal;
 	public static final fun triple ()Larrow/optics/PTraversal;
 	public static final fun tuple4 ()Larrow/optics/PTraversal;
@@ -385,6 +387,7 @@ public abstract interface class arrow/optics/PTraversal {
 	public static fun map ()Larrow/optics/PTraversal;
 	public abstract fun modify (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 	public static fun nonEmptyList ()Larrow/optics/PTraversal;
+	public static fun nonEmptySet ()Larrow/optics/PTraversal;
 	public static fun option ()Larrow/optics/PTraversal;
 	public static fun pPair ()Larrow/optics/PTraversal;
 	public static fun pTriple ()Larrow/optics/PTraversal;
@@ -397,6 +400,7 @@ public abstract interface class arrow/optics/PTraversal {
 	public static fun pair ()Larrow/optics/PTraversal;
 	public abstract fun plus (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static fun sequence ()Larrow/optics/PTraversal;
+	public static fun set ()Larrow/optics/PTraversal;
 	public abstract fun set (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public abstract fun size (Ljava/lang/Object;)I
 	public static fun string ()Larrow/optics/PTraversal;
@@ -425,6 +429,7 @@ public final class arrow/optics/PTraversal$Companion {
 	public final fun list ()Larrow/optics/PTraversal;
 	public final fun map ()Larrow/optics/PTraversal;
 	public final fun nonEmptyList ()Larrow/optics/PTraversal;
+	public final fun nonEmptySet ()Larrow/optics/PTraversal;
 	public final fun option ()Larrow/optics/PTraversal;
 	public final fun pPair ()Larrow/optics/PTraversal;
 	public final fun pTriple ()Larrow/optics/PTraversal;
@@ -436,6 +441,7 @@ public final class arrow/optics/PTraversal$Companion {
 	public final fun pTuple9 ()Larrow/optics/PTraversal;
 	public final fun pair ()Larrow/optics/PTraversal;
 	public final fun sequence ()Larrow/optics/PTraversal;
+	public final fun set ()Larrow/optics/PTraversal;
 	public final fun string ()Larrow/optics/PTraversal;
 	public final fun triple ()Larrow/optics/PTraversal;
 	public final fun tuple4 ()Larrow/optics/PTraversal;
@@ -501,8 +507,10 @@ public final class arrow/optics/dsl/EveryKt {
 	public static final fun every (Larrow/optics/PTraversal;Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun everyChar (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun everyNonEmptyList (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everyNonEmptySet (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun everyRight (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun everySequence (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
+	public static final fun everySet (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun everySome (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun everyValue (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;
 	public static final fun getEvery (Larrow/optics/PTraversal;)Larrow/optics/PTraversal;

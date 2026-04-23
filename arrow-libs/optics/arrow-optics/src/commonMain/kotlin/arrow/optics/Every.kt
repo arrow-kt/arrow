@@ -2,7 +2,9 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.NonEmptySet
 import arrow.core.Option
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
@@ -10,6 +12,7 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.fold
+import arrow.core.wrapAsNonEmptySetOrThrow
 import kotlin.jvm.JvmStatic
 
 public object Every {
@@ -23,6 +26,18 @@ public object Every {
 
     override fun modify(source: List<A>, map: (focus: A) -> A): List<A> =
       source.map(map)
+  }
+
+  /**
+   * [Traversal] for [Set] that focuses in each [A] of the source [Set].
+   */
+  @JvmStatic
+  public fun <A> set(): Traversal<Set<A>, A> = object : Traversal<Set<A>, A> {
+    override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: Set<A>, map: (focus: A) -> R): R =
+      source.fold(initial) { acc, a -> combine(acc, map(a)) }
+
+    override fun modify(source: Set<A>, map: (focus: A) -> A): Set<A> =
+      source.mapTo(mutableSetOf(), map)
   }
 
   /**
@@ -66,6 +81,24 @@ public object Every {
 
     override fun modify(source: NonEmptyList<A>, map: (focus: A) -> A): NonEmptyList<A> =
       source.map(map)
+  }
+
+  /**
+   * [Traversal] for [NonEmptySet] that has focus in each [A].
+   *
+   * @receiver [PTraversal.Companion] to make it statically available.
+   * @return [Traversal] with source [NonEmptySet] and focus every [A] of the source.
+   */
+  @JvmStatic
+  public fun <A> nonEmptySet(): Traversal<NonEmptySet<A>, A> = object : Traversal<NonEmptySet<A>, A> {
+    override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: NonEmptySet<A>, map: (focus: A) -> R): R =
+      source.fold(initial) { acc, a ->
+        combine(acc, map(a))
+      }
+
+    @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+    override fun modify(source: NonEmptySet<A>, map: (focus: A) -> A): NonEmptySet<A> =
+      source.mapTo(mutableSetOf(), map).wrapAsNonEmptySetOrThrow()
   }
 
   /**
