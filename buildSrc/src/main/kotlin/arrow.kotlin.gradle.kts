@@ -105,6 +105,7 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
     "-Xreturn-value-checker=full",
     "-Xexpect-actual-classes",
     "-Xcontext-parameters",
+    "-Xallow-holdsin-contract",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
   )
