@@ -19,11 +19,11 @@ composePlugin = "1.10.3"
 agp = "9.2.0"
 cache4k = "0.14.0"
 publish = "0.36.0"
-jackson2 = "2.21.2"
+jackson2 = "2.21.3"
 jackson = "3.1.2"
 jacksonAnnotations = "2.21"
 shadow = "9.4.1"
-kotlinWrappers = "2026.4.13"
+kotlinWrappers = "2026.4.14"
 result4k="2.25.4.0"
 
 [libraries]
