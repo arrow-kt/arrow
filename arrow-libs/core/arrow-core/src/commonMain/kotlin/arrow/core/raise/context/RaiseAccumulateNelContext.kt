@@ -31,17 +31,17 @@ context(raise: Raise<NonEmptyList<Error>>)
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): List<B> = raise.mapOrAccumulateExt(this, transform)
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B> Sequence<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): List<B> = raise.mapOrAccumulateExt(this, transform)
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B> NonEmptyList<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): NonEmptyList<B> {
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
   return raise.mapOrAccumulateExt(this, transform)
@@ -49,7 +49,7 @@ context(raise: Raise<NonEmptyList<Error>>)
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B> NonEmptySet<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): NonEmptySet<B> {
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
   return raise.mapOrAccumulateExt(this, transform)
@@ -59,21 +59,21 @@ context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL
 public inline fun <Error, A> forEachAccumulating(
   iterable: Iterable<A>,
-  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+  block: RaiseAccumulate<Error>.(A) -> Unit
 ): Unit = raise.forEachAccumulatingExt(iterable, block)
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL
 public inline fun <Error, A> forEachAccumulating(
   sequence: Sequence<A>,
-  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+  block: RaiseAccumulate<Error>.(A) -> Unit
 ): Unit = raise.forEachAccumulatingExt(sequence, block)
 
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL
 public inline fun <Error, A> forEachAccumulating(
   iterator: Iterator<A>,
-  @BuilderInference block: RaiseAccumulate<Error>.(A) -> Unit
+  block: RaiseAccumulate<Error>.(A) -> Unit
 ): Unit = raise.forEachAccumulatingExt(iterator, block)
 
 /**
@@ -85,8 +85,8 @@ public inline fun <Error, A> forEachAccumulating(
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C> zipOrAccumulate(
-  @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(RaiseAccumulate<Error>) () -> B,
+  action1: context(RaiseAccumulate<Error>) () -> A,
+  action2: context(RaiseAccumulate<Error>) () -> B,
   block: (A, B) -> C
 ): C {
   contract {
@@ -106,9 +106,9 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D> zipOrAccumulate(
-  @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(RaiseAccumulate<Error>) () -> C,
+  action1: context(RaiseAccumulate<Error>) () -> A,
+  action2: context(RaiseAccumulate<Error>) () -> B,
+  action3: context(RaiseAccumulate<Error>) () -> C,
   block: (A, B, C) -> D
 ): D {
   contract {
@@ -129,10 +129,10 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E> zipOrAccumulate(
-  @BuilderInference action1: context(RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(RaiseAccumulate<Error>) () -> C,
-  @BuilderInference action4: context(RaiseAccumulate<Error>) () -> D,
+  action1: context(RaiseAccumulate<Error>) () -> A,
+  action2: context(RaiseAccumulate<Error>) () -> B,
+  action3: context(RaiseAccumulate<Error>) () -> C,
+  action4: context(RaiseAccumulate<Error>) () -> D,
   block: (A, B, C, D) -> E
 ): E {
   contract {
@@ -154,11 +154,11 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E, F> zipOrAccumulate(
-  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
-  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
-  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
   block: (A, B, C, D, E) -> F
 ): F {
   contract {
@@ -181,12 +181,12 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E, F, G> zipOrAccumulate(
-  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
-  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
-  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
-  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
   block: (A, B, C, D, E, F) -> G
 ): G {
   contract {
@@ -210,13 +210,13 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E, F, G, H> zipOrAccumulate(
-  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
-  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
-  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
-  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
-  @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
+  action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
   block: (A, B, C, D, E, F, G) -> H
 ): H {
   contract {
@@ -241,14 +241,14 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E, F, G, H, I> zipOrAccumulate(
-  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
-  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
-  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
-  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
-  @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
-  @BuilderInference action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
+  action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
+  action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
   block: (A, B, C, D, E, F, G, H) -> I
 ): I {
   contract {
@@ -274,15 +274,15 @@ context(raise: Raise<NonEmptyList<Error>>)
  */
 context(raise: Raise<NonEmptyList<Error>>)
 @RaiseDSL public inline fun <Error, A, B, C, D, E, F, G, H, I, J> zipOrAccumulate(
-  @BuilderInference action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
-  @BuilderInference action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
-  @BuilderInference action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
-  @BuilderInference action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
-  @BuilderInference action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
-  @BuilderInference action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
-  @BuilderInference action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
-  @BuilderInference action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
-  @BuilderInference action9: context(arrow.core.raise.RaiseAccumulate<Error>) () -> I,
+  action1: context(arrow.core.raise.RaiseAccumulate<Error>) () -> A,
+  action2: context(arrow.core.raise.RaiseAccumulate<Error>) () -> B,
+  action3: context(arrow.core.raise.RaiseAccumulate<Error>) () -> C,
+  action4: context(arrow.core.raise.RaiseAccumulate<Error>) () -> D,
+  action5: context(arrow.core.raise.RaiseAccumulate<Error>) () -> E,
+  action6: context(arrow.core.raise.RaiseAccumulate<Error>) () -> F,
+  action7: context(arrow.core.raise.RaiseAccumulate<Error>) () -> G,
+  action8: context(arrow.core.raise.RaiseAccumulate<Error>) () -> H,
+  action9: context(arrow.core.raise.RaiseAccumulate<Error>) () -> I,
   block: (A, B, C, D, E, F, G, H, I) -> J
 ): J {
   contract {

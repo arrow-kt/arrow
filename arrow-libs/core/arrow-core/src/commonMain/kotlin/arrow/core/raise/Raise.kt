@@ -339,8 +339,8 @@ public interface Raise<in Error> {
  */
 @RaiseDSL
 public inline fun <Error, A> recover(
-  @BuilderInference block: Raise<Error>.() -> A,
-  @BuilderInference recover: (error: Error) -> A,
+  block: Raise<Error>.() -> A,
+  recover: (error: Error) -> A,
 ): A {
   contract {
     callsInPlace(block, AT_MOST_ONCE)
@@ -379,9 +379,9 @@ public inline fun <Error, A> recover(
  */
 @RaiseDSL
 public inline fun <Error, A> recover(
-  @BuilderInference block: Raise<Error>.() -> A,
-  @BuilderInference recover: (error: Error) -> A,
-  @BuilderInference catch: (throwable: Throwable) -> A,
+  block: Raise<Error>.() -> A,
+  recover: (error: Error) -> A,
+  catch: (throwable: Throwable) -> A,
 ): A {
   contract {
     callsInPlace(block, AT_MOST_ONCE)
@@ -423,9 +423,9 @@ public inline fun <Error, A> recover(
 @RaiseDSL
 @JvmName("recoverReified")
 public inline fun <reified T : Throwable, Error, A> recover(
-  @BuilderInference block: Raise<Error>.() -> A,
-  @BuilderInference recover: (error: Error) -> A,
-  @BuilderInference catch: (t: T) -> A,
+  block: Raise<Error>.() -> A,
+  recover: (error: Error) -> A,
+  catch: (t: T) -> A,
 ): A {
   contract {
     callsInPlace(block, AT_MOST_ONCE)
@@ -702,7 +702,7 @@ public inline fun <Error, B : Any> Raise<Error>.ensureNotNull(value: B?, raise: 
 @RaiseDSL
 public inline fun <Error, OtherError, A> Raise<Error>.withError(
   transform: (OtherError) -> Error,
-  @BuilderInference block: Raise<OtherError>.() -> A
+  block: Raise<OtherError>.() -> A
 ): A {
   contract {
     callsInPlace(block, EXACTLY_ONCE)
@@ -732,7 +732,7 @@ public inline fun <Error, OtherError, A> Raise<Error>.withError(
 @RaiseDSL
 @JvmName("_merge")
 public inline fun <A> merge(
-  @BuilderInference block: Raise<A>.() -> A,
+  block: Raise<A>.() -> A,
 ): A {
   contract {
     callsInPlace(block, AT_MOST_ONCE)

@@ -104,7 +104,7 @@ public inline fun <Error, A, B> EagerEffect<Error, A>.fold(recover: (error: Erro
  */
 @JvmName("_foldOrThrow")
 public inline fun <Error, A, B> fold(
-  @BuilderInference block: Raise<Error>.() -> A,
+  block: Raise<Error>.() -> A,
   recover: (error: Error) -> B,
   transform: (value: A) -> B,
 ): B {
@@ -129,7 +129,7 @@ public inline fun <Error, A, B> fold(
 @OptIn(DelicateRaiseApi::class)
 @JvmName("_fold")
 public inline fun <Error, A, B> fold(
-  @BuilderInference block: Raise<Error>.() -> A,
+  block: Raise<Error>.() -> A,
   catch: (throwable: Throwable) -> B,
   recover: (error: Error) -> B,
   transform: (value: A) -> B,
@@ -196,7 +196,7 @@ public inline fun <Error, A, B> fold(
 @OptIn(DelicateRaiseApi::class)
 @ExperimentalTraceApi
 public inline fun <Error, A> Raise<Error>.traced(
-  @BuilderInference block: Raise<Error>.() -> A,
+  block: Raise<Error>.() -> A,
   trace: (trace: Trace, error: Error) -> Unit
 ): A {
   contract {

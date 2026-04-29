@@ -14,5 +14,5 @@ public value class Cache4kMemoizationCache<K: Any, V: Any>(
 
 @OptIn(ExperimentalTypeInference::class)
 public fun <K: Any, V: Any> buildCache4K(
-  @BuilderInference configure: Cache.Builder<K, V>.() -> Unit
+  configure: Cache.Builder<K, V>.() -> Unit
 ): Cache<K, V> = Cache.Builder<K, V>().apply(configure).build()

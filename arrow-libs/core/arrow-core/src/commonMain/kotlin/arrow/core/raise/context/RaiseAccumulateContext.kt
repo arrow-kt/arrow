@@ -25,20 +25,22 @@ public typealias RaiseAccumulate<A> = arrow.core.raise.RaiseAccumulate<A>
 
 context(raise: RaiseAccumulate<Error>)
 @RaiseDSL public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): List<B> = raise.mapOrAccumulate(this, transform)
 
+@Suppress("WRONG_INVOCATION_KIND") // at least once is given by the type
 context(raise: RaiseAccumulate<Error>)
 @RaiseDSL public inline fun <Error, A, B> NonEmptyList<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): NonEmptyList<B> {
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
   return raise.mapOrAccumulate(this, transform)
 }
 
+@Suppress("WRONG_INVOCATION_KIND") // at least once is given by the type
 context(raise: RaiseAccumulate<Error>)
 @RaiseDSL public inline fun <Error, A, B> NonEmptySet<A>.mapOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (A) -> B
+  transform: context(RaiseAccumulate<Error>) (A) -> B
 ): NonEmptySet<B> {
   contract { callsInPlace(transform, AT_LEAST_ONCE) }
   return raise.mapOrAccumulate(this, transform)
@@ -46,7 +48,7 @@ context(raise: RaiseAccumulate<Error>)
 
 context(raise: RaiseAccumulate<Error>)
 @RaiseDSL public inline fun <K, Error, A, B> Map<K, A>.mapValuesOrAccumulate(
-  @BuilderInference transform: context(RaiseAccumulate<Error>) (Map.Entry<K, A>) -> B
+  transform: context(RaiseAccumulate<Error>) (Map.Entry<K, A>) -> B
 ): Map<K, B> = with(raise) { this@mapValuesOrAccumulate.mapValuesOrAccumulate(transform) }
 
 @RaiseDSL
@@ -78,9 +80,9 @@ public fun <Error, A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
 
 @ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: RaiseAccumulate<Error>)
-public inline fun <Error> ensureOrAccumulate(condition: Boolean, error: () -> Error) {
+public inline fun <Error> ensureOrAccumulate(condition: Boolean, error: () -> Error): Value<Unit> {
   contract { callsInPlace(error, AT_MOST_ONCE) }
-  with(raise) { ensureOrAccumulate(condition, error) }
+  return with(raise) { ensureOrAccumulate(condition, error) }
 }
 
 @ExperimentalRaiseAccumulateApi @RaiseDSL

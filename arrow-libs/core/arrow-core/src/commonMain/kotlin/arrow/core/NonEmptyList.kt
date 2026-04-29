@@ -444,12 +444,12 @@ public inline fun <A, B, E> NonEmptyList<E>.unzip(f: (E) -> Pair<A, B>): Pair<No
 
 public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+  transform: RaiseAccumulate<Error>.(E) -> T
 ): Either<Error, NonEmptyList<T>> =
   all.mapOrAccumulate(combine, transform).map(::NonEmptyList)
 
 public inline fun <Error, E, T> NonEmptyList<E>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+  transform: RaiseAccumulate<Error>.(E) -> T
 ): Either<NonEmptyList<Error>, NonEmptyList<T>> =
   all.mapOrAccumulate(transform).map(::NonEmptyList)
 

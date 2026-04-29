@@ -12,7 +12,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.raise.IorRaise
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
@@ -20,7 +19,7 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
 public inline fun <Error, A> either(
-  @BuilderInference block: context(Raise<Error>) () -> A
+  block: context(Raise<Error>) () -> A
 ): Either<Error, A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return arrow.core.raise.either(block)
@@ -49,7 +48,7 @@ public inline fun <A> option(
 
 public inline fun <A> singleton(
   raise: () -> A,
-  @BuilderInference block: context(SingletonRaise<A>) () -> A
+  block: context(SingletonRaise<A>) () -> A
 ): A {
   contract {
     callsInPlace(raise, AT_MOST_ONCE)
@@ -60,7 +59,7 @@ public inline fun <A> singleton(
 
 public inline fun <Error, A> ior(
   noinline combineError: (Error, Error) -> Error,
-  @BuilderInference block: context(IorRaise<Error>) () -> A
+  block: context(IorRaise<Error>) () -> A
 ): Ior<Error, A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return arrow.core.raise.ior(combineError, block)
@@ -68,7 +67,7 @@ public inline fun <Error, A> ior(
 
 public inline fun <Error, A> iorNel(
   noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b },
-  @BuilderInference block: context(IorRaise<NonEmptyList<Error>>) () -> A
+  block: context(IorRaise<NonEmptyList<Error>>) () -> A
 ): IorNel<Error, A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return arrow.core.raise.iorNel(combineError, block)

@@ -29,7 +29,7 @@ import kotlin.jvm.JvmName
 @RaiseDSL
 public inline fun <A> singleton(
   raise: () -> A,
-  @BuilderInference block: SingletonRaise<A>.() -> A,
+  block: SingletonRaise<A>.() -> A,
 ): A {
   contract {
     callsInPlace(raise, InvocationKind.AT_MOST_ONCE)
@@ -48,7 +48,7 @@ public inline fun <A> singleton(
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> either(@BuilderInference block: Raise<Error>.() -> A): Either<Error, A> {
+public inline fun <Error, A> either(block: Raise<Error>.() -> A): Either<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return fold(block, { Either.Left(it) }, { Either.Right(it) })
 }
@@ -112,7 +112,7 @@ public inline fun <A> option(block: SingletonRaise<None>.() -> A): Option<A> {
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, @BuilderInference block: IorRaise<Error>.() -> A): Ior<Error, A> {
+public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error, block: IorRaise<Error>.() -> A): Ior<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   val state: Atomic<Any?> = Atomic(EmptyValue)
   return fold(
@@ -138,7 +138,7 @@ public inline fun <Error, A> ior(noinline combineError: (Error, Error) -> Error,
  * Read more about running a [Raise] computation in the
  * [Arrow docs](https://arrow-kt.io/learn/typed-errors/working-with-typed-errors/#running-and-inspecting-results).
  */
-public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, @BuilderInference block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> {
+public inline fun <Error, A> iorNel(noinline combineError: (NonEmptyList<Error>, NonEmptyList<Error>) -> NonEmptyList<Error> = { a, b -> a + b }, block: IorRaise<NonEmptyList<Error>>.() -> A): IorNel<Error, A> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return ior(combineError, block)
 }
@@ -330,7 +330,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
 
   @RaiseDSL
   public inline fun <A> recover(
-    @BuilderInference block: ResultRaise.() -> A,
+    block: ResultRaise.() -> A,
     recover: (Throwable) -> A,
   ): A {
     contract {
@@ -392,7 +392,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
 
   @RaiseDSL
   public inline fun <A> recover(
-    @BuilderInference block: IorRaise<Error>.() -> A,
+    block: IorRaise<Error>.() -> A,
     recover: (error: Error) -> A,
   ): A {
     contract {

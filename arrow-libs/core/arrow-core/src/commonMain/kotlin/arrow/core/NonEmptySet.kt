@@ -73,13 +73,13 @@ public value class NonEmptySet<out E> internal constructor(
 
 public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+  transform: RaiseAccumulate<Error>.(E) -> T
 ): Either<Error, NonEmptySet<T>> = either {
   withError({ it.reduce(combine) }) { mapOrAccumulate(this@mapOrAccumulate, transform) }
 }
 
 public inline fun <Error, E, T> NonEmptySet<E>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<Error>.(E) -> T
+  transform: RaiseAccumulate<Error>.(E) -> T
 ): Either<NonEmptyList<Error>, NonEmptySet<T>> = either {
   mapOrAccumulate(this@mapOrAccumulate, transform)
 }

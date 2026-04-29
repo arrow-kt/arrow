@@ -2,8 +2,8 @@ public abstract interface annotation class arrow/AutoCloseImplementation : java/
 }
 
 public abstract interface class arrow/AutoCloseScope {
-	public abstract fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public abstract fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
+	public fun autoClose (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun install (Ljava/lang/AutoCloseable;)Ljava/lang/AutoCloseable;
 	public abstract fun onClose (Lkotlin/jvm/functions/Function1;)V
 }
 

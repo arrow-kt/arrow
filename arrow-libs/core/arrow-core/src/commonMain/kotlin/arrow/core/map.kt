@@ -261,7 +261,7 @@ public fun <K, A, B> Map<K, A>.flatMapValues(f: (Map.Entry<K, A>) -> Map<K, B>):
 )
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
+  transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
 ): Either<E, Map<K, B>> = mapValuesOrAccumulate(combine, transform)
 
 @Deprecated(
@@ -269,18 +269,18 @@ public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
   replaceWith = ReplaceWith("mapValuesOrAccumulate(transform)"),
 )
 public inline fun <K, E, A, B> Map<K, A>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
+  transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
 ): Either<NonEmptyList<E>, Map<K, B>> = mapValuesOrAccumulate(transform)
 
 public inline fun <K, E, A, B> Map<K, A>.mapValuesOrAccumulate(
   combine: (E, E) -> E,
-  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
+  transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
 ): Either<E, Map<K, B>> = either {
   mapValuesOrAccumulate(this@mapValuesOrAccumulate, combine, transform)
 }
 
 public inline fun <K, E, A, B> Map<K, A>.mapValuesOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
+  transform: RaiseAccumulate<E>.(Map.Entry<K, A>) -> B
 ): Either<NonEmptyList<E>, Map<K, B>> = either {
   mapValuesOrAccumulate(this@mapValuesOrAccumulate, transform)
 }

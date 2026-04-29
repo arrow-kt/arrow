@@ -40,7 +40,7 @@ public interface Copy<A> {
    * ```
    */
   @OptIn(ExperimentalTypeInference::class)
-  public fun <B> inside(field: Traversal<A, B>, @BuilderInference f: Copy<B>.() -> Unit): Unit =
+  public fun <B> inside(field: Traversal<A, B>, f: Copy<B>.() -> Unit): Unit =
     field.transform { it.copy(f) }
 }
 
@@ -91,5 +91,5 @@ private class CopyImpl<A>(var current: A): Copy<A> {
  * ```
  */
 @OptIn(ExperimentalTypeInference::class)
-public fun <A> A.copy(@BuilderInference f: Copy<A>.() -> Unit): A =
+public fun <A> A.copy(f: Copy<A>.() -> Unit): A =
   CopyImpl(this).also(f).current
