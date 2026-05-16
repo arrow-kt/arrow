@@ -11,6 +11,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
+import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.jacksonTypeRef
 import kotlin.test.Ignore
@@ -54,7 +55,7 @@ class NonEmptySetModuleTest {
     }
   }
 
-  @Test @Ignore
+  @Test
   fun `serializing NonEmptySet in an object should round trip`() = runTest {
     checkAll(arbitrary { WrapperWithSet(Arb.nonEmptySet(Arb.someObject()).bind()) }) { wrapper ->
       val encoded: String = mapper.writeValueAsString(wrapper)
@@ -77,4 +78,4 @@ class NonEmptySetModuleTest {
   }
 }
 
-data class WrapperWithSet(val nel: NonEmptySet<SomeObject>)
+data class WrapperWithSet(@field:JsonDeserialize(contentAs = SomeObject::class) val nel: NonEmptySet<SomeObject>)
