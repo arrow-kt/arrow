@@ -207,13 +207,17 @@ if (isKotlinMultiplatform) {
     linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    if (project.name != "arrow-cache4k") watchosArm32()
+    if (project.name != "arrow-cache4k") {
+      watchosArm32()
+    }
     watchosArm64()
     tvosSimulatorArm64()
     tvosArm64()
     // -- Tier 3 --
     mingwX64()
-    iosX64()
+    if (project.name != "arrow-optics-compose") {
+      iosX64()
+    }
     if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
       androidNativeX86()
       androidNativeX64()
