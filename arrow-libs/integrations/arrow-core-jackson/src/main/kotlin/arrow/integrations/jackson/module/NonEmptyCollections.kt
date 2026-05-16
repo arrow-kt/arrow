@@ -94,7 +94,7 @@ public class NonEmptyListDeserializer(
 public class NonEmptySetDeserializer(
   private val contentType: JavaType,
   private val elementTypeDeserializer: TypeDeserializer?,
-  private val elementDeserializer: ValueDeserializer<*>?
+  private val elementDeserializer: ValueDeserializer<*>?,
 ) : StdDeserializer<NonEmptySet<*>>(NonEmptySet::class.java) {
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptySet<*>? {

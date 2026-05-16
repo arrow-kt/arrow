@@ -21,8 +21,8 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.jacksonTypeRef
 import tools.jackson.module.kotlin.jacksonMapperBuilder
+import tools.jackson.module.kotlin.jacksonTypeRef
 
 internal fun basicKotlinArrowMapper(
   eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),
