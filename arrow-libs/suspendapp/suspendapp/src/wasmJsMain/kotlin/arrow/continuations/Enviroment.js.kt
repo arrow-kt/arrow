@@ -38,7 +38,7 @@ private object JsProcess : Process {
   @Suppress("UNUSED_PARAMETER")
   private fun onSignal(signal: String, block: suspend () -> Unit) {
     @Suppress("UNUSED_VARIABLE")
-    val provide: () -> Promise<JsAny?> = { GlobalScope.promise { block() } }
+    val provide: () -> Promise<JsAny?> = { GlobalScope.promise { block().toJsReference() } }
     processOn(signal, provide)
   }
 
