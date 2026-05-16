@@ -10,7 +10,7 @@ kotlin {
       dependencies {
         api(projects.arrowOptics)
         api(libs.coroutines.core)
-        api("org.jetbrains.compose.runtime:runtime:1.10.3")
+        api("org.jetbrains.compose.runtime:runtime:1.11.0")
       }
     }
 
@@ -33,7 +33,7 @@ composeCompiler {
 
 // https://youtrack.jetbrains.com/issue/KT-68095/MPP-Compose-Kover-Cannot-expand-ZIP-build-kover-default.artifact
 val compileTargetsThatNeedKoverFix =
-  listOf("iosSimulatorArm64", "iosX64", "iosArm64", "watchosSimulatorArm64", "macosArm64", "tvosSimulatorArm64", "js", "mingwX64", "linuxX64")
+  listOf("iosSimulatorArm64", /*"iosX64", */ "iosArm64", "watchosSimulatorArm64", "macosArm64", "tvosSimulatorArm64", "js", "mingwX64", "linuxX64")
 
 afterEvaluate {
   for (task in compileTargetsThatNeedKoverFix) {
