@@ -12,8 +12,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
+import tools.jackson.databind.annotation.JsonDeserialize
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.module.kotlin.jacksonTypeRef
+import tools.jackson.module.kotlin.readValue
 import kotlin.test.Ignore
 import kotlin.test.Test
 
@@ -51,11 +53,11 @@ class NonEmptyListModuleTest {
     }
   }
 
-  @Test @Ignore
+  @Test
   fun `serializing NonEmptyList in an object should round trip`() = runTest {
     checkAll(arbitrary { WrapperWithList(Arb.nonEmptyList(Arb.someObject()).bind()) }) { wrapper ->
       val encoded: String = mapper.writeValueAsString(wrapper)
-      val decoded: WrapperWithList = mapper.readValue(encoded, WrapperWithList::class.java)
+      val decoded: WrapperWithList = mapper.readValue<WrapperWithList>(encoded)
 
       decoded shouldBe wrapper
     }
@@ -64,9 +66,9 @@ class NonEmptyListModuleTest {
   @Test
   fun `should round trip on NonEmptyList with wildcard type`() = runTest {
     checkAll(Arb.nonEmptyList(Arb.string())) { original: NonEmptyList<*> ->
-      val deserialized: NonEmptyList<*>? = shouldNotThrowAny {
+      val deserialized: NonEmptyList<*> = shouldNotThrowAny {
         val serialized: String = mapper.writeValueAsString(original)
-        mapper.readValue(serialized, NonEmptyList::class.java)
+        mapper.readValue<NonEmptyList<String>>(serialized)
       }
 
       deserialized.shouldNotBeNull() shouldBe original
@@ -74,4 +76,4 @@ class NonEmptyListModuleTest {
   }
 }
 
-data class WrapperWithList(val nel: Nel<SomeObject>)
+data class WrapperWithList(@field:JsonDeserialize(contentAs = SomeObject::class) val nel: Nel<SomeObject>)

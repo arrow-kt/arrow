@@ -21,13 +21,13 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.jacksonMapperBuilder
 import tools.jackson.module.kotlin.jacksonTypeRef
-import tools.jackson.module.kotlin.kotlinModule
 
 internal fun basicKotlinArrowMapper(
   eitherModuleConfig: EitherModuleConfig = EitherModuleConfig("left", "right"),
   iorModuleConfig: IorModuleConfig = IorModuleConfig("left", "right"),
-): JsonMapper = JsonMapper.builder().addModule(kotlinModule()).addArrowModule(eitherModuleConfig, iorModuleConfig).build()
+): JsonMapper = jacksonMapperBuilder().addArrowModule(eitherModuleConfig, iorModuleConfig).build()
 
 inline fun <reified T> T.shouldRoundTrip(mapper: ObjectMapper) {
   val encoded = mapper.writeValueAsString(this)

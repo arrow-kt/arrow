@@ -19,6 +19,7 @@ import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.deser.Deserializers
+import tools.jackson.databind.deser.std.ContainerDeserializerBase
 import tools.jackson.databind.deser.std.StdDeserializer
 import tools.jackson.databind.jsontype.TypeDeserializer
 import tools.jackson.databind.jsontype.TypeSerializer
@@ -55,7 +56,6 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
   override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = NonEmptyList::class.java.isAssignableFrom(valueType) ||
     NonEmptySet::class.java.isAssignableFrom(valueType)
 
-  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun findCollectionDeserializer(
     type: CollectionType,
     config: DeserializationConfig,
@@ -63,8 +63,8 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
     elementTypeDeserializer: TypeDeserializer?,
     elementDeserializer: ValueDeserializer<*>?,
   ): ValueDeserializer<*>? = when {
-    NonEmptyList::class.java.isAssignableFrom(type.rawClass) -> NonEmptyListDeserializer(type.contentType)
-    NonEmptySet::class.java.isAssignableFrom(type.rawClass) -> NonEmptySetDeserializer(type.contentType)
+    NonEmptyList::class.java.isAssignableFrom(type.rawClass) -> NonEmptyListDeserializer(type.contentType, elementTypeDeserializer, elementDeserializer)
+    NonEmptySet::class.java.isAssignableFrom(type.rawClass) -> NonEmptySetDeserializer(type.contentType, elementTypeDeserializer, elementDeserializer)
     else -> null
   }
 }
@@ -75,22 +75,34 @@ public object NonEmptyCollectionSerializer : StdSerializer<NonEmptyCollection<*>
   }
 }
 
-public class NonEmptyListDeserializer(private val contentType: JavaType) : StdDeserializer<NonEmptyList<*>>(NonEmptyList::class.java) {
+public class NonEmptyListDeserializer(
+  private val contentType: JavaType,
+  private val elementTypeDeserializer: TypeDeserializer?,
+  private val elementDeserializer: ValueDeserializer<*>?,
+) : StdDeserializer<NonEmptyList<*>>(NonEmptyList::class.java) {
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptyList<*>? {
     val bindings = TypeBindings.create(ArrayList::class.java, contentType)
     val superClass = TypeFactory.createDefaultInstance().constructParametricType(List::class.java, contentType)
-    val collection = CollectionType.construct(ArrayList::class.java, bindings, superClass, null, contentType)
+    var collection = CollectionType.construct(ArrayList::class.java, bindings, superClass, null, contentType)
+    if (elementTypeDeserializer != null) collection = collection.withContentTypeHandler(elementTypeDeserializer)
+    if (elementDeserializer != null) collection = collection.withContentValueHandler(elementDeserializer)
     return ctxt.readValue<List<*>>(p, collection).wrapAsNonEmptyListOrNull()
   }
 }
 
-public class NonEmptySetDeserializer(private val contentType: JavaType) : StdDeserializer<NonEmptySet<*>>(NonEmptySet::class.java) {
+public class NonEmptySetDeserializer(
+  private val contentType: JavaType,
+  private val elementTypeDeserializer: TypeDeserializer?,
+  private val elementDeserializer: ValueDeserializer<*>?,
+) : StdDeserializer<NonEmptySet<*>>(NonEmptySet::class.java) {
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptySet<*>? {
     val bindings = TypeBindings.create(LinkedHashSet::class.java, contentType)
     val superClass = TypeFactory.createDefaultInstance().constructParametricType(Set::class.java, contentType)
-    val collection = CollectionType.construct(LinkedHashSet::class.java, bindings, superClass, null, contentType)
+    var collection = CollectionType.construct(LinkedHashSet::class.java, bindings, superClass, null, contentType)
+    if (elementTypeDeserializer != null) collection = collection.withContentTypeHandler(elementTypeDeserializer)
+    if (elementDeserializer != null) collection = collection.withContentValueHandler(elementDeserializer)
     return ctxt.readValue<Set<*>>(p, collection).wrapAsNonEmptySetOrNull()
   }
 }
