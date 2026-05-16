@@ -317,7 +317,7 @@ public fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
+  transform: RaiseAccumulate<Error>.(A) -> B,
 ): Either<Error, List<B>> = either {
   mapOrAccumulate(this@mapOrAccumulate, combine, transform)
 }
@@ -351,7 +351,7 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
  */
 @OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B,
+  transform: RaiseAccumulate<Error>.(A) -> B,
 ): Either<NonEmptyList<Error>, List<B>> = either {
   mapOrAccumulate(this@mapOrAccumulate, transform)
 }
@@ -820,6 +820,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
 @Deprecated("To be removed due to unclear semantics. Please report use cases at https://github.com/arrow-kt/arrow/issues/3675.")
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
   split()?.let { (fa, a) ->
+    @Suppress("DEPRECATION")
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptyList()
 

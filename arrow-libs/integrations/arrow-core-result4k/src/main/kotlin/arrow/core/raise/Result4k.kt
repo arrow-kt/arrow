@@ -12,7 +12,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.experimental.ExperimentalTypeInference
 
-public inline fun <Error, A> result4k(@BuilderInference block: Raise<Error>.() -> A): Result<A, Error> {
+public inline fun <Error, A> result4k(block: Raise<Error>.() -> A): Result<A, Error> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }
   return fold(block, { Failure(it) }, { Success(it) })
 }

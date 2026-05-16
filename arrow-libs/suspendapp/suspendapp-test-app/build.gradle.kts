@@ -19,7 +19,7 @@ kotlin {
   macosArm64().binaries.executable()
   linuxArm64().binaries.executable()
   linuxX64().binaries.executable()
-  js(IR) {
+  js {
     nodejs()
     binaries.executable()
   }

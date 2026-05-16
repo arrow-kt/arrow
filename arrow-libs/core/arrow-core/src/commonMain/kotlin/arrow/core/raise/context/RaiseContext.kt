@@ -53,7 +53,7 @@ context(raise: Raise<Error>) @RaiseDSL @IgnorableReturnValue public inline fun <
 
 context(raise: Raise<Error>) @RaiseDSL public inline fun <Error, OtherError, A> withError(
   transform: (OtherError) -> Error,
-  @BuilderInference block: context(Raise<OtherError>) () -> A
+  block: context(Raise<OtherError>) () -> A
 ): A {
   contract {
     callsInPlace(block, EXACTLY_ONCE)

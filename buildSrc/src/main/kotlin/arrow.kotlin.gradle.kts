@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
-import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationVariantSpec
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import java.time.Duration
 
@@ -97,8 +95,8 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  apiVersion = KotlinVersion.KOTLIN_2_1
-  languageVersion = KotlinVersion.KOTLIN_2_1
+  apiVersion = KotlinVersion.KOTLIN_2_2
+  languageVersion = KotlinVersion.KOTLIN_2_2
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
@@ -108,6 +106,7 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
     "-Xallow-holdsin-contract",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
+    "-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled",
   )
   // required to be part of the Kotlin User Projects repository
   providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
@@ -116,14 +115,18 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
 }
 
 @OptIn(ExperimentalAbiValidation::class)
-fun AbiValidationVariantSpec.commonValidationOptions() {
-  filters {
-    exclude {
-      annotatedWith.addAll(
-        "arrow.fx.coroutines.await.ExperimentalAwaitAllApi",
-        "arrow.core.raise.ExperimentalRaiseAccumulateApi",
-        "arrow.core.raise.ExperimentalTraceApi",
-      )
+fun KotlinProjectExtension.applyValidationIfNeeded() {
+  if (needsAbiValidation) {
+    abiValidation {
+      filters {
+        exclude {
+          annotatedWith.addAll(
+            "arrow.fx.coroutines.await.ExperimentalAwaitAllApi",
+            "arrow.core.raise.ExperimentalRaiseAccumulateApi",
+            "arrow.core.raise.ExperimentalTraceApi",
+          )
+        }
+      }
     }
   }
 }
@@ -131,15 +134,7 @@ fun AbiValidationVariantSpec.commonValidationOptions() {
 if (isKotlinMultiplatform) {
   configure<KotlinMultiplatformExtension> {
     compilerOptions { commonCompilerOptions() }
-
-    @OptIn(ExperimentalAbiValidation::class)
-    if (needsAbiValidation) {
-      extensions.configure<AbiValidationMultiplatformExtension>("abiValidation") {
-        enabled.set(true)
-        klib.enabled.set(true)
-        commonValidationOptions()
-      }
-    }
+    applyValidationIfNeeded()
 
     jvm {
       compilerOptions {
@@ -156,7 +151,7 @@ if (isKotlinMultiplatform) {
       }
     }
 
-    js(IR) {
+    js {
       nodejs {
         testTask {
           useMocha {
@@ -288,13 +283,7 @@ if (isKotlinJvm) {
   }
 
   configure<KotlinJvmProjectExtension> {
-    @OptIn(ExperimentalAbiValidation::class)
-    if (needsAbiValidation) {
-      extensions.configure<AbiValidationExtension>("abiValidation") {
-        enabled.set(true)
-        commonValidationOptions()
-      }
-    }
+    applyValidationIfNeeded()
   }
 }
 

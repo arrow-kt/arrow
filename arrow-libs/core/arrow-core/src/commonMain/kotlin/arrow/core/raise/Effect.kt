@@ -665,13 +665,13 @@ import kotlin.jvm.JvmName
 public typealias Effect<Error, A> = suspend Raise<Error>.() -> A
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <Error, A> effect(@BuilderInference noinline block: suspend Raise<Error>.() -> A): Effect<Error, A> = block
+public inline fun <Error, A> effect(noinline block: suspend Raise<Error>.() -> A): Effect<Error, A> = block
 
 /** The same behavior and API as [Effect] except without requiring _suspend_. */
 public typealias EagerEffect<Error, A> = Raise<Error>.() -> A
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <Error, A> eagerEffect(@BuilderInference noinline block: Raise<Error>.() -> A): EagerEffect<Error, A> = block
+public inline fun <Error, A> eagerEffect(noinline block: Raise<Error>.() -> A): EagerEffect<Error, A> = block
 
 public suspend fun <A> Effect<A, A>.merge(): A = merge { invoke() }
 public fun <A> EagerEffect<A, A>.merge(): A = merge { invoke() }

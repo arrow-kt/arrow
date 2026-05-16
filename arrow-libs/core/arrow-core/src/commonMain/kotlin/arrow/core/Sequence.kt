@@ -610,13 +610,13 @@ public fun <A> Sequence<A>.tail(): Sequence<A> =
 
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
-  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+  transform: RaiseAccumulate<Error>.(A) -> B
 ): Either<Error, List<B>> = either {
   mapOrAccumulate(this@mapOrAccumulate, combine, transform)
 }
 
 public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
-  @BuilderInference transform: RaiseAccumulate<Error>.(A) -> B
+  transform: RaiseAccumulate<Error>.(A) -> B
 ): Either<NonEmptyList<Error>, List<B>> = either {
   mapOrAccumulate(this@mapOrAccumulate, transform)
 }
@@ -684,6 +684,7 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
 @Deprecated("To be removed due to unclear semantics. Please report use cases at https://github.com/arrow-kt/arrow/issues/3675.")
 public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
   split()?.let { (fa, a) ->
+    @Suppress("DEPRECATION")
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptySequence()
 

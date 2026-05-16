@@ -512,7 +512,7 @@ public suspend fun <E: Throwable, Input, Output, A> Schedule<E, Output>.retryOrE
  * It will return the last [Error] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
 public suspend inline fun <Error, Result, Output> Schedule<Error, Output>.retryRaise(
-  @BuilderInference action: Raise<Error>.() -> Result,
+  action: Raise<Error>.() -> Result,
 ): Either<Error, Result> = either {
   retry(this@retryRaise, action)
 }
@@ -522,7 +522,7 @@ public suspend inline fun <Error, Result, Output> Schedule<Error, Output>.retryR
  * It will return the last [Error] if the [Schedule] is exhausted, and ignores the output of the [Schedule].
  */
 public suspend inline fun <Error, Result, Output> Schedule<Error, Output>.retryEither(
-  @BuilderInference action: () -> Either<Error, Result>,
+  action: () -> Either<Error, Result>,
 ): Either<Error, Result> = retryRaise {
   action().bind()
 }
@@ -533,7 +533,7 @@ public suspend inline fun <Error, Result, Output> Schedule<Error, Output>.retryE
  */
 public suspend inline fun <Error, Result, Output> Raise<Error>.retry(
   schedule: Schedule<Error, Output>,
-  @BuilderInference action: Raise<Error>.() -> Result,
+  action: Raise<Error>.() -> Result,
 ): Result {
   contract {
     callsInPlace(action, InvocationKind.AT_LEAST_ONCE)

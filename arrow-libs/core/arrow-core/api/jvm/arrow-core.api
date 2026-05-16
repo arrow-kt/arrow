@@ -350,20 +350,20 @@ public final class arrow/core/MemoizedDeepRecursiveFunctionKt {
 }
 
 public abstract interface class arrow/core/NonEmptyCollection : java/util/Collection, kotlin/jvm/internal/markers/KMappedMarker {
-	public abstract fun distinct-1X0FA-Y ()Ljava/util/List;
-	public abstract fun distinctBy-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public abstract fun firstOrNull ()Ljava/lang/Object;
-	public abstract fun flatMap-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun distinct-1X0FA-Y ()Ljava/util/List;
+	public fun distinctBy-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun firstOrNull ()Ljava/lang/Object;
+	public fun flatMap-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
 	public abstract fun getHead ()Ljava/lang/Object;
-	public abstract fun isEmpty ()Z
+	public fun isEmpty ()Z
 	public abstract fun lastOrNull ()Ljava/lang/Object;
-	public abstract fun map-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
-	public abstract fun mapIndexed-0-xjo5U (Lkotlin/jvm/functions/Function2;)Ljava/util/List;
+	public fun map-0-xjo5U (Lkotlin/jvm/functions/Function1;)Ljava/util/List;
+	public fun mapIndexed-0-xjo5U (Lkotlin/jvm/functions/Function2;)Ljava/util/List;
 	public abstract fun plus (Ljava/lang/Iterable;)Larrow/core/NonEmptyCollection;
 	public abstract fun plus (Ljava/lang/Object;)Larrow/core/NonEmptyCollection;
-	public abstract fun toNonEmptyList-1X0FA-Y ()Ljava/util/List;
-	public abstract fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
-	public abstract fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
+	public fun toNonEmptyList-1X0FA-Y ()Ljava/util/List;
+	public fun toNonEmptySet-5sCjGKo ()Ljava/util/Set;
+	public fun zip (Larrow/core/NonEmptyCollection;)Larrow/core/NonEmptyCollection;
 }
 
 public final class arrow/core/NonEmptyCollection$DefaultImpls {
@@ -952,15 +952,15 @@ public final class arrow/core/raise/IorRaise : arrow/core/raise/Raise {
 }
 
 public abstract interface class arrow/core/raise/Raise {
-	public abstract fun bind (Larrow/core/Either;)Ljava/lang/Object;
-	public abstract fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
-	public abstract fun bindAll (Ljava/util/Map;)Ljava/util/Map;
-	public abstract fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
-	public abstract fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
-	public abstract fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bind (Larrow/core/Either;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun bind (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun bindAll (Ljava/lang/Iterable;)Ljava/util/List;
+	public fun bindAll (Ljava/util/Map;)Ljava/util/Map;
+	public fun bindAll-1TN0_VU (Ljava/util/Set;)Ljava/util/Set;
+	public fun bindAll-vcjLgH4 (Ljava/util/List;)Ljava/util/List;
+	public fun invoke (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun invoke (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun raise (Ljava/lang/Object;)Ljava/lang/Void;
 }
 

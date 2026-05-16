@@ -293,7 +293,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Update API files
-        run: ./gradlew updateLegacyAbi
+        run: ./gradlew updateKotlinAbi
 
       - name: Commit updated API files
         uses: stefanzweifel/git-auto-commit-action@v7

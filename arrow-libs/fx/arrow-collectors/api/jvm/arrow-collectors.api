@@ -31,14 +31,14 @@ public final class arrow/collectors/CollectKt {
 public abstract interface class arrow/collectors/CollectorI {
 	public static final field Companion Larrow/collectors/CollectorI$Companion;
 	public abstract fun accumulate (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public fun contramap (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public abstract fun finish (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getCharacteristics ()Ljava/util/Set;
-	public abstract fun has ([Larrow/collectors/Characteristics;)Z
-	public abstract fun map (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
+	public fun has ([Larrow/collectors/Characteristics;)Z
+	public fun map (Lkotlin/jvm/functions/Function2;)Larrow/collectors/CollectorI;
 	public abstract fun supply (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun zip (Larrow/collectors/CollectorI;)Larrow/collectors/CollectorI;
-	public abstract fun zip (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function3;)Larrow/collectors/CollectorI;
+	public fun zip (Larrow/collectors/CollectorI;)Larrow/collectors/CollectorI;
+	public fun zip (Larrow/collectors/CollectorI;Lkotlin/jvm/functions/Function3;)Larrow/collectors/CollectorI;
 }
 
 public final class arrow/collectors/CollectorI$Companion {
@@ -87,16 +87,16 @@ public final class arrow/collectors/JvmCollectorKt {
 }
 
 public abstract interface class arrow/collectors/NonSuspendCollectorI : arrow/collectors/CollectorI {
-	public abstract fun accumulate (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun accumulate (Ljava/lang/Object;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun accumulateNonSuspend (Ljava/lang/Object;Ljava/lang/Object;)V
-	public abstract fun contramapNonSuspend (Lkotlin/jvm/functions/Function1;)Larrow/collectors/NonSuspendCollectorI;
-	public abstract fun finish (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun contramapNonSuspend (Lkotlin/jvm/functions/Function1;)Larrow/collectors/NonSuspendCollectorI;
+	public fun finish (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun finishNonSuspend (Ljava/lang/Object;)Ljava/lang/Object;
-	public abstract fun mapNonSuspend (Lkotlin/jvm/functions/Function1;)Larrow/collectors/NonSuspendCollectorI;
-	public abstract fun supply (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun mapNonSuspend (Lkotlin/jvm/functions/Function1;)Larrow/collectors/NonSuspendCollectorI;
+	public fun supply (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun supplyNonSuspend ()Ljava/lang/Object;
-	public abstract fun zip (Larrow/collectors/NonSuspendCollectorI;)Larrow/collectors/NonSuspendCollectorI;
-	public abstract fun zipNonSuspend (Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/NonSuspendCollectorI;
+	public fun zip (Larrow/collectors/NonSuspendCollectorI;)Larrow/collectors/NonSuspendCollectorI;
+	public fun zipNonSuspend (Larrow/collectors/NonSuspendCollectorI;Lkotlin/jvm/functions/Function2;)Larrow/collectors/NonSuspendCollectorI;
 }
 
 public final class arrow/collectors/NonSuspendCollectorI$DefaultImpls {
