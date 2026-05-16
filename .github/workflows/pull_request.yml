@@ -71,7 +71,7 @@ jobs:
           file_pattern: arrow-libs/**/*.kt
 
   ios:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:
@@ -109,7 +109,7 @@ jobs:
           path: '**/build/reports/**'
 
   macos:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:
