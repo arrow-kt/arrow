@@ -49,13 +49,13 @@ public object NonEmptyCollectionSerializerResolver : Serializers.Base() {
   ): ValueSerializer<*>? = when {
     NonEmptyCollection::class.java.isAssignableFrom(type.rawClass) ->
       IndexedListSerializer(type.contentType, false, elementTypeSerializer, elementValueSerializer)
+
     else -> null
   }
 }
 
 public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
-  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean =
-    NonEmptyList::class.java.isAssignableFrom(valueType) || NonEmptySet::class.java.isAssignableFrom(valueType)
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = NonEmptyList::class.java.isAssignableFrom(valueType) || NonEmptySet::class.java.isAssignableFrom(valueType)
 
   override fun findCollectionDeserializer(
     type: CollectionType,
@@ -82,7 +82,7 @@ public class NonEmptyListDeserializer(
   private val elementTypeDeserializer: TypeDeserializer?,
   private val elementDeserializer: ValueDeserializer<*>?,
 ) : StdDeserializer<NonEmptyList<*>>(NonEmptyList::class.java) {
-  public constructor(contentType: JavaType): this(contentType, null, null)
+  public constructor(contentType: JavaType) : this(contentType, null, null)
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptyList<*>? {
@@ -95,13 +95,12 @@ public class NonEmptyListDeserializer(
   }
 }
 
-
 public class NonEmptySetDeserializer(
   private val contentType: JavaType,
   private val elementTypeDeserializer: TypeDeserializer?,
   private val elementDeserializer: ValueDeserializer<*>?,
 ) : StdDeserializer<NonEmptySet<*>>(NonEmptySet::class.java) {
-  public constructor(contentType: JavaType): this(contentType, null, null)
+  public constructor(contentType: JavaType) : this(contentType, null, null)
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptySet<*>? {
