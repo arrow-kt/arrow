@@ -19,12 +19,12 @@ import tools.jackson.databind.SerializationContext
 import tools.jackson.databind.ValueDeserializer
 import tools.jackson.databind.ValueSerializer
 import tools.jackson.databind.deser.Deserializers
-import tools.jackson.databind.deser.std.ContainerDeserializerBase
 import tools.jackson.databind.deser.std.StdDeserializer
 import tools.jackson.databind.jsontype.TypeDeserializer
 import tools.jackson.databind.jsontype.TypeSerializer
 import tools.jackson.databind.module.SimpleModule
 import tools.jackson.databind.ser.Serializers
+import tools.jackson.databind.ser.jdk.IndexedListSerializer
 import tools.jackson.databind.ser.std.StdSerializer
 import tools.jackson.databind.type.CollectionType
 import tools.jackson.databind.type.TypeBindings
@@ -47,19 +47,20 @@ public object NonEmptyCollectionSerializerResolver : Serializers.Base() {
     elementTypeSerializer: TypeSerializer?,
     elementValueSerializer: ValueSerializer<Any>?,
   ): ValueSerializer<*>? = when {
-    NonEmptyCollection::class.java.isAssignableFrom(type.rawClass) -> NonEmptyCollectionSerializer
+    NonEmptyCollection::class.java.isAssignableFrom(type.rawClass) ->
+      IndexedListSerializer(type.contentType, false, elementTypeSerializer, elementValueSerializer)
     else -> null
   }
 }
 
 public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
-  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean = NonEmptyList::class.java.isAssignableFrom(valueType) ||
-    NonEmptySet::class.java.isAssignableFrom(valueType)
+  override fun hasDeserializerFor(config: DeserializationConfig, valueType: Class<*>): Boolean =
+    NonEmptyList::class.java.isAssignableFrom(valueType) || NonEmptySet::class.java.isAssignableFrom(valueType)
 
   override fun findCollectionDeserializer(
     type: CollectionType,
     config: DeserializationConfig,
-    beanDescRef: BeanDescription.Supplier?,
+    beanDescRef: BeanDescription.Supplier,
     elementTypeDeserializer: TypeDeserializer?,
     elementDeserializer: ValueDeserializer<*>?,
   ): ValueDeserializer<*>? = when {
@@ -69,6 +70,7 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
   }
 }
 
+@Deprecated("Use IndexedListSerializer instead")
 public object NonEmptyCollectionSerializer : StdSerializer<NonEmptyCollection<*>>(NonEmptyCollection::class.java) {
   override fun serialize(value: NonEmptyCollection<*>, gen: JsonGenerator, provider: SerializationContext) {
     provider.writeValue(gen, value.toList())
@@ -80,6 +82,8 @@ public class NonEmptyListDeserializer(
   private val elementTypeDeserializer: TypeDeserializer?,
   private val elementDeserializer: ValueDeserializer<*>?,
 ) : StdDeserializer<NonEmptyList<*>>(NonEmptyList::class.java) {
+  public constructor(contentType: JavaType): this(contentType, null, null)
+
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptyList<*>? {
     val bindings = TypeBindings.create(ArrayList::class.java, contentType)
@@ -91,11 +95,14 @@ public class NonEmptyListDeserializer(
   }
 }
 
+
 public class NonEmptySetDeserializer(
   private val contentType: JavaType,
   private val elementTypeDeserializer: TypeDeserializer?,
   private val elementDeserializer: ValueDeserializer<*>?,
 ) : StdDeserializer<NonEmptySet<*>>(NonEmptySet::class.java) {
+  public constructor(contentType: JavaType): this(contentType, null, null)
+
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): NonEmptySet<*>? {
     val bindings = TypeBindings.create(LinkedHashSet::class.java, contentType)
