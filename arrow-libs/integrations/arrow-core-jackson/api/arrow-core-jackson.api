@@ -91,12 +91,14 @@ public final class arrow/integrations/jackson/module/NonEmptyCollectionsModule :
 
 public final class arrow/integrations/jackson/module/NonEmptyListDeserializer : tools/jackson/databind/deser/std/StdDeserializer {
 	public fun <init> (Ltools/jackson/databind/JavaType;)V
+	public fun <init> (Ltools/jackson/databind/JavaType;Ltools/jackson/databind/jsontype/TypeDeserializer;Ltools/jackson/databind/ValueDeserializer;)V
 	public synthetic fun deserialize (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/lang/Object;
 	public fun deserialize-L4fWQpE (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/util/List;
 }
 
 public final class arrow/integrations/jackson/module/NonEmptySetDeserializer : tools/jackson/databind/deser/std/StdDeserializer {
 	public fun <init> (Ltools/jackson/databind/JavaType;)V
+	public fun <init> (Ltools/jackson/databind/JavaType;Ltools/jackson/databind/jsontype/TypeDeserializer;Ltools/jackson/databind/ValueDeserializer;)V
 	public synthetic fun deserialize (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/lang/Object;
 	public fun deserialize-OZgIoXQ (Ltools/jackson/core/JsonParser;Ltools/jackson/databind/DeserializationContext;)Ljava/util/Set;
 }
