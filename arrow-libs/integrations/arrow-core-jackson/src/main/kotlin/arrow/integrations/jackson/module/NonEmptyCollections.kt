@@ -50,8 +50,10 @@ public object NonEmptyCollectionSerializerResolver : Serializers.Base() {
   ): ValueSerializer<*>? = when {
     NonEmptyList::class.java.isAssignableFrom(type.rawClass) ->
       IndexedListSerializer(type.contentType, false, elementTypeSerializer, elementValueSerializer)
+
     NonEmptySet::class.java.isAssignableFrom(type.rawClass) ->
       CollectionSerializer(type.contentType, false, elementTypeSerializer, elementValueSerializer)
+
     else -> null
   }
 }
