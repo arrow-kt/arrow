@@ -24,6 +24,7 @@ import tools.jackson.databind.jsontype.TypeDeserializer
 import tools.jackson.databind.jsontype.TypeSerializer
 import tools.jackson.databind.module.SimpleModule
 import tools.jackson.databind.ser.Serializers
+import tools.jackson.databind.ser.jdk.CollectionSerializer
 import tools.jackson.databind.ser.jdk.IndexedListSerializer
 import tools.jackson.databind.ser.std.StdSerializer
 import tools.jackson.databind.type.CollectionType
@@ -47,9 +48,10 @@ public object NonEmptyCollectionSerializerResolver : Serializers.Base() {
     elementTypeSerializer: TypeSerializer?,
     elementValueSerializer: ValueSerializer<Any>?,
   ): ValueSerializer<*>? = when {
-    NonEmptyCollection::class.java.isAssignableFrom(type.rawClass) ->
+    NonEmptyList::class.java.isAssignableFrom(type.rawClass) ->
       IndexedListSerializer(type.contentType, false, elementTypeSerializer, elementValueSerializer)
-
+    NonEmptySet::class.java.isAssignableFrom(type.rawClass) ->
+      CollectionSerializer(type.contentType, false, elementTypeSerializer, elementValueSerializer)
     else -> null
   }
 }
@@ -70,7 +72,7 @@ public object NonEmptyCollectionDeserializerResolver : Deserializers.Base() {
   }
 }
 
-@Deprecated("Use IndexedListSerializer instead")
+@Deprecated("Use IndexedListSerializer or CollectionSerializer instead")
 public object NonEmptyCollectionSerializer : StdSerializer<NonEmptyCollection<*>>(NonEmptyCollection::class.java) {
   override fun serialize(value: NonEmptyCollection<*>, gen: JsonGenerator, provider: SerializationContext) {
     provider.writeValue(gen, value.toList())
