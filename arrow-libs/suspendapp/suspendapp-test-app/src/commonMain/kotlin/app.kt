@@ -1,6 +1,8 @@
 import arrow.continuations.SuspendApp
+import arrow.continuations.exitApp
 import arrow.fx.coroutines.resourceScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -21,6 +23,8 @@ data object Wait : Mode, Work by Work({
 
 data object Fail : Mode, Work by Work({ error("BOOM!") })
 data object ChildFail : Mode, Work by Work({ launch { error("boom.") } })
+data object ExitApp : Mode, Work by Work({ exitApp(42) })
+data object ChildExitApp : Mode, Work by Work({ async { exitApp(2) }.await() })
 
 fun app(mode: String?) = app(
   when (mode) {
@@ -28,6 +32,8 @@ fun app(mode: String?) = app(
     "wait" -> Wait
     "fail" -> Fail
     "childfail" -> ChildFail
+    "exitapp" -> ExitApp
+    "childexitapp" -> ChildExitApp
     else -> Delay()
   }
 )

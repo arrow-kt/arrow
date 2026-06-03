@@ -7,6 +7,17 @@ import kotlin.time.Duration
 import kotlinx.coroutines.*
 
 /**
+ * Gracefully exits the enclosing [SuspendApp] with [code].
+ *
+ * This signals [SuspendApp] to complete with [code], allowing `finally` blocks and resource
+ * finalizers to run before [SuspendApp] exits the process.
+ *
+ * This function is intended to be used from inside [SuspendApp], where it is interpreted as a
+ * graceful exit with [code].
+ */
+public suspend fun exitApp(code: Int): Nothing = throw SuspendAppShutdown(code)
+
+/**
  * An unsafe blocking edge that wires the [CoroutineScope] (and structured concurrency) to the
  * [SuspendApp], such that the [CoroutineScope] gets cancelled when the `App` is requested to
  * gracefully shutdown. => `SIGTERM` & `SIGINT` on Native & NodeJS and a ShutdownHook for JVM.
@@ -42,13 +53,17 @@ public fun SuspendApp(
         .also { unregister() }
     }
     result.fold({ env.exit(0) }) { e ->
-      if (e !is SuspendAppShutdown) {
-        uncaught(e)
-        env.exit(-1)
+      when (e) {
+        is SuspendAppShutdown -> e.code?.let(env::exit)
+        else -> {
+          uncaught(e)
+          env.exit(-1)
+        }
       }
     }
   }
 }
 
 /** Marker type to track shutdown signal */
-private class SuspendAppShutdown : CancellationException("SuspendApp shutting down.")
+private class SuspendAppShutdown(val code: Int? = null) :
+  CancellationException(code?.let { "SuspendApp exiting with code $it." } ?: "SuspendApp shutting down.")
