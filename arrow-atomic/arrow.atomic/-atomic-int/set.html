@@ -18,7 +18,6 @@
         }
       }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
@@ -39,14 +38,12 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.2.2.1
+        <div class="library-version" id="library-version">2.2.3
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
                 <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/commonMain">common</button>
-                <button class="platform-tag platform-selector js-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/jsMain">js</button>
-                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/nativeMain">native</button>
-                <button class="platform-tag platform-selector wasm-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/wasmJsMain">wasmJs</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":arrow-atomic/nonJvmMain">nonJvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
@@ -62,25 +59,11 @@
                                 common
                             </label>
                         </li>
-                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":arrow-atomic/jsMain" data-filter=":arrow-atomic/jsMain">
-                                <span class="checkbox--icon"></span>
-                                js
-                            </label>
-                        </li>
                         <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":arrow-atomic/nativeMain" data-filter=":arrow-atomic/nativeMain">
+                                <input type="checkbox" class="checkbox--input" id=":arrow-atomic/nonJvmMain" data-filter=":arrow-atomic/nonJvmMain">
                                 <span class="checkbox--icon"></span>
-                                native
-                            </label>
-                        </li>
-                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
-                            <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":arrow-atomic/wasmJsMain" data-filter=":arrow-atomic/wasmJsMain">
-                                <span class="checkbox--icon"></span>
-                                wasmJs
+                                nonJvm
                             </label>
                         </li>
                 </ul>
@@ -114,14 +97,14 @@
         </nav>
         <div id="resizer" class="resizer" data-item-type="BAR"></div>
         <div id="main" data-item-type="SECTION" role="main">
-<div class="main-content" data-page-type="member" id="content" pageids="arrow-atomic::arrow.atomic/AtomicInt/set/#kotlin.Int/PointingToDeclaration//1691069325">
+<div class="main-content" data-page-type="member" id="content" pageids="arrow-atomic::arrow.atomic/AtomicInt/set/#kotlin.Int/PointingToDeclaration//-388669112">
   <div class="breadcrumbs"><a href="../../index.html">arrow-atomic</a><span class="delimiter">/</span><a href="../index.html">arrow.atomic</a><span class="delimiter">/</span><a href="index.html">AtomicInt</a><span class="delimiter">/</span><span class="current">set</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>set</span></span></h1>
   </div>
   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain" data-active="" data-toggle=":arrow-atomic/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/jsMain" data-filterable-set=":arrow-atomic/jsMain" data-toggle=":arrow-atomic/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/nativeMain" data-filterable-set=":arrow-atomic/nativeMain" data-toggle=":arrow-atomic/nativeMain">native</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/wasmJsMain" data-filterable-set=":arrow-atomic/wasmJsMain" data-toggle=":arrow-atomic/wasmJsMain">wasmJs</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>  </div>
+    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":arrow-atomic/commonMain" data-filterable-set=":arrow-atomic/commonMain" data-active="" data-toggle=":arrow-atomic/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":arrow-atomic/nonJvmMain" data-filterable-set=":arrow-atomic/nonJvmMain" data-toggle=":arrow-atomic/nonJvmMain">nonJvm</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-atomic/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":arrow-atomic/nonJvmMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="set.html"><span class="token function">set</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">newValue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>  </div>
 </div>
     <div class="footer">
         <div class="footer--container">

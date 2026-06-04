@@ -18,7 +18,6 @@
         }
       }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
@@ -39,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.2.2.1
+        <div class="library-version" id="library-version">2.2.3
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -120,7 +119,7 @@ import kotlinx.coroutines.withContext
 class UserProcessor {
 suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
 suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
-    println("Shutting down UserProcessor")
+     println("Shutting down UserProcessor")
 }
 }
 
@@ -142,7 +141,7 @@ import kotlinx.coroutines.withContext
 class UserProcessor {
 suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
 suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
-    println("Shutting down UserProcessor")
+     println("Shutting down UserProcessor")
 }
 }
 --><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">suspend fun ResourceScope.userProcessor(): UserProcessor =<br>  install({  UserProcessor().also { it.start() } }) { processor, _ -&gt;<br>    processor.shutdown()<br>  }</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><p class="paragraph">We can of course also create <code class="lang-kotlin">lazy</code> representations of this by wrapping <code class="lang-kotlin">install</code> in <a href="../resource.html">resource</a> and returning the <code class="lang-kotlin">suspend lambda</code> value instead.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor: Resource&lt;UserProcessor&gt; = resource {<br>  val x: UserProcessor = install(<br>    {  UserProcessor().also { it.start() } },<br>    { processor, _ -&gt; processor.shutdown() }<br>  )<br>  x<br>}</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><p class="paragraph">There is also a convenience operator for this pattern, but you might have preferred <code class="lang-kotlin">ResourceScope::userProcessor</code> instead since it yields the same result.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val userProcessor2: Resource&lt;UserProcessor&gt; = resource({<br>  UserProcessor().also { it.start() }<br>}) { processor, _ -&gt; processor.shutdown() }<br><br>val userProcessor3: Resource&lt;UserProcessor&gt; = ResourceScope::userProcessor</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><!-- KNIT example-resource-04.kt --><h2 class="">Scope DSL</h2><p class="paragraph">The <a href="../-resource-scope/index.html">ResourceScope</a> DSL allows you to <i>install</i> resources, and interact with them in a safe way.</p><p class="paragraph">Arrow offers the same elegant <code class="lang-kotlin">bind</code> DSL for Resource composition as you might be familiar with from Arrow Core. Which we've already seen above, in our first example. What is more interesting, is that we can also compose it with any other existing pattern from Arrow! Let's compose our <code class="lang-kotlin">UserProcessor</code> and <code class="lang-kotlin">DataSource</code> in parallel, so that their <code class="lang-kotlin">start</code> and <code class="lang-kotlin">connect</code> methods can run in parallel.</p><!-- INCLUDE
@@ -155,7 +154,7 @@ import kotlinx.coroutines.withContext
 class UserProcessor {
 suspend fun start(): Unit = withContext(Dispatchers.IO) { println("Creating UserProcessor") }
 suspend fun shutdown(): Unit = withContext(Dispatchers.IO) {
-    println("Shutting down UserProcessor")
+     println("Shutting down UserProcessor")
 }
 }
 

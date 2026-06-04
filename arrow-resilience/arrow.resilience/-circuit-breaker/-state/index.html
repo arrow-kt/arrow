@@ -18,7 +18,6 @@
         }
       }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../../styles/style.css" rel="Stylesheet">
 <link href="../../../../styles/main.css" rel="Stylesheet">
@@ -39,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.2.2.1
+        <div class="library-version" id="library-version">2.2.3
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -111,7 +110,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-closed/index.html">Closed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>openingStrategy<span class="token operator">: </span><a href="../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></span></span><span class="token punctuation">)</span> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph"><a href="-closed/index.html">Closed</a> is the normal state of the <a href="../index.html">CircuitBreaker</a>, where requests are being made. The state in which <a href="../index.html">CircuitBreaker</a> starts.     - When an exception occurs it increments the failure counter     - A successful request will reset the failure counter to zero     - When the failure counter reaches the OpeningStrategy.Count.maxFailures threshold, the breaker is tripped into the Open state</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-closed/index.html">Closed</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>openingStrategy<span class="token operator">: </span><a href="../-opening-strategy/index.html">CircuitBreaker.OpeningStrategy</a></span></span><span class="token punctuation">)</span> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph"><a href="-closed/index.html">Closed</a> is the normal state of the <a href="../index.html">CircuitBreaker</a>, where requests are being made. The state in which <a href="../index.html">CircuitBreaker</a> starts.     - When an exception occurs it increments the failure counter     - A successful request will reset the failure counter to zero     - When the failure counter reaches the <a href="../-opening-strategy/-count/max-failures.html">OpeningStrategy.Count.maxFailures</a> threshold, the breaker is tripped into the <a href="-open/index.html">Open</a> state</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -141,7 +140,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-open/index.html">Open</a> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph">When the <a href="../index.html">CircuitBreaker</a> is in the <a href="-open/index.html">Open</a> state it will short-circuit/fail-fast all requests     - All requests short-circuit/fail-fast with ExecutionRejected     - If a request is made after the configured <a href="../../../../arrow-resilience/arrow.resilience/-circuit-breaker/-state/-open/--root--.html">resetTimeout</a> passes, the <a href="../index.html">CircuitBreaker</a> is tripped into the a HalfOpen state, allowing one request to go through as a test.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":arrow-resilience/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-open/index.html">Open</a> : <a href="index.html">CircuitBreaker.State</a></div><div class="brief "><p class="paragraph">When the <a href="../index.html">CircuitBreaker</a> is in the <a href="-open/index.html">Open</a> state it will short-circuit/fail-fast all requests     - All requests short-circuit/fail-fast with <a href="../-execution-rejected/index.html">ExecutionRejected</a>     - If a request is made after the configured <a href="../../../../arrow-resilience/arrow.resilience/-circuit-breaker/-state/-open/--root--.html">resetTimeout</a> passes, the <a href="../index.html">CircuitBreaker</a> is tripped into the a <a href="-half-open/index.html">HalfOpen</a> state, allowing one request to go through as a test.</p></div></div></div>
                 </div>
               </div>
             </div>
