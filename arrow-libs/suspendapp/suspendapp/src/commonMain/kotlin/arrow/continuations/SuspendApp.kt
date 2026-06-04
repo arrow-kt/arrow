@@ -3,6 +3,7 @@ package arrow.continuations
 import arrow.autoCloseScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 import kotlinx.coroutines.*
 
@@ -15,7 +16,12 @@ import kotlinx.coroutines.*
  * This function is intended to be used from inside [SuspendApp], where it is interpreted as a
  * graceful exit with [code].
  */
-public suspend fun exitApp(code: Int): Nothing = throw SuspendAppShutdown(code)
+public suspend fun CoroutineScope.exitApp(code: Int): Nothing {
+  check(coroutineContext[SuspendAppContextKey] != null) {
+    "arrow.continuations.exitApp can only be used inside SuspendApp"
+  }
+  throw SuspendAppShutdown(code)
+}
 
 /**
  * An unsafe blocking edge that wires the [CoroutineScope] (and structured concurrency) to the
@@ -41,7 +47,7 @@ public fun SuspendApp(
   env.runScope(context) {
     val result = supervisorScope {
       val app =
-        async(start = CoroutineStart.LAZY, block = block)
+        async(context = SuspendAppContext, start = CoroutineStart.LAZY, block = block)
       val unregister =
         env.onShutdown {
           withTimeout(timeout) {
@@ -67,3 +73,9 @@ public fun SuspendApp(
 /** Marker type to track shutdown signal */
 private class SuspendAppShutdown(val code: Int? = null) :
   CancellationException(code?.let { "SuspendApp exiting with code $it." } ?: "SuspendApp shutting down.")
+
+private object SuspendAppContextKey : CoroutineContext.Key<SuspendAppContext>
+
+private object SuspendAppContext : CoroutineContext.Element {
+  override val key: CoroutineContext.Key<*> = SuspendAppContextKey
+}
