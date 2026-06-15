@@ -3,3 +3,7 @@ public final class arrow/continuations/SuspendAppKt {
 	public static synthetic fun SuspendApp-exY8QGI$default (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;JLkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 }
 
+public abstract interface class arrow/continuations/SuspendAppScope : kotlinx/coroutines/CoroutineScope {
+	public abstract fun exit (I)V
+}
+
