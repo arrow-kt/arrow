@@ -66,7 +66,7 @@ public fun SuspendApp(
     }
     result.fold({ env.exit(0) }) { e ->
       when (e) {
-        is SuspendAppShutdown -> e.code?.let(env::exit)
+        is SuspendAppShutdown -> env.exit(e.code ?: -1)
         else -> {
           uncaught(e)
           env.exit(-1)
