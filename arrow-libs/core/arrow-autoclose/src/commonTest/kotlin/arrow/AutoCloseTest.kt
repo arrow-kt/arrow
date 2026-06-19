@@ -2,8 +2,9 @@ package arrow
 
 import arrow.atomic.AtomicBoolean
 import io.kotest.assertions.AssertionErrorBuilder
+import io.kotest.assertions.assertionCounter
 import io.kotest.common.reflection.bestName
-import io.kotest.matchers.assertionCounter
+import io.kotest.matchers.collections.shouldHaveSingleElement
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
@@ -72,7 +73,7 @@ class AutoCloseTest {
           r.shutdown()
           throw error2
         }
-        autoClose({ Resource() }) { _, _ -> throw error3 }
+        val _ = autoClose({ Resource() }) { _, _ -> throw error3 }
         require(wasActive.complete(r.isActive()))
         throw error
       }
@@ -93,7 +94,7 @@ class AutoCloseTest {
 
     val e = shouldThrow<RuntimeException> {
       autoCloseScope {
-        autoClose({ Resource() }) { r, e ->
+        val _ = autoClose({ Resource() }) { r, e ->
           require(promise.complete(e))
           r.shutdown()
           throw error2
@@ -163,7 +164,7 @@ class AutoCloseTest {
     val wasActive = Channel<Boolean>(Channel.UNLIMITED)
     val closed = Channel<Resource>(Channel.UNLIMITED)
 
-    autoCloseScope {
+    val _ = autoCloseScope {
       val r1 = autoClose({ res1 }) { r, _ ->
         closed.trySend(r).getOrThrow()
         r.shutdown()
@@ -190,28 +191,29 @@ class AutoCloseTest {
     closed.cancel()
   }
 
+  @Test
+  fun normalCancel() = shouldAutoCloseWithSecond({}) { throw CancellationException("second") }
 
-  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
-  private class Resource : AutoCloseable {
-    private val isActive = AtomicBoolean(true)
+  @Test
+  fun returnCancel(): Unit = shouldAutoCloseWithSecond({ return }) { throw CancellationException("second") }
 
-    fun isActive(): Boolean = isActive.get()
+  @Test
+  fun cancelCancel() = shouldAutoCloseWithSecond({ throw CancellationException("first") }) { throw CancellationException("second") }
 
-    fun shutdown() {
-      require(isActive.compareAndSet(expected = true, new = false)) {
-        "Already shut down"
-      }
-    }
+  @Test
+  fun throwCancel() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw CancellationException("second") }
 
-    override fun close() {
-      shutdown()
-    }
-  }
+  @Test
+  fun normalThrow() = shouldAutoCloseWithSecond({}) { throw RuntimeException("second") }
 
-  private suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {
-    isCompleted shouldBe true
-    return await()
-  }
+  @Test
+  fun returnThrow(): Unit = shouldAutoCloseWithSecond({ return }) { throw RuntimeException("second") }
+
+  @Test
+  fun cancelThrow() = shouldAutoCloseWithSecond({ throw CancellationException("first") }) { throw RuntimeException("second") }
+
+  @Test
+  fun throwThrow() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw RuntimeException("second") }
 }
 
 // copied from Kotest so we can inline it
@@ -219,7 +221,7 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
   assertionCounter.inc()
   val expectedExceptionClass = T::class
   val thrownThrowable = try {
-    block()
+    val _ = block()
     null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
   } catch (thrown: Throwable) {
     thrown
@@ -236,4 +238,72 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
       .withCause(thrownThrowable)
       .build()
   }
+}
+
+private class Resource : AutoCloseable {
+  private val isActive = AtomicBoolean(true)
+
+  fun isActive(): Boolean = isActive.get()
+
+  fun shutdown() {
+    require(isActive.compareAndSet(expected = true, new = false)) {
+      "Already shut down"
+    }
+  }
+
+  override fun close() {
+    shutdown()
+  }
+}
+
+private suspend fun <T> CompletableDeferred<T>.shouldHaveCompleted(): T {
+  isCompleted shouldBe true
+  return await()
+}
+
+private inline fun shouldAutoCloseWithFirst(first: () -> Unit, crossinline second: () -> Nothing) {
+  var firstThrowable: Throwable? = null
+  lateinit var secondThrowable: Throwable
+  try {
+    autoCloseScope {
+      onClose {
+        it shouldBe firstThrowable
+        peekThrowable(second) { secondThrowable = it }
+      }
+      peekThrowable(first) { firstThrowable = it }
+    }
+  } catch (e: Throwable) {
+    e shouldBe firstThrowable
+    e.suppressedExceptions shouldHaveSingleElement secondThrowable
+  } finally {
+    val _ = secondThrowable // ensure that onClose ran
+  }
+}
+
+private inline fun shouldAutoCloseWithSecond(first: () -> Unit, crossinline second: () -> Nothing) {
+  var firstThrowable: Throwable? = null
+  lateinit var secondThrowable: Throwable
+  var finishedWithThrowable = false
+  try {
+    autoCloseScope {
+      onClose {
+        it shouldBe firstThrowable
+        peekThrowable(second) { secondThrowable = it }
+      }
+      peekThrowable(first) { firstThrowable = it }
+    }
+  } catch (e: Throwable) {
+    e shouldBe secondThrowable
+    if (firstThrowable != null) e.suppressedExceptions shouldHaveSingleElement firstThrowable
+    finishedWithThrowable = true
+  } finally {
+    finishedWithThrowable shouldBe true // otherwise, we finished with first somehow, either non-locally, or with Unit
+  }
+}
+
+private inline fun <R> peekThrowable(block: () -> R, peek: (Throwable) -> Unit): R = try {
+  block()
+} catch (e: Throwable) {
+  peek(e)
+  throw e
 }

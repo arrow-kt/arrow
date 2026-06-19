@@ -656,7 +656,7 @@ class ResourceTest {
           throw suppressed
         }.allocate()
 
-      val exception = shouldThrow<CancellationException> {
+      val exception = shouldThrow<IllegalStateException> {
         try {
           allocated shouldBe seed
           throw cancellation
@@ -665,8 +665,8 @@ class ResourceTest {
         }
       }
 
-      exception shouldBe cancellation
-      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      exception shouldBe suppressed
+      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe cancellation
       released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Cancelled>()
     }
   }

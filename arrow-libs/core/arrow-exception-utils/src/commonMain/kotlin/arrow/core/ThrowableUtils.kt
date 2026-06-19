@@ -12,9 +12,15 @@ public infix fun Throwable?.mergeSuppressed(other: Throwable?): Throwable? {
     returns(null) implies (this@mergeSuppressed == null && other == null)
   }
   return when {
+    // other completed normally
     other == null -> this
+    // this completed normally or with a non-local return
     this == null -> other
+    // this completed with a cancellation
+    this is CancellationException -> other.also { other.addSuppressed(this) }
+    // other completed with a cancellation
     other is CancellationException -> this.also { addSuppressed(other) }
+    // both completed exceptionally
     else -> this.also { addSuppressed(other.nonFatalOrThrow()) }
   }
 }
