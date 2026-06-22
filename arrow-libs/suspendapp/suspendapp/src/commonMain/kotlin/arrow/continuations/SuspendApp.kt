@@ -9,7 +9,9 @@ import kotlinx.coroutines.*
 /**
  * Scope for [SuspendApp], with operations that are specific to the application lifecycle.
  */
-public interface SuspendAppScope : CoroutineScope
+public class SuspendAppScope internal constructor(
+  private val coroutineScope: CoroutineScope,
+) : CoroutineScope by coroutineScope
 
 /**
  * An unsafe blocking edge that wires the [SuspendAppScope] (and structured concurrency) to the
@@ -36,7 +38,7 @@ public fun SuspendApp(
     val result = supervisorScope {
       val app =
         async(start = CoroutineStart.LAZY) {
-          val appScope = DefaultSuspendAppScope(this)
+          val appScope = SuspendAppScope(this)
           appScope.block()
         }
       val unregister =
@@ -83,7 +85,3 @@ public fun SuspendAppScope.exitApp(code: Int) {
 /** Marker type to track the shutdown signal */
 private class SuspendAppShutdown(val code: Int? = null) :
   CancellationException(code?.let { "SuspendApp exiting with code $it." } ?: "SuspendApp shutting down.")
-
-private class DefaultSuspendAppScope(
-  coroutineScope: CoroutineScope,
-) : SuspendAppScope, CoroutineScope by coroutineScope

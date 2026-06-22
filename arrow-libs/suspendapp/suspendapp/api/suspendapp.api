@@ -4,6 +4,7 @@ public final class arrow/continuations/SuspendAppKt {
 	public static final fun exitApp (Larrow/continuations/SuspendAppScope;I)V
 }
 
-public abstract interface class arrow/continuations/SuspendAppScope : kotlinx/coroutines/CoroutineScope {
+public final class arrow/continuations/SuspendAppScope : kotlinx/coroutines/CoroutineScope {
+	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
 }
 
