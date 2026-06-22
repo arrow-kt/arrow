@@ -6,8 +6,7 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:suspendapp>
-abstract interface arrow.continuations/SuspendAppScope : kotlinx.coroutines/CoroutineScope { // arrow.continuations/SuspendAppScope|null[0]
-    abstract fun exit(kotlin/Int) // arrow.continuations/SuspendAppScope.exit|exit(kotlin.Int){}[0]
-}
+abstract interface arrow.continuations/SuspendAppScope : kotlinx.coroutines/CoroutineScope // arrow.continuations/SuspendAppScope|null[0]
 
+final fun (arrow.continuations/SuspendAppScope).arrow.continuations/exitApp(kotlin/Int) // arrow.continuations/exitApp|exitApp@arrow.continuations.SuspendAppScope(kotlin.Int){}[0]
 final fun arrow.continuations/SuspendApp(kotlin.coroutines/CoroutineContext = ..., kotlin/Function1<kotlin/Throwable, kotlin/Unit> = ..., kotlin.time/Duration = ..., kotlin.coroutines/SuspendFunction1<arrow.continuations/SuspendAppScope, kotlin/Unit>) // arrow.continuations/SuspendApp|SuspendApp(kotlin.coroutines.CoroutineContext;kotlin.Function1<kotlin.Throwable,kotlin.Unit>;kotlin.time.Duration;kotlin.coroutines.SuspendFunction1<arrow.continuations.SuspendAppScope,kotlin.Unit>){}[0]

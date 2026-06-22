@@ -9,22 +9,7 @@ import kotlinx.coroutines.*
 /**
  * Scope for [SuspendApp], with operations that are specific to the application lifecycle.
  */
-public interface SuspendAppScope : CoroutineScope {
-  /**
-   * Gracefully exits the enclosing [SuspendApp] with process exit status [code].
-   *
-   * This signals [SuspendApp] to complete with the given process exit status, while allowing
-   * resource finalizers to run before [SuspendApp] exits the process. On Unix-like systems, this
-   * status is reported to the parent process or shell; `0` conventionally denotes success, and
-   * non-zero values denote failure or application-specific outcomes.
-   *
-   * To be used as a replacement for `System.exit(code)` and for `kotlin.system.exitProcess(code)`,
-   * which are unsafe to use in a coroutines-driven `main`, leading to deadlocks.
-   *
-   * @param code the exit status of the process.
-   */
-  public fun exit(code: Int)
-}
+public interface SuspendAppScope : CoroutineScope
 
 /**
  * An unsafe blocking edge that wires the [SuspendAppScope] (and structured concurrency) to the
@@ -76,16 +61,29 @@ public fun SuspendApp(
   }
 }
 
+/**
+ * Gracefully exits the enclosing [SuspendApp] with process exit status [code].
+ *
+ * This signals [SuspendApp] to complete with the given process exit status, while allowing
+ * resource finalizers to run before [SuspendApp] exits the process. On Unix-like systems, this
+ * status is reported to the parent process or shell; `0` conventionally denotes success, and
+ * non-zero values denote failure or application-specific outcomes.
+ *
+ * To be used as a replacement for `System.exit(code)` and for `kotlin.system.exitProcess(code)`,
+ * which are unsafe to use in a coroutines-driven `main`, leading to deadlocks.
+ *
+ * @param code the exit status of the process.
+ */
+public fun SuspendAppScope.exitApp(code: Int) {
+  val shutdown = SuspendAppShutdown(code)
+  coroutineContext.cancel(shutdown)
+  throw shutdown
+}
+
 /** Marker type to track the shutdown signal */
 private class SuspendAppShutdown(val code: Int? = null) :
   CancellationException(code?.let { "SuspendApp exiting with code $it." } ?: "SuspendApp shutting down.")
 
 private class DefaultSuspendAppScope(
   coroutineScope: CoroutineScope,
-) : SuspendAppScope, CoroutineScope by coroutineScope {
-  override fun exit(code: Int) {
-    val shutdown = SuspendAppShutdown(code)
-    coroutineContext.cancel(shutdown)
-    throw shutdown
-  }
-}
+) : SuspendAppScope, CoroutineScope by coroutineScope

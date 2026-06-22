@@ -1,5 +1,6 @@
 import arrow.continuations.SuspendApp
 import arrow.continuations.SuspendAppScope
+import arrow.continuations.exitApp
 import arrow.fx.coroutines.resourceScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.async
@@ -23,10 +24,10 @@ data object Wait : Mode, Work by Work({
 
 data object Fail : Mode, Work by Work({ error("BOOM!") })
 data object ChildFail : Mode, Work by Work({ launch { error("boom.") } })
-data object ExitApp : Mode, Work by Work({ exit(42) })
-data object ChildExitApp : Mode, Work by Work({ async { exit(2) }.await() })
+data object ExitApp : Mode, Work by Work({ exitApp(42) })
+data object ChildExitApp : Mode, Work by Work({ async { exitApp(2) }.await() })
 data object ChildLaunchExitApp : Mode, Work by Work({
-  launch { exit(24) }
+  launch { exitApp(24) }
   awaitCancellation()
 })
 
