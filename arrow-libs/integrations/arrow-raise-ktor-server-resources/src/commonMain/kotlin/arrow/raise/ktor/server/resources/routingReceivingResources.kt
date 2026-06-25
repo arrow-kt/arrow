@@ -36,3 +36,11 @@ public inline fun <reified TRoute : Any, reified TRequest : Any, reified TRespon
   statusCode: HttpStatusCode? = null,
   crossinline body: ResourcedReceivingRespondingRaiseRoutingHandler<TRoute, TRequest, TResponse>,
 ): Route = putOrRaise<TRoute, TResponse>(statusCode) { body(it, call.receive()) }
+
+@KtorDsl
+@RaiseDSL
+@IgnorableReturnValue
+public inline fun <reified TRoute : Any, reified TRequest : Any, reified TResponse> Route.queryOrRaise(
+  statusCode: HttpStatusCode? = null,
+  crossinline body: ResourcedReceivingRespondingRaiseRoutingHandler<TRoute, TRequest, TResponse>,
+): Route = queryOrRaise<TRoute, TResponse>(statusCode) { body(it, call.receive()) }
