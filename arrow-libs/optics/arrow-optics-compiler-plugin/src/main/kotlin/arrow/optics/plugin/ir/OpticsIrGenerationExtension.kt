@@ -1,3 +1,4 @@
+@file:OptIn(UnsafeDuringIrConstructionAPI::class)
 package arrow.optics.plugin.ir
 
 import arrow.optics.plugin.OpticsNames
@@ -32,9 +33,11 @@ import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.companionObject
@@ -62,36 +65,38 @@ class OpticsIrGenerationExtension : IrGenerationExtension {
  * (and therefore generates nothing) never forces resolution and never crashes (review §2.5).
  */
 class OpticsIrSymbols(private val ctx: IrPluginContext) {
+  val finder get() = ctx.finderForBuiltins()
+
   val lensInvoke: IrSimpleFunctionSymbol by lazy {
-    ctx.referenceFunctions(OpticsNames.LENS_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
+    finder.findFunctions(OpticsNames.LENS_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
   }
   val isoInvoke: IrSimpleFunctionSymbol by lazy {
-    ctx.referenceFunctions(OpticsNames.ISO_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
+    finder.findFunctions(OpticsNames.ISO_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
   }
   val prismInstanceOf: IrSimpleFunctionSymbol by lazy {
-    ctx.referenceFunctions(OpticsNames.PRISM_INSTANCE_OF).first { it.owner.parameters.none { p -> p.kind == IrParameterKind.Regular } }
+    finder.findFunctions(OpticsNames.PRISM_INSTANCE_OF).first { it.owner.parameters.none { p -> p.kind == IrParameterKind.Regular } }
   }
-  val plens: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PLENS)!! }
-  val piso: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PISO)!! }
-  val pprism: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PPRISM)!! }
-  val plensCompanion: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PLENS_COMPANION)!! }
-  val pisoCompanion: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PISO_COMPANION)!! }
-  val pprismCompanion: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PPRISM_COMPANION)!! }
+  val plens: IrClassSymbol by lazy { finder.findClass(OpticsNames.PLENS)!! }
+  val piso: IrClassSymbol by lazy { finder.findClass(OpticsNames.PISO)!! }
+  val pprism: IrClassSymbol by lazy { finder.findClass(OpticsNames.PPRISM)!! }
+  val plensCompanion: IrClassSymbol by lazy { finder.findClass(OpticsNames.PLENS_COMPANION)!! }
+  val pisoCompanion: IrClassSymbol by lazy { finder.findClass(OpticsNames.PISO_COMPANION)!! }
+  val pprismCompanion: IrClassSymbol by lazy { finder.findClass(OpticsNames.PPRISM_COMPANION)!! }
 
   /** For each optic poly-interface, its `plus` composition operator (keyed by the receiver class). */
   val polyPlus: Map<IrClassSymbol, IrSimpleFunctionSymbol> by lazy {
     arrow.optics.plugin.DslKind.entries.associate { kind ->
-      val cls = ctx.referenceClass(OpticsNames.polyClassFor(kind))!!
-      val plus = ctx.referenceFunctions(OpticsNames.plusFor(kind))
+      val cls = finder.findClass(OpticsNames.polyClassFor(kind))!!
+      val plus = finder.findFunctions(OpticsNames.plusFor(kind))
         .first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 1 }
       cls to plus
     }
   }
 
   // COPY builder support.
-  val copyClass: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.COPY)!! }
+  val copyClass: IrClassSymbol by lazy { finder.findClass(OpticsNames.COPY)!! }
   val arrowOpticsCopy: IrSimpleFunctionSymbol by lazy {
-    ctx.referenceFunctions(OpticsNames.ARROW_OPTICS_COPY).first { fn ->
+    finder.findFunctions(OpticsNames.ARROW_OPTICS_COPY).first { fn ->
       fn.owner.parameters.any { it.kind == IrParameterKind.ExtensionReceiver } &&
         fn.owner.parameters.count { it.kind == IrParameterKind.Regular } == 1
     }
@@ -178,7 +183,7 @@ private class OpticsBodyGenerator(
     val rt = opticFn.returnType as IrSimpleType
     val sourceType = rt.arguments[0].typeOrNull!!
     val focusType = rt.arguments[2].typeOrNull!!
-    val ctorTypeArgs = opticFn.typeParameters.map { it.coneType() }
+    val ctorTypeArgs = opticFn.typeParameters.map { it.defaultType }
 
     opticFn.body = DeclarationIrBuilder(ctx, opticFn.symbol).irBlockBody {
       val expr = when (kind) {

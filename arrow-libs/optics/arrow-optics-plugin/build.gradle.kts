@@ -24,9 +24,9 @@ dependencies {
   compileOnly(kotlin("compiler"))
   implementation(kotlin("gradle-plugin-api"))
   implementation(kotlin("gradle-plugin"))
-  implementation(projects.arrowOpticsKspPlugin)
+  // implementation(projects.arrowOpticsKspPlugin)
   implementation(projects.arrowOpticsCompilerPlugin)
-  implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${libs.versions.kspVersion.get()}")
+  // implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${libs.versions.kspVersion.get()}")
 }
 
 buildConfig {
@@ -37,12 +37,14 @@ buildConfig {
   buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${compilerPluginProject.name}\"")
   buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${compilerPluginProject.version}\"")
 
+  /* No more KSP plugin required
   val kspPluginProject = project(":arrow-optics-ksp-plugin")
   buildConfigField(
     type = "String",
     name = "KSP_PLUGIN_LIBRARY_COORDINATES",
     expression = "\"${kspPluginProject.group}:${kspPluginProject.name}:${kspPluginProject.version}\""
   )
+  */
 
   val annotationsProject = project(":arrow-annotations")
   buildConfigField(

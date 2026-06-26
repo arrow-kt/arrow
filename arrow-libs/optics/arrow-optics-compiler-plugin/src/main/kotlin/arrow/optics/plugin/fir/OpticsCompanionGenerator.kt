@@ -6,7 +6,6 @@ import arrow.optics.plugin.mostRestrictive
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
 import org.jetbrains.kotlin.fir.declarations.utils.isCompanion
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
@@ -24,7 +23,6 @@ import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
-import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
@@ -42,7 +40,6 @@ import org.jetbrains.kotlin.name.SpecialNames
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-@OptIn(DirectDeclarationsAccess::class, SymbolInternals::class, ExperimentalContracts::class)
 class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
   companion object {
     val OPTICS_ANNOTATION_FQNAME = OpticsNames.OPTICS_ANNOTATION_FQNAME
@@ -72,13 +69,14 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
   override fun generateNestedClassLikeDeclaration(owner: FirClassSymbol<*>, name: Name, context: NestedClassGenerationContext): FirClassLikeSymbol<*>? {
     if (owner !is FirRegularClassSymbol) return null
     if (!session.predicateBasedProvider.matches(predicate, owner)) return null
-    if (owner.companionObjectSymbol != null) return null
+    if (owner.resolvedCompanionObjectSymbol != null) return null
     if (name != SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT) return null
     return createCompanionObject(owner, Key) {
       this.visibility = owner.rawStatus.visibility
     }.symbol
   }
 
+  @OptIn(ExperimentalContracts::class)
   fun FirClassSymbol<*>.isGeneratedOpticsCompanion(): Boolean {
     contract {
       returns(true) implies (this@isGeneratedOpticsCompanion is FirRegularClassSymbol)

@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalCompilerApi::class)
 package arrow.optics.plugin.fir
 
 import arrow.optics.plugin.ir.OpticsIrGenerationExtension
@@ -6,6 +7,7 @@ import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter

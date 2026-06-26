@@ -6,7 +6,7 @@ import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.dslVariantsFor
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.utils.visibility
+import org.jetbrains.kotlin.fir.extensions.ExperimentalTopLevelDeclarationsGenerationApi
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
@@ -14,13 +14,13 @@ import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
 import org.jetbrains.kotlin.fir.extensions.predicate.LookupPredicate
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.plugin.createTopLevelProperty
+import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.types.constructType
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
-import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.name.Name
  * These cannot be companion members (their receiver is an arbitrary outer optic), so they remain
  * top-level extensions. Only monomorphic sources are supported for now.
  */
+@OptIn(ExperimentalTopLevelDeclarationsGenerationApi::class)
 class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
 
   private val lookupPredicate = LookupPredicate.create {

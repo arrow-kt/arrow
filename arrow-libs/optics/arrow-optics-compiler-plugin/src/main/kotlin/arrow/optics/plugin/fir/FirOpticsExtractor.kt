@@ -12,22 +12,22 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.getSealedClassInheritors
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
-import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
-import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
-import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
-import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
+import org.jetbrains.kotlin.fir.declarations.processAllDeclarations
+import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.utils.isAbstract
 import org.jetbrains.kotlin.fir.declarations.utils.isData
 import org.jetbrains.kotlin.fir.declarations.utils.isInlineOrValue
-import org.jetbrains.kotlin.fir.declarations.utils.modality
 import org.jetbrains.kotlin.fir.declarations.utils.isSealed
+import org.jetbrains.kotlin.fir.declarations.utils.modality
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
+import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
@@ -37,6 +37,8 @@ import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.constructType
 import org.jetbrains.kotlin.fir.types.isMarkedNullable
 import org.jetbrains.kotlin.fir.types.type
+import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
 /** A single base-optic focus discovered on the source class, as seen from FIR. */
@@ -54,9 +56,7 @@ data class FirFocus(
 )
 
 /** Reads `@optics`-annotated FIR class symbols and extracts the foci to generate. */
-@OptIn(SymbolInternals::class, DirectDeclarationsAccess::class)
 object FirOpticsExtractor {
-
   fun classKind(symbol: FirRegularClassSymbol): OpticsClassKind = when {
     symbol.isData -> OpticsClassKind.DATA
     symbol.isInlineOrValue && symbol.classKind == ClassKind.CLASS -> OpticsClassKind.VALUE
@@ -104,7 +104,7 @@ object FirOpticsExtractor {
   private fun requestedTargets(symbol: FirRegularClassSymbol, session: FirSession): Set<OpticsTargetKind> {
     val annotation = symbol.resolvedAnnotationsWithClassIds
       .firstOrNull { it.toAnnotationClassId(session) == OpticsNames.OPTICS_ANNOTATION }
-      as? FirAnnotationCall ?: return emptySet()
+    if (annotation !is FirAnnotationCall) return emptySet()
     val found = mutableSetOf<OpticsTargetKind>()
     val collector = object : FirVisitorVoid() {
       override fun visitElement(element: FirElement) {
@@ -132,13 +132,15 @@ object FirOpticsExtractor {
    */
   private fun sealedLensFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
     if (symbol.typeParameterSymbols.isNotEmpty()) return emptyList()
-    val abstractProps = symbol.fir.declarations
-      .filterIsInstance<org.jetbrains.kotlin.fir.declarations.FirProperty>()
-      .filter { it.isAbstract && it.receiverParameter == null }
-      .map { it.symbol }
+    val abstractProps = mutableListOf<FirPropertySymbol>()
+    symbol.processAllDeclarations(session) {
+      if (it is FirPropertySymbol && it.isAbstract && it.receiverParameterSymbol == null) {
+        abstractProps.add(it)
+      }
+    }
     if (abstractProps.isEmpty()) return emptyList()
 
-    val subclasses = symbol.fir.getSealedClassInheritors(session).mapNotNull {
+    val subclasses = symbol.getSealedClassInheritors(session).mapNotNull {
       session.symbolProvider.getClassLikeSymbolByClassId(it) as? FirRegularClassSymbol
     }
     if (subclasses.isEmpty() || subclasses.any { !it.isData }) return emptyList()
@@ -195,9 +197,8 @@ object FirOpticsExtractor {
   }
 
   /** One PRISM focus per sealed subclass (algo §6). */
-  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
-    val inheritorIds = symbol.fir.getSealedClassInheritors(session)
-    return inheritorIds.mapNotNull { classId ->
+  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> =
+    symbol.getSealedClassInheritors(session).mapNotNull { classId ->
       val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol
         ?: return@mapNotNull null
       val starArgs: Array<ConeTypeProjection> =
@@ -212,7 +213,6 @@ object FirOpticsExtractor {
         refinedSource = refined,
       )
     }
-  }
 
   /** One focus per primary-constructor value parameter (LENS for data, ISO for value classes). */
   private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind): List<FirFocus> {
@@ -225,5 +225,10 @@ object FirOpticsExtractor {
         componentName = param.name,
       )
     }
+  }
+
+  @OptIn(SymbolInternals::class)
+  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): List<ClassId> {
+    return fir.getSealedClassInheritors(session)
   }
 }

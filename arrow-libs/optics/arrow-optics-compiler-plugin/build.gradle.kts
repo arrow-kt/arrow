@@ -6,9 +6,9 @@ plugins {
 kotlin {
   explicitApi = null
   compilerOptions {
-    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-    optIn.add("org.jetbrains.kotlin.fir.extensions.ExperimentalTopLevelDeclarationsGenerationApi")
-    optIn.add("org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI")
+    // optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+    // optIn.add("org.jetbrains.kotlin.fir.extensions.ExperimentalTopLevelDeclarationsGenerationApi")
+    // optIn.add("org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI")
     freeCompilerArgs.add("-Xcontext-parameters")
   }
 }

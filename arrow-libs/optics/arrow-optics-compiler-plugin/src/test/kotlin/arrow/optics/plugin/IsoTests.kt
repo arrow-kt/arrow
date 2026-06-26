@@ -1,6 +1,5 @@
 package arrow.optics.plugin
 
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class IsoTests {
@@ -33,7 +32,6 @@ class IsoTests {
   }
 
   @Test
-  @Ignore("Needs fixing joinedTypeParams in processIsoSyntax function")
   fun `Isos will be generated for generic value class with parameters having keywords as names`() {
     """
       |$`package`
@@ -45,8 +43,6 @@ class IsoTests {
       """.compilationSucceeds()
   }
 
-  // In the compiler plugin the companion object is generated automatically when missing,
-  // so a value class without a companion is now valid (unlike the KSP processor).
   @Test
   fun `Iso generation works without an explicit companion object`() {
     """

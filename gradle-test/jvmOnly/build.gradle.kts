@@ -1,5 +1,3 @@
-import arrow.optics.plugin.arrowOptics
-
 plugins {
   kotlin("jvm") version "2.4.0"
   id("io.arrow-kt.optics") version "10.0-test"
@@ -10,6 +8,6 @@ repositories {
   mavenCentral()
 }
 
-kotlin {
-  arrowOptics()
+dependencies {
+  implementation("io.arrow-kt:arrow-optics:10.0-test")
 }

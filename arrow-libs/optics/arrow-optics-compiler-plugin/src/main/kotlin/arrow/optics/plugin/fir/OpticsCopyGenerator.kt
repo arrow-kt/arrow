@@ -4,7 +4,7 @@ import arrow.optics.plugin.OpticsNames
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
-import org.jetbrains.kotlin.fir.declarations.utils.visibility
+import org.jetbrains.kotlin.fir.extensions.ExperimentalTopLevelDeclarationsGenerationApi
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.name.Name
  * `fun Source.copy(block: context(Copy<Source>) Source.Companion.(Source) -> Unit): Source`.
  * Only monomorphic sources are supported for now.
  */
+@OptIn(ExperimentalTopLevelDeclarationsGenerationApi::class)
 class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
 
   private val lookupPredicate = LookupPredicate.create {
@@ -65,7 +66,7 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
         val companionType = companion.constructType(emptyArray(), false)
         val copyType = OpticsNames.COPY.constructClassLikeType(arrayOf(sourceType), false)
         // context(Copy<Source>) Source.Companion.(Source) -> Unit  ==>  kotlin.Function3 with attributes.
-        val blockAttributes = ConeAttributes.Companion.create(
+        val blockAttributes = ConeAttributes.create(
           listOf(CompilerConeAttributes.ExtensionFunctionType, CompilerConeAttributes.ContextFunctionTypeParams(1)),
         )
         val blockType = FUNCTION3.constructClassLikeType(

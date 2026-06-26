@@ -1,20 +1,12 @@
 package arrow.optics.plugin
 
-import com.google.devtools.ksp.gradle.KspAATask
-import com.google.devtools.ksp.gradle.KspExtension
-import com.google.devtools.ksp.gradle.KspGradleSubplugin
-import org.gradle.api.Project
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
-import org.gradle.internal.extensions.stdlib.capitalized
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
+/* No more KSP plugin required
 public fun KotlinSingleTargetExtension<*>.arrowOptics() {
   project.dependencies.add("ksp", BuildConfig.KSP_PLUGIN_LIBRARY_COORDINATES)
 
@@ -71,8 +63,10 @@ public fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget>)
     }
   }
 }
+*/
 
 public class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
+  /* No more KSP plugin required
   override fun apply(target: Project) {
     target.pluginManager.apply(KspGradleSubplugin::class.java)
     target.extensions.configure(KspExtension::class.java) {
@@ -81,6 +75,7 @@ public class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
     target.extensions.create("optics", OpticsGradleExtension::class.java)
 
   }
+  */
 
   override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> =
     kotlinCompilation.target.project.provider { emptyList() }
@@ -96,4 +91,4 @@ public class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
   override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
 }
 
-public open class OpticsGradleExtension(objectFactory: ObjectFactory)
+// public open class OpticsGradleExtension(objectFactory: ObjectFactory)

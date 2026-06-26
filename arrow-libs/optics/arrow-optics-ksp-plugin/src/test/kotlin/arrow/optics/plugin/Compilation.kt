@@ -70,10 +70,7 @@ internal fun compile(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
   vararg sources: SourceFile,
-): CompilationResult {
-  val compilation = buildCompilation(allWarningsAsErrors, contextParameters, *sources)
-  return compilation.compile()
-}
+): CompilationResult = buildCompilation(allWarningsAsErrors, contextParameters, *sources).compile()
 
 fun buildCompilation(
   allWarningsAsErrors: Boolean = false,
@@ -89,7 +86,8 @@ fun buildCompilation(
   this.sources = sources.toList()
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
-  this.languageVersion = "2.1"
+  this.languageVersion = "2.2"
+  this.apiVersion = "2.2"
   if (contextParameters) {
     this.kotlincArguments = listOf("-Xcontext-parameters")
   }
