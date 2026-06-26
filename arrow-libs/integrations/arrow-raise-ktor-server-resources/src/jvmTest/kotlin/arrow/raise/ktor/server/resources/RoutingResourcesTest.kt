@@ -9,6 +9,7 @@ import io.ktor.client.request.options
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.put
+import io.ktor.client.request.query
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.resources.Resource
@@ -60,6 +61,7 @@ class RoutingResourcesTest {
       patchOrRaise<Foo.Id, _> { it.name.uppercase() }
       postOrRaise<Foo.Id, _> { it.name.uppercase() }
       putOrRaise<Foo.Id, _> { it.name.uppercase() }
+      queryOrRaise<Foo.Id, _> { it.name.uppercase() }
     }
     listOf(
       client.get("/foo/bar"),
@@ -68,6 +70,7 @@ class RoutingResourcesTest {
       client.patch("/foo/bar"),
       client.post("/foo/bar"),
       client.put("/foo/bar"),
+      client.query("/foo/bar"),
     ).forEach {
       it.status shouldBe HttpStatusCode.OK
       it.bodyAsText() shouldBe "BAR"
@@ -85,6 +88,7 @@ class RoutingResourcesTest {
       patchOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
       postOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
       putOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
+      queryOrRaise<Foo.Id, String> { raise(HttpStatusCode.BadRequest, "BAR") }
     }
     listOf(
       client.get("/foo/bar"),
@@ -94,6 +98,7 @@ class RoutingResourcesTest {
       client.patch("/foo/bar"),
       client.post("/foo/bar"),
       client.put("/foo/bar"),
+      client.query("/foo/bar"),
     ).forEach {
       it.status shouldBe HttpStatusCode.BadRequest
       it.bodyAsText() shouldBe "BAR"
