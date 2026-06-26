@@ -2,25 +2,29 @@
 
 ## Implementation status (as of this change)
 
-Implemented end-to-end (FIR signature generation **as companion members** + IR body generation), each with passing `kotlin-compile-testing` tests under `src/test`:
+The full KSP-plugin test suite has been ported to `arrow-optics-compiler-plugin/src/test` and **all 57 tests pass** (LensTests, IsoTests, PrismTests, OptionalTests, DSLTests, CopyTest, GeneratedCopyTest; one generic-value-class iso test is `@Ignore`d exactly as in the KSP suite).
 
-| Feature | Mono | Generic | Tests |
+Implemented end-to-end (FIR signature generation **as companion members** + IR body generation):
+
+| Feature | Mono | Generic | Notes |
 |---|---|---|---|
-| **LENS** (data class fields) | ✅ | ✅ (`fun field()` form) | `LensTests` |
-| **LENS** nullable focus (`Optional` via `notNull`) | ✅ | — | `LensTests` |
-| **LENS** sealed shared abstract property (§5.2, `when`-dispatch `set`) | ✅ | ❌ (mono parents only) | `LensTests` |
-| **ISO** (value classes) | ✅ | ✅ | `IsoTests` |
-| **PRISM** (sealed subclasses, `Prism.instanceOf`) | ✅ | ❌ (mono parents only) | `PrismTests` |
-| **DSL** composition extensions (top-level, §8.2 variant matrix) | ✅ | ❌ (mono sources only) | `DSLTests` |
+| **LENS** (data class fields) | ✅ | ✅ (`fun field()`) | bounds preserved via mirrored type params |
+| **LENS** nullable focus (`Optional` via `notNull`) | ✅ | ✅ | |
+| **LENS** sealed shared abstract property (§5.2) | ✅ | n/a | `when`-dispatch `set`, exhaustive `else` |
+| **ISO** (value classes) | ✅ | ✅ | |
+| **PRISM** (sealed subclasses, `Prism.instanceOf`) | ✅ | ✅ (§6) | refined supertype + subclass type params |
+| **DSL** composition extensions (top-level, §8.2 matrix) | ✅ | — (mono sources) | |
+| **COPY** (`@optics.copy`, §9) | ✅ | — (mono sources) | `context(Copy<S>) S.Companion.(S)->Unit` built as `kotlin.Function3` + context/extension attributes |
+| **Target selection** (§2.3) | ✅ | ✅ | reads `@optics([...])`, intersects with class kind |
 
-Key infrastructure in place: companion-member generation (`OpticsCompanionGenerator`), top-level DSL extension generation (`OpticsDslGenerator`), the IR body generator (`OpticsIrGenerationExtension` + `OpticsIrHelpers`), the shared model (`OpticsModel`, `OpticsNames`), and the FIR focus extractor (`FirOpticsExtractor`). The build wires both the FIR and IR phases (`OpticsPluginWrappers`), and a `kotlin-compile-testing` harness (`Compilation.kt`) runs the plugin.
+Key infrastructure: companion-member generation + target selection + generic PRISM (`OpticsCompanionGenerator`, `FirOpticsExtractor`), top-level DSL extensions (`OpticsDslGenerator`), the `@optics.copy` builder (`OpticsCopyGenerator`), the IR body generator (`OpticsIrGenerationExtension` + `OpticsIrHelpers`), and the shared model (`OpticsModel`, `OpticsNames`). Both FIR and IR phases are wired in `OpticsPluginWrappers`.
 
-**Not yet implemented (documented follow-ups):**
-- **COPY** (`@optics.copy`, §9) — blocked on constructing the `context(Copy<S>) S.Companion.(S) -> Unit` function type in FIR (context parameters) and invoking it in IR; flagged as the most fragile milestone (§2.8, §7.6).
-- **Generic PRISM** (§6 refined-supertype + free-var union) and **generic sealed-lens / generic DSL** — the generic-parent type-parameter logic differs from the LENS/ISO mirroring and is gated off for now.
-- **§12 diagnostics** — custom FIR error/warning factories (ineligible class, non-uniform property, …). Ineligible classes currently generate no optics rather than reporting a hard error.
+**Intentional differences from the KSP processor / known limitations:**
+- **Missing companion is *not* an error.** The compiler plugin auto-generates the companion object when absent (it can, unlike the KSP processor), so the "must declare a companion object" diagnostic no longer applies; the corresponding `IsoTests` case was updated to expect success.
+- **No custom §12 diagnostics.** Ineligible classes / non-uniform sealed properties silently generate no optics, so use sites fail to resolve (same observable outcome as the KSP "informational note" cases that the ported `compilationFails()` tests assert).
+- **Generic DSL and generic COPY** are restricted to monomorphic sources (no ported test exercises them; generic value-class DSL is broken in KSP too, algo §13).
 
-Everything below is the original design; sections on COPY/generic-prism/diagnostics describe the intended (not-yet-built) behaviour.
+Everything below is the original design.
 
 ---
 

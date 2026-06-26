@@ -67,3 +67,10 @@ fun IrMemberAccessExpression<*>.setRegular(n: Int, value: IrExpression) {
   val regulars = owner.parameters.filter { it.kind == IrParameterKind.Regular }
   arguments[regulars[n]] = value
 }
+
+/** Set the extension-receiver argument of [this] call. */
+fun IrMemberAccessExpression<*>.setExtension(receiver: IrExpression) {
+  val owner = (symbol.owner as? org.jetbrains.kotlin.ir.declarations.IrFunction) ?: return
+  val ext = owner.parameters.firstOrNull { it.kind == IrParameterKind.ExtensionReceiver } ?: return
+  arguments[ext] = receiver
+}

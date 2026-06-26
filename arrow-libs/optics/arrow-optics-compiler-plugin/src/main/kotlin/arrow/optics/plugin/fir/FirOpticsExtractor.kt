@@ -2,13 +2,21 @@ package arrow.optics.plugin.fir
 
 import arrow.optics.plugin.OpticKind
 import arrow.optics.plugin.OpticsClassKind
+import arrow.optics.plugin.OpticsNames
+import arrow.optics.plugin.OpticsTargetKind
+import arrow.optics.plugin.computeTargets
 import arrow.optics.plugin.lowercaseFirst
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.getSealedClassInheritors
+import org.jetbrains.kotlin.fir.declarations.hasAnnotation
+import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
+import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
+import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 import org.jetbrains.kotlin.fir.declarations.utils.isAbstract
 import org.jetbrains.kotlin.fir.declarations.utils.isData
 import org.jetbrains.kotlin.fir.declarations.utils.isInlineOrValue
@@ -30,10 +38,14 @@ import org.jetbrains.kotlin.name.Name
 data class FirFocus(
   val kind: OpticKind,
   val opticName: Name,
-  /** The focus type (e.g. the field type for a lens, the subtype for a prism). */
+  /** The focus type as used for a *monomorphic* parent (field type for a lens, `Sub<*>` for a prism). */
   val focusType: ConeKotlinType,
   /** For lenses/isos: the source component (constructor parameter / property) name. */
   val componentName: Name? = null,
+  /** For prisms: the subclass symbol (used for generic parents, algo §6). */
+  val subclass: FirRegularClassSymbol? = null,
+  /** For prisms with a generic parent: the subclass's supertype, e.g. `Parent<String, C>`. */
+  val refinedSource: ConeKotlinType? = null,
 )
 
 /** Reads `@optics`-annotated FIR class symbols and extracts the foci to generate. */
@@ -47,14 +59,59 @@ object FirOpticsExtractor {
     else -> OpticsClassKind.INELIGIBLE
   }
 
-  /** Base optic foci to generate as companion members of [symbol]. */
-  fun foci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> =
-    when (classKind(symbol)) {
+  /** Base optic foci to generate as companion members of [symbol], honouring the requested targets. */
+  fun foci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
+    val targets = effectiveTargets(symbol, session)
+    val all = when (classKind(symbol)) {
       OpticsClassKind.DATA -> constructorFoci(symbol, session, OpticKind.LENS)
       OpticsClassKind.VALUE -> constructorFoci(symbol, session, OpticKind.ISO)
       OpticsClassKind.SEALED -> prismFoci(symbol, session) + sealedLensFoci(symbol, session)
       else -> emptyList()
     }
+    return all.filter { targetOf(it.kind) in targets }
+  }
+
+  private fun targetOf(kind: OpticKind): OpticsTargetKind = when (kind) {
+    OpticKind.LENS -> OpticsTargetKind.LENS
+    OpticKind.ISO -> OpticsTargetKind.ISO
+    OpticKind.PRISM -> OpticsTargetKind.PRISM
+  }
+
+  /** Whether the DSL composition extensions should be generated for [symbol]. */
+  fun dslEnabled(symbol: FirRegularClassSymbol, session: FirSession): Boolean =
+    OpticsTargetKind.DSL in effectiveTargets(symbol, session)
+
+  /** The effective target set (algo §2.3): requested ∩ kind-allowed, plus COPY when present. */
+  fun effectiveTargets(symbol: FirRegularClassSymbol, session: FirSession): Set<OpticsTargetKind> {
+    val requested = requestedTargets(symbol, session)
+    val hasCopy = symbol.hasAnnotation(OpticsNames.OPTICS_COPY_ANNOTATION, session)
+    return computeTargets(classKind(symbol), requested, hasCopy)
+  }
+
+  /** Parse the `targets` array of `@optics(...)`, collecting the referenced [OpticsTargetKind]s. */
+  private fun requestedTargets(symbol: FirRegularClassSymbol, session: FirSession): Set<OpticsTargetKind> {
+    val annotation = symbol.resolvedAnnotationsWithArguments
+      .firstOrNull { it.toAnnotationClassId(session) == OpticsNames.OPTICS_ANNOTATION } ?: return emptySet()
+    val targetsExpr = annotation.argumentMapping.mapping[Name.identifier("targets")] ?: return emptySet()
+    val found = mutableSetOf<OpticsTargetKind>()
+    targetsExpr.acceptChildren(object : FirVisitorVoid() {
+      override fun visitElement(element: FirElement) {
+        element.acceptChildren(this)
+      }
+
+      override fun visitPropertyAccessExpression(propertyAccessExpression: FirPropertyAccessExpression) {
+        when (propertyAccessExpression.calleeReference.name.asString()) {
+          "ISO" -> found += OpticsTargetKind.ISO
+          "LENS" -> found += OpticsTargetKind.LENS
+          "PRISM" -> found += OpticsTargetKind.PRISM
+          "DSL" -> found += OpticsTargetKind.DSL
+          // OPTIONAL is silently dropped (algo §2.3)
+        }
+        propertyAccessExpression.acceptChildren(this)
+      }
+    })
+    return found
+  }
 
   /**
    * LENS foci for abstract properties that are uniform across every (data-class) subclass of a
@@ -94,19 +151,22 @@ object FirOpticsExtractor {
   private fun sameType(a: ConeKotlinType, b: ConeKotlinType): Boolean =
     a.classId == b.classId && a.isMarkedNullable == b.isMarkedNullable
 
-  /** One PRISM focus per sealed subclass (algo §6). Generic parents are handled separately (TODO). */
+  /** One PRISM focus per sealed subclass (algo §6). */
   private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
-    if (symbol.typeParameterSymbols.isNotEmpty()) return emptyList()
     val inheritorIds = symbol.fir.getSealedClassInheritors(session)
     return inheritorIds.mapNotNull { classId ->
       val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol
         ?: return@mapNotNull null
-      val args: Array<ConeTypeProjection> =
+      val starArgs: Array<ConeTypeProjection> =
         Array(sub.typeParameterSymbols.size) { ConeStarProjection }
+      // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
+      val refined = sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId }
       FirFocus(
         kind = OpticKind.PRISM,
         opticName = lowercaseFirst(classId.shortClassName),
-        focusType = sub.constructType(args, false),
+        focusType = sub.constructType(starArgs, false),
+        subclass = sub,
+        refinedSource = refined,
       )
     }
   }

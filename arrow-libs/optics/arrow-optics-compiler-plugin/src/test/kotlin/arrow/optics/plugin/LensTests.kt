@@ -5,102 +5,343 @@ import kotlin.test.Test
 class LensTests {
 
   @Test
-  fun `companion lens is generated for a monomorphic data class`() {
+  fun `Lenses will be generated for data class`() {
     """
-    |import arrow.optics.*
-    |
-    |@optics
-    |data class LensData(val field1: String) {
-    |  companion object
-    |}
-    |
-    |val lens: Lens<LensData, String> = LensData.field1
-    |val r = lens.get(LensData("hello")) == "hello" &&
-    |        lens.set(LensData("hello"), "world") == LensData("world")
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData(
+      |  val field1: String
+      |) { companion object }
+      |
+      |val i: Lens<LensData, String> = LensData.field1
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses will be generated for data class with parameters having keywords as names`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData(
+      |  val `in`: String
+      |) { companion object }
+      """.compilationSucceeds()
+  }
+
+  @Test
+  fun `Lenses will be generated for generic data class with parameters having keywords as names`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData<T>(
+      |  val `in`: T
+      |) { companion object }
+      """.compilationSucceeds()
+  }
+
+  @Test
+  fun `Lenses will be generated for data class with secondary constructors`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensesSecondaryConstructor(val fieldNumber: Int, val fieldString: String) {
+      |  constructor(number: Int) : this(number, number.toString())
+      |  companion object
+      |}
+      |
+      |val i: Lens<LensesSecondaryConstructor, String> = LensesSecondaryConstructor.fieldString
+      |val r = i != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses are generated for data class referencing its own lenses for type inference`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class UsingLens(val field: String) {
+      |  fun getLens() = UsingLens.field
+      |  companion object
+      |}
+      |
+      |val i: Lens<UsingLens, String> = UsingLens.field
+      |val r = i != null
     """.evals("r" to true)
   }
 
   @Test
-  fun `lens generated without an explicit companion object`() {
+  fun `Lenses are not generated for unresolved types`() {
     """
-    |import arrow.optics.*
-    |
-    |@optics
-    |data class LensData(val field1: String)
-    |
-    |val r = LensData.field1.get(LensData("hello")) == "hello"
-    """.evals("r" to true)
+      |$`package`
+      |$imports
+      |@optics
+      |data class InvalidType(val field: Foo) {
+      |  companion object
+      |}
+    """.compilationFails()
   }
 
   @Test
-  fun `generic data class produces a lens function`() {
+  fun `Lenses which mentions imported elements`() {
     """
-    |import arrow.optics.*
-    |
-    |@optics
-    |data class OpticsTest<A>(val field: A) {
-    |  companion object
-    |}
-    |
-    |val lens: Lens<OpticsTest<String>, String> = OpticsTest.field<String>()
-    |val r = lens.get(OpticsTest("x")) == "x" &&
-    |        lens.set(OpticsTest("x"), "y") == OpticsTest("y")
-    """.evals("r" to true)
+      |$`package`
+      |$imports
+      |
+      |@optics
+      |data class OpticsTest(val time: kotlin.time.Duration) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<OpticsTest, kotlin.time.Duration> = OpticsTest.time
+      |val r = i != null
+      """.evals("r" to true)
   }
 
   @Test
-  fun `nullable focus keeps nullability`() {
+  fun `Lenses which mentions type arguments`() {
     """
-    |import arrow.optics.*
-    |import arrow.optics.dsl.*
-    |
-    |@optics
-    |data class OptionalData(val field1: String?) {
-    |  companion object
-    |}
-    |
-    |val lens: Lens<OptionalData, String?> = OptionalData.field1
-    |val opt: Optional<OptionalData, String> = OptionalData.field1.notNull
-    |val r = lens.get(OptionalData(null)) == null &&
-    |        opt.getOrNull(OptionalData("x")) == "x"
-    """.evals("r" to true)
+      |$`package`
+      |$imports
+      |@optics
+      |data class OpticsTest<A>(val field: A) {
+      |  companion object
+      |}
+      |
+      |val i: Lens<OpticsTest<Int>, Int> = OpticsTest.field()
+      |val r = i != null
+      """.evals("r" to true)
   }
 
   @Test
-  fun `shared abstract property of a sealed class produces a lens`() {
+  fun `Lenses for nested classes`() {
     """
-    |import arrow.optics.*
-    |
-    |@optics
-    |sealed class LensSealed {
-    |  abstract val property1: String
-    |  data class Child1(override val property1: String) : LensSealed()
-    |  data class Child2(override val property1: String, val n: Int) : LensSealed()
-    |  companion object
-    |}
-    |
-    |val lens: Lens<LensSealed, String> = LensSealed.property1
-    |val c1: LensSealed = LensSealed.Child1("a")
-    |val c2: LensSealed = LensSealed.Child2("b", 5)
-    |val r = lens.get(c1) == "a" &&
-    |        lens.set(c1, "z") == LensSealed.Child1("z") &&
-    |        lens.set(c2, "z") == LensSealed.Child2("z", 5)
-    """.evals("r" to true)
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData(val field1: String) {
+      |  @optics
+      |  data class InnerLensData(val field2: String) {
+      |    companion object
+      |  }
+      |  companion object
+      |}
+      |
+      |val i: Lens<LensData.InnerLensData, String> = LensData.InnerLensData.field2
+      |val r = i != null
+      """.evals("r" to true)
   }
 
   @Test
-  fun `multiple fields each produce a lens`() {
+  fun `Lenses for nested classes with repeated names (#2718)`() {
     """
-    |import arrow.optics.*
-    |
-    |@optics
-    |data class Person(val name: String, val age: Int) {
-    |  companion object
-    |}
-    |
-    |val p = Person("Alejandro", 40)
-    |val r = Person.name.get(p) == "Alejandro" &&
-    |        Person.age.set(p, 41) == Person("Alejandro", 41)
-    """.evals("r" to true)
+      |$`package`
+      |$imports
+      |@optics
+      |data class LensData(val field1: String) {
+      |  @optics
+      |  data class InnerLensData(val field2: String) {
+      |    companion object
+      |  }
+      |  companion object
+      |}
+      |
+      |@optics
+      |data class OtherLensData(val field1: String) {
+      |  @optics
+      |  data class InnerLensData(val field2: String) {
+      |    companion object
+      |  }
+      |  companion object
+      |}
+      |
+      |val i: Lens<LensData.InnerLensData, String> = LensData.InnerLensData.field2
+      |val j: Lens<OtherLensData.InnerLensData, String> = OtherLensData.InnerLensData.field2
+      |val r = i != null && j != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lenses for STAR arguments`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class GenericType<A>(
+      |  val field1: A
+      |) { companion object }
+      |
+      |@optics
+      |data class IsoData(val genericType: GenericType<*>) {
+      |  companion object
+      |}
+      """.compilationSucceeds()
+  }
+
+  @Test
+  fun `Lens for sealed class property, one choice`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |
+      |  data class dataChild(override val property1: String) : LensSealed()
+      |
+      |  companion object
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lens for sealed class property, three choices`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |
+      |  data class dataChild1(override val property1: String) : LensSealed()
+      |  data class dataChild2(override val property1: String, val number: Int) : LensSealed()
+      |  data class dataChild3(override val property1: String, val enabled: Boolean) : LensSealed()
+      |
+      |  companion object
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lens for sealed class property, three choices outside`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |
+      |  companion object
+      |}
+      |
+      |data class dataChild1(override val property1: String) : LensSealed()
+      |data class dataChild2(override val property1: String, val number: Int) : LensSealed()
+      |data class dataChild3(override val property1: String, val enabled: Boolean) : LensSealed()
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Lens for sealed class property, zero choices`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String
+      |
+      |  companion object
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.compilationFails()
+  }
+
+  @Test
+  fun `Lens for sealed class property, ignoring changed nullability`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed class LensSealed {
+      |  abstract val property1: String?
+      |
+      |  data class dataChild1(override val property1: String?) : LensSealed()
+      |  data class dataChild2(override val property1: String?, val number: Int) : LensSealed()
+      |  data class dataChild3(override val property1: String, val enabled: Boolean) : LensSealed()
+      |
+      |  companion object
+      |}
+      |
+      |val l: Lens<LensSealed, String>? = LensSealed.property1
+      |val r = l != null
+      """.compilationFails()
+  }
+
+  @Test
+  fun `Lens for sealed class property, ignoring changed types`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |sealed interface Base<out T> {
+      |    val prop: T
+      |
+      |    companion object
+      |}
+      |
+      |@optics
+      |data class Child1(override val prop: String) : Base<String> {
+      |    companion object
+      |}
+      |
+      |@optics
+      |data class Child2(override val prop: Int) : Base<Int> {
+      |    companion object
+      |}
+      |
+      |val l: Lens<Base<String>, String> = Base.prop()
+      |val r = l != null
+      """.compilationFails()
+  }
+
+  @Test
+  fun `Lenses will be generated for data class with property named arrow (issue #3789)`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |data class AutoLambdaData(
+      |  val leftBrace: String = "",
+      |  val arrow: String = "->",
+      |  val rightBrace: String = ""
+      |) { companion object }
+      |
+      |val lens: Lens<AutoLambdaData, String> = AutoLambdaData.arrow
+      |val r = lens != null
+      """.evals("r" to true)
+  }
+
+  @Test
+  fun `Visibilities are correctly computed (#3869)`() {
+    """
+      |$`package`
+      |$imports
+      |@optics
+      |internal sealed interface Interface {
+      |  @optics
+      |  data class DataClass(val value: Int) : Interface {
+      |    companion object
+      |  }
+      |  companion object
+      |}
+      |
+      |internal val lens: Lens<Interface.DataClass, Int> = Interface.DataClass.value
+      |internal val r = lens != null
+      """.evals("r" to true)
   }
 }

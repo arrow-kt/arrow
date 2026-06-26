@@ -2,6 +2,7 @@ package arrow.optics.plugin.ir
 
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.fir.OpticsCompanionGenerator
+import arrow.optics.plugin.fir.OpticsCopyGenerator
 import arrow.optics.plugin.fir.OpticsDslGenerator
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -35,8 +36,10 @@ import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.typeOrNull
+import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.ir.util.properties
@@ -74,6 +77,14 @@ class OpticsIrSymbols(ctx: IrPluginContext) {
         .first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 1 }
       cls to plus
     }
+
+  // COPY builder support.
+  val copyClass: IrClassSymbol = ctx.referenceClass(OpticsNames.COPY)!!
+  val arrowOpticsCopy: IrSimpleFunctionSymbol =
+    ctx.referenceFunctions(OpticsNames.ARROW_OPTICS_COPY).first { fn ->
+      fn.owner.parameters.any { it.kind == IrParameterKind.ExtensionReceiver } &&
+        fn.owner.parameters.count { it.kind == IrParameterKind.Regular } == 1
+    }
 }
 
 private enum class IrOpticKind { LENS, ISO, PRISM }
@@ -105,12 +116,40 @@ private class OpticsBodyGenerator(
   }
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction) {
-    if (keyOf(declaration.origin) == OpticsCompanionGenerator.Key &&
-      declaration.correspondingPropertySymbol == null && declaration.body == null
-    ) {
-      buildOpticBody(declaration, declaration.name)
+    if (declaration.correspondingPropertySymbol == null && declaration.body == null) {
+      when (keyOf(declaration.origin)) {
+        OpticsCompanionGenerator.Key -> buildOpticBody(declaration, declaration.name)
+        OpticsCopyGenerator.Key -> buildCopyBody(declaration)
+      }
     }
     super.visitSimpleFunction(declaration)
+  }
+
+  /** `{ val me = this; me.copy { block(this, Source.Companion, me) } }` for a generated `@optics.copy`. */
+  private fun buildCopyBody(copyFn: IrSimpleFunction) {
+    val extReceiver = copyFn.parameters.first { it.kind == IrParameterKind.ExtensionReceiver }
+    val blockParam = copyFn.parameters.first { it.kind == IrParameterKind.Regular }
+    val sourceType = extReceiver.type
+    val source = sourceType.classOrNull?.owner ?: return
+    val companion = source.companionObject() ?: return
+    val copyType = symbols.copyClass.typeWith(sourceType)
+    val unit = ctx.irBuiltIns.unitType
+    val function3Invoke = ctx.irBuiltIns.functionN(3).functions.first { it.name.asString() == "invoke" }.symbol
+
+    copyFn.body = DeclarationIrBuilder(ctx, copyFn.symbol).irBlockBody {
+      val lambda = ctx.buildLambda(copyFn, listOf(copyType), unit) { (copyReceiver) ->
+        val invoke = irCall(function3Invoke, unit)
+        invoke.setDispatch(irGet(blockParam))
+        invoke.setRegular(0, irGet(copyReceiver))
+        invoke.setRegular(1, irGetObjectValue(companion.defaultType, companion.symbol))
+        invoke.setRegular(2, irGet(extReceiver))
+        +invoke
+      }
+      val call = irCall(symbols.arrowOpticsCopy, sourceType, listOf(sourceType))
+      call.setExtension(irGet(extReceiver))
+      call.setRegular(0, lambda)
+      +irReturn(call)
+    }
   }
 
   private fun keyOf(origin: IrDeclarationOrigin): GeneratedDeclarationKey? =

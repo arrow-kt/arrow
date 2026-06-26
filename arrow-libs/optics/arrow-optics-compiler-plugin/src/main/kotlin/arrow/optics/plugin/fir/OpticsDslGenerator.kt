@@ -45,11 +45,11 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
 
   private val DSL_S = Name.identifier("__S")
 
-  /** Monomorphic `@optics`-annotated source classes. */
+  /** Monomorphic `@optics`-annotated source classes for which the DSL target is enabled. */
   private fun annotatedSources(): List<FirRegularClassSymbol> =
     session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
       .filterIsInstance<FirRegularClassSymbol>()
-      .filter { it.typeParameterSymbols.isEmpty() }
+      .filter { it.typeParameterSymbols.isEmpty() && FirOpticsExtractor.dslEnabled(it, session) }
 
   override fun getTopLevelCallableIds(): Set<CallableId> = buildSet {
     annotatedSources().forEach { source ->

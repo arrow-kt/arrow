@@ -130,28 +130,50 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     if (source.typeParameterSymbols.isEmpty()) return emptyList() // monomorphic -> property form
     val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
     val vis = mostRestrictive(source.visibility, owner.visibility)
-    val sourceTypeParams = source.typeParameterSymbols
-    val function = createMemberFunction(
-      owner,
-      Key,
-      callableId.callableName,
-      returnTypeProvider = { functionTypeParameters ->
-        val funCones: List<ConeKotlinType> = functionTypeParameters.map {
-          ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false)
-        }
-        val substitutor = substitutorByMap(sourceTypeParams.zip(funCones).toMap(), session)
-        val substFocus = substitutor.substituteOrSelf(focus.focusType)
-        val sourceType = source.constructType(funCones.toTypedArray(), false)
-        polyClassOf(focus.kind).constructClassLikeType(
-          arrayOf(sourceType, sourceType, substFocus, substFocus),
-        )
-      },
-    ) {
-      sourceTypeParams.forEach { tp -> typeParameter(tp.name) }
-      visibility = vis
+
+    // A PRISM on a generic parent quantifies over the *subclass's* type parameters and uses the
+    // subclass's refined supertype as its source (algo §6). Lenses/isos mirror the parent's parameters.
+    val function = if (focus.kind == OpticKind.PRISM) {
+      val subParams = focus.subclass?.typeParameterSymbols.orEmpty()
+      createMemberFunction(
+        owner, Key, callableId.callableName,
+        returnTypeProvider = { functionTypeParameters ->
+          val funCones = functionTypeParameters.coneTypes()
+          val substitutor = substitutorByMap(subParams.zip(funCones).toMap(), session)
+          val sourceType = focus.refinedSource?.let { substitutor.substituteOrSelf(it) }
+            ?: source.constructType(emptyArray(), false)
+          val focusType = focus.subclass?.constructType(funCones.toTypedArray(), false) ?: focus.focusType
+          polyClassOf(focus.kind).constructClassLikeType(
+            arrayOf(sourceType, sourceType, focusType, focusType),
+          )
+        },
+      ) {
+        subParams.forEach { tp -> typeParameter(tp.name) }
+        visibility = vis
+      }
+    } else {
+      val sourceTypeParams = source.typeParameterSymbols
+      createMemberFunction(
+        owner, Key, callableId.callableName,
+        returnTypeProvider = { functionTypeParameters ->
+          val funCones = functionTypeParameters.coneTypes()
+          val substitutor = substitutorByMap(sourceTypeParams.zip(funCones).toMap(), session)
+          val substFocus = substitutor.substituteOrSelf(focus.focusType)
+          val sourceType = source.constructType(funCones.toTypedArray(), false)
+          polyClassOf(focus.kind).constructClassLikeType(
+            arrayOf(sourceType, sourceType, substFocus, substFocus),
+          )
+        },
+      ) {
+        sourceTypeParams.forEach { tp -> typeParameter(tp.name) }
+        visibility = vis
+      }
     }
     return listOf(function.symbol)
   }
+
+  private fun List<org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> =
+    map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
 
   override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
     val owner = context.owner

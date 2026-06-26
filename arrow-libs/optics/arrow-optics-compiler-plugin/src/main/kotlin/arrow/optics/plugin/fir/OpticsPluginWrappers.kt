@@ -36,5 +36,6 @@ class OpticsPluginRegistrar : FirExtensionRegistrar() {
   override fun ExtensionRegistrarContext.configurePlugin() {
     +::OpticsCompanionGenerator
     +::OpticsDslGenerator
+    +::OpticsCopyGenerator
   }
 }
