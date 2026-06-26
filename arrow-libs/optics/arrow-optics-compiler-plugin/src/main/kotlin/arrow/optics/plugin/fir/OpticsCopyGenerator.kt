@@ -81,7 +81,7 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
         ) {
           extensionReceiverType(sourceType)
           valueParameter(Name.identifier("block"), blockType)
-          visibility = source.visibility
+          visibility = FirOpticsExtractor.effectiveVisibility(source, session)
         }
         function.symbol
       }

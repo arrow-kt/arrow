@@ -54,37 +54,48 @@ class OpticsIrGenerationExtension : IrGenerationExtension {
   }
 }
 
-/** Resolved references to the `arrow.optics` API used inside generated bodies. */
-class OpticsIrSymbols(ctx: IrPluginContext) {
-  val lensInvoke: IrSimpleFunctionSymbol =
+/**
+ * Resolved references to the `arrow.optics` API used inside generated bodies.
+ *
+ * Everything is resolved lazily: the symbols are only looked up the first time a generated optic
+ * body is actually built, so applying the plugin to a module that does not depend on `arrow-optics`
+ * (and therefore generates nothing) never forces resolution and never crashes (review §2.5).
+ */
+class OpticsIrSymbols(private val ctx: IrPluginContext) {
+  val lensInvoke: IrSimpleFunctionSymbol by lazy {
     ctx.referenceFunctions(OpticsNames.LENS_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
-  val isoInvoke: IrSimpleFunctionSymbol =
+  }
+  val isoInvoke: IrSimpleFunctionSymbol by lazy {
     ctx.referenceFunctions(OpticsNames.ISO_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
-  val prismInstanceOf: IrSimpleFunctionSymbol =
+  }
+  val prismInstanceOf: IrSimpleFunctionSymbol by lazy {
     ctx.referenceFunctions(OpticsNames.PRISM_INSTANCE_OF).first { it.owner.parameters.none { p -> p.kind == IrParameterKind.Regular } }
-  val plens: IrClassSymbol = ctx.referenceClass(OpticsNames.PLENS)!!
-  val piso: IrClassSymbol = ctx.referenceClass(OpticsNames.PISO)!!
-  val pprism: IrClassSymbol = ctx.referenceClass(OpticsNames.PPRISM)!!
-  val plensCompanion: IrClassSymbol = ctx.referenceClass(OpticsNames.PLENS_COMPANION)!!
-  val pisoCompanion: IrClassSymbol = ctx.referenceClass(OpticsNames.PISO_COMPANION)!!
-  val pprismCompanion: IrClassSymbol = ctx.referenceClass(OpticsNames.PPRISM_COMPANION)!!
+  }
+  val plens: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PLENS)!! }
+  val piso: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PISO)!! }
+  val pprism: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PPRISM)!! }
+  val plensCompanion: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PLENS_COMPANION)!! }
+  val pisoCompanion: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PISO_COMPANION)!! }
+  val pprismCompanion: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.PPRISM_COMPANION)!! }
 
   /** For each optic poly-interface, its `plus` composition operator (keyed by the receiver class). */
-  val polyPlus: Map<IrClassSymbol, IrSimpleFunctionSymbol> =
+  val polyPlus: Map<IrClassSymbol, IrSimpleFunctionSymbol> by lazy {
     arrow.optics.plugin.DslKind.entries.associate { kind ->
       val cls = ctx.referenceClass(OpticsNames.polyClassFor(kind))!!
       val plus = ctx.referenceFunctions(OpticsNames.plusFor(kind))
         .first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 1 }
       cls to plus
     }
+  }
 
   // COPY builder support.
-  val copyClass: IrClassSymbol = ctx.referenceClass(OpticsNames.COPY)!!
-  val arrowOpticsCopy: IrSimpleFunctionSymbol =
+  val copyClass: IrClassSymbol by lazy { ctx.referenceClass(OpticsNames.COPY)!! }
+  val arrowOpticsCopy: IrSimpleFunctionSymbol by lazy {
     ctx.referenceFunctions(OpticsNames.ARROW_OPTICS_COPY).first { fn ->
       fn.owner.parameters.any { it.kind == IrParameterKind.ExtensionReceiver } &&
         fn.owner.parameters.count { it.kind == IrParameterKind.Regular } == 1
     }
+  }
 }
 
 private enum class IrOpticKind { LENS, ISO, PRISM }
@@ -227,7 +238,7 @@ private class OpticsBodyGenerator(
       val body = if (source.modality == Modality.SEALED) {
         sealedSet(source, sourceType, fieldName, s, v)
       } else {
-        reconstruct(source, ctorTypeArgs, irGet(s), fieldName, irGet(v))
+        reconstruct(source, ctorTypeArgs, { irGet(s) }, fieldName) { irGet(v) }
       }
       +irReturn(body)
     }
@@ -249,10 +260,10 @@ private class OpticsBodyGenerator(
     val branches = source.sealedSubclasses.map { subSymbol ->
       val sub = subSymbol.owner
       val subType = sub.defaultType
-      val cast = irImplicitCast(irGet(instance), subType)
       irBranch(
         irIs(irGet(instance), subType),
-        reconstruct(sub, emptyList(), cast, fieldName, irGet(value)),
+        // A fresh `instance as Sub` is built for every field read, so no IR node is shared.
+        reconstruct(sub, emptyList(), { irImplicitCast(irGet(instance), subType) }, fieldName) { irGet(value) },
       )
     } + irElseBranch(irCall(ctx.irBuiltIns.noWhenBranchMatchedExceptionSymbol))
     return irWhen(sourceType, branches)
@@ -270,7 +281,7 @@ private class OpticsBodyGenerator(
       +irReturn(readComponent(source, fieldName, focusType, irGet(s)))
     }
     val reverseGetLambda = ctx.buildLambda(opticFn, listOf(focusType), sourceType) { (v) ->
-      +irReturn(reconstruct(source, ctorTypeArgs, irGet(v), fieldName, irGet(v)))
+      +irReturn(reconstruct(source, ctorTypeArgs, { irGet(v) }, fieldName) { irGet(v) })
     }
     val call = irCall(symbols.isoInvoke, opticFn.returnType, listOf(sourceType, sourceType, focusType, focusType))
     call.setDispatch(irGetObjectValue(symbols.pisoCompanion.owner.defaultType, symbols.pisoCompanion))
@@ -279,7 +290,7 @@ private class OpticsBodyGenerator(
     return call
   }
 
-  /** `instance.field` via the property getter. */
+  /** `instance.field` via the property getter; [instance] must produce a fresh expression. */
   private fun IrBuilderWithScope.readComponent(
     source: IrClass,
     fieldName: Name,
@@ -292,21 +303,26 @@ private class OpticsBodyGenerator(
     return call
   }
 
-  /** Reconstruct [source] via its primary constructor, replacing [overrideName] with [overrideValue]. */
+  /**
+   * Reconstruct [source] via its primary constructor, replacing [overrideName] with [overrideValue].
+   * [instance] and [overrideValue] are *factories* that must produce a fresh IR node on every call, so
+   * that reading several sibling components never shares the same IR node (which would break IR
+   * invariants — see review §2.1).
+   */
   private fun IrBuilderWithScope.reconstruct(
     source: IrClass,
     ctorTypeArgs: List<IrType>,
-    instance: IrExpression,
+    instance: () -> IrExpression,
     overrideName: Name,
-    overrideValue: IrExpression,
+    overrideValue: () -> IrExpression,
   ): IrExpression {
     val ctor = source.primaryConstructor!!
     val call = irCallConstructor(ctor.symbol, ctorTypeArgs)
     ctor.parameters.filter { it.kind == IrParameterKind.Regular }.forEach { param ->
       val arg = if (param.name == overrideName) {
-        overrideValue
+        overrideValue()
       } else {
-        readComponent(source, param.name, param.type, instance)
+        readComponent(source, param.name, param.type, instance())
       }
       call.arguments[param] = arg
     }

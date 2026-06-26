@@ -19,6 +19,15 @@ Implemented end-to-end (FIR signature generation **as companion members** + IR b
 
 Key infrastructure: companion-member generation + target selection + generic PRISM (`OpticsCompanionGenerator`, `FirOpticsExtractor`), top-level DSL extensions (`OpticsDslGenerator`), the `@optics.copy` builder (`OpticsCopyGenerator`), the IR body generator (`OpticsIrGenerationExtension` + `OpticsIrHelpers`), and the shared model (`OpticsModel`, `OpticsNames`). Both FIR and IR phases are wired in `OpticsPluginWrappers`.
 
+**Review-driven hardening (see `arrow-optics-impl-review1.md`):**
+- IR body builders no longer share IR nodes — `reconstruct`/`sealedSet` take fresh-expression factories, so multi-field reconstruction (and the sealed `when`-`set`) is valid IR.
+- `OpticsIrSymbols` resolves every `arrow.optics` reference lazily, so applying the plugin to a module without `arrow-optics` never forces resolution / crashes.
+- Visibility folds `mostRestrictive` over the source **and all enclosing classifiers** (§3.3), and that result is used for the top-level DSL/copy extensions too.
+- The §5.2 uniformity check compares full resolved types (classifier + nullability + type arguments), not just the classifier.
+- Sealed types emit DSL helpers only for their prisms (§8.4); their shared-property lenses get no DSL variants.
+- Target parsing reads the **raw** annotation arguments, so `@optics([...])` is honoured regardless of the resolution phase at which generation runs.
+- Tests now **execute** the generated bodies for every optic kind (`RuntimeTests`: lens get/set/modify + laws, iso round-trips, prism `getOrNull` both branches incl. generic, sealed shared-property lens across subclasses with extra fields, generic lens with a heterogeneous sibling, nullable + `notNull`) and cover target selection / ineligible classes (`TargetTests`).
+
 **Intentional differences from the KSP processor / known limitations:**
 - **Missing companion is *not* an error.** The compiler plugin auto-generates the companion object when absent (it can, unlike the KSP processor), so the "must declare a companion object" diagnostic no longer applies; the corresponding `IsoTests` case was updated to expect success.
 - **No custom §12 diagnostics.** Ineligible classes / non-uniform sealed properties silently generate no optics, so use sites fail to resolve (same observable outcome as the KSP "informational note" cases that the ported `compilationFails()` tests assert).

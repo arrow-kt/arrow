@@ -6,8 +6,10 @@ import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.OpticsTargetKind
 import arrow.optics.plugin.computeTargets
 import arrow.optics.plugin.lowercaseFirst
+import arrow.optics.plugin.mostRestrictive
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
@@ -15,6 +17,7 @@ import org.jetbrains.kotlin.fir.declarations.getSealedClassInheritors
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
+import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 import org.jetbrains.kotlin.fir.declarations.utils.isAbstract
@@ -22,6 +25,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.isData
 import org.jetbrains.kotlin.fir.declarations.utils.isInlineOrValue
 import org.jetbrains.kotlin.fir.declarations.utils.modality
 import org.jetbrains.kotlin.fir.declarations.utils.isSealed
+import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
@@ -32,6 +36,7 @@ import org.jetbrains.kotlin.fir.types.ConeTypeProjection
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.constructType
 import org.jetbrains.kotlin.fir.types.isMarkedNullable
+import org.jetbrains.kotlin.fir.types.type
 import org.jetbrains.kotlin.name.Name
 
 /** A single base-optic focus discovered on the source class, as seen from FIR. */
@@ -88,13 +93,20 @@ object FirOpticsExtractor {
     return computeTargets(classKind(symbol), requested, hasCopy)
   }
 
-  /** Parse the `targets` array of `@optics(...)`, collecting the referenced [OpticsTargetKind]s. */
+  /**
+   * Parse the `targets` array of `@optics(...)`, collecting the referenced [OpticsTargetKind]s.
+   *
+   * We walk the *raw* annotation argument expressions (only the annotation's class id is forced to
+   * resolve) and read the referenced enum-entry names. This is robust to the resolution phase at
+   * which generation runs — relying on `resolvedAnnotationsWithArguments.argumentMapping` is not, as
+   * the argument mapping may not yet be populated when `getCallableNamesForClass` runs (review §2.6).
+   */
   private fun requestedTargets(symbol: FirRegularClassSymbol, session: FirSession): Set<OpticsTargetKind> {
-    val annotation = symbol.resolvedAnnotationsWithArguments
-      .firstOrNull { it.toAnnotationClassId(session) == OpticsNames.OPTICS_ANNOTATION } ?: return emptySet()
-    val targetsExpr = annotation.argumentMapping.mapping[Name.identifier("targets")] ?: return emptySet()
+    val annotation = symbol.resolvedAnnotationsWithClassIds
+      .firstOrNull { it.toAnnotationClassId(session) == OpticsNames.OPTICS_ANNOTATION }
+      as? FirAnnotationCall ?: return emptySet()
     val found = mutableSetOf<OpticsTargetKind>()
-    targetsExpr.acceptChildren(object : FirVisitorVoid() {
+    val collector = object : FirVisitorVoid() {
       override fun visitElement(element: FirElement) {
         element.acceptChildren(this)
       }
@@ -109,7 +121,8 @@ object FirOpticsExtractor {
         }
         propertyAccessExpression.acceptChildren(this)
       }
-    })
+    }
+    annotation.argumentList.arguments.forEach { it.accept(collector, null) }
     return found
   }
 
@@ -147,9 +160,39 @@ object FirOpticsExtractor {
     }
   }
 
-  /** Structural type equality sufficient for uniformity checks (classifier + nullability). */
-  private fun sameType(a: ConeKotlinType, b: ConeKotlinType): Boolean =
-    a.classId == b.classId && a.isMarkedNullable == b.isMarkedNullable
+  /**
+   * Structural type equality for the §5.2 uniformity check: classifier, nullability, and (recursively)
+   * the type arguments together with their projection kind, so e.g. `List<String>` and `List<Int>`
+   * are *not* considered uniform.
+   */
+  private fun sameType(a: ConeKotlinType, b: ConeKotlinType): Boolean {
+    if (a.classId != b.classId || a.isMarkedNullable != b.isMarkedNullable) return false
+    val aArgs = a.typeArguments
+    val bArgs = b.typeArguments
+    if (aArgs.size != bArgs.size) return false
+    return aArgs.indices.all { i ->
+      val at = aArgs[i].type
+      val bt = bArgs[i].type
+      if (at == null || bt == null) aArgs[i].kind == bArgs[i].kind // star projections
+      else aArgs[i].kind == bArgs[i].kind && sameType(at, bt)
+    }
+  }
+
+  /**
+   * The most-restrictive visibility of [symbol] and all of its enclosing classifiers (algo §3.3).
+   * Used directly for the top-level DSL/copy extensions, and combined with the companion's own
+   * visibility for the base companion members.
+   */
+  fun effectiveVisibility(symbol: FirRegularClassSymbol, session: FirSession): Visibility {
+    var result: Visibility = symbol.visibility
+    var outerId = symbol.classId.outerClassId
+    while (outerId != null) {
+      val outer = session.symbolProvider.getClassLikeSymbolByClassId(outerId) as? FirRegularClassSymbol
+      if (outer != null) result = mostRestrictive(result, outer.visibility)
+      outerId = outerId.outerClassId
+    }
+    return result
+  }
 
   /** One PRISM focus per sealed subclass (algo §6). */
   private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {

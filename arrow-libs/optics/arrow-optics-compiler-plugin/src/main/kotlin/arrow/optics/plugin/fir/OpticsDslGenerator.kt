@@ -1,5 +1,7 @@
 package arrow.optics.plugin.fir
 
+import arrow.optics.plugin.OpticKind
+import arrow.optics.plugin.OpticsClassKind
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.dslVariantsFor
 import org.jetbrains.kotlin.GeneratedDeclarationKey
@@ -51,10 +53,20 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
       .filterIsInstance<FirRegularClassSymbol>()
       .filter { it.typeParameterSymbols.isEmpty() && FirOpticsExtractor.dslEnabled(it, session) }
 
+  /**
+   * The foci that get DSL composition helpers. Per algo §8.4 a sealed type contributes only its
+   * prism family — its shared-property lenses (§5.2) do *not* get DSL variants.
+   */
+  private fun dslFoci(source: FirRegularClassSymbol): List<FirFocus> {
+    val isSealed = FirOpticsExtractor.classKind(source) == OpticsClassKind.SEALED
+    return FirOpticsExtractor.foci(source, session)
+      .filter { !(isSealed && it.kind == OpticKind.LENS) }
+  }
+
   override fun getTopLevelCallableIds(): Set<CallableId> = buildSet {
     annotatedSources().forEach { source ->
       val pkg = source.classId.packageFqName
-      FirOpticsExtractor.foci(source, session).forEach { add(CallableId(pkg, it.opticName)) }
+      dslFoci(source).forEach { add(CallableId(pkg, it.opticName)) }
     }
   }
 
@@ -68,7 +80,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
       if (source.classId.packageFqName != callableId.packageName) return@forEach
       val sourceType = source.constructType(emptyArray(), false)
       val fileName = "${source.classId.shortClassName.asString()}Optics"
-      FirOpticsExtractor.foci(source, session)
+      dslFoci(source)
         .filter { it.opticName == callableId.callableName }
         .forEach { focus ->
           dslVariantsFor(focus.kind).forEach { dslKind ->
@@ -89,7 +101,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
                 val s = sCone(tps)
                 poly.constructClassLikeType(arrayOf(s, s, sourceType, sourceType))
               }
-              visibility = source.visibility
+              visibility = FirOpticsExtractor.effectiveVisibility(source, session)
             }
             result += property.symbol
           }

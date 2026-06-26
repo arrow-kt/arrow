@@ -4,6 +4,7 @@ import arrow.optics.plugin.OpticKind
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.mostRestrictive
 import org.jetbrains.kotlin.GeneratedDeclarationKey
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
 import org.jetbrains.kotlin.fir.plugin.createMemberFunction
 import org.jetbrains.kotlin.fir.plugin.createMemberProperty
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
+import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -29,6 +31,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.types.constructType
@@ -54,6 +57,11 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
   }
 
   // ---- companion object creation (for classes that lack one) -------------------------
+
+  // NOTE: the companion-object phase runs before declaration *status* is resolved, so eligibility
+  // (which inspects `modality`/`isSealed`) cannot be checked here without crashing the compiler.
+  // Ineligible classes are therefore filtered later, during member generation (`foci` returns none),
+  // so they simply receive no optics — see `TargetTests."ineligible class generates no optics"`.
 
   override fun getNestedClassifiersNames(classSymbol: FirClassSymbol<*>, context: NestedClassGenerationContext): Set<Name> {
     if (classSymbol !is FirRegularClassSymbol) return emptySet()
@@ -117,7 +125,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     val opticType = polyClassOf(focus.kind).constructClassLikeType(
       arrayOf(sourceType, sourceType, focus.focusType, focus.focusType),
     )
-    val vis = mostRestrictive(source.visibility, owner.visibility)
+    val vis = mostRestrictive(FirOpticsExtractor.effectiveVisibility(source, session), owner.visibility)
     val property = createMemberProperty(owner, Key, callableId.callableName, opticType, isVal = true, hasBackingField = false) {
       visibility = vis
     }
@@ -129,47 +137,48 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     val source = sourceClassOf(owner) ?: return emptyList()
     if (source.typeParameterSymbols.isEmpty()) return emptyList() // monomorphic -> property form
     val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
-    val vis = mostRestrictive(source.visibility, owner.visibility)
+    val vis = mostRestrictive(FirOpticsExtractor.effectiveVisibility(source, session), owner.visibility)
 
     // A PRISM on a generic parent quantifies over the *subclass's* type parameters and uses the
     // subclass's refined supertype as its source (algo §6). Lenses/isos mirror the parent's parameters.
     val function = if (focus.kind == OpticKind.PRISM) {
-      val subParams = focus.subclass?.typeParameterSymbols.orEmpty()
-      createMemberFunction(
-        owner, Key, callableId.callableName,
-        returnTypeProvider = { functionTypeParameters ->
-          val funCones = functionTypeParameters.coneTypes()
-          val substitutor = substitutorByMap(subParams.zip(funCones).toMap(), session)
-          val sourceType = focus.refinedSource?.let { substitutor.substituteOrSelf(it) }
-            ?: source.constructType(emptyArray(), false)
-          val focusType = focus.subclass?.constructType(funCones.toTypedArray(), false) ?: focus.focusType
-          polyClassOf(focus.kind).constructClassLikeType(
-            arrayOf(sourceType, sourceType, focusType, focusType),
-          )
-        },
-      ) {
-        subParams.forEach { tp -> typeParameter(tp.name) }
-        visibility = vis
+      opticFunction(owner, callableId, focus.kind, vis, focus.subclass?.typeParameterSymbols.orEmpty()) { substitutor, funCones ->
+        val sourceType = focus.refinedSource?.let { substitutor.substituteOrSelf(it) }
+          ?: source.constructType(emptyArray(), false)
+        val focusType = focus.subclass?.constructType(funCones.toTypedArray(), false) ?: focus.focusType
+        sourceType to focusType
       }
     } else {
-      val sourceTypeParams = source.typeParameterSymbols
-      createMemberFunction(
-        owner, Key, callableId.callableName,
-        returnTypeProvider = { functionTypeParameters ->
-          val funCones = functionTypeParameters.coneTypes()
-          val substitutor = substitutorByMap(sourceTypeParams.zip(funCones).toMap(), session)
-          val substFocus = substitutor.substituteOrSelf(focus.focusType)
-          val sourceType = source.constructType(funCones.toTypedArray(), false)
-          polyClassOf(focus.kind).constructClassLikeType(
-            arrayOf(sourceType, sourceType, substFocus, substFocus),
-          )
-        },
-      ) {
-        sourceTypeParams.forEach { tp -> typeParameter(tp.name) }
-        visibility = vis
+      opticFunction(owner, callableId, focus.kind, vis, source.typeParameterSymbols) { substitutor, funCones ->
+        source.constructType(funCones.toTypedArray(), false) to substitutor.substituteOrSelf(focus.focusType)
       }
     }
     return listOf(function.symbol)
+  }
+
+  /**
+   * Build a generic base-optic function quantified over [typeParams]. [sourceAndFocus] receives a
+   * substitutor mapping the declared parameters to the function's freshly-introduced ones plus those
+   * fresh cone types, and returns the `(source, focus)` pair used as `Poly<source, source, focus, focus>`.
+   */
+  private fun opticFunction(
+    owner: FirClassSymbol<*>,
+    callableId: CallableId,
+    kind: OpticKind,
+    vis: Visibility,
+    typeParams: List<FirTypeParameterSymbol>,
+    sourceAndFocus: (ConeSubstitutor, List<ConeKotlinType>) -> Pair<ConeKotlinType, ConeKotlinType>,
+  ) = createMemberFunction(
+    owner, Key, callableId.callableName,
+    returnTypeProvider = { functionTypeParameters ->
+      val funCones = functionTypeParameters.coneTypes()
+      val substitutor = substitutorByMap(typeParams.zip(funCones).toMap(), session)
+      val (sourceType, focusType) = sourceAndFocus(substitutor, funCones)
+      polyClassOf(kind).constructClassLikeType(arrayOf(sourceType, sourceType, focusType, focusType))
+    },
+  ) {
+    typeParams.forEach { tp -> typeParameter(tp.name) }
+    visibility = vis
   }
 
   private fun List<org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> =

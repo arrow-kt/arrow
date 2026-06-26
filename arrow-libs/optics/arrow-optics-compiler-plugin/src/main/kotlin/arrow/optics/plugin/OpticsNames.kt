@@ -17,18 +17,9 @@ object OpticsNames {
   val OPTICS_ANNOTATION_FQNAME: FqName = OPTICS_ANNOTATION.asSingleFqName()
   val OPTICS_COPY_ANNOTATION =
     OPTICS_ANNOTATION.createNestedClassId(Name.identifier("copy"))
-  val OPTICS_COPY_ANNOTATION_FQNAME: FqName = OPTICS_COPY_ANNOTATION.asSingleFqName()
 
-  val OPTICS_TARGET = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("OpticsTarget"))
-
-  // Optic type aliases (the user-facing names, 2 type arguments each).
-  val LENS = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Lens"))
-  val ISO = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Iso"))
-  val PRISM = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Prism"))
-  val OPTIONAL = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Optional"))
-  val TRAVERSAL = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Traversal"))
-
-  // Underlying poly interfaces (these carry the companion objects with the factories).
+  // Underlying poly interfaces (these carry the companion objects with the factories, and the
+  // generated optic types use them directly — the `Lens`/`Iso`/… type-aliases are never referenced).
   val PLENS = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PLens"))
   val PISO = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PIso"))
   val PPRISM = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PPrism"))
