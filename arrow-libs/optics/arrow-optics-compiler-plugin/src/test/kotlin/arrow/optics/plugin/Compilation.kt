@@ -1,0 +1,138 @@
+@file:OptIn(ExperimentalCompilerApi::class)
+
+package arrow.optics.plugin
+
+import arrow.optics.plugin.fir.OpticsPluginComponentRegistrar
+import com.tschuchort.compiletesting.CompilationResult
+import com.tschuchort.compiletesting.KotlinCompilation
+import com.tschuchort.compiletesting.SourceFile
+import io.github.classgraph.ClassGraph
+import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import org.jetbrains.kotlin.config.JvmTarget
+import java.io.File
+import java.net.URLClassLoader
+import java.nio.file.Files
+import java.nio.file.Paths
+
+val arrowVersion: String? = System.getProperty("arrowVersion")
+const val SOURCE_FILENAME = "Source.kt"
+const val CLASS_FILENAME = "SourceKt"
+
+fun String.failsWith(check: (String) -> Boolean) {
+  val compilationResult = compile(this)
+  compilationResult.exitCode shouldNotBe KotlinCompilation.ExitCode.OK
+  check(compilationResult.messages).shouldBeTrue()
+}
+
+fun String.compilationFails() {
+  val compilationResult = compile(this)
+  compilationResult.exitCode shouldNotBe KotlinCompilation.ExitCode.OK
+}
+
+fun String.compilationSucceeds(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+) {
+  compilationSucceeds(allWarningsAsErrors, contextParameters, SourceFile.kotlin(SOURCE_FILENAME, this.trimMargin()))
+}
+
+fun compilationSucceeds(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+  vararg sources: SourceFile,
+) {
+  val compilationResult = compile(allWarningsAsErrors, contextParameters, *sources)
+  compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
+}
+
+fun String.evals(thing: Pair<String, Any?>, contextParameters: Boolean = false) {
+  val compilationResult = compile(this, contextParameters = contextParameters)
+  compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
+  val classesDirectory = compilationResult.outputDirectory
+  val (variable, output) = thing
+  eval(variable, classesDirectory) shouldBe output
+}
+
+internal fun compile(
+  text: String,
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+): CompilationResult = compile(allWarningsAsErrors, contextParameters, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+
+internal fun compile(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+  vararg sources: SourceFile,
+): CompilationResult = buildCompilation(allWarningsAsErrors, contextParameters, *sources).compile()
+
+fun buildCompilation(
+  allWarningsAsErrors: Boolean = false,
+  contextParameters: Boolean = false,
+  vararg sources: SourceFile,
+) = KotlinCompilation().apply {
+  this.jvmTarget = JvmTarget.JVM_1_8.description
+  this.classpaths = listOf(
+    "arrow-annotations:$arrowVersion",
+    "arrow-core:$arrowVersion",
+    "arrow-optics:$arrowVersion",
+  ).map { classpathOf(it) }
+  this.sources = sources.toList()
+  this.verbose = false
+  this.allWarningsAsErrors = allWarningsAsErrors
+  this.compilerPluginRegistrars = listOf(OpticsPluginComponentRegistrar())
+  if (contextParameters) {
+    this.kotlincArguments = listOf("-Xcontext-parameters")
+  }
+}
+
+private fun classpathOf(dependency: String): File {
+  val file =
+    ClassGraph().classpathFiles.firstOrNull { classpath ->
+      dependenciesMatch(classpath, dependency)
+    }
+  if (file == null) {
+    fail("$dependency not found in test runtime. Check your build configuration.")
+  }
+  return file
+}
+
+private fun dependenciesMatch(classpath: File, dependency: String): Boolean {
+  val dep = classpath.name
+  val dependencyName = sanitizeClassPathFileName(dep)
+  val testdep = dependency.substringBefore(":")
+  return testdep == dependencyName
+}
+
+private fun sanitizeClassPathFileName(dep: String): String = buildList {
+  var skip = false
+  add(dep.first())
+  val _ = dep.reduce { a, b ->
+    if (a == '-' && b.isDigit()) skip = true
+    if (!skip) add(b)
+    b
+  }
+  if (skip) removeLast()
+}
+  .joinToString("")
+  .replace("-jvm.jar", "")
+  .replace("-jvm", "")
+
+private fun eval(expression: String, classesDirectory: File): Any? {
+  val classLoader = URLClassLoader(arrayOf(classesDirectory.toURI().toURL()))
+  val fullClassName = getFullClassName(classesDirectory)
+  val field = classLoader.loadClass(fullClassName).getDeclaredField(expression)
+  field.isAccessible = true
+  return field.get(Any())
+}
+
+private fun getFullClassName(classesDirectory: File): String = Files.walk(Paths.get(classesDirectory.toURI()))
+  .filter { it.toFile().name == "$CLASS_FILENAME.class" }
+  .toArray()[0]
+  .toString()
+  .removePrefix(classesDirectory.absolutePath + File.separator)
+  .removeSuffix(".class")
+  .replace(File.separator, ".")

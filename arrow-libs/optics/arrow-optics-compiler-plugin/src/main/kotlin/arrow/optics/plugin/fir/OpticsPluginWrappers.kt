@@ -1,5 +1,7 @@
 package arrow.optics.plugin.fir
 
+import arrow.optics.plugin.ir.OpticsIrGenerationExtension
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -26,11 +28,13 @@ class OpticsPluginComponentRegistrar : CompilerPluginRegistrar() {
 
   override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
     FirExtensionRegistrarAdapter.registerExtension(OpticsPluginRegistrar())
+    IrGenerationExtension.registerExtension(OpticsIrGenerationExtension())
   }
 }
 
 class OpticsPluginRegistrar : FirExtensionRegistrar() {
   override fun ExtensionRegistrarContext.configurePlugin() {
     +::OpticsCompanionGenerator
+    +::OpticsDslGenerator
   }
 }

@@ -1,10 +1,14 @@
 package arrow.optics.plugin.fir
 
+import arrow.optics.plugin.OpticKind
+import arrow.optics.plugin.OpticsNames
+import arrow.optics.plugin.mostRestrictive
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
 import org.jetbrains.kotlin.fir.declarations.utils.isCompanion
+import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
@@ -13,12 +17,23 @@ import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.plugin.createCompanionObject
 import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
+import org.jetbrains.kotlin.fir.plugin.createMemberFunction
+import org.jetbrains.kotlin.fir.plugin.createMemberProperty
+import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
+import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
+import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
-import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.constructClassLikeType
+import org.jetbrains.kotlin.fir.types.constructType
+import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import kotlin.contracts.ExperimentalContracts
@@ -27,7 +42,7 @@ import kotlin.contracts.contract
 @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class, ExperimentalContracts::class)
 class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
   companion object {
-    val OPTICS_ANNOTATION_FQNAME = FqName.fromSegments(listOf("arrow", "optics", "optics"))
+    val OPTICS_ANNOTATION_FQNAME = OpticsNames.OPTICS_ANNOTATION_FQNAME
 
     val predicate = DeclarationPredicate.create {
       annotated(setOf(OPTICS_ANNOTATION_FQNAME))
@@ -37,6 +52,8 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(predicate)
   }
+
+  // ---- companion object creation (for classes that lack one) -------------------------
 
   override fun getNestedClassifiersNames(classSymbol: FirClassSymbol<*>, context: NestedClassGenerationContext): Set<Name> {
     if (classSymbol !is FirRegularClassSymbol) return emptySet()
@@ -61,9 +78,79 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     return isCompanion && this is FirRegularClassSymbol && (origin as? FirDeclarationOrigin.Plugin)?.key == Key
   }
 
+  // ---- base optic member generation --------------------------------------------------
+
+  /** The `@optics`-annotated source class enclosing [companion], if eligible. */
+  private fun sourceClassOf(companion: FirClassSymbol<*>): FirRegularClassSymbol? {
+    if (!companion.isCompanion) return null
+    val outerId = companion.classId.outerClassId ?: return null
+    val source = session.symbolProvider.getClassLikeSymbolByClassId(outerId) as? FirRegularClassSymbol ?: return null
+    if (!session.predicateBasedProvider.matches(predicate, source)) return null
+    return source
+  }
+
+  /** Base optic foci to generate as members of [companion]. */
+  private fun fociFor(companion: FirClassSymbol<*>): List<FirFocus> {
+    val source = sourceClassOf(companion) ?: return emptyList()
+    return FirOpticsExtractor.foci(source, session)
+  }
+
+  /** The `arrow.optics` poly-interface backing a focus of the given kind. */
+  private fun polyClassOf(kind: OpticKind) = when (kind) {
+    OpticKind.LENS -> OpticsNames.PLENS
+    OpticKind.ISO -> OpticsNames.PISO
+    OpticKind.PRISM -> OpticsNames.PPRISM
+  }
+
   override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> {
-    if (!classSymbol.isGeneratedOpticsCompanion()) return emptySet()
-    return setOf(SpecialNames.INIT)
+    val names = fociFor(classSymbol).mapTo(mutableSetOf()) { it.opticName }
+    if (classSymbol.isGeneratedOpticsCompanion()) names += SpecialNames.INIT
+    return names
+  }
+
+  override fun generateProperties(callableId: CallableId, context: MemberGenerationContext?): List<FirPropertySymbol> {
+    val owner = context?.owner ?: return emptyList()
+    val source = sourceClassOf(owner) ?: return emptyList()
+    if (source.typeParameterSymbols.isNotEmpty()) return emptyList() // generic -> function form
+    val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
+    val sourceType = source.constructType(emptyArray(), false)
+    val opticType = polyClassOf(focus.kind).constructClassLikeType(
+      arrayOf(sourceType, sourceType, focus.focusType, focus.focusType),
+    )
+    val vis = mostRestrictive(source.visibility, owner.visibility)
+    val property = createMemberProperty(owner, Key, callableId.callableName, opticType, isVal = true, hasBackingField = false) {
+      visibility = vis
+    }
+    return listOf(property.symbol)
+  }
+
+  override fun generateFunctions(callableId: CallableId, context: MemberGenerationContext?): List<FirNamedFunctionSymbol> {
+    val owner = context?.owner ?: return emptyList()
+    val source = sourceClassOf(owner) ?: return emptyList()
+    if (source.typeParameterSymbols.isEmpty()) return emptyList() // monomorphic -> property form
+    val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
+    val vis = mostRestrictive(source.visibility, owner.visibility)
+    val sourceTypeParams = source.typeParameterSymbols
+    val function = createMemberFunction(
+      owner,
+      Key,
+      callableId.callableName,
+      returnTypeProvider = { functionTypeParameters ->
+        val funCones: List<ConeKotlinType> = functionTypeParameters.map {
+          ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false)
+        }
+        val substitutor = substitutorByMap(sourceTypeParams.zip(funCones).toMap(), session)
+        val substFocus = substitutor.substituteOrSelf(focus.focusType)
+        val sourceType = source.constructType(funCones.toTypedArray(), false)
+        polyClassOf(focus.kind).constructClassLikeType(
+          arrayOf(sourceType, sourceType, substFocus, substFocus),
+        )
+      },
+    ) {
+      sourceTypeParams.forEach { tp -> typeParameter(tp.name) }
+      visibility = vis
+    }
+    return listOf(function.symbol)
   }
 
   override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
