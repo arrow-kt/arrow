@@ -3,6 +3,7 @@
 ### Kotlin ###
 
 **/.kotlin
+gradle-test/**/.idea
 
 ### Android ###
 # Built application files

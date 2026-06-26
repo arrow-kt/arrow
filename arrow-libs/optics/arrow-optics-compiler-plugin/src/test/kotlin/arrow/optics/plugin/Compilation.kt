@@ -2,10 +2,10 @@
 
 package arrow.optics.plugin
 
+import arrow.optics.plugin.fir.OpticsPluginComponentRegistrar
 import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
-import com.tschuchort.compiletesting.configureKsp
 import io.github.classgraph.ClassGraph
 import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -57,9 +57,6 @@ fun String.evals(thing: Pair<String, Any?>, contextParameters: Boolean = false) 
   eval(variable, classesDirectory) shouldBe output
 }
 
-// UTILITY FUNCTIONS COPIED FROM META-TEST
-// =======================================
-
 internal fun compile(
   text: String,
   allWarningsAsErrors: Boolean = false,
@@ -86,14 +83,9 @@ fun buildCompilation(
   this.sources = sources.toList()
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
-  this.languageVersion = "2.2"
-  this.apiVersion = "2.2"
+  this.compilerPluginRegistrars = listOf(OpticsPluginComponentRegistrar())
   if (contextParameters) {
     this.kotlincArguments = listOf("-Xcontext-parameters")
-  }
-  configureKsp {
-    withCompilation = true
-    symbolProcessorProviders += OpticsProcessorProvider()
   }
 }
 
