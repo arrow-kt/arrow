@@ -25,7 +25,7 @@ kotlin {
 
 composeCompiler {
   // override the choice of Compose if we use a Kotlin -dev version
-  val kotlinVersion = project.rootProject.properties["kotlin_version"] as? String
+  val kotlinVersion = project.rootProject.findProperty("kotlin_version") as? String
   if (kotlinVersion != null && kotlinVersion.contains("-dev-")) {
     ext["suppressKotlinVersionCompatibilityCheck"] = kotlinVersion
   }
