@@ -1041,7 +1041,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     }, recover)
   }
 
-  @ExperimentalRaiseAccumulateApi
+  @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public inline fun ensureOrAccumulate(condition: Boolean, raise: () -> Error): Value<Unit> {
     contract { callsInPlace(raise, AT_MOST_ONCE) }
     return (this as Accumulate<Error>).ensureOrAccumulate(condition, raise)
@@ -1183,7 +1183,7 @@ public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumula
   }
 }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @IgnorableReturnValue
 public inline fun <Error> Accumulate<Error>.ensureOrAccumulate(condition: Boolean, raise: () -> Error): Value<Unit> {
   contract { callsInPlace(raise, AT_MOST_ONCE) }
   return if (condition) Ok(Unit) else accumulate(raise())
