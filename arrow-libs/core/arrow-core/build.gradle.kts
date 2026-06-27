@@ -8,14 +8,15 @@ plugins {
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
   sourceSets {
-    val nonJvmAndJsMain by creating { dependsOn(nonJvmMain.get()) }
-    val nonJvmAndJsTest by creating { dependsOn(nonJvmTest.get()) }
+    val nonJvmAndJsMain = create("nonJvmAndJsMain") { dependsOn(nonJvmMain.get()) }
+    val nonJvmAndJsTest = create("nonJvmAndJsTest") { dependsOn(nonJvmTest.get()) }
 
     nativeMain.get().dependsOn(nonJvmAndJsMain)
     nativeTest.get().dependsOn(nonJvmAndJsTest)
 
-    wasmJsMain.get().dependsOn(nonJvmAndJsMain)
-    wasmJsTest.get().dependsOn(nonJvmAndJsTest)
+    wasmMain.get().dependsOn(nonJvmAndJsMain)
+    wasmTest.get().dependsOn(nonJvmAndJsTest)
+    
     commonMain {
       dependencies {
         api(projects.arrowAtomic)
