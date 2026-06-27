@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalCompilerApi::class)
+
 package arrow.optics.plugin.fir
 
 import arrow.optics.plugin.ir.OpticsIrGenerationExtension

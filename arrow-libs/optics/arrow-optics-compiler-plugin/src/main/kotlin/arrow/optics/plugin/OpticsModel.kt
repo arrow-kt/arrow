@@ -65,9 +65,13 @@ fun lowercaseFirst(name: Name): Name {
  */
 fun mostRestrictive(a: Visibility, b: Visibility): Visibility = when {
   a == Visibilities.Public -> b
+
   b == Visibilities.Public -> a
+
   a == Visibilities.Private || b == Visibilities.Private -> Visibilities.Private
+
   a == b -> a
+
   // mixing internal and protected
   else -> Visibilities.Private
 }

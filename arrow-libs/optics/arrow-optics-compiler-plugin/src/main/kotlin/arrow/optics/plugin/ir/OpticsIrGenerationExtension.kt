@@ -1,14 +1,15 @@
 @file:OptIn(UnsafeDuringIrConstructionAPI::class)
+
 package arrow.optics.plugin.ir
 
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.fir.OpticsCompanionGenerator
 import arrow.optics.plugin.fir.OpticsCopyGenerator
 import arrow.optics.plugin.fir.OpticsDslGenerator
+import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
-import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
@@ -122,6 +123,7 @@ private class OpticsBodyGenerator(
           declaration.backingField = null
           buildOpticBody(getter, declaration.name)
         }
+
         OpticsDslGenerator.Key -> {
           declaration.backingField = null
           buildDslBody(getter, declaration.name)
@@ -168,8 +170,7 @@ private class OpticsBodyGenerator(
     }
   }
 
-  private fun keyOf(origin: IrDeclarationOrigin): GeneratedDeclarationKey? =
-    (origin as? IrDeclarationOrigin.GeneratedByPlugin)?.pluginKey
+  private fun keyOf(origin: IrDeclarationOrigin): GeneratedDeclarationKey? = (origin as? IrDeclarationOrigin.GeneratedByPlugin)?.pluginKey
 
   /** Fill in the body of a generated companion optic ([opticFn] is the property getter or the standalone function). */
   private fun buildOpticBody(opticFn: IrSimpleFunction, opticName: Name) {

@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.name.Name
  */
 @OptIn(ExperimentalTopLevelDeclarationsGenerationApi::class)
 class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
+  object Key : GeneratedDeclarationKey()
 
   private val lookupPredicate = LookupPredicate.create {
     annotated(setOf(OpticsNames.OPTICS_ANNOTATION_FQNAME))
@@ -42,19 +43,15 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
     register(declarationPredicate)
   }
 
-  private val COPY_NAME = Name.identifier("copy")
-  private val FUNCTION3 = ClassId(FqName("kotlin"), Name.identifier("Function3"))
+  private fun copySources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
+    .filterIsInstance<FirRegularClassSymbol>()
+    .filter { it.typeParameterSymbols.isEmpty() && it.hasAnnotation(OpticsNames.OPTICS_COPY_ANNOTATION, session) }
 
-  private fun copySources(): List<FirRegularClassSymbol> =
-    session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
-      .filterIsInstance<FirRegularClassSymbol>()
-      .filter { it.typeParameterSymbols.isEmpty() && it.hasAnnotation(OpticsNames.OPTICS_COPY_ANNOTATION, session) }
+  override fun getTopLevelCallableIds(): Set<CallableId> = copySources().mapTo(mutableSetOf()) {
+    CallableId(it.classId.packageFqName, Name.identifier("copy"))
+  }
 
-  override fun getTopLevelCallableIds(): Set<CallableId> =
-    copySources().mapTo(mutableSetOf()) { CallableId(it.classId.packageFqName, COPY_NAME) }
-
-  override fun hasPackage(packageFqName: FqName): Boolean =
-    copySources().any { it.classId.packageFqName == packageFqName }
+  override fun hasPackage(packageFqName: FqName): Boolean = copySources().any { it.classId.packageFqName == packageFqName }
 
   override fun generateFunctions(callableId: CallableId, context: MemberGenerationContext?): List<FirNamedFunctionSymbol> {
     if (context != null) return emptyList()
@@ -69,14 +66,15 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
         val blockAttributes = ConeAttributes.create(
           listOf(CompilerConeAttributes.ExtensionFunctionType, CompilerConeAttributes.ContextFunctionTypeParams(1)),
         )
-        val blockType = FUNCTION3.constructClassLikeType(
-          arrayOf(copyType, companionType, sourceType, session.builtinTypes.unitType.coneType),
-          false,
-          blockAttributes,
-        )
+        val blockType = ClassId(FqName("kotlin"), Name.identifier("Function3"))
+          .constructClassLikeType(
+            typeArguments = arrayOf(copyType, companionType, sourceType, session.builtinTypes.unitType.coneType),
+            isMarkedNullable = false,
+            blockAttributes,
+          )
         val function = createTopLevelFunction(
-          Key,
-          callableId,
+          key = Key,
+          callableId = callableId,
           returnType = sourceType,
           containingFileName = "${source.classId.shortClassName.asString()}Copy",
         ) {
@@ -87,6 +85,4 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
         function.symbol
       }
   }
-
-  object Key : GeneratedDeclarationKey()
 }

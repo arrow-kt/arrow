@@ -167,7 +167,9 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     typeParams: List<FirTypeParameterSymbol>,
     sourceAndFocus: (ConeSubstitutor, List<ConeKotlinType>) -> Pair<ConeKotlinType, ConeKotlinType>,
   ) = createMemberFunction(
-    owner, Key, callableId.callableName,
+    owner,
+    Key,
+    callableId.callableName,
     returnTypeProvider = { functionTypeParameters ->
       val funCones = functionTypeParameters.coneTypes()
       val substitutor = substitutorByMap(typeParams.zip(funCones).toMap(), session)
@@ -179,8 +181,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     visibility = vis
   }
 
-  private fun List<org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> =
-    map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
+  private fun List<org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> = map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
 
   override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
     val owner = context.owner
