@@ -2,6 +2,7 @@
 
 package arrow.optics.plugin.ir
 
+import arrow.optics.plugin.DslKind
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.fir.OpticsCompanionGenerator
 import arrow.optics.plugin.fir.OpticsCopyGenerator
@@ -86,7 +87,7 @@ class OpticsIrSymbols(private val ctx: IrPluginContext) {
 
   /** For each optic poly-interface, its `plus` composition operator (keyed by the receiver class). */
   val polyPlus: Map<IrClassSymbol, IrSimpleFunctionSymbol> by lazy {
-    arrow.optics.plugin.DslKind.entries.associate { kind ->
+    DslKind.entries.associate { kind ->
       val cls = finder.findClass(OpticsNames.polyClassFor(kind))!!
       val plus = finder.findFunctions(OpticsNames.plusFor(kind))
         .first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 1 }

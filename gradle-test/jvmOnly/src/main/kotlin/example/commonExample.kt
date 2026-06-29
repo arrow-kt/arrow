@@ -3,8 +3,9 @@ package example
 import arrow.optics.optics
 
 @optics
-data class Person(val name: String, val age: Int)
+data class Person(val name: String, val age: Int, val address: Address)
 
+@optics
 data class Address(val street: String, val city: String)
 
 @optics

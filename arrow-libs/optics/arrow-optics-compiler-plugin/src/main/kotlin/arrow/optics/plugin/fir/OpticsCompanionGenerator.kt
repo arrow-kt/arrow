@@ -106,13 +106,6 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     return FirOpticsExtractor.foci(source, session)
   }
 
-  /** The `arrow.optics` poly-interface backing a focus of the given kind. */
-  private fun polyClassOf(kind: OpticKind) = when (kind) {
-    OpticKind.LENS -> OpticsNames.PLENS
-    OpticKind.ISO -> OpticsNames.PISO
-    OpticKind.PRISM -> OpticsNames.PPRISM
-  }
-
   override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> {
     val names = fociFor(classSymbol).mapTo(mutableSetOf()) { it.opticName }
     if (classSymbol.isGeneratedOpticsCompanion()) names += SpecialNames.INIT
@@ -125,9 +118,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     if (source.typeParameterSymbols.isNotEmpty()) return emptyList() // generic -> function form
     val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
     val sourceType = source.constructType(emptyArray(), false)
-    val opticType = polyClassOf(focus.kind).constructClassLikeType(
-      arrayOf(sourceType, sourceType, focus.focusType, focus.focusType),
-    )
+    val opticType = OpticsNames.monoClassOf(focus.kind).constructClassLikeType(arrayOf(sourceType, focus.focusType))
     val vis = mostRestrictive(FirOpticsExtractor.effectiveVisibility(source, session), owner.visibility)
     val property = createMemberProperty(owner, Key, callableId.callableName, opticType, isVal = true, hasBackingField = false) {
       visibility = vis
@@ -179,7 +170,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
       val funCones = functionTypeParameters.coneTypes()
       val substitutor = substitutorByMap(typeParams.zip(funCones).toMap(), session)
       val (sourceType, focusType) = sourceAndFocus(substitutor, funCones)
-      polyClassOf(kind).constructClassLikeType(arrayOf(sourceType, sourceType, focusType, focusType))
+      OpticsNames.monoClassOf(kind).constructClassLikeType(arrayOf(sourceType, focusType))
     },
   ) {
     typeParams.forEach { tp -> typeParameter(tp.name) }

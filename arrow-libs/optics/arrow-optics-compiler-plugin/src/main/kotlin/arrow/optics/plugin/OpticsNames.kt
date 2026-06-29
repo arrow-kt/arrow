@@ -18,8 +18,14 @@ object OpticsNames {
   val OPTICS_COPY_ANNOTATION =
     OPTICS_ANNOTATION.createNestedClassId(Name.identifier("copy"))
 
-  // Underlying poly interfaces (these carry the companion objects with the factories, and the
-  // generated optic types use them directly — the `Lens`/`Iso`/… type-aliases are never referenced).
+  // Underlying monomorphic interfaces
+  val MLENS = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Lens"))
+  val MISO = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Iso"))
+  val MPRISM = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Prism"))
+  val MOPTIONAL = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Optional"))
+  val MTRAVERSAL = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Traversal"))
+
+  // Underlying polymorphic interfaces (these carry the companion objects with the factories)
   val PLENS = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PLens"))
   val PISO = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PIso"))
   val PPRISM = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PPrism"))
@@ -46,7 +52,24 @@ object OpticsNames {
   val ARROW_OPTICS_COPY = CallableId(ARROW_OPTICS_PACKAGE, Name.identifier("copy"))
   val COPY = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Copy"))
 
-  /** Poly-interface ClassId for a DSL outer-optic kind. */
+  /** The monomorphic `arrow.optics` poly-interface backing a focus of the given kind. */
+  fun monoClassOf(kind: OpticKind) = when (kind) {
+    OpticKind.LENS -> MLENS
+    OpticKind.ISO -> MISO
+    OpticKind.PRISM -> MPRISM
+  }
+
+  /** Monomorphic interface ClassId for a DSL outer-optic kind. */
+  @Suppress("UNUSED")
+  fun monoClassFor(kind: DslKind): ClassId = when (kind) {
+    DslKind.ISO -> MISO
+    DslKind.LENS -> MLENS
+    DslKind.PRISM -> MPRISM
+    DslKind.OPTIONAL -> MOPTIONAL
+    DslKind.TRAVERSAL -> MTRAVERSAL
+  }
+
+  /** Polymorphic interface ClassId for a DSL outer-optic kind. */
   fun polyClassFor(kind: DslKind): ClassId = when (kind) {
     DslKind.ISO -> PISO
     DslKind.LENS -> PLENS

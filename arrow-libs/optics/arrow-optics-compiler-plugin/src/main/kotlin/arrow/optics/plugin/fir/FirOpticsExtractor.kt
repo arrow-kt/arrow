@@ -18,8 +18,6 @@ import org.jetbrains.kotlin.fir.declarations.processAllDeclarations
 import org.jetbrains.kotlin.fir.declarations.utils.isAbstract
 import org.jetbrains.kotlin.fir.declarations.utils.isData
 import org.jetbrains.kotlin.fir.declarations.utils.isInlineOrValue
-import org.jetbrains.kotlin.fir.declarations.utils.isSealed
-import org.jetbrains.kotlin.fir.declarations.utils.modality
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -58,11 +56,17 @@ data class FirFocus(
 
 /** Reads `@optics`-annotated FIR class symbols and extracts the foci to generate. */
 object FirOpticsExtractor {
-  fun classKind(symbol: FirRegularClassSymbol): OpticsClassKind = when {
-    symbol.isData -> OpticsClassKind.DATA
-    symbol.isInlineOrValue && symbol.classKind == ClassKind.CLASS -> OpticsClassKind.VALUE
-    symbol.isSealed || symbol.modality == Modality.SEALED -> OpticsClassKind.SEALED
-    else -> OpticsClassKind.INELIGIBLE
+  fun classKind(symbol: FirRegularClassSymbol): OpticsClassKind {
+    val isData = symbol.isData
+    val isInlineOrValue = symbol.isInlineOrValue
+    val classKind = symbol.classKind
+    val modality = symbol.rawStatus.modality
+    return when {
+      isData -> OpticsClassKind.DATA
+      isInlineOrValue && classKind == ClassKind.CLASS -> OpticsClassKind.VALUE
+      modality == Modality.SEALED -> OpticsClassKind.SEALED
+      else -> OpticsClassKind.INELIGIBLE
+    }
   }
 
   /** Base optic foci to generate as companion members of [symbol], honouring the requested targets. */

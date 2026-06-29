@@ -1,3 +1,3 @@
 package example
 
-val nameLens = Person.name
+val nameLens = Person.address.street

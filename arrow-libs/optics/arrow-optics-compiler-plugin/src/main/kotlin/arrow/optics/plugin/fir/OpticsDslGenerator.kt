@@ -80,14 +80,13 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
       dslFoci(source)
         .filter { it.opticName == callableId.callableName }
         .forEach { focus ->
-          dslVariantsFor(focus.kind).forEach { dslKind ->
-            val poly = OpticsNames.polyClassFor(dslKind)
+          for (dslKind in dslVariantsFor(focus.kind)) {
             val property = createTopLevelProperty(
               key = Key,
               callableId = callableId,
               returnTypeProvider = { tps ->
                 val s = ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(tps[0].symbol), isMarkedNullable = false)
-                poly.constructClassLikeType(arrayOf(s, s, focus.focusType, focus.focusType))
+                OpticsNames.polyClassFor(dslKind).constructClassLikeType(arrayOf(s, s, focus.focusType, focus.focusType))
               },
               isVal = true,
               hasBackingField = false,
@@ -96,7 +95,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
               typeParameter(Name.identifier("__S"))
               extensionReceiverType { tps ->
                 val s = ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(tps[0].symbol), isMarkedNullable = false)
-                poly.constructClassLikeType(arrayOf(s, s, sourceType, sourceType))
+                OpticsNames.polyClassFor(dslKind).constructClassLikeType(arrayOf(s, s, sourceType, sourceType))
               }
               visibility = FirOpticsExtractor.effectiveVisibility(source, session)
             }
