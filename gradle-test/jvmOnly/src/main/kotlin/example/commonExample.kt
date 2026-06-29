@@ -10,3 +10,6 @@ data class Address(val street: String, val city: String)
 
 @optics
 internal data class Thing(val essence: String)
+
+@optics
+data class Generic<A>(val value: A)
