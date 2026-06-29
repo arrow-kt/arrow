@@ -28,6 +28,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param timeout timeout a duration after which the server will be forcibly shutdown.
  * @param module Represents configured and running web application, capable of handling requests.
  */
+@IgnorableReturnValue
 public suspend fun <
   TEngine : ApplicationEngine,
   TConfiguration : ApplicationEngine.Configuration,
@@ -63,6 +64,7 @@ public suspend fun <
  *   before the shutdown process begins.
  * @param timeout timeout a duration after which the server will be forcibly shutdown.
  */
+@IgnorableReturnValue
 public suspend fun <
   TEngine : ApplicationEngine,
   TConfiguration : ApplicationEngine.Configuration,
@@ -103,7 +105,7 @@ private suspend fun EmbeddedServer<*, *>.release(
     environment.log.info(
       "prewait delay of ${preWait.inWholeMilliseconds}ms, turn it off using io.ktor.development=true"
     )
-    delay(preWait.inWholeMilliseconds)
+    delay(preWait)
   }
   environment.log.info("Shutting down HTTP server...")
   stopSuspend(grace.inWholeMilliseconds, timeout.inWholeMilliseconds)
