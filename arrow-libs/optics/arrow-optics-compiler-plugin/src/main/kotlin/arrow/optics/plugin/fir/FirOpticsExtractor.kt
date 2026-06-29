@@ -13,16 +13,15 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.getSealedClassInheritors
-import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
 import org.jetbrains.kotlin.fir.declarations.processAllDeclarations
-import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.utils.isAbstract
 import org.jetbrains.kotlin.fir.declarations.utils.isData
 import org.jetbrains.kotlin.fir.declarations.utils.isInlineOrValue
 import org.jetbrains.kotlin.fir.declarations.utils.isSealed
 import org.jetbrains.kotlin.fir.declarations.utils.modality
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
+import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
@@ -33,6 +32,8 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.ConeStarProjection
 import org.jetbrains.kotlin.fir.types.ConeTypeProjection
+import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.FirUserTypeRef
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.constructType
 import org.jetbrains.kotlin.fir.types.isMarkedNullable
@@ -66,7 +67,7 @@ object FirOpticsExtractor {
 
   /** Base optic foci to generate as companion members of [symbol], honouring the requested targets. */
   fun foci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
-    val targets = effectiveTargets(symbol, session)
+    val targets = effectiveTargets(symbol)
     val all = when (classKind(symbol)) {
       OpticsClassKind.DATA -> constructorFoci(symbol, session, OpticKind.LENS)
       OpticsClassKind.VALUE -> constructorFoci(symbol, session, OpticKind.ISO)
@@ -83,12 +84,14 @@ object FirOpticsExtractor {
   }
 
   /** Whether the DSL composition extensions should be generated for [symbol]. */
-  fun dslEnabled(symbol: FirRegularClassSymbol, session: FirSession): Boolean = OpticsTargetKind.DSL in effectiveTargets(symbol, session)
+  fun dslEnabled(symbol: FirRegularClassSymbol): Boolean =
+    OpticsTargetKind.DSL in effectiveTargets(symbol)
 
   /** The effective target set (algo §2.3): requested ∩ kind-allowed, plus COPY when present. */
-  fun effectiveTargets(symbol: FirRegularClassSymbol, session: FirSession): Set<OpticsTargetKind> {
-    val requested = requestedTargets(symbol, session)
-    val hasCopy = symbol.hasAnnotation(OpticsNames.OPTICS_COPY_ANNOTATION, session)
+  @OptIn(SymbolInternals::class)
+  fun effectiveTargets(symbol: FirRegularClassSymbol): Set<OpticsTargetKind> {
+    val requested = requestedTargets(symbol)
+    val hasCopy = symbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) }
     return computeTargets(classKind(symbol), requested, hasCopy)
   }
 
@@ -100,10 +103,11 @@ object FirOpticsExtractor {
    * which generation runs — relying on `resolvedAnnotationsWithArguments.argumentMapping` is not, as
    * the argument mapping may not yet be populated when `getCallableNamesForClass` runs (review §2.6).
    */
-  private fun requestedTargets(symbol: FirRegularClassSymbol, session: FirSession): Set<OpticsTargetKind> {
-    val annotation = symbol.resolvedAnnotationsWithClassIds
-      .firstOrNull { it.toAnnotationClassId(session) == OpticsNames.OPTICS_ANNOTATION }
+  @OptIn(SymbolInternals::class)
+  private fun requestedTargets(symbol: FirRegularClassSymbol): Set<OpticsTargetKind> {
+    val annotation = symbol.annotations.firstOrNull { it.checkEvenIfUnresolved(OpticsNames.OPTICS_ANNOTATION) }
     if (annotation !is FirAnnotationCall) return emptySet()
+
     val found = mutableSetOf<OpticsTargetKind>()
     val collector = object : FirVisitorVoid() {
       override fun visitElement(element: FirElement) {
@@ -230,4 +234,23 @@ object FirOpticsExtractor {
 
   @OptIn(SymbolInternals::class)
   private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): List<ClassId> = fir.getSealedClassInheritors(session)
+}
+
+fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
+  when (val ref = annotationTypeRef) {
+    is FirResolvedTypeRef -> return ref.coneType.classId == classId
+    is FirUserTypeRef -> {
+      var current: ClassId? = classId
+      var position = ref.qualifier.size - 1
+      while (current != null) {
+        if (position < 0) return false
+        if (ref.qualifier[position] != current.shortClassName) return false
+
+        current = current.outerClassId
+        position--
+      }
+      return true
+    }
+    else -> return false
+  }
 }

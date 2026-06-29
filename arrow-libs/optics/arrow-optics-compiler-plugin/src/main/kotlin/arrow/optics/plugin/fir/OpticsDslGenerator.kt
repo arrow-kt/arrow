@@ -49,7 +49,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
   /** Monomorphic `@optics`-annotated source classes for which the DSL target is enabled. */
   private fun annotatedSources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
     .filterIsInstance<FirRegularClassSymbol>()
-    .filter { it.typeParameterSymbols.isEmpty() && FirOpticsExtractor.dslEnabled(it, session) }
+    .filter { it.typeParameterSymbols.isEmpty() && FirOpticsExtractor.dslEnabled(it) }
 
   /**
    * The foci that get DSL composition helpers. Per algo §8.4 a sealed type contributes only its

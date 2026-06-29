@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
+import org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef
 import org.jetbrains.kotlin.fir.declarations.utils.isCompanion
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
@@ -23,6 +24,7 @@ import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
@@ -41,6 +43,8 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
+  object Key : GeneratedDeclarationKey()
+
   companion object {
     val OPTICS_ANNOTATION_FQNAME = OpticsNames.OPTICS_ANNOTATION_FQNAME
 
@@ -66,10 +70,11 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     return setOf(SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT)
   }
 
+  @OptIn(SymbolInternals::class)
   override fun generateNestedClassLikeDeclaration(owner: FirClassSymbol<*>, name: Name, context: NestedClassGenerationContext): FirClassLikeSymbol<*>? {
     if (owner !is FirRegularClassSymbol) return null
     if (!session.predicateBasedProvider.matches(predicate, owner)) return null
-    if (owner.resolvedCompanionObjectSymbol != null) return null
+    if (owner.companionObjectSymbol != null) return null
     if (name != SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT) return null
     return createCompanionObject(owner, Key) {
       this.visibility = owner.rawStatus.visibility
@@ -181,13 +186,12 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     visibility = vis
   }
 
-  private fun List<org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> = map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
+  private fun List<FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> =
+    map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
 
   override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
     val owner = context.owner
     if (!owner.isGeneratedOpticsCompanion()) return emptyList()
     return listOf(createDefaultPrivateConstructor(owner, Key).symbol)
   }
-
-  object Key : GeneratedDeclarationKey()
 }

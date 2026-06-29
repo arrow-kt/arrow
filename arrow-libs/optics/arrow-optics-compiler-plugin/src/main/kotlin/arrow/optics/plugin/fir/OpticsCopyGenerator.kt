@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
 import org.jetbrains.kotlin.fir.extensions.predicate.LookupPredicate
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.plugin.createTopLevelFunction
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.CompilerConeAttributes
@@ -43,9 +44,10 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
     register(declarationPredicate)
   }
 
+  @OptIn(SymbolInternals::class)
   private fun copySources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
     .filterIsInstance<FirRegularClassSymbol>()
-    .filter { it.typeParameterSymbols.isEmpty() && it.hasAnnotation(OpticsNames.OPTICS_COPY_ANNOTATION, session) }
+    .filter { it.typeParameterSymbols.isEmpty() && it.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) } }
 
   override fun getTopLevelCallableIds(): Set<CallableId> = copySources().mapTo(mutableSetOf()) {
     CallableId(it.classId.packageFqName, Name.identifier("copy"))
