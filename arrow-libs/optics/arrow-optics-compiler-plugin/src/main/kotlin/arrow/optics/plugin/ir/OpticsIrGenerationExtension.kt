@@ -135,20 +135,21 @@ private class OpticsBodyGenerator(
   }
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction) {
-    if (declaration.correspondingPropertySymbol == null && declaration.body == null) {
+    if (declaration.correspondingPropertySymbol == null) {
       when (keyOf(declaration.origin)) {
-        OpticsCompanionGenerator.Key -> buildOpticBody(declaration, declaration.name)
+        OpticsCompanionGenerator.Key -> if (declaration.body == null) buildOpticBody(declaration, declaration.name)
+        // The copy member is created with a placeholder body (see OpticsCopyGenerator), so overwrite it.
         OpticsCopyGenerator.Key -> buildCopyBody(declaration)
       }
     }
     super.visitSimpleFunction(declaration)
   }
 
-  /** `{ val me = this; me.copy { block(this, Source.Companion, me) } }` for a generated `@optics.copy`. */
+  /** `{ this.copy { block(this, Source.Companion, this@copy) } }` for a generated `@optics.copy` member. */
   private fun buildCopyBody(copyFn: IrSimpleFunction) {
-    val extReceiver = copyFn.parameters.first { it.kind == IrParameterKind.ExtensionReceiver }
+    val receiver = copyFn.parameters.first { it.kind == IrParameterKind.DispatchReceiver }
     val blockParam = copyFn.parameters.first { it.kind == IrParameterKind.Regular }
-    val sourceType = extReceiver.type
+    val sourceType = receiver.type
     val source = sourceType.classOrNull?.owner ?: return
     val companion = source.companionObject() ?: return
     val copyType = symbols.copyClass.typeWith(sourceType)
@@ -161,11 +162,11 @@ private class OpticsBodyGenerator(
         invoke.setDispatch(irGet(blockParam))
         invoke.setRegular(0, irGet(copyReceiver))
         invoke.setRegular(1, irGetObjectValue(companion.defaultType, companion.symbol))
-        invoke.setRegular(2, irGet(extReceiver))
+        invoke.setRegular(2, irGet(receiver))
         +invoke
       }
       val call = irCall(symbols.arrowOpticsCopy, sourceType, listOf(sourceType))
-      call.setExtension(irGet(extReceiver))
+      call.setExtension(irGet(receiver))
       call.setRegular(0, lambda)
       +irReturn(call)
     }

@@ -2,7 +2,7 @@ package example
 
 import arrow.optics.optics
 
-@optics
+@optics @optics.copy
 data class Person(val name: String, val age: Int, val address: Address)
 
 @optics

@@ -15,8 +15,7 @@ object OpticsNames {
 
   val OPTICS_ANNOTATION = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("optics"))
   val OPTICS_ANNOTATION_FQNAME: FqName = OPTICS_ANNOTATION.asSingleFqName()
-  val OPTICS_COPY_ANNOTATION =
-    OPTICS_ANNOTATION.createNestedClassId(Name.identifier("copy"))
+  val OPTICS_COPY_ANNOTATION = OPTICS_ANNOTATION.createNestedClassId(Name.identifier("copy"))
 
   // Underlying monomorphic interfaces
   val MLENS = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Lens"))
