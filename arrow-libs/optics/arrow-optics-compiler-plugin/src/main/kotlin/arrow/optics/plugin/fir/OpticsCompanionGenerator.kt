@@ -177,8 +177,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     visibility = vis
   }
 
-  private fun List<FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> =
-    map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
+  private fun List<FirTypeParameterRef>.coneTypes(): List<ConeKotlinType> = map { ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(it.symbol), isMarkedNullable = false) }
 
   override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
     val owner = context.owner

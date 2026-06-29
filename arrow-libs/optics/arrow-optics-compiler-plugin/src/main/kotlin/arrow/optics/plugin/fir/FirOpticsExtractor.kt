@@ -88,8 +88,7 @@ object FirOpticsExtractor {
   }
 
   /** Whether the DSL composition extensions should be generated for [symbol]. */
-  fun dslEnabled(symbol: FirRegularClassSymbol): Boolean =
-    OpticsTargetKind.DSL in effectiveTargets(symbol)
+  fun dslEnabled(symbol: FirRegularClassSymbol): Boolean = OpticsTargetKind.DSL in effectiveTargets(symbol)
 
   /** The effective target set (algo §2.3): requested ∩ kind-allowed, plus COPY when present. */
   @OptIn(SymbolInternals::class)
@@ -243,6 +242,7 @@ object FirOpticsExtractor {
 fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
   when (val ref = annotationTypeRef) {
     is FirResolvedTypeRef -> return ref.coneType.classId == classId
+
     is FirUserTypeRef -> {
       var current: ClassId? = classId
       var position = ref.qualifier.size - 1
@@ -255,6 +255,7 @@ fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
       }
       return true
     }
+
     else -> return false
   }
 }

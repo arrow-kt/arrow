@@ -38,22 +38,18 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
     register(declarationPredicate)
   }
 
-  private val COPY_NAME = Name.identifier("copy")
-
   /** A monomorphic class carrying both `@optics` and `@optics.copy`, onto which we add `copy`. */
   @OptIn(SymbolInternals::class)
-  private fun isCopySource(classSymbol: FirClassSymbol<*>): Boolean =
-    classSymbol is FirRegularClassSymbol &&
-      classSymbol.typeParameterSymbols.isEmpty() &&
-      session.predicateBasedProvider.matches(declarationPredicate, classSymbol) &&
-      classSymbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) }
+  private fun isCopySource(classSymbol: FirClassSymbol<*>): Boolean = classSymbol is FirRegularClassSymbol &&
+    classSymbol.typeParameterSymbols.isEmpty() &&
+    session.predicateBasedProvider.matches(declarationPredicate, classSymbol) &&
+    classSymbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) }
 
-  override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> =
-    if (isCopySource(classSymbol)) setOf(COPY_NAME) else emptySet()
+  override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> = if (isCopySource(classSymbol)) setOf(OpticsNames.COPY_METHOD_NAME) else emptySet()
 
   override fun generateFunctions(callableId: CallableId, context: MemberGenerationContext?): List<FirNamedFunctionSymbol> {
     val source = context?.owner as? FirRegularClassSymbol ?: return emptyList()
-    if (callableId.callableName != COPY_NAME || !isCopySource(source)) return emptyList()
+    if (callableId.callableName != OpticsNames.COPY_METHOD_NAME || !isCopySource(source)) return emptyList()
     val companion = source.resolvedCompanionObjectSymbol ?: return emptyList()
 
     val sourceType = source.constructType(emptyArray(), false)
@@ -69,7 +65,7 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
         isMarkedNullable = false,
         blockAttributes,
       )
-    val function = createMemberFunction(source, Key, COPY_NAME, sourceType) {
+    val function = createMemberFunction(source, Key, OpticsNames.COPY_METHOD_NAME, sourceType) {
       valueParameter(Name.identifier("block"), blockType)
       visibility = FirOpticsExtractor.effectiveVisibility(source, session)
       // Give the function a body up front so the synthetic data-class `copy` body generator (which

@@ -50,6 +50,7 @@ object OpticsNames {
 
   val ARROW_OPTICS_COPY = CallableId(ARROW_OPTICS_PACKAGE, Name.identifier("copy"))
   val COPY = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Copy"))
+  val COPY_METHOD_NAME = Name.identifier("copy")
 
   /** The monomorphic `arrow.optics` poly-interface backing a focus of the given kind. */
   fun monoClassOf(kind: OpticKind) = when (kind) {

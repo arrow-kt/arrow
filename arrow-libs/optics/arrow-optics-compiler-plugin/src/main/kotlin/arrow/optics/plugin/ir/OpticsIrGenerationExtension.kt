@@ -138,6 +138,7 @@ private class OpticsBodyGenerator(
     if (declaration.correspondingPropertySymbol == null) {
       when (keyOf(declaration.origin)) {
         OpticsCompanionGenerator.Key -> if (declaration.body == null) buildOpticBody(declaration, declaration.name)
+
         // The copy member is created with a placeholder body (see OpticsCopyGenerator), so overwrite it.
         OpticsCopyGenerator.Key -> buildCopyBody(declaration)
       }
