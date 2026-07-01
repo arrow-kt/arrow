@@ -1,7 +1,9 @@
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
+import arrow.core.ControlCancellationException
 import arrow.core.Either
+import arrow.core.InternalArrowApi
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.none
@@ -656,6 +658,36 @@ class ResourceTest {
           throw suppressed
         }.allocate()
 
+      val exception = shouldThrow<CancellationException> {
+        try {
+          allocated shouldBe seed
+          throw cancellation
+        } catch (e: Throwable) {
+          release(ExitCase(e))
+        }
+      }
+
+      exception shouldBe cancellation
+      exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe suppressed
+      released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Cancelled>()
+    }
+  }
+
+  @OptIn(DelicateCoroutinesApi::class, InternalArrowApi::class)
+  @Test
+  fun allocateControlCancellationException() = runTest {
+    checkAll(
+      Arb.int(),
+      Arb.string().map { ControlCancellationException(it) },
+      Arb.string().map(::IllegalStateException)
+    ) { seed, cancellation, thrown ->
+      val released = CompletableDeferred<ExitCase>()
+      val (allocated, release) =
+        resource({ seed }) { _, exitCase ->
+          require(released.complete(exitCase))
+          throw thrown
+        }.allocate()
+
       val exception = shouldThrow<IllegalStateException> {
         try {
           allocated shouldBe seed
@@ -665,7 +697,7 @@ class ResourceTest {
         }
       }
 
-      exception shouldBe suppressed
+      exception shouldBe thrown
       exception.suppressedExceptions.firstOrNull().shouldNotBeNull() shouldBe cancellation
       released.shouldHaveCompleted().shouldBeTypeOf<ExitCase.Cancelled>()
     }
