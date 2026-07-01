@@ -1,6 +1,8 @@
 package arrow
 
 import arrow.atomic.AtomicBoolean
+import arrow.core.ControlCancellationException
+import arrow.core.InternalArrowApi
 import io.kotest.assertions.AssertionErrorBuilder
 import io.kotest.assertions.assertionCounter
 import io.kotest.common.reflection.bestName
@@ -13,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
 
+@OptIn(InternalArrowApi::class)
 class AutoCloseTest {
 
   @Test
@@ -192,13 +195,31 @@ class AutoCloseTest {
   }
 
   @Test
+  fun normalRaise() = shouldAutoCloseWithSecond({}) { throw ControlCancellationException("second") }
+
+  @Test
+  fun returnRaise() = shouldAutoCloseWithSecond({ return }) { throw ControlCancellationException("second") }
+
+  @Test
+  fun raiseRaise() = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw ControlCancellationException("second") }
+
+  @Test
+  fun cancelRaise() = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw ControlCancellationException("second") }
+
+  @Test
+  fun throwRaise() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw ControlCancellationException("second") }
+
+  @Test
   fun normalCancel() = shouldAutoCloseWithSecond({}) { throw CancellationException("second") }
 
   @Test
-  fun returnCancel(): Unit = shouldAutoCloseWithSecond({ return }) { throw CancellationException("second") }
+  fun returnCancel() = shouldAutoCloseWithSecond({ return }) { throw CancellationException("second") }
 
   @Test
-  fun cancelCancel() = shouldAutoCloseWithSecond({ throw CancellationException("first") }) { throw CancellationException("second") }
+  fun raiseCancel() = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw CancellationException("second") }
+
+  @Test
+  fun cancelCancel() = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw CancellationException("second") }
 
   @Test
   fun throwCancel() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw CancellationException("second") }
@@ -207,10 +228,13 @@ class AutoCloseTest {
   fun normalThrow() = shouldAutoCloseWithSecond({}) { throw RuntimeException("second") }
 
   @Test
-  fun returnThrow(): Unit = shouldAutoCloseWithSecond({ return }) { throw RuntimeException("second") }
+  fun returnThrow() = shouldAutoCloseWithSecond({ return }) { throw RuntimeException("second") }
 
   @Test
-  fun cancelThrow() = shouldAutoCloseWithSecond({ throw CancellationException("first") }) { throw RuntimeException("second") }
+  fun raiseThrow() = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw RuntimeException("second") }
+
+  @Test
+  fun cancelThrow() = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw RuntimeException("second") }
 
   @Test
   fun throwThrow() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw RuntimeException("second") }

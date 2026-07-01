@@ -1,7 +1,8 @@
 package arrow.core.raise
 
+import arrow.core.ControlCancellationException
+import arrow.core.InternalArrowApi
 import kotlinx.js.JsPlainObject
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * There is no direct way to create an instance of [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) without a stack in JS.
@@ -15,11 +16,12 @@ internal external interface RaiseCancellationExceptionLike {
   val raise: Raise<Any?>
 }
 
+@OptIn(InternalArrowApi::class)
 @DelicateRaiseApi
 public actual sealed class RaiseCancellationException actual constructor(
   raised: Any?,
   raise: Raise<Any?>
-) : CancellationException(RaiseCancellationExceptionCaptured) {
+) : ControlCancellationException(RaiseCancellationExceptionCaptured) {
   private val _raised = raised
   private val _raise = raise
 
