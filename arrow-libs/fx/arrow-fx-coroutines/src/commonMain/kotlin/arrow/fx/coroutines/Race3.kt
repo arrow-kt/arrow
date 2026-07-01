@@ -4,7 +4,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.mergeSuppressed
-import arrow.core.nonFatalOrThrow
+import arrow.core.throwIfFatal
 import arrow.core.throwIfNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -20,6 +20,7 @@ import kotlin.contracts.contract
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 public sealed class Race3<out A, out B, out C> {
   public data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
@@ -114,13 +115,13 @@ internal suspend fun cancelAndCompose(first: Deferred<*>, second: Deferred<*>) {
     first.cancelAndJoin()
     null
   } catch (e: Throwable) {
-    e.nonFatalOrThrow()
+    e.also { if (e !is CancellationException) e.throwIfFatal() }
   }
   val e2 = try {
     second.cancelAndJoin()
     null
   } catch (e: Throwable) {
-    e.nonFatalOrThrow()
+    e.also { if (e !is CancellationException) e.throwIfFatal() }
   }
   (e1 mergeSuppressed e2).throwIfNotNull()
 }
