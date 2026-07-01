@@ -46,6 +46,7 @@ configure<KnitPluginExtension> {
     include("**/*.kts")
     exclude("**/build/**")
     exclude("**/.gradle/**")
+    exclude("**/vibe/**")
   }
 }
 
