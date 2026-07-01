@@ -157,7 +157,7 @@ internal class SagaBuilder(
           finalizer()
           acc
         } catch (e: Throwable) {
-          acc mergeSuppressed e.nonFatalOrThrow()
+          acc mergeSuppressed e
         }
       }.throwIfNotNull()
   }
