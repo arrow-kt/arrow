@@ -9,6 +9,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.put
+import io.ktor.client.request.query
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -111,11 +112,13 @@ class RoutingReceivingResourcesTest {
       patchOrRaise<Foo.Id, _, _> { route, body: String -> route.name.uppercase() + body.uppercase() }
       postOrRaise<Foo.Id, _, _> { route, body: String -> route.name.uppercase() + body.uppercase() }
       putOrRaise<Foo.Id, _, _> { route, body: String -> route.name.uppercase() + body.uppercase() }
+      queryOrRaise<Foo.Id, _, _> { route, body: String -> route.name.uppercase() + body.uppercase() }
     }
     listOf(
       client.patch("/foo/bar") { setBody("bazz") },
       client.post("/foo/bar") { setBody("bazz") },
       client.put("/foo/bar") { setBody("bazz") },
+      client.query("/foo/bar") { setBody("bazz") },
     ).forEach {
       it.status shouldBe HttpStatusCode.OK
       it.bodyAsText() shouldBe "BARBAZZ"
@@ -129,11 +132,13 @@ class RoutingReceivingResourcesTest {
       patchOrRaise<Foo.Id, String, String> { _, _ -> raise(HttpStatusCode.BadRequest, "BAR") }
       postOrRaise<Foo.Id, String, String> { _, _ -> raise(HttpStatusCode.BadRequest, "BAR") }
       putOrRaise<Foo.Id, String, String> { _, _ -> raise(HttpStatusCode.BadRequest, "BAR") }
+      queryOrRaise<Foo.Id, String, String> { _, _ -> raise(HttpStatusCode.BadRequest, "BAR") }
     }
     listOf(
       client.patch("/foo/bar"),
       client.post("/foo/bar"),
       client.put("/foo/bar"),
+      client.query("/foo/bar"),
     ).forEach {
       it.status shouldBe HttpStatusCode.BadRequest
       it.bodyAsText() shouldBe "BAR"

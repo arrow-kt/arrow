@@ -78,7 +78,7 @@ context(raise: RaiseAccumulate<Error>)
 public fun <Error, A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
   with(raise) { this@bindNelOrAccumulate.bindNelOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi @RaiseDSL
+@ExperimentalRaiseAccumulateApi @RaiseDSL @IgnorableReturnValue
 context(raise: RaiseAccumulate<Error>)
 public inline fun <Error> ensureOrAccumulate(condition: Boolean, error: () -> Error): Value<Unit> {
   contract { callsInPlace(error, AT_MOST_ONCE) }

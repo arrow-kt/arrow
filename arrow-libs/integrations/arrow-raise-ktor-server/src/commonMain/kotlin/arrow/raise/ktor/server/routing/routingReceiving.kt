@@ -95,3 +95,32 @@ public inline fun <reified TRequest : Any, reified TResponse> Route.putOrRaise(
   statusCode: HttpStatusCode? = null,
   body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
 ): Route = put(path) { respondOrRaise(statusCode, body) }
+
+@KtorDsl
+@RaiseDSL
+@JvmName("queryOrRaiseTyped")
+@IgnorableReturnValue
+public inline fun <reified TRequest : Any, reified TResponse> Route.queryOrRaise(
+  statusCode: HttpStatusCode? = null,
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = query { respondOrRaise(statusCode, body) }
+
+@KtorDsl
+@RaiseDSL
+@JvmName("queryOrRaiseTypedPath")
+@IgnorableReturnValue
+public inline fun <reified TRequest : Any, reified TResponse> Route.queryOrRaise(
+  path: String,
+  statusCode: HttpStatusCode? = null,
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = query(path) { respondOrRaise(statusCode, body) }
+
+@KtorDsl
+@RaiseDSL
+@JvmName("queryOrRaiseTypedRegex")
+@IgnorableReturnValue
+public inline fun <reified TRequest : Any, reified TResponse> Route.queryOrRaise(
+  path: Regex,
+  statusCode: HttpStatusCode? = null,
+  body: ReceivingRespondingRaiseRoutingHandler<TRequest, TResponse>,
+): Route = query(path) { respondOrRaise(statusCode, body) }

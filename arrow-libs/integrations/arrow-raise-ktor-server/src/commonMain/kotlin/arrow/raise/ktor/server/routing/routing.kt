@@ -211,3 +211,32 @@ public inline fun <reified TResponse> Route.putOrRaise(
   statusCode: HttpStatusCode? = null,
   crossinline body: RespondingRaiseRoutingHandler<TResponse>,
 ): Route = put(path) { respondOrRaise(statusCode, body) }
+
+@KtorDsl
+@RaiseDSL
+@JvmName("queryOrRaise")
+@IgnorableReturnValue
+public inline fun <reified TResponse> Route.queryOrRaise(
+  statusCode: HttpStatusCode? = null,
+  crossinline body: RespondingRaiseRoutingHandler<TResponse>,
+): Route = query { respondOrRaise(statusCode, body) }
+
+@KtorDsl
+@RaiseDSL
+@JvmName("queryOrRaisePath")
+@IgnorableReturnValue
+public inline fun <reified TResponse> Route.queryOrRaise(
+  path: String,
+  statusCode: HttpStatusCode? = null,
+  crossinline body: RespondingRaiseRoutingHandler<TResponse>,
+): Route = query(path) { respondOrRaise(statusCode, body) }
+
+@KtorDsl
+@RaiseDSL
+@JvmName("queryOrRaiseRegex")
+@IgnorableReturnValue
+public inline fun <reified TResponse> Route.queryOrRaise(
+  path: Regex,
+  statusCode: HttpStatusCode? = null,
+  crossinline body: RespondingRaiseRoutingHandler<TResponse>,
+): Route = query(path) { respondOrRaise(statusCode, body) }

@@ -43,6 +43,12 @@ val Project.needsAbiValidation
     "suspendapp-test-runner",
   )
 
+val Project.noWasmWasi
+  get() = project.name.endsWith("-compose") ||
+    project.name.contains("ktor") ||
+    project.name.contains("cache4k") ||
+    project.name.contains("suspendapp")
+
 val Project.isKotlinJvm: Boolean
   get() = pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
@@ -180,6 +186,13 @@ if (isKotlinMultiplatform) {
       }
     }
 
+    if (!noWasmWasi) {
+      @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+      wasmWasi {
+        nodejs()
+      }
+    }
+
     if (multiplatformWithAndroid) {
       // this line is required to make AnimalSniffer happy
       tasks.register("androidMainClasses")
@@ -233,8 +246,8 @@ if (isKotlinMultiplatform) {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-      val nonJvmMain by creating { dependsOn(commonMain.get()) }
-      val nonJvmTest by creating { dependsOn(commonTest.get()) }
+      val nonJvmMain= create("nonJvmMain") { dependsOn(commonMain.get()) }
+      val nonJvmTest= create("nonJvmTest") { dependsOn(commonTest.get()) }
 
       nativeMain.get().dependsOn(nonJvmMain)
       nativeTest.get().dependsOn(nonJvmTest)
@@ -242,11 +255,19 @@ if (isKotlinMultiplatform) {
       jsMain.get().dependsOn(nonJvmMain)
       jsTest.get().dependsOn(nonJvmTest)
 
-      wasmJsMain.get().dependsOn(nonJvmMain)
-      wasmJsTest.get().dependsOn(nonJvmTest)
+      val wasmMain = create("wasmMain") { dependsOn(nonJvmMain) }
+      val wasmTest = create("wasmTest") { dependsOn(nonJvmTest) }
+
+      wasmJsMain.get().dependsOn(wasmMain)
+      wasmJsTest.get().dependsOn(wasmTest)
+
+      if (!noWasmWasi) {
+        wasmWasiMain.get().dependsOn(wasmMain)
+        wasmWasiTest.get().dependsOn(wasmTest)
+      }
 
       if (multiplatformWithAndroid) {
-        val androidAndJvmMain by creating { dependsOn(commonMain.get()) }
+        val androidAndJvmMain = create("androidAndJvmMain") { dependsOn(commonMain.get()) }
         jvmMain.get().dependsOn(androidAndJvmMain)
         androidMain.get().dependsOn(androidAndJvmMain)
       }
@@ -335,7 +356,7 @@ configure<ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension> {
   // ignore("java.lang.*")
 }
 
-val signature by configurations.getting
+val signature = configurations.getByName("signature")
 dependencies {
   signature("org.codehaus.mojo.signature:java18:1.0@signature")
   when {

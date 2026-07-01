@@ -31,6 +31,27 @@ abstract class SuspendAppTest : ProcessProvider {
   }
 
   @Test
+  fun exitApp() = runTest {
+    val (process, output) = execute("exitapp")
+    process.exitValue() shouldBe 42
+    output.shouldForOne { it.line shouldBe "resource clean complete" }
+  }
+
+  @Test
+  fun childExitApp() = runTest {
+    val (process, output) = execute("childexitapp")
+    process.exitValue() shouldBe 2
+    output.shouldForOne { it.line shouldBe "resource clean complete" }
+  }
+
+  @Test
+  fun childLaunchExitApp() = runTest {
+    val (process, output) = execute("childlaunchexitapp")
+    process.exitValue() shouldBe 24
+    output.shouldForOne { it.line shouldBe "resource clean complete" }
+  }
+
+  @Test
   fun waitAndSignalSigterm() = waitAndSignal(Signal.SIGTERM)
 
   @Test
