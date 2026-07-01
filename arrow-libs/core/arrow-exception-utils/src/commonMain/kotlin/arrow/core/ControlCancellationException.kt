@@ -15,7 +15,7 @@ public annotation class InternalArrowApi
  * @see mergeSuppressed
  */
 @InternalArrowApi
-public open class ControlCancellationException: CancellationException {
-    public constructor()
-    public constructor(message: String?)
+public open class ControlCancellationException : CancellationException {
+  public constructor() : super()
+  public constructor(message: String?) : super(message)
 }
