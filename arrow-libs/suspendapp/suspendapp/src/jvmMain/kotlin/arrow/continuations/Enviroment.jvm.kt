@@ -63,6 +63,8 @@ private object JvmProcess : Process {
               e.printStackTrace()
             }
           }
+        } else {
+          System.err.println("WARNING: SuspendApp Shutdown Hook invoked without being signalled. No SuspendApp cancellation will occur.")
         }
       }
     }
@@ -96,8 +98,9 @@ private object JvmProcess : Process {
             handle?.handle(sig)
           }
         }
-    } catch (_: Throwable) {
-      /* Ignore */
+    } catch (ex: Throwable) {
+      System.err.println("WARNING: SuspendApp was unable to install a signal handler for SIG$signal. Signalled cancellation may be impacted.")
+      ex.printStackTrace()
     }
 
   override fun runScope(context: CoroutineContext, block: suspend CoroutineScope.() -> Unit): Unit =
