@@ -5,12 +5,12 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "arrow"
 
 pluginManagement {
-  @Suppress("LocalVariableName") val kotlin_repo_url: String? by settings
+  val kotlinRepoUrl: String? = providers.gradleProperty("kotlin_repo_url").orNull
   repositories {
     gradlePluginPortal()
     mavenCentral()
     mavenLocal()
-    kotlin_repo_url?.also { maven(it) }
+    kotlinRepoUrl?.also { maven(it) }
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
@@ -21,32 +21,32 @@ plugins {
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-val kotlin_repo_url: String? by settings
-val kotlin_version: String? by settings
-val ksp_version: String? by settings
-val compose_version: String? by settings
+val kotlinRepoUrl: String? = providers.gradleProperty("kotlin_repo_url").orNull
+val kotlinVersion: String? = providers.gradleProperty("kotlin_version").orNull
+val kspVersion: String? = providers.gradleProperty("ksp_version").orNull
+val composeVersion: String? = providers.gradleProperty("compose_version").orNull
 
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
     gradlePluginPortal()
     mavenLocal()
-    kotlin_repo_url?.also { maven(it) }
+    kotlinRepoUrl?.also { maven(it) }
     google()
   }
   versionCatalogs {
     create("libs") {
-      if (!kotlin_version.isNullOrBlank()) {
-        println("Overriding Kotlin version with $kotlin_version")
-        version("kotlin", kotlin_version!!)
+      if (!kotlinVersion.isNullOrBlank()) {
+        println("Overriding Kotlin version with $kotlinVersion")
+        version("kotlin", kotlinVersion)
       }
-      if (!ksp_version.isNullOrBlank()) {
-        println("Overriding KSP version with $ksp_version")
-        version("kspVersion", ksp_version!!)
+      if (!kspVersion.isNullOrBlank()) {
+        println("Overriding KSP version with $kspVersion")
+        version("kspVersion", kspVersion)
       }
-      if (!compose_version.isNullOrBlank()) {
-        println("Overriding Compose version with $compose_version")
-        version("composePlugin", compose_version!!)
+      if (!composeVersion.isNullOrBlank()) {
+        println("Overriding Compose version with $composeVersion")
+        version("composePlugin", composeVersion)
       }
     }
   }
