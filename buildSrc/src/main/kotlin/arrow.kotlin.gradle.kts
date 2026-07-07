@@ -362,9 +362,9 @@ dependencies {
   when {
     !isKotlinMultiplatform || !multiplatformWithAndroid -> { }
     needsAndroidCoreLibraryDesugaring ->
-      signature("com.toasttab.android:gummy-bears-api-21:0.14.0:coreLib2@signature")
+      signature("com.toasttab.android:gummy-bears-api-21:0.15.0:coreLib2@signature")
     else ->
-      signature("com.toasttab.android:gummy-bears-api-21:0.14.0@signature")
+      signature("com.toasttab.android:gummy-bears-api-21:0.15.0@signature")
   }
 }
 

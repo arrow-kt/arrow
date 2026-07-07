@@ -22,7 +22,7 @@ publish = "0.37.0"
 jackson2 = "2.22.0"
 jackson = "3.2.0"
 jacksonAnnotations = "2.22"
-shadow = "9.4.3"
+shadow = "9.5.1"
 kotlinWrappers = "2026.7.0"
 result4k="2.25.6.0"
 
