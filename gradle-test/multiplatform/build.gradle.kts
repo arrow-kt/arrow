@@ -1,5 +1,3 @@
-import arrow.optics.plugin.arrowOpticsCommon
-
 plugins {
   kotlin("multiplatform") version "2.4.0"
   id("io.arrow-kt.optics") version "10.0-test"
@@ -15,6 +13,4 @@ kotlin {
   js().browser()
 
   applyDefaultHierarchyTemplate()
-
-  arrowOpticsCommon()
 }

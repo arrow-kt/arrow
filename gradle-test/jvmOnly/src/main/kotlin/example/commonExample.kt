@@ -2,10 +2,14 @@ package example
 
 import arrow.optics.optics
 
-@optics
-data class Person(val name: String, val age: Int)
+@optics @optics.copy
+data class Person(val name: String, val age: Int, val address: Address)
 
+@optics
 data class Address(val street: String, val city: String)
 
 @optics
 internal data class Thing(val essence: String)
+
+@optics
+data class Generic<A>(val value: A)
