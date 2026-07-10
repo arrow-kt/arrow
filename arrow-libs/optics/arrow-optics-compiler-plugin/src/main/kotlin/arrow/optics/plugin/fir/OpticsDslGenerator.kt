@@ -55,16 +55,16 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
    * The foci that get DSL composition helpers. Per algo §8.4 a sealed type contributes only its
    * prism family — its shared-property lenses (§5.2) do *not* get DSL variants.
    */
-  private fun dslFoci(source: FirRegularClassSymbol): List<FirFocus> {
+  private fun dslFoci(source: FirRegularClassSymbol, resolveFocusTypes: Boolean): List<FirFocus> {
     val isSealed = FirOpticsExtractor.classKind(source) == OpticsClassKind.SEALED
-    return FirOpticsExtractor.foci(source, session)
+    return FirOpticsExtractor.foci(source, resolveFocusTypes, session)
       .filter { !(isSealed && it.kind == OpticKind.LENS) }
   }
 
   override fun getTopLevelCallableIds(): Set<CallableId> = buildSet {
     annotatedSources().forEach { source ->
       val pkg = source.classId.packageFqName
-      dslFoci(source).forEach { add(CallableId(pkg, it.opticName)) }
+      dslFoci(source, resolveFocusTypes = false).forEach { add(CallableId(pkg, it.opticName)) }
     }
   }
 
@@ -77,9 +77,10 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
       if (source.classId.packageFqName != callableId.packageName) return@forEach
       val sourceType = source.constructType(emptyArray(), false)
       val fileName = "${source.classId.shortClassName.asString()}Optics"
-      dslFoci(source)
+      dslFoci(source, resolveFocusTypes = true)
         .filter { it.opticName == callableId.callableName }
         .forEach { focus ->
+          requireNotNull(focus.focusType) { "focusType must be resolved at this stage" }
           for (dslKind in dslVariantsFor(focus.kind)) {
             val property = createTopLevelProperty(
               key = Key,
