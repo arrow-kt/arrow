@@ -45,7 +45,7 @@ data class FirFocus(
   val kind: OpticKind,
   val opticName: Name,
   /** The focus type as used for a *monomorphic* parent (field type for a lens, `Sub<*>` for a prism). */
-  val focusType: ConeKotlinType,
+  val focusType: ConeKotlinType?,
   /** For lenses/isos: the source component (constructor parameter / property) name. */
   val componentName: Name? = null,
   /** For prisms: the subclass symbol (used for generic parents, algo §6). */
@@ -70,12 +70,12 @@ object FirOpticsExtractor {
   }
 
   /** Base optic foci to generate as companion members of [symbol], honouring the requested targets. */
-  fun foci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
+  fun foci(symbol: FirRegularClassSymbol, resolveFocusTypes: Boolean, session: FirSession): List<FirFocus> {
     val targets = effectiveTargets(symbol)
     val all = when (classKind(symbol)) {
-      OpticsClassKind.DATA -> constructorFoci(symbol, session, OpticKind.LENS)
-      OpticsClassKind.VALUE -> constructorFoci(symbol, session, OpticKind.ISO)
-      OpticsClassKind.SEALED -> prismFoci(symbol, session) + sealedLensFoci(symbol, session)
+      OpticsClassKind.DATA -> constructorFoci(symbol, session, OpticKind.LENS, resolveFocusTypes)
+      OpticsClassKind.VALUE -> constructorFoci(symbol, session, OpticKind.ISO, resolveFocusTypes)
+      OpticsClassKind.SEALED -> prismFoci(symbol, session) + sealedLensFoci(symbol, session, resolveFocusTypes)
       else -> emptyList()
     }
     return all.filter { targetOf(it.kind) in targets }
@@ -136,7 +136,7 @@ object FirOpticsExtractor {
    * LENS foci for abstract properties that are uniform across every (data-class) subclass of a
    * sealed type (algo §5.2). Only monomorphic parents for now.
    */
-  private fun sealedLensFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> {
+  private fun sealedLensFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
     if (symbol.typeParameterSymbols.isNotEmpty()) return emptyList()
     val abstractProps = mutableListOf<FirPropertySymbol>()
     symbol.processAllDeclarations(session) {
@@ -152,17 +152,23 @@ object FirOpticsExtractor {
     if (subclasses.isEmpty() || subclasses.any { !it.isData }) return emptyList()
 
     return abstractProps.mapNotNull { prop ->
-      val propType = prop.resolvedReturnType
-      val uniform = subclasses.all { sub ->
-        val ctorParam = sub.primaryConstructorIfAny(session)
-          ?.valueParameterSymbols?.firstOrNull { it.name == prop.name }
-        ctorParam != null && sameType(ctorParam.resolvedReturnType, propType)
+      val uniform = if (resolveFocusTypes) {
+        val propType = prop.resolvedReturnType
+        subclasses.all { sub ->
+          val ctorParam = sub.primaryConstructorIfAny(session)?.valueParameterSymbols?.firstOrNull { it.name == prop.name }
+          ctorParam != null && sameType(ctorParam.resolvedReturnType, propType)
+        }
+      } else {
+        subclasses.all { sub ->
+          val ctorParam = sub.primaryConstructorIfAny(session)?.valueParameterSymbols?.firstOrNull { it.name == prop.name }
+          ctorParam != null
+        }
       }
       if (!uniform) return@mapNotNull null
       FirFocus(
         kind = OpticKind.LENS,
         opticName = prop.name,
-        focusType = propType,
+        focusType = if (resolveFocusTypes) prop.resolvedReturnType else null,
         componentName = prop.name,
       )
     }
@@ -223,13 +229,13 @@ object FirOpticsExtractor {
   }
 
   /** One focus per primary-constructor value parameter (LENS for data, ISO for value classes). */
-  private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind): List<FirFocus> {
+  private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind, resolveFocusTypes: Boolean): List<FirFocus> {
     val ctor = symbol.primaryConstructorIfAny(session) ?: return emptyList()
     return ctor.valueParameterSymbols.map { param: FirValueParameterSymbol ->
       FirFocus(
         kind = kind,
         opticName = param.name,
-        focusType = param.resolvedReturnType,
+        focusType = if (resolveFocusTypes) param.resolvedReturnType else null,
         componentName = param.name,
       )
     }

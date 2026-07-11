@@ -101,13 +101,13 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
   }
 
   /** Base optic foci to generate as members of [companion]. */
-  private fun fociFor(companion: FirClassSymbol<*>): List<FirFocus> {
+  private fun fociFor(companion: FirClassSymbol<*>, resolveFocusTypes: Boolean): List<FirFocus> {
     val source = sourceClassOf(companion) ?: return emptyList()
-    return FirOpticsExtractor.foci(source, session)
+    return FirOpticsExtractor.foci(source, resolveFocusTypes, session)
   }
 
   override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> {
-    val names = fociFor(classSymbol).mapTo(mutableSetOf()) { it.opticName }
+    val names = fociFor(classSymbol, resolveFocusTypes = false).mapTo(mutableSetOf()) { it.opticName }
     if (classSymbol.isGeneratedOpticsCompanion()) names += SpecialNames.INIT
     return names
   }
@@ -116,8 +116,9 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     val owner = context?.owner ?: return emptyList()
     val source = sourceClassOf(owner) ?: return emptyList()
     if (source.typeParameterSymbols.isNotEmpty()) return emptyList() // generic -> function form
-    val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
+    val focus = fociFor(owner, resolveFocusTypes = true).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
     val sourceType = source.constructType(emptyArray(), false)
+    requireNotNull(focus.focusType) { "focusType must be resolved at this stage" }
     val opticType = OpticsNames.monoClassOf(focus.kind).constructClassLikeType(arrayOf(sourceType, focus.focusType))
     val vis = mostRestrictive(FirOpticsExtractor.effectiveVisibility(source, session), owner.visibility)
     val property = createMemberProperty(owner, Key, callableId.callableName, opticType, isVal = true, hasBackingField = false) {
@@ -130,7 +131,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     val owner = context?.owner ?: return emptyList()
     val source = sourceClassOf(owner) ?: return emptyList()
     if (source.typeParameterSymbols.isEmpty()) return emptyList() // monomorphic -> property form
-    val focus = fociFor(owner).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
+    val focus = fociFor(owner, resolveFocusTypes = true).firstOrNull { it.opticName == callableId.callableName } ?: return emptyList()
     val vis = mostRestrictive(FirOpticsExtractor.effectiveVisibility(source, session), owner.visibility)
 
     // A PRISM on a generic parent quantifies over the *subclass's* type parameters and uses the
@@ -140,10 +141,12 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
         val sourceType = focus.refinedSource?.let { substitutor.substituteOrSelf(it) }
           ?: source.constructType(emptyArray(), false)
         val focusType = focus.subclass?.constructType(funCones.toTypedArray(), false) ?: focus.focusType
+        requireNotNull(focusType) { "focusType must be resolved at this stage" }
         sourceType to focusType
       }
     } else {
       opticFunction(owner, callableId, focus.kind, vis, source.typeParameterSymbols) { substitutor, funCones ->
+        requireNotNull(focus.focusType) { "focusType must be resolved at this stage" }
         source.constructType(funCones.toTypedArray(), false) to substitutor.substituteOrSelf(focus.focusType)
       }
     }
