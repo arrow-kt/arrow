@@ -24,7 +24,7 @@ jackson = "3.2.1"
 jacksonAnnotations = "2.22"
 shadow = "9.5.1"
 kotlinWrappers = "2026.7.1"
-result4k="2.25.6.0"
+result4k="3.0.0.0"
 
 [libraries]
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
