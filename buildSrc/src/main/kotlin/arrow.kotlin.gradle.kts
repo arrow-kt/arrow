@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import java.time.Duration
 
@@ -28,11 +27,28 @@ val Project.multiplatformWithAndroid
 val Project.needsAndroidCoreLibraryDesugaring
   get() = project.name == "arrow-collectors"
 
-val Project.needsJava11
-  get() = project.name.endsWith("-compose") || project.name.endsWith("-result4k")
+val Project.requiredJavaVersion
+  get() = when {
+    project.name.endsWith("-result4k") -> JavaVersion.VERSION_21
+    project.name.endsWith("-jackson") -> JavaVersion.VERSION_17
+    project.name.endsWith("-compose") -> JavaVersion.VERSION_11
+    else -> JavaVersion.VERSION_1_8
+  }
 
-val Project.needsJava17
-  get() = project.name.endsWith("-jackson")
+val Project.requiredJavaLanguageVersionForTests
+  get() = when {
+    project.name.endsWith("-result4k") -> JavaLanguageVersion.of(21)
+    project.name.endsWith("-jackson") -> JavaLanguageVersion.of(21)
+    else -> JavaLanguageVersion.of(11)
+  }
+
+val Project.requiredJvmTarget
+  get() = when {
+    project.name.endsWith("-result4k") -> JvmTarget.JVM_21
+    project.name.endsWith("-jackson") -> JvmTarget.JVM_17
+    project.name.endsWith("-compose") -> JvmTarget.JVM_11
+    else -> JvmTarget.JVM_1_8
+  }
 
 val Project.needsAbiValidation
   get() = project.name !in listOf(
@@ -71,8 +87,7 @@ tasks {
     maxParallelForks = Runtime.getRuntime().availableProcessors()
     // always use Java 11, because Kotest requires it
     javaLauncher.set(javaToolchains.launcherFor {
-      val requiredVersion = if (needsJava17) 17 else 11
-      languageVersion.set(JavaLanguageVersion.of(requiredVersion))
+      languageVersion.set(requiredJavaLanguageVersionForTests)
     })
     useJUnitPlatform()
     testLogging {
@@ -89,11 +104,7 @@ configure<KotlinProjectExtension> {
 configure<JavaPluginExtension> {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
-    targetCompatibility = when {
-      needsJava17 -> JavaVersion.VERSION_17
-      needsJava11 -> JavaVersion.VERSION_11
-      else -> JavaVersion.VERSION_1_8
-    }
+    targetCompatibility = requiredJavaVersion
   }
 }
 
@@ -144,11 +155,7 @@ if (isKotlinMultiplatform) {
 
     jvm {
       compilerOptions {
-        jvmTarget = when {
-          needsJava17 -> JvmTarget.JVM_17
-          needsJava11 -> JvmTarget.JVM_11
-          else -> JvmTarget.JVM_1_8
-        }
+        jvmTarget = JvmTarget.fromTarget(requiredJavaVersion.toString())
       }
       tasks.named<Jar>("jvmJar") {
         manifest {
@@ -201,11 +208,7 @@ if (isKotlinMultiplatform) {
         compileSdk = 36
         minSdk = 21
         compilerOptions {
-          jvmTarget = when {
-            needsJava17 -> JvmTarget.JVM_17
-            needsJava11 -> JvmTarget.JVM_11
-            else -> JvmTarget.JVM_1_8
-          }
+          jvmTarget = requiredJvmTarget
         }
         withHostTest {}
       }
@@ -298,11 +301,7 @@ if (isKotlinJvm) {
 
   configure<KotlinJvmExtension> {
     compilerOptions {
-      jvmTarget = when {
-        needsJava17 -> JvmTarget.JVM_17
-        needsJava11 -> JvmTarget.JVM_11
-        else -> JvmTarget.JVM_1_8
-      }
+      jvmTarget = requiredJvmTarget
       commonCompilerOptions()
     }
   }
@@ -378,7 +377,7 @@ configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
 }
 
 if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() == true) {
-  configure<org.gradle.api.publish.PublishingExtension> {
+  configure<PublishingExtension> {
     repositories {
       maven {
         name = "localPluginRepository"
