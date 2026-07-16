@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.getSealedClassInheritors
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
 import org.jetbrains.kotlin.fir.declarations.processAllDeclarations
-import org.jetbrains.kotlin.fir.declarations.utils.isAbstract
 import org.jetbrains.kotlin.fir.declarations.utils.isData
 import org.jetbrains.kotlin.fir.declarations.utils.isInlineOrValue
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
@@ -29,7 +28,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.ConeStarProjection
-import org.jetbrains.kotlin.fir.types.ConeTypeProjection
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirUserTypeRef
 import org.jetbrains.kotlin.fir.types.classId
@@ -75,7 +73,7 @@ object FirOpticsExtractor {
     val all = when (classKind(symbol)) {
       OpticsClassKind.DATA -> constructorFoci(symbol, session, OpticKind.LENS, resolveFocusTypes)
       OpticsClassKind.VALUE -> constructorFoci(symbol, session, OpticKind.ISO, resolveFocusTypes)
-      OpticsClassKind.SEALED -> prismFoci(symbol, session) + sealedLensFoci(symbol, session, resolveFocusTypes)
+      OpticsClassKind.SEALED -> prismFoci(symbol, session, resolveFocusTypes) + sealedLensFoci(symbol, session, resolveFocusTypes)
       else -> emptyList()
     }
     return all.filter { targetOf(it.kind) in targets }
@@ -139,10 +137,12 @@ object FirOpticsExtractor {
   private fun sealedLensFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
     if (symbol.typeParameterSymbols.isNotEmpty()) return emptyList()
     val abstractProps = mutableListOf<FirPropertySymbol>()
-    symbol.processAllDeclarations(session) {
-      if (it is FirPropertySymbol && it.isAbstract && it.receiverParameterSymbol == null) {
-        abstractProps.add(it)
-      }
+    symbol.processAllDeclarations(session) visitor@{
+      if (it !is FirPropertySymbol) return@visitor
+      val modality = it.rawStatus.modality
+      if (modality != Modality.ABSTRACT) return@visitor
+      if (it.receiverParameterSymbol != null) return@visitor
+      abstractProps.add(it)
     }
     if (abstractProps.isEmpty()) return emptyList()
 
@@ -212,21 +212,18 @@ object FirOpticsExtractor {
   }
 
   /** One PRISM focus per sealed subclass (algo §6). */
-  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession): List<FirFocus> = symbol.getSealedClassInheritors(session).mapNotNull { classId ->
-    val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol
-      ?: return@mapNotNull null
-    val starArgs: Array<ConeTypeProjection> =
-      Array(sub.typeParameterSymbols.size) { ConeStarProjection }
-    // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
-    val refined = sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId }
-    FirFocus(
-      kind = OpticKind.PRISM,
-      opticName = lowercaseFirst(classId.shortClassName),
-      focusType = sub.constructType(starArgs, false),
-      subclass = sub,
-      refinedSource = refined,
-    )
-  }
+  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> =
+    symbol.getSealedClassInheritors(session).mapNotNull { classId ->
+      val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol ?: return@mapNotNull null
+      FirFocus(
+        kind = OpticKind.PRISM,
+        opticName = lowercaseFirst(classId.shortClassName),
+        focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
+        subclass = sub,
+        // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
+        refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
+      )
+    }
 
   /** One focus per primary-constructor value parameter (LENS for data, ISO for value classes). */
   private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind, resolveFocusTypes: Boolean): List<FirFocus> {
