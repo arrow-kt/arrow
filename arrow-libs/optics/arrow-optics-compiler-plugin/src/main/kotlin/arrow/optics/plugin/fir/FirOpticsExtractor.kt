@@ -212,18 +212,17 @@ object FirOpticsExtractor {
   }
 
   /** One PRISM focus per sealed subclass (algo §6). */
-  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> =
-    symbol.getSealedClassInheritors(session).mapNotNull { classId ->
-      val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol ?: return@mapNotNull null
-      FirFocus(
-        kind = OpticKind.PRISM,
-        opticName = lowercaseFirst(classId.shortClassName),
-        focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
-        subclass = sub,
-        // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
-        refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
-      )
-    }
+  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> = symbol.getSealedClassInheritors(session).mapNotNull { classId ->
+    val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol ?: return@mapNotNull null
+    FirFocus(
+      kind = OpticKind.PRISM,
+      opticName = lowercaseFirst(classId.shortClassName),
+      focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
+      subclass = sub,
+      // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
+      refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
+    )
+  }
 
   /** One focus per primary-constructor value parameter (LENS for data, ISO for value classes). */
   private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind, resolveFocusTypes: Boolean): List<FirFocus> {
