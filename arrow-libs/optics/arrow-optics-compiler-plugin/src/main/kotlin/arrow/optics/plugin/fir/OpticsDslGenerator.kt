@@ -55,8 +55,6 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
     register(declarationPredicate)
   }
 
-  private val DSL_S = Name.identifier("__S")
-
   /** `@optics`-annotated source classes for which the DSL target is enabled. */
   private fun annotatedSources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
     .filterIsInstance<FirRegularClassSymbol>()
@@ -105,7 +103,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
               hasBackingField = false,
               containingFileName = fileName,
             ) {
-              typeParameter(DSL_S)
+              typeParameter(Name.identifier("__S"))
               extensionReceiverType { tps ->
                 val s = coneOf(tps[0])
                 OpticsNames.polyClassFor(dslKind).constructClassLikeType(arrayOf(s, s, sourceType, sourceType))
@@ -145,7 +143,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
               containingFileName = fileName,
             ) {
               declaredParams.forEach { typeParameter(it.name) }
-              typeParameter(DSL_S)
+              typeParameter(Name.identifier("__S"))
               extensionReceiverType { tps ->
                 val (sourceType, _) = dslSourceAndFocus(source, focus, declaredParams, tps)
                 val s = coneOf(tps.last())
@@ -184,6 +182,5 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
     }
   }
 
-  private fun coneOf(tp: FirTypeParameterRef): ConeKotlinType =
-    ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(tp.symbol), isMarkedNullable = false)
+  private fun coneOf(tp: FirTypeParameterRef): ConeKotlinType = ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(tp.symbol), isMarkedNullable = false)
 }
