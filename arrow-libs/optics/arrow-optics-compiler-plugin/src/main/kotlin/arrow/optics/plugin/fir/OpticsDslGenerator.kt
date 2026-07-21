@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.fir.plugin.createTopLevelProperty
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
@@ -46,10 +47,17 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
     register(OpticsPredicates.optics, OpticsPredicates.opticsLookup)
   }
 
+  @OptIn(SymbolInternals::class)
+  fun FirRegularClassSymbol.matches() = session.predicateBasedProvider.matches(OpticsPredicates.optics, this) &&
+    (
+      this.annotations.none { it.checkEvenIfUnresolved(OpticsNames.SERIALIZABLE_ANNOTATION) } ||
+        (this.companionObjectSymbol != null && keyOf(this.companionObjectSymbol!!.origin) == null)
+      )
+
   /** `@optics`-annotated source classes for which the DSL target is enabled. */
   private fun annotatedSources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(OpticsPredicates.opticsLookup)
     .filterIsInstance<FirRegularClassSymbol>()
-    .filter { FirOpticsExtractor.dslEnabled(it) }
+    .filter { it.matches() && FirOpticsExtractor.dslEnabled(it) }
 
   /**
    * The foci that get DSL composition helpers. Per algo section 8.4 a sealed type contributes only its

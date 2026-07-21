@@ -4,9 +4,9 @@ import arrow.optics.plugin.OpticsNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticsContainer
+import org.jetbrains.kotlin.diagnostics.error0
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.reportOn
-import org.jetbrains.kotlin.diagnostics.warning0
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -37,7 +37,7 @@ object OpticsSerializableChecker : FirRegularClassChecker(MppCheckerKind.Common)
 }
 
 object OpticsSerializableDiagnostics : KtDiagnosticsContainer() {
-  val INCOMPATIBLE_ANNOTATION by warning0<KtElement>()
+  val INCOMPATIBLE_ANNOTATION by error0<KtElement>()
 
   override fun getRendererFactory() = object : BaseDiagnosticRendererFactory() {
     override val MAP by KtDiagnosticFactoryToRendererMap("Arrow Optics") {
