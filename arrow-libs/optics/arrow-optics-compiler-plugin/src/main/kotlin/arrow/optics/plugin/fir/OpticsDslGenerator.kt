@@ -11,8 +11,6 @@ import org.jetbrains.kotlin.fir.extensions.ExperimentalTopLevelDeclarationsGener
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
-import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
-import org.jetbrains.kotlin.fir.extensions.predicate.LookupPredicate
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.plugin.createTopLevelFunction
 import org.jetbrains.kotlin.fir.plugin.createTopLevelProperty
@@ -44,19 +42,12 @@ import org.jetbrains.kotlin.name.Name
 class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
   object Key : GeneratedDeclarationKey()
 
-  private val lookupPredicate = LookupPredicate.create {
-    annotated(setOf(OpticsNames.OPTICS_ANNOTATION_FQNAME))
-  }
-  private val declarationPredicate = DeclarationPredicate.create {
-    annotated(setOf(OpticsNames.OPTICS_ANNOTATION_FQNAME))
-  }
-
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
-    register(declarationPredicate)
+    register(OpticsPredicates.optics, OpticsPredicates.opticsLookup)
   }
 
   /** `@optics`-annotated source classes for which the DSL target is enabled. */
-  private fun annotatedSources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(lookupPredicate)
+  private fun annotatedSources(): List<FirRegularClassSymbol> = session.predicateBasedProvider.getSymbolsByPredicate(OpticsPredicates.opticsLookup)
     .filterIsInstance<FirRegularClassSymbol>()
     .filter { FirOpticsExtractor.dslEnabled(it) }
 

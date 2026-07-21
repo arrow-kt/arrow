@@ -12,10 +12,14 @@ import org.jetbrains.kotlin.name.Name
  */
 object OpticsNames {
   val ARROW_OPTICS_PACKAGE = FqName("arrow.optics")
+  val KOTLINX_SERIALIZATION_PACKAGE = FqName("kotlinx.serialization")
 
   val OPTICS_ANNOTATION = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("optics"))
   val OPTICS_ANNOTATION_FQNAME: FqName = OPTICS_ANNOTATION.asSingleFqName()
   val OPTICS_COPY_ANNOTATION = OPTICS_ANNOTATION.createNestedClassId(Name.identifier("copy"))
+
+  val SERIALIZABLE_ANNOTATION = ClassId(KOTLINX_SERIALIZATION_PACKAGE, Name.identifier("Serializable"))
+  // val SERIALIZABLE_ANNOTATION_FQNAME: FqName = SERIALIZABLE_ANNOTATION.asSingleFqName()
 
   // Underlying monomorphic interfaces
   val MLENS = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("Lens"))
