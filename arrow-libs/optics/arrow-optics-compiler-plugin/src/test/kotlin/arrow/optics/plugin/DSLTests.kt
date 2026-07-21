@@ -306,4 +306,30 @@ class DSLTests {
       |}
       """.compilationSucceeds()
   }
+
+  @Test
+  fun `DSL with generics`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |@optics
+      |sealed interface UiState<out Data> {
+      |    data object Loading : UiState<Nothing>
+      |
+      |    @optics
+      |    data class Content<out Data>(val data: Data) : UiState<Data> {
+      |        companion object
+      |    }
+      |
+      |    @optics
+      |    data class Error(val message: Throwable) : UiState<Nothing> {
+      |        companion object
+      |    }
+      |}
+      |
+      |val i: Optional<UiState<Int>, Int> = UiState.content<Int>().data()
+      |val r = i != null
+      """.evals("r" to true)
+  }
 }

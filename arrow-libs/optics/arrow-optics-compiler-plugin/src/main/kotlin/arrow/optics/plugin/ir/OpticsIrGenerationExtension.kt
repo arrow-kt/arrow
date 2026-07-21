@@ -139,6 +139,9 @@ private class OpticsBodyGenerator(
       when (keyOf(declaration.origin)) {
         OpticsCompanionGenerator.Key -> if (declaration.body == null) buildOpticBody(declaration, declaration.name)
 
+        // Generic sources get their DSL composition helpers as functions (see OpticsDslGenerator).
+        OpticsDslGenerator.Key -> if (declaration.body == null) buildDslBody(declaration, declaration.name)
+
         // The copy member is created with a placeholder body (see OpticsCopyGenerator), so overwrite it.
         OpticsCopyGenerator.Key -> buildCopyBody(declaration)
       }
@@ -199,23 +202,44 @@ private class OpticsBodyGenerator(
     }
   }
 
-  /** `get() = this + Source.focus` for a generated DSL composition extension. */
-  private fun buildDslBody(getter: IrSimpleFunction, focusName: Name) {
-    val receiver = getter.parameters.first { it.kind == IrParameterKind.ExtensionReceiver }
+  /**
+   * `this + Source.focus` for a generated DSL composition extension. [opticFn] is the property getter
+   * (monomorphic source, whose base optic is a companion *property*) or the standalone function
+   * (generic source, whose base optic is a companion *function* taking the source's type arguments).
+   */
+  private fun buildDslBody(opticFn: IrSimpleFunction, focusName: Name) {
+    val receiver = opticFn.parameters.first { it.kind == IrParameterKind.ExtensionReceiver }
     val receiverType = receiver.type as IrSimpleType
     val outerClass = receiverType.classOrNull ?: return
     val plus = symbols.polyPlus[outerClass] ?: return
     val sourceType = receiverType.arguments[2].typeOrNull ?: return
     val source = sourceType.classOrNull?.owner ?: return
-    val focusType = (getter.returnType as IrSimpleType).arguments[2].typeOrNull ?: return
+    val focusType = (opticFn.returnType as IrSimpleType).arguments[2].typeOrNull ?: return
     val companion = source.companionObject() ?: return
-    val baseProp = companion.properties.firstOrNull { it.name == focusName } ?: return
-    val baseGetter = baseProp.getter ?: return
 
-    getter.body = DeclarationIrBuilder(ctx, getter.symbol).irBlockBody {
-      val base = irCall(baseGetter.symbol, baseGetter.returnType)
+    // The base optic is a companion *property* for a monomorphic source and a companion *function*
+    // (taking the source's type arguments) for a generic one. Detect which by looking it up, rather
+    // than by the DSL helper's own type-parameter count: a prism helper for a non-generic subclass of
+    // a *generic* sealed parent has only `__S` yet its base optic is still a function.
+    val baseSymbol: IrSimpleFunctionSymbol
+    val baseReturn: IrType
+    val baseTypeArgs: List<IrType>
+    val baseGetter = companion.properties.firstOrNull { it.name == focusName }?.getter
+    if (baseGetter != null) {
+      baseSymbol = baseGetter.symbol
+      baseReturn = baseGetter.returnType
+      baseTypeArgs = emptyList()
+    } else {
+      val baseFn = companion.functions.firstOrNull { it.name == focusName } ?: return
+      baseSymbol = baseFn.symbol
+      baseReturn = (baseFn.returnType.classOrNull ?: return).typeWith(sourceType, sourceType, focusType, focusType)
+      baseTypeArgs = opticFn.typeParameters.dropLast(1).map { it.defaultType }
+    }
+
+    opticFn.body = DeclarationIrBuilder(ctx, opticFn.symbol).irBlockBody {
+      val base = irCall(baseSymbol, baseReturn, baseTypeArgs)
       base.setDispatch(irGetObjectValue(companion.defaultType, companion.symbol))
-      val composed = irCall(plus, getter.returnType, listOf(focusType, focusType))
+      val composed = irCall(plus, opticFn.returnType, listOf(focusType, focusType))
       composed.setDispatch(irGet(receiver))
       composed.setRegular(0, base)
       +irReturn(composed)
