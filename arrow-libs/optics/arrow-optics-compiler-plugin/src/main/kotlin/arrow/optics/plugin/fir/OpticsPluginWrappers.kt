@@ -40,5 +40,6 @@ class OpticsPluginRegistrar : FirExtensionRegistrar() {
     +::OpticsCompanionGenerator
     +::OpticsDslGenerator
     +::OpticsCopyGenerator
+    +::OpticsSerializableCheckerExtension
   }
 }

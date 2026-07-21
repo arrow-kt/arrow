@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
-import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.plugin.createMemberFunction
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -30,19 +29,14 @@ import org.jetbrains.kotlin.name.Name
 class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
   object Key : GeneratedDeclarationKey()
 
-  private val declarationPredicate = DeclarationPredicate.create {
-    annotated(setOf(OpticsNames.OPTICS_ANNOTATION_FQNAME))
-  }
-
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
-    register(declarationPredicate)
+    register(OpticsPredicates.optics)
   }
 
   /** A monomorphic class carrying both `@optics` and `@optics.copy`, onto which we add `copy`. */
   @OptIn(SymbolInternals::class)
-  private fun isCopySource(classSymbol: FirClassSymbol<*>): Boolean = classSymbol is FirRegularClassSymbol &&
-    classSymbol.typeParameterSymbols.isEmpty() &&
-    session.predicateBasedProvider.matches(declarationPredicate, classSymbol) &&
+  private fun isCopySource(classSymbol: FirClassSymbol<*>): Boolean = classSymbol.typeParameterSymbols.isEmpty() &&
+    session.predicateBasedProvider.matches(OpticsPredicates.optics, classSymbol) &&
     classSymbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) }
 
   override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> = if (isCopySource(classSymbol)) setOf(OpticsNames.COPY_METHOD_NAME) else emptySet()

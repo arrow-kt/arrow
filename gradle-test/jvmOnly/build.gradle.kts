@@ -1,9 +1,14 @@
 plugins {
   kotlin("jvm") version "2.4.10"
+  kotlin("plugin.serialization") version "2.4.10"
   id("io.arrow-kt.optics") version "10.0-test"
 }
 
 repositories {
   maven(url = file("../../build/local-plugin-repository"))
   mavenCentral()
+}
+
+dependencies {
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
 }

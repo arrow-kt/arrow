@@ -1,12 +1,17 @@
 package example
 
 import arrow.optics.optics
+import kotlinx.serialization.Serializable
 
-@optics @optics.copy
-data class Person(val name: String, val age: Int, val address: Address)
+@optics @optics.copy @Serializable
+data class Person(val name: String, val age: Int, val address: Address) {
+  companion object
+}
 
-@optics
-data class Address(val street: String, val city: String)
+@optics @Serializable
+data class Address(val street: String, val city: String) {
+  companion object
+}
 
 @optics
 internal data class Thing(val essence: String)

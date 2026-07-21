@@ -91,6 +91,8 @@ object FirOpticsExtractor {
   /** The effective target set (algo §2.3): requested ∩ kind-allowed, plus COPY when present. */
   @OptIn(SymbolInternals::class)
   fun effectiveTargets(symbol: FirRegularClassSymbol): Set<OpticsTargetKind> {
+    if (symbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.SERIALIZABLE_ANNOTATION) } && symbol.companionObjectSymbol == null) return emptySet()
+
     val requested = requestedTargets(symbol)
     val hasCopy = symbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) }
     return computeTargets(classKind(symbol), requested, hasCopy)
@@ -106,6 +108,8 @@ object FirOpticsExtractor {
    */
   @OptIn(SymbolInternals::class)
   private fun requestedTargets(symbol: FirRegularClassSymbol): Set<OpticsTargetKind> {
+    if (symbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.SERIALIZABLE_ANNOTATION) } && symbol.companionObjectSymbol == null) return emptySet()
+
     val annotation = symbol.annotations.firstOrNull { it.checkEvenIfUnresolved(OpticsNames.OPTICS_ANNOTATION) }
     if (annotation !is FirAnnotationCall) return emptySet()
 
@@ -250,7 +254,7 @@ fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
       var position = ref.qualifier.size - 1
       while (current != null) {
         if (position < 0) return false
-        if (ref.qualifier[position] != current.shortClassName) return false
+        if (ref.qualifier[position].name != current.shortClassName) return false
 
         current = current.outerClassId
         position--

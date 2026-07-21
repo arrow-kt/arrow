@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
-import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.plugin.createCompanionObject
 import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
@@ -45,16 +44,8 @@ import kotlin.contracts.contract
 class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
   object Key : GeneratedDeclarationKey()
 
-  companion object {
-    val OPTICS_ANNOTATION_FQNAME = OpticsNames.OPTICS_ANNOTATION_FQNAME
-
-    val predicate = DeclarationPredicate.create {
-      annotated(setOf(OPTICS_ANNOTATION_FQNAME))
-    }
-  }
-
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
-    register(predicate)
+    register(OpticsPredicates.optics)
   }
 
   // ---- companion object creation (for classes that lack one) -------------------------
@@ -64,16 +55,20 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
   // Ineligible classes are therefore filtered later, during member generation (`foci` returns none),
   // so they simply receive no optics — see `TargetTests."ineligible class generates no optics"`.
 
+  @OptIn(SymbolInternals::class)
+  fun FirRegularClassSymbol.matches() = session.predicateBasedProvider.matches(OpticsPredicates.optics, this) &&
+    (this.annotations.none { it.checkEvenIfUnresolved(OpticsNames.SERIALIZABLE_ANNOTATION) } || this.companionObjectSymbol != null)
+
   override fun getNestedClassifiersNames(classSymbol: FirClassSymbol<*>, context: NestedClassGenerationContext): Set<Name> {
     if (classSymbol !is FirRegularClassSymbol) return emptySet()
-    if (!session.predicateBasedProvider.matches(predicate, classSymbol)) return emptySet()
+    if (!classSymbol.matches()) return emptySet()
     return setOf(SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT)
   }
 
   @OptIn(SymbolInternals::class)
   override fun generateNestedClassLikeDeclaration(owner: FirClassSymbol<*>, name: Name, context: NestedClassGenerationContext): FirClassLikeSymbol<*>? {
     if (owner !is FirRegularClassSymbol) return null
-    if (!session.predicateBasedProvider.matches(predicate, owner)) return null
+    if (!owner.matches()) return null
     if (owner.companionObjectSymbol != null) return null
     if (name != SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT) return null
     return createCompanionObject(owner, Key) {
@@ -96,7 +91,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     if (!companion.isCompanion) return null
     val outerId = companion.classId.outerClassId ?: return null
     val source = session.symbolProvider.getClassLikeSymbolByClassId(outerId) as? FirRegularClassSymbol ?: return null
-    if (!session.predicateBasedProvider.matches(predicate, source)) return null
+    if (!session.predicateBasedProvider.matches(OpticsPredicates.optics, source)) return null
     return source
   }
 
