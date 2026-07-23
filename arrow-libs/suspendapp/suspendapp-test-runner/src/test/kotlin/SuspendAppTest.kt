@@ -78,8 +78,12 @@ abstract class SuspendAppTest : ProcessProvider {
       delay(0.5.seconds)
       sendSignal(Signal.SIGTERM)
     }
-    // TODO: inconsistent exit codes across platforms, for now just check it's not a success
-    process.exitValue() shouldNotBe 0
+
+    // TODO: inconsistent exit codes across platforms - accept either 255 or 143 (SIGTERM + 128)
+    // JVM signal handler still trumps the timeout exception and exits with Signal + 128
+    // All other platforms exit due to the timeout exception with 255
+    // Both outcomes are currently acceptable.
+    process.exitValue() shouldBeIn listOf(255, Signal.SIGTERM.code + 128)
     output.shouldForAtLeastOne { it.line shouldContain "Timed out waiting for 5000 ms" }
       .shouldForNone { it.line shouldContain "resource clean complete" }
   }

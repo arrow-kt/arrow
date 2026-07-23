@@ -47,6 +47,7 @@ suspend fun ProcessProvider.execute(
   }
   interaction.cancel()
 
+  println("[${this@execute}:$mode:exitCode] ${process.exitValue()}")
   process to output.await()
 }
 
@@ -55,6 +56,8 @@ fun Process.sendSignal(signal: Signal) {
 }
 
 enum class Signal(val code: Int) {
+  SIGHUP(1),
   SIGINT(2),
+  SIGQUIT(3),
   SIGTERM(15),
 }
