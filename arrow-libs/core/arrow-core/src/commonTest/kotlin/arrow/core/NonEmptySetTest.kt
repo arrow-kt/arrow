@@ -8,11 +8,11 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContainOnlyOnce
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.Codepoint
 import io.kotest.property.arbitrary.az
 import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.negativeInt
 import io.kotest.property.arbitrary.next
 import io.kotest.property.arbitrary.orNull
@@ -75,7 +75,7 @@ class NonEmptySetTest {
     checkAll(
       Arb.nonEmptySet(Arb.int()),
     ) { nes ->
-      val s = nes.toSet().toNonEmptySetOrThrow()
+      val s = nes.toNonEmptyList().toNonEmptySet()
       (nes == s).shouldBeTrue() // `shouldBe` doesn't use the `equals` methods on `Iterable`
       nes.hashCode() shouldBe s.hashCode()
     }
@@ -84,13 +84,11 @@ class NonEmptySetTest {
   @Test
   fun mapOrAccumulateIsStackSafe() = runTest {
     val acc = mutableSetOf<Int>()
-    val res = (0..stackSafeIteration())
-      .toNonEmptySetOrThrow()
-      .mapOrAccumulate(String::plus) {
-        acc.add(it)
-        it
-      }
-    res shouldBe Either.Right(acc)
+    NonEmptySet(0, 1..stackSafeIteration()).mapOrAccumulate(String::plus) {
+      acc.add(it)
+      it
+    }.merge() shouldBe acc
+    acc shouldBe (0..stackSafeIteration()).toSet()
   }
 
   @Test
@@ -100,10 +98,7 @@ class NonEmptySetTest {
         if (i % 2 == 0) i else raise(i)
       }
 
-      val expected = nes.filterNot { it % 2 == 0 }
-        .toNonEmptyListOrNull()?.left() ?: nes.filter { it % 2 == 0 }.toNonEmptySetOrThrow().right()
-
-      res shouldBe expected
+      res shouldBe (nes.filterNot { it % 2 == 0 }.toNonEmptyListOrNull()?.left() ?: nes.right())
     }
   }
 
@@ -120,104 +115,91 @@ class NonEmptySetTest {
 
   @Test
   fun head() = runTest {
-    checkAll(Arb.set(Arb.int(), range = 1..10)) { a ->
-      a.toNonEmptySetOrThrow().head shouldBe a.first()
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 1..10)) { a ->
+      a.head shouldBe a.elements.first()
     }
   }
 
   @Test
   fun lastOrNull() = runTest {
-    checkAll(Arb.set(Arb.int(), range = 1..10)) { a ->
-      a.toNonEmptySetOrThrow().lastOrNull() shouldBe a.last()
+    checkAll(Arb.nonEmptySet(Arb.int(), range = 1..10)) { a ->
+      a.lastOrNull() shouldBe a.elements.last()
     }
   }
 
   @Test
   fun toStringContainsData() = runTest {
-    checkAll(Arb.set(Arb.int(0..9), 1..9)) { a ->
-      a.toNonEmptySetOrThrow().toString().also { s ->
-        a.onEach { i ->
-          s shouldContainOnlyOnce i.toString()
-        }
+    checkAll(Arb.nonEmptySet(Arb.int(0..9), 1..9)) { a ->
+      val s = a.toString()
+      a.forEach { i ->
+        s shouldContainOnlyOnce i.toString()
       }
     }
   }
 
   @Test
   fun distinct() = runTest {
-    checkAll(Arb.list(Arb.int(0..5), 1..30)) { a ->
-      val expected = a.distinct()
-
-      a.toNonEmptySetOrThrow().also { nes ->
-        nes.distinct() shouldBe expected
-        nes.toList() shouldBe expected // the same as distinct
-      }
+    checkAll(Arb.nonEmptySet(Arb.int(0..5), 1..5)) { a ->
+      val expected = a.elements.distinct()
+      a.distinct() shouldBe expected
+      a.toList() shouldBe expected // the same as distinct
     }
   }
 
   @Test
   fun distinctBy() = runTest {
-    checkAll(30, Arb.list(Arb.string(1, 3, Codepoint.az()), 1..50)) { a ->
+    checkAll(30, Arb.nonEmptySet(Arb.string(1, 3, Codepoint.az()), 1..50)) { a ->
       fun selector(s: String) = s[0]
 
-      a.toNonEmptySetOrThrow()
-        .distinctBy(::selector) shouldBe a.distinctBy(::selector)
+      a.distinctBy(::selector) shouldBe a.elements.distinctBy(::selector)
     }
   }
 
   @Test
   fun flatMap() = runTest {
-    checkAll(30, Arb.set(Arb.int(), 1..10)) { a ->
-      fun transform(i: Int) = listOf(i, i + 1, i * 2)
+    checkAll(30, Arb.nonEmptySet(Arb.int(), 1..10)) { a ->
+      fun transform(i: Int) = nonEmptyListOf(i, i + 1, i * 2)
         .map { it.toString() }
-        .toNonEmptyListOrThrow()
 
-      a.toNonEmptySetOrThrow()
-        .flatMap(::transform) shouldBe a.flatMap(::transform)
+      a.flatMap(::transform) shouldBe a.elements.flatMap(::transform)
     }
   }
 
   @Test
   fun mapIndexed() = runTest {
-    checkAll(Arb.set(Arb.int(), 1..30)) { a ->
+    checkAll(Arb.nonEmptySet(Arb.int(), 1..30)) { a ->
       fun transform(index: Int, i: Int) = when (index) {
         in 0..10 -> i * 2
         in 11..20 -> i * 3
         else -> i * 4
       }.toString()
 
-      a.toNonEmptySetOrThrow()
-        .mapIndexed(::transform) shouldBe a.mapIndexed(::transform)
+      a.mapIndexed(::transform) shouldBe a.elements.mapIndexed(::transform)
     }
   }
 
   @Test
   fun zip() = runTest {
-    checkAll(Arb.set(Arb.int(), 1..30), Arb.nonEmptyList(Arb.string(0..5), 1..30)) { a, b ->
+    checkAll(Arb.nonEmptySet(Arb.int(), 1..30), Arb.nonEmptyList(Arb.string(0..5), 1..30)) { a, b ->
       val expected = (0 until min(a.size, b.size)).map {
         a.elementAt(it) to b[it]
       }
 
-      a.toNonEmptySetOrThrow().zip(b) shouldBe expected
+      a.zip(b) shouldBe expected
     }
   }
 
   @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   @Test
-  fun wrapAsNonEmptySetOrThrow() = runTest {
-    checkAll(Arb.set(Arb.int(), 0..10)) { a ->
-      runCatching {
-        a.wrapAsNonEmptySetOrThrow()
-      }.also {
-        when (a.isEmpty()) {
-          true -> {
-            it.isFailure shouldBe true
-          }
-          false -> {
-            it.getOrNull() shouldBe a.toNonEmptySetOrThrow()
-          }
-        }
-      }
+  fun wrapAsNonEmptySetOrThrowEmpty() = runTest {
+    runCatching { emptySet<Int>().wrapAsNonEmptySetOrThrow() }.isFailure.shouldBeTrue()
+  }
+
+  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+  @Test
+  fun wrapAsNonEmptySetOrThrowNonEmpty() = runTest {
+    checkAll(Arb.set(Arb.int(), 1..10)) { a ->
+      a.wrapAsNonEmptySetOrThrow().elements shouldBeSameInstanceAs a
     }
   }
 
