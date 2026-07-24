@@ -332,4 +332,38 @@ class DSLTests {
       |val r = i != null
       """.evals("r" to true)
   }
+
+  @Test
+  fun `Extensions for optionals are created`() {
+    """
+      |$`package`
+      |$imports
+      |
+      |enum class ImAnEnum {
+      |  Foo, Bar, Baz
+      |}
+      |
+      |@optics
+      |data class ScreenContent(
+      |    val state: ScreenState = ScreenState.Loading,
+      |)
+      |
+      |@optics
+      |sealed interface ScreenState {
+      |    @optics
+      |    data class Content(val text: String? = null) : ScreenState
+      |
+      |    data object Loading : ScreenState
+      |}
+      |
+      |fun setText(state: ScreenContent, text: String?): ScreenContent {
+      |    return ScreenContent.state
+      |        .content
+      |        .text.set(state, text)
+      |}
+      |
+      |val i: Optional<ScreenContent, ScreenState.Content> = ScreenContent.state.content
+      |val r = i != null
+      """.evals("r" to true)
+  }
 }

@@ -1,18 +1,14 @@
 package arrow.optics.plugin.fir
 
-import arrow.optics.plugin.OpticKind
-import arrow.optics.plugin.OpticsClassKind
-import arrow.optics.plugin.OpticsNames
-import arrow.optics.plugin.OpticsTargetKind
-import arrow.optics.plugin.computeTargets
-import arrow.optics.plugin.lowercaseFirst
-import arrow.optics.plugin.mostRestrictive
+import arrow.optics.plugin.*
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.getSealedClassInheritors
+import org.jetbrains.kotlin.fir.analysis.checkers.isSupertypeOf
+import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
+import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
 import org.jetbrains.kotlin.fir.declarations.processAllDeclarations
 import org.jetbrains.kotlin.fir.declarations.utils.isData
@@ -21,19 +17,12 @@ import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
+import org.jetbrains.kotlin.fir.packageFqName
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
-import org.jetbrains.kotlin.fir.types.ConeKotlinType
-import org.jetbrains.kotlin.fir.types.ConeStarProjection
-import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.FirUserTypeRef
-import org.jetbrains.kotlin.fir.types.classId
-import org.jetbrains.kotlin.fir.types.constructType
-import org.jetbrains.kotlin.fir.types.isMarkedNullable
-import org.jetbrains.kotlin.fir.types.type
+import org.jetbrains.kotlin.fir.symbols.impl.*
+import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
+import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
@@ -47,7 +36,7 @@ data class FirFocus(
   /** For lenses/isos: the source component (constructor parameter / property) name. */
   val componentName: Name? = null,
   /** For prisms: the subclass symbol (used for generic parents, algo §6). */
-  val subclass: FirRegularClassSymbol? = null,
+  val subclass: FirClassSymbol<*>? = null,
   /** For prisms with a generic parent: the subclass's supertype, e.g. `Parent<String, C>`. */
   val refinedSource: ConeKotlinType? = null,
 )
@@ -150,9 +139,7 @@ object FirOpticsExtractor {
     }
     if (abstractProps.isEmpty()) return emptyList()
 
-    val subclasses = symbol.getSealedClassInheritors(session).mapNotNull {
-      session.symbolProvider.getClassLikeSymbolByClassId(it) as? FirRegularClassSymbol
-    }
+    val subclasses = symbol.getSealedClassInheritors(session)
     if (subclasses.isEmpty() || subclasses.any { !it.isData }) return emptyList()
 
     return abstractProps.mapNotNull { prop ->
@@ -216,17 +203,16 @@ object FirOpticsExtractor {
   }
 
   /** One PRISM focus per sealed subclass (algo §6). */
-  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> = symbol.getSealedClassInheritors(session).mapNotNull { classId ->
-    val sub = session.symbolProvider.getClassLikeSymbolByClassId(classId) as? FirRegularClassSymbol ?: return@mapNotNull null
-    FirFocus(
-      kind = OpticKind.PRISM,
-      opticName = lowercaseFirst(classId.shortClassName),
-      focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
-      subclass = sub,
-      // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
-      refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
-    )
-  }
+  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> =
+    symbol.getSealedClassInheritors(session).map { sub -> FirFocus(
+        kind = OpticKind.PRISM,
+        opticName = lowercaseFirst(sub.classId.shortClassName),
+        focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
+        subclass = sub,
+        // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
+        refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
+      )
+    }
 
   /** One focus per primary-constructor value parameter (LENS for data, ISO for value classes). */
   private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind, resolveFocusTypes: Boolean): List<FirFocus> {
@@ -241,8 +227,30 @@ object FirOpticsExtractor {
     }
   }
 
-  @OptIn(SymbolInternals::class)
-  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): List<ClassId> = fir.getSealedClassInheritors(session)
+  @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
+  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): Set<FirClassSymbol<*>> {
+    if (this.rawStatus.modality != Modality.SEALED) return emptySet()
+    val thePackage = this.packageFqName()
+    val classNames = session.symbolProvider.symbolNamesProvider.getTopLevelClassifierNamesInPackage(thePackage) ?: return emptySet()
+    val worklist = ArrayDeque(
+      classNames.map { session.symbolProvider.getClassLikeSymbolByClassId(ClassId(thePackage, it)) }
+    )
+
+    return buildSet {
+      while (worklist.isNotEmpty()) {
+        val current = worklist.removeFirst() as? FirClassSymbol<*> ?: break
+        current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
+        val typeRefs = current.fir.superTypeRefs
+        if (typeRefs.any { it !is FirResolvedTypeRef }) throw IllegalStateException("Supertype references are not resolved for $current")
+        if (current != this@getSealedClassInheritors) {
+          if (this@getSealedClassInheritors.isSupertypeOf(current, session)) add(current)
+        }
+        for (symbol in current.declarationSymbols) {
+          if (symbol is FirClassLikeSymbol<*>) worklist.add(symbol)
+        }
+      }
+    }
+  }
 }
 
 fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
