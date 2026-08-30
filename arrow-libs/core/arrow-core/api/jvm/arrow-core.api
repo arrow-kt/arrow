@@ -1180,6 +1180,7 @@ public final class arrow/core/raise/Traced : arrow/core/raise/RaiseCancellationE
 }
 
 public final class arrow/core/raise/context/RaiseContextualKt {
+	public static final fun accumulateContextMap (Larrow/core/raise/Accumulate;Ljava/lang/Iterable;Lkotlin/jvm/functions/Function2;)Larrow/core/raise/RaiseAccumulate$Value;
 	public static final fun bind (Larrow/core/raise/Raise;Larrow/core/Either;)Ljava/lang/Object;
 	public static final fun bind (Larrow/core/raise/Raise;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun bind (Larrow/core/raise/ResultRaise;Ljava/lang/Object;)Ljava/lang/Object;
