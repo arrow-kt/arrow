@@ -1,3 +1,11 @@
+public class arrow/core/ControlCancellationException : java/util/concurrent/CancellationException {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+}
+
+public abstract interface annotation class arrow/core/InternalArrowApi : java/lang/annotation/Annotation {
+}
+
 public final class arrow/core/NonFatalKt {
 	public static final fun NonFatal (Ljava/lang/Throwable;)Z
 }
