@@ -2,6 +2,7 @@ package arrow.core.test
 
 import arrow.core.*
 import io.kotest.property.Arb
+import io.kotest.property.Gen
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.boolean
@@ -29,13 +30,14 @@ import kotlin.coroutines.startCoroutine
 
 // copied from kotest-extensions-arrow
 
-fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
+fun <A> Arb.Companion.nonEmptyList(arb: Gen<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
   Arb.list(arb, max(range.first, 1) .. range.last)
     .filter { it.isNotEmpty() }
     .map { NonEmptyList(it) }
 
-fun <A> Arb.Companion.nonEmptySet(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
-  Arb.set(arb, max(range.first, 1) .. range.last).map { it.toNonEmptySetOrNull()!! }
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+fun <A> Arb.Companion.nonEmptySet(arb: Gen<A>, range: IntRange = 0 .. 100): Arb<NonEmptySet<A>> =
+  Arb.set(arb, max(range.first, 1) .. range.last).map { it.wrapAsNonEmptySetOrThrow() }
 
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }
