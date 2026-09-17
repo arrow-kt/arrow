@@ -5,7 +5,7 @@ class WasmJsSpec : JsSpec() {
   override val config: JsTestConfig get() = Companion.config
 
   companion object {
-    val config = JsTestConfig("wasmJsNodeRun")
+    val config = JsTestConfig("wasmJsNodeProductionRun")
 
     @JvmStatic
     fun enabled() = config.validConfig()
