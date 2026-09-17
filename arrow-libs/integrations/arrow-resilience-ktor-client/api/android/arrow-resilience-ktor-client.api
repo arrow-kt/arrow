@@ -51,10 +51,10 @@ public abstract interface class arrow/resilience/ktor/client/ModifyRequestPerReq
 }
 
 public abstract interface class arrow/resilience/ktor/client/RetryEventData {
-	public abstract fun exceptionOrNull ()Ljava/lang/Throwable;
+	public fun exceptionOrNull ()Ljava/lang/Throwable;
 	public abstract fun getRequest ()Lio/ktor/client/request/HttpRequestBuilder;
 	public abstract fun getRetryCount ()I
-	public abstract fun responseOrNull ()Lio/ktor/client/statement/HttpResponse;
+	public fun responseOrNull ()Lio/ktor/client/statement/HttpResponse;
 }
 
 public final class arrow/resilience/ktor/client/RetryEventData$DefaultImpls {

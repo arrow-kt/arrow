@@ -123,9 +123,9 @@ public abstract interface class arrow/eval/SuspendEval {
 	public static fun always (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$Always;
 	public static fun atMostOnce (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$AtMostOnce;
 	public static fun defer (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval;
-	public abstract fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
+	public fun flatMapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
 	public static fun later (Lkotlin/jvm/functions/Function1;)Larrow/eval/SuspendEval$Later;
-	public abstract fun mapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
+	public fun mapSuspend (Lkotlin/jvm/functions/Function2;)Larrow/eval/SuspendEval;
 	public abstract fun memoize ()Larrow/eval/SuspendEval;
 	public static fun now (Ljava/lang/Object;)Larrow/eval/SuspendEval;
 	public static fun raise (Ljava/lang/Throwable;)Larrow/eval/SuspendEval;
