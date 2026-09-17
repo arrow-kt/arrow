@@ -1002,7 +1002,7 @@ public class arrow/core/raise/RaiseAccumulate : arrow/core/raise/Accumulate, arr
 	public final fun mapOrAccumulate-nfMsDo0 (Ljava/util/Set;Lkotlin/jvm/functions/Function2;)Ljava/util/Set;
 	public final fun mapValuesOrAccumulate (Ljava/util/Map;Lkotlin/jvm/functions/Function2;)Ljava/util/Map;
 	public fun raise (Ljava/lang/Object;)Ljava/lang/Void;
-	public final fun raiseErrors ()Ljava/lang/Void;
+	public final synthetic fun raiseErrors ()Ljava/lang/Void;
 	public final fun withNel (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
