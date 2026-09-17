@@ -2,9 +2,9 @@ package arrow.core
 
 import arrow.core.test.either
 import arrow.core.test.ior
+import arrow.core.test.nonEmptyList
 import arrow.core.test.option
 import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.boolean
@@ -23,36 +23,14 @@ class IterableTest {
   @Test
   fun flattenOrAccumulateCombine() = runTest(timeout = 30.seconds) {
     checkAll(Arb.list(Arb.either(Arb.string(maxSize = 10), Arb.int()), range = 0..20)) { list ->
-      val expected =
-        if (list.any { it.isLeft() }) {
-          list
-            .filterIsInstance<Either.Left<String>>()
-            .fold("") { acc, either -> "$acc${either.value}" }
-            .left()
-        } else {
-          list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
-        }
-
-      list.flattenOrAccumulate(String::plus) shouldBe expected
+      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulateCombine()
     }
   }
 
   @Test
   fun flattenOrAccumulateOk() = runTest {
     checkAll(Arb.list(Arb.either(Arb.int(), Arb.int()), range = 0..20)) { list ->
-      val expected =
-        if (list.any { it.isLeft() }) {
-          list
-            .filterIsInstance<Either.Left<Int>>()
-            .map { it.value }
-            .toNonEmptyListOrNull()
-            .shouldNotBeNull()
-            .left()
-        } else {
-          list.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
-        }
-
-      list.flattenOrAccumulate() shouldBe expected
+      list.flattenOrAccumulate() shouldBe list.simpleFlattenOrAccumulate()
     }
   }
 
@@ -76,11 +54,7 @@ class IterableTest {
     checkAll(Arb.list(Arb.int(), range = 0..20)) { ints ->
       val res = ints.mapOrAccumulate { i -> if (predicate(i)) i else raise(i) }
 
-      val expected: Either<NonEmptyList<Int>, List<Int>> =
-        ints.filterNot(::predicate).toNonEmptyListOrNull()?.left()
-          ?: ints.filter(::predicate).right()
-
-      res shouldBe expected
+      res shouldBe (ints.filterNot(::predicate).toNonEmptyListOrNull()?.left() ?: ints.right())
     }
   }
 
@@ -475,28 +449,13 @@ class IterableTest {
     checkAll(
       Arb.list(
         Arb.either(
-          Arb.list(Arb.string(0..5), 0..5),
+          Arb.nonEmptyList(Arb.string(0..5), 0..5),
           Arb.int(),
         ),
         0..10,
       ),
     ) { list ->
-      val nelslist = list.mapNotNull { it.withLeftListAsNelOrNull() }
-
-      val expected =
-        if (nelslist.any { it.isLeft() }) {
-          nelslist
-            .filterIsInstance<Either.Left<NonEmptyList<String>>>()
-            .map { it.value }
-            .flatten()
-            .toNonEmptyListOrNull()
-            .shouldNotBeNull()
-            .left()
-        } else {
-          nelslist.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
-        }
-
-      nelslist.flattenOrAccumulate() shouldBe expected
+      list.flattenOrAccumulate() shouldBe list.simpleFlattenOrAccumulateNel()
     }
   }
 
@@ -505,29 +464,13 @@ class IterableTest {
     checkAll(
       Arb.list(
         Arb.either(
-          Arb.list(Arb.string(0..5), 0..5),
+          Arb.nonEmptyList(Arb.string(0..5), 0..5),
           Arb.int(),
         ),
         0..10,
       ),
     ) { list ->
-      val nelslist = list.mapNotNull { it.withLeftListAsNelOrNull() }
-
-      val expected =
-        if (nelslist.any { it.isLeft() }) {
-          nelslist
-            .filterIsInstance<Either.Left<NonEmptyList<String>>>()
-            .fold("") { accA, either ->
-              "$accA${
-                either.value.fold("") {accB, entry -> "$accB$entry"}
-              }"
-            }
-            .left()
-        } else {
-          nelslist.filterIsInstance<Either.Right<Int>>().map { it.value }.right()
-        }
-
-      nelslist.flattenOrAccumulate(String::plus) shouldBe expected
+      list.flattenOrAccumulate(String::plus) shouldBe list.simpleFlattenOrAccumulateNel().mapLeft { it.reduce(String::plus) }
     }
   }
 
@@ -623,10 +566,14 @@ class IterableTest {
   }
 }
 
-private fun <E, A> Either<List<E>, A>.withLeftListAsNelOrNull(): Either<NonEmptyList<E>, A>? = when (this) {
-  is Either.Left -> {
-    value.toNonEmptyListOrNull()?.left()
-  }
-
-  is Either.Right -> value.right()
+fun <A, B> List<Either<A, B>>.simpleFlattenOrAccumulate(): Either<NonEmptyList<A>, List<B>> {
+  val (lefts, rights) = this.separateEither()
+  return lefts.toNonEmptyListOrNull()?.left() ?: rights.right()
 }
+
+fun <A, B> List<Either<NonEmptyList<A>, B>>.simpleFlattenOrAccumulateNel(): Either<NonEmptyList<A>, List<B>> =
+  simpleFlattenOrAccumulate().mapLeft { it.flatten() }
+
+
+fun <B> List<Either<String, B>>.simpleFlattenOrAccumulateCombine(): Either<String, List<B>> =
+  simpleFlattenOrAccumulate().mapLeft { it.reduce(String::plus) }
