@@ -839,7 +839,7 @@ public inline fun <K, Error, A, B> Raise<NonEmptyList<Error>>.mapValuesOrAccumul
 @Retention(AnnotationRetention.BINARY)
 @Target(
   AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR,
-  AnnotationTarget.CLASS
+  AnnotationTarget.CLASS, AnnotationTarget.TYPEALIAS
 )
 public annotation class ExperimentalRaiseAccumulateApi
 

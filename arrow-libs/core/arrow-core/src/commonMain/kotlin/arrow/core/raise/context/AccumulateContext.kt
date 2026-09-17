@@ -20,39 +20,32 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
+@ExperimentalRaiseAccumulateApi
 public typealias Accumulate<A> = arrow.core.raise.Accumulate<A>
 
-@ExperimentalRaiseAccumulateApi
-@JvmName("accumulateContextBindOr")
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: Accumulate<Error>)
 public fun <Error, A> Either<Error, A>.bindOrAccumulate(): Value<A> =
   with(raise) { this@bindOrAccumulate.bindOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi
-@JvmName("accumulateContextBindAll")
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: Accumulate<Error>)
 public fun <Error, A> Iterable<Either<Error, A>>.bindAllOrAccumulate(): Value<List<A>> =
   with(raise) { this@bindAllOrAccumulate.bindAllOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi
-@JvmName("accumulateContextBindNel")
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: Accumulate<Error>)
 public fun <Error, A> EitherNel<Error, A>.bindNelOrAccumulate(): Value<A> =
   with(raise) { this@bindNelOrAccumulate.bindNelOrAccumulate() }
 
-@ExperimentalRaiseAccumulateApi
-@RaiseDSL
-@IgnorableReturnValue
-@JvmName("accumulateContextEnsure")
+@ExperimentalRaiseAccumulateApi @RaiseDSL @IgnorableReturnValue
 context(raise: Accumulate<Error>)
 public inline fun <Error> ensureOrAccumulate(condition: Boolean, error: () -> Error): Value<Unit> {
   contract { callsInPlace(error, AT_MOST_ONCE) }
   return raise.ensureOrAccumulate(condition, error)
 }
 
-@ExperimentalRaiseAccumulateApi
-@RaiseDSL
-@JvmName("accumulateContextEnsureNotNull")
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: Accumulate<Error>)
 public inline fun <Error, B : Any> ensureNotNullOrAccumulate(value: B?, error: () -> Error): Value<B> {
   contract { callsInPlace(error, AT_MOST_ONCE) }
@@ -65,19 +58,9 @@ context(raise: Accumulate<Error>)
 public fun <Error, A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A =
   with(raise) { this@getOrAccumulate.getOrAccumulate(recover) }
 
-@ExperimentalRaiseAccumulateApi
-@JvmName("accumulateContextAccumulating")
+@ExperimentalRaiseAccumulateApi @RaiseDSL
 context(raise: Accumulate<Error>)
 public inline fun <Error, A> accumulating(block: context(RaiseAccumulate<Error>) () -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
   return raise.accumulating { block() }
-}
-
-@JvmName("accumulateContextMap")
-context(raise: Accumulate<Error>)
-@RaiseDSL
-public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
-  transform: context(RaiseAccumulate<Error>) (A) -> B
-): Value<List<B>> = raise.accumulating {
-  this@mapOrAccumulate.mapOrAccumulate(transform)
 }
