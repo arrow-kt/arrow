@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -54,7 +54,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -91,7 +91,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -129,7 +129,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -167,7 +167,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -197,7 +197,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -241,7 +241,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -314,7 +314,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
