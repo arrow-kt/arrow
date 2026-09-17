@@ -1,60 +1,60 @@
 public abstract interface class arrow/fx/stm/STM {
-	public abstract fun acquire (Larrow/fx/stm/TSemaphore;)V
-	public abstract fun acquire (Larrow/fx/stm/TSemaphore;I)V
-	public abstract fun available (Larrow/fx/stm/TSemaphore;)I
+	public fun acquire (Larrow/fx/stm/TSemaphore;)V
+	public fun acquire (Larrow/fx/stm/TSemaphore;I)V
+	public fun available (Larrow/fx/stm/TSemaphore;)I
 	public abstract fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public abstract fun flush (Larrow/fx/stm/TQueue;)Ljava/util/List;
-	public abstract fun fold (Larrow/fx/stm/TArray;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public abstract fun get (Larrow/fx/stm/TArray;I)Ljava/lang/Object;
-	public abstract fun get (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
-	public abstract fun getValue (Larrow/fx/stm/TVar;)Ljava/lang/Object;
-	public abstract fun getValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
-	public abstract fun insert (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
-	public abstract fun insert (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
-	public abstract fun isEmpty (Larrow/fx/stm/TMVar;)Z
-	public abstract fun isEmpty (Larrow/fx/stm/TQueue;)Z
-	public abstract fun isNotEmpty (Larrow/fx/stm/TMVar;)Z
-	public abstract fun isNotEmpty (Larrow/fx/stm/TQueue;)Z
-	public abstract fun lookup (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
-	public abstract fun member (Larrow/fx/stm/TMap;Ljava/lang/Object;)Z
-	public abstract fun member (Larrow/fx/stm/TSet;Ljava/lang/Object;)Z
-	public abstract fun modify (Larrow/fx/stm/TVar;Lkotlin/jvm/functions/Function1;)V
-	public abstract fun newTVar (Ljava/lang/Object;)Larrow/fx/stm/TVar;
+	public fun flush (Larrow/fx/stm/TQueue;)Ljava/util/List;
+	public fun fold (Larrow/fx/stm/TArray;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun get (Larrow/fx/stm/TArray;I)Ljava/lang/Object;
+	public fun get (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun getValue (Larrow/fx/stm/TVar;)Ljava/lang/Object;
+	public fun getValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
+	public fun insert (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun insert (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public fun isEmpty (Larrow/fx/stm/TMVar;)Z
+	public fun isEmpty (Larrow/fx/stm/TQueue;)Z
+	public fun isNotEmpty (Larrow/fx/stm/TMVar;)Z
+	public fun isNotEmpty (Larrow/fx/stm/TQueue;)Z
+	public fun lookup (Larrow/fx/stm/TMap;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun member (Larrow/fx/stm/TMap;Ljava/lang/Object;)Z
+	public fun member (Larrow/fx/stm/TSet;Ljava/lang/Object;)Z
+	public fun modify (Larrow/fx/stm/TVar;Lkotlin/jvm/functions/Function1;)V
+	public fun newTVar (Ljava/lang/Object;)Larrow/fx/stm/TVar;
 	public abstract fun orElse (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
-	public abstract fun peek (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
-	public abstract fun plusAssign (Larrow/fx/stm/TMap;Lkotlin/Pair;)V
-	public abstract fun plusAssign (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
-	public abstract fun plusAssign (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
-	public abstract fun put (Larrow/fx/stm/TMVar;Ljava/lang/Object;)V
-	public abstract fun read (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
-	public abstract fun read (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public fun peek (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public fun plusAssign (Larrow/fx/stm/TMap;Lkotlin/Pair;)V
+	public fun plusAssign (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public fun plusAssign (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public fun put (Larrow/fx/stm/TMVar;Ljava/lang/Object;)V
+	public fun read (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public fun read (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
 	public abstract fun read (Larrow/fx/stm/TVar;)Ljava/lang/Object;
-	public abstract fun release (Larrow/fx/stm/TSemaphore;)V
-	public abstract fun release (Larrow/fx/stm/TSemaphore;I)V
-	public abstract fun remove (Larrow/fx/stm/TMap;Ljava/lang/Object;)V
-	public abstract fun remove (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
-	public abstract fun removeAll (Larrow/fx/stm/TQueue;Lkotlin/jvm/functions/Function1;)V
+	public fun release (Larrow/fx/stm/TSemaphore;)V
+	public fun release (Larrow/fx/stm/TSemaphore;I)V
+	public fun remove (Larrow/fx/stm/TMap;Ljava/lang/Object;)V
+	public fun remove (Larrow/fx/stm/TSet;Ljava/lang/Object;)V
+	public fun removeAll (Larrow/fx/stm/TQueue;Lkotlin/jvm/functions/Function1;)V
 	public abstract fun retry ()Ljava/lang/Void;
-	public abstract fun set (Larrow/fx/stm/TArray;ILjava/lang/Object;)V
-	public abstract fun set (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
-	public abstract fun set (Larrow/fx/stm/TVar;Ljava/lang/Object;)V
-	public abstract fun setValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;Ljava/lang/Object;)V
-	public abstract fun size (Larrow/fx/stm/TQueue;)I
-	public abstract fun swap (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Ljava/lang/Object;
-	public abstract fun swap (Larrow/fx/stm/TVar;Ljava/lang/Object;)Ljava/lang/Object;
-	public abstract fun take (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
-	public abstract fun transform (Larrow/fx/stm/TArray;Lkotlin/jvm/functions/Function1;)V
-	public abstract fun tryAcquire (Larrow/fx/stm/TSemaphore;)Z
-	public abstract fun tryAcquire (Larrow/fx/stm/TSemaphore;I)Z
-	public abstract fun tryPeek (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
-	public abstract fun tryPut (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Z
-	public abstract fun tryRead (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
-	public abstract fun tryRead (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
-	public abstract fun tryTake (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
-	public abstract fun update (Larrow/fx/stm/TMap;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
-	public abstract fun write (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public fun set (Larrow/fx/stm/TArray;ILjava/lang/Object;)V
+	public fun set (Larrow/fx/stm/TMap;Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun set (Larrow/fx/stm/TVar;Ljava/lang/Object;)V
+	public fun setValue (Larrow/fx/stm/TVar;Ljava/lang/Void;Lkotlin/reflect/KProperty;Ljava/lang/Object;)V
+	public fun size (Larrow/fx/stm/TQueue;)I
+	public fun swap (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun swap (Larrow/fx/stm/TVar;Ljava/lang/Object;)Ljava/lang/Object;
+	public fun take (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public fun transform (Larrow/fx/stm/TArray;Lkotlin/jvm/functions/Function1;)V
+	public fun tryAcquire (Larrow/fx/stm/TSemaphore;)Z
+	public fun tryAcquire (Larrow/fx/stm/TSemaphore;I)Z
+	public fun tryPeek (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public fun tryPut (Larrow/fx/stm/TMVar;Ljava/lang/Object;)Z
+	public fun tryRead (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public fun tryRead (Larrow/fx/stm/TQueue;)Ljava/lang/Object;
+	public fun tryTake (Larrow/fx/stm/TMVar;)Ljava/lang/Object;
+	public fun update (Larrow/fx/stm/TMap;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)V
+	public fun write (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
 	public abstract fun write (Larrow/fx/stm/TVar;Ljava/lang/Object;)V
-	public abstract fun writeFront (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
+	public fun writeFront (Larrow/fx/stm/TQueue;Ljava/lang/Object;)V
 }
 
 public final class arrow/fx/stm/STM$DefaultImpls {
