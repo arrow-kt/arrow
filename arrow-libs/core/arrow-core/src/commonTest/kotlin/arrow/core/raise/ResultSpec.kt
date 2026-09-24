@@ -1,14 +1,13 @@
 package arrow.core.raise
 
+import arrow.core.test.nonEmptyList
+import arrow.core.test.nonEmptySet
 import arrow.core.test.result
-import arrow.core.toNonEmptyListOrThrow
-import arrow.core.toNonEmptySetOrThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.set
 import io.kotest.property.checkAll
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -86,8 +85,7 @@ class ResultSpec {
 
   @Test
   fun bindAllNel() = runTest {
-    checkAll(iterations, Arb.list(Arb.result(Arb.int()), nelRange)) { generated ->
-      val a = generated.toNonEmptyListOrThrow()
+    checkAll(iterations, Arb.nonEmptyList(Arb.result(Arb.int()), nelRange)) { a ->
       val expected = a.firstOrNull { it.isFailure }
         ?: Result.success(
           a.map {
@@ -103,14 +101,9 @@ class ResultSpec {
 
   @Test
   fun bindAllNes() = runTest {
-    checkAll(iterations, Arb.set(Arb.result(Arb.int()), nelRange)) { generated ->
-      val a = generated.toNonEmptySetOrThrow()
+    checkAll(iterations, Arb.nonEmptySet(Arb.result(Arb.int()), nelRange)) { a ->
       val expected = a.firstOrNull { it.isFailure }
-        ?: Result.success(
-          a.map {
-            it.getOrThrow()
-          }.toNonEmptySetOrThrow(),
-        )
+        ?: Result.success(a.map { it.getOrThrow() }.toNonEmptySet())
 
       result {
         a.bindAll()
