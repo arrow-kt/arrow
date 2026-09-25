@@ -699,7 +699,7 @@ sealed class <#A: out kotlin/Any?> arrow.core/Option { // arrow.core/Option|null
     }
 }
 
-sealed class arrow.core.raise/RaiseCancellationException : kotlin.coroutines.cancellation/CancellationException // arrow.core.raise/RaiseCancellationException|null[0]
+sealed class arrow.core.raise/RaiseCancellationException : arrow.core/ControlCancellationException // arrow.core.raise/RaiseCancellationException|null[0]
 
 final object arrow.core/ArrowCoreInternalException : kotlin/RuntimeException // arrow.core/ArrowCoreInternalException|null[0]
 
