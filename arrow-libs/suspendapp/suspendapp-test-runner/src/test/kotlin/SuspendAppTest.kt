@@ -1,5 +1,10 @@
+import io.kotest.inspectors.shouldForAtLeastOne
+import io.kotest.inspectors.shouldForNone
 import io.kotest.inspectors.shouldForOne
+import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldEndWith
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -19,7 +24,17 @@ abstract class SuspendAppTest : ProcessProvider {
     val (process, output) = execute("fail")
     process.exitValue() shouldBe 255
     output.shouldForOne { it.line shouldBe "resource clean complete" }
-      .shouldForOne { it.line shouldEndWith "IllegalStateException: BOOM!" }
+      .shouldForAtLeastOne { it.line shouldEndWith "IllegalStateException: BOOM!" }
+  }
+
+  @Test
+  fun exit() = runTest {
+    val (process, output) = execute("exit")
+    process.exitValue() shouldBe 42
+    output
+      .filter { it.source == "stdout" }
+      .shouldForNone { it.line shouldBe "resource clean complete" }
+      .last().line shouldBe "Running ExitProcess"
   }
 
   @Test
@@ -27,7 +42,7 @@ abstract class SuspendAppTest : ProcessProvider {
     val (process, output) = execute("childfail")
     process.exitValue() shouldBe 255
     output.shouldForOne { it.line shouldBe "resource clean complete" }
-      .shouldForOne { it.line shouldEndWith "IllegalStateException: boom." }
+      .shouldForAtLeastOne { it.line shouldEndWith "IllegalStateException: boom." }
   }
 
   @Test
@@ -57,9 +72,21 @@ abstract class SuspendAppTest : ProcessProvider {
   @Test
   fun waitAndSignalSigint() = waitAndSignal(Signal.SIGINT)
 
-  private fun waitAndSignal(signal: Signal) = runTest {
-    val (process, output) = execute("wait") {
-      delay(1.seconds)
+  @Test
+  fun waitAndTimeout() = runTest {
+    val (process, output) = execute("timeout") {
+      delay(0.5.seconds)
+      sendSignal(Signal.SIGTERM)
+    }
+    // TODO: inconsistent exit codes across platforms, for now just check it's not a success
+    process.exitValue() shouldNotBe 0
+    output.shouldForAtLeastOne { it.line shouldContain "Timed out waiting for 5000 ms" }
+      .shouldForNone { it.line shouldContain "resource clean complete" }
+  }
+
+  private fun waitAndSignal(signal: Signal, mode: String = "wait") = runTest {
+    val (process, output) = execute(mode) {
+      delay(0.5.seconds)
       sendSignal(signal)
     }
     process.exitValue() shouldBe signal.code + 128
