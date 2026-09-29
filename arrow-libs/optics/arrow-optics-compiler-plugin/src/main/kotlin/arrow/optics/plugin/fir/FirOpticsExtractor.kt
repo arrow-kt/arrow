@@ -156,7 +156,9 @@ object FirOpticsExtractor {
     }
     if (abstractProps.isEmpty()) return emptyList()
 
-    val subclasses = symbol.getSealedClassInheritors(session)
+    val inheritors = symbol.getSealedClassInheritors(session)
+    val subclasses = inheritors.symbols
+
     if (subclasses.isEmpty() || subclasses.any { !it.isData }) return emptyList()
 
     return abstractProps.mapNotNull { prop ->
@@ -220,16 +222,20 @@ object FirOpticsExtractor {
   }
 
   /** One PRISM focus per sealed subclass (algo §6). */
-  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> = symbol.getSealedClassInheritors(session).map { sub ->
-    FirFocus(
-      kind = OpticKind.PRISM,
-      opticName = lowercaseFirst(sub.classId.shortClassName),
-      focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
-      subclass = sub,
-      // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
-      refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
-    )
+  private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
+    val inheritors = symbol.getSealedClassInheritors(session)
+
+    return inheritors.symbols.map { sub -> prismFocus(symbol, sub, resolveFocusTypes) }
   }
+
+  private fun prismFocus(symbol: FirRegularClassSymbol, sub: FirClassSymbol<*>, resolveFocusTypes: Boolean): FirFocus = FirFocus(
+    kind = OpticKind.PRISM,
+    opticName = lowercaseFirst(sub.classId.shortClassName),
+    focusType = if (resolveFocusTypes) sub.constructType(Array(sub.typeParameterSymbols.size) { ConeStarProjection }, false) else null,
+    subclass = sub,
+    // The subclass's supertype that mentions the sealed parent, e.g. `Parent<String, C>`.
+    refinedSource = if (resolveFocusTypes) sub.resolvedSuperTypes.firstOrNull { it.classId == symbol.classId } else null,
+  )
 
   /** One focus per primary-constructor value parameter (LENS for data, ISO for value classes). */
   private fun constructorFoci(symbol: FirRegularClassSymbol, session: FirSession, kind: OpticKind, resolveFocusTypes: Boolean): List<FirFocus> {
@@ -245,28 +251,41 @@ object FirOpticsExtractor {
   }
 
   @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
-  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): Set<FirClassSymbol<*>> {
-    if (this.rawStatus.modality != Modality.SEALED) return emptySet()
+  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): SealedInheritors {
+    if (this.rawStatus.modality != Modality.SEALED) return SealedInheritors.Empty
+
     val thePackage = this.packageFqName()
-    val classNames = session.symbolProvider.symbolNamesProvider.getTopLevelClassifierNamesInPackage(thePackage) ?: return emptySet()
+    val classNames = session.symbolProvider.symbolNamesProvider
+      .getTopLevelClassifierNamesInPackage(thePackage)
+      ?: return SealedInheritors.Empty
+
     val worklist = ArrayDeque(
       classNames.map { session.symbolProvider.getClassLikeSymbolByClassId(ClassId(thePackage, it)) },
     )
 
-    return buildSet {
+    val symbols = buildSet {
       while (worklist.isNotEmpty()) {
         val current = worklist.removeFirst() as? FirClassSymbol<*> ?: continue
+
         current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
+
         val typeRefs = current.fir.superTypeRefs
-        if (typeRefs.any { it !is FirResolvedTypeRef }) throw IllegalStateException("Supertype references are not resolved for $current")
+
+        if (typeRefs.any { it !is FirResolvedTypeRef }) {
+          throw IllegalStateException("Supertype references are not resolved for $current")
+        }
+
         if (current != this@getSealedClassInheritors) {
           if (this@getSealedClassInheritors.isSupertypeOf(current, session)) add(current)
         }
+
         for (symbol in current.declarationSymbols) {
           if (symbol is FirClassLikeSymbol<*>) worklist.add(symbol)
         }
       }
     }
+
+    return SealedInheritors(symbols)
   }
 }
 
@@ -288,5 +307,14 @@ fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
     }
 
     else -> return false
+  }
+}
+
+/**
+ * The subclasses of a sealed class.
+ */
+private class SealedInheritors(val symbols: Set<FirClassSymbol<*>>) {
+  companion object {
+    val Empty = SealedInheritors(emptySet())
   }
 }
