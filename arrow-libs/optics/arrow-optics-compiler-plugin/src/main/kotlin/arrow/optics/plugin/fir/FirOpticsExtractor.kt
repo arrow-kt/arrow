@@ -255,7 +255,7 @@ object FirOpticsExtractor {
 
     return buildSet {
       while (worklist.isNotEmpty()) {
-        val current = worklist.removeFirst() as? FirClassSymbol<*> ?: break
+        val current = worklist.removeFirst() as? FirClassSymbol<*> ?: continue
         current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
         val typeRefs = current.fir.superTypeRefs
         if (typeRefs.any { it !is FirResolvedTypeRef }) throw IllegalStateException("Supertype references are not resolved for $current")
