@@ -157,6 +157,22 @@ object FirOpticsExtractor {
     if (abstractProps.isEmpty()) return emptyList()
 
     val inheritors = symbol.getSealedClassInheritors(session)
+
+    if (!inheritors.allAreResolved) {
+      check(!resolveFocusTypes) { "Supertypes must be resolved to compute focus types of $symbol" }
+
+      // Supertypes aren't resolved yet, so we don't know which subclasses are real. Every abstract property
+      // is then a candidate. Generation will run later and re-check with guaranteed resolved types.
+      return abstractProps.map { prop ->
+        FirFocus(
+          kind = OpticKind.LENS,
+          opticName = prop.name,
+          focusType = null,
+          componentName = prop.name,
+        )
+      }
+    }
+
     val subclasses = inheritors.symbols
 
     if (subclasses.isEmpty() || subclasses.any { !it.isData }) return emptyList()
@@ -225,6 +241,10 @@ object FirOpticsExtractor {
   private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
     val inheritors = symbol.getSealedClassInheritors(session)
 
+    if (resolveFocusTypes) {
+      check(inheritors.allAreResolved) { "Supertypes must be resolved to compute focus types of $symbol" }
+    }
+
     return inheritors.symbols.map { sub -> prismFocus(symbol, sub, resolveFocusTypes) }
   }
 
@@ -263,20 +283,21 @@ object FirOpticsExtractor {
       classNames.map { session.symbolProvider.getClassLikeSymbolByClassId(ClassId(thePackage, it)) },
     )
 
+    var allAreResolved = true
+
     val symbols = buildSet {
       while (worklist.isNotEmpty()) {
         val current = worklist.removeFirst() as? FirClassSymbol<*> ?: continue
 
-        current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
-
-        val typeRefs = current.fir.superTypeRefs
-
-        if (typeRefs.any { it !is FirResolvedTypeRef }) {
-          throw IllegalStateException("Supertype references are not resolved for $current")
-        }
-
         if (current != this@getSealedClassInheritors) {
-          if (this@getSealedClassInheritors.isSupertypeOf(current, session)) add(current)
+          current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
+
+          if (current.fir.superTypeRefs.all { it is FirResolvedTypeRef }) {
+            if (this@getSealedClassInheritors.isSupertypeOf(current, session)) add(current)
+          } else {
+            allAreResolved = false
+            add(current)
+          }
         }
 
         for (symbol in current.declarationSymbols) {
@@ -285,7 +306,7 @@ object FirOpticsExtractor {
       }
     }
 
-    return SealedInheritors(symbols)
+    return SealedInheritors(symbols, allAreResolved)
   }
 }
 
@@ -311,10 +332,11 @@ fun FirAnnotation.checkEvenIfUnresolved(classId: ClassId): Boolean {
 }
 
 /**
- * The subclasses of a sealed class.
+ * The subclasses of a sealed class. When [allAreResolved] is `false`, some supertypes weren't resolved
+ * yet and [symbols] is a superset: it also has every class whose supertypes we couldn't check.
  */
-private class SealedInheritors(val symbols: Set<FirClassSymbol<*>>) {
+private class SealedInheritors(val symbols: Set<FirClassSymbol<*>>, val allAreResolved: Boolean) {
   companion object {
-    val Empty = SealedInheritors(emptySet())
+    val Empty = SealedInheritors(emptySet(), allAreResolved = true)
   }
 }
