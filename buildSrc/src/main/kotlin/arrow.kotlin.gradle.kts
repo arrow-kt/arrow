@@ -112,16 +112,16 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  apiVersion = KotlinVersion.KOTLIN_2_2
-  languageVersion = KotlinVersion.KOTLIN_2_2
+  apiVersion = KotlinVersion.KOTLIN_2_3
+  languageVersion = KotlinVersion.KOTLIN_2_3
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
     "-Xreturn-value-checker=full",
     "-Xexpect-actual-classes",
     "-Xcontext-parameters",
-    "-Xallow-holdsin-contract",
     "-Xcollection-literals",
+    "-Xname-based-destructuring=name-mismatch",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
     "-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled",
@@ -198,7 +198,7 @@ if (isKotlinMultiplatform) {
     if (!noWasmWasi) {
       @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
       wasmWasi {
-        nodejs()
+        wasmtime()
       }
     }
 
@@ -226,9 +226,10 @@ if (isKotlinMultiplatform) {
     linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    if (project.name != "arrow-cache4k") {
-      watchosArm32()
-    }
+    // deprecated in 2.5.0
+    // if (project.name != "arrow-cache4k") {
+    //   watchosArm32()
+    // }
     watchosArm64()
     tvosSimulatorArm64()
     tvosArm64()
@@ -238,10 +239,11 @@ if (isKotlinMultiplatform) {
       iosX64()
     }
     if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
-      androidNativeX86()
-      androidNativeX64()
-      androidNativeArm32()
-      androidNativeArm64()
+      // deprecated in 2.5.0
+      // androidNativeX86()
+      // androidNativeX64()
+      // androidNativeArm32()
+      // androidNativeArm64()
       watchosDeviceArm64()
     }
     // deprecated in 2.3.20

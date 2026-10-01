@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class)
 
 package arrow.resilience
 
@@ -14,7 +14,6 @@ import arrow.core.raise.either
 import arrow.core.raise.recover
 import arrow.core.right
 import arrow.core.some
-import arrow.resilience.Schedule.Companion.identity
 import arrow.resilience.Schedule.Decision.Continue
 import arrow.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.currentCoroutineContext
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.retry
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.reflect.KClass

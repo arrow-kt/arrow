@@ -209,7 +209,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
     returnTypeProvider = { functionTypeParameters ->
       val funCones = functionTypeParameters.coneTypes()
       val substitutor = substitutorByMap(typeParams.zip(funCones).toMap(), session)
-      val (sourceType, focusType) = sourceAndFocus(substitutor, funCones)
+      val [sourceType, focusType] = sourceAndFocus(substitutor, funCones)
       OpticsNames.monoClassOf(kind).constructClassLikeType(arrayOf(sourceType, focusType))
     },
   ) {

@@ -29,7 +29,7 @@ class ComparisonKtTest {
   @Test fun arbericSort2() = runTest {
     checkAll(Arb.person(), Arb.person()) { a, b ->
       val (first, second) = sort(a, b)
-      val (aa, bb) = listOf(a, b).sorted()
+      val [aa, bb] = listOf(a, b).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -39,7 +39,7 @@ class ComparisonKtTest {
   @Test fun arbericSort3() = runTest {
     checkAll(Arb.person(), Arb.person(), Arb.person()) { a, b, c ->
       val (first, second, third) = sort(a, b, c)
-      val (aa, bb, cc) = listOf(a, b, c).sorted()
+      val [aa, bb, cc] = listOf(a, b, c).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -60,7 +60,7 @@ class ComparisonKtTest {
   @Test fun arbericComparatorSort2() = runTest {
     checkAll(Arb.person(), Arb.person()) { a, b ->
       val (first, second) = sort(a, b, Person.comparator)
-      val (aa, bb) = listOf(a, b).sorted()
+      val [aa, bb] = listOf(a, b).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -70,7 +70,7 @@ class ComparisonKtTest {
   @Test fun arbericComparatorSort3() = runTest {
     checkAll(Arb.person(), Arb.person(), Arb.person()) { a, b, c ->
       val (first, second, third) = sort(a, b, c, Person.comparator)
-      val (aa, bb, cc) = listOf(a, b, c).sorted()
+      val [aa, bb, cc] = listOf(a, b, c).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -81,7 +81,7 @@ class ComparisonKtTest {
   @Test fun byteSort2() = runTest {
     checkAll(Arb.byte(), Arb.byte()) { a, b ->
       val (first, second) = sort(a, b)
-      val (aa, bb) = listOf(a, b).sorted()
+      val [aa, bb] = listOf(a, b).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -91,7 +91,7 @@ class ComparisonKtTest {
   @Test fun byteSort3() = runTest {
     checkAll(Arb.byte(), Arb.byte(), Arb.byte()) { a, b, c ->
       val (first, second, third) = sort(a, b, c)
-      val (aa, bb, cc) = listOf(a, b, c).sorted()
+      val [aa, bb, cc] = listOf(a, b, c).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -111,7 +111,7 @@ class ComparisonKtTest {
   @Test fun shortSort2() = runTest {
     checkAll(Arb.short(), Arb.short()) { a, b ->
       val (first, second) = sort(a, b)
-      val (aa, bb) = listOf(a, b).sorted()
+      val [aa, bb] = listOf(a, b).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -121,7 +121,7 @@ class ComparisonKtTest {
   @Test fun shortSort3() = runTest {
     checkAll(Arb.short(), Arb.short(), Arb.short()) { a, b, c ->
       val (first, second, third) = sort(a, b, c)
-      val (aa, bb, cc) = listOf(a, b, c).sorted()
+      val [aa, bb, cc] = listOf(a, b, c).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -141,7 +141,7 @@ class ComparisonKtTest {
   @Test fun intSort2() = runTest {
     checkAll(Arb.int(), Arb.int()) { a, b ->
       val (first, second) = sort(a, b)
-      val (aa, bb) = listOf(a, b).sorted()
+      val [aa, bb] = listOf(a, b).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -151,7 +151,7 @@ class ComparisonKtTest {
   @Test fun intSort3() = runTest {
     checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
       val (first, second, third) = sort(a, b, c)
-      val (aa, bb, cc) = listOf(a, b, c).sorted()
+      val [aa, bb, cc] = listOf(a, b, c).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -171,7 +171,7 @@ class ComparisonKtTest {
   @Test fun longSort2() = runTest {
     checkAll(Arb.long(), Arb.long()) { a, b ->
       val (first, second) = sort(a, b)
-      val (aa, bb) = listOf(a, b).sorted()
+      val [aa, bb] = listOf(a, b).sorted()
 
       first shouldBe aa
       second shouldBe bb
@@ -181,7 +181,7 @@ class ComparisonKtTest {
   @Test fun longSort3() = runTest {
     checkAll(Arb.long(), Arb.long(), Arb.long()) { a, b, c ->
       val (first, second, third) = sort(a, b, c)
-      val (aa, bb, cc) = listOf(a, b, c).sorted()
+      val [aa, bb, cc] = listOf(a, b, c).sorted()
 
       first shouldBe aa
       second shouldBe bb

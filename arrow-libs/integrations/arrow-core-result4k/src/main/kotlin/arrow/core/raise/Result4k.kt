@@ -1,5 +1,5 @@
 @file:JvmName("Result4k")
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class)
 
 package arrow.core.raise
 
@@ -10,7 +10,6 @@ import dev.forkhandles.result4k.Success
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.experimental.ExperimentalTypeInference
 
 public inline fun <Error, A> result4k(block: Raise<Error>.() -> A): Result<A, Error> {
   contract { callsInPlace(block, InvocationKind.AT_MOST_ONCE) }

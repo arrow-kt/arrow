@@ -19,6 +19,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalRacingApi
 class RaiseRacingTest {
@@ -370,7 +371,7 @@ class RaiseRacingTest {
   fun testProducesSuccessIfPossible() = runTest {
     val result = either {
       racing {
-        race(doNothingExceptionHandler) { kotlinx.coroutines.delay(1000); 104 }
+        race(doNothingExceptionHandler) { kotlinx.coroutines.delay(1.seconds); 104 }
 
         // this blocks ends earlier,
         // but it is not considered successful

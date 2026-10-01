@@ -125,8 +125,8 @@ project(":suspendapp-ktor").projectDir = file("arrow-libs/suspendapp/suspendapp-
 include("suspendapp-test-app")
 project(":suspendapp-test-app").projectDir = file("arrow-libs/suspendapp/suspendapp-test-app")
 
-include("suspendapp-test-runner")
-project(":suspendapp-test-runner").projectDir = file("arrow-libs/suspendapp/suspendapp-test-runner")
+// include("suspendapp-test-runner")
+// project(":suspendapp-test-runner").projectDir = file("arrow-libs/suspendapp/suspendapp-test-runner")
 
 // INTEGRATIONS
 include("arrow-core-retrofit")

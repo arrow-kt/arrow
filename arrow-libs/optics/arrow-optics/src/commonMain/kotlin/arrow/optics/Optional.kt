@@ -125,8 +125,8 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
    */
   public fun <C> first(): POptional<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     POptional(
-      { (source, c) -> getOrModify(source).mapLeft { Pair(it, c) }.map { Pair(it, c) } },
-      { (source, c2), (update, c) -> setNullable(source, update)?.let { Pair(it, c) } ?: Pair(set(source, update), c2) }
+      { [source, c] -> getOrModify(source).mapLeft { Pair(it, c) }.map { Pair(it, c) } },
+      { [source, c2], [update, c] -> setNullable(source, update)?.let { Pair(it, c) } ?: Pair(set(source, update), c2) }
     )
 
   /**
@@ -134,8 +134,8 @@ public interface POptional<S, T, A, B> : PTraversal<S, T, A, B> {
    */
   public fun <C> second(): POptional<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     POptional(
-      { (c, s) -> getOrModify(s).mapLeft { c to it }.map { c to it } },
-      { (c2, s), (c, b) -> setNullable(s, b)?.let { c to it } ?: (c2 to set(s, b)) }
+      { [c, s] -> getOrModify(s).mapLeft { c to it }.map { c to it } },
+      { [c2, s], [c, b] -> setNullable(s, b)?.let { c to it } ?: (c2 to set(s, b)) }
     )
 
   /**

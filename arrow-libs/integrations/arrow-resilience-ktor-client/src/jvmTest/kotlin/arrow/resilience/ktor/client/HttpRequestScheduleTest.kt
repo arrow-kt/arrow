@@ -6,8 +6,8 @@ import arrow.atomic.AtomicLong
 import arrow.resilience.CircuitBreaker
 import arrow.resilience.Schedule
 import io.kotest.assertions.AssertionErrorBuilder
+import io.kotest.assertions.assertionCounter
 import io.kotest.common.reflection.bestName
-import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.long
@@ -28,10 +28,12 @@ import kotlin.time.Duration.Companion.seconds
 class HttpRequestScheduleTest {
   class NotFoundExceptionForMocking : Exception()
 
+  data class Setup(val counter: AtomicLong, val client: HttpClient)
+
   fun setup(
     check: suspend (counter: Long) -> Unit,
     configure: HttpRequestScheduleConfiguration.() -> Unit,
-  ): Pair<AtomicLong, HttpClient> {
+  ): Setup {
     val counter = AtomicLong(0)
     val engine = MockEngine { _ ->
       try {
@@ -41,9 +43,10 @@ class HttpRequestScheduleTest {
         respond(content = "Not Found", status = HttpStatusCode.NotFound)
       }
     }
-    return counter to HttpClient(engine) {
+    val client = HttpClient(engine) {
       install(HttpRequestSchedule, configure)
     }
+    return Setup(counter, client)
   }
 
   val MAX_CHECKS = 19L
@@ -109,7 +112,7 @@ class HttpRequestScheduleTest {
 
   fun expectSuccessSetup(
     expectSuccess: Boolean
-  ): Pair<AtomicLong, HttpClient> {
+  ): Setup {
     val counter = AtomicLong(0)
     val mockEngine =
       MockEngine {
@@ -128,7 +131,7 @@ class HttpRequestScheduleTest {
         this.expectSuccess = expectSuccess
       }
 
-    return counter to client
+    return Setup(counter, client)
   }
 
   @Test

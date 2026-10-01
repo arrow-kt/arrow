@@ -55,9 +55,9 @@ public class IorSerializer<A, B>(
     }
     return when {
       leftValue is None && rightValue is None -> throw SerializationException("No information found for this Ior")
-      leftValue is Some && rightValue is Some -> Ior.Both((leftValue as Some<A>).value, (rightValue as Some<B>).value)
-      leftValue is Some -> Ior.Left((leftValue as Some<A>).value)
-      rightValue is Some -> Ior.Right((rightValue as Some<B>).value)
+      leftValue is Some && rightValue is Some -> Ior.Both(leftValue.value, rightValue.value)
+      leftValue is Some -> Ior.Left(leftValue.value)
+      rightValue is Some -> Ior.Right(rightValue.value)
       else -> error("this should never happen")
     }
   }

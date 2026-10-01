@@ -3,7 +3,7 @@ package arrow.optics.plugin.internals
 import arrow.optics.plugin.OpticsProcessorOptions
 
 internal fun OpticsProcessorOptions.generateLenses(ele: ADT, target: LensTarget): Snippet {
-  val (lensType, lensImport) = ele.resolveTypeName(Lens)
+  val [lensType, lensImport] = ele.resolveTypeName(Lens)
   return Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,

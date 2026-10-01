@@ -60,16 +60,16 @@ internal const val CallAlreadyHandledInRespondOrRaiseBody: String =
     "This prevents the result or raised response of the body from being sent to the client. " +
     "When using call.respondOrRaise, do not directly respond to the call and instead either `raise` a `Response` or return the desired response from the body."
 
-context(r: Raise<Response>)
 @RaiseDSL
 @Suppress("NOTHING_TO_INLINE")
+context(r: Raise<Response>)
 public inline fun raise(outgoingContent: OutgoingContent): Nothing = r.raise(Response(outgoingContent))
 
-context(r: Raise<Response>)
 @RaiseDSL
 @Suppress("NOTHING_TO_INLINE")
+context(r: Raise<Response>)
 public inline fun raise(statusCode: HttpStatusCode): Nothing = r.raise(Response(statusCode))
 
-context(r: Raise<Response>)
 @RaiseDSL
+context(r: Raise<Response>)
 public inline fun <reified T> raise(statusCode: HttpStatusCode, content: T): Nothing = r.raise(Response(statusCode, content))

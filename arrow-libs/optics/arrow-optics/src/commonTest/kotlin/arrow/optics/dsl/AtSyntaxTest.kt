@@ -9,7 +9,7 @@ class AtSyntaxTest {
   @Test
   fun mapModify() {
     val original = mapOf("one" to 1, "two" to 2)
-    val expected = Wrapper(original.mapValues { (k, i) ->
+    val expected = Wrapper(original.mapValues { [k, i] ->
       if (k == "one") i + 1 else i
     })
     val actual = Wrapper.lens<Map<String, Int>>()

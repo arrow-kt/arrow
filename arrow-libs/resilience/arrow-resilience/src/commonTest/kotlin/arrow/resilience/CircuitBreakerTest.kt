@@ -34,7 +34,7 @@ class CircuitBreakerTest {
     val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
     var effect = 0
     val iterations = stackSafeIteration()
-    Schedule.recurs<Unit>(iterations.toLong()).repeat {
+    val _ = Schedule.recurs<Unit>(iterations.toLong()).repeat {
       cb.protectOrThrow { withContext(Dispatchers.Default) { effect += 1 } }
     }
     assertEquals(iterations + 1, effect)
@@ -45,7 +45,7 @@ class CircuitBreakerTest {
     val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
     var effect = 0
     val iterations = stackSafeIteration()
-    Schedule.recurs<Unit>(iterations.toLong()).repeat {
+    val _ = Schedule.recurs<Unit>(iterations.toLong()).repeat {
       cb.protectOrThrow { effect += 1 }
     }
     assertEquals(iterations + 1, effect)
@@ -115,7 +115,9 @@ class CircuitBreakerTest {
       .doOnRejectedTask { rejectedCount += 1 }
 
     // CircuitBreaker opens after 5 failures
-    recurAndCollect<Unit>(5).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
+    val _ = recurAndCollect<Unit>(5).repeat {
+      val _ = Either.catch { cb.protectOrThrow { throw dummy } }
+    }
 
     assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
@@ -184,7 +186,9 @@ class CircuitBreakerTest {
       .doOnRejectedTask { rejectedCount += 1 }
 
     // CircuitBreaker opens after 5 failures
-    recurAndCollect<Unit>(5).repeat { Either.catch { cb.protectOrThrow { throw dummy } } }
+    val _ = recurAndCollect<Unit>(5).repeat {
+      val _ = Either.catch { cb.protectOrThrow { throw dummy } }
+    }
 
     assert(cb.state()) { s: CircuitBreaker.State.Open -> assertEquals(resetTimeout, s.resetTimeout) }
 
@@ -206,7 +210,7 @@ class CircuitBreakerTest {
     @Suppress("DeferredResultUnused")
     async { // Successful tasks puts circuit breaker back in HalfOpen
       // Delay protect, to inspect HalfOpen state.
-      Either.catch {
+      val _ = Either.catch {
         cb.protectOrThrow {
           checkHalfOpen.complete(Unit)
           delayProtectLatch.await(); throw dummy
@@ -301,7 +305,7 @@ class CircuitBreakerTest {
     var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
     val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(10)
 
-    schedule.repeat {
+    val _ = schedule.repeat {
       timeSource += stepDuration
       openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
       val shouldOpen = openingStrategy.shouldOpen()
@@ -319,7 +323,7 @@ class CircuitBreakerTest {
     var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
     val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
 
-    schedule.repeat {
+    val _ = schedule.repeat {
       timeSource += stepDuration
       openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
     }
@@ -341,7 +345,7 @@ class CircuitBreakerTest {
     var openingStrategy: OpeningStrategy = SlidingWindow(timeSource, windowDuration, maxFailures)
     val schedule = Schedule.spaced<Unit>(stepDuration) and Schedule.recurs(5)
 
-    schedule.repeat {
+    val _ = schedule.repeat {
       timeSource += stepDuration
       openingStrategy = openingStrategy.trackFailure(timeSource.markNow())
     }

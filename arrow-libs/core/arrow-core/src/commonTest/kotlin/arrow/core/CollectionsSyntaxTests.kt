@@ -30,7 +30,7 @@ class CollectionsSyntaxTests {
     }
 
     @Test fun destructured() = runTest {
-      val (head, tail) = listOf(1, 2, 3).let { it.first() to it.tail() }
+      val [head, tail] = listOf(1, 2, 3).let { it.first() to it.tail() }
       head shouldBe 1
       tail shouldBe listOf(2, 3)
     }

@@ -1,3 +1,4 @@
+@file:Suppress("RETURN_VALUE_NOT_USED_COERCION")
 package arrow.fx.coroutines
 
 import arrow.core.Either

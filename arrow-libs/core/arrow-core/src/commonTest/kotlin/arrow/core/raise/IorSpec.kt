@@ -287,7 +287,7 @@ class IorSpec {
             acc.value.plus(p).rightIor()
           }
           is Ior.Both -> {
-            val (rhsL, rhsR) = rhs.value as Ior.Both<E, V>
+            val [rhsL, rhsR] = rhs.value as Ior.Both<E, V>
             val p = rhs.key to rhsR
             val r = acc.value.plus(p)
             (rhsL to r).bothIor()
@@ -306,7 +306,7 @@ class IorSpec {
             (acc.leftValue to r).bothIor()
           }
           is Ior.Both -> {
-            val (rhsL, rhsR) = rhs.value as Ior.Both<E, V>
+            val [rhsL, rhsR] = rhs.value as Ior.Both<E, V>
             val l = combine(acc.leftValue, rhsL)
             val p = rhs.key to rhsR
             val r = acc.rightValue.plus(p)

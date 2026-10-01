@@ -18,7 +18,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R> Map<Key, 
   m10: Map<Key, T10>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -76,7 +76,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R> Map<
   m11: Map<Key, T11>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -138,7 +138,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R>
   m12: Map<Key, T12>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -204,7 +204,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m13: Map<Key, T13>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -274,7 +274,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m14: Map<Key, T14>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -348,7 +348,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m15: Map<Key, T15>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -426,7 +426,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m16: Map<Key, T16>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -508,7 +508,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m17: Map<Key, T17>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -594,7 +594,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m18: Map<Key, T18>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -684,7 +684,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m19: Map<Key, T19>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -778,7 +778,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m20: Map<Key, T20>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
@@ -875,7 +875,7 @@ public inline fun <Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T1
   m21: Map<Key, T21>,
   map: (Key, A, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) -> R,
 ): Map<Key, R> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (m1.containsKey(key)
       && m2.containsKey(key)
       && m3.containsKey(key)
