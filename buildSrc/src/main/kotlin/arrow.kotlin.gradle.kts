@@ -207,6 +207,7 @@ if (isKotlinMultiplatform) {
         namespace = projectNameWithDots
         compileSdk = 36
         minSdk = 21
+        aarMetadata.minCompileSdk = 1
         compilerOptions {
           jvmTarget = requiredJvmTarget
         }
