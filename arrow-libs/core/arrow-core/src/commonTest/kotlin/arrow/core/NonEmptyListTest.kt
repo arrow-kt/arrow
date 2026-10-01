@@ -600,4 +600,9 @@ class NonEmptyListTest {
       (MyVerySpecialList(it)).wrapAsNonEmptyListOrThrow().toString() shouldBe "MyVerySpecialList(${it.reversed()})"
     }
   }
+
+  @Test fun collectionLiteralSyntax() {
+    val x: NonEmptyList<Int> = [1, 2, 3]
+    x shouldBe nonEmptyListOf(1, 2, 3)
+  }
 }

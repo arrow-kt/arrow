@@ -121,6 +121,8 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions() {
     "-Xexpect-actual-classes",
     "-Xcontext-parameters",
     "-Xallow-holdsin-contract",
+    "-Xcollection-literals",
+    "-Xcompanion-blocks",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
     "-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled",
@@ -223,9 +225,10 @@ if (isKotlinMultiplatform) {
     linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    if (project.name != "arrow-cache4k") {
-      watchosArm32()
-    }
+    // deprecated in 2.5.0
+    // if (project.name != "arrow-cache4k") {
+    //   watchosArm32()
+    // }
     watchosArm64()
     tvosSimulatorArm64()
     tvosArm64()
@@ -235,9 +238,10 @@ if (isKotlinMultiplatform) {
       iosX64()
     }
     if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
-      androidNativeX86()
-      androidNativeX64()
-      androidNativeArm32()
+      // deprecated in 2.5.0
+      // androidNativeX86()
+      // androidNativeX64()
+      // androidNativeArm32()
       androidNativeArm64()
       watchosDeviceArm64()
     }

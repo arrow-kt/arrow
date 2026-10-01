@@ -62,7 +62,7 @@ public value class NonEmptySet<out E> internal constructor(
 
   public companion object {
     @JvmStatic @JvmExposeBoxed
-    public fun <E> of(head: E, vararg t: E): NonEmptySet<E> =
+    public operator fun <E> of(head: E, vararg t: E): NonEmptySet<E> =
       nonEmptySetOf(head, *t)
 
     @JvmStatic @JvmExposeBoxed
