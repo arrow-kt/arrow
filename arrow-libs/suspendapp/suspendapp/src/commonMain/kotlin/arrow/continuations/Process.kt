@@ -11,7 +11,6 @@ internal expect fun AutoCloseScope.process(): Process
  * [Process] offers a common API to work with our application's process, installing signal handlers,
  * shutdown hooks, running scopes in our process (runBlocking), and exiting the process.
  */
-@OptIn(ExperimentalStdlibApi::class)
 internal interface Process {
   fun onSigTerm(block: suspend (code: Int) -> Unit)
 

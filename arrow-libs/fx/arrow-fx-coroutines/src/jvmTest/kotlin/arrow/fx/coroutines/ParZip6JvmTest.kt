@@ -24,7 +24,7 @@ class ParZip6JvmTest {
       withContext(single()) {
         threadName() shouldStartWith "single"
 
-        val (s1, s2, s3, s4, s5, s6) = parZip(
+        val [s1, s2, s3, s4, s5, s6] = parZip(
           zipCtx, threadName, threadName, threadName, threadName, threadName, threadName
         ) { a, b, c, d, e, f ->
           Tuple6(a, b, c, d, e, f)

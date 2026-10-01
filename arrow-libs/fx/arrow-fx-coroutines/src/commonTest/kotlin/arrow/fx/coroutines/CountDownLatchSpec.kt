@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 class CountDownLatchSpec {
   @Test
@@ -47,7 +48,7 @@ class CountDownLatchSpec {
     checkAll(10, Arb.long(1, 20)) { count ->
       val latch = CountDownLatch(count)
       repeat(count.toInt() - 1) { latch.countDown() }
-      withTimeoutOrNull(1) { latch.await() }.shouldBeNull()
+      withTimeoutOrNull(1.milliseconds) { latch.await() }.shouldBeNull()
       latch.count() shouldBe 1
     }
   }

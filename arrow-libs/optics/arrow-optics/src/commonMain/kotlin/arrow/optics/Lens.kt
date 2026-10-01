@@ -52,24 +52,24 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
    */
   public infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Pair<S, S1>, Pair<T, T1>, Pair<A, A1>, Pair<B, B1>> =
     PLens(
-      { (s, c) -> get(s) to other.get(c) },
-      { (s, s1), (b, b1) -> set(s, b) to other.set(s1, b1) }
+      { [s, c] -> get(s) to other.get(c) },
+      { [s, s1], [b, b1] -> set(s, b) to other.set(s1, b1) }
     )
 
   /**
    * Create a product of the [PLens] and a type [C]
    */
   override fun <C> first(): PLens<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> = PLens(
-    { (s, c) -> get(s) to c },
-    { (s, _), (b, c) -> set(s, b) to c }
+    { [s, c] -> get(s) to c },
+    { [s, _], [b, c] -> set(s, b) to c }
   )
 
   /**
    * Create a product of a type [C] and the [PLens]
    */
   override fun <C> second(): PLens<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> = PLens(
-    { (c, s) -> c to get(s) },
-    { (_, s), (c, b) -> c to set(s, b) }
+    { [c, s] -> c to get(s) },
+    { [_, s], [c, b] -> c to set(s, b) }
   )
 
   /**
@@ -132,7 +132,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
     public fun <A, B, R> pairPFirst(): PLens<Pair<A, B>, Pair<R, B>, A, R> =
       PLens(
         get = { it.first },
-        set = { (_, b), r -> r to b }
+        set = { [_, b], r -> r to b }
       )
 
     /**
@@ -149,7 +149,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
     public fun <A, B, R> pairPSecond(): PLens<Pair<A, B>, Pair<A, R>, B, R> =
       PLens(
         get = { it.second },
-        set = { (a, _), r -> a to r }
+        set = { [a, _], r -> a to r }
       )
 
     /**
@@ -166,7 +166,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
     public fun <A, B, C, R> triplePFirst(): PLens<Triple<A, B, C>, Triple<R, B, C>, A, R> =
       PLens(
         get = { it.first },
-        set = { (_, b, c), r -> Triple(r, b, c) }
+        set = { [_, b, c], r -> Triple(r, b, c) }
       )
 
     /**
@@ -183,7 +183,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
     public fun <A, B, C, R> triplePSecond(): PLens<Triple<A, B, C>, Triple<A, R, C>, B, R> =
       PLens(
         get = { it.second },
-        set = { (a, _, c), r -> Triple(a, r, c) }
+        set = { [a, _, c], r -> Triple(a, r, c) }
       )
 
     /**
@@ -200,7 +200,7 @@ public interface PLens<S, T, A, B> : POptional<S, T, A, B> {
     public fun <A, B, C, R> triplePThird(): PLens<Triple<A, B, C>, Triple<A, B, R>, C, R> =
       PLens(
         get = { it.third },
-        set = { (a, b, _), r -> Triple(a, b, r) }
+        set = { [a, b, _], r -> Triple(a, b, r) }
       )
 
     /**

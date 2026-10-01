@@ -1,8 +1,6 @@
 package arrow.optics.dsl
 
 import arrow.core.*
-import arrow.optics.Lens
-import kotlin.jvm.JvmInline
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -41,7 +39,7 @@ class EverySyntaxTest {
   @Test
   fun map() {
     val original = mapOf("one" to 1, "two" to 2)
-    val expected = Wrapper(original.mapValues { (_, i) -> i + 1 })
+    val expected = Wrapper(original.mapValues { [_, i] -> i + 1 })
     val actual = Wrapper.lens<Map<String, Int>>()
       .every
       .modify(Wrapper(original), Int::inc)

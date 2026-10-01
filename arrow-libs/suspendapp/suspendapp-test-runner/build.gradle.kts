@@ -40,6 +40,7 @@ tasks.test {
 if (jvmTask != null) {
   tasks.register<Test>("jvmTest") {
     group = "verification"
+    description = "Runs the JVM test."
     jvmTask.addToTestTask(this)
     useJUnitPlatform()
   }
@@ -54,6 +55,7 @@ nonJvmTasks.all {
   val testTask = "${target}Test"
   tasks.register<Test>(testTask) {
     group = "verification"
+    description = "Runs the $target test."
     addToTestTask(this)
     useJUnitPlatform()
   }

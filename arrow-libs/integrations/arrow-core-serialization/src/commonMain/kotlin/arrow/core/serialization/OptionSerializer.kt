@@ -2,7 +2,6 @@ package arrow.core.serialization
 
 import arrow.core.Option
 import arrow.core.toOption
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -22,7 +21,6 @@ public class OptionSerializer<T>(
     nullableSerializer.deserialize(decoder).toOption()
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private val <T> KSerializer<T>.nullable get() =
   @Suppress("UNCHECKED_CAST")
   if (descriptor.isNullable) (this as KSerializer<T?>)

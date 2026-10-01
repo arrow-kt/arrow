@@ -58,7 +58,7 @@ public class ProductTypeDeserializer<T>(
     property: BeanProperty?,
   ): ValueDeserializer<*> {
     val deserializer = ProductTypeDeserializer(javaType, fields, fold)
-    for ((index, field) in fields.withIndex()) {
+    for ([index, field] in fields.withIndex()) {
       deserializer.deserializers[field.fieldName] =
         ElementDeserializer.resolve(
           ctxt.contextualType.containedTypeOrUnknown(index),

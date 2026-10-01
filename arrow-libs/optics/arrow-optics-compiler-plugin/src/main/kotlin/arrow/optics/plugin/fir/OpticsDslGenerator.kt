@@ -148,7 +148,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
               key = Key,
               callableId = callableId,
               returnTypeProvider = { tps ->
-                val (_, focusType) = dslSourceAndFocus(source, focus, declaredParams, tps)
+                val [_, focusType] = dslSourceAndFocus(source, focus, declaredParams, tps)
                 val s = coneOf(tps.last())
                 OpticsNames.polyClassFor(dslKind).constructClassLikeType(arrayOf(s, s, focusType, focusType))
               },
@@ -157,7 +157,7 @@ class OpticsDslGenerator(session: FirSession) : FirDeclarationGenerationExtensio
               copyTypeParameters(declaredParams, session)
               typeParameter(Name.identifier("__S"))
               extensionReceiverType { tps ->
-                val (sourceType, _) = dslSourceAndFocus(source, focus, declaredParams, tps)
+                val [sourceType, _] = dslSourceAndFocus(source, focus, declaredParams, tps)
                 val s = coneOf(tps.last())
                 OpticsNames.polyClassFor(dslKind).constructClassLikeType(arrayOf(s, s, sourceType, sourceType))
               }

@@ -171,7 +171,7 @@ if (isKotlinMultiplatform) {
     if (!noWasmWasi) {
       @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
       wasmWasi {
-        nodejs()
+        wasmtime()
       }
     }
 
@@ -199,9 +199,10 @@ if (isKotlinMultiplatform) {
     linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    if (project.name != "arrow-cache4k") {
-      watchosArm32()
-    }
+    // deprecated in 2.5.0
+    // if (project.name != "arrow-cache4k") {
+    //   watchosArm32()
+    // }
     watchosArm64()
     tvosSimulatorArm64()
     tvosArm64()
@@ -211,10 +212,11 @@ if (isKotlinMultiplatform) {
       iosX64()
     }
     if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
-      androidNativeX86()
-      androidNativeX64()
-      androidNativeArm32()
-      androidNativeArm64()
+      // deprecated in 2.5.0
+      // androidNativeX86()
+      // androidNativeX64()
+      // androidNativeArm32()
+      // androidNativeArm64()
       watchosDeviceArm64()
     }
     // deprecated in 2.3.20

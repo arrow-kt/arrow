@@ -1,6 +1,6 @@
 plugins {
-  kotlin("jvm") version "2.4.21"
-  kotlin("plugin.serialization") version "2.4.21"
+  kotlin("jvm") version "2.5.0-RC"
+  kotlin("plugin.serialization") version "2.5.0-RC"
   id("io.arrow-kt.optics") version "10.0-test"
 }
 

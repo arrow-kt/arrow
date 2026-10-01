@@ -23,7 +23,7 @@ class ParZip8JvmTest {
       withContext(single()) {
         threadName() shouldStartWith "single"
 
-        val (s1, s2, s3, s4, s5, s6, s7, s8) = parZip(
+        val [s1, s2, s3, s4, s5, s6, s7, s8] = parZip(
           zipCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName, threadName
         ) { a, b, c, d, e, f, g, h ->
           Tuple8(a, b, c, d, e, f, g, h)

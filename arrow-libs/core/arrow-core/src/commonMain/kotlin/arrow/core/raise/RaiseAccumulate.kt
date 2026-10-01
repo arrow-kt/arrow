@@ -993,7 +993,6 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @Deprecated("Binary compatibility", level = DeprecationLevel.HIDDEN)
   internal fun hasErrors(): Boolean = hasAccumulatedErrors
 
-  @Suppress("KotlinUnreachableCode") // wrong inspection
   @OptIn(ExperimentalRaiseAccumulateApi::class)
   @PublishedApi
   @Deprecated("Binary compatibility", level = DeprecationLevel.WARNING)
@@ -1091,7 +1090,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
   @JvmName("bindAllIor")
   @ExperimentalRaiseAccumulateApi
   public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> =
-    mapValuesOrAccumulate { (_, v) -> v.bind() }
+    mapValuesOrAccumulate { [_, v] -> v.bind() }
 }
 
 @ExperimentalRaiseAccumulateApi

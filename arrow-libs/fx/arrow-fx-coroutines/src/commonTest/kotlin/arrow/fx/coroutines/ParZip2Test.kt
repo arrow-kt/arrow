@@ -25,7 +25,7 @@ class ParZip2Test {
       val r = AtomicInt(0)
       val modifyGate = CompletableDeferred<Int>()
 
-      parZip(
+      val _ = parZip(
         {
           modifyGate.await()
           r.update { i -> i + a }
@@ -59,11 +59,11 @@ class ParZip2Test {
       s.send(Unit)
       f.cancel()
 
-      pa.await().let { (res, exit) ->
+      pa.await().let { [res, exit] ->
         res shouldBe a
         exit.shouldBeTypeOf<ExitCase.Cancelled>()
       }
-      pb.await().let { (res, exit) ->
+      pb.await().let { [res, exit] ->
         res shouldBe b
         exit.shouldBeTypeOf<ExitCase.Cancelled>()
       }

@@ -8,15 +8,14 @@ fun Provider<String>.ifAvailable(block: (String) -> Unit) =
   orNull?.takeIf(String::isNotBlank)?.also(block)
 
 fun KotlinCommonCompilerOptions.commonCompilerOptions(providers: ProviderFactory) {
-  apiVersion = KotlinVersion.KOTLIN_2_2
-  languageVersion = KotlinVersion.KOTLIN_2_2
+  apiVersion = KotlinVersion.KOTLIN_2_3
+  languageVersion = KotlinVersion.KOTLIN_2_3
   freeCompilerArgs.addAll(
     "-Xreport-all-warnings",
     "-Xrender-internal-diagnostic-names",
     "-Xreturn-value-checker=full",
     "-Xexpect-actual-classes",
     "-Xcontext-parameters",
-    "-Xallow-holdsin-contract",
     "-Xcollection-literals",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",

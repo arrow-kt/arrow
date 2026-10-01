@@ -140,7 +140,7 @@ internal fun evalAnnotatedDataClass(
         return null
       }
 
-      val (goodProperties, badProperties) = properties.partition { it.sameInChildren(subclasses) }
+      val [goodProperties, badProperties] = properties.partition { it.sameInChildren(subclasses) }
 
       badProperties.forEach {
         logger.info(it.qualifiedNameOrSimpleName.sealedLensChangedProperties, element)

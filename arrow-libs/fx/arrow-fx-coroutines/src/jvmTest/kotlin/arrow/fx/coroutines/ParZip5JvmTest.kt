@@ -24,7 +24,7 @@ class ParZip5JvmTest {
       withContext(single()) {
         threadName() shouldStartWith "single"
 
-        val (s1, s2, s3, s4, s5) = parZip(
+        val [s1, s2, s3, s4, s5] = parZip(
           zipCtx, threadName, threadName, threadName, threadName, threadName
         ) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
 
