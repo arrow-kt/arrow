@@ -1024,7 +1024,7 @@ public abstract class arrow/core/raise/RaiseAccumulate$Value {
 	public final fun getValue (Ljava/lang/Void;Lkotlin/reflect/KProperty;)Ljava/lang/Object;
 }
 
-public abstract class arrow/core/raise/RaiseCancellationException : java/util/concurrent/CancellationException {
+public abstract class arrow/core/raise/RaiseCancellationException : arrow/core/ControlCancellationException {
 	public synthetic fun <init> (Ljava/lang/Object;Larrow/core/raise/Raise;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
