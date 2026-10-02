@@ -25,7 +25,7 @@ class ResourceTestJvm {
 
   @Test fun autoCloseableJvmCloses() = runTest {
       val t = AutoCloseableJvmTest()
-      resourceScope {
+      val _ = resourceScope {
         autoCloseable { t }
       }
 
@@ -38,7 +38,7 @@ class ResourceTestJvm {
 
       shouldThrow<Exception> {
         resourceScope {
-          autoCloseable { t }
+          val _ = autoCloseable { t }
           throw throwable
         }
       } shouldBe throwable
@@ -50,7 +50,7 @@ class ResourceTestJvm {
   @Test fun closeableCloses() = runTest {
       val t = CloseableTest()
 
-      resourceScope {
+      val _ = resourceScope {
         closeable { t }
       }
 
@@ -63,7 +63,7 @@ class ResourceTestJvm {
 
       shouldThrow<Exception> {
         resourceScope {
-          closeable { t }
+          val _ = closeable { t }
           throw throwable
         }
       } shouldBe throwable

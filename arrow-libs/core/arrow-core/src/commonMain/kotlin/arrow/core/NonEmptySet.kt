@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalStdlibApi::class)
+@file:OptIn(ExperimentalStdlibApi::class)
 @file:Suppress("API_NOT_AVAILABLE", "RESERVED_MEMBER_INSIDE_VALUE_CLASS")
 
 package arrow.core
@@ -7,7 +7,6 @@ import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.either
 import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.withError
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmStatic
@@ -62,7 +61,7 @@ public value class NonEmptySet<out E> internal constructor(
 
   public companion object {
     @JvmStatic @JvmExposeBoxed
-    public fun <E> of(head: E, vararg t: E): NonEmptySet<E> =
+    public operator fun <E> of(head: E, vararg t: E): NonEmptySet<E> =
       nonEmptySetOf(head, *t)
 
     @JvmStatic @JvmExposeBoxed

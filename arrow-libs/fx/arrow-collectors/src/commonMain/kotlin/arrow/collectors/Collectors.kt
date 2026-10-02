@@ -103,7 +103,7 @@ public object Collectors {
    * Collects all the values in a map.
    */
   public fun <K, V> mapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, Map<K, V>> =
-    map<K, V>().contramapNonSuspend { (k, v) -> k to v }
+    map<K, V>().contramapNonSuspend { [k, v] -> k to v }
 
   /**
    * Collects all the values in a map.
@@ -130,7 +130,7 @@ public object Collectors {
 
   private val _map: NonSuspendCollector<Pair<Any?, Any?>, Map<Any?, Any?>> = Collector.nonSuspendOf(
     supply = { mutableMapOf<Any?, Any?>() },
-    accumulate = { current, (k, v) -> current[k] = v },
+    accumulate = { current, [k, v] -> current[k] = v },
     finish = { it },
     characteristics = Characteristics.IDENTITY_UNORDERED
   )

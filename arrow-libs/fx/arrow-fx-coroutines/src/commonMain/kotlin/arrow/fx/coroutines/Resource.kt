@@ -367,7 +367,7 @@ public suspend inline fun <A> resourceScope(action: suspend ResourceScope.() -> 
   contract {
     callsInPlace(action, InvocationKind.EXACTLY_ONCE)
   }
-  val (scope, cancelAll) = resource { this }.allocate()
+  val [scope, cancelAll] = resource { this }.allocate()
   return finalizeCase({ scope.action() }) { cancelAll(it) }
 }
 
@@ -457,7 +457,7 @@ public fun <A> Resource<A>.asFlow(): Flow<A> =
  *
  * @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
  * suspend fun main(): Unit {
- *   val (acquired: String, release: suspend (ExitCase) -> Unit) = resource.allocate()
+ *   val [acquired: String, release: suspend (ExitCase) -> Unit] = resource.allocate()
  *   try {
  *     /** Do something with A */
  *     release(ExitCase.Completed)
@@ -515,7 +515,6 @@ internal expect val IODispatcher: CoroutineDispatcher
  * <!--- KNIT example-resource-10.kt -->
  */
 @ResourceDSL
-@OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
 public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,
@@ -532,7 +531,6 @@ public suspend fun <A : AutoCloseable> ResourceScope.autoCloseable(
   }
 }
 
-@OptIn(ExperimentalStdlibApi::class)  // 'AutoCloseable' in stdlib < 2.0
 public fun <A : AutoCloseable> autoCloseable(
   closingDispatcher: CoroutineDispatcher = IODispatcher,
   autoCloseable: suspend () -> A,

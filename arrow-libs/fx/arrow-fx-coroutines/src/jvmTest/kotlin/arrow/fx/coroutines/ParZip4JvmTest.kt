@@ -14,7 +14,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.test.Test
-import kotlin.time.Duration.Companion.seconds
 
 class ParZip4JvmTest {
     @Test fun parZip4ReturnsToOriginalContext(): Unit = runBlocking(Dispatchers.Default) {
@@ -25,7 +24,7 @@ class ParZip4JvmTest {
           withContext(single()) {
             Thread.currentThread().name shouldStartWith "single"
 
-            val (s1, s2, s3, s4) = parZip(
+            val [s1, s2, s3, s4] = parZip(
               zipCtx,
               { Thread.currentThread().name },
               { Thread.currentThread().name },

@@ -94,7 +94,7 @@ class IterableTest {
   fun zip3Ok() = runTest {
     checkAll(Arb.list(Arb.int()), Arb.list(Arb.int()), Arb.list(Arb.int())) { a, b, c ->
       val result = a.zip(b, c, ::Triple)
-      val expected = a.zip(b, ::Pair).zip(c) { (a, b), c -> Triple(a, b, c) }
+      val expected = a.zip(b, ::Pair).zip(c) { [a, b], c -> Triple(a, b, c) }
       result shouldBe expected
     }
   }
@@ -110,8 +110,8 @@ class IterableTest {
       val result = a.zip(b, c, d, ::Tuple4)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
 
       result shouldBe expected
     }
@@ -129,9 +129,9 @@ class IterableTest {
       val result = a.zip(b, c, d, e, ::Tuple5)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
+          .zip(e) { [a, b, c, d], e -> Tuple5(a, b, c, d, e) }
 
       result shouldBe expected
     }
@@ -150,10 +150,10 @@ class IterableTest {
       val result = a.zip(b, c, d, e, f, ::Tuple6)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
+          .zip(e) { [a, b, c, d], e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { [a, b, c, d, e], f -> Tuple6(a, b, c, d, e, f) }
 
       result shouldBe expected
     }
@@ -173,11 +173,11 @@ class IterableTest {
       val result = a.zip(b, c, d, e, f, g, ::Tuple7)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
+          .zip(e) { [a, b, c, d], e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { [a, b, c, d, e], f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { [a, b, c, d, e, f], g -> Tuple7(a, b, c, d, e, f, g) }
 
       result shouldBe expected
     }
@@ -198,12 +198,12 @@ class IterableTest {
       val result = a.zip(b, c, d, e, f, g, h, ::Tuple8)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
+          .zip(e) { [a, b, c, d], e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { [a, b, c, d, e], f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { [a, b, c, d, e, f], g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(h) { [a, b, c, d, e, f, g], h -> Tuple8(a, b, c, d, e, f, g, h) }
 
       result shouldBe expected
     }
@@ -225,13 +225,13 @@ class IterableTest {
       val result = a.zip(b, c, d, e, f, g, h, i, ::Tuple9)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
-          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
+          .zip(e) { [a, b, c, d], e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { [a, b, c, d, e], f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { [a, b, c, d, e, f], g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(h) { [a, b, c, d, e, f, g], h -> Tuple8(a, b, c, d, e, f, g, h) }
+          .zip(i) { [a, b, c, d, e, f, g, h], i -> Tuple9(a, b, c, d, e, f, g, h, i) }
 
       result shouldBe expected
     }
@@ -267,14 +267,14 @@ class IterableTest {
       val result = a.zip(b, c, d, e, f, g, h, i, j, ::Tuple10)
       val expected =
         a.zip(b, ::Pair)
-          .zip(c) { (a, b), c -> Triple(a, b, c) }
-          .zip(d) { (a, b, c), d -> Tuple4(a, b, c, d) }
-          .zip(e) { (a, b, c, d), e -> Tuple5(a, b, c, d, e) }
-          .zip(f) { (a, b, c, d, e), f -> Tuple6(a, b, c, d, e, f) }
-          .zip(g) { (a, b, c, d, e, f), g -> Tuple7(a, b, c, d, e, f, g) }
-          .zip(h) { (a, b, c, d, e, f, g), h -> Tuple8(a, b, c, d, e, f, g, h) }
-          .zip(i) { (a, b, c, d, e, f, g, h), i -> Tuple9(a, b, c, d, e, f, g, h, i) }
-          .zip(j) { (a, b, c, d, e, f, g, h, i), j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
+          .zip(c) { [a, b], c -> Triple(a, b, c) }
+          .zip(d) { [a, b, c], d -> Tuple4(a, b, c, d) }
+          .zip(e) { [a, b, c, d], e -> Tuple5(a, b, c, d, e) }
+          .zip(f) { [a, b, c, d, e], f -> Tuple6(a, b, c, d, e, f) }
+          .zip(g) { [a, b, c, d, e, f], g -> Tuple7(a, b, c, d, e, f, g) }
+          .zip(h) { [a, b, c, d, e, f, g], h -> Tuple8(a, b, c, d, e, f, g, h) }
+          .zip(i) { [a, b, c, d, e, f, g, h], i -> Tuple9(a, b, c, d, e, f, g, h, i) }
+          .zip(j) { [a, b, c, d, e, f, g, h, i], j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }
 
       result shouldBe expected
     }
@@ -432,7 +432,7 @@ class IterableTest {
     )
 
     checkAll(Arb.list(Arb.ior(Arb.int(), Arb.int()))) { xs ->
-      val (a, b) = xs.unalign()
+      val [a, b] = xs.unalign()
       a.align(b) { it.fix() } shouldBe xs
     }
   }
@@ -601,8 +601,7 @@ class IterableTest {
       val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
       val both = left.zip(right)
 
-      val expected = both.firstNotNullOfOrNull {
-        val (l, r) = it
+      val expected = both.firstNotNullOfOrNull { [l, r] ->
         when {
           (l != null && r == null) -> 1
           (l == null && r != null) -> -1

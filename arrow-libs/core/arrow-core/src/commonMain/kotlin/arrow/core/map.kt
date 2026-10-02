@@ -1,12 +1,8 @@
-@file:OptIn(ExperimentalTypeInference::class)
-
 package arrow.core
 
 import arrow.core.raise.either
-import arrow.core.raise.mapOrAccumulate
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapValuesOrAccumulate
-import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * Combines to structures by taking the intersection of their shapes
@@ -47,7 +43,7 @@ public fun <K, A, B> Map<K, A>.zip(other: Map<K, B>): Map<K, Pair<A, B>> =
 @Suppress("UNCHECKED_CAST")
 public inline fun <Key, A, B, C> Map<Key, A>.zip(other: Map<Key, B>, map: (Key, A, B) -> C): Map<Key, C> =
   buildMap(size) {
-    this@zip.forEach { (key, bb) ->
+    this@zip.forEach { [key, bb] ->
       if (other.containsKey(key)) {
         put(key, map(key, bb, other[key] as B))
       }
@@ -60,7 +56,7 @@ public inline fun <Key, B, C, D, E> Map<Key, B>.zip(
   d: Map<Key, D>,
   map: (Key, B, C, D) -> E
 ): Map<Key, E> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -77,7 +73,7 @@ public inline fun <Key, B, C, D, E, F> Map<Key, B>.zip(
   e: Map<Key, E>,
   map: (Key, B, C, D, E) -> F
 ): Map<Key, F> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -96,7 +92,7 @@ public inline fun <Key, B, C, D, E, F, G> Map<Key, B>.zip(
   f: Map<Key, F>,
   map: (Key, B, C, D, E, F) -> G
 ): Map<Key, G> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -117,7 +113,7 @@ public inline fun <Key, B, C, D, E, F, G, H> Map<Key, B>.zip(
   g: Map<Key, G>,
   map: (Key, B, C, D, E, F, G) -> H
 ): Map<Key, H> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -140,7 +136,7 @@ public inline fun <Key, B, C, D, E, F, G, H, I> Map<Key, B>.zip(
   h: Map<Key, H>,
   map: (Key, B, C, D, E, F, G, H) -> I
 ): Map<Key, I> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -165,7 +161,7 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J> Map<Key, B>.zip(
   i: Map<Key, I>,
   map: (Key, B, C, D, E, F, G, H, I) -> J
 ): Map<Key, J> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key) && i.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -194,7 +190,7 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K> Map<Key, B>.zip(
   j: Map<Key, J>,
   map: (Key, B, C, D, E, F, G, H, I, J) -> K
 ): Map<Key, K> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key) && i.containsKey(key) && j.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -223,7 +219,7 @@ public inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> Map<Key, B>.zip(
   k: Map<Key, K>,
   map: (Key, B, C, D, E, F, G, H, I, J, K) -> L
 ): Map<Key, L> = buildMap(size) {
-  this@zip.forEach { (key, bb) ->
+  this@zip.forEach { [key, bb] ->
     if (c.containsKey(key) && d.containsKey(key) && e.containsKey(key) && f.containsKey(key) && g.containsKey(key) && h.containsKey(key) && i.containsKey(key) && j.containsKey(key) && k.containsKey(key)) {
       val cc = c[key] as C
       val dd = d[key] as D
@@ -294,7 +290,7 @@ public inline fun <K, A, B> Map<K, A>.mapValuesNotNull(transform: (Map.Entry<K, 
 
 public fun <K, A> Map<K, Option<A>>.filterOption(): Map<K, A> =
   buildMap {
-    this@filterOption.forEach { (key, option) ->
+    this@filterOption.forEach { [key, option] ->
       option.fold({ }, { put(key, it) })
     }
   }
@@ -404,7 +400,7 @@ public inline fun <K, A, B, C> Map<K, A>.padZip(
  * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
-  unalign { (_, ior) -> ior }
+  unalign { [_, ior] -> ior }
 
 /**
  * after applying the given function, splits the resulting union shaped structure into its components parts
@@ -461,7 +457,7 @@ public inline fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A,
  * <!--- lines.isEmpty() -->
  */
 public fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
-  unzip { (_, pair) -> pair }
+  unzip { [_, pair] -> pair }
 
 /**
  * After applying the given function unzip the resulting structure into its elements.
@@ -488,7 +484,7 @@ public inline fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, 
   val lefts = mutableMapOf<K, A>()
   val rights = mutableMapOf<K, B>()
   forEach { entry ->
-    val (a, b) = fc(entry)
+    val [a, b] = fc(entry)
     lefts[entry.key] = a
     rights[entry.key] = b
   }
@@ -508,8 +504,8 @@ public fun <K, V> Map<K, V>.getOrNone(key: K): Option<V> {
 
 /** Combines two maps using [combine] to combine values for the same key. */
 public fun <K, A> Map<K, A>.combine(other: Map<K, A>, combine: (A, A) -> A): Map<K, A> =
-  if (size < other.size) fold(other) { my, (k, b) -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
-  else other.fold(this@combine) { my, (k, a) -> my + Pair(k, my[k]?.let { combine(it, a) } ?: a) }
+  if (size < other.size) fold(other) { my, [k, b] -> my + Pair(k, my[k]?.let { combine(b, it) } ?: b) }
+  else other.fold(this@combine) { my, [k, a] -> my + Pair(k, my[k]?.let { combine(it, a) } ?: a) }
 
 public inline fun <K, A, B> Map<K, A>.fold(initial: B, operation: (acc: B, Map.Entry<K, A>) -> B): B {
   var accumulator = initial

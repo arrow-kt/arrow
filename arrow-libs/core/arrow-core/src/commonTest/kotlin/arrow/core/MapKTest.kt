@@ -62,7 +62,7 @@ class MapKTest {
   @Test fun alignMaps() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val aligned = a.align(b)
       // aligned keySet is union of a's and b's keys
       aligned.size shouldBe (a.keys + b.keys).size
@@ -100,7 +100,7 @@ class MapKTest {
   @Test fun zipIsCommutative() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
 
       a.zip(b) shouldBe b.zip(a).mapValues { it.value.second to it.value.first }
     }
@@ -109,7 +109,7 @@ class MapKTest {
   @Test fun alignIsCommutative() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
 
       a.align(b) shouldBe b.align(a).mapValues { it.value.swap() }
     }
@@ -118,7 +118,7 @@ class MapKTest {
   @Test fun zipIsAssociative() = runTest {
     checkAll(
       Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b, c) ->
+    ) { [a, b, c] ->
 
       fun <A, B, C> Pair<Pair<A, B>, C>.assoc(): Pair<A, Pair<B, C>> = this.first.first to (this.first.second to this.second)
 
@@ -129,7 +129,7 @@ class MapKTest {
   @Test fun alignIsAssociative() = runTest {
     checkAll(
       Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b, c) ->
+    ) { [a, b, c] ->
 
       fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> = when (this) {
         is Ior.Left -> when (val inner = this.value) {
@@ -153,7 +153,7 @@ class MapKTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
       Arb.functionABCToD<Int, Int, Int, Int>(Arb.int()),
-    ) { (a, b), fn ->
+    ) { [a, b], fn ->
       a.zip(b, fn) shouldBe a.zip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
     }
   }
@@ -162,7 +162,7 @@ class MapKTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
       Arb.functionAToB<Map.Entry<Int, Ior<Int, Int>>, Int>(Arb.int()),
-    ) { (a, b), fn ->
+    ) { [a, b], fn ->
       a.align(b, fn) shouldBe a.align(b).mapValues { fn(it) }
     }
   }
@@ -172,7 +172,7 @@ class MapKTest {
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
       Arb.functionAToB<Int, Int>(Arb.int()),
       Arb.functionAToB<Int, Int>(Arb.int()),
-    ) { (a, b), f, g ->
+    ) { [a, b], f, g ->
 
       fun <A, B, C, D> Pair<A, C>.bimap(f: (A) -> B, g: (C) -> D) = Pair(f(first), g(second))
 
@@ -188,7 +188,7 @@ class MapKTest {
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
       Arb.functionAToB<Int, Int>(Arb.int()),
       Arb.functionAToB<Int, Int>(Arb.int()),
-    ) { (a, b), f, g ->
+    ) { [a, b], f, g ->
 
       val l = a.mapValues { f(it.value) }.align(b.mapValues { g(it.value) })
       val r = a.align(b).mapValues { it.value.map(g).mapLeft(f) }
@@ -200,7 +200,7 @@ class MapKTest {
   @Test fun alignedness() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
 
       fun <K, V> toList(es: Map<K, V>): List<V> = es.fold(emptyList()) { acc, e ->
         acc + e.value
@@ -248,7 +248,7 @@ class MapKTest {
   @Test fun distributivity1() = runTest {
     checkAll(
       Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-    ) { (x, y, z) ->
+    ) { [x, y, z] ->
 
       fun <A, B, C> Pair<Ior<A, C>, Ior<B, C>>.undistrThesePair(): Ior<Pair<A, B>, C> = when (val l = this.first) {
         is Ior.Left -> {
@@ -276,7 +276,7 @@ class MapKTest {
   @Test fun distributivity2() = runTest {
     checkAll(
       Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-    ) { (x, y, z) ->
+    ) { [x, y, z] ->
 
       fun <A, B, C> Pair<Ior<A, B>, C>.distrPairThese(): Ior<Pair<A, C>, Pair<B, C>> = when (val l = this.first) {
         is Ior.Left -> Ior.Left(l.value to this.second)
@@ -294,7 +294,7 @@ class MapKTest {
   @Test fun distributivity3() = runTest {
     checkAll(
       Arb.map3(Arb.int(), Arb.int(), Arb.int(), Arb.int()),
-    ) { (x, y, z) ->
+    ) { [x, y, z] ->
 
       fun <A, B, C> Ior<Pair<A, C>, Pair<B, C>>.undistrPairThese(): Pair<Ior<A, B>, C> = when (val e = this) {
         is Ior.Left -> Ior.Left(e.value.first) to e.value.second
@@ -324,7 +324,7 @@ class MapKTest {
     checkAll(
       Arb.map(Arb.int(), Arb.pair(Arb.int(), Arb.int()), maxSize = 30),
     ) { xs ->
-      val (a, b) = xs.unzip()
+      val [a, b] = xs.unzip()
       a.zip(b) shouldBe xs
     }
   }
@@ -349,7 +349,7 @@ class MapKTest {
     checkAll(
       Arb.map(Arb.int(0..1000), Arb.int(), maxSize = 30),
     ) { xs ->
-      val (found, notFound) = (0..1000).partition { xs.containsKey(it) }
+      val [found, notFound] = (0..1000).partition { xs.containsKey(it) }
 
       found.forEach {
         xs.getOrNone(it)
@@ -367,7 +367,7 @@ class MapKTest {
   @Test fun unalignInverseOfAlign() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       a.align(b).unalign() shouldBe (a to b)
     }
   }
@@ -376,7 +376,7 @@ class MapKTest {
     checkAll(
       Arb.map(Arb.int(), Arb.ior(Arb.int(), Arb.int()), maxSize = 30),
     ) { xs ->
-      val (a, b) = xs.unalign()
+      val [a, b] = xs.unalign()
 
       a.align(b) shouldBe xs
     }
@@ -385,7 +385,7 @@ class MapKTest {
   @Test fun padZipOk() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val x = a.padZip(b)
 
       a.forEach {
@@ -406,7 +406,7 @@ class MapKTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
       Arb.functionABCToD<Int, Int?, Int?, Int>(Arb.int()),
-    ) { (a, b), fn ->
+    ) { [a, b], fn ->
       a.padZip(b, fn) shouldBe a.padZip(b).mapValues { fn(it.key, it.value.first, it.value.second) }
     }
   }
@@ -414,7 +414,7 @@ class MapKTest {
   @Test fun salignOk() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.intSmall(), Arb.intSmall()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       a.salign(b, Int::plus) shouldBe a.align(b) { it.value.fold(::identity, ::identity) { a, b -> a + b } }
     }
   }
@@ -423,7 +423,7 @@ class MapKTest {
     checkAll(
       Arb.map(Arb.int(), Arb.boolean(), maxSize = 30),
     ) { xs ->
-      val rs = xs.mapValuesNotNull { (_, pred) -> if (pred) true else null }
+      val rs = xs.mapValuesNotNull { [_, pred] -> if (pred) true else null }
 
       xs.forEach {
         if (it.value) {
@@ -478,10 +478,10 @@ class MapKTest {
   @Test fun zip2Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b) { _, aa, bb -> Pair(aa, bb) }
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Pair(v, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Pair(v, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -491,10 +491,10 @@ class MapKTest {
   @Test fun zip2Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB) { _, aa, bb -> Pair(aa, bb) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Pair(v, mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Pair(v, mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -504,11 +504,11 @@ class MapKTest {
   @Test fun zip3Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b) { _, aa, bb, cc -> Triple(aa, bb, cc) }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Triple(v, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Triple(v, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -518,10 +518,10 @@ class MapKTest {
   @Test fun zip3Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB, mapB) { _, aa, bb, cc -> Triple(aa, bb, cc) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Triple(v, mapB[k], mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Triple(v, mapB[k], mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -531,11 +531,11 @@ class MapKTest {
   @Test fun zip4Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b, b) { _, aa, bb, cc, dd -> Tuple4(aa, bb, cc, dd) }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple4(v, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple4(v, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -545,10 +545,10 @@ class MapKTest {
   @Test fun zip4Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB, mapB, mapB) { _, aa, bb, cc, dd -> Tuple4(aa, bb, cc, dd) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple4(v, mapB[k], mapB[k], mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple4(v, mapB[k], mapB[k], mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -558,11 +558,11 @@ class MapKTest {
   @Test fun zip5Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b, b, b) { _, aa, bb, cc, dd, ee -> Tuple5(aa, bb, cc, dd, ee) }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple5(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple5(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -572,10 +572,10 @@ class MapKTest {
   @Test fun zip5Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee -> Tuple5(aa, bb, cc, dd, ee) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple5(v, mapB[k], mapB[k], mapB[k], mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple5(v, mapB[k], mapB[k], mapB[k], mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -585,11 +585,11 @@ class MapKTest {
   @Test fun zip6Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff -> Tuple6(aa, bb, cc, dd, ee, ff) }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple6(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple6(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -599,10 +599,10 @@ class MapKTest {
   @Test fun zip6Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff -> Tuple6(aa, bb, cc, dd, ee, ff) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple6(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple6(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -612,11 +612,11 @@ class MapKTest {
   @Test fun zip7Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg -> Tuple7(aa, bb, cc, dd, ee, ff, gg) }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple7(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple7(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -626,10 +626,10 @@ class MapKTest {
   @Test fun zip7Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg -> Tuple7(aa, bb, cc, dd, ee, ff, gg) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple7(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple7(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -639,12 +639,12 @@ class MapKTest {
   @Test fun zip8Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result =
         a.zip(b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh -> Tuple8(aa, bb, cc, dd, ee, ff, gg, hh) }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple8(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple8(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -654,10 +654,10 @@ class MapKTest {
   @Test fun zip8Null() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.zip(mapB, mapB, mapB, mapB, mapB, mapB, mapB) { _, aa, bb, cc, dd, ee, ff, gg, hh -> Tuple8(aa, bb, cc, dd, ee, ff, gg, hh) }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple8(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple8(v, mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k], mapB[k])) }
         .toMap()
 
       result shouldBe expected
@@ -667,7 +667,7 @@ class MapKTest {
   @Test fun zip9Ok() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii ->
         Tuple9(
           aa,
@@ -682,8 +682,8 @@ class MapKTest {
         )
       }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple9(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple9(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected
@@ -693,10 +693,10 @@ class MapKTest {
   @Test fun flatMapValuesOk() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.flatMapValues { b }
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, _) -> Pair(k, b[k]!!) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, _] -> Pair(k, b[k]!!) }
         .toMap()
       result shouldBe expected
     }
@@ -741,10 +741,10 @@ class MapKTest {
   @Test fun flatMapValuesNull() = runTest {
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int().orNull()),
-    ) { (mapA, mapB) ->
+    ) { [mapA, mapB] ->
       val result = mapA.flatMapValues { mapB }
-      val expected = mapA.filter { (k, _) -> mapB.containsKey(k) }
-        .map { (k, _) -> Pair(k, mapB[k]) }
+      val expected = mapA.filter { [k, _] -> mapB.containsKey(k) }
+        .map { [k, _] -> Pair(k, mapB[k]) }
         .toMap()
       result shouldBe expected
     }
@@ -790,7 +790,7 @@ class MapKTest {
         raise(it.value.toString())
       }
 
-      val expected = xs.map { (_, value) ->
+      val expected = xs.map { [_, value] ->
         value.toString()
       }.joinToString(separator)
 
@@ -816,7 +816,7 @@ class MapKTest {
 
     checkAll(
       Arb.map2(Arb.int(), Arb.int(), Arb.int()),
-    ) { (a, b) ->
+    ) { [a, b] ->
       val result = a.zip(b, b, b, b, b, b, b, b, b) { _, aa, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
         Tuple10(
           aa,
@@ -832,8 +832,8 @@ class MapKTest {
         )
       }
 
-      val expected = a.filter { (k, _) -> b.containsKey(k) }
-        .map { (k, v) -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
+      val expected = a.filter { [k, _] -> b.containsKey(k) }
+        .map { [k, v] -> Pair(k, Tuple10(v, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!, b[k]!!)) }
         .toMap()
 
       result shouldBe expected

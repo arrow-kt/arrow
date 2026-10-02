@@ -73,7 +73,7 @@ class EffectSpec {
         try {
           raise(s())
         } catch (e: RaiseCancellationException) {
-          i()
+          val _ = i()
         }
         raise(s2())
       }
@@ -325,7 +325,7 @@ class EffectSpec {
   @Test fun canShortCircuitFromNestedBlocks() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect<String, Int> {
-        effect<Nothing, Long> { raise(msg()) }.getOrElse { unreachable() }
+        val _ = effect<Nothing, Long> { raise(msg()) }.getOrElse { unreachable() }
         fail("Should never reach this point")
       }
         .fold(::identity, ::identity) shouldBe msg()
@@ -335,8 +335,8 @@ class EffectSpec {
   @Test fun canShortCircuitImmediatelyAfterSuspendingFromNestedBlocks() = runTest {
     checkAll(Arb.string().suspend()) { msg ->
       effect<String, Int> {
-        effect<Nothing, Long> {
-          1L.suspend()
+        val _ = effect<Nothing, Long> {
+          val _ = 1L.suspend()
           raise(msg())
         }.getOrElse { unreachable() }
         fail("Should never reach this point")
@@ -380,7 +380,7 @@ class EffectSpec {
       }
 
       effect {
-        failure().bind()
+        val _ = failure().bind()
         1
       }.fold(
         recover = { it },

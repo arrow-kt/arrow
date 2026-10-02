@@ -223,10 +223,10 @@ class OptionalTest {
   fun filterModify() = runTest {
     checkAll(Arb.list(Arb.pair(Arb.int(), Arb.string(maxSize = 10)))) { lst: List<Pair<Int, String>> ->
       Every.list<Pair<Int, String>>()
-        .filter { (n, _) -> n % 2 == 0 }
+        .filter { [n, _] -> n % 2 == 0 }
         .compose(Lens.pairSecond())
         .modify(lst) { it.uppercase() }
-        .shouldBe(lst.map { (n, s) -> Pair(n, if (n % 2 == 0) s.uppercase() else s) })
+        .shouldBe(lst.map { [n, s] -> Pair(n, if (n % 2 == 0) s.uppercase() else s) })
     }
   }
 

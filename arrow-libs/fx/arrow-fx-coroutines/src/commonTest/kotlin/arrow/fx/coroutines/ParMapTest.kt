@@ -1,3 +1,4 @@
+@file:Suppress("RETURN_VALUE_NOT_USED_COERCION")
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicInt
@@ -24,7 +25,7 @@ class ParMapTest {
   @Test fun parMapIsStackSafe() = runTestUsingDefaultDispatcher {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
-    (0 until count).parMap { _: Int ->
+    val _ = (0 until count).parMap { _: Int ->
       ref.update { it + 1 }
     }
     ref.get() shouldBe count
@@ -93,7 +94,7 @@ class ParMapTest {
   @Test fun parMapOrAccumulateIsStackSafe() = runTestUsingDefaultDispatcher {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
-    (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
+    val _ = (0 until count).parMapOrAccumulate(combine = emptyError) { _: Int ->
       ref.update { it + 1 }
     }
     ref.get() shouldBe count
@@ -156,7 +157,7 @@ class ParMapTest {
   @Test fun parMapNotNullIsStackSafe() = runTestUsingDefaultDispatcher {
     val count = stackSafeIteration()
     val ref = AtomicInt(0)
-    (0 until count).parMapNotNull { _: Int ->
+    val _ = (0 until count).parMapNotNull { _: Int ->
       ref.update { it + 1 }
     }
     ref.get() shouldBe count

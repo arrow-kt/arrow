@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 
 suspend fun main(): Unit {
-  resourceScope {
+  val _ = resourceScope {
     val pool = executor {
       val ctr = AtomicInteger(0)
       val size = max(2, Runtime.getRuntime().availableProcessors())

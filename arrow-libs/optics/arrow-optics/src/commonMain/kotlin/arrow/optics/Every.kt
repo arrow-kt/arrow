@@ -58,12 +58,12 @@ public object Every {
   @JvmStatic
   public fun <K, V> map(): Traversal<Map<K, V>, V> = object : Traversal<Map<K, V>, V> {
     override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: Map<K, V>, map: (focus: V) -> R): R =
-      source.fold(initial) { acc, (_, v) ->
+      source.fold(initial) { acc, [_, v] ->
         combine(acc, map(v))
       }
 
     override fun modify(source: Map<K, V>, map: (focus: V) -> V): Map<K, V> =
-      source.mapValues { (_, v) -> map(v) }
+      source.mapValues { [_, v] -> map(v) }
   }
 
   /**

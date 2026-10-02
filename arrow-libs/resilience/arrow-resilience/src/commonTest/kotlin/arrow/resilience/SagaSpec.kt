@@ -32,7 +32,7 @@ class SagaSpec {
     val value = Random.nextInt()
     val compensation = CompletableDeferred<Int>()
     val saga = saga {
-      saga({ value }) { compensation.complete(it) }
+      val _ = saga({ value }) { compensation.complete(it) }
       throw SagaFailed("Exception in builder")
     }
     assertFailsWith<SagaFailed> { saga.transact() }
@@ -44,7 +44,7 @@ class SagaSpec {
     val value = Random.nextInt()
     val compensation = CompletableDeferred<Int>()
     val saga = saga {
-      saga({ value }) { compensation.complete(it) }
+      val _ = saga({ value }) { compensation.complete(it) }
       saga({ throw SagaFailed("Exception in saga") }) { fail("Doesn't run") }
     }
     assertFailsWith<SagaFailed> { saga.transact() }
@@ -58,8 +58,8 @@ class SagaSpec {
 
     val compensations = Channel<Int>(2)
     val saga = saga {
-      saga({ valueA }) { compensations.send(it) }
-      saga({ valueB }) { compensations.send(it) }
+      val _ = saga({ valueA }) { compensations.send(it) }
+      val _ = saga({ valueB }) { compensations.send(it) }
       saga({ throw SagaFailed("Exception in saga") }) { fail("Doesn't run") }
     }
     assertFailsWith<SagaFailed> { saga.transact() }
@@ -75,7 +75,7 @@ class SagaSpec {
     val original = SagaFailed("Exception in saga")
     val compensation = SagaFailed("Exception in compensation")
     val saga = saga {
-      saga({ value }) { compensationA.complete(it) }
+      val _ = saga({ value }) { compensationA.complete(it) }
       saga({}) { throw compensation }
       saga({ throw original }) { fail("Doesn't run") }
     }
@@ -94,7 +94,7 @@ class SagaSpec {
     val compensation = SagaFailed("Exception in compensation")
 
     val saga = saga {
-      saga({ value }) { compensationA.complete(it) }
+      val _ = saga({ value }) { compensationA.complete(it) }
       saga({}) { throw compensation }
       throw original
     }
@@ -193,9 +193,9 @@ class SagaSpec {
     }
 
     assertTrue(result.isLeft(), "action was rolled back")
-    assertEquals(actionAStarted, true, "main block executes")
-    assertEquals(actionAFinished, false, "main block does not pass raise")
-    assertEquals(actionARolled, false, "rollback block does not execute")
+    assertEquals(true, actionAStarted, "main block executes")
+    assertEquals(false, actionAFinished, "main block does not pass raise")
+    assertEquals(false, actionARolled, "rollback block does not execute")
   }
 
   @Test @Suppress("UNREACHABLE_CODE")
@@ -223,10 +223,10 @@ class SagaSpec {
     }
 
     assertTrue(result.isLeft(), "action was rolled back")
-    assertEquals(actionAStarted, true, "main block A executes")
-    assertEquals(actionARolled, true, "rollback block B executes")
-    assertEquals(actionBStarted, true, "main block B executes")
-    assertEquals(actionBFinished, false, "main block B does not pass raise")
-    assertEquals(actionBRolled, false, "rollback block does not execute")
+    assertEquals(true, actionAStarted, "main block A executes")
+    assertEquals(true, actionARolled, "rollback block B executes")
+    assertEquals(true, actionBStarted, "main block B executes")
+    assertEquals(false, actionBFinished, "main block B does not pass raise")
+    assertEquals(false, actionBRolled, "rollback block does not execute")
   }
 }

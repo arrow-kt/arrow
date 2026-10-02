@@ -43,12 +43,12 @@ public fun interface FilterIndex<S, I, A> {
       FilterIndex { p ->
         object : Traversal<Map<K, V>, V> {
           override fun <R> foldMap(initial: R, combine: (R, R) -> R, source: Map<K, V>, map: (V) -> R): R =
-            source.entries.fold(initial) { acc, (k, v) ->
+            source.entries.fold(initial) { acc, [k, v] ->
               if (p(k)) combine(acc, map(v)) else acc
             }
 
           override fun modify(source: Map<K, V>, map: (focus: V) -> V): Map<K, V> =
-            source.mapValues { (k, v) -> if (p(k)) map(v) else v }
+            source.mapValues { [k, v] -> if (p(k)) map(v) else v }
         }
       }
 

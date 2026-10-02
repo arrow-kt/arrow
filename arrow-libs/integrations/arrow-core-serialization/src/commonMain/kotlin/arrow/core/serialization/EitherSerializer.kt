@@ -54,8 +54,8 @@ public class EitherSerializer<A, B>(
     return when {
       leftValue is None && rightValue is None -> throw SerializationException("No information found for this Either")
       leftValue is Some && rightValue is Some -> throw SerializationException("Both Left and Right specified for Either")
-      leftValue is Some -> (leftValue as Some<A>).value.left()
-      rightValue is Some -> (rightValue as Some<B>).value.right()
+      leftValue is Some -> leftValue.value.left()
+      rightValue is Some -> rightValue.value.right()
       else -> error("this should never happen")
     }
   }

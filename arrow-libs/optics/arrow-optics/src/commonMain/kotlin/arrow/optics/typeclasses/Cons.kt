@@ -63,7 +63,7 @@ public fun interface Cons<S, A> {
       Cons {
         PPrism(
           getOrModify = { list -> list.firstOrNull()?.let { Pair(it, list.drop(1)) }?.right() ?: list.left() },
-          reverseGet = { (a, aas) -> listOf(a) + aas }
+          reverseGet = { [a, aas] -> listOf(a) + aas }
         )
       }
 
@@ -75,7 +75,7 @@ public fun interface Cons<S, A> {
       Cons {
         Prism(
           getOrModify = { if (it.isNotEmpty()) Pair(it.first(), it.drop(1)).right() else it.left() },
-          reverseGet = { (h, t) -> h + t }
+          reverseGet = { [h, t] -> h + t }
         )
       }
   }

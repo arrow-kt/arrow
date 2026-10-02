@@ -13,7 +13,6 @@ import kotlin.test.Test
 
 class ResourceAutoCloseTest {
 
-  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
   class AutoCloseableTest : AutoCloseable {
     val didClose = AtomicBoolean(false)
     override fun close() = didClose.set(true)
@@ -22,7 +21,7 @@ class ResourceAutoCloseTest {
   @Test
   fun autoCloseableCloses() = runTest {
     val t = AutoCloseableTest()
-    resourceScope {
+    val _ = resourceScope {
       autoCloseable { t }
     }
 
@@ -36,7 +35,7 @@ class ResourceAutoCloseTest {
 
       shouldThrow<Exception> {
         resourceScope {
-          autoCloseable { t }
+          val _ = autoCloseable { t }
           throw throwable
         }
       } shouldBe throwable
@@ -56,7 +55,7 @@ class ResourceAutoCloseTest {
     val job = launch {
       resourceScope {
         onRelease { require(exit.complete(it)) }
-        autoCloseable {
+        val _ = autoCloseable {
           waitingToBeCancelled.complete(Unit)
           cancelled.await()
           t
