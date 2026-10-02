@@ -93,4 +93,24 @@ class PrismTests {
       |val r = i != null
       """.compilationFails()
   }
+
+  @Test
+  fun `Prism will be generated for top-level subclasses when the package also has a typealias`() {
+    """
+      |$`package`
+      |
+      |$imports
+      |
+      |typealias Alias = String
+      |
+      |@optics
+      |sealed class PrismSealed {
+      | companion object
+      |}
+      |
+      |data class PrismSealed1(val a: String?) : PrismSealed()
+      |
+      |val i: Prism<PrismSealed, PrismSealed1> = PrismSealed.prismSealed1
+      """.compilationSucceeds()
+  }
 }
