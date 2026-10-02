@@ -51,11 +51,11 @@ class RaceNTest {
       s.send(Unit)
       f.cancel()
 
-      pa.await().let { (res, exit) ->
+      pa.await().let { [res, exit] ->
         res shouldBe a
         exit.shouldBeInstanceOf<ExitCase.Cancelled>()
       }
-      pb.await().let { (res, exit) ->
+      pb.await().let { [res, exit] ->
         res shouldBe b
         exit.shouldBeInstanceOf<ExitCase.Cancelled>()
       }
@@ -79,7 +79,7 @@ class RaceNTest {
         else raceN(loserA, winner)
       }.map { it.merge() }
 
-      pa.await().let { (res, exit) ->
+      pa.await().let { [res, exit] ->
         res shouldBe a
         exit.shouldBeInstanceOf<ExitCase.Cancelled>()
       }
@@ -127,15 +127,15 @@ class RaceNTest {
         s.send(Unit)
         f.cancel()
 
-        pa.await().let { (res, exit) ->
+        pa.await().let { [res, exit] ->
           res shouldBe a
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
-        pb.await().let { (res, exit) ->
+        pb.await().let { [res, exit] ->
           res shouldBe b
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
-        pc.await().let { (res, exit) ->
+        pc.await().let { [res, exit] ->
           res shouldBe c
           exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
@@ -166,11 +166,11 @@ class RaceNTest {
         }
       }.map { it.fold(::identity, ::identity, ::identity) }
 
-      pa.await().let { (res, exit) ->
+      pa.await().let { [res, exit] ->
         res shouldBe a
         exit.shouldBeInstanceOf<ExitCase.Cancelled>()
       }
-      pb.await().let { (res, exit) ->
+      pb.await().let { [res, exit] ->
         res shouldBe b
         exit.shouldBeInstanceOf<ExitCase.Cancelled>()
       }

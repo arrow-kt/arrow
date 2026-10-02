@@ -79,24 +79,24 @@ public interface PIso<S, T, A, B> : PPrism<S, T, A, B>, PLens<S, T, A, B> {
    */
   public infix fun <S1, T1, A1, B1> split(other: PIso<S1, T1, A1, B1>): PIso<Pair<S, S1>, Pair<T, T1>, Pair<A, A1>, Pair<B, B1>> =
     PIso(
-      { (a, c) -> get(a) to other.get(c) },
-      { (b, d) -> reverseGet(b) to other.reverseGet(d) }
+      { [a, c] -> get(a) to other.get(c) },
+      { [b, d] -> reverseGet(b) to other.reverseGet(d) }
     )
 
   /**
    * Create a pair of the [PIso] and a type [C]
    */
   override fun <C> first(): PIso<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> = Iso(
-    { (a, c) -> get(a) to c },
-    { (b, c) -> reverseGet(b) to c }
+    { [a, c] -> get(a) to c },
+    { [b, c] -> reverseGet(b) to c }
   )
 
   /**
    * Create a pair of a type [C] and the [PIso]
    */
   override fun <C> second(): PIso<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> = PIso(
-    { (c, a) -> c to get(a) },
-    { (c, b) -> c to reverseGet(b) }
+    { [c, a] -> c to get(a) },
+    { [c, b] -> c to reverseGet(b) }
   )
 
   /**

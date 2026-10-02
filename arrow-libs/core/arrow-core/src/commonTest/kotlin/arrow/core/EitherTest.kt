@@ -925,9 +925,7 @@ class EitherTest {
   fun catchOrThrowRuntimeException() = runTest {
     checkAll(20, Arb.int(-2..2)) { a ->
       fun func() = 1001 / a
-      val res = Either.catchOrThrow<Throwable, Int>(::func)
-
-      when (res) {
+      when (val res = Either.catchOrThrow<Throwable, Int>(::func)) {
         is Left -> {
           res.value::class shouldBe ArithmeticException::class
         }

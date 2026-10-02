@@ -85,7 +85,7 @@ public fun interface Snoc<S, A> {
       Snoc {
         Prism(
           getOrModify = { if (it.isNotEmpty()) Pair(it.dropLast(1), it.last()).right() else it.left() },
-          reverseGet = { (i, l) -> i + l }
+          reverseGet = { [i, l] -> i + l }
         )
       }
   }

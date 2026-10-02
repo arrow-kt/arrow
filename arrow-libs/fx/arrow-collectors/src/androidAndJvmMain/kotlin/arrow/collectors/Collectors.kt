@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentMap
  */
 @Suppress("UnusedReceiverParameter")
 public fun <K, V> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, ConcurrentMap<K, V>> =
-  Collectors.concurrentMap<K, V>().contramapNonSuspend { (k, v) -> k to v }
+  Collectors.concurrentMap<K, V>().contramapNonSuspend { [k, v] -> k to v }
 
 /**
  * Collects all the values in a map.
@@ -22,7 +22,7 @@ public fun <K, V> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map
 @Suppress("UnusedReceiverParameter")
 public fun <K, V> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, ConcurrentMap<K, V>> = Collector.nonSuspendOf(
   supply = { ConcurrentHashMap<K, V>() },
-  accumulate = { current, (k, v) -> current[k] = v },
+  accumulate = { current, [k, v] -> current[k] = v },
   finish = { it },
   characteristics = Characteristics.IDENTITY_CONCURRENT_UNORDERED
 )

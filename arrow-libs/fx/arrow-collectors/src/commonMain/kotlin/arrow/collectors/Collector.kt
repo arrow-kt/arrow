@@ -171,11 +171,11 @@ public interface CollectorI<InternalAccumulator, in Value, out Result> {
     combine: suspend (Result, S) -> V,
   ): Collector<Value, V> = of(
     supply = { Pair(this.supply(), other.supply()) },
-    accumulate = { (currentThis, currentOther), value ->
+    accumulate = { [currentThis, currentOther], value ->
       this.accumulate(currentThis, value)
       other.accumulate(currentOther, value)
     },
-    finish = { (currentThis, currentOther) ->
+    finish = { [currentThis, currentOther] ->
       combine(this.finish(currentThis), other.finish(currentOther))
     },
     characteristics = this.characteristics intersect other.characteristics,
@@ -250,11 +250,11 @@ public interface NonSuspendCollectorI<InternalAccumulator, in Value, out Result>
     combine: (Result, S) -> V,
   ): NonSuspendCollector<Value, V> = CollectorI.nonSuspendOf(
     supply = { Pair(this.supplyNonSuspend(), other.supplyNonSuspend()) },
-    accumulate = { (currentThis, currentOther), value ->
+    accumulate = { [currentThis, currentOther], value ->
       this.accumulateNonSuspend(currentThis, value)
       other.accumulateNonSuspend(currentOther, value)
     },
-    finish = { (currentThis, currentOther) ->
+    finish = { [currentThis, currentOther] ->
       combine(this.finishNonSuspend(currentThis), other.finishNonSuspend(currentOther))
     },
     characteristics = this.characteristics intersect other.characteristics,

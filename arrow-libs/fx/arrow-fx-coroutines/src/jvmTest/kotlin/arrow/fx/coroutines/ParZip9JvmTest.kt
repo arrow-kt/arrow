@@ -23,7 +23,7 @@ class ParZip9JvmTest {
       withContext(single()) {
         threadName() shouldStartWith "single"
 
-        val (s1, s2, s3, s4, s5, s6, s7, s8, s9) = parZip(
+        val [s1, s2, s3, s4, s5, s6, s7, s8, s9] = parZip(
           zipCtx,
           threadName,
           threadName,

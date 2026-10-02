@@ -74,8 +74,8 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
       barrierAction.invoke()
     } catch (e: Throwable) {
       val cancellationException =
-        if (e is CancellationException) e
-        else CancellationException("CyclicBarrier barrierAction failed with exception.", e.nonFatalOrThrow())
+        e as? CancellationException ?:
+        CancellationException("CyclicBarrier barrierAction failed with exception.", e.nonFatalOrThrow())
       unblock.cancel(cancellationException)
       throw cancellationException
     }
@@ -88,7 +88,7 @@ public class CyclicBarrier(public val capacity: Int, private val barrierAction: 
     state.loop { state ->
       when (state) {
         is Awaiting -> {
-          val (awaiting, epoch, unblock) = state
+          (val awaiting = awaitingNow, val epoch, val unblock) = state
           val awaitingNow = awaiting - 1
           if (awaitingNow == 0 && this.state.compareAndSet(
               state,

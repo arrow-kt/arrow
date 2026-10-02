@@ -95,7 +95,7 @@ class FlowTest {
         fail("Cannot reach here. $e should be thrown.")
       } shouldBe e
 
-      val (ii, ex) = exit.await()
+      val [ii, ex] = exit.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -123,11 +123,11 @@ class FlowTest {
       latch.await()
       job.cancel()
 
-      val (ii, ex) = exitA.await()
+      val [ii, ex] = exitA.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Cancelled>()
 
-      val (ii2, ex2) = exitB.await()
+      val [ii2, ex2] = exitB.await()
       ii2 shouldBe i2
       ex2.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -196,7 +196,7 @@ class FlowTest {
         fail("Cannot reach here. $e should be thrown.")
       } shouldBe e
 
-      val (ii, ex) = exit.await()
+      val [ii, ex] = exit.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -224,11 +224,11 @@ class FlowTest {
       latch.await()
       job.cancel()
 
-      val (ii, ex) = exitA.await()
+      val [ii, ex] = exitA.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Cancelled>()
 
-      val (ii2, ex2) = exitB.await()
+      val [ii2, ex2] = exitB.await()
       ii2 shouldBe i2
       ex2.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -309,11 +309,11 @@ class FlowTest {
   @Test @ExperimentalTime
   fun fixedRateWithDampenTrue() = runTest {
     val buffer = mutableListOf<Unit>()
-    withTimeoutOrNull(4500) {
-      fixedRate(1000, true) { testTimeSource.markNow() }
+    withTimeoutOrNull(4500.milliseconds) {
+      fixedRate(1000.milliseconds, true) { testTimeSource.markNow() }
         .mapIndexed { index, _ ->
-          if (index == 0) delay(3000) else Unit
-          advanceTimeBy(1)
+          if (index == 0) delay(3000.milliseconds) else Unit
+          advanceTimeBy(1.milliseconds)
         }.collect(buffer::add)
     }
     buffer.size shouldBe 2
@@ -322,11 +322,11 @@ class FlowTest {
   @Test @ExperimentalTime
   fun fixedRateWithDampenFalse() = runTest {
     val buffer = mutableListOf<Unit>()
-    withTimeoutOrNull(4500) {
-      fixedRate(1000, false) { testTimeSource.markNow() }
+    withTimeoutOrNull(4500.milliseconds) {
+      fixedRate(1000.milliseconds, false) { testTimeSource.markNow() }
         .mapIndexed { index, _ ->
-          if (index == 0) delay(3000) else Unit
-          advanceTimeBy(1)
+          if (index == 0) delay(3000.milliseconds) else Unit
+          advanceTimeBy(1.milliseconds)
         }.collect(buffer::add)
     }
     buffer.size shouldBe 4

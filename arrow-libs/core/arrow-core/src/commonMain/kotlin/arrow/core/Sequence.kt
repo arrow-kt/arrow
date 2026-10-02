@@ -574,7 +574,7 @@ public fun <A> Sequence<A>.salign(
  * @return a tuple containing Sequence with [Either.Left] and another Sequence with its [Either.Right] values.
  */
 public fun <A, B> Sequence<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> =
-  fold(listOf<A>() to listOf()) { (lefts, rights), either ->
+  fold(listOf<A>() to listOf()) { [lefts, rights], either ->
     when (either) {
       is Left -> lefts + either.value to rights
       is Right -> lefts to rights + either.value
@@ -639,7 +639,7 @@ public fun <Error, A, B> Sequence<A>.mapOrAccumulate(
  * <!--- KNIT example-sequence-11.kt -->
  */
 public fun <A, B> Sequence<Ior<A, B>>.unalign(): Pair<Sequence<A>, Sequence<B>> =
-  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
+  fold(emptySequence<A>() to emptySequence()) { [l, r], x ->
     x.fold(
       { l + it to r },
       { l to r + it },
@@ -683,7 +683,7 @@ public fun <A, B, C> Sequence<C>.unalign(fa: (C) -> Ior<A, B>): Pair<Sequence<A>
  */
 @Deprecated("To be removed due to unclear semantics. Please report use cases at https://github.com/arrow-kt/arrow/issues/3675.")
 public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
-  split()?.let { (fa, a) ->
+  split()?.let { [fa, a] ->
     @Suppress("DEPRECATION")
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptySequence()
@@ -704,8 +704,8 @@ public fun <A, B> Sequence<A>.unweave(ffa: (A) -> Sequence<B>): Sequence<B> =
  * <!--- KNIT example-sequence-14.kt -->
  */
 public fun <A, B> Sequence<Pair<A, B>>.unzip(): Pair<Sequence<A>, Sequence<B>> =
-  fold(emptySequence<A>() to emptySequence()) { (l, r), x ->
-    l + x.first to r + x.second
+  fold(emptySequence<A>() to emptySequence()) { [l, r], [x, y] ->
+    l + x to r + y
   }
 
 /**

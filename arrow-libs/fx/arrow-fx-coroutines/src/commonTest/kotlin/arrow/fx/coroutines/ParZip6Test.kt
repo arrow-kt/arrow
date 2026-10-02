@@ -30,7 +30,7 @@ class ParZip6Test {
         val modifyGate4 = CompletableDeferred<Unit>()
         val modifyGate5 = CompletableDeferred<Unit>()
 
-        parZip(
+        val _ = parZip(
           {
             modifyGate2.await()
             r.update { i -> "$i$a" }

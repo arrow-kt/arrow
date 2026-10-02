@@ -422,17 +422,17 @@ fun <A, B> Schedule.Decision<A, B>.delay(): Duration? = when (this) {
 }
 
 private fun fibs(one: Duration): Sequence<Duration> =
-  generateSequence(Pair(one, one)) { (a, b) ->
+  generateSequence(Pair(one, one)) { [a, b] ->
     Pair(b, (a + b))
   }.map { it.first }
 
 private fun exp(base: Duration): Sequence<Duration> =
-  generateSequence(Pair(base, 1.0)) { (_, n) ->
+  generateSequence(Pair(base, 1.0)) { [_, n] ->
     Pair(base * 2.0.pow(n), n + 1)
   }.map { it.first }
 
 private fun linear(base: Duration): Sequence<Duration> =
-  generateSequence(Pair(base, 1.0)) { (_, n) ->
+  generateSequence(Pair(base, 1.0)) { [_, n] ->
     Pair((base * n), (n + 1))
   }.map { it.first }.drop(1)
 
@@ -497,5 +497,5 @@ inline fun <reified A : Throwable> assertThrows(executable: () -> Unit): A {
     e
   }
 
-  return if (a is A) a else fail("Expected an exception but found: $a")
+  return a as? A ?: fail("Expected an exception but found: $a")
 }

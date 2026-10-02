@@ -136,7 +136,7 @@ class NonEmptySetTest {
   fun toStringContainsData() = runTest {
     checkAll(Arb.set(Arb.int(0..9), 1..9)) { a ->
       a.toNonEmptySetOrThrow().toString().also { s ->
-        a.onEach { i ->
+        val _ = a.onEach { i ->
           s shouldContainOnlyOnce i.toString()
         }
       }
@@ -233,7 +233,6 @@ class NonEmptySetTest {
     override fun toString(): String = "MyVerySpecialSet(${other.reversed()})"
   }
 
-  @OptIn(PotentiallyUnsafeNonEmptyOperation::class)
   @Test
   fun toStringUsesUnderlyingImplementation() = runTest {
     checkAll(Arb.set(Arb.int(), 1..100)) {

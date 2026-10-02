@@ -21,7 +21,7 @@ class ParZip2JvmTest {
           withContext(single()) {
             Thread.currentThread().name shouldStartWith "single"
 
-            val (s1, s2) =
+            val [s1, s2] =
                 parZip(zipCtx, { Thread.currentThread().name }, { Thread.currentThread().name }) {
                     a,
                     b ->

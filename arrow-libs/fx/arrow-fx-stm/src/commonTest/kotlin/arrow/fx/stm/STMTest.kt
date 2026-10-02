@@ -5,9 +5,9 @@ package arrow.fx.stm
 import arrow.fx.coroutines.parMap
 import arrow.fx.coroutines.parZip
 import arrow.fx.stm.internal.BlockedIndefinitely
+import io.kotest.assertions.assertionCounter
 import io.kotest.assertions.AssertionErrorBuilder
 import io.kotest.common.reflection.bestName
-import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.ints.shouldBeInRange
 import io.kotest.matchers.shouldBe

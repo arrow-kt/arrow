@@ -100,7 +100,7 @@ class StructuredConcurrencySpec {
           coroutineScope {
             val fa =
               async<Unit> {
-                startLatches.drop(1).zip(nestedExits) { start, promise ->
+                val _ = startLatches.drop(1).zip(nestedExits) { start, promise ->
                   asyncTask(start, promise)
                 }
                 startLatches.awaitAll()
@@ -156,7 +156,7 @@ class StructuredConcurrencySpec {
         guaranteeCase({
           coroutineScope {
             async<Unit> {
-              startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
+              val _ = startLatches.zip(nestedExits) { start, promise -> asyncTask(start, promise) }
               startLatches.awaitAll()
               raise(a)
             }
@@ -205,7 +205,7 @@ class StructuredConcurrencySpec {
         guaranteeCase({
           coroutineScope {
             launch {
-              startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
+              val _ = startLatches.zip(nestedExits) { start, promise -> launchTask(start, promise) }
               startLatches.awaitAll()
               raise(a)
             }

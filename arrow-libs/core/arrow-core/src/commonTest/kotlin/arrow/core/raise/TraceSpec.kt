@@ -34,7 +34,7 @@ class TraceSpec {
 
   @Test fun nestedTracingIdentity() = runTest {
     val inner = CompletableDeferred<String>()
-    ior(String::plus) {
+    val _ = ior(String::plus) {
       traced({
         traced({ raise("") }) { traced, _ ->
           inner.complete(traced.stackTraceToString())
@@ -46,7 +46,7 @@ class TraceSpec {
   }
 
   @Test fun nestedTracingDifferentTypes() = runTest {
-    either {
+    val _ = either {
       traced<Any?, _>({
         traced<String, _> ({
           raise(Unit)

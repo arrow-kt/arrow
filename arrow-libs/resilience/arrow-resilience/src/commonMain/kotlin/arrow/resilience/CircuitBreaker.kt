@@ -266,7 +266,7 @@ private constructor(
       onHalfOpen.invoke()
       task.invoke()
     }) {
-      val (value, timeout) = when (it) {
+      val [value, timeout] = when (it) {
         is ExitCase.Completed -> return@guaranteeCase
         // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
         is ExitCase.Cancelled -> lastStartedAt to resetTimeout

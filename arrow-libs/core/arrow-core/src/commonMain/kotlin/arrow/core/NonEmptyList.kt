@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class, ExperimentalStdlibApi::class)
+@file:OptIn(ExperimentalContracts::class, ExperimentalStdlibApi::class)
 @file:Suppress("API_NOT_AVAILABLE", "RESERVED_MEMBER_INSIDE_VALUE_CLASS")
 
 package arrow.core
@@ -7,7 +7,6 @@ import arrow.core.raise.RaiseAccumulate
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmExposeBoxed
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
@@ -435,7 +434,7 @@ public inline fun <A, B, E> NonEmptyList<E>.unzip(f: (E) -> Pair<A, B>): Pair<No
   val listA = ArrayList<A>(size)
   val listB = ArrayList<B>(size)
   for (element in this) {
-    val (a, b) = f(element)
+    val [a, b] = f(element)
     listA.add(a)
     listB.add(b)
   }

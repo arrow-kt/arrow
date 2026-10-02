@@ -22,10 +22,10 @@ class TMapTest {
     checkAll(Arb.map(Arb.int(), Arb.int())) { pairs ->
       val map = TMap.new<Int, Int>()
       atomically {
-        for ((k, v) in pairs) map.insert(k, v)
+        for ([k, v] in pairs) map.insert(k, v)
       }
       atomically {
-        for ((k, v) in pairs) map.lookup(k) shouldBe v
+        for ([k, v] in pairs) map.lookup(k) shouldBe v
       }
     }
   }
@@ -34,10 +34,10 @@ class TMapTest {
     checkAll(Arb.map(Arb.int(), Arb.int())) { pairs ->
       val map = TMap.new<Int, Int> { 0 } // hash function that always returns 0
       atomically {
-        for ((k, v) in pairs) map.insert(k, v)
+        for ([k, v] in pairs) map.insert(k, v)
       }
       atomically {
-        for ((k, v) in pairs) map.lookup(k) shouldBe v
+        for ([k, v] in pairs) map.lookup(k) shouldBe v
       }
     }
   }
