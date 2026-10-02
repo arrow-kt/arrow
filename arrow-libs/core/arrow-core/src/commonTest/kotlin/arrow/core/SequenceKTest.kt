@@ -483,21 +483,16 @@ class SequenceKTest {
 
       val errors = mutableListOf<String>()
       val successes = a.mapNotNull { s ->
-        runCatching { s.toInt() }
-          .onFailure { errors.add(s) }
-          .getOrNull()
-      }
-
-      val expected = if (errors.isNotEmpty()) {
-        errors.toNonEmptyListOrThrow().left()
-      } else {
-        successes.right()
+        s.toIntOrNull() ?: run {
+          errors.add(s)
+          null
+        }
       }
 
       a.asSequence().mapOrAccumulate {
         ensure(it[0].isDigit()) { it }
         it.toInt()
-      } shouldBe expected
+      } shouldBe (errors.toNonEmptyListOrNull()?.left() ?: successes.right())
     }
   }
 
