@@ -455,6 +455,24 @@ public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (
   }
 }
 
+/**
+ * Binds the given function across [Ior.Left] and [Ior.Both], passing the left value and any accumulated right value.
+ *
+ * @param f The function to bind across [Ior.Left] and [Ior.Both].
+ */
+public inline fun <A, B, D> Ior<A, B>.handleErrorWith(f: (A, B?) -> Ior<D, B>): Ior<D, B> {
+  contract {
+    callsInPlace(f, InvocationKind.AT_MOST_ONCE)
+    (this@handleErrorWith !is Right) holdsIn f
+  }
+  return when (this) {
+    is Left -> f(value, null)
+    is Right -> this
+    is Both -> f(leftValue, rightValue)
+  }
+}
+
+
 public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract {
     callsInPlace(default, InvocationKind.AT_MOST_ONCE)

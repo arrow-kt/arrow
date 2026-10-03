@@ -244,4 +244,46 @@ class IorTest {
       }
     }
   }
+
+  @Test
+  fun handleErrorWithAccumulatedValue() = runTest {
+    val left: Ior<String, Int> = Ior.Left("error")
+    val recoveredLeft = left.handleErrorWith { err, accumulated ->
+      accumulated shouldBe null
+      Ior.Right(err.length)
+    }
+    recoveredLeft shouldBe Ior.Right(5)
+
+    var calledForRight = false
+    val right: Ior<String, Int> = Ior.Right(42)
+    val unchangedRight = right.handleErrorWith { _, _ ->
+      calledForRight = true
+      Ior.Right(0)
+    }
+    calledForRight shouldBe false
+    unchangedRight shouldBe Ior.Right(42)
+
+    val both: Ior<String, Int> = Ior.Both("error", 42)
+    val recoveredBoth = both.handleErrorWith { err, accumulated ->
+      accumulated shouldBe 42
+      Ior.Both(err.length, accumulated!! + 10)
+    }
+    recoveredBoth shouldBe Ior.Both(5, 52)
+
+  }
+
+  @Test
+  fun handleErrorWithProperty() = runTest {
+    checkAll(Arb.ior(Arb.string(), Arb.int())) { ior ->
+      val res = ior.handleErrorWith { err, acc ->
+        if (acc != null) Ior.Both(err.length, acc) else Ior.Left(err.length)
+      }
+      when (ior) {
+        is Ior.Left -> res shouldBe Ior.Left(ior.value.length)
+        is Ior.Right -> res shouldBe ior
+        is Ior.Both -> res shouldBe Ior.Both(ior.leftValue.length, ior.rightValue)
+      }
+    }
+  }
 }
+
