@@ -19,6 +19,7 @@ dependencies {
   testImplementation(kotlin("test"))
   testImplementation(libs.kotest.assertionsCore)
   testImplementation(libs.classgraph)
+  testImplementation(kotlin("serialization-compiler-plugin-embeddable"))
   testImplementation(libs.kotlinCompileTesting) {
     exclude(
       group = libs.classgraph.get().module.group,

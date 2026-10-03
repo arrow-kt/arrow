@@ -284,7 +284,13 @@ class DSLTests {
           companion object
       }""",
     )
-    compilationSucceeds(allWarningsAsErrors = false, contextParameters = false, source1, source2)
+    compilationSucceeds(
+      allWarningsAsErrors = false,
+      contextParameters = false,
+      withKotlinxSerialization = false,
+      source1,
+      source2,
+    )
   }
 
   @Test

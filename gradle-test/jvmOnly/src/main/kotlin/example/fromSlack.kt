@@ -2,9 +2,9 @@ package example
 
 import arrow.optics.optics
 
-// enum class ImAnEnum {
-//   Foo, Bar, Baz
-// }
+enum class ImAnEnum {
+  Foo, Bar, Baz
+}
 
 @optics
 data class ScreenContent(
