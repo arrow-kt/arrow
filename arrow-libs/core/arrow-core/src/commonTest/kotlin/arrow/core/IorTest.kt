@@ -245,45 +245,56 @@ class IorTest {
     }
   }
 
-  @Test
-  fun handleErrorWithAccumulatedValue() = runTest {
+  @Test fun handleErrorWithPassesAccumulatedValue() = runTest {
     val left: Ior<String, Int> = Ior.Left("error")
-    val recoveredLeft = left.handleErrorWith { err, accumulated ->
-      accumulated shouldBe null
+    left.handleErrorWith { err, acc ->
+      acc shouldBe None
       Ior.Right(err.length)
-    }
-    recoveredLeft shouldBe Ior.Right(5)
-
-    var calledForRight = false
-    val right: Ior<String, Int> = Ior.Right(42)
-    val unchangedRight = right.handleErrorWith { _, _ ->
-      calledForRight = true
-      Ior.Right(0)
-    }
-    calledForRight shouldBe false
-    unchangedRight shouldBe Ior.Right(42)
+    } shouldBe Ior.Right(5)
 
     val both: Ior<String, Int> = Ior.Both("error", 42)
-    val recoveredBoth = both.handleErrorWith { err, accumulated ->
-      accumulated shouldBe 42
-      Ior.Both(err.length, accumulated!! + 10)
-    }
-    recoveredBoth shouldBe Ior.Both(5, 52)
+    both.handleErrorWith { err, acc ->
+      acc shouldBe Some(42)
+      Ior.Left(err.length)
+    } shouldBe Ior.Left(5)
 
+    var called = false
+    val right: Ior<String, Int> = Ior.Right(42)
+    right.handleErrorWith { _, _ ->
+      called = true
+      Ior.Right(0)
+    } shouldBe Ior.Right(42)
+    called shouldBe false
   }
 
-  @Test
-  fun handleErrorWithProperty() = runTest {
-    checkAll(Arb.ior(Arb.string(), Arb.int())) { ior ->
-      val res = ior.handleErrorWith { err, acc ->
-        if (acc != null) Ior.Both(err.length, acc) else Ior.Left(err.length)
+  @Test fun handleErrorWithKeepsNullRightValueApart() = runTest {
+    val left: Ior<String, String?> = Ior.Left("error")
+    val both: Ior<String, String?> = Ior.Both("error", null)
+    left.handleErrorWith { err, acc -> Ior.Left(err to acc) } shouldBe Ior.Left("error" to None)
+    both.handleErrorWith { err, acc -> Ior.Left(err to acc) } shouldBe Ior.Left("error" to Some(null))
+  }
+
+  @Test fun handleErrorWithRecoveryDependsOnAccumulatedValue() = runTest {
+    // drop the error when enough has been accumulated, otherwise keep failing
+    val recover = { ior: Ior<String, Int> ->
+      ior.handleErrorWith { err, acc ->
+        if (acc is Some && acc.value >= 10) Ior.Right(acc.value) else Ior.Left(err.length)
       }
-      when (ior) {
-        is Ior.Left -> res shouldBe Ior.Left(ior.value.length)
-        is Ior.Right -> res shouldBe ior
-        is Ior.Both -> res shouldBe Ior.Both(ior.leftValue.length, ior.rightValue)
-      }
+    }
+    recover(Ior.Both("error", 42)) shouldBe Ior.Right(42)
+    recover(Ior.Both("error", 3)) shouldBe Ior.Left(5)
+    recover(Ior.Left("error")) shouldBe Ior.Left(5)
+  }
+
+  @Test fun handleErrorWithKeepingAccumulatedValueIsMapLeft() = runTest {
+    checkAll(Arb.ior(Arb.string(), Arb.int()), Arb.int()) { ior, n ->
+      val transform = { s: String -> s.length + n }
+      ior.handleErrorWith { err, acc ->
+        when (acc) {
+          is None -> Ior.Left(transform(err))
+          is Some -> Ior.Both(transform(err), acc.value)
+        }
+      } shouldBe ior.mapLeft(transform)
     }
   }
 }
-

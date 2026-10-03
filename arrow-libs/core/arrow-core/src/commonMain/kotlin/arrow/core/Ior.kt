@@ -456,22 +456,25 @@ public inline fun <A, B, D> Ior<A, B>.handleErrorWith(combine: (B, B) -> B, f: (
 }
 
 /**
- * Binds the given function across [Ior.Left] and [Ior.Both], passing the left value and any accumulated right value.
+ * Binds the given function across [Ior.Left] and [Ior.Both], passing the left value together with
+ * the right value accumulated so far, so the recovery itself can depend on it.
+ *
+ * [f] receives [None] for [Ior.Left] and [Some] for [Ior.Both]. Unlike the overload taking `combine`,
+ * the result of [f] is returned as is, so [f] decides whether the existing right value is kept.
  *
  * @param f The function to bind across [Ior.Left] and [Ior.Both].
  */
-public inline fun <A, B, D> Ior<A, B>.handleErrorWith(f: (A, B?) -> Ior<D, B>): Ior<D, B> {
+public inline fun <A, B, D> Ior<A, B>.handleErrorWith(f: (A, Option<B>) -> Ior<D, B>): Ior<D, B> {
   contract {
     callsInPlace(f, InvocationKind.AT_MOST_ONCE)
     (this@handleErrorWith !is Right) holdsIn f
   }
   return when (this) {
-    is Left -> f(value, null)
+    is Left -> f(value, None)
     is Right -> this
-    is Both -> f(leftValue, rightValue)
+    is Both -> f(leftValue, Some(rightValue))
   }
 }
-
 
 public inline fun <A, B> Ior<A, B>.getOrElse(default: (A) -> B): B {
   contract {
