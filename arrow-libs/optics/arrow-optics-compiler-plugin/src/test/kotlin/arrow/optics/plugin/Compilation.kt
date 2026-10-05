@@ -13,6 +13,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.JvmTarget
+import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationComponentRegistrar
 import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -36,16 +37,23 @@ fun String.compilationFails() {
 fun String.compilationSucceeds(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
+  withKotlinxSerialization: Boolean = false,
 ) {
-  compilationSucceeds(allWarningsAsErrors, contextParameters, SourceFile.kotlin(SOURCE_FILENAME, this.trimMargin()))
+  compilationSucceeds(
+    allWarningsAsErrors,
+    contextParameters,
+    withKotlinxSerialization,
+    SourceFile.kotlin(SOURCE_FILENAME, this.trimMargin()),
+  )
 }
 
 fun compilationSucceeds(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
+  withKotlinxSerialization: Boolean = false,
   vararg sources: SourceFile,
 ) {
-  val compilationResult = compile(allWarningsAsErrors, contextParameters, *sources)
+  val compilationResult = compile(allWarningsAsErrors, contextParameters, withKotlinxSerialization, *sources)
   compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
 }
 
@@ -61,17 +69,19 @@ internal fun compile(
   text: String,
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
-): CompilationResult = compile(allWarningsAsErrors, contextParameters, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
+): CompilationResult = compile(allWarningsAsErrors, contextParameters, false, SourceFile.kotlin(SOURCE_FILENAME, text.trimMargin()))
 
 internal fun compile(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
+  withKotlinxSerialization: Boolean = false,
   vararg sources: SourceFile,
-): CompilationResult = buildCompilation(allWarningsAsErrors, contextParameters, *sources).compile()
+): CompilationResult = buildCompilation(allWarningsAsErrors, contextParameters, withKotlinxSerialization, *sources).compile()
 
 fun buildCompilation(
   allWarningsAsErrors: Boolean = false,
   contextParameters: Boolean = false,
+  withKotlinxSerialization: Boolean = false,
   vararg sources: SourceFile,
 ) = KotlinCompilation().apply {
   this.jvmTarget = JvmTarget.JVM_1_8.description
@@ -83,7 +93,10 @@ fun buildCompilation(
   this.sources = sources.toList()
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
-  this.compilerPluginRegistrars = listOf(OpticsPluginComponentRegistrar())
+  this.compilerPluginRegistrars = listOfNotNull(
+    OpticsPluginComponentRegistrar(),
+    SerializationComponentRegistrar().takeIf { withKotlinxSerialization },
+  )
   if (contextParameters) {
     this.kotlincArguments = listOf("-Xcontext-parameters")
   }
