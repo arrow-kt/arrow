@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.packageFqName
+import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
@@ -275,9 +276,7 @@ object FirOpticsExtractor {
     if (this.rawStatus.modality != Modality.SEALED) return SealedInheritors.Empty
 
     val thePackage = this.packageFqName()
-    val classNames = session.symbolProvider.symbolNamesProvider
-      .getTopLevelClassifierNamesInPackage(thePackage)
-      ?: return SealedInheritors.Empty
+    val classNames = session.firProvider.getClassNamesInPackage(thePackage)
 
     val worklist = ArrayDeque(
       classNames.map { session.symbolProvider.getClassLikeSymbolByClassId(ClassId(thePackage, it)) },
