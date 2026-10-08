@@ -6,7 +6,9 @@
 package arrow.core.raise
 
 import arrow.atomic.AtomicBoolean
+import arrow.core.ControlCancellationException
 import arrow.core.Either
+import arrow.core.InternalArrowApi
 import arrow.core.nonFatalOrThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -271,11 +273,12 @@ public annotation class DelicateRaiseApi
  * [RaiseCancellationException] is a _delicate_ api, and should be used with care.
  * It drives the short-circuiting behavior of [Raise].
  */
+@OptIn(InternalArrowApi::class)
 @DelicateRaiseApi
 public expect sealed class RaiseCancellationException(
   raised: Any?,
   raise: Raise<Any?>
-) : CancellationException {
+) : ControlCancellationException {
   internal val raised: Any?
   internal val raise: Raise<Any?>
 }
