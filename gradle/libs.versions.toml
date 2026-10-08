@@ -1,11 +1,11 @@
 [versions]
 animalSniffer = "2.0.1"
 coroutines = "1.11.0"
-classgraph = "4.8.196"
+classgraph = "4.8.197"
 dokka = "2.2.0"
 kotest = "6.2.5"
 kover = "0.9.11"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 kotlinCompileTesting = "0.14.0"
 knit = "0.5.1"
 kspVersion = "2.3.12"
