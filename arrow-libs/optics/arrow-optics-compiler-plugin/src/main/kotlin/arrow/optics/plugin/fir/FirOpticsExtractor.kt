@@ -157,7 +157,7 @@ object FirOpticsExtractor {
     }
     if (abstractProps.isEmpty()) return emptyList()
 
-    val inheritors = symbol.getSealedClassInheritors(session)
+    val inheritors = symbol.getSealedClassInheritors(session, resolveSupertypes = resolveFocusTypes)
 
     if (!inheritors.allAreResolved) {
       check(!resolveFocusTypes) { "Supertypes must be resolved to compute focus types of $symbol" }
@@ -240,7 +240,7 @@ object FirOpticsExtractor {
 
   /** One PRISM focus per sealed subclass (algo §6). */
   private fun prismFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
-    val inheritors = symbol.getSealedClassInheritors(session)
+    val inheritors = symbol.getSealedClassInheritors(session, resolveSupertypes = resolveFocusTypes)
 
     if (resolveFocusTypes) {
       check(inheritors.allAreResolved) { "Supertypes must be resolved to compute focus types of $symbol" }
@@ -271,8 +271,19 @@ object FirOpticsExtractor {
     }
   }
 
+  /**
+   * The subclasses of this sealed class.
+   *
+   * If [resolveSupertypes] is `false`, we do not inspect supertypes, because we might be in an earlier phase where this
+   * information is not available yet (and it is unsafe to do so). Instead, every class in the package is a candidate, and,
+   * if there are any, the returned [SealedInheritors.allAreResolved] will be `false`. Attempting to resolve supertypes
+   * _during_ the `SUPER_TYPES` phase could deadlock the IDE, for example.
+   *
+   * During generation, [resolveSupertypes] should be `true`. This will make sure supertypes are actually inspected, and
+   * the returned [SealedInheritors.allAreResolved] _should_ be `true`.
+   */
   @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
-  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession): SealedInheritors {
+  private fun FirRegularClassSymbol.getSealedClassInheritors(session: FirSession, resolveSupertypes: Boolean): SealedInheritors {
     if (this.rawStatus.modality != Modality.SEALED) return SealedInheritors.Empty
 
     val thePackage = this.packageFqName()
@@ -289,10 +300,15 @@ object FirOpticsExtractor {
         val current = worklist.removeFirst() as? FirClassSymbol<*> ?: continue
 
         if (current != this@getSealedClassInheritors) {
-          current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
+          if (resolveSupertypes) {
+            current.lazyResolveToPhase(FirResolvePhase.SUPER_TYPES)
 
-          if (current.fir.superTypeRefs.all { it is FirResolvedTypeRef }) {
-            if (this@getSealedClassInheritors.isSupertypeOf(current, session)) add(current)
+            if (current.fir.superTypeRefs.all { it is FirResolvedTypeRef }) {
+              if (this@getSealedClassInheritors.isSupertypeOf(current, session)) add(current)
+            } else {
+              allAreResolved = false
+              add(current)
+            }
           } else {
             allAreResolved = false
             add(current)
