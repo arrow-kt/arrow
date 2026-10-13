@@ -267,7 +267,7 @@ public value class NonEmptyList<out E> @PublishedApi internal constructor(
       nonEmptyListOf(Unit)
 
     @JvmStatic @JvmExposeBoxed
-    public fun <E> of(head: E, vararg t: E): NonEmptyList<E> =
+    public operator fun <E> of(head: E, vararg t: E): NonEmptyList<E> =
       nonEmptyListOf(head, *t)
 
     @JvmStatic @JvmExposeBoxed

@@ -34,6 +34,7 @@ kotlin {
     commonMain {
       dependencies {
         implementation(kotlin("stdlib"))
+        implementation(projects.arrowCore)
         implementation(projects.arrowFxCoroutines)
         implementation(projects.suspendapp)
       }
