@@ -241,4 +241,9 @@ class NonEmptySetTest {
       NonEmptySet(MyVerySpecialSet(it)).toString() shouldBe "MyVerySpecialSet(${it.reversed()})"
     }
   }
+
+  @Test fun collectionLiteralSyntax() {
+    val x: NonEmptySet<Int> = [1, 2, 3]
+    x shouldBe nonEmptySetOf(1, 2, 3)
+  }
 }
