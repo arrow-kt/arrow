@@ -45,7 +45,7 @@ public inline fun <Error> ensureOrAccumulate(condition: Boolean, error: () -> Er
   return raise.ensureOrAccumulate(condition, error)
 }
 
-@ExperimentalRaiseAccumulateApi @RaiseDSL
+@ExperimentalRaiseAccumulateApi @RaiseDSL @IgnorableReturnValue
 context(raise: Accumulate<Error>)
 public inline fun <Error, B : Any> ensureNotNullOrAccumulate(value: B?, error: () -> Error): Value<B> {
   contract { callsInPlace(error, AT_MOST_ONCE) }
@@ -58,7 +58,7 @@ context(raise: Accumulate<Error>)
 public fun <Error, A> Either<Error, A>.getOrAccumulate(recover: (Error) -> A): A =
   with(raise) { this@getOrAccumulate.getOrAccumulate(recover) }
 
-@ExperimentalRaiseAccumulateApi @RaiseDSL
+@ExperimentalRaiseAccumulateApi @RaiseDSL @IgnorableReturnValue
 context(raise: Accumulate<Error>)
 public inline fun <Error, A> accumulating(block: context(RaiseAccumulate<Error>) () -> A): Value<A> {
   contract { callsInPlace(block, AT_MOST_ONCE) }
