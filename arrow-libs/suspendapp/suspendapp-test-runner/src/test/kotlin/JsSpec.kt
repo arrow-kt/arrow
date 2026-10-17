@@ -12,7 +12,7 @@ open class JsSpec : SuspendAppTest() {
     .apply { environment()["TASK"] = mode }
 
   companion object {
-    val config = JsTestConfig("jsNodeRun")
+    val config = JsTestConfig("jsNodeProductionRun")
 
     @JvmStatic
     fun enabled() = config.validConfig()
