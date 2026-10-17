@@ -1047,7 +1047,7 @@ public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constru
     return (this as Accumulate<Error>).ensureOrAccumulate(condition, raise)
   }
 
-  @ExperimentalRaiseAccumulateApi
+  @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public inline fun <B : Any> ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
     contract { callsInPlace(raise, AT_MOST_ONCE) }
     return (this as Accumulate<Error>).ensureNotNullOrAccumulate(value, raise)
@@ -1148,7 +1148,7 @@ public interface Accumulate<Error> {
   @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public fun accumulate(error: Error): Value<Nothing> = accumulateAll(error.nel())
 
-  @ExperimentalRaiseAccumulateApi
+  @ExperimentalRaiseAccumulateApi @IgnorableReturnValue
   public fun accumulateAll(errors: NonEmptyList<Error>): Value<Nothing>
 
   @ExperimentalRaiseAccumulateApi
@@ -1174,7 +1174,7 @@ public interface Accumulate<Error> {
   }
 }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @IgnorableReturnValue
 @Suppress("WRONG_INVOCATION_KIND")
 public inline fun <Error, A> Accumulate<Error>.accumulating(block: RaiseAccumulate<Error>.() -> A): Value<A> {
   contract { callsInPlace(block, EXACTLY_ONCE) }
@@ -1189,7 +1189,7 @@ public inline fun <Error> Accumulate<Error>.ensureOrAccumulate(condition: Boolea
   return if (condition) Ok(Unit) else accumulate(raise())
 }
 
-@ExperimentalRaiseAccumulateApi
+@ExperimentalRaiseAccumulateApi @IgnorableReturnValue
 public inline fun <Error, B : Any> Accumulate<Error>.ensureNotNullOrAccumulate(value: B?, raise: () -> Error): Value<B> {
   contract { callsInPlace(raise, AT_MOST_ONCE) }
   return if (value != null) Ok(value) else accumulate(raise())
