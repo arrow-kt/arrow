@@ -30,9 +30,9 @@ internal actual fun AutoCloseScope.process(): Process {
 private class NativeProcess(job: Job) : Process {
   private val scope = CoroutineScope(SIGNAL_DISPATCHER + job)
 
-  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
-    onSigTerm { exitAfter(it + 128) { block() } }
-    onSigInt { exitAfter(it + 128) { block() } }
+  override fun onShutdown(block: suspend (exitCode: Int) -> Unit): () -> Unit {
+    onSigTerm { exitOnFailure { block(it + 128) } }
+    onSigInt { exitOnFailure { block(it + 128) } }
     return { /* Nothing to unregister */ }
   }
 
@@ -84,12 +84,3 @@ private val BACKPRESSURE: CompletableDeferred<Int> = CompletableDeferred()
 @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 private val SIGNAL_DISPATCHER: CloseableCoroutineDispatcher =
   newSingleThreadContext("arrow-kt-suspendapp-signal-dispatcher")
-
-private inline fun Process.exitAfter(code: Int, block: () -> Unit): Unit =
-  try {
-    block()
-    exit(code)
-  } catch (e: Throwable) {
-    e.printStackTrace()
-    exit(-1)
-  }
