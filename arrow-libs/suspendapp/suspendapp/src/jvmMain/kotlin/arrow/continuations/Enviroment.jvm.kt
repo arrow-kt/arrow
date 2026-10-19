@@ -98,6 +98,7 @@ private object JvmProcess : Process {
             handle?.handle(sig)
           }
         }
+      check(handle != SignalHandler.SIG_IGN) { "Signal Handler for SIG$signal was SIG_IGN." }
     } catch (ex: Throwable) {
       System.err.println("WARNING: SuspendApp was unable to install a signal handler for SIG$signal. Signalled cancellation may be impacted.")
       ex.printStackTrace()
