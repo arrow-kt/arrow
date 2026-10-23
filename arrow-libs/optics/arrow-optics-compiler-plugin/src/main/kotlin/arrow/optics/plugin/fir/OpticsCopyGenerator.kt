@@ -1,8 +1,12 @@
 package arrow.optics.plugin.fir
 
+import arrow.optics.plugin.OpticsClassKind
 import arrow.optics.plugin.OpticsNames
+import arrow.optics.plugin.memberVisibility
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
+import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
@@ -33,10 +37,15 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
     register(OpticsPredicates.optics)
   }
 
-  /** A monomorphic class carrying both `@optics` and `@optics.copy`, onto which we add `copy`. */
+  private val runtimeAvailable by lazy { FirOpticsExtractor.runtimeAvailable(session) }
+
+  /** A monomorphic, eligible class carrying both `@optics` and `@optics.copy`, onto which we add `copy`. */
   @OptIn(SymbolInternals::class)
-  private fun isCopySource(classSymbol: FirClassSymbol<*>): Boolean = classSymbol.typeParameterSymbols.isEmpty() &&
+  private fun isCopySource(classSymbol: FirClassSymbol<*>): Boolean = classSymbol is FirRegularClassSymbol &&
+    classSymbol.typeParameterSymbols.isEmpty() &&
     session.predicateBasedProvider.matches(OpticsPredicates.optics, classSymbol) &&
+    runtimeAvailable &&
+    FirOpticsExtractor.classKind(classSymbol) != OpticsClassKind.INELIGIBLE &&
     classSymbol.annotations.any { it.checkEvenIfUnresolved(OpticsNames.OPTICS_COPY_ANNOTATION) }
 
   override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> = if (isCopySource(classSymbol)) setOf(OpticsNames.COPY_METHOD_NAME) else emptySet()
@@ -61,7 +70,11 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
       )
     val function = createMemberFunction(source, Key, OpticsNames.COPY_METHOD_NAME, sourceType) {
       valueParameter(Name.identifier("block"), blockType)
-      visibility = FirOpticsExtractor.effectiveVisibility(source, session)
+      // like the data-class `copy`, it follows the primary constructor's visibility (review 2.2);
+      // a sealed type is never built through its own constructor
+      if (FirOpticsExtractor.classKind(source) != OpticsClassKind.SEALED) {
+        visibility = memberVisibility(listOfNotNull(source.primaryConstructorIfAny(session)?.visibility))
+      }
       // Give the function a body up front so the synthetic data-class `copy` body generator (which
       // runs in Fir2Ir, before our IR pass) does not treat this body-less generated `copy` as the
       // data-class copy and try to fill it as one. The real body is installed in the IR phase.

@@ -44,15 +44,13 @@ class TargetTests {
   }
 
   @Test
-  fun `ineligible class generates no optics`() {
-    // A plain class is not data/value/sealed: no optics are generated, so referencing one fails.
+  fun `ineligible class is rejected`() {
+    // A plain class is not data/value/sealed: it is reported, and no optics are generated.
     """
       |$`package`
       |$imports
       |@optics
       |class Plain(val x: Int) { companion object }
-      |
-      |val l = Plain.x
-      """.compilationFails()
+      """.failsWith { "Only data classes, value classes with a single field, and sealed classes and interfaces can be annotated with @optics" in it }
   }
 }

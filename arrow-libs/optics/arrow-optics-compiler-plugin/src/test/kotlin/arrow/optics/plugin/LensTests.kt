@@ -283,7 +283,7 @@ class LensTests {
   }
 
   @Test
-  fun `Lens for sealed class property, ignoring changed types`() {
+  fun `Lens for generic sealed class property with fixed covariant arguments requires opt-in`() {
     """
       |$`package`
       |$imports
@@ -306,7 +306,7 @@ class LensTests {
       |
       |val l: Lens<Base<String>, String> = Base.prop()
       |val r = l != null
-      """.compilationFails()
+      """.failsWith { "Potentially unsafe optic because of a covariant type argument" in it }
   }
 
   @Test

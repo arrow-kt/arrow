@@ -62,16 +62,38 @@ fun lowercaseFirst(name: Name): Name {
 /**
  * Most-restrictive combination of two visibilities (algo §3.3).
  * `public` is the identity; `private` dominates; `internal` and `protected` collapse to `private`.
+ * Any other visibility (`local`, `private-to-this`, ...) is treated as `private`.
  */
-fun mostRestrictive(a: Visibility, b: Visibility): Visibility = when {
-  a == Visibilities.Public -> b
+fun mostRestrictive(a: Visibility, b: Visibility): Visibility {
+  val na = normalized(a)
+  val nb = normalized(b)
+  return when {
+    na == Visibilities.Public -> nb
 
-  b == Visibilities.Public -> a
+    nb == Visibilities.Public -> na
 
-  a == Visibilities.Private || b == Visibilities.Private -> Visibilities.Private
+    na == Visibilities.Private || nb == Visibilities.Private -> Visibilities.Private
 
-  a == b -> a
+    na == nb -> na
 
-  // mixing internal and protected
+    // mixing internal and protected
+    else -> Visibilities.Private
+  }
+}
+
+private fun normalized(v: Visibility): Visibility = when (v.normalize()) {
+  Visibilities.Public, Visibilities.Internal, Visibilities.Protected, Visibilities.Private -> v.normalize()
   else -> Visibilities.Private
 }
+
+/**
+ * Visibility of a generated companion member whose body relies on declarations with the given
+ * [visibilities] (constructors, properties, subclasses). `protected` collapses to `private`: the
+ * classes whose constructors and properties are used are final, so both mean the same there.
+ */
+fun memberVisibility(visibilities: Iterable<Visibility>): Visibility = visibilities
+  .map { if (normalized(it) == Visibilities.Protected) Visibilities.Private else it }
+  .fold(Visibilities.Public, ::mostRestrictive)
+
+/** Whether a top-level declaration may have [visibility] and still be usable from the source's file. */
+fun isUsableTopLevelVisibility(visibility: Visibility): Boolean = normalized(visibility).let { it == Visibilities.Public || it == Visibilities.Internal }

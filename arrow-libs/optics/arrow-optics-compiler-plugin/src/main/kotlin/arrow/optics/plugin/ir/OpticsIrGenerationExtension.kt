@@ -3,6 +3,7 @@
 package arrow.optics.plugin.ir
 
 import arrow.optics.plugin.DslKind
+import arrow.optics.plugin.OpticKind
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.fir.OpticsCompanionGenerator
 import arrow.optics.plugin.fir.OpticsCopyGenerator
@@ -31,15 +32,22 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrParameterKind
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.classifierOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.isMarkedNullable
+import org.jetbrains.kotlin.ir.types.makeNullable
+import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.types.typeOrNull
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.companionObject
@@ -48,6 +56,7 @@ import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.ir.util.properties
+import org.jetbrains.kotlin.ir.util.substitute
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
@@ -65,47 +74,67 @@ class OpticsIrGenerationExtension : IrGenerationExtension {
  * Everything is resolved lazily: the symbols are only looked up the first time a generated optic
  * body is actually built, so applying the plugin to a module that does not depend on `arrow-optics`
  * (and therefore generates nothing) never forces resolution and never crashes (review §2.5).
+ * Overloads are picked by their parameter types (review 3.1).
  */
 class OpticsIrSymbols(private val ctx: IrPluginContext) {
   val finder get() = ctx.finderForBuiltins()
 
+  private val function1 get() = ctx.irBuiltIns.functionN(1).symbol
+  private val function2 get() = ctx.irBuiltIns.functionN(2).symbol
+
+  /** `PLens.Companion.invoke(get: (S) -> A, set: (S, B) -> T)`. */
   val lensInvoke: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.LENS_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
+    finder.findFunctions(OpticsNames.LENS_INVOKE).singleOrNull { it.regularParameterClassifiers() == listOf(function1, function2) }
+      ?: missing(OpticsNames.LENS_INVOKE.toString())
   }
+
+  /** `PIso.Companion.invoke(get: (S) -> A, reverseGet: (B) -> T)`. */
   val isoInvoke: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.ISO_INVOKE).first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 2 }
+    finder.findFunctions(OpticsNames.ISO_INVOKE).singleOrNull { it.regularParameterClassifiers() == listOf(function1, function1) }
+      ?: missing(OpticsNames.ISO_INVOKE.toString())
   }
+
+  /** `PPrism.Companion.instanceOf<A, reified B : A>()`. */
   val prismInstanceOf: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.PRISM_INSTANCE_OF).first { it.owner.parameters.none { p -> p.kind == IrParameterKind.Regular } }
+    finder.findFunctions(OpticsNames.PRISM_INSTANCE_OF).singleOrNull {
+      it.regularParameterClassifiers().isEmpty() && it.owner.typeParameters.size == 2 && it.owner.typeParameters[1].isReified
+    } ?: missing(OpticsNames.PRISM_INSTANCE_OF.toString())
   }
-  val plens: IrClassSymbol by lazy { finder.findClass(OpticsNames.PLENS)!! }
-  val piso: IrClassSymbol by lazy { finder.findClass(OpticsNames.PISO)!! }
-  val pprism: IrClassSymbol by lazy { finder.findClass(OpticsNames.PPRISM)!! }
-  val plensCompanion: IrClassSymbol by lazy { finder.findClass(OpticsNames.PLENS_COMPANION)!! }
-  val pisoCompanion: IrClassSymbol by lazy { finder.findClass(OpticsNames.PISO_COMPANION)!! }
-  val pprismCompanion: IrClassSymbol by lazy { finder.findClass(OpticsNames.PPRISM_COMPANION)!! }
+
+  val pprismCompanion: IrClassSymbol by lazy { findClass(OpticsNames.PPRISM_COMPANION) }
+  val plensCompanion: IrClassSymbol by lazy { findClass(OpticsNames.PLENS_COMPANION) }
+  val pisoCompanion: IrClassSymbol by lazy { findClass(OpticsNames.PISO_COMPANION) }
 
   /** For each optic poly-interface, its `plus` composition operator (keyed by the receiver class). */
   val polyPlus: Map<IrClassSymbol, IrSimpleFunctionSymbol> by lazy {
     DslKind.entries.associate { kind ->
-      val cls = finder.findClass(OpticsNames.polyClassFor(kind))!!
-      val plus = finder.findFunctions(OpticsNames.plusFor(kind))
-        .first { it.owner.parameters.count { p -> p.kind == IrParameterKind.Regular } == 1 }
+      val cls = findClass(OpticsNames.polyClassFor(kind))
+      // `operator fun <C, D> plus(other: PSame<in A, out B, out C, in D>): PSame<S, T, C, D>`
+      val plus = finder.findFunctions(OpticsNames.plusFor(kind)).singleOrNull { it.regularParameterClassifiers() == listOf(cls) }
+        ?: missing(OpticsNames.plusFor(kind).toString())
       cls to plus
     }
   }
 
   // COPY builder support.
-  val copyClass: IrClassSymbol by lazy { finder.findClass(OpticsNames.COPY)!! }
-  val arrowOpticsCopy: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.ARROW_OPTICS_COPY).first { fn ->
-      fn.owner.parameters.any { it.kind == IrParameterKind.ExtensionReceiver } &&
-        fn.owner.parameters.count { it.kind == IrParameterKind.Regular } == 1
-    }
-  }
-}
+  val copyClass: IrClassSymbol by lazy { findClass(OpticsNames.COPY) }
 
-private enum class IrOpticKind { LENS, ISO, PRISM }
+  /** `fun <A> A.copy(f: Copy<A>.() -> Unit): A`. */
+  val arrowOpticsCopy: IrSimpleFunctionSymbol by lazy {
+    finder.findFunctions(OpticsNames.ARROW_OPTICS_COPY).singleOrNull { fn ->
+      val receiver = fn.owner.parameters.singleOrNull { it.kind == IrParameterKind.ExtensionReceiver }
+      receiver?.type?.classifierOrNull is IrTypeParameterSymbol && fn.regularParameterClassifiers() == listOf(function1)
+    } ?: missing(OpticsNames.ARROW_OPTICS_COPY.toString())
+  }
+
+  private fun findClass(classId: org.jetbrains.kotlin.name.ClassId): IrClassSymbol = finder.findClass(classId) ?: missing(classId.asString())
+
+  private fun IrSimpleFunctionSymbol.regularParameterClassifiers(): List<IrClassifierSymbol?> = owner.parameters.filter { it.kind == IrParameterKind.Regular }.map { it.type.classifierOrNull }
+
+  // The FIR side does not generate anything without arrow-optics in the classpath, so this means an
+  // incompatible arrow-optics version.
+  private fun missing(what: String): Nothing = error("Arrow Optics plugin: cannot find '$what' in arrow-optics; is the arrow-optics version compatible with the plugin?")
+}
 
 private class OpticsBodyGenerator(
   private val ctx: IrPluginContext,
@@ -118,15 +147,20 @@ private class OpticsBodyGenerator(
 
   override fun visitProperty(declaration: IrProperty) {
     val getter = declaration.getter
-    if (getter != null) {
-      when (keyOf(declaration.origin)) {
-        OpticsCompanionGenerator.Key -> {
-          declaration.backingField = null
-          buildOpticBody(getter, declaration.name)
+    val key = keyOf(declaration.origin)
+    if (getter != null && key != null) {
+      // The getter gets a real body, so it must not be treated as a default accessor (the JVM backend
+      // replaces calls to private default getters with field accesses, and there is no field).
+      if (key == OpticsDslGenerator.Key || opticKindOf(key) != null) getter.origin = declaration.origin
+      val kind = opticKindOf(key)
+      when {
+        kind != null -> {
+          check(declaration.backingField == null) { "Generated optic ${declaration.name} must not have a backing field" }
+          buildOpticBody(getter, kind, declaration.name)
         }
 
-        OpticsDslGenerator.Key -> {
-          declaration.backingField = null
+        key == OpticsDslGenerator.Key -> {
+          check(declaration.backingField == null) { "Generated optic ${declaration.name} must not have a backing field" }
           buildDslBody(getter, declaration.name)
         }
       }
@@ -136,17 +170,26 @@ private class OpticsBodyGenerator(
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction) {
     if (declaration.correspondingPropertySymbol == null) {
-      when (keyOf(declaration.origin)) {
-        OpticsCompanionGenerator.Key -> if (declaration.body == null) buildOpticBody(declaration, declaration.name)
+      val key = keyOf(declaration.origin)
+      val kind = key?.let(::opticKindOf)
+      when {
+        kind != null -> if (declaration.body == null) buildOpticBody(declaration, kind, declaration.name)
 
         // Generic sources get their DSL composition helpers as functions (see OpticsDslGenerator).
-        OpticsDslGenerator.Key -> if (declaration.body == null) buildDslBody(declaration, declaration.name)
+        key == OpticsDslGenerator.Key -> if (declaration.body == null) buildDslBody(declaration, declaration.name)
 
         // The copy member is created with a placeholder body (see OpticsCopyGenerator), so overwrite it.
-        OpticsCopyGenerator.Key -> buildCopyBody(declaration)
+        key == OpticsCopyGenerator.Key -> buildCopyBody(declaration)
       }
     }
     super.visitSimpleFunction(declaration)
+  }
+
+  private fun opticKindOf(key: GeneratedDeclarationKey): OpticKind? = when (key) {
+    OpticsCompanionGenerator.LensKey -> OpticKind.LENS
+    OpticsCompanionGenerator.IsoKey -> OpticKind.ISO
+    OpticsCompanionGenerator.PrismKey -> OpticKind.PRISM
+    else -> null
   }
 
   /** `{ this.copy { block(this, Source.Companion, this@copy) } }` for a generated `@optics.copy` member. */
@@ -179,24 +222,18 @@ private class OpticsBodyGenerator(
   private fun keyOf(origin: IrDeclarationOrigin): GeneratedDeclarationKey? = (origin as? IrDeclarationOrigin.GeneratedByPlugin)?.pluginKey
 
   /** Fill in the body of a generated companion optic ([opticFn] is the property getter or the standalone function). */
-  private fun buildOpticBody(opticFn: IrSimpleFunction, opticName: Name) {
-    val kind = when (opticFn.returnType.classOrNull) {
-      symbols.plens -> IrOpticKind.LENS
-      symbols.piso -> IrOpticKind.ISO
-      symbols.pprism -> IrOpticKind.PRISM
-      else -> return
-    }
+  private fun buildOpticBody(opticFn: IrSimpleFunction, kind: OpticKind, opticName: Name) {
     val source = opticFn.parentAsClass.parentAsClass
     val rt = opticFn.returnType as IrSimpleType
-    val sourceType = rt.arguments[0].typeOrNull!!
-    val focusType = rt.arguments[2].typeOrNull!!
+    val sourceType = rt.arguments[0].typeOrNull ?: error("Optic $opticName has a star-projected source type")
+    val focusType = rt.arguments[2].typeOrNull ?: error("Optic $opticName has a star-projected focus type")
     val ctorTypeArgs = opticFn.typeParameters.map { it.defaultType }
 
     opticFn.body = DeclarationIrBuilder(ctx, opticFn.symbol).irBlockBody {
       val expr = when (kind) {
-        IrOpticKind.LENS -> buildLens(opticFn, source, sourceType, focusType, opticName, ctorTypeArgs)
-        IrOpticKind.ISO -> buildIso(opticFn, source, sourceType, focusType, opticName, ctorTypeArgs)
-        IrOpticKind.PRISM -> buildPrism(sourceType, focusType, opticFn.returnType)
+        OpticKind.LENS -> buildLens(opticFn, source, sourceType, focusType, opticName, ctorTypeArgs)
+        OpticKind.ISO -> buildIso(opticFn, source, sourceType, focusType, opticName, ctorTypeArgs)
+        OpticKind.PRISM -> buildPrism(sourceType, focusType, opticFn.returnType)
       }
       +irReturn(expr)
     }
@@ -221,16 +258,18 @@ private class OpticsBodyGenerator(
     // (taking the source's type arguments) for a generic one. Detect which by looking it up, rather
     // than by the DSL helper's own type-parameter count: a prism helper for a non-generic subclass of
     // a *generic* sealed parent has only `__S` yet its base optic is still a function.
+    // Only generated optics are considered, never a user member with the same name.
     val baseSymbol: IrSimpleFunctionSymbol
     val baseReturn: IrType
     val baseTypeArgs: List<IrType>
-    val baseGetter = companion.properties.firstOrNull { it.name == focusName }?.getter
+    val baseGetter = companion.properties.firstOrNull { it.name == focusName && isGeneratedOptic(it.origin) }?.getter
     if (baseGetter != null) {
       baseSymbol = baseGetter.symbol
       baseReturn = baseGetter.returnType
       baseTypeArgs = emptyList()
     } else {
-      val baseFn = companion.functions.firstOrNull { it.name == focusName } ?: return
+      val baseFn = companion.functions.firstOrNull { it.name == focusName && isGeneratedOptic(it.origin) }
+        ?: error("Arrow Optics plugin: no generated base optic '$focusName' in ${companion.name}")
       baseSymbol = baseFn.symbol
       baseReturn = (baseFn.returnType.classOrNull ?: return).typeWith(sourceType, sourceType, focusType, focusType)
       baseTypeArgs = opticFn.typeParameters.dropLast(1).map { it.defaultType }
@@ -245,6 +284,8 @@ private class OpticsBodyGenerator(
       +irReturn(composed)
     }
   }
+
+  private fun isGeneratedOptic(origin: IrDeclarationOrigin): Boolean = keyOf(origin) in OpticsCompanionGenerator.opticKeys
 
   private fun IrBuilderWithScope.buildPrism(
     sourceType: IrType,
@@ -271,7 +312,7 @@ private class OpticsBodyGenerator(
       val body = if (source.modality == Modality.SEALED) {
         sealedSet(source, sourceType, fieldName, s, v)
       } else {
-        reconstruct(source, ctorTypeArgs, { irGet(s) }, fieldName) { irGet(v) }
+        reconstruct(source, ctorTypeArgs, sourceType, { irGet(s) }, fieldName) { irGet(v) }
       }
       +irReturn(body)
     }
@@ -282,7 +323,10 @@ private class OpticsBodyGenerator(
     return call
   }
 
-  /** `when (s) { is Sub1 -> Sub1(prop = v, ...); ... }` over a sealed hierarchy. */
+  /**
+   * `when (s) { is Sub1 -> Sub1(prop = v, ...); ... }` over a sealed hierarchy. A generic subclass is
+   * tested as `Sub<*>` and rebuilt with the type arguments given by [subclassTypeArguments].
+   */
   private fun IrBuilderWithScope.sealedSet(
     source: IrClass,
     sourceType: IrType,
@@ -292,14 +336,44 @@ private class OpticsBodyGenerator(
   ): IrExpression {
     val branches = source.sealedSubclasses.map { subSymbol ->
       val sub = subSymbol.owner
-      val subType = sub.defaultType
+      val subTypeArgs = subclassTypeArguments(sub, source, sourceType)
+      val subType = subSymbol.typeWith(subTypeArgs)
       irBranch(
-        irIs(irGet(instance), subType),
+        irIs(irGet(instance), subSymbol.starProjectedType),
         // A fresh `instance as Sub` is built for every field read, so no IR node is shared.
-        reconstruct(sub, emptyList(), { irImplicitCast(irGet(instance), subType) }, fieldName) { irGet(value) },
+        reconstruct(sub, subTypeArgs, subType, { irImplicitCast(irGet(instance), subType) }, fieldName) { irGet(value) },
       )
     } + irElseBranch(irCall(ctx.irBuiltIns.noWhenBranchMatchedExceptionSymbol))
     return irWhen(sourceType, branches)
+  }
+
+  /**
+   * Type arguments to rebuild [sub] at, when the parent is used at [sourceType]. A type parameter of
+   * [sub] that it forwards to the parent (`Full<B> : Box<B>`) takes the corresponding argument of
+   * [sourceType]; the others are not determined by the parent, so they are erased to their upper bounds.
+   */
+  private fun subclassTypeArguments(sub: IrClass, parent: IrClass, sourceType: IrType): List<IrType> {
+    val supertype = sub.superTypes.firstOrNull { it.classOrNull == parent.symbol } as? IrSimpleType
+    val sourceArguments = (sourceType as? IrSimpleType)?.arguments.orEmpty()
+    val forwarded = mutableMapOf<IrTypeParameterSymbol, IrType>()
+    supertype?.arguments?.forEachIndexed { i, argument ->
+      val type = argument.typeOrNull ?: return@forEachIndexed
+      val parameter = type.classifierOrNull as? IrTypeParameterSymbol ?: return@forEachIndexed
+      val actual = sourceArguments.getOrNull(i)?.typeOrNull ?: return@forEachIndexed
+      if (parameter.owner.parent == sub && !type.isMarkedNullable()) forwarded.putIfAbsent(parameter, actual)
+    }
+    return sub.typeParameters.map { forwarded[it.symbol] ?: erasedArgument(it) }
+  }
+
+  /** The erasure of [typeParameter]: its first upper bound, star-projected, or `Any?`. */
+  private fun erasedArgument(typeParameter: IrTypeParameter, seen: Set<IrTypeParameter> = emptySet()): IrType {
+    val bound = typeParameter.superTypes.firstOrNull() ?: return ctx.irBuiltIns.anyNType
+    val erased = when (val classifier = bound.classifierOrNull) {
+      is IrClassSymbol -> classifier.starProjectedType
+      is IrTypeParameterSymbol -> if (classifier.owner in seen) ctx.irBuiltIns.anyNType else erasedArgument(classifier.owner, seen + typeParameter)
+      else -> ctx.irBuiltIns.anyNType
+    }
+    return if (bound.isMarkedNullable()) erased.makeNullable() else erased
   }
 
   private fun IrBuilderWithScope.buildIso(
@@ -314,7 +388,7 @@ private class OpticsBodyGenerator(
       +irReturn(readComponent(source, fieldName, focusType, irGet(s)))
     }
     val reverseGetLambda = ctx.buildLambda(opticFn, listOf(focusType), sourceType) { (v) ->
-      +irReturn(reconstruct(source, ctorTypeArgs, { irGet(v) }, fieldName) { irGet(v) })
+      +irReturn(reconstruct(source, ctorTypeArgs, sourceType, { irGet(v) }, fieldName) { irGet(v) })
     }
     val call = irCall(symbols.isoInvoke, opticFn.returnType, listOf(sourceType, sourceType, focusType, focusType))
     call.setDispatch(irGetObjectValue(symbols.pisoCompanion.owner.defaultType, symbols.pisoCompanion))
@@ -330,32 +404,38 @@ private class OpticsBodyGenerator(
     focusType: IrType,
     instance: IrExpression,
   ): IrExpression {
-    val prop = source.properties.first { it.name == fieldName }
-    val call = irCall(prop.getter!!.symbol, focusType)
+    val getter = source.properties.firstOrNull { it.name == fieldName }?.getter
+      ?: error("Arrow Optics plugin: no property '$fieldName' with a getter in ${source.name}")
+    val call = irCall(getter.symbol, focusType)
     call.setDispatch(instance)
     return call
   }
 
   /**
    * Reconstruct [source] via its primary constructor, replacing [overrideName] with [overrideValue].
+   * [typeArgs] are the type arguments of the constructed class and [resultType] the resulting type;
+   * the types of the sibling components are substituted accordingly (review 1.2).
    * [instance] and [overrideValue] are *factories* that must produce a fresh IR node on every call, so
    * that reading several sibling components never shares the same IR node (which would break IR
    * invariants — see review §2.1).
    */
   private fun IrBuilderWithScope.reconstruct(
     source: IrClass,
-    ctorTypeArgs: List<IrType>,
+    typeArgs: List<IrType>,
+    resultType: IrType,
     instance: () -> IrExpression,
     overrideName: Name,
     overrideValue: () -> IrExpression,
   ): IrExpression {
-    val ctor = source.primaryConstructor!!
-    val call = irCallConstructor(ctor.symbol, ctorTypeArgs)
+    val ctor = source.primaryConstructor ?: error("Arrow Optics plugin: ${source.name} has no primary constructor")
+    val substitution = source.typeParameters.map { it.symbol }.zip(typeArgs).toMap()
+    val call = irCallConstructor(ctor.symbol, typeArgs)
+    call.type = resultType
     ctor.parameters.filter { it.kind == IrParameterKind.Regular }.forEach { param ->
       val arg = if (param.name == overrideName) {
         overrideValue()
       } else {
-        readComponent(source, param.name, param.type, instance())
+        readComponent(source, param.name, param.type.substitute(substitution), instance())
       }
       call.arguments[param] = arg
     }

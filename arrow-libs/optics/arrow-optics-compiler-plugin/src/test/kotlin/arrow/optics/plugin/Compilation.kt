@@ -29,6 +29,12 @@ fun String.failsWith(check: (String) -> Boolean) {
   check(compilationResult.messages).shouldBeTrue()
 }
 
+fun String.warnsWith(check: (String) -> Boolean) {
+  val compilationResult = compile(this)
+  compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
+  check(compilationResult.messages).shouldBeTrue()
+}
+
 fun String.compilationFails() {
   val compilationResult = compile(this)
   compilationResult.exitCode shouldNotBe KotlinCompilation.ExitCode.OK
@@ -97,9 +103,11 @@ fun buildCompilation(
     OpticsPluginComponentRegistrar(),
     SerializationComponentRegistrar().takeIf { withKotlinxSerialization },
   )
-  if (contextParameters) {
-    this.kotlincArguments = listOf("-Xcontext-parameters")
-  }
+  // Generated IR must always be valid, even where JVM erasure would hide the problem (review 1.2).
+  this.kotlincArguments = listOfNotNull(
+    "-Xverify-ir=error",
+    "-Xcontext-parameters".takeIf { contextParameters },
+  )
 }
 
 private fun classpathOf(dependency: String): File {
