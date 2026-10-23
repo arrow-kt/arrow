@@ -9,6 +9,9 @@ public final class arrow/optics/OpticsTarget : java/lang/Enum {
 	public static fun values ()[Larrow/optics/OpticsTarget;
 }
 
+public abstract interface annotation class arrow/optics/PotentiallyUnsafeCovariantOptic : java/lang/annotation/Annotation {
+}
+
 public abstract interface annotation class arrow/optics/optics : java/lang/annotation/Annotation {
 	public abstract fun targets ()[Larrow/optics/OpticsTarget;
 }

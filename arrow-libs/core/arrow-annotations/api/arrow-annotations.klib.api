@@ -6,6 +6,10 @@
 // - Show declarations: true
 
 // Library unique name: <io.arrow-kt:arrow-annotations>
+open annotation class arrow.optics/PotentiallyUnsafeCovariantOptic : kotlin/Annotation { // arrow.optics/PotentiallyUnsafeCovariantOptic|null[0]
+    constructor <init>() // arrow.optics/PotentiallyUnsafeCovariantOptic.<init>|<init>(){}[0]
+}
+
 open annotation class arrow.optics/optics : kotlin/Annotation { // arrow.optics/optics|null[0]
     constructor <init>(kotlin/Array<arrow.optics/OpticsTarget> = ...) // arrow.optics/optics.<init>|<init>(kotlin.Array<arrow.optics.OpticsTarget>){}[0]
 
