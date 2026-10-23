@@ -1,7 +1,7 @@
 [versions]
 animalSniffer = "2.0.1"
 coroutines = "1.11.0"
-classgraph = "4.8.199"
+classgraph = "6.0.0"
 dokka = "2.2.0"
 kotest = "6.2.6"
 kover = "0.9.11"
