@@ -42,15 +42,17 @@ public fun SuspendApp(
           appScope.block()
         }
       val unregister =
-        env.onShutdown {
+        env.onShutdown { exitCode ->
           withTimeout(timeout) {
-            app.cancel(SuspendAppShutdown())
+            // Carry the signal's exit code, so exiting after the cancellation matches the signal handler's exit code.
+            app.cancel(SuspendAppShutdown(exitCode))
             app.join()
           }
         }
       runCatching { app.await() }
         .also { unregister() }
     }
+    // The single place that exits the process on completion, including a signalled shutdown (see [Process.onShutdown]).
     result.fold({ env.exit(0) }) { e ->
       when (e) {
         is SuspendAppShutdown -> env.exit(e.code ?: -1)

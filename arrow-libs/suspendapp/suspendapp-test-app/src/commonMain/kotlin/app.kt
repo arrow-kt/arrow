@@ -3,14 +3,10 @@ import arrow.continuations.SuspendAppScope
 import arrow.continuations.exitApp
 import arrow.fx.coroutines.resourceScope
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 fun interface Work {
@@ -28,6 +24,7 @@ data object ChildLaunchExitApp : Mode, Work by Work({
   launch { exitApp(24) }
   awaitCancellation()
 })
+
 data object ExitProcess : Mode, Work by Work({
   launch { exitProcess(42) }
   awaitCancellation()

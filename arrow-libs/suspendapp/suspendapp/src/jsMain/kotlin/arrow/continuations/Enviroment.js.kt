@@ -21,9 +21,9 @@ import kotlinx.coroutines.withContext
 internal actual fun AutoCloseScope.process(): Process = JsProcess
 
 private object JsProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
-    onSigTerm { code -> exitAfter(128 + code) { block() } }
-    onSigInt { code -> exitAfter(128 + code) { block() } }
+  override fun onShutdown(block: suspend (exitCode: Int) -> Unit): () -> Unit {
+    onSigTerm { code -> exitOnFailure { block(128 + code) } }
+    onSigInt { code -> exitOnFailure { block(128 + code) } }
     return { /* Nothing to unregister */ }
   }
 
@@ -67,12 +67,3 @@ private object JsProcess : Process {
     error("process.exit() should have exited...")
   }
 }
-
-private inline fun Process.exitAfter(code: Int, block: () -> Unit): Unit =
-  try {
-    block()
-    exit(code)
-  } catch (e: Throwable) {
-    e.printStackTrace()
-    exit(-1)
-  }
