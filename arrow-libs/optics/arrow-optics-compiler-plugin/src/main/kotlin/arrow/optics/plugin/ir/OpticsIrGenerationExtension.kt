@@ -325,8 +325,7 @@ private class OpticsBodyGenerator(
 
   /**
    * `when (s) { is Sub1 -> Sub1(prop = v, ...); ... }` over a sealed hierarchy. A generic subclass is
-   * tested as `Sub<*>` and rebuilt with its type parameters erased to their upper bounds, since the
-   * (non-generic) parent does not determine them.
+   * tested as `Sub<*>` and rebuilt with the type arguments given by [subclassTypeArguments].
    */
   private fun IrBuilderWithScope.sealedSet(
     source: IrClass,
@@ -337,7 +336,7 @@ private class OpticsBodyGenerator(
   ): IrExpression {
     val branches = source.sealedSubclasses.map { subSymbol ->
       val sub = subSymbol.owner
-      val subTypeArgs = sub.typeParameters.map { erasedArgument(it) }
+      val subTypeArgs = subclassTypeArguments(sub, source, sourceType)
       val subType = subSymbol.typeWith(subTypeArgs)
       irBranch(
         irIs(irGet(instance), subSymbol.starProjectedType),
@@ -346,6 +345,24 @@ private class OpticsBodyGenerator(
       )
     } + irElseBranch(irCall(ctx.irBuiltIns.noWhenBranchMatchedExceptionSymbol))
     return irWhen(sourceType, branches)
+  }
+
+  /**
+   * Type arguments to rebuild [sub] at, when the parent is used at [sourceType]. A type parameter of
+   * [sub] that it forwards to the parent (`Full<B> : Box<B>`) takes the corresponding argument of
+   * [sourceType]; the others are not determined by the parent, so they are erased to their upper bounds.
+   */
+  private fun subclassTypeArguments(sub: IrClass, parent: IrClass, sourceType: IrType): List<IrType> {
+    val supertype = sub.superTypes.firstOrNull { it.classOrNull == parent.symbol } as? IrSimpleType
+    val sourceArguments = (sourceType as? IrSimpleType)?.arguments.orEmpty()
+    val forwarded = mutableMapOf<IrTypeParameterSymbol, IrType>()
+    supertype?.arguments?.forEachIndexed { i, argument ->
+      val type = argument.typeOrNull ?: return@forEachIndexed
+      val parameter = type.classifierOrNull as? IrTypeParameterSymbol ?: return@forEachIndexed
+      val actual = sourceArguments.getOrNull(i)?.typeOrNull ?: return@forEachIndexed
+      if (parameter.owner.parent == sub && !type.isMarkedNullable()) forwarded.putIfAbsent(parameter, actual)
+    }
+    return sub.typeParameters.map { forwarded[it.symbol] ?: erasedArgument(it) }
   }
 
   /** The erasure of [typeParameter]: its first upper bound, star-projected, or `Any?`. */

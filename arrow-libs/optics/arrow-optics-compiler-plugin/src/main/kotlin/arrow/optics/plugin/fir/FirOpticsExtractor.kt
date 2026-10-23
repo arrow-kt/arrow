@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.fir.packageFqName
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
+import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
@@ -38,19 +39,24 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
+import org.jetbrains.kotlin.fir.types.ConeDefinitelyNotNullType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.ConeStarProjection
+import org.jetbrains.kotlin.fir.types.ConeTypeParameterType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirUserTypeRef
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.constructType
+import org.jetbrains.kotlin.fir.types.contains
 import org.jetbrains.kotlin.fir.types.isMarkedNullable
 import org.jetbrains.kotlin.fir.types.type
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.types.Variance
 
 /** A single base-optic focus discovered on the source class, as seen from FIR. */
 data class FirFocus(
@@ -69,6 +75,11 @@ data class FirFocus(
    * properties and subclasses its body relies on (review 1.1, 2.2). Only meaningful once types are resolved.
    */
   val visibility: Visibility = Visibilities.Public,
+  /**
+   * For sealed shared-property lenses on a generic parent: `set` may not respect the type arguments,
+   * so the optic requires opting into `PotentiallyUnsafeCovariantOptic`.
+   */
+  val potentiallyUnsafe: Boolean = false,
 )
 
 /** Reads `@optics`-annotated FIR class symbols and extracts the foci to generate. */
@@ -108,8 +119,15 @@ object FirOpticsExtractor {
     val all = allFoci(symbol, resolveFocusTypes, session)
     if (!resolveFocusTypes) return all
     val clashing = clashingNames(all)
-    return all.filter { it.opticName !in clashing }
+    val unsafeAllowed = unsafeMarkerAvailable(session)
+    return all.filter { it.opticName !in clashing && (unsafeAllowed || !it.potentiallyUnsafe) }
   }
+
+  /**
+   * Whether `PotentiallyUnsafeCovariantOptic` is in the classpath (it is missing in older arrow-annotations).
+   * Without it, potentially unsafe lenses are not generated, since they could not require an opt-in.
+   */
+  fun unsafeMarkerAvailable(session: FirSession): Boolean = session.symbolProvider.getClassLikeSymbolByClassId(OpticsNames.POTENTIALLY_UNSAFE_COVARIANT_OPTIC) != null
 
   /** All foci of [symbol], without removing clashing names. */
   fun allFoci(symbol: FirRegularClassSymbol, resolveFocusTypes: Boolean, session: FirSession): List<FirFocus> {
@@ -214,10 +232,14 @@ object FirOpticsExtractor {
 
   /**
    * LENS foci for abstract properties that are uniform across every (data-class) subclass of a
-   * sealed type (algo §5.2). Only monomorphic parents for now.
+   * sealed type (algo §5.2).
+   *
+   * For a generic parent, the property's type is compared with the subclass's constructor parameter
+   * after replacing the parent's type parameters with the arguments the subclass gives them in its
+   * supertype: `Full<B>(override val value: B) : Box<B>()` and `Str(override val value: String) : Box<String>()`
+   * are both uniform with `abstract val value: A` (review #1 §3.2).
    */
   private fun sealedLensFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
-    if (symbol.typeParameterSymbols.isNotEmpty()) return emptyList()
     val abstractProps = mutableListOf<FirPropertySymbol>()
     symbol.processAllDeclarations(session) visitor@{
       if (it !is FirPropertySymbol) return@visitor
@@ -248,39 +270,83 @@ object FirOpticsExtractor {
 
     if (subclasses.isEmpty() || subclasses.any { !it.isData }) return emptyList()
 
+    if (!resolveFocusTypes) {
+      return abstractProps.mapNotNull { prop ->
+        val uniform = subclasses.all { sub ->
+          sub.primaryConstructorIfAny(session)?.valueParameterSymbols?.any { it.name == prop.name } == true
+        }
+        if (!uniform) return@mapNotNull null
+        FirFocus(kind = OpticKind.LENS, opticName = prop.name, focusType = null, componentName = prop.name)
+      }
+    }
+
+    val parentParams = symbol.typeParameterSymbols
     return abstractProps.mapNotNull { prop ->
-      val uniform = if (resolveFocusTypes) {
-        val propType = prop.resolvedReturnType
-        subclasses.all { sub ->
-          val ctorParam = sub.primaryConstructorIfAny(session)?.valueParameterSymbols?.firstOrNull { it.name == prop.name }
-          ctorParam != null && sameType(ctorParam.resolvedReturnType, propType)
-        }
-      } else {
-        subclasses.all { sub ->
-          val ctorParam = sub.primaryConstructorIfAny(session)?.valueParameterSymbols?.firstOrNull { it.name == prop.name }
-          ctorParam != null
-        }
+      val propType = prop.resolvedReturnType
+      var potentiallyUnsafe = false
+      val uniform = subclasses.all { sub ->
+        val ctor = sub.primaryConstructorIfAny(session) ?: return@all false
+        val ctorParam = ctor.valueParameterSymbols.firstOrNull { it.name == prop.name } ?: return@all false
+        val args = supertypeArguments(sub, symbol, session) ?: return@all false
+        val expected = substitutorByMap(parentParams.zip(args).toMap(), session).substituteOrSelf(propType)
+        if (!sameType(ctorParam.resolvedReturnType, expected)) return@all false
+        if (isPotentiallyUnsafe(propType, parentParams, args, sub, ctor, prop.name)) potentiallyUnsafe = true
+        true
       }
       if (!uniform) return@mapNotNull null
       FirFocus(
         kind = OpticKind.LENS,
         opticName = prop.name,
-        focusType = if (resolveFocusTypes) prop.resolvedReturnType else null,
+        focusType = propType,
         componentName = prop.name,
-        visibility = if (resolveFocusTypes) {
-          // `set` rebuilds every subclass through its constructor and reads its properties
-          memberVisibility(
-            listOf(prop.visibility) + subclasses.flatMap { sub ->
-              listOfNotNull(sub.primaryConstructorIfAny(session)?.visibility, sub.declaredProperty(prop.name)?.visibility) +
-                classChainVisibilities(sub as FirRegularClassSymbol, session)
-            },
-          )
-        } else {
-          Visibilities.Public
-        },
+        // `set` rebuilds every subclass through its constructor and reads its properties
+        visibility = memberVisibility(
+          listOf(prop.visibility) + subclasses.flatMap { sub ->
+            listOfNotNull(sub.primaryConstructorIfAny(session)?.visibility, sub.declaredProperty(prop.name)?.visibility) +
+              classChainVisibilities(sub as FirRegularClassSymbol, session)
+          },
+        ),
+        potentiallyUnsafe = potentiallyUnsafe,
       )
     }
   }
+
+  /** The arguments that [sub] gives to [parent] in its direct supertype, e.g. `[String, C]` for `Sub<C> : Parent<String, C>`. */
+  private fun supertypeArguments(sub: FirClassSymbol<*>, parent: FirRegularClassSymbol, session: FirSession): List<ConeKotlinType>? {
+    val supertype = sub.resolvedSuperTypes.map { it.fullyExpandedType(session) }.firstOrNull { it.classId == parent.classId } ?: return null
+    return supertype.typeArguments.map { it.type ?: return null }
+  }
+
+  /**
+   * Whether the `set` of a shared-property lens may not respect the type arguments of [sub].
+   *
+   * This can only happen when the property mentions a parent type parameter `P` declared with variance
+   * (`out` or `in`): a value of [sub] may then be seen at other arguments than those it was built with.
+   * It is safe when [sub] simply forwards one of its own type parameters at `P`'s position, and that
+   * parameter occurs nowhere else (in other supertype arguments or other constructor parameters).
+   * Otherwise (a fixed argument like `Base<String>`, or a forwarded parameter shared with a sibling
+   * field like `MutableList<B>`), `set` may build a value whose fields disagree on the argument.
+   */
+  private fun isPotentiallyUnsafe(
+    propType: ConeKotlinType,
+    parentParams: List<FirTypeParameterSymbol>,
+    args: List<ConeKotlinType>,
+    sub: FirClassSymbol<*>,
+    ctor: FirConstructorSymbol,
+    propName: Name,
+  ): Boolean = parentParams.withIndex().any { (i, param) ->
+    if (param.variance == Variance.INVARIANT || !propType.mentions(param)) return@any false
+    val arg = args[i]
+    val forwarded = (arg as? ConeTypeParameterType)
+      ?.takeIf { !it.isMarkedNullable }
+      ?.lookupTag?.typeParameterSymbol
+      ?.takeIf { it in sub.typeParameterSymbols }
+      ?: return@any true
+    args.withIndex().any { (j, other) -> j != i && other.mentions(forwarded) } ||
+      ctor.valueParameterSymbols.any { it.name != propName && it.resolvedReturnType.mentions(forwarded) }
+  }
+
+  private fun ConeKotlinType.mentions(param: FirTypeParameterSymbol): Boolean = contains { (it as? ConeTypeParameterType)?.lookupTag?.typeParameterSymbol == param }
 
   /**
    * Whether [this] property is abstract. Interface members without a body are implicitly abstract, but
@@ -304,12 +370,19 @@ object FirOpticsExtractor {
   private fun FirClassSymbol<*>.declaredProperty(name: Name): FirPropertySymbol? = declarationSymbols.filterIsInstance<FirPropertySymbol>().firstOrNull { it.name == name }
 
   /**
-   * Structural type equality for the §5.2 uniformity check: classifier, nullability, and (recursively)
-   * the type arguments together with their projection kind, so e.g. `List<String>` and `List<Int>`
-   * are *not* considered uniform.
+   * Structural type equality for the §5.2 uniformity check: classifier (or type parameter), nullability,
+   * and (recursively) the type arguments together with their projection kind, so e.g. `List<String>` and
+   * `List<Int>` are *not* considered uniform.
    */
   private fun sameType(a: ConeKotlinType, b: ConeKotlinType): Boolean {
-    if (a.classId != b.classId || a.isMarkedNullable != b.isMarkedNullable) return false
+    if (a.isMarkedNullable != b.isMarkedNullable) return false
+    if (a is ConeTypeParameterType || b is ConeTypeParameterType) {
+      return a is ConeTypeParameterType && b is ConeTypeParameterType && a.lookupTag == b.lookupTag
+    }
+    if (a is ConeDefinitelyNotNullType || b is ConeDefinitelyNotNullType) {
+      return a is ConeDefinitelyNotNullType && b is ConeDefinitelyNotNullType && sameType(a.original, b.original)
+    }
+    if (a.classId != b.classId) return false
     val aArgs = a.typeArguments
     val bArgs = b.typeArguments
     if (aArgs.size != bArgs.size) return false

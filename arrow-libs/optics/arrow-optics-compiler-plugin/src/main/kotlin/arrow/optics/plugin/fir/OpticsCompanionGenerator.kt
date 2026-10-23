@@ -10,10 +10,11 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.caches.createCache
 import org.jetbrains.kotlin.fir.caches.firCachesFactory
 import org.jetbrains.kotlin.fir.caches.getValue
-import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
 import org.jetbrains.kotlin.fir.declarations.FirTypeParameterRef
 import org.jetbrains.kotlin.fir.declarations.utils.hasBackingFieldAttr
 import org.jetbrains.kotlin.fir.declarations.utils.isCompanion
+import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
+import org.jetbrains.kotlin.fir.expressions.impl.FirEmptyAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
@@ -36,8 +37,8 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
+import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
-import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.types.constructType
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
@@ -179,6 +180,14 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
         requireNotNull(focus.focusType) { "focusType must be resolved at this stage" }
         source.constructType(funCones.toTypedArray(), false) to substitutor.substituteOrSelf(focus.focusType)
       }
+    }
+    if (focus.potentiallyUnsafe) {
+      function.replaceAnnotations(
+        function.annotations + buildAnnotation {
+          annotationTypeRef = OpticsNames.POTENTIALLY_UNSAFE_COVARIANT_OPTIC.constructClassLikeType().toFirResolvedTypeRef()
+          argumentMapping = FirEmptyAnnotationArgumentMapping
+        },
+      )
     }
     return listOf(function.symbol)
   }

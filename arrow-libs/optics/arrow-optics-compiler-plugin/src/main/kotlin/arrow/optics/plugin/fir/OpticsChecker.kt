@@ -84,6 +84,14 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
       reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.NAME_CLASH, name.asString(), context)
     }
 
+    if (!FirOpticsExtractor.unsafeMarkerAvailable(session)) {
+      for (focus in foci) {
+        if (focus.potentiallyUnsafe && focus.opticName !in clashing) {
+          reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.UNSAFE_MARKER_MISSING, focus.opticName.asString(), context)
+        }
+      }
+    }
+
     val userNames = FirOpticsExtractor.userMemberNames(declaration.companionObjectSymbol)
     for (focus in foci) {
       if (focus.opticName in userNames && focus.opticName !in clashing) {
@@ -139,6 +147,7 @@ object OpticsDiagnostics : KtDiagnosticsContainer() {
   val NAME_CLASH by error1<KtElement, String>()
   val USER_MEMBER_CLASH by warning1<KtElement, String>()
   val DSL_SKIPPED by warning1<KtElement, String>()
+  val UNSAFE_MARKER_MISSING by warning1<KtElement, String>()
 
   override fun getRendererFactory() = object : BaseDiagnosticRendererFactory() {
     override val MAP by KtDiagnosticFactoryToRendererMap("Arrow Optics") {
@@ -174,6 +183,11 @@ object OpticsDiagnostics : KtDiagnosticsContainer() {
       it.put(
         USER_MEMBER_CLASH,
         "The optic ''{0}'' is not generated because the companion object already declares a member with that name.",
+        CommonRenderers.STRING,
+      )
+      it.put(
+        UNSAFE_MARKER_MISSING,
+        "The lens ''{0}'' is not generated because setting it may not respect covariant type arguments, and the opt-in marker 'arrow.optics.PotentiallyUnsafeCovariantOptic' was not found in the classpath. Please update arrow-annotations.",
         CommonRenderers.STRING,
       )
       it.put(

@@ -18,6 +18,9 @@ object OpticsNames {
   val OPTICS_ANNOTATION_FQNAME: FqName = OPTICS_ANNOTATION.asSingleFqName()
   val OPTICS_COPY_ANNOTATION = OPTICS_ANNOTATION.createNestedClassId(Name.identifier("copy"))
 
+  /** Opt-in marker for lenses whose `set` may not respect covariant type arguments */
+  val POTENTIALLY_UNSAFE_COVARIANT_OPTIC = ClassId(ARROW_OPTICS_PACKAGE, Name.identifier("PotentiallyUnsafeCovariantOptic"))
+
   val SERIALIZABLE_ANNOTATION = ClassId(KOTLINX_SERIALIZATION_PACKAGE, Name.identifier("Serializable"))
   // val SERIALIZABLE_ANNOTATION_FQNAME: FqName = SERIALIZABLE_ANNOTATION.asSingleFqName()
 
