@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.builders.IrBlockBodyBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.builders.irBlockBody
+import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -28,7 +29,8 @@ import org.jetbrains.kotlin.name.SpecialNames
 
 /**
  * Build an anonymous lambda `{ p0, p1, ... -> body }` as an [IrFunctionExpression], for use as a
- * `get`/`set`/`reverseGet` argument to an optic factory.
+ * `get`/`set`/`reverseGet` argument to an optic factory. The lambda gets the offsets of [parent]
+ * (the generated declaration), so that stack traces and debuggers can locate it.
  */
 fun IrPluginContext.buildLambda(
   parent: IrDeclarationParent,
@@ -36,7 +38,11 @@ fun IrPluginContext.buildLambda(
   returnType: IrType,
   body: IrBlockBodyBuilder.(params: List<IrValueParameter>) -> Unit,
 ): IrFunctionExpression {
+  val startOffset = (parent as? IrDeclaration)?.startOffset ?: UNDEFINED_OFFSET
+  val endOffset = (parent as? IrDeclaration)?.endOffset ?: UNDEFINED_OFFSET
   val lambda = irFactory.buildFun {
+    this.startOffset = startOffset
+    this.endOffset = endOffset
     name = SpecialNames.NO_NAME_PROVIDED
     origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA
     visibility = DescriptorVisibilities.LOCAL
@@ -45,11 +51,11 @@ fun IrPluginContext.buildLambda(
   }
   lambda.parent = parent
   parameterTypes.forEachIndexed { i, t -> lambda.addValueParameter("p$i", t) }
-  lambda.body = DeclarationIrBuilder(this, lambda.symbol).irBlockBody {
+  lambda.body = DeclarationIrBuilder(this, lambda.symbol, startOffset, endOffset).irBlockBody {
     body(lambda.parameters)
   }
   val functionType = irBuiltIns.functionN(parameterTypes.size).typeWith(parameterTypes + returnType)
-  return IrFunctionExpressionImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, functionType, lambda, IrStatementOrigin.LAMBDA)
+  return IrFunctionExpressionImpl(startOffset, endOffset, functionType, lambda, IrStatementOrigin.LAMBDA)
 }
 
 /** Set the dispatch-receiver argument of [this] call, addressing it by parameter kind. */
