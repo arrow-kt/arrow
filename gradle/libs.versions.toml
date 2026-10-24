@@ -23,7 +23,7 @@ jackson2 = "2.22.4"
 jackson = "3.2.4"
 jacksonAnnotations = "2.22"
 shadow = "9.6.1"
-kotlinWrappers = "2026.10.1"
+kotlinWrappers = "2026.10.3"
 result4k="3.1.0.0"
 
 [libraries]
