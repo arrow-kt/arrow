@@ -3,7 +3,6 @@ import io.kotest.inspectors.shouldForNone
 import io.kotest.inspectors.shouldForOne
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldEndWith
 import kotlinx.coroutines.delay
@@ -79,7 +78,6 @@ abstract class SuspendAppTest : ProcessProvider {
       sendSignal(Signal.SIGTERM)
     }
 
-    // TODO: inconsistent exit codes across platforms - accept either 255 or 143 (SIGTERM + 128)
     // JVM signal handler still trumps the timeout exception and exits with Signal + 128
     // All other platforms exit due to the timeout exception with 255
     // Both outcomes are currently acceptable.
