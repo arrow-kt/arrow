@@ -38,7 +38,7 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">2.2.3
+        <div class="library-version" id="library-version">2.3.0
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -95,21 +95,55 @@
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
     <div class="tabs-section-body">
-      <div data-togglable="FUNCTION">
-        <h2 class="tableheader">Functions</h2>
-        <div class="table"><a data-name="2062100285%2FFunctions%2F989385456" anchor-label="SuspendApp" id="2062100285%2FFunctions%2F989385456" data-filterable-set=":suspendapp/commonMain"></a>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-2038564038%2FClasslikes%2F989385456" anchor-label="SuspendAppScope" id="-2038564038%2FClasslikes%2F989385456" data-filterable-set=":suspendapp/commonMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":suspendapp/commonMain" data-filterable-set=":suspendapp/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-suspend-app.html"><span>Suspend</span><wbr><span><span>App</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2062100285%2FFunctions%2F989385456"></span>
+                  <div><a href="-suspend-app-scope/index.html"><span>Suspend</span><wbr><span>App</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2038564038%2FClasslikes%2F989385456"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":suspendapp/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-suspend-app.html"><span class="token function">SuspendApp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token operator"> = </span>Dispatchers.Default<span class="token punctuation">, </span></span><span class="parameter ">uncaught<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>Throwable::printStackTrace<span class="token punctuation">, </span></span><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>Duration.INFINITE<span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">An unsafe blocking edge that wires the <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span> (and structured concurrency) to the <a href="-suspend-app.html">SuspendApp</a>, such that the <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span> gets cancelled when the <code class="lang-kotlin">App</code> is requested to gracefully shutdown. =&gt;<code class="lang-kotlin">SIGTERM</code>&amp;<code class="lang-kotlin">SIGINT</code> on Native &amp; NodeJS and a ShutdownHook for JVM.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":suspendapp/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-suspend-app-scope/index.html">SuspendAppScope</a> : <span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span></div><div class="brief "><p class="paragraph">Scope for <a href="-suspend-app.html">SuspendApp</a>, with operations that are specific to the application lifecycle.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-799985663%2FFunctions%2F989385456" anchor-label="exitApp" id="-799985663%2FFunctions%2F989385456" data-filterable-set=":suspendapp/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":suspendapp/commonMain" data-filterable-set=":suspendapp/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-app.html"><span>exit</span><wbr><span><span>App</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-799985663%2FFunctions%2F989385456"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":suspendapp/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-suspend-app-scope/index.html">SuspendAppScope</a><span class="token punctuation">.</span><a href="exit-app.html"><span class="token function">exitApp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">code<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Gracefully exits the enclosing <a href="-suspend-app.html">SuspendApp</a> with process exit status <a href="exit-app.html">code</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="507901085%2FFunctions%2F989385456" anchor-label="SuspendApp" id="507901085%2FFunctions%2F989385456" data-filterable-set=":suspendapp/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":suspendapp/commonMain" data-filterable-set=":suspendapp/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-suspend-app.html"><span>Suspend</span><wbr><span><span>App</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="507901085%2FFunctions%2F989385456"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":suspendapp/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-suspend-app.html"><span class="token function">SuspendApp</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token operator"> = </span>Dispatchers.Default<span class="token punctuation">, </span></span><span class="parameter ">uncaught<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-throwable/index.html">Throwable</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>Throwable::printStackTrace<span class="token punctuation">, </span></span><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/index.html">Duration</a><span class="token operator"> = </span>Duration.INFINITE<span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><a href="-suspend-app-scope/index.html">SuspendAppScope</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">An unsafe blocking edge that wires the <a href="-suspend-app-scope/index.html">SuspendAppScope</a> (and structured concurrency) to the <a href="-suspend-app.html">SuspendApp</a>, such that the <a href="-suspend-app-scope/index.html">SuspendAppScope</a> gets cancelled when the <code class="lang-kotlin">App</code> is requested to gracefully shutdown. =&gt;<code class="lang-kotlin">SIGTERM</code>&amp;<code class="lang-kotlin">SIGINT</code> on Native &amp; NodeJS and a ShutdownHook for JVM.</p></div></div></div>
                 </div>
               </div>
             </div>
