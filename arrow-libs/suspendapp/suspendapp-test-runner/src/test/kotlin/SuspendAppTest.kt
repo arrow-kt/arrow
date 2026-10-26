@@ -3,7 +3,6 @@ import io.kotest.inspectors.shouldForNone
 import io.kotest.inspectors.shouldForOne
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldEndWith
 import kotlinx.coroutines.delay
@@ -78,8 +77,11 @@ abstract class SuspendAppTest : ProcessProvider {
       delay(0.5.seconds)
       sendSignal(Signal.SIGTERM)
     }
-    // TODO: inconsistent exit codes across platforms, for now just check it's not a success
-    process.exitValue() shouldNotBe 0
+
+    // JVM signal handler still trumps the timeout exception and exits with Signal + 128
+    // All other platforms exit due to the timeout exception with 255
+    // Both outcomes are currently acceptable.
+    process.exitValue() shouldBeIn listOf(255, Signal.SIGTERM.code + 128)
     output.shouldForAtLeastOne { it.line shouldContain "Timed out waiting for 5000 ms" }
       .shouldForNone { it.line shouldContain "resource clean complete" }
   }

@@ -13,7 +13,7 @@ import sun.misc.SignalHandler
 internal actual fun AutoCloseScope.process(): Process = JvmProcess
 
 private object JvmProcess : Process {
-  override fun onShutdown(block: suspend () -> Unit): () -> Unit {
+  override fun onShutdown(block: suspend (exitCode: Int) -> Unit): () -> Unit {
     val isShutdown = AtomicBoolean(false)
     val lastSignal = AtomicInteger(-1)
     onSigInt(lastSignal::set)
@@ -58,7 +58,7 @@ private object JvmProcess : Process {
           runBlocking {
             // We don't call exit from ShutdownHook on JVM
             try {
-              block()
+              block(128 + lastSignal.get())
             } catch (e: Throwable) {
               e.printStackTrace()
             }
@@ -98,6 +98,7 @@ private object JvmProcess : Process {
             handle?.handle(sig)
           }
         }
+      check(handle != SignalHandler.SIG_IGN) { "Signal Handler for SIG$signal was SIG_IGN." }
     } catch (ex: Throwable) {
       System.err.println("WARNING: SuspendApp was unable to install a signal handler for SIG$signal. Signalled cancellation may be impacted.")
       ex.printStackTrace()
