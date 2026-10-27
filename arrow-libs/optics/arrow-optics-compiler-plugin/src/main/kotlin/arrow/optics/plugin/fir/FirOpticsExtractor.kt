@@ -242,7 +242,9 @@ object FirOpticsExtractor {
    */
   private fun sealedLensFoci(symbol: FirRegularClassSymbol, session: FirSession, resolveFocusTypes: Boolean): List<FirFocus> {
     val abstractProps = mutableListOf<FirPropertySymbol>()
-    symbol.processAllDeclarations(session) visitor@{
+    // Members are only needed at RAW_FIR here. The default (STATUS) breaks in the IDE when resolving lazily.
+    // Only names and syntactic modifiers are read early; return types and visibility are resolved on demand only when computing focus types.
+    symbol.processAllDeclarations(session, memberRequiredPhase = FirResolvePhase.RAW_FIR) visitor@{
       if (it !is FirPropertySymbol) return@visitor
       if (!it.isAbstractMemberOf(symbol)) return@visitor
       if (it.receiverParameterSymbol != null) return@visitor
