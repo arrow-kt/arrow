@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
+import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
@@ -290,7 +291,7 @@ object FirOpticsExtractor {
         val args = supertypeArguments(sub, symbol, session) ?: return@all false
         val expected = substitutorByMap(parentParams.zip(args).toMap(), session).substituteOrSelf(propType)
         if (!sameType(ctorParam.resolvedReturnType, expected)) return@all false
-        if (isPotentiallyUnsafe(propType, parentParams, args, sub, ctor, prop.name)) potentiallyUnsafe = true
+        if (isPotentiallyUnsafe(propType, parentParams, args, sub, ctor, prop.name, session)) potentiallyUnsafe = true
         true
       }
       if (!uniform) return@mapNotNull null
@@ -334,19 +335,22 @@ object FirOpticsExtractor {
     sub: FirClassSymbol<*>,
     ctor: FirConstructorSymbol,
     propName: Name,
+    session: FirSession,
   ): Boolean = parentParams.withIndex().any { (i, param) ->
-    if (param.variance == Variance.INVARIANT || !propType.mentions(param)) return@any false
+    if (param.variance == Variance.INVARIANT || !propType.mentions(param, session)) return@any false
     val arg = args[i]
     val forwarded = (arg as? ConeTypeParameterType)
       ?.takeIf { !it.isMarkedNullable }
-      ?.lookupTag?.typeParameterSymbol
+      ?.toTypeParameterSymbol(session)
       ?.takeIf { it in sub.typeParameterSymbols }
       ?: return@any true
-    args.withIndex().any { (j, other) -> j != i && other.mentions(forwarded) } ||
-      ctor.valueParameterSymbols.any { it.name != propName && it.resolvedReturnType.mentions(forwarded) }
+    args.withIndex().any { (j, other) -> j != i && other.mentions(forwarded, session) } ||
+      ctor.valueParameterSymbols.any { it.name != propName && it.resolvedReturnType.mentions(forwarded, session) }
   }
 
-  private fun ConeKotlinType.mentions(param: FirTypeParameterSymbol): Boolean = contains { (it as? ConeTypeParameterType)?.lookupTag?.typeParameterSymbol == param }
+  private fun ConeKotlinType.mentions(param: FirTypeParameterSymbol, session: FirSession): Boolean = contains { (it as? ConeTypeParameterType)?.toTypeParameterSymbol(session) == param }
+
+  fun ConeTypeParameterType.toTypeParameterSymbol(session: FirSession): FirTypeParameterSymbol? = lookupTag.toSymbol(session) as? FirTypeParameterSymbol
 
   /**
    * Whether [this] property is abstract. Interface members without a body are implicitly abstract, but
