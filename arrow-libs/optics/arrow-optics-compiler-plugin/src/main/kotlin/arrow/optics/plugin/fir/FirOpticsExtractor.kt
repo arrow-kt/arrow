@@ -43,8 +43,10 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.lazyResolveToPhase
+import org.jetbrains.kotlin.fir.types.ConeClassifierLookupTag
 import org.jetbrains.kotlin.fir.types.ConeDefinitelyNotNullType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.ConeLookupTagBasedType
 import org.jetbrains.kotlin.fir.types.ConeStarProjection
 import org.jetbrains.kotlin.fir.types.ConeTypeParameterType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
@@ -352,7 +354,15 @@ object FirOpticsExtractor {
 
   private fun ConeKotlinType.mentions(param: FirTypeParameterSymbol, session: FirSession): Boolean = contains { (it as? ConeTypeParameterType)?.toTypeParameterSymbol(session) == param }
 
-  fun ConeTypeParameterType.toTypeParameterSymbol(session: FirSession): FirTypeParameterSymbol? = lookupTag.toSymbol(session) as? FirTypeParameterSymbol
+  fun ConeTypeParameterType.toTypeParameterSymbol(session: FirSession): FirTypeParameterSymbol? = stableLookupTag.toSymbol(session) as? FirTypeParameterSymbol
+
+  /**
+   * The lookup tag, read through the supertype: `ConeTypeParameterType.lookupTag` returns a class that moved
+   * package in Kotlin 2.5, so calling it directly links on only one of 2.4 and 2.5; the supertype's getter
+   * (`ConeLookupTagBasedType.lookupTag`) has the same signature in both.
+   */
+  @Suppress("USELESS_CAST")
+  private val ConeTypeParameterType.stableLookupTag: ConeClassifierLookupTag get() = (this as ConeLookupTagBasedType).lookupTag
 
   /**
    * Whether [this] property is abstract. Interface members without a body are implicitly abstract, but
@@ -383,7 +393,7 @@ object FirOpticsExtractor {
   private fun sameType(a: ConeKotlinType, b: ConeKotlinType): Boolean {
     if (a.isMarkedNullable != b.isMarkedNullable) return false
     if (a is ConeTypeParameterType || b is ConeTypeParameterType) {
-      return a is ConeTypeParameterType && b is ConeTypeParameterType && a.lookupTag == b.lookupTag
+      return a is ConeTypeParameterType && b is ConeTypeParameterType && a.stableLookupTag == b.stableLookupTag
     }
     if (a is ConeDefinitelyNotNullType || b is ConeDefinitelyNotNullType) {
       return a is ConeDefinitelyNotNullType && b is ConeDefinitelyNotNullType && sameType(a.original, b.original)
