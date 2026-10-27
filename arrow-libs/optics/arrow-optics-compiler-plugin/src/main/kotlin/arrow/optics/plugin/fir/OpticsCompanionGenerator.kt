@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.fir.plugin.createMemberProperty
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.substitutorByMap
-import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
@@ -41,7 +40,6 @@ import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.types.constructType
-import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.fir.types.isNullableAny
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
@@ -229,7 +227,7 @@ class OpticsCompanionGenerator(session: FirSession) : FirDeclarationGenerationEx
 }
 
 /** The cone type referring to the type parameter [tp]. */
-fun coneOf(tp: FirTypeParameterRef): ConeKotlinType = ConeTypeParameterTypeImpl(ConeTypeParameterLookupTag(tp.symbol), isMarkedNullable = false)
+fun coneOf(tp: FirTypeParameterRef): ConeKotlinType = tp.symbol.constructType()
 
 /**
  * Declare a type parameter for each of [typeParams], in order, keeping their upper bounds (algo §3.5).
