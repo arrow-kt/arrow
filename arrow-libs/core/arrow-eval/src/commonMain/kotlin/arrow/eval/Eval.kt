@@ -605,9 +605,15 @@ public fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-public fun <A, B> Eval<A>.replicate(n: Int, initial: () -> B, combine: (A, B) -> B): Eval<B> =
-  if (n <= 0) Eval.now(initial())
-  else this.zip(replicate(n - 1, initial, combine), combine)
+public fun <A, B> Eval<A>.replicate(n: Int, initial: () -> B, combine: (A, B) -> B): Eval<B> {
+  val b = initial()
+  return replicate(n).map { it.foldRight(b, combine) }
+}
 
-public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
-  replicate(n, { emptyList() }) { x, xs -> listOf(x) + xs }
+public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> = Eval.defer {
+  val values = ArrayList<A>()
+  fun loop(): Eval<List<A>> =
+    if (values.size >= n) Eval.now(values)
+    else flatMap { values.add(it); loop() }
+  loop()
+}
