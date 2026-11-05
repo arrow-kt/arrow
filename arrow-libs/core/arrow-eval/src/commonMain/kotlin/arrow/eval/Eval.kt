@@ -190,7 +190,7 @@ public sealed class Eval<out A>: SuspendEval<A> {
     @Suppress("UNCHECKED_CAST")
     private fun <A> evaluate(e: Eval<A>): A = run {
       var curr: Eval<Any?> = e
-      val fs: MutableList<(Any?) -> Eval<Any?>> = mutableListOf()
+      val fs: MutableList<(Any?) -> Eval<Any?>> = ArrayDeque()
 
       fun addToMemo(m: Memoize<Any?>): (Any?) -> Eval<Any?> = {
         m.result = Some(it)
