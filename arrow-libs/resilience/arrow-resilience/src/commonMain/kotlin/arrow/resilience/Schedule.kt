@@ -98,7 +98,7 @@ public fun interface Schedule<in Input, out Output> {
    * Modify [Continue.delay] by the given function [transform].
    */
   public fun delayed(transform: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
-    Schedule { step(it).delayed(transform) }
+    mapDecision { it.delayed(transform) }
 
   /**
    * Transform the [Schedule] by mapping the [Input]'s.

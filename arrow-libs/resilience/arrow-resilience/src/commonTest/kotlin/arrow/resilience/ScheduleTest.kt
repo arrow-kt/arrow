@@ -14,6 +14,7 @@ import arrow.resilience.Schedule.Decision.Done
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest
 import kotlin.math.pow
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -149,6 +150,30 @@ class ScheduleTest {
     val res = Schedule.exponential<String>(10.seconds).calculateDelay("test", n)
 
     val exp = exp(10.seconds).take(n.toInt()).toList()
+    assertEquals(exp, res)
+  }
+
+  @Test
+  fun delayedTransformsEveryDelay(): TestResult = runTest {
+    val n = 10L
+    val res = Schedule.exponential<String>(10.seconds)
+      .delayed { _, duration -> duration * 2 }
+      .calculateDelay("test", n)
+
+    val exp = exp(10.seconds).take(n.toInt()).map { it * 2 }.toList()
+    assertEquals(exp, res)
+  }
+
+  @Test
+  fun jitteredJittersEveryDelay(): TestResult = runTest {
+    val n = 10L
+    val seed = 42
+    val res = Schedule.spaced<String>(10.seconds)
+      .jittered(random = Random(seed))
+      .calculateDelay("test", n)
+
+    val random = Random(seed)
+    val exp = List(n.toInt()) { 10.seconds * random.nextDouble(0.0, 1.0) }
     assertEquals(exp, res)
   }
 
