@@ -11,15 +11,13 @@ import arrow.core.rightIor
 import arrow.core.shouldThrow
 import arrow.core.test.ior
 import arrow.core.test.nonEmptyList
+import arrow.core.test.nonEmptySet
 import arrow.core.toIorNel
-import arrow.core.toNonEmptyListOrThrow
-import arrow.core.toNonEmptySetOrThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.set
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.async
@@ -211,8 +209,7 @@ class IorSpec {
 
   @Test
   fun bindAllNel() = runTest {
-    checkAll(iterations, Arb.list(iorArb, nelRange)) { generated ->
-      val a = generated.toNonEmptyListOrThrow()
+    checkAll(iterations, Arb.nonEmptyList(iorArb, nelRange)) { a ->
       val expected =
         a.fold(listOf<Int>().rightIor(), iorFold(String::plus))
 
@@ -224,11 +221,10 @@ class IorSpec {
 
   @Test
   fun bindAllNes() = runTest {
-    checkAll(iterations, Arb.set(iorArb, nelRange)) { generated ->
-      val a = generated.toNonEmptySetOrThrow()
+    checkAll(iterations, Arb.nonEmptySet(iorArb, nelRange)) { a ->
       val expected =
         a.fold(listOf<Int>().rightIor(), iorFold(String::plus))
-          .map { l -> l.toNonEmptySetOrThrow() }
+          .map { l -> l.toSet() }
 
       ior(String::plus) {
         a.bindAll()
