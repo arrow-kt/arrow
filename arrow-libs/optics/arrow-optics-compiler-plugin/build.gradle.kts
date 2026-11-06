@@ -13,8 +13,16 @@ kotlin {
   }
 }
 
+val kotlinPluginId = "arrow.optics.plugin"
+
+// Kotlin versions the plugin supports, oldest first; each is declared to IntelliJ through the KEFS markers below.
+// Add a version once the tests pass on it (see testCompilers).
+val supportedCompilers = listOf("2.4.20", "2.5.0")
+
 dependencies {
-  compileOnly(kotlin("compiler"))
+  // Built against the oldest supported compiler, so it can't use newer compiler APIs.
+  // Kept out of the version catalog so Renovate doesn't bump it.
+  compileOnly("org.jetbrains.kotlin:kotlin-compiler:${supportedCompilers.first()}")
 
   testImplementation(kotlin("test"))
   testImplementation(libs.kotest.assertionsCore)
@@ -33,6 +41,33 @@ dependencies {
   testRuntimeOnly(projects.arrowAnnotations)
   testRuntimeOnly(projects.arrowCore)
   testRuntimeOnly(projects.arrowOptics)
+}
+
+// Compiler Plugin DevKit markers, so IntelliJ's Kotlin External FIR Support (KEFS) loads the jar without
+// the global registry key. The classes stay at the jar root; the version directories only declare support.
+val kefsMarkers = tasks.register("kefsMarkers") {
+  val pluginId = kotlinPluginId
+  val versions = supportedCompilers
+  val outputDir = layout.buildDirectory.dir("generated/kefs")
+  inputs.property("pluginId", pluginId)
+  inputs.property("versions", versions)
+  outputs.dir(outputDir)
+
+  doLast {
+    val root = outputDir.get().asFile.apply { deleteRecursively() }
+    versions.forEach { version ->
+      root.resolve("META-INF/kotlin/plugin/$pluginId/versions/$version").apply { mkdirs() }
+        .resolve("README.txt")
+        .writeText("Supports Kotlin $version; the plugin classes are at the root of this jar.\n")
+    }
+  }
+}
+
+tasks.jar {
+  from(kefsMarkers)
+  manifest {
+    attributes("Kotlin-Compiler-Plugin-Multi-Release" to "true")
+  }
 }
 
 // Compilers the tests also run on, each with its own test task in `check`. The default `test` task runs on the
