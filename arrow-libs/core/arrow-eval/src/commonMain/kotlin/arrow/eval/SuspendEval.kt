@@ -51,7 +51,7 @@ public sealed interface SuspendEval<out A> {
     @Suppress("UNCHECKED_CAST")
     private suspend fun <A> evaluate(e: SuspendEval<A>): A = run {
       var curr: SuspendEval<Any?> = e
-      val fs: MutableList<suspend (Any?) -> SuspendEval<Any?>> = mutableListOf()
+      val fs: MutableList<suspend (Any?) -> SuspendEval<Any?>> = ArrayDeque()
 
       fun addToMemo(m: AbstractMemoize<Any?>): (Any?) -> SuspendEval<Any?> = {
         m.result = Some(it)
