@@ -147,4 +147,27 @@ class EvalTest {
     Eval.now(0).flatMap { memoized }.value() shouldBe 2
     sideEffect.counter shouldBe 1
   }
+
+  @Test
+  fun replicateShouldEvaluateInOrder() {
+    val sideEffect = SideEffect()
+    val replicated = Eval.always { sideEffect.increment(); sideEffect.counter }.replicate(3)
+    sideEffect.counter shouldBe 0
+    replicated.value() shouldBe listOf(1, 2, 3)
+    replicated.value() shouldBe listOf(4, 5, 6)
+  }
+
+  @Test
+  fun replicateShouldFoldRight() {
+    val sideEffect = SideEffect()
+    val replicated = Eval.always { sideEffect.increment(); sideEffect.counter }
+      .replicate(3, { "" }) { a, acc -> acc + a }
+    replicated.value() shouldBe "321"
+  }
+
+  @Test
+  fun replicateShouldNotBlowTheStack() {
+    val limit = stackSafeIteration()
+    Eval.now(1).replicate(limit).value().size shouldBe limit
+  }
 }
