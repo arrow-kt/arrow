@@ -3,14 +3,15 @@ package arrow.optics.test
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.Tuple4
 import arrow.core.Tuple5
 import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.toNonEmptyListOrNull
 import arrow.core.toOption
+import arrow.core.wrapAsNonEmptyListOrThrow
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.choice
@@ -19,8 +20,9 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
 import kotlin.math.max
 
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
 fun <A> Arb.Companion.nonEmptyList(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<NonEmptyList<A>> =
-  Arb.list(arb, max(range.first, 1) .. range.last).map { it.toNonEmptyListOrNull()!! }
+  Arb.list(arb, max(range.first, 1) .. range.last).map { it.wrapAsNonEmptyListOrThrow() }
 
 fun <A> Arb.Companion.sequence(arb: Arb<A>, range: IntRange = 0 .. 100): Arb<Sequence<A>> =
   Arb.list(arb, range).map { it.asSequence() }

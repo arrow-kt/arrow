@@ -5,17 +5,16 @@ import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptySet
 import arrow.core.Option
+import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.bothIor
 import arrow.core.leftIor
 import arrow.core.rightIor
-import arrow.core.toNonEmptyListOrNull
-import arrow.core.toNonEmptySetOrNull
 import arrow.core.toOption
+import arrow.core.wrapAsNonEmptyListOrThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.orNull
@@ -45,9 +44,10 @@ fun <B> Arb.Companion.option(arb: Arb<B>): Arb<Option<B>> = arb.orNull().map { i
 
 fun <A, B> Arb.Companion.either(left: Arb<A>, right: Arb<B>): Arb<Either<A, B>> = choice(left.map { Either.Left(it) }, right.map { Either.Right(it) })
 
-fun <A> Arb.Companion.nonEmptyList(a: Arb<A>): Arb<NonEmptyList<A>> = list(a).filter(List<A>::isNotEmpty).map { it.toNonEmptyListOrNull()!! }
+@OptIn(PotentiallyUnsafeNonEmptyOperation::class)
+fun <A> Arb.Companion.nonEmptyList(a: Arb<A>): Arb<NonEmptyList<A>> = list(a, 1..100).map { it.wrapAsNonEmptyListOrThrow() }
 
-fun <A> Arb.Companion.nonEmptySet(a: Arb<A>): Arb<NonEmptySet<A>> = list(a).filter(List<A>::isNotEmpty).map { it.toNonEmptySetOrNull()!! }
+fun <A> Arb.Companion.nonEmptySet(a: Arb<A>): Arb<NonEmptySet<A>> = nonEmptyList(a).map { it.toNonEmptySet() }
 
 fun <L, R> Arb.Companion.ior(arbL: Arb<L>, arbR: Arb<R>): Arb<Ior<L, R>> = Arb.choice(
   arbitrary { arbL.bind().leftIor() },
