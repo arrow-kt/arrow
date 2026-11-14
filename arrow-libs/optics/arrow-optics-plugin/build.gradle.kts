@@ -1,9 +1,7 @@
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
-  id("java-gradle-plugin")
-  id("com.github.gmazzo.buildconfig") version "6.1.2"
+  pluginDevKit("gradle-plugin")
   id("com.diffplug.spotless")
-  // id("com.vanniktech.maven.publish.base")
   id("com.gradle.plugin-publish") version "2.2.1"
 }
 
@@ -11,54 +9,14 @@ group = property("projects.group").toString()
 
 repositories {
   gradlePluginPortal()
+  maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
 }
 
-kotlin {
-  explicitApi()
-  compilerOptions {
-    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-  }
-}
-
-dependencies {
-  compileOnly(kotlin("compiler"))
-  implementation(kotlin("gradle-plugin-api"))
-  implementation(kotlin("gradle-plugin"))
-  // implementation(projects.arrowOpticsKspPlugin)
-  implementation(projects.arrowOpticsCompilerPlugin)
-  // implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${libs.versions.kspVersion.get()}")
-}
-
-buildConfig {
-  packageName("arrow.optics.plugin")
-
-  val compilerPluginProject = project(":arrow-optics-compiler-plugin")
-  buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${compilerPluginProject.group}\"")
-  buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${compilerPluginProject.name}\"")
-  buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${compilerPluginProject.version}\"")
-
-  /* No more KSP plugin required
-  val kspPluginProject = project(":arrow-optics-ksp-plugin")
-  buildConfigField(
-    type = "String",
-    name = "KSP_PLUGIN_LIBRARY_COORDINATES",
-    expression = "\"${kspPluginProject.group}:${kspPluginProject.name}:${kspPluginProject.version}\""
-  )
-  */
-
-  val annotationsProject = project(":arrow-annotations")
-  buildConfigField(
-    type = "String",
-    name = "ANNOTATIONS_LIBRARY_COORDINATES",
-    expression = "\"${annotationsProject.group}:${annotationsProject.name}:${annotationsProject.version}\""
-  )
-
-  val opticsProject = project(":arrow-optics")
-  buildConfigField(
-    type = "String",
-    name = "OPTICS_LIBRARY_COORDINATES",
-    expression = "\"${opticsProject.group}:${opticsProject.name}:${opticsProject.version}\""
-  )
+pluginDevKit {
+  compilerPlugin(project(":arrow-optics-compiler-plugin"))
+  pluginPackage = "arrow.optics.plugin"
+  companionLibrary(project(":arrow-annotations"))
+  companionLibrary(project(":arrow-optics"))
 }
 
 gradlePlugin {

@@ -1,106 +1,18 @@
 package arrow.optics.plugin
 
-import arrow.optics.plugin.BuildConfig.ANNOTATIONS_LIBRARY_COORDINATES
-import arrow.optics.plugin.BuildConfig.OPTICS_LIBRARY_COORDINATES
 import org.gradle.api.Project
+import org.jetbrains.kotlin.compiler.plugin.devkit.DevKitSupportPlugin
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
-import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
-/* No more KSP plugin required
-public fun KotlinSingleTargetExtension<*>.arrowOptics() {
-  project.dependencies.add("ksp", BuildConfig.KSP_PLUGIN_LIBRARY_COORDINATES)
-
-  for (sourceSet in sourceSets) {
-    sourceSet.dependencies {
-      implementation(BuildConfig.ANNOTATIONS_LIBRARY_COORDINATES)
-      implementation(BuildConfig.OPTICS_LIBRARY_COORDINATES)
-    }
-  }
-}
-
-public fun KotlinMultiplatformExtension.arrowOpticsCommon() {
-  arrowOptics(metadata())
-}
-
-public fun KotlinMultiplatformExtension.arrowOpticsAllTargets() {
-  arrowOptics(targets.toList())
-}
-
-public fun KotlinMultiplatformExtension.arrowOptics(target: KotlinTarget, vararg moreTargets: KotlinTarget) {
-  arrowOptics(listOf(target) + moreTargets.toList())
-}
-
-public fun KotlinMultiplatformExtension.arrowOptics(targets: List<KotlinTarget>) {
-  for (target in targets) {
-    val miniTarget = target.name.lowercase()
-
-    // add 'kspThing' to every source set
-    val kspTargetName = when (miniTarget) {
-      "metadata" -> "CommonMainMetadata"
-      else -> target.name.capitalized()
-    }
-    project.dependencies.add(
-      "ksp$kspTargetName",
-      BuildConfig.KSP_PLUGIN_LIBRARY_COORDINATES
-    )
-
-    for (compilation in target.compilations) {
-      for (sourceSet in compilation.kotlinSourceSets) {
-        sourceSet.kotlin.srcDir("build/generated/ksp/${target.name}/${sourceSet.name}")
-        sourceSet.dependencies {
-          implementation(BuildConfig.ANNOTATIONS_LIBRARY_COORDINATES)
-          implementation(BuildConfig.OPTICS_LIBRARY_COORDINATES)
-        }
-      }
-    }
-  }
-
-  project.afterEvaluate {
-    project.tasks.withType(KspAATask::class.java).configureEach {
-      if (it.name != "kspCommonMainKotlinMetadata") {
-        it.dependsOn("kspCommonMainKotlinMetadata")
-      }
-    }
-  }
-}
-*/
-
-public class ArrowOpticsPlugin : KotlinCompilerPluginSupportPlugin {
-  /* No more KSP plugin required
-  override fun apply(target: Project) {
-    target.pluginManager.apply(KspGradleSubplugin::class.java)
-    target.extensions.configure(KspExtension::class.java) {
-      it.arg("companionCheck", "false")
-    }
-    target.extensions.create("optics", OpticsGradleExtension::class.java)
-
-  }
-  */
-
-  override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-    kotlinCompilation.defaultSourceSet.dependencies {
-      implementation(ANNOTATIONS_LIBRARY_COORDINATES)
-      implementation(OPTICS_LIBRARY_COORDINATES)
-    }
+@Suppress("unused")
+class ArrowOpticsPlugin : DevKitSupportPlugin(PluginInfo.PLUGIN_INFO) {
+  override fun Project.applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
     kotlinCompilation.compileTaskProvider.configure {
       // Run this compiler plugin before Compose plugin.
-      it.compilerOptions.freeCompilerArgs.add("-Xcompiler-plugin-order=${BuildConfig.KOTLIN_PLUGIN_GROUP}>androidx.compose.compiler.plugins.kotlin")
+      it.compilerOptions.freeCompilerArgs.add("-Xcompiler-plugin-order=${PluginInfo.PLUGIN_ID}>androidx.compose.compiler.plugins.kotlin")
     }
-    return kotlinCompilation.target.project.provider { emptyList() }
+    return providers.provider { emptyList() }
   }
-
-  override fun getCompilerPluginId(): String = "arrow.optics.plugin"
-
-  override fun getPluginArtifact(): SubpluginArtifact = SubpluginArtifact(
-    groupId = BuildConfig.KOTLIN_PLUGIN_GROUP,
-    artifactId = BuildConfig.KOTLIN_PLUGIN_NAME,
-    version = BuildConfig.KOTLIN_PLUGIN_VERSION,
-  )
-
-  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
 }
-
-// public open class OpticsGradleExtension(objectFactory: ObjectFactory)
