@@ -154,6 +154,15 @@ class SuspendEvalTest {
   }
 
   @Test
+  fun flatMapShouldReturnEvaluatedMemoize() = runTest {
+    val sideEffect = SuspendSideEffect()
+    val memoized = Eval.now(1).mapSuspend { sideEffect.increment(); it + 1 }.memoize()
+    memoized.run() shouldBe 2
+    Eval.now(0).flatMapSuspend { memoized }.run() shouldBe 2
+    sideEffect.counter shouldBe 1
+  }
+
+  @Test
   fun atMostOnceSemantics() = runTest {
     var executionCount = 0
 

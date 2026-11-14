@@ -236,10 +236,7 @@ public sealed class Eval<out A>: SuspendEval<A> {
                 fs.add(0, addToMemo(currComp))
               },
               {
-                if (fs.isNotEmpty()) {
-                  curr = fs[0](it)
-                  fs.removeAt(0)
-                }
+                curr = Now(it)
               }
             )
           }

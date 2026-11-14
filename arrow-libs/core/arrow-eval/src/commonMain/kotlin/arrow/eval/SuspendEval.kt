@@ -100,10 +100,7 @@ public sealed interface SuspendEval<out A> {
                 fs.add(0, addToMemo(currComp))
               },
               {
-                if (fs.isNotEmpty()) {
-                  curr = fs[0](it)
-                  fs.removeAt(0)
-                }
+                curr = Now(it)
               }
             )
           }

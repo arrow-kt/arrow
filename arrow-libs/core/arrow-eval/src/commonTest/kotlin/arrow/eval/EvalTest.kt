@@ -138,4 +138,13 @@ class EvalTest {
     flatMapped.value() shouldBe -1
     sideEffect.counter shouldBe limit + 1
   }
+
+  @Test
+  fun flatMapShouldReturnEvaluatedMemoize() {
+    val sideEffect = SideEffect()
+    val memoized = Eval.now(1).map { sideEffect.increment(); it + 1 }.memoize()
+    memoized.value() shouldBe 2
+    Eval.now(0).flatMap { memoized }.value() shouldBe 2
+    sideEffect.counter shouldBe 1
+  }
 }
