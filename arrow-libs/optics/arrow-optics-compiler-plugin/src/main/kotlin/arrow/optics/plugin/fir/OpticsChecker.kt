@@ -3,14 +3,18 @@ package arrow.optics.plugin.fir
 import arrow.optics.plugin.OpticsClassKind
 import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.OpticsTargetKind
+import org.jetbrains.kotlin.AbstractKtSourceElement
+import org.jetbrains.kotlin.diagnostics.DiagnosticContext
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
+import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory0
+import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticsContainer
 import org.jetbrains.kotlin.diagnostics.error0
 import org.jetbrains.kotlin.diagnostics.error1
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
-import org.jetbrains.kotlin.diagnostics.reportOn
+import org.jetbrains.kotlin.diagnostics.reportOn as diagReportOn
 import org.jetbrains.kotlin.diagnostics.warning0
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.fir.FirSession
@@ -136,6 +140,19 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
     return written.qualifier.lastOrNull()?.name == OpticsNames.SERIALIZABLE_ANNOTATION.shortClassName
   }
 }
+
+private fun DiagnosticReporter.reportOn(
+  source: AbstractKtSourceElement?,
+  factory: KtDiagnosticFactory0,
+  context: DiagnosticContext,
+): Unit = this.diagReportOn(source, factory, context)
+
+private fun <A> DiagnosticReporter.reportOn(
+  source: AbstractKtSourceElement?,
+  factory: KtDiagnosticFactory1<A>,
+  a: A,
+  context: DiagnosticContext,
+): Unit = this.diagReportOn(source, factory, a, context)
 
 object OpticsDiagnostics : KtDiagnosticsContainer() {
   val INCOMPATIBLE_ANNOTATION by error0<KtElement>()
