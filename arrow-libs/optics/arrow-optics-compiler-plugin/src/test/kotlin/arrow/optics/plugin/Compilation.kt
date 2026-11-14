@@ -1,8 +1,6 @@
-@file:OptIn(ExperimentalCompilerApi::class)
-
 package arrow.optics.plugin
 
-import arrow.optics.plugin.fir.OpticsPluginComponentRegistrar
+import arrow.optics.plugin.fir.OpticsPluginComponentRegistrarForTests
 import com.tschuchort.compiletesting.CompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
@@ -11,7 +9,6 @@ import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationComponentRegistrar
 import java.io.File
@@ -100,7 +97,7 @@ fun buildCompilation(
   this.verbose = false
   this.allWarningsAsErrors = allWarningsAsErrors
   this.compilerPluginRegistrars = listOfNotNull(
-    OpticsPluginComponentRegistrar(),
+    OpticsPluginComponentRegistrarForTests(),
     SerializationComponentRegistrar().takeIf { withKotlinxSerialization },
   )
   // Generated IR must always be valid, even where JVM erasure would hide the problem (review 1.2).
