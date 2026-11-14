@@ -321,6 +321,9 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
+      - name: Compiler plugin tests
+        run: ./gradlew :arrow-optics-compiler-plugin:allTests
+
       - name: Optics Gradle plugin
         run: ./test-optics-gradle-plugin.sh
 
