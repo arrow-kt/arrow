@@ -18,17 +18,21 @@ pluginDevKit {
   pluginPackage = "arrow.optics.plugin"
 
   defaultTestVersion("2.4.21")
-  cliVersions(min = "2.4.0", max = null, org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc.LATEST)
+  cliVersions(min = "2.3.0", max = null, org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc.LATEST)
   ideaVersions(min = "261", max = null, includeRc = true, includeEap = true)
+
+  versionHierarchy {
+    splitDev(2, 3, 20)
+  }
 }
 
 kotlin {
   sourceSets {
     commonMain {
-      kotlin.setSrcDirs(listOf("src/main"))
+      kotlin.setSrcDirs(listOf("src/main/kotlin"))
     }
     commonTest {
-      kotlin.setSrcDirs(listOf("src/test"))
+      kotlin.setSrcDirs(listOf("src/test/kotlin"))
 
       dependencies {
         implementation(kotlin("test"))
