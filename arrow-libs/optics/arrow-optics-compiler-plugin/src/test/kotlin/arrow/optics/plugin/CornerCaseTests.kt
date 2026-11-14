@@ -56,7 +56,7 @@ class CornerCaseTests {
       |
       |val p = LCE.content<Int>()
       // the only candidate is the DSL extension for `CE`'s prism, not a member of `LCE.Companion`
-      """.failsWith { "Candidate 'fun <D, __S> PPrism<__S, __S, LCE.CE<D>, LCE.CE<D>>.content()" in it && "receiver type mismatch" in it }
+      """.failsWith { "fun <D, __S> PPrism<__S, __S, LCE.CE<D>, LCE.CE<D>>.content()" in it && "receiver type mismatch" in it }
   }
 
   @Test
