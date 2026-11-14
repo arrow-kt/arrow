@@ -1,7 +1,7 @@
 plugins {
   id(libs.plugins.kotlin.jvm.get().pluginId)
   pluginDevKit("gradle-plugin")
-  id("com.diffplug.spotless")
+  id("arrow.spotless")
   id("com.gradle.plugin-publish") version "2.2.1"
 }
 
