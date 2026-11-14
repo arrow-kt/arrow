@@ -1,5 +1,3 @@
-@file:OptIn(UnsafeDuringIrConstructionAPI::class)
-
 package arrow.optics.plugin.ir
 
 import arrow.optics.plugin.DslKind
@@ -39,7 +37,6 @@ import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
-import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
@@ -130,7 +127,7 @@ class OpticsIrSymbols(private val ctx: IrPluginContext) {
     } ?: missing(OpticsNames.ARROW_OPTICS_COPY.toString())
   }
 
-  private fun findClass(classId: org.jetbrains.kotlin.name.ClassId): IrClassSymbol = ctx.findClass(classId) ?: missing(classId.asString())
+  private fun findClass(classId: ClassId): IrClassSymbol = ctx.findClass(classId) ?: missing(classId.asString())
 
   private fun IrSimpleFunctionSymbol.regularParameterClassifiers(): List<IrClassifierSymbol?> = owner.parameters.filter { it.kind == IrParameterKind.Regular }.map { it.type.classifierOrNull }
 

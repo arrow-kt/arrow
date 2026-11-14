@@ -17,7 +17,6 @@ pluginDevKit {
 
   pluginPackage = "arrow.optics.plugin"
 
-  defaultTestVersion("2.4.21")
   cliVersions(min = "2.3.0", max = null, org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc.LATEST)
   ideaVersions(min = "261", max = null, includeRc = true, includeEap = true)
 
@@ -109,7 +108,6 @@ if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() == true) {
   }
 }
 
-val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks.withType<Test>().configureEach {
   maxParallelForks = 1
   useJUnitPlatform()
