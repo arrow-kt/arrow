@@ -1,8 +1,8 @@
 package arrow.optics.plugin
 
 import org.gradle.api.Project
-import org.jetbrains.kotlin.compiler.plugin.devkit.DevKitSupportPlugin
 import org.gradle.api.provider.Provider
+import org.jetbrains.kotlin.compiler.plugin.devkit.DevKitSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
