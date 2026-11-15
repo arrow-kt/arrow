@@ -170,4 +170,11 @@ class EvalTest {
     val limit = stackSafeIteration()
     Eval.now(1).replicate(limit).value().size shouldBe limit
   }
+
+  @Test
+  fun replicateShouldReturnDifferentInitials() {
+    val sideEffect = SideEffect()
+    val replicated = Eval.always { sideEffect.increment() }.replicate(0)
+    (replicated.value() === replicated.value()) shouldBe false
+  }
 }

@@ -602,9 +602,10 @@ public fun <A, B, C, D, E, F, G, H, I, J, K> Eval<A>.zip(
     }
   }
 
-public fun <A, B> Eval<A>.replicate(n: Int, initial: () -> B, combine: (A, B) -> B): Eval<B> =
+public fun <A, B> Eval<A>.replicate(n: Int, initial: () -> B, combine: (A, B) -> B): Eval<B> = Eval.defer {
   if (n <= 0) Eval.now(initial())
   else Eval.defer { this.zip(replicate(n - 1, initial, combine), combine) }
+}
 
 public fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
-  replicate(n, { ArrayDeque<A>() }) { x, xs -> xs.addFirst(x) ; xs }
+  replicate(n, { ArrayDeque() }) { x, xs -> xs.addFirst(x) ; xs }
