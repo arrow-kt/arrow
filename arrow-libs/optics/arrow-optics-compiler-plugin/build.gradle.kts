@@ -15,8 +15,8 @@ pluginDevKit {
 
   pluginPackage = "arrow.optics.plugin"
 
-  cliVersions(min = "2.3.0", max = null, org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc.LATEST)
-  ideaVersions(min = "261", max = null, includeRc = true, includeEap = true)
+  cliVersions(min = "2.3.0", max = "2.5.0", org.jetbrains.kotlin.compiler.plugin.devkit.BetaAndRc.LATEST)
+  ideaVersions(min = "261", 263, includeRc = true, includeEap = true)
 
   versionHierarchy {
     splitDev(2, 3, 20)
