@@ -7,6 +7,8 @@ import arrow.optics.plugin.internals.noCompanion
 import arrow.optics.plugin.internals.otherClassTypeErrorMessage
 import arrow.optics.plugin.internals.qualifiedNameOrSimpleName
 import arrow.optics.plugin.internals.snippets
+import com.google.devtools.ksp.ApiFeatures
+import com.google.devtools.ksp.buildApiFeatures
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -24,15 +26,20 @@ class OpticsProcessor(
   private val logger: KSPLogger,
   private val options: OpticsProcessorOptions,
 ) : SymbolProcessor {
+  override val apiFeatures: ApiFeatures = buildApiFeatures {
+    enableBackingFields = true
+    enableContextParameters = true
+  }
+
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val symbols = resolver.getSymbolsWithAnnotation("arrow.optics.optics")
     val (resolved, deferred) =
       symbols
         .filterIsInstance<KSClassDeclaration>()
         .partition {
-          it.validate { _, element ->
+          it.validate(predicate = { _, element ->
             element !is KSAnnotation && element !is KSFunctionDeclaration && element !is KSPropertyDeclaration
-          }
+          }, apiFeatures)
         }
 
     // Generate the optics

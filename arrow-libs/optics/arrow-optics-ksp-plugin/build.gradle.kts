@@ -23,6 +23,10 @@ dependencies {
       module = "kotlin-stdlib"
     )
   }
+  // force the dependencies of libs.kotlinCompileTestingKsp
+  // to be the same version as libs.ksp
+  testImplementation(libs.kspSymbolProcessing)
+  testImplementation(libs.kspSymbolProcessingAA)
   testImplementation(libs.kotlinCompileTestingKsp)
   testRuntimeOnly(projects.arrowOpticsKspPlugin)
   testRuntimeOnly(projects.arrowAnnotations)
