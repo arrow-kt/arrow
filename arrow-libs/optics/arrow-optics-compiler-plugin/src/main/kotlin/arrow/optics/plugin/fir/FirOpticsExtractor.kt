@@ -352,8 +352,6 @@ object FirOpticsExtractor {
 
   private fun ConeKotlinType.mentions(param: FirTypeParameterSymbol, session: FirSession): Boolean = contains { (it as? ConeTypeParameterType)?.toTypeParameterSymbol(session) == param }
 
-  // fun ConeTypeParameterType.toTypeParameterSymbol(session: FirSession): FirTypeParameterSymbol? = lookupTag.toSymbol(session) as? FirTypeParameterSymbol
-
   /**
    * Whether [this] property is abstract. Interface members without a body are implicitly abstract, but
    * their *raw* modality is `null` until status resolution, so we also recognise them syntactically:
