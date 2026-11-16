@@ -2,12 +2,10 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import groovy.util.Node
 import groovy.util.NodeList
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import java.time.Duration
 
@@ -75,11 +73,11 @@ if (!isKotlinJvm) {
   plugins.apply("org.jetbrains.kotlin.multiplatform")
   if (multiplatformWithAndroid) plugins.apply("com.android.kotlin.multiplatform.library")
 }
-plugins.apply("com.diffplug.spotless")
+plugins.apply("arrow.spotless")
 plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
 plugins.apply("org.jetbrains.kotlinx.kover")
-plugins.apply("com.vanniktech.maven.publish.base")
+plugins.apply("arrow.publish")
 
 val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks {
@@ -108,31 +106,6 @@ configure<JavaPluginExtension> {
   }
 }
 
-fun Provider<String>.ifAvailable(block: (String) -> Unit) =
-  orNull?.takeIf(String::isNotBlank)?.also(block)
-
-fun KotlinCommonCompilerOptions.commonCompilerOptions() {
-  apiVersion = KotlinVersion.KOTLIN_2_2
-  languageVersion = KotlinVersion.KOTLIN_2_2
-  freeCompilerArgs.addAll(
-    "-Xreport-all-warnings",
-    "-Xrender-internal-diagnostic-names",
-    "-Xreturn-value-checker=full",
-    "-Xexpect-actual-classes",
-    "-Xcontext-parameters",
-    "-Xallow-holdsin-contract",
-    "-Xcollection-literals",
-    "-Xwarning-level=ERROR_SUPPRESSION:disabled",
-    "-Xwarning-level=NOTHING_TO_INLINE:disabled",
-    "-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled",
-    "-Xwarning-level=RETURN_VALUE_NOT_USED_COERCION:disabled",
-  )
-  // required to be part of the Kotlin User Projects repository
-  providers.gradleProperty("kotlin_language_version").ifAvailable { languageVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_api_version").ifAvailable { apiVersion = KotlinVersion.fromVersion(it) }
-  providers.gradleProperty("kotlin_additional_cli_options").ifAvailable { freeCompilerArgs.addAll(it.split(" ")) }
-}
-
 @OptIn(ExperimentalAbiValidation::class)
 fun KotlinProjectExtension.applyValidationIfNeeded() {
   if (needsAbiValidation) {
@@ -152,7 +125,7 @@ fun KotlinProjectExtension.applyValidationIfNeeded() {
 
 if (isKotlinMultiplatform) {
   configure<KotlinMultiplatformExtension> {
-    compilerOptions { commonCompilerOptions() }
+    compilerOptions { commonCompilerOptions(providers) }
     applyValidationIfNeeded()
 
     jvm {
@@ -305,7 +278,7 @@ if (isKotlinJvm) {
   configure<KotlinJvmExtension> {
     compilerOptions {
       jvmTarget = requiredJvmTarget
-      commonCompilerOptions()
+      commonCompilerOptions(providers)
     }
   }
 
@@ -313,17 +286,6 @@ if (isKotlinJvm) {
     applyValidationIfNeeded()
   }
 }
-
-configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-  kotlin {
-    ktlint().editorConfigOverride(mapOf(
-      "ktlint_standard_filename" to "disabled",
-      "ktlint_standard_backing-property-naming" to "disabled",
-      "ktlint_standard_property-naming" to "disabled"
-    ))
-  }
-}
-
 
 configure<org.jetbrains.dokka.gradle.DokkaExtension> {
   extensions.findByType<KotlinProjectExtension>()?.sourceSets?.forEach { kotlinSourceSet ->
@@ -368,26 +330,6 @@ dependencies {
       signature("com.toasttab.android:gummy-bears-api-21:0.16.0:coreLib2@signature")
     else ->
       signature("com.toasttab.android:gummy-bears-api-21:0.16.0@signature")
-  }
-}
-
-configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
-  configureBasedOnAppliedPlugins()
-  pomFromGradleProperties()
-  if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() != true) {
-    publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
-  }
-}
-
-if (project.findProperty("onlyLocal")?.toString()?.toBooleanStrict() == true) {
-  configure<PublishingExtension> {
-    repositories {
-      maven {
-        name = "localPluginRepository"
-        url = uri("${rootProject.projectDir.absolutePath}/build/local-plugin-repository")
-      }
-    }
   }
 }
 

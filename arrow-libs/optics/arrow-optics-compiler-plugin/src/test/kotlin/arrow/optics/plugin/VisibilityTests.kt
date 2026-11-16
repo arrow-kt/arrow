@@ -17,7 +17,7 @@ class VisibilityTests {
       |val r = P.x.get(p) == 1 &&
       |        P.q.set(p, Q(3)) == P(1, Q(3)) &&
       |        p.copy { P.x set 5 } == P(5, Q(2))
-      """.evals("r" to true)
+      """.evals("r" to true, contextParameters = true)
   }
 
   @Test
@@ -166,6 +166,6 @@ class VisibilityTests {
       |}
       |
       |val r = C.of(1).two() == C.of(2)
-      """.evals("r" to true)
+      """.evals("r" to true, contextParameters = true)
   }
 }

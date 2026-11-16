@@ -53,7 +53,7 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
     for (annotation in opticsAnnotations) {
       val written = (annotation.annotationTypeRef as? FirResolvedTypeRef)?.delegatedTypeRef as? FirUserTypeRef ?: continue
       if (!written.isWrittenAs(annotation.toAnnotationClassIdSafe(session) ?: continue)) {
-        reporter.reportOn(annotation.source, OpticsDiagnostics.ALIASED_ANNOTATION, context)
+        reporter.reportOn(annotation.source, OpticsDiagnostics.ALIASED_ANNOTATION)
         aliased = true
       }
     }
@@ -61,7 +61,7 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
     if (aliased) return
 
     if (!FirOpticsExtractor.runtimeAvailable(session)) {
-      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.MISSING_RUNTIME, context)
+      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.MISSING_RUNTIME)
       return
     }
 
@@ -69,25 +69,25 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
 
     val symbol = declaration.symbol
     if (FirOpticsExtractor.classKind(symbol) == OpticsClassKind.INELIGIBLE) {
-      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.INELIGIBLE_CLASS, context)
+      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.INELIGIBLE_CLASS)
       return
     }
 
     if (FirOpticsExtractor.effectiveTargets(symbol).none { it in BASE_TARGETS }) {
-      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.NO_TARGETS, context)
+      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.NO_TARGETS)
       return
     }
 
     val foci = FirOpticsExtractor.allFoci(symbol, resolveFocusTypes = true, session)
     val clashing = FirOpticsExtractor.clashingNames(foci)
     for (name in clashing) {
-      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.NAME_CLASH, name.asString(), context)
+      reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.NAME_CLASH, name.asString())
     }
 
     if (!FirOpticsExtractor.unsafeMarkerAvailable(session)) {
       for (focus in foci) {
         if (focus.potentiallyUnsafe && focus.opticName !in clashing) {
-          reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.UNSAFE_MARKER_MISSING, focus.opticName.asString(), context)
+          reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.UNSAFE_MARKER_MISSING, focus.opticName.asString())
         }
       }
     }
@@ -95,7 +95,7 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
     val userNames = FirOpticsExtractor.userMemberNames(declaration.companionObjectSymbol)
     for (focus in foci) {
       if (focus.opticName in userNames && focus.opticName !in clashing) {
-        reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.USER_MEMBER_CLASH, focus.opticName.asString(), context)
+        reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.USER_MEMBER_CLASH, focus.opticName.asString())
       }
     }
 
@@ -103,7 +103,7 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
       val skipped = FirOpticsExtractor.dslFoci(symbol, resolveFocusTypes = true, session)
         .filter { FirOpticsExtractor.dslVisibility(symbol, it, session) == null }
       if (skipped.isNotEmpty()) {
-        reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.DSL_SKIPPED, skipped.joinToString { it.opticName.asString() }, context)
+        reporter.reportOn(opticsAnnotation.source, OpticsDiagnostics.DSL_SKIPPED, skipped.joinToString { it.opticName.asString() })
       }
     }
   }
@@ -120,11 +120,11 @@ object OpticsChecker : FirRegularClassChecker(MppCheckerKind.Common) {
     var reported = false
     for (annotation in declaration.annotations) {
       if (annotation.toAnnotationClassIdSafe(session) == OpticsNames.SERIALIZABLE_ANNOTATION) {
-        reporter.reportOn(annotation.source, OpticsDiagnostics.INCOMPATIBLE_ANNOTATION, context)
+        reporter.reportOn(annotation.source, OpticsDiagnostics.INCOMPATIBLE_ANNOTATION)
         reported = true
       } else if (companion == null && annotation.isWrittenAsSerializable()) {
         // generation only sees the name, so any annotation called `Serializable` prevents the companion
-        reporter.reportOn(annotation.source, OpticsDiagnostics.SERIALIZABLE_NAME, context)
+        reporter.reportOn(annotation.source, OpticsDiagnostics.SERIALIZABLE_NAME)
         reported = true
       }
     }
