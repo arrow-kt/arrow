@@ -894,6 +894,14 @@ public final class arrow/core/TupleNKt {
 	public static final fun plus (Larrow/core/Tuple8;Ljava/lang/Object;)Larrow/core/Tuple9;
 	public static final fun plus (Lkotlin/Pair;Ljava/lang/Object;)Lkotlin/Triple;
 	public static final fun plus (Lkotlin/Triple;Ljava/lang/Object;)Larrow/core/Tuple4;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;)Lkotlin/Pair;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Lkotlin/Triple;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Tuple4;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Tuple5;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Tuple6;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Tuple7;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Tuple8;
+	public static final fun tupleOf (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Larrow/core/Tuple9;
 }
 
 public final class arrow/core/UtilsKt {
