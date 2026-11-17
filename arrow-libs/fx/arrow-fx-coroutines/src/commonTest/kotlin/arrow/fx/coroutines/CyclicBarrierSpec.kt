@@ -96,7 +96,7 @@ class CyclicBarrierSpec {
         }
 
       barrier.reset()
-      jobs.map { it.isCancelled shouldBe true }
+      jobs.forEach { it.isCancelled shouldBe true }
     }
   }
 

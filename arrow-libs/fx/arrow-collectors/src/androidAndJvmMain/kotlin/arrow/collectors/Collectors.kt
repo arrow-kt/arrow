@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap
  * so it's potential faster than [Collectors.mapFromEntries].
  */
 @Suppress("UnusedReceiverParameter")
-public fun <K, V> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, ConcurrentMap<K, V>> =
+public fun <K : Any, V : Any> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, ConcurrentMap<K, V>> =
   Collectors.concurrentMap<K, V>().contramapNonSuspend { [k, v] -> k to v }
 
 /**
@@ -20,7 +20,7 @@ public fun <K, V> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map
  * so it's potential faster than [Collectors.map].
  */
 @Suppress("UnusedReceiverParameter")
-public fun <K, V> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, ConcurrentMap<K, V>> = Collector.nonSuspendOf(
+public fun <K : Any, V : Any> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, ConcurrentMap<K, V>> = Collector.nonSuspendOf(
   supply = { ConcurrentHashMap<K, V>() },
   accumulate = { current, [k, v] -> current[k] = v },
   finish = { it },
@@ -34,7 +34,7 @@ public fun <K, V> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, Co
  * so it's potential faster than [Collectors.set].
  */
 @Suppress("UnusedReceiverParameter")
-public fun <T> Collectors.concurrentSet(): NonSuspendCollector<T, Set<T>> = Collector.nonSuspendOf(
+public fun <T : Any> Collectors.concurrentSet(): NonSuspendCollector<T, Set<T>> = Collector.nonSuspendOf(
   supply = { ConcurrentHashMap<T, Unit>().keySet(Unit) },
   accumulate = ConcurrentHashMap.KeySetView<T, Unit>::add,
   finish = { it },

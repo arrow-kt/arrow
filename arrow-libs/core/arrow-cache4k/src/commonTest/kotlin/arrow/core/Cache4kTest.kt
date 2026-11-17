@@ -12,7 +12,7 @@ class Cache4kTest {
     val expectedKey = "user:age:userId:5"
     val expectedValue = 32
 
-    cache.set(expectedKey, expectedValue)
+    val _ = cache.set(expectedKey, expectedValue)
     cache.get(expectedKey) shouldBe expectedValue
   }
 

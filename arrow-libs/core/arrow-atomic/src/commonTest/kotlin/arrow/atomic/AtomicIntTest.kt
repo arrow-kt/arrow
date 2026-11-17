@@ -62,7 +62,7 @@ class AtomicIntTest {
   fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.int()) { x ->
       val ref = AtomicInt(x)
-      ref.tryUpdate { it + 1 }
+      val _ = ref.tryUpdate { it + 1 }
       ref.value shouldBe x + 1
     }
   }
@@ -101,7 +101,7 @@ class AtomicIntTest {
   fun concurrentModifications() = runTestWithDelay {
     val finalValue = stackSafeIteration()
     val r = AtomicInt(0)
-    (0 until finalValue).parMap { r.update { it + 1 } }
+    val _ = (0 until finalValue).parMap { r.update { it + 1 } }
     r.value shouldBe finalValue
   }
 }
