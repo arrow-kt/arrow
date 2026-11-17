@@ -79,7 +79,7 @@ class CircuitBreakerTest {
 
   @Test
   fun circuitBreakerOpensAfterMaxFailures(): TestResult = runTest {
-    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures),)
+    val cb = CircuitBreaker(resetTimeout = resetTimeout, openingStrategy = OpeningStrategy.Count(maxFailures))
 
     val result = recurAndCollect<Either<Throwable, Unit>>(4).repeat {
       Either.catch { cb.protectOrThrow { throw dummy } }

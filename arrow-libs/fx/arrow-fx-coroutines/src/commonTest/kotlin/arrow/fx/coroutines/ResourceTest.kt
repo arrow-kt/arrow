@@ -846,9 +846,9 @@ class ResourceTest {
     }
 
     resourceScope {
-      install({
-        install({
-          install({ res1 }, releaser)
+      val _ = install({
+        val _ = install({
+          val _ = install({ res1 }, releaser)
           res2
         }, releaser)
         res3
