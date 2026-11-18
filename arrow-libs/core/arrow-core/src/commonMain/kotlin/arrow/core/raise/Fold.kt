@@ -147,7 +147,7 @@ public inline fun <Error, A, B> fold(
 @ExperimentalTraceApi
 @JvmName("_fold")
 public inline fun <Error, A, B> foldTraced(
-  @BuilderInference block: Raise<Error>.() -> A,
+  block: Raise<Error>.() -> A,
   catch: (throwable: Throwable) -> B,
   recover: (trace: Trace, error: Error) -> B,
   transform: (value: A) -> B,
@@ -212,7 +212,6 @@ public inline fun <Error, A, B> foldTraced(
  * but **this only occurs** when composing `traced`.
  * The stacktrace creation is disabled if no `traced` calls are made within the function composition.
  */
-@OptIn(DelicateRaiseApi::class)
 @ExperimentalTraceApi
 public inline fun <Error, A> Raise<Error>.traced(
   block: Raise<Error>.() -> A,
