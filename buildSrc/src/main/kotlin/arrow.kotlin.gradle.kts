@@ -181,7 +181,7 @@ if (isKotlinMultiplatform) {
       extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()!!.apply {
         namespace = projectNameWithDots
         compileSdk = 36
-        minSdk = 21
+        minSdk = if (needsAndroidCoreLibraryDesugaring) 24 else 21
         aarMetadata.minCompileSdk = 1
         compilerOptions {
           jvmTarget = requiredJvmTarget
@@ -329,7 +329,7 @@ dependencies {
   when {
     !isKotlinMultiplatform || !multiplatformWithAndroid -> { }
     needsAndroidCoreLibraryDesugaring ->
-      signature("com.toasttab.android:gummy-bears-api-21:0.16.0:coreLib2@signature")
+      signature("com.toasttab.android:gummy-bears-api-24:0.16.0:coreLib2@signature")
     else ->
       signature("com.toasttab.android:gummy-bears-api-21:0.16.0@signature")
   }

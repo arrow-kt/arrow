@@ -29,7 +29,7 @@ suspend fun main(): Unit {
     resilient(Schedule.recurs(5), ::apiCall)
   }.let { println("recurs(5) apiCall twice and 4x short-circuit result from CircuitBreaker: $it") }
 
-  delay(2000)
+  delay(2.seconds)
   println("CircuitBreaker ready to half-open")
 
   // Retry once and when the CircuitBreaker opens after 2 failures then retry with exponential back-off with same time as CircuitBreaker's resetTimeout
