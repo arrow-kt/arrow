@@ -1,9 +1,11 @@
 package arrow.core.raise
 
-import kotlin.coroutines.cancellation.CancellationException
+import arrow.core.ControlCancellationException
+import arrow.core.InternalArrowApi
 
+@OptIn(InternalArrowApi::class)
 @DelicateRaiseApi
 public actual sealed class RaiseCancellationException actual constructor(
   internal actual val raised: Any?,
   internal actual val raise: Raise<Any?>
-) : CancellationException(RaiseCancellationExceptionCaptured)
+) : ControlCancellationException(RaiseCancellationExceptionCaptured)
