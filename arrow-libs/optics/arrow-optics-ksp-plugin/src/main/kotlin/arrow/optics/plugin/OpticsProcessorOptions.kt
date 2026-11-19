@@ -8,8 +8,8 @@ data class OpticsProcessorOptions(
 
   companion object {
     fun from(options: Map<String, String>): OpticsProcessorOptions = OpticsProcessorOptions(
-      useInline = options.get("inline")?.toBooleanStrict() ?: false,
-      companionCheck = options.get("companionCheck")?.toBooleanStrict() ?: true,
+      useInline = options["inline"]?.toBooleanStrict() ?: false,
+      companionCheck = options["companionCheck"]?.toBooleanStrict() ?: true,
     )
   }
 }

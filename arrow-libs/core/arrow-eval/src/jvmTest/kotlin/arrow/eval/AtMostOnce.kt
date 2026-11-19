@@ -21,7 +21,7 @@ class AtMostOnce {
       }
 
     Array(20) {
-      Thread { name() }.also { it.start() }
+      Thread { val _ = name() }.also { it.start() }
     }.forEach {
       it.join()
     }

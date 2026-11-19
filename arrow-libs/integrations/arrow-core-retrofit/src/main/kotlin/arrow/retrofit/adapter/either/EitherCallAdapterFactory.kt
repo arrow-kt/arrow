@@ -95,7 +95,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     val wrapperType = getParameterUpperBound(0, returnType)
     return when (getRawType(wrapperType)) {
       Either::class.java -> {
-        val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
+        val [errorType, bodyType] = extractErrorAndReturnType(wrapperType, returnType)
         if (errorType == CallError::class.java) {
           NetworkEitherCallAdapter(bodyType)
         } else {
@@ -104,7 +104,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
       }
 
       ResponseE::class.java -> {
-        val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
+        val [errorType, bodyType] = extractErrorAndReturnType(wrapperType, returnType)
         ArrowResponseECallAdapter<Any?, Type>(retrofit, errorType, bodyType)
       }
 

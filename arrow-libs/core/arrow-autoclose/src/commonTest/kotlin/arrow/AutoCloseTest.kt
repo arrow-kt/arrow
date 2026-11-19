@@ -1,9 +1,9 @@
 package arrow
 
 import arrow.atomic.AtomicBoolean
+import io.kotest.assertions.assertionCounter
 import io.kotest.assertions.AssertionErrorBuilder
 import io.kotest.common.reflection.bestName
-import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
@@ -72,7 +72,7 @@ class AutoCloseTest {
           r.shutdown()
           throw error2
         }
-        autoClose({ Resource() }) { _, _ -> throw error3 }
+        val _ = autoClose({ Resource() }) { _, _ -> throw error3 }
         require(wasActive.complete(r.isActive()))
         throw error
       }
@@ -93,7 +93,7 @@ class AutoCloseTest {
 
     val e = shouldThrow<RuntimeException> {
       autoCloseScope {
-        autoClose({ Resource() }) { r, e ->
+        val _ = autoClose({ Resource() }) { r, e ->
           require(promise.complete(e))
           r.shutdown()
           throw error2
@@ -163,7 +163,7 @@ class AutoCloseTest {
     val wasActive = Channel<Boolean>(Channel.UNLIMITED)
     val closed = Channel<Resource>(Channel.UNLIMITED)
 
-    autoCloseScope {
+    val _ = autoCloseScope {
       val r1 = autoClose({ res1 }) { r, _ ->
         closed.trySend(r).getOrThrow()
         r.shutdown()
@@ -191,7 +191,7 @@ class AutoCloseTest {
   }
 
 
-  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
+  // @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
   private class Resource : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
@@ -219,7 +219,7 @@ inline fun <reified T : Throwable> shouldThrow(block: () -> Any?): T {
   assertionCounter.inc()
   val expectedExceptionClass = T::class
   val thrownThrowable = try {
-    block()
+    val _ = block()
     null  // Can't throw failure here directly, as it would be caught by the catch clause, and it's an AssertionError, which is a special case
   } catch (thrown: Throwable) {
     thrown

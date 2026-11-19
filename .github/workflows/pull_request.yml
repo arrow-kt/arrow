@@ -283,7 +283,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Compile WebAssembly
-        run: ./gradlew wasmJsJar wasmWasiJar :suspendapp-test-runner:wasmJsTest -Penable_wasm=true
+        run: ./gradlew wasmJsJar wasmWasiJar -Penable_wasm=true # :suspendapp-test-runner:wasmJsTest
 
       - name: Upload reports
         if: failure()

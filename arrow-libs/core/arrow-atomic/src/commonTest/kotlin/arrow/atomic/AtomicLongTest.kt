@@ -62,7 +62,7 @@ class AtomicLongTest {
   fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.long()) { x ->
       val ref = AtomicLong(x)
-      ref.tryUpdate { it + 1 }
+      val _ = ref.tryUpdate { it + 1 }
       ref.value shouldBe x + 1
     }
   }
@@ -101,7 +101,7 @@ class AtomicLongTest {
   fun concurrentModifications() = runTestWithDelay {
     val finalValue = stackSafeIteration()
     val r = AtomicLong(0)
-    (0 until finalValue).parMap { r.update { it + 1 } }
+    val _ = (0 until finalValue).parMap { r.update { it + 1 } }
     r.value shouldBe finalValue
   }
 }

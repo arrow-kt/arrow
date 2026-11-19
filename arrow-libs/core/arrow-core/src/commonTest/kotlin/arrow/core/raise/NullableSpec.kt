@@ -36,7 +36,7 @@ class NullableSpec {
   @Test fun shortCircuitNull() = runTest {
     nullable {
       val number: Int = "s".length
-      (number.takeIf { it > 1 }?.toString()).bind()
+      val _ = (number.takeIf { it > 1 }?.toString()).bind()
       throw IllegalStateException("This should not be executed")
     } shouldBe null
   }
@@ -109,7 +109,7 @@ class NullableSpec {
   @Test fun shortCircuitOption() = runTest {
     nullable {
       val number = Some("s".length)
-      number.filter { it > 1 }.map(Int::toString).bind()
+      val _ = number.filter { it > 1 }.map(Int::toString).bind()
       throw IllegalStateException("This should not be executed")
     } shouldBe null
   }

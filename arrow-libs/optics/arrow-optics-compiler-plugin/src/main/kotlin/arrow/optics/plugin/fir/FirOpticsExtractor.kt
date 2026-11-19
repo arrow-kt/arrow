@@ -336,7 +336,7 @@ object FirOpticsExtractor {
     ctor: FirConstructorSymbol,
     propName: Name,
     session: FirSession,
-  ): Boolean = parentParams.withIndex().any { (i, param) ->
+  ): Boolean = parentParams.withIndex().any { [i, param] ->
     if (param.variance == Variance.INVARIANT || !propType.mentions(param, session)) return@any false
     val arg = args[i]
     val forwarded = (arg as? ConeTypeParameterType)
@@ -344,7 +344,7 @@ object FirOpticsExtractor {
       ?.toTypeParameterSymbol(session)
       ?.takeIf { it in sub.typeParameterSymbols }
       ?: return@any true
-    args.withIndex().any { (j, other) -> j != i && other.mentions(forwarded, session) } ||
+    args.withIndex().any { [j, other] -> j != i && other.mentions(forwarded, session) } ||
       ctor.valueParameterSymbols.any { it.name != propName && it.resolvedReturnType.mentions(forwarded, session) }
   }
 

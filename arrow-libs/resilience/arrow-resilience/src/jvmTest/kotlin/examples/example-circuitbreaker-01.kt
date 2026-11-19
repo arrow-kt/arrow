@@ -21,7 +21,7 @@ suspend fun main(): Unit {
   Either.catch { circuitBreaker.protectOrThrow { throw RuntimeException("Service overloaded") } }.also(::println)
   circuitBreaker.protectEither { }.also { println("I am Open and short-circuit with ${it}. ${circuitBreaker.state()}") }
 
-  println("Service recovering . . .").also { delay(2000) }
+  println("Service recovering . . .").also { delay(2.seconds) }
 
   circuitBreaker.protectOrThrow { "I am running test-request in HalfOpen: ${circuitBreaker.state()}" }.also(::println)
   println("I am back to normal state closed ${circuitBreaker.state()}")

@@ -60,7 +60,7 @@ class AtomicBooleanTest {
   fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.boolean()) { x ->
       val ref = AtomicBoolean(x)
-      ref.tryUpdate { !it }
+      val _ = ref.tryUpdate { !it }
       ref.value shouldBe !x
     }
   }

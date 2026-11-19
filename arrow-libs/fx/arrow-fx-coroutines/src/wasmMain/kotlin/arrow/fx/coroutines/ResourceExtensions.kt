@@ -1,3 +1,5 @@
+@file:MustUseReturnValues
+
 package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineDispatcher

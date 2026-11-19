@@ -4,10 +4,10 @@ import arrow.optics.plugin.OpticsProcessorOptions
 import com.google.devtools.ksp.getDeclaredProperties
 
 fun OpticsProcessorOptions.generateLensDsl(ele: ADT, optic: DataClassDsl): Snippet {
-  val (className, classImport) = resolveClassName(ele)
-  val (lensType, lensImport) = ele.resolveTypeName(Lens)
-  val (optionalType, optionalImport) = ele.resolveTypeName(Optional)
-  val (traversalType, traversalImport) = ele.resolveTypeName(Traversal)
+  val [className, classImport] = resolveClassName(ele)
+  val [lensType, lensImport] = ele.resolveTypeName(Lens)
+  val [optionalType, optionalImport] = ele.resolveTypeName(Optional)
+  val [traversalType, traversalImport] = ele.resolveTypeName(Traversal)
   return Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
@@ -17,10 +17,10 @@ fun OpticsProcessorOptions.generateLensDsl(ele: ADT, optic: DataClassDsl): Snipp
 }
 
 fun OpticsProcessorOptions.generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl): Snippet {
-  val (className, classImport) = resolveClassName(ele)
-  val (optionalType, optionalImport) = ele.resolveTypeName(Optional)
-  val (prismType, prismImport) = ele.resolveTypeName(Prism)
-  val (traversalType, traversalImport) = ele.resolveTypeName(Traversal)
+  val [className, classImport] = resolveClassName(ele)
+  val [optionalType, optionalImport] = ele.resolveTypeName(Optional)
+  val [prismType, prismImport] = ele.resolveTypeName(Prism)
+  val [traversalType, traversalImport] = ele.resolveTypeName(Traversal)
   return Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,
@@ -30,12 +30,12 @@ fun OpticsProcessorOptions.generatePrismDsl(ele: ADT, isoOptic: SealedClassDsl):
 }
 
 fun OpticsProcessorOptions.generateIsoDsl(ele: ADT, isoOptic: ValueClassDsl): Snippet {
-  val (className, classImport) = resolveClassName(ele)
-  val (isoType, isoImport) = ele.resolveTypeName(Iso)
-  val (lensType, lensImport) = ele.resolveTypeName(Lens)
-  val (optionalType, optionalImport) = ele.resolveTypeName(Optional)
-  val (prismType, prismImport) = ele.resolveTypeName(Prism)
-  val (traversalType, traversalImport) = ele.resolveTypeName(Traversal)
+  val [className, classImport] = resolveClassName(ele)
+  val [isoType, isoImport] = ele.resolveTypeName(Iso)
+  val [lensType, lensImport] = ele.resolveTypeName(Lens)
+  val [optionalType, optionalImport] = ele.resolveTypeName(Optional)
+  val [prismType, prismImport] = ele.resolveTypeName(Prism)
+  val [traversalType, traversalImport] = ele.resolveTypeName(Traversal)
   return Snippet(
     `package` = ele.packageName,
     name = ele.simpleName,

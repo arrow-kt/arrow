@@ -33,7 +33,7 @@ class OpticsProcessor(
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val symbols = resolver.getSymbolsWithAnnotation("arrow.optics.optics")
-    val (resolved, deferred) =
+    val [resolved, deferred] =
       symbols
         .filterIsInstance<KSClassDeclaration>()
         .partition {
@@ -65,7 +65,7 @@ class OpticsProcessor(
     }
 
     val snippets = adt(klass, logger).snippets(options).groupBy { Pair(it.`package`, it.name) }
-    for ((info, snippets) in snippets) {
+    for ([info, snippets] in snippets) {
       codegen.createNewFile(
         Dependencies(aggregating = true, *listOfNotNull(klass.containingFile).toTypedArray()),
         info.first,

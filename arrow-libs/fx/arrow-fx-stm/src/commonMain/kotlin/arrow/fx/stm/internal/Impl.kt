@@ -101,7 +101,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
   }
 
   internal fun validate(): Boolean =
-    accessMap.all { (tv, entry) -> tv._value === entry.initialVal }
+    accessMap.all { [tv, entry] -> tv._value === entry.initialVal }
 
   internal fun validateAndCommit(): Boolean {
     if (accessMap.isEmpty()) return true
@@ -119,7 +119,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
      *  any other transaction depending on a variable we are about to write to has to wait for us and then verify again
      */
     accessMap.forEach { tvToEntry ->
-      val (tv, entry) = tvToEntry
+      val [tv, entry] = tvToEntry
       if (entry.isWrite()) {
         if (tv.lock_cond(this, entry.initialVal)) {
           locked.add(tvToEntry)
@@ -137,7 +137,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
       }
     }
 
-    if (reads.any { (tv, entry) -> tv._value !== entry.initialVal }) {
+    if (reads.any { [tv, entry] -> tv._value !== entry.initialVal }) {
       locked.forEach { it.key.release(this, it.value.initialVal) }
       return false
     }
@@ -150,7 +150,7 @@ internal class STMFrame(private val parent: STMFrame? = null) : STM {
   }
 
   private fun mergeReads(other: STMFrame) {
-    accessMap.putAll(other.accessMap.filter { (_, e) -> e.isWrite().not() })
+    accessMap.putAll(other.accessMap.filter { [_, e] -> e.isWrite().not() })
   }
 
   private fun merge(other: STMFrame) {
@@ -205,7 +205,7 @@ internal class STMTransaction {
           cont.value = k
 
           frame.accessMap
-            .forEach { (tv, entry) ->
+            .forEach { [tv, entry] ->
               if (tv.registerWaiting(this, entry.initialVal)) registered.add(tv)
               else return@susp
             }
