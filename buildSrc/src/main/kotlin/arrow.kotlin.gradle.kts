@@ -15,7 +15,7 @@ repositories {
   mavenCentral()
   providers.gradleProperty("kotlin_repo_url").orNull?.also { maven(it) }
   google()
-  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+  // maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 group = property("projects.group").toString()

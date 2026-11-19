@@ -12,7 +12,7 @@ pluginManagement {
     mavenLocal()
     kotlinRepoUrl?.also { maven(it) }
     google()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    // maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
 }
 
