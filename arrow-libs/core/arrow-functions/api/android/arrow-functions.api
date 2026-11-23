@@ -610,3 +610,27 @@ public final class arrow/core/Partials {
 	public static final fun partially9Effect (Lkotlin/jvm/functions/FunctionN;Ljava/lang/Object;)Lkotlin/jvm/functions/Function22;
 }
 
+public final class arrow/core/partial/Placeholder {
+	public static final field INSTANCE Larrow/core/partial/Placeholder;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/core/partial/PlaceholderKt {
+	public static final fun getPlaceholder ()Larrow/core/partial/Placeholder;
+	public static final fun get__ ()Larrow/core/partial/Placeholder;
+	public static final fun invoke (Lkotlin/jvm/functions/Function2;Ljava/lang/Object;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function1;
+	public static final fun invoke (Lkotlin/jvm/functions/Function3;Ljava/lang/Object;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function2;
+	public static final fun invoke (Lkotlin/jvm/functions/Function3;Ljava/lang/Object;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function2;
+	public static final fun invoke (Lkotlin/jvm/functions/Function3;Ljava/lang/Object;Ljava/lang/Object;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function1;
+	public static final fun invoke (Lkotlin/jvm/functions/Function4;Ljava/lang/Object;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function3;
+	public static final fun invoke (Lkotlin/jvm/functions/Function4;Ljava/lang/Object;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function3;
+	public static final fun invoke (Lkotlin/jvm/functions/Function4;Ljava/lang/Object;Ljava/lang/Object;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function2;
+	public static final fun invoke (Lkotlin/jvm/functions/Function4;Ljava/lang/Object;Ljava/lang/Object;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function2;
+	public static final fun invoke (Lkotlin/jvm/functions/Function4;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function1;
+	public static final fun invoke (Lkotlin/jvm/functions/Function5;Ljava/lang/Object;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function4;
+	public static final fun invoke (Lkotlin/jvm/functions/Function5;Ljava/lang/Object;Ljava/lang/Object;Larrow/core/partial/Placeholder;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function3;
+	public static final fun invoke (Lkotlin/jvm/functions/Function5;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Larrow/core/partial/Placeholder;)Lkotlin/jvm/functions/Function2;
+}
+
