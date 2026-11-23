@@ -6,7 +6,6 @@ plugins {
 repositories {
   maven(url = file("../../build/local-plugin-repository"))
   mavenCentral()
-  maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
 }
 
 kotlin {

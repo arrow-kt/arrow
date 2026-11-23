@@ -57,7 +57,6 @@ kotlin {
 }
 
 tasks.withType<Test>().configureEach {
-  maxParallelForks = 1
   useJUnitPlatform()
   systemProperty("arrowVersion", project(":arrow-optics").version.toString())
 }

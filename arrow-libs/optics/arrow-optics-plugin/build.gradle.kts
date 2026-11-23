@@ -9,7 +9,6 @@ group = property("projects.group").toString()
 
 repositories {
   gradlePluginPortal()
-  maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
 }
 
 pluginDevKit {

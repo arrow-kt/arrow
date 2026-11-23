@@ -13,14 +13,13 @@ pluginManagement {
     kotlinRepoUrl?.also { maven(it) }
     google()
     // maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
   }
 }
 
 plugins {
   id("com.gradle.develocity") version "4.6.1"
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-  kotlin("compiler.plugin.devkit") version "0.0.4-dev-396"
+  kotlin("compiler.plugin.devkit") version "0.1.0"
 }
 
 val kotlinRepoUrl: String? = providers.gradleProperty("kotlin_repo_url").orNull
@@ -35,7 +34,6 @@ dependencyResolutionManagement {
     mavenLocal()
     kotlinRepoUrl?.also { maven(it) }
     google()
-    maven("https://packages.jetbrains.team/maven/p/compiler-plugin-dev-kit/eap")
   }
   versionCatalogs {
     create("libs") {
