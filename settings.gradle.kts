@@ -19,6 +19,7 @@ pluginManagement {
 plugins {
   id("com.gradle.develocity") version "4.6.1"
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+  kotlin("compiler.plugin.devkit") version "0.1.0"
 }
 
 val kotlinRepoUrl: String? = providers.gradleProperty("kotlin_repo_url").orNull

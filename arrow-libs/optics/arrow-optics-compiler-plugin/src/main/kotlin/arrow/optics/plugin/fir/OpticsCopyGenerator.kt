@@ -5,19 +5,22 @@ import arrow.optics.plugin.OpticsNames
 import arrow.optics.plugin.memberVisibility
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
 import org.jetbrains.kotlin.fir.declarations.primaryConstructorIfAny
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
+import org.jetbrains.kotlin.fir.extensions.FirExtension
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
-import org.jetbrains.kotlin.fir.plugin.createMemberFunction
+import org.jetbrains.kotlin.fir.plugin.SimpleFunctionBuildingContext
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.CompilerConeAttributes
 import org.jetbrains.kotlin.fir.types.ConeAttributes
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.types.constructType
 import org.jetbrains.kotlin.name.CallableId
@@ -68,18 +71,25 @@ class OpticsCopyGenerator(session: FirSession) : FirDeclarationGenerationExtensi
         isMarkedNullable = false,
         blockAttributes,
       )
-    val function = createMemberFunction(source, Key, OpticsNames.COPY_METHOD_NAME, sourceType) {
+    val function = createMemberFunctionWithDefaultBody(source, Key, OpticsNames.COPY_METHOD_NAME, sourceType) {
       valueParameter(Name.identifier("block"), blockType)
       // like the data-class `copy`, it follows the primary constructor's visibility (review 2.2);
       // a sealed type is never built through its own constructor
       if (FirOpticsExtractor.classKind(source) != OpticsClassKind.SEALED) {
         visibility = memberVisibility(listOfNotNull(source.primaryConstructorIfAny(session)?.visibility))
       }
-      // Give the function a body up front so the synthetic data-class `copy` body generator (which
-      // runs in Fir2Ir, before our IR pass) does not treat this body-less generated `copy` as the
-      // data-class copy and try to fill it as one. The real body is installed in the IR phase.
-      withGeneratedDefaultBody()
     }
     return listOf(function.symbol)
   }
 }
+
+// Give the function a body up front so the synthetic data-class `copy` body generator (which
+// runs in Fir2Ir, before our IR pass) does not treat this body-less generated `copy` as the
+// data-class copy and try to fill it as one. The real body is installed in the IR phase.
+expect fun FirExtension.createMemberFunctionWithDefaultBody(
+  owner: FirClassSymbol<*>,
+  key: GeneratedDeclarationKey,
+  name: Name,
+  returnType: ConeKotlinType,
+  config: SimpleFunctionBuildingContext.() -> Unit = {}
+): FirNamedFunction

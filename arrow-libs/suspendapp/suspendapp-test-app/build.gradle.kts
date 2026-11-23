@@ -3,14 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
   id(libs.plugins.kotlin.multiplatform.get().pluginId)
-  id(libs.plugins.spotless.get().pluginId)
+  id("arrow.spotless")
   alias(libs.plugins.shadow)
-}
-
-spotless {
-  kotlin {
-    ktlint().editorConfigOverride(mapOf("ktlint_standard_filename" to "disabled"))
-  }
 }
 
 kotlin {

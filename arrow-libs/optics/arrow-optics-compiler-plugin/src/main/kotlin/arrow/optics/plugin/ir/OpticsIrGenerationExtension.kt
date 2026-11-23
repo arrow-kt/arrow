@@ -1,5 +1,3 @@
-@file:OptIn(UnsafeDuringIrConstructionAPI::class)
-
 package arrow.optics.plugin.ir
 
 import arrow.optics.plugin.DslKind
@@ -39,7 +37,6 @@ import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrClassifierSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrTypeParameterSymbol
-import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
@@ -59,6 +56,8 @@ import org.jetbrains.kotlin.ir.util.properties
 import org.jetbrains.kotlin.ir.util.substitute
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
+import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
 class OpticsIrGenerationExtension : IrGenerationExtension {
@@ -67,6 +66,9 @@ class OpticsIrGenerationExtension : IrGenerationExtension {
     moduleFragment.acceptChildrenVoid(OpticsBodyGenerator(pluginContext, symbols))
   }
 }
+
+expect fun IrPluginContext.findFunctions(callableId: CallableId): Collection<IrSimpleFunctionSymbol>
+expect fun IrPluginContext.findClass(classId: ClassId): IrClassSymbol?
 
 /**
  * Resolved references to the `arrow.optics` API used inside generated bodies.
@@ -77,26 +79,24 @@ class OpticsIrGenerationExtension : IrGenerationExtension {
  * Overloads are picked by their parameter types (review 3.1).
  */
 class OpticsIrSymbols(private val ctx: IrPluginContext) {
-  val finder get() = ctx.finderForBuiltins()
-
   private val function1 get() = ctx.irBuiltIns.functionN(1).symbol
   private val function2 get() = ctx.irBuiltIns.functionN(2).symbol
 
   /** `PLens.Companion.invoke(get: (S) -> A, set: (S, B) -> T)`. */
   val lensInvoke: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.LENS_INVOKE).singleOrNull { it.regularParameterClassifiers() == listOf(function1, function2) }
+    ctx.findFunctions(OpticsNames.LENS_INVOKE).singleOrNull { it.regularParameterClassifiers() == listOf(function1, function2) }
       ?: missing(OpticsNames.LENS_INVOKE.toString())
   }
 
   /** `PIso.Companion.invoke(get: (S) -> A, reverseGet: (B) -> T)`. */
   val isoInvoke: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.ISO_INVOKE).singleOrNull { it.regularParameterClassifiers() == listOf(function1, function1) }
+    ctx.findFunctions(OpticsNames.ISO_INVOKE).singleOrNull { it.regularParameterClassifiers() == listOf(function1, function1) }
       ?: missing(OpticsNames.ISO_INVOKE.toString())
   }
 
   /** `PPrism.Companion.instanceOf<A, reified B : A>()`. */
   val prismInstanceOf: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.PRISM_INSTANCE_OF).singleOrNull {
+    ctx.findFunctions(OpticsNames.PRISM_INSTANCE_OF).singleOrNull {
       it.regularParameterClassifiers().isEmpty() && it.owner.typeParameters.size == 2 && it.owner.typeParameters[1].isReified
     } ?: missing(OpticsNames.PRISM_INSTANCE_OF.toString())
   }
@@ -110,7 +110,7 @@ class OpticsIrSymbols(private val ctx: IrPluginContext) {
     DslKind.entries.associate { kind ->
       val cls = findClass(OpticsNames.polyClassFor(kind))
       // `operator fun <C, D> plus(other: PSame<in A, out B, out C, in D>): PSame<S, T, C, D>`
-      val plus = finder.findFunctions(OpticsNames.plusFor(kind)).singleOrNull { it.regularParameterClassifiers() == listOf(cls) }
+      val plus = ctx.findFunctions(OpticsNames.plusFor(kind)).singleOrNull { it.regularParameterClassifiers() == listOf(cls) }
         ?: missing(OpticsNames.plusFor(kind).toString())
       cls to plus
     }
@@ -121,13 +121,13 @@ class OpticsIrSymbols(private val ctx: IrPluginContext) {
 
   /** `fun <A> A.copy(f: Copy<A>.() -> Unit): A`. */
   val arrowOpticsCopy: IrSimpleFunctionSymbol by lazy {
-    finder.findFunctions(OpticsNames.ARROW_OPTICS_COPY).singleOrNull { fn ->
+    ctx.findFunctions(OpticsNames.ARROW_OPTICS_COPY).singleOrNull { fn ->
       val receiver = fn.owner.parameters.singleOrNull { it.kind == IrParameterKind.ExtensionReceiver }
       receiver?.type?.classifierOrNull is IrTypeParameterSymbol && fn.regularParameterClassifiers() == listOf(function1)
     } ?: missing(OpticsNames.ARROW_OPTICS_COPY.toString())
   }
 
-  private fun findClass(classId: org.jetbrains.kotlin.name.ClassId): IrClassSymbol = finder.findClass(classId) ?: missing(classId.asString())
+  private fun findClass(classId: ClassId): IrClassSymbol = ctx.findClass(classId) ?: missing(classId.asString())
 
   private fun IrSimpleFunctionSymbol.regularParameterClassifiers(): List<IrClassifierSymbol?> = owner.parameters.filter { it.kind == IrParameterKind.Regular }.map { it.type.classifierOrNull }
 
