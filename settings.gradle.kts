@@ -154,6 +154,10 @@ project(":arrow-raise-ktor-server-resources").projectDir = file("arrow-libs/inte
 include("arrow-core-result4k")
 project(":arrow-core-result4k").projectDir = file("arrow-libs/integrations/arrow-core-result4k")
 
+// GENERIC
+include("arrow-generic")
+project(":arrow-generic").projectDir = file("arrow-libs/generic/arrow-generic")
+
 // STACK
 include("arrow-stack")
 project(":arrow-stack").projectDir = file("arrow-libs/stack")

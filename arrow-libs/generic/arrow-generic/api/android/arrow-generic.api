@@ -1,0 +1,112 @@
+public final class arrow/generic/DslKt {
+	public static final fun absurd (Larrow/generic/Generic$Void;)Ljava/lang/Void;
+	public static final fun and (Larrow/generic/Tagged;)Larrow/generic/Generic$And;
+	public static final fun and (Larrow/generic/Tagged;Larrow/generic/Generic$Product;)Larrow/generic/Generic$And;
+	public static final fun and (Larrow/generic/Tagged;Larrow/generic/Tagged;)Larrow/generic/Generic$And;
+	public static final fun and (Larrow/generic/Tagged;Larrow/generic/Tagged;Larrow/generic/Tagged;)Larrow/generic/Generic$And;
+	public static final fun getNil ()Larrow/generic/Generic$Nil;
+	public static final fun tag (Ljava/lang/Object;Ljava/lang/Object;)Larrow/generic/Tagged;
+	public static final fun that (Larrow/generic/Generic$Sum;)Larrow/generic/Generic$Or$That;
+	public static final fun this (Larrow/generic/Tagged;)Larrow/generic/Generic$Or$This;
+	public static final fun untagged (Ljava/lang/Object;)Larrow/generic/Tagged;
+}
+
+public abstract interface class arrow/generic/Generic {
+}
+
+public final class arrow/generic/Generic$And : arrow/generic/Generic$Product {
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Object;Larrow/generic/Generic$Product;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun component3 ()Larrow/generic/Generic$Product;
+	public final fun copy (Ljava/lang/Object;Ljava/lang/Object;Larrow/generic/Generic$Product;)Larrow/generic/Generic$And;
+	public static synthetic fun copy$default (Larrow/generic/Generic$And;Ljava/lang/Object;Ljava/lang/Object;Larrow/generic/Generic$Product;ILjava/lang/Object;)Larrow/generic/Generic$And;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun fold (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public final fun getRest ()Larrow/generic/Generic$Product;
+	public final fun getTag ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/Generic$Nil : arrow/generic/Generic$Product {
+	public static final field INSTANCE Larrow/generic/Generic$Nil;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun fold (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generic/Generic$Or : arrow/generic/Generic$Sum {
+}
+
+public final class arrow/generic/Generic$Or$That : arrow/generic/Generic$Or {
+	public fun <init> (Larrow/generic/Generic$Sum;)V
+	public final fun component1 ()Larrow/generic/Generic$Sum;
+	public final fun copy (Larrow/generic/Generic$Sum;)Larrow/generic/Generic$Or$That;
+	public static synthetic fun copy$default (Larrow/generic/Generic$Or$That;Larrow/generic/Generic$Sum;ILjava/lang/Object;)Larrow/generic/Generic$Or$That;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getThat ()Larrow/generic/Generic$Sum;
+	public fun hashCode ()I
+	public fun merge (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/generic/Generic$Or$This : arrow/generic/Generic$Or {
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;Ljava/lang/Object;)Larrow/generic/Generic$Or$This;
+	public static synthetic fun copy$default (Larrow/generic/Generic$Or$This;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Larrow/generic/Generic$Or$This;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTag ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun merge (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class arrow/generic/Generic$Product : arrow/generic/Generic {
+	public abstract fun fold (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/generic/Generic$Sum : arrow/generic/Generic {
+	public abstract fun merge (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+}
+
+public final class arrow/generic/Generic$Void : arrow/generic/Generic$Sum {
+	public fun merge (Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+}
+
+public abstract interface class arrow/generic/Repr {
+	public abstract fun fromGeneric (Larrow/generic/Generic$Sum;)Ljava/lang/Object;
+	public abstract fun toGeneric (Ljava/lang/Object;)Larrow/generic/Generic$Sum;
+}
+
+public final class arrow/generic/RepresentableKt {
+	public static final fun properties (Ljava/lang/Object;)Larrow/generic/Generic$Nil;
+	public static final fun properties (Ljava/lang/Object;Lkotlin/reflect/KProperty1;)Larrow/generic/Generic$And;
+	public static final fun properties (Ljava/lang/Object;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Larrow/generic/Generic$And;
+	public static final fun properties (Ljava/lang/Object;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;Lkotlin/reflect/KProperty1;)Larrow/generic/Generic$And;
+}
+
+public final class arrow/generic/Representables {
+	public static final field INSTANCE Larrow/generic/Representables;
+	public final fun either ()Larrow/generic/Repr;
+	public final fun pair ()Larrow/generic/Repr;
+}
+
+public final class arrow/generic/Tagged {
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;Ljava/lang/Object;)Larrow/generic/Tagged;
+	public static synthetic fun copy$default (Larrow/generic/Tagged;Ljava/lang/Object;Ljava/lang/Object;ILjava/lang/Object;)Larrow/generic/Tagged;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getTag ()Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

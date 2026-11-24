@@ -1,0 +1,125 @@
+// Klib ABI Dump
+// Targets: [androidNativeArm32, androidNativeArm64, androidNativeX64, androidNativeX86, iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, mingwX64, tvosArm64, tvosSimulatorArm64, wasmJs, wasmWasi, watchosArm32, watchosArm64, watchosDeviceArm64, watchosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.arrow-kt:arrow-generic>
+abstract interface <#A: kotlin/Any?, #B: arrow.generic/Generic.Sum<arrow.generic/Generic.Product<*, kotlin.reflect/KProperty1<*, *>>, kotlin.reflect/KClass<*>>> arrow.generic/Repr { // arrow.generic/Repr|null[0]
+    abstract fun (#A).toGeneric(): #B // arrow.generic/Repr.toGeneric|toGeneric@1:0(){}[0]
+    abstract fun (#B).fromGeneric(): #A // arrow.generic/Repr.fromGeneric|fromGeneric@1:1(){}[0]
+}
+
+abstract interface <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.generic/Generic { // arrow.generic/Generic|null[0]
+    sealed interface <#A1: out kotlin/Any?, #B1: out kotlin/Any?, #C1: out #A1, #D1: out #B1, #E1: out arrow.generic/Generic.Sum<#A1, #B1>> Or : arrow.generic/Generic.Sum<#A1, #B1> { // arrow.generic/Generic.Or|null[0]
+        final class <#A2: out kotlin/Any?, #B2: out kotlin/Any?, #C2: out #A2, #D2: out #B2> This : arrow.generic/Generic.Or<#A2, #B2, #C2, #D2, kotlin/Nothing> { // arrow.generic/Generic.Or.This|null[0]
+            constructor <init>(#D2, #C2) // arrow.generic/Generic.Or.This.<init>|<init>(1:3;1:2){}[0]
+
+            final val tag // arrow.generic/Generic.Or.This.tag|{}tag[0]
+                final fun <get-tag>(): #D2 // arrow.generic/Generic.Or.This.tag.<get-tag>|<get-tag>(){}[0]
+            final val value // arrow.generic/Generic.Or.This.value|{}value[0]
+                final fun <get-value>(): #C2 // arrow.generic/Generic.Or.This.value.<get-value>|<get-value>(){}[0]
+
+            final fun <#A3: kotlin/Any?> merge(kotlin/Function2<#B2, #A2, #A3>): #A3 // arrow.generic/Generic.Or.This.merge|merge(kotlin.Function2<1:1,1:0,0:0>){0§<kotlin.Any?>}[0]
+            final fun component1(): #D2 // arrow.generic/Generic.Or.This.component1|component1(){}[0]
+            final fun component2(): #C2 // arrow.generic/Generic.Or.This.component2|component2(){}[0]
+            final fun copy(#D2 = ..., #C2 = ...): arrow.generic/Generic.Or.This<#A2, #B2, #C2, #D2> // arrow.generic/Generic.Or.This.copy|copy(1:3;1:2){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.generic/Generic.Or.This.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.generic/Generic.Or.This.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.generic/Generic.Or.This.toString|toString(){}[0]
+        }
+
+        final class <#A2: out kotlin/Any?, #B2: out kotlin/Any?, #C2: out arrow.generic/Generic.Sum<#A2, #B2>> That : arrow.generic/Generic.Or<#A2, #B2, kotlin/Nothing, kotlin/Nothing, #C2> { // arrow.generic/Generic.Or.That|null[0]
+            constructor <init>(#C2) // arrow.generic/Generic.Or.That.<init>|<init>(1:2){}[0]
+
+            final val that // arrow.generic/Generic.Or.That.that|{}that[0]
+                final fun <get-that>(): #C2 // arrow.generic/Generic.Or.That.that.<get-that>|<get-that>(){}[0]
+
+            final fun <#A3: kotlin/Any?> merge(kotlin/Function2<#B2, #A2, #A3>): #A3 // arrow.generic/Generic.Or.That.merge|merge(kotlin.Function2<1:1,1:0,0:0>){0§<kotlin.Any?>}[0]
+            final fun component1(): #C2 // arrow.generic/Generic.Or.That.component1|component1(){}[0]
+            final fun copy(#C2 = ...): arrow.generic/Generic.Or.That<#A2, #B2, #C2> // arrow.generic/Generic.Or.That.copy|copy(1:2){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // arrow.generic/Generic.Or.That.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // arrow.generic/Generic.Or.That.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // arrow.generic/Generic.Or.That.toString|toString(){}[0]
+        }
+    }
+
+    sealed interface <#A1: out kotlin/Any?, #B1: out kotlin/Any?> Product : arrow.generic/Generic<#A1, #B1> { // arrow.generic/Generic.Product|null[0]
+        abstract fun <#A2: kotlin/Any?> fold(kotlin/Function3<#B1, #A1, #A2, #A2>, kotlin/Function0<#A2>): #A2 // arrow.generic/Generic.Product.fold|fold(kotlin.Function3<1:1,1:0,0:0,0:0>;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+    }
+
+    sealed interface <#A1: out kotlin/Any?, #B1: out kotlin/Any?> Sum : arrow.generic/Generic<#A1, #B1> { // arrow.generic/Generic.Sum|null[0]
+        abstract fun <#A2: kotlin/Any?> merge(kotlin/Function2<#B1, #A1, #A2>): #A2 // arrow.generic/Generic.Sum.merge|merge(kotlin.Function2<1:1,1:0,0:0>){0§<kotlin.Any?>}[0]
+    }
+
+    final class <#A1: out kotlin/Any?, #B1: out kotlin/Any?, #C1: out #A1, #D1: out #B1, #E1: out arrow.generic/Generic.Product<#A1, #B1>> And : arrow.generic/Generic.Product<#A1, #B1> { // arrow.generic/Generic.And|null[0]
+        constructor <init>(#D1, #C1, #E1) // arrow.generic/Generic.And.<init>|<init>(1:3;1:2;1:4){}[0]
+
+        final val rest // arrow.generic/Generic.And.rest|{}rest[0]
+            final fun <get-rest>(): #E1 // arrow.generic/Generic.And.rest.<get-rest>|<get-rest>(){}[0]
+        final val tag // arrow.generic/Generic.And.tag|{}tag[0]
+            final fun <get-tag>(): #D1 // arrow.generic/Generic.And.tag.<get-tag>|<get-tag>(){}[0]
+        final val value // arrow.generic/Generic.And.value|{}value[0]
+            final fun <get-value>(): #C1 // arrow.generic/Generic.And.value.<get-value>|<get-value>(){}[0]
+
+        final fun <#A2: kotlin/Any?> fold(kotlin/Function3<#B1, #A1, #A2, #A2>, kotlin/Function0<#A2>): #A2 // arrow.generic/Generic.And.fold|fold(kotlin.Function3<1:1,1:0,0:0,0:0>;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+        final fun component1(): #D1 // arrow.generic/Generic.And.component1|component1(){}[0]
+        final fun component2(): #C1 // arrow.generic/Generic.And.component2|component2(){}[0]
+        final fun component3(): #E1 // arrow.generic/Generic.And.component3|component3(){}[0]
+        final fun copy(#D1 = ..., #C1 = ..., #E1 = ...): arrow.generic/Generic.And<#A1, #B1, #C1, #D1, #E1> // arrow.generic/Generic.And.copy|copy(1:3;1:2;1:4){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.generic/Generic.And.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.generic/Generic.And.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // arrow.generic/Generic.And.toString|toString(){}[0]
+    }
+
+    final class Void : arrow.generic/Generic.Sum<kotlin/Nothing, kotlin/Nothing> { // arrow.generic/Generic.Void|null[0]
+        final fun <#A2: kotlin/Any?> merge(kotlin/Function2<kotlin/Nothing, kotlin/Nothing, #A2>): #A2 // arrow.generic/Generic.Void.merge|merge(kotlin.Function2<kotlin.Nothing,kotlin.Nothing,0:0>){0§<kotlin.Any?>}[0]
+    }
+
+    final object Nil : arrow.generic/Generic.Product<kotlin/Nothing, kotlin/Nothing> { // arrow.generic/Generic.Nil|null[0]
+        final fun <#A2: kotlin/Any?> fold(kotlin/Function3<kotlin/Nothing, kotlin/Nothing, #A2, #A2>, kotlin/Function0<#A2>): #A2 // arrow.generic/Generic.Nil.fold|fold(kotlin.Function3<kotlin.Nothing,kotlin.Nothing,0:0,0:0>;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // arrow.generic/Generic.Nil.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // arrow.generic/Generic.Nil.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // arrow.generic/Generic.Nil.toString|toString(){}[0]
+    }
+}
+
+final class <#A: out kotlin/Any?, #B: out kotlin/Any?> arrow.generic/Tagged { // arrow.generic/Tagged|null[0]
+    constructor <init>(#B, #A) // arrow.generic/Tagged.<init>|<init>(1:1;1:0){}[0]
+
+    final val tag // arrow.generic/Tagged.tag|{}tag[0]
+        final fun <get-tag>(): #B // arrow.generic/Tagged.tag.<get-tag>|<get-tag>(){}[0]
+    final val value // arrow.generic/Tagged.value|{}value[0]
+        final fun <get-value>(): #A // arrow.generic/Tagged.value.<get-value>|<get-value>(){}[0]
+
+    final fun component1(): #B // arrow.generic/Tagged.component1|component1(){}[0]
+    final fun component2(): #A // arrow.generic/Tagged.component2|component2(){}[0]
+    final fun copy(#B = ..., #A = ...): arrow.generic/Tagged<#A, #B> // arrow.generic/Tagged.copy|copy(1:1;1:0){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // arrow.generic/Tagged.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // arrow.generic/Tagged.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // arrow.generic/Tagged.toString|toString(){}[0]
+}
+
+final object arrow.generic/Representables { // arrow.generic/Representables|null[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> either(): arrow.generic/Repr<arrow.core/Either<#A1, #B1>, arrow.generic/Generic.Or<arrow.generic/Generic.Product<*, kotlin.reflect/KProperty1<*, *>>, kotlin.reflect/KClass<*>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #A1, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.Nil>, kotlin.reflect/KClass<*>, arrow.generic/Generic.Or<arrow.generic/Generic.Product<*, kotlin.reflect/KProperty1<*, *>>, kotlin.reflect/KClass<*>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #B1, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.Nil>, kotlin.reflect/KClass<*>, arrow.generic/Generic.Void>>> // arrow.generic/Representables.either|either(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> pair(): arrow.generic/Repr<kotlin/Pair<#A1, #B1>, arrow.generic/Generic.Or<arrow.generic/Generic.Product<*, kotlin.reflect/KProperty1<*, *>>, kotlin.reflect/KClass<*>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #A1, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #B1, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.Nil>>, kotlin.reflect/KClass<*>, arrow.generic/Generic.Void>> // arrow.generic/Representables.pair|pair(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+}
+
+final val arrow.generic/nil // arrow.generic/nil|{}nil[0]
+    final fun <get-nil>(): arrow.generic/Generic.Nil // arrow.generic/nil.<get-nil>|<get-nil>(){}[0]
+
+final fun (arrow.generic/Generic.Void).arrow.generic/absurd(): kotlin/Nothing // arrow.generic/absurd|absurd@arrow.generic.Generic.Void(){}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: #A, #D: #B, #E: #A, #F: #B, #G: #A, #H: #B> arrow.generic/and(arrow.generic/Tagged<#C, #D>, arrow.generic/Tagged<#E, #F>, arrow.generic/Tagged<#G, #H>): arrow.generic/Generic.And<#A, #B, #C, #D, arrow.generic/Generic.And<#A, #B, #E, #F, arrow.generic/Generic.And<#A, #B, #G, #H, arrow.generic/Generic.Nil>>> // arrow.generic/and|and(arrow.generic.Tagged<0:2,0:3>;arrow.generic.Tagged<0:4,0:5>;arrow.generic.Tagged<0:6,0:7>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<0:0>;3§<0:1>;4§<0:0>;5§<0:1>;6§<0:0>;7§<0:1>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: #A, #D: #B, #E: #A, #F: #B> arrow.generic/and(arrow.generic/Tagged<#C, #D>, arrow.generic/Tagged<#E, #F>): arrow.generic/Generic.And<#A, #B, #C, #D, arrow.generic/Generic.And<#A, #B, #E, #F, arrow.generic/Generic.Nil>> // arrow.generic/and|and(arrow.generic.Tagged<0:2,0:3>;arrow.generic.Tagged<0:4,0:5>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<0:0>;3§<0:1>;4§<0:0>;5§<0:1>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: #A, #D: #B, #E: arrow.generic/Generic.Product<#A, #B>> (arrow.generic/Tagged<#C, #D>).arrow.generic/and(#E): arrow.generic/Generic.And<#A, #B, #C, #D, #E> // arrow.generic/and|and@arrow.generic.Tagged<0:2,0:3>(0:4){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<0:0>;3§<0:1>;4§<arrow.generic.Generic.Product<0:0,0:1>>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: #A, #D: #B> (arrow.generic/Tagged<#C, #D>).arrow.generic/this(): arrow.generic/Generic.Or.This<#A, #B, #C, #D> // arrow.generic/this|this@arrow.generic.Tagged<0:2,0:3>(){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<0:0>;3§<0:1>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: #A, #D: #B> arrow.generic/and(arrow.generic/Tagged<#C, #D>): arrow.generic/Generic.And<#A, #B, #C, #D, arrow.generic/Generic.Nil> // arrow.generic/and|and(arrow.generic.Tagged<0:2,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<0:0>;3§<0:1>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: arrow.generic/Generic.Sum<#A, #B>> (#C).arrow.generic/that(): arrow.generic/Generic.Or.That<#A, #B, #C> // arrow.generic/that|that@0:2(){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<arrow.generic.Generic.Sum<0:0,0:1>>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?> (#A).arrow.generic/properties(kotlin.reflect/KProperty1<#A, #B>, kotlin.reflect/KProperty1<#A, #C>, kotlin.reflect/KProperty1<#A, #D>): arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #B, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #C, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #D, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.Nil>>> // arrow.generic/properties|properties@0:0(kotlin.reflect.KProperty1<0:0,0:1>;kotlin.reflect.KProperty1<0:0,0:2>;kotlin.reflect.KProperty1<0:0,0:3>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> (#A).arrow.generic/properties(kotlin.reflect/KProperty1<#A, #B>, kotlin.reflect/KProperty1<#A, #C>): arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #B, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #C, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.Nil>> // arrow.generic/properties|properties@0:0(kotlin.reflect.KProperty1<0:0,0:1>;kotlin.reflect.KProperty1<0:0,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (#A).arrow.generic/properties(kotlin.reflect/KProperty1<#A, #B>): arrow.generic/Generic.And<*, kotlin.reflect/KProperty1<*, *>, #B, kotlin.reflect/KProperty1<*, *>, arrow.generic/Generic.Nil> // arrow.generic/properties|properties@0:0(kotlin.reflect.KProperty1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (#A).arrow.generic/tag(#B): arrow.generic/Tagged<#A, #B> // arrow.generic/tag|tag@0:0(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (#A).arrow.generic/properties(): arrow.generic/Generic.Nil // arrow.generic/properties|properties@0:0(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (#A).arrow.generic/untagged(): arrow.generic/Tagged<#A, kotlin/Nothing?> // arrow.generic/untagged|untagged@0:0(){0§<kotlin.Any?>}[0]
+final inline fun <#A: kotlin/Any?, #B: reified kotlin/Any?> (#A).arrow.generic/withClass(): arrow.generic/Tagged<#A, kotlin.reflect/KClass<*>> // arrow.generic/withClass|withClass@0:0(){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
