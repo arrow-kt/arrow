@@ -19,8 +19,6 @@ kotlin {
   }
 
   compilerOptions {
-    freeCompilerArgs.add("-Xcollection-literals")
-    freeCompilerArgs.add("-Xname-based-destructuring=only-syntax")
     freeCompilerArgs.add("-Xnested-type-aliases")
   }
 }
