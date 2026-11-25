@@ -22,7 +22,7 @@ fun Jar.addToTestTask(test: Test) {
 
 fun AbstractExecTask<*>.addToTestTask(test: Test) {
   test.dependsOn(taskDependencies)
-  test.systemProperty("$name.executable", executable!!)
+  executable?.let { test.systemProperty("$name.executable", it) }
   test.systemProperty("$name.workdir", workingDir.absolutePath)
   if (this is NodeJsExec) {
     test.systemProperty("$name.entrypoint", inputFileProperty.map { it.asFile.absolutePath }.get())
