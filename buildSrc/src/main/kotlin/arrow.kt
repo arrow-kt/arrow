@@ -17,6 +17,7 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions(providers: ProviderFactory
     "-Xexpect-actual-classes",
     "-Xcontext-parameters",
     "-Xcollection-literals",
+    "-Xname-based-destructuring=name-mismatch",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
     "-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled",

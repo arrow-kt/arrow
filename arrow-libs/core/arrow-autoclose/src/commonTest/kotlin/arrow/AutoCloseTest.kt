@@ -195,49 +195,49 @@ class AutoCloseTest {
   }
 
   @Test
-  fun normalRaise() = shouldAutoCloseWithSecond({}) { throw ControlCancellationException("second") }
+  fun normalRaise(): Unit = shouldAutoCloseWithSecond({}) { throw ControlCancellationException("second") }
 
   @Test
-  fun returnRaise() = shouldAutoCloseWithSecond({ return }) { throw ControlCancellationException("second") }
+  fun returnRaise(): Unit = shouldAutoCloseWithSecond({ return }) { throw ControlCancellationException("second") }
 
   @Test
-  fun raiseRaise() = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw ControlCancellationException("second") }
+  fun raiseRaise(): Unit = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw ControlCancellationException("second") }
 
   @Test
-  fun cancelRaise() = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw ControlCancellationException("second") }
+  fun cancelRaise(): Unit = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw ControlCancellationException("second") }
 
   @Test
-  fun throwRaise() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw ControlCancellationException("second") }
+  fun throwRaise(): Unit = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw ControlCancellationException("second") }
 
   @Test
-  fun normalCancel() = shouldAutoCloseWithSecond({}) { throw CancellationException("second") }
+  fun normalCancel(): Unit = shouldAutoCloseWithSecond({}) { throw CancellationException("second") }
 
   @Test
-  fun returnCancel() = shouldAutoCloseWithSecond({ return }) { throw CancellationException("second") }
+  fun returnCancel(): Unit = shouldAutoCloseWithSecond({ return }) { throw CancellationException("second") }
 
   @Test
-  fun raiseCancel() = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw CancellationException("second") }
+  fun raiseCancel(): Unit = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw CancellationException("second") }
 
   @Test
-  fun cancelCancel() = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw CancellationException("second") }
+  fun cancelCancel(): Unit = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw CancellationException("second") }
 
   @Test
-  fun throwCancel() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw CancellationException("second") }
+  fun throwCancel(): Unit = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw CancellationException("second") }
 
   @Test
-  fun normalThrow() = shouldAutoCloseWithSecond({}) { throw RuntimeException("second") }
+  fun normalThrow(): Unit = shouldAutoCloseWithSecond({}) { throw RuntimeException("second") }
 
   @Test
-  fun returnThrow() = shouldAutoCloseWithSecond({ return }) { throw RuntimeException("second") }
+  fun returnThrow(): Unit = shouldAutoCloseWithSecond({ return }) { throw RuntimeException("second") }
 
   @Test
-  fun raiseThrow() = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw RuntimeException("second") }
+  fun raiseThrow(): Unit = shouldAutoCloseWithSecond({ throw ControlCancellationException("first") }) { throw RuntimeException("second") }
 
   @Test
-  fun cancelThrow() = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw RuntimeException("second") }
+  fun cancelThrow(): Unit = shouldAutoCloseWithFirst({ throw CancellationException("first") }) { throw RuntimeException("second") }
 
   @Test
-  fun throwThrow() = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw RuntimeException("second") }
+  fun throwThrow(): Unit = shouldAutoCloseWithFirst({ throw RuntimeException("first") }) { throw RuntimeException("second") }
 }
 
 // copied from Kotest so we can inline it
@@ -290,8 +290,8 @@ private inline fun shouldAutoCloseWithFirst(first: () -> Unit, crossinline secon
   lateinit var secondThrowable: Throwable
   try {
     autoCloseScope {
-      onClose {
-        it shouldBe firstThrowable
+      onClose { throwable ->
+        throwable shouldBe firstThrowable
         peekThrowable(second) { secondThrowable = it }
       }
       peekThrowable(first) { firstThrowable = it }
@@ -310,8 +310,8 @@ private inline fun shouldAutoCloseWithSecond(first: () -> Unit, crossinline seco
   var finishedWithThrowable = false
   try {
     autoCloseScope {
-      onClose {
-        it shouldBe firstThrowable
+      onClose { throwable ->
+        throwable shouldBe firstThrowable
         peekThrowable(second) { secondThrowable = it }
       }
       peekThrowable(first) { firstThrowable = it }
