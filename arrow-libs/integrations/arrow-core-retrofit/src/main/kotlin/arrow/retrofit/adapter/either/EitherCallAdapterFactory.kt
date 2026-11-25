@@ -95,7 +95,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     val wrapperType = getParameterUpperBound(0, returnType)
     return when (getRawType(wrapperType)) {
       Either::class.java -> {
-        val [errorType, bodyType] = extractErrorAndReturnType(wrapperType, returnType)
+        val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
         if (errorType == CallError::class.java) {
           NetworkEitherCallAdapter(bodyType)
         } else {
@@ -104,7 +104,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
       }
 
       ResponseE::class.java -> {
-        val [errorType, bodyType] = extractErrorAndReturnType(wrapperType, returnType)
+        val (errorType, bodyType) = extractErrorAndReturnType(wrapperType, returnType)
         ArrowResponseECallAdapter<Any?, Type>(retrofit, errorType, bodyType)
       }
 
@@ -112,7 +112,9 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     }
   }
 
-  private fun extractErrorAndReturnType(wrapperType: Type, returnType: ParameterizedType): Pair<Type, Type> {
+  private data class ErrorAndReturnType(val errorType: Type, val bodyType: Type)
+
+  private fun extractErrorAndReturnType(wrapperType: Type, returnType: ParameterizedType): ErrorAndReturnType {
     if (wrapperType !is ParameterizedType) {
       val name = parseTypeName(returnType)
       throw IllegalArgumentException(
@@ -122,7 +124,7 @@ public class EitherCallAdapterFactory : CallAdapter.Factory() {
     }
     val errorType = getParameterUpperBound(0, wrapperType)
     val bodyType = getParameterUpperBound(1, wrapperType)
-    return Pair(errorType, bodyType)
+    return ErrorAndReturnType(errorType, bodyType)
   }
 }
 
