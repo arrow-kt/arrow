@@ -1,5 +1,5 @@
 plugins {
-  kotlin("multiplatform") version "2.5.0-RC"
+  kotlin("multiplatform") version "2.5.0-RC2"
   id("io.arrow-kt.optics") version "10.0-test"
 }
 
