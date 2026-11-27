@@ -1,5 +1,7 @@
 package arrow.collectors
 
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyMutableCollection
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
@@ -10,6 +12,7 @@ import java.util.concurrent.ConcurrentMap
  * so it's potential faster than [Collectors.mapFromEntries].
  */
 @Suppress("UnusedReceiverParameter")
+@IntentionallyMutableCollection(reason = ExemptionReason.API_DESIGN)
 public fun <K : Any, V : Any> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, ConcurrentMap<K, V>> =
   Collectors.concurrentMap<K, V>().contramapNonSuspend { [k, v] -> k to v }
 
@@ -20,6 +23,7 @@ public fun <K : Any, V : Any> Collectors.concurrentMapFromEntries(): NonSuspendC
  * so it's potential faster than [Collectors.map].
  */
 @Suppress("UnusedReceiverParameter")
+@IntentionallyMutableCollection(reason = ExemptionReason.API_DESIGN)
 public fun <K : Any, V : Any> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, ConcurrentMap<K, V>> = Collector.nonSuspendOf(
   supply = { ConcurrentHashMap<K, V>() },
   accumulate = { current, [k, v] -> current[k] = v },

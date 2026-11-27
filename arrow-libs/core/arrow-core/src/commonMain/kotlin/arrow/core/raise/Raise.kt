@@ -12,6 +12,8 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.core.recover
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -628,6 +630,7 @@ public inline fun <reified T : Throwable, A, B> catch(block: () -> A, transform:
  *
  */
 @OptIn(ExperimentalExtendedContracts::class)
+@IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
 @RaiseDSL
 public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> Error) {
   contract {

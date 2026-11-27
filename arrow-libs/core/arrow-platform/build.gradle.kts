@@ -16,7 +16,7 @@ kotlin {
     }
     jvmMain {
       dependencies {
-        implementation(kotlin("test-junit5"))
+        api(kotlin("test-junit5"))
       }
     }
     jsMain {

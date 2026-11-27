@@ -19,6 +19,7 @@ import arrow.core.raise.RaiseAccumulate.Ok
 import arrow.core.raise.RaiseAccumulate.Value
 import arrow.core.toNonEmptyListOrNull
 import arrow.core.wrapAsNonEmptySetOrThrow
+import kotlinx.library.watchdog.IntentionallyExposedInternalApiForBackwardsCompatibility
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.AT_LEAST_ONCE
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
@@ -871,8 +872,9 @@ public inline fun <Error, A, R> accumulate(
  * Allows binding both [Either] and [EitherNel] values for [Either.Left] types of [Error].
  * It extends [Raise] of [Error], and allows working over [Raise] of [NonEmptyList] of [Error] as well.
  */
-@OptIn(ExperimentalSubclassOptIn::class, ExperimentalRaiseAccumulateApi::class)
+@OptIn(ExperimentalRaiseAccumulateApi::class)
 @Suppress("DEPRECATION")
+@IntentionallyExposedInternalApiForBackwardsCompatibility
 @SubclassOptInRequired(ExperimentalRaiseAccumulateApi::class)
 public open class RaiseAccumulate<Error> @ExperimentalRaiseAccumulateApi constructor(
   accumulate: Accumulate<Error>,

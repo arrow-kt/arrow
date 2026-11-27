@@ -1,6 +1,8 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import groovy.util.Node
 import groovy.util.NodeList
+import kotlinx.library.watchdog.WatchdogGradleExtension
+import kotlinx.library.watchdog.WatchdogSeverity
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -78,6 +80,26 @@ plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
 plugins.apply("org.jetbrains.kotlinx.kover")
 plugins.apply("arrow.publish")
+
+if (needsAbiValidation) {
+  plugins.apply("org.jetbrains.kotlin.library.api-watchdog")
+
+  configure<WatchdogGradleExtension> {
+    statefulClassWithoutEquals = WatchdogSeverity.NONE
+    statefulClassWithoutHashCode = WatchdogSeverity.NONE
+    statefulClassWithoutToString = WatchdogSeverity.NONE
+    inlineFunctionWithLogic = WatchdogSeverity.NONE
+    undocumentedPublicApi = WatchdogSeverity.NONE
+    openApiWithoutSubclassOptIn = WatchdogSeverity.NONE
+    dataClassPublicApi = WatchdogSeverity.NONE
+    exhaustivePublicApi = WatchdogSeverity.NONE
+    functionTypeAliasPublicApi = WatchdogSeverity.NONE
+    pairOrTriplePublicApi = WatchdogSeverity.NONE
+    dslMarkerWithoutExplicitTargets = WatchdogSeverity.NONE
+    inconsistentParameterOrderInOverloads = WatchdogSeverity.NONE
+    javaInterop { enabled = false }
+  }
+}
 
 val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks {

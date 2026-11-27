@@ -3,6 +3,8 @@ package arrow.collectors
 import arrow.atomic.Atomic
 import arrow.atomic.AtomicInt
 import arrow.atomic.update
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 
 /**
  * Library of [Collector]s.
@@ -45,6 +47,7 @@ public object Collectors {
     finish = AtomicInt::get,
   )
 
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   public fun <M> reducer(
     initial: () -> M, combine: (M, M) -> M, unordered: Boolean = false,
   ): NonSuspendCollector<M, M> = Collector.nonSuspendOf(

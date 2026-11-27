@@ -35,6 +35,7 @@ plugins {
   alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.kotlinx.knit)
   id(libs.plugins.kotlinx.kover.get().pluginId)
+  id(libs.plugins.kotlin.watchdog.aggregation.get().pluginId)
 }
 
 configure<KnitPluginExtension> {
@@ -110,6 +111,36 @@ dependencies {
   dokka(projects.arrowExceptionUtils)
   dokka(projects.suspendapp)
   dokka(projects.suspendappKtor)
+}
+
+dependencies {
+  apiWatchdogReports(projects.arrowAnnotations)
+  apiWatchdogReports(projects.arrowAtomic)
+  apiWatchdogReports(projects.arrowAutoclose)
+  apiWatchdogReports(projects.arrowCore)
+  apiWatchdogReports(projects.arrowCoreHighArity)
+  apiWatchdogReports(projects.arrowCache4k)
+  apiWatchdogReports(projects.arrowEval)
+  apiWatchdogReports(projects.arrowFunctions)
+  apiWatchdogReports(projects.arrowPlatform)
+  apiWatchdogReports(projects.arrowFxCoroutines)
+  apiWatchdogReports(projects.arrowFxStm)
+  apiWatchdogReports(projects.arrowCollectors)
+  apiWatchdogReports(projects.arrowOptics)
+  apiWatchdogReports(projects.arrowOpticsReflect)
+  apiWatchdogReports(projects.arrowOpticsCompose)
+  apiWatchdogReports(projects.arrowResilience)
+  apiWatchdogReports(projects.arrowCoreResult4k)
+  apiWatchdogReports(projects.arrowExceptionUtils)
+  apiWatchdogReports(projects.suspendapp)
+}
+
+tasks.aggregateApiWatchdogReports {
+  reports {
+    html = true
+    htmlFile = layout.buildDirectory.file("reports/api-watchdog/aggregate-report.html")
+    sarif = false
+  }
 }
 
 dokka {

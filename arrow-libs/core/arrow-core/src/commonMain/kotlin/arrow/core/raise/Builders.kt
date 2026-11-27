@@ -19,6 +19,8 @@ import arrow.core.Some
 import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -227,6 +229,7 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
   override val isTraced: Boolean
     get() = raise.isTraced
 
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   @RaiseDSL
   public fun ensure(condition: Boolean) {
     contract { returns() implies condition }

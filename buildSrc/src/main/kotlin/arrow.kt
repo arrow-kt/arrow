@@ -19,6 +19,7 @@ fun KotlinCommonCompilerOptions.commonCompilerOptions(providers: ProviderFactory
     "-Xcollection-literals",
     "-Xname-based-destructuring=complete",
     "-Xstrict-equality-for-structural-classes",
+    "-Xannotation-default-target=param-property",
     "-Xwarning-level=ERROR_SUPPRESSION:disabled",
     "-Xwarning-level=NOTHING_TO_INLINE:disabled",
     "-Xwarning-level=DSL_MARKER_APPLIED_TO_WRONG_TARGET:disabled",

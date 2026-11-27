@@ -17,4 +17,5 @@ dependencies {
   implementation(libs.gradlePlugin.kover)
   implementation(libs.gradlePlugin.dokka)
   implementation(libs.gradlePlugin.publish)
+  implementation(libs.gradlePlugin.kotlin.watchdog)
 }

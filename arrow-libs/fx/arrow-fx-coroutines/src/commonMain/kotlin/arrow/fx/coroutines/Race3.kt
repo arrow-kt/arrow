@@ -13,6 +13,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.selects.select
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyRequiredParameterAfterOptional
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
@@ -80,6 +82,7 @@ public suspend inline fun <A, B, C> raceN(
  * @see raceN for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C> raceN(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,

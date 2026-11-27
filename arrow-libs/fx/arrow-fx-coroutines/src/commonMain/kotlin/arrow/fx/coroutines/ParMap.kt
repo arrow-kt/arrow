@@ -13,9 +13,12 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyRequiredParameterAfterOptional
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend fun <A, B> Iterable<A>.parMap(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
@@ -34,6 +37,7 @@ public suspend fun <A, B> Iterable<A>.parMap(
   map { async(context) { transform.invoke(this, it) } }.awaitAll()
 }
 
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend fun <A, B> Iterable<A>.parMapNotNull(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
@@ -54,6 +58,7 @@ public class ScopedRaiseAccumulate<Error>(
   scope: CoroutineScope
 ) : CoroutineScope by scope, RaiseAccumulate<Error>(raise)
 
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,
@@ -73,6 +78,7 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
     }.awaitAll().flattenOrAccumulate(combine)
   }
 
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   combine: (Error, Error) -> Error,
@@ -88,6 +94,7 @@ public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
     }.awaitAll().flattenOrAccumulate(combine)
   }
 
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend fun <Error, A, B> Iterable<A>.parMapOrAccumulate(
   context: CoroutineContext = EmptyCoroutineContext,
   concurrency: Int,

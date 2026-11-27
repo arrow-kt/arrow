@@ -25,6 +25,8 @@ import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.zip
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -219,6 +221,7 @@ public fun <A> Flow<A>.metered(period: Duration): Flow<A> =
 public fun <A> Flow<A>.metered(period: Long): Flow<A> =
   fixedRate(period).zip(this) { _, a -> a }
 
+@IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
 @ExperimentalTime
 public fun fixedRate(
   periodInMillis: Long,
@@ -243,6 +246,7 @@ public fun fixedRate(
  * @param dampen if you set [dampen] to false it will send `n` times [period] time it took downstream to process the emission.
  * @param timeStamp allows for supplying a different timestamp function, useful to override with `runBlockingTest`
  */
+@IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
 public fun fixedRate(
   period: Duration,
   dampen: Boolean = true,
