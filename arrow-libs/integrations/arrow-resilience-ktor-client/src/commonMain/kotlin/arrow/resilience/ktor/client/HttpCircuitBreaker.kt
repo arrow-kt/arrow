@@ -20,7 +20,6 @@ import io.ktor.util.AttributeKey
 import io.ktor.utils.io.KtorDsl
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 import kotlinx.coroutines.CompletableJob
 
@@ -47,7 +46,6 @@ public class HttpCircuitBreaker internal constructor(configuration: Configuratio
   /**
    * Contains [HttpCircuitBreaker] configurations settings.
    */
-  @OptIn(ExperimentalTime::class)
   @KtorDsl
   public class Configuration {
     internal var breaker: CircuitBreaker

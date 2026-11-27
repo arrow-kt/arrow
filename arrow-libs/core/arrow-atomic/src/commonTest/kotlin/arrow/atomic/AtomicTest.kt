@@ -65,7 +65,7 @@ class AtomicTest {
   fun tryUpdateModificationOccursSuccessfully() = runTest {
     checkAll(Arb.string()) { x ->
       val ref = Atomic(x)
-      ref.tryUpdate { it + 1 }
+      val _ = ref.tryUpdate { it + 1 }
       ref.value shouldBe x + 1
     }
   }
@@ -75,7 +75,7 @@ class AtomicTest {
     checkAll(Arb.string()) { x ->
       val ref = Atomic(x)
       ref.tryUpdate {
-        suspend { ref.update { it + "a" } }
+        val _ = suspend { ref.update { it + "a" } }
           .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { })
         it + "b"
       } shouldBe false
@@ -105,7 +105,7 @@ class AtomicTest {
   fun concurrentModifications() = runTestWithDelay {
     val finalValue = stackSafeIteration()
     val r = Atomic("")
-    (0 until finalValue).parMap { r.update { it + "a" } }
+    val _ = (0 until finalValue).parMap { r.update { it + "a" } }
     r.value shouldBe "a".repeat(finalValue)
   }
 }

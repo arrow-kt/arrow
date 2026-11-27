@@ -1,5 +1,7 @@
 package arrow.collectors
 
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyMutableCollection
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
@@ -10,8 +12,9 @@ import java.util.concurrent.ConcurrentMap
  * so it's potential faster than [Collectors.mapFromEntries].
  */
 @Suppress("UnusedReceiverParameter")
-public fun <K, V> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, ConcurrentMap<K, V>> =
-  Collectors.concurrentMap<K, V>().contramapNonSuspend { (k, v) -> k to v }
+@IntentionallyMutableCollection(reason = ExemptionReason.API_DESIGN)
+public fun <K : Any, V : Any> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, ConcurrentMap<K, V>> =
+  Collectors.concurrentMap<K, V>().contramapNonSuspend { [k, v] -> k to v }
 
 /**
  * Collects all the values in a map.
@@ -20,9 +23,10 @@ public fun <K, V> Collectors.concurrentMapFromEntries(): NonSuspendCollector<Map
  * so it's potential faster than [Collectors.map].
  */
 @Suppress("UnusedReceiverParameter")
-public fun <K, V> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, ConcurrentMap<K, V>> = Collector.nonSuspendOf(
+@IntentionallyMutableCollection(reason = ExemptionReason.API_DESIGN)
+public fun <K : Any, V : Any> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, ConcurrentMap<K, V>> = Collector.nonSuspendOf(
   supply = { ConcurrentHashMap<K, V>() },
-  accumulate = { current, (k, v) -> current[k] = v },
+  accumulate = { current, [k, v] -> current[k] = v },
   finish = { it },
   characteristics = Characteristics.IDENTITY_CONCURRENT_UNORDERED
 )
@@ -34,7 +38,7 @@ public fun <K, V> Collectors.concurrentMap(): NonSuspendCollector<Pair<K, V>, Co
  * so it's potential faster than [Collectors.set].
  */
 @Suppress("UnusedReceiverParameter")
-public fun <T> Collectors.concurrentSet(): NonSuspendCollector<T, Set<T>> = Collector.nonSuspendOf(
+public fun <T : Any> Collectors.concurrentSet(): NonSuspendCollector<T, Set<T>> = Collector.nonSuspendOf(
   supply = { ConcurrentHashMap<T, Unit>().keySet(Unit) },
   accumulate = ConcurrentHashMap.KeySetView<T, Unit>::add,
   finish = { it },

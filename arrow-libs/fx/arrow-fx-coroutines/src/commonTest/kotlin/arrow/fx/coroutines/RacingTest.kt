@@ -284,7 +284,7 @@ class RacingTest {
     }
 
     assertEquals("success", result)
-    assertTrue(withTimeoutOrNull(600.milliseconds) { exceptionHandlerCalled.await() } == true)
+    assertEquals(true, withTimeoutOrNull(600.milliseconds) { exceptionHandlerCalled.await() })
     assertEquals(2, exceptionsHandled.size)
     assertTrue(exceptionsHandled.any { it is IllegalStateException && it.message == "First exception" })
     assertTrue(exceptionsHandled.any { it is RuntimeException && it.message == "Second exception" })
@@ -345,6 +345,6 @@ class RacingTest {
     val exception = withTimeoutOrNull(600.milliseconds) { nonCancellationExceptionHandled.await() }
     assertIs<RuntimeException>(exception)
     assertEquals("Non-cancellation exception", exception.message)
-    assertTrue(withTimeoutOrNull(600.milliseconds) { cancellationExceptionThrown.await() } == true)
+    assertEquals(true, withTimeoutOrNull(600.milliseconds) { cancellationExceptionThrown.await() })
   }
 }

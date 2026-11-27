@@ -2,6 +2,8 @@
 
 package arrow.atomic
 
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -15,19 +17,27 @@ public class AtomicBoolean(value: Boolean) {
       inner.value = value.toInt()
     }
 
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   public fun compareAndSet(expected: Boolean, new: Boolean): Boolean =
     inner.compareAndSet(expected.toInt(), new.toInt())
 
   public fun get(): Boolean = value
+
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   public fun set(value: Boolean) {
      this.value = value
   }
 
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   public fun getAndSet(value: Boolean): Boolean =
     inner.getAndSet(value.toInt()) == 1
 
   private fun Boolean.toInt(): Int =
     if (this) 1 else 0
+
+  override fun equals(other: Any?): Boolean = other is AtomicBoolean && inner == other.inner
+  override fun hashCode(): Int = inner.hashCode()
+  override fun toString(): String = value.toString()
 }
 
 

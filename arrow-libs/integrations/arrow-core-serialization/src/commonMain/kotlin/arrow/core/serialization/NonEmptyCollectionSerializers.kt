@@ -5,7 +5,6 @@ import arrow.core.NonEmptySet
 import arrow.core.PotentiallyUnsafeNonEmptyOperation
 import arrow.core.wrapAsNonEmptyListOrNull
 import arrow.core.wrapAsNonEmptySetOrNull
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
@@ -19,7 +18,6 @@ public class NonEmptyListSerializer<T>(
 ) : KSerializer<NonEmptyList<T>> {
   private val listSerializer: KSerializer<List<T>> = ListSerializer(elementSerializer)
 
-  @OptIn(ExperimentalSerializationApi::class)
   override val descriptor: SerialDescriptor =
     SerialDescriptor("NonEmptyList", listSerializer.descriptor)
   override fun serialize(encoder: Encoder, value: NonEmptyList<T>) {
@@ -36,7 +34,6 @@ public class NonEmptySetSerializer<T>(
 ) : KSerializer<NonEmptySet<T>> {
   private val setSerializer: KSerializer<Set<T>> = SetSerializer(elementSerializer)
 
-  @OptIn(ExperimentalSerializationApi::class)
   override val descriptor: SerialDescriptor =
     SerialDescriptor("NonEmptySet", setSerializer.descriptor)
   override fun serialize(encoder: Encoder, value: NonEmptySet<T>) {

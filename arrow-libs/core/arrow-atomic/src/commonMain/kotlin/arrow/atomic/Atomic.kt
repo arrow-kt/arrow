@@ -17,7 +17,7 @@ import kotlin.contracts.contract
  *
  * suspend fun main() {
  *   val count = AtomicInt(0)
- *   (0 until 20_000).parMap {
+ *   val _ = (0 until 20_000).parMap {
  *     count.update(Int::inc)
  *   }
  *   println(count.value)

@@ -1,6 +1,8 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import groovy.util.Node
 import groovy.util.NodeList
+import kotlinx.library.watchdog.WatchdogGradleExtension
+import kotlinx.library.watchdog.WatchdogSeverity
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -78,6 +80,26 @@ plugins.apply("ru.vyarus.animalsniffer")
 plugins.apply("org.jetbrains.dokka")
 plugins.apply("org.jetbrains.kotlinx.kover")
 plugins.apply("arrow.publish")
+
+if (needsAbiValidation) {
+  plugins.apply("org.jetbrains.kotlin.library.api-watchdog")
+
+  configure<WatchdogGradleExtension> {
+    statefulClassWithoutEquals = WatchdogSeverity.NONE
+    statefulClassWithoutHashCode = WatchdogSeverity.NONE
+    statefulClassWithoutToString = WatchdogSeverity.NONE
+    inlineFunctionWithLogic = WatchdogSeverity.NONE
+    undocumentedPublicApi = WatchdogSeverity.NONE
+    openApiWithoutSubclassOptIn = WatchdogSeverity.NONE
+    dataClassPublicApi = WatchdogSeverity.NONE
+    exhaustivePublicApi = WatchdogSeverity.NONE
+    functionTypeAliasPublicApi = WatchdogSeverity.NONE
+    pairOrTriplePublicApi = WatchdogSeverity.NONE
+    dslMarkerWithoutExplicitTargets = WatchdogSeverity.NONE
+    inconsistentParameterOrderInOverloads = WatchdogSeverity.NONE
+    javaInterop { enabled = false }
+  }
+}
 
 val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
 tasks {
@@ -171,7 +193,7 @@ if (isKotlinMultiplatform) {
     if (!noWasmWasi) {
       @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
       wasmWasi {
-        nodejs()
+        wasmtime()
       }
     }
 
@@ -181,7 +203,7 @@ if (isKotlinMultiplatform) {
       extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()!!.apply {
         namespace = projectNameWithDots
         compileSdk = 36
-        minSdk = 21
+        minSdk = if (needsAndroidCoreLibraryDesugaring) 24 else 21
         aarMetadata.minCompileSdk = 1
         compilerOptions {
           jvmTarget = requiredJvmTarget
@@ -199,9 +221,10 @@ if (isKotlinMultiplatform) {
     linuxX64()
     linuxArm64()
     watchosSimulatorArm64()
-    if (project.name != "arrow-cache4k") {
-      watchosArm32()
-    }
+    // deprecated in 2.5.0
+    // if (project.name != "arrow-cache4k") {
+    //   watchosArm32()
+    // }
     watchosArm64()
     tvosSimulatorArm64()
     tvosArm64()
@@ -211,10 +234,11 @@ if (isKotlinMultiplatform) {
       iosX64()
     }
     if (project.name != "arrow-cache4k" && project.name != "arrow-optics-compose") {
-      androidNativeX86()
-      androidNativeX64()
-      androidNativeArm32()
-      androidNativeArm64()
+      // deprecated in 2.5.0
+      // androidNativeX86()
+      // androidNativeX64()
+      // androidNativeArm32()
+      // androidNativeArm64()
       watchosDeviceArm64()
     }
     // deprecated in 2.3.20
@@ -327,7 +351,7 @@ dependencies {
   when {
     !isKotlinMultiplatform || !multiplatformWithAndroid -> { }
     needsAndroidCoreLibraryDesugaring ->
-      signature("com.toasttab.android:gummy-bears-api-21:0.16.0:coreLib2@signature")
+      signature("com.toasttab.android:gummy-bears-api-24:0.16.0:coreLib2@signature")
     else ->
       signature("com.toasttab.android:gummy-bears-api-21:0.16.0@signature")
   }

@@ -204,7 +204,7 @@ private class OpticsBodyGenerator(
     val function3Invoke = ctx.irBuiltIns.functionN(3).functions.first { it.name.asString() == "invoke" }.symbol
 
     copyFn.body = DeclarationIrBuilder(ctx, copyFn.symbol).irBlockBody {
-      val lambda = ctx.buildLambda(copyFn, listOf(copyType), unit) { (copyReceiver) ->
+      val lambda = ctx.buildLambda(copyFn, listOf(copyType), unit) { [copyReceiver] ->
         val invoke = irCall(function3Invoke, unit)
         invoke.setDispatch(irGet(blockParam))
         invoke.setRegular(0, irGet(copyReceiver))
@@ -305,10 +305,10 @@ private class OpticsBodyGenerator(
     fieldName: Name,
     ctorTypeArgs: List<IrType>,
   ): IrExpression {
-    val getLambda = ctx.buildLambda(opticFn, listOf(sourceType), focusType) { (s) ->
+    val getLambda = ctx.buildLambda(opticFn, listOf(sourceType), focusType) { [s] ->
       +irReturn(readComponent(source, fieldName, focusType, irGet(s)))
     }
-    val setLambda = ctx.buildLambda(opticFn, listOf(sourceType, focusType), sourceType) { (s, v) ->
+    val setLambda = ctx.buildLambda(opticFn, listOf(sourceType, focusType), sourceType) { [s, v] ->
       val body = if (source.modality == Modality.SEALED) {
         sealedSet(source, sourceType, fieldName, s, v)
       } else {
@@ -384,10 +384,10 @@ private class OpticsBodyGenerator(
     fieldName: Name,
     ctorTypeArgs: List<IrType>,
   ): IrExpression {
-    val getLambda = ctx.buildLambda(opticFn, listOf(sourceType), focusType) { (s) ->
+    val getLambda = ctx.buildLambda(opticFn, listOf(sourceType), focusType) { [s] ->
       +irReturn(readComponent(source, fieldName, focusType, irGet(s)))
     }
-    val reverseGetLambda = ctx.buildLambda(opticFn, listOf(focusType), sourceType) { (v) ->
+    val reverseGetLambda = ctx.buildLambda(opticFn, listOf(focusType), sourceType) { [v] ->
       +irReturn(reconstruct(source, ctorTypeArgs, sourceType, { irGet(v) }, fieldName) { irGet(v) })
     }
     val call = irCall(symbols.isoInvoke, opticFn.returnType, listOf(sourceType, sourceType, focusType, focusType))

@@ -5,6 +5,7 @@ cd jvmOnly
 ./gradlew build
 cd ..
 cd multiplatform
+# ./gradlew kotlinUpgradeYarnLock
 ./gradlew build
 cd ..
 cd ..

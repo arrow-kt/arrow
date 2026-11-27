@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class)
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
 @file:Suppress("API_NOT_AVAILABLE")
@@ -12,13 +12,14 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.core.recover
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -298,7 +299,7 @@ public interface Raise<in Error> {
    * value in this [Map].
    */
   public fun <K, A> Map<K, Either<Error, A>>.bindAll(): Map<K, A> =
-    mapValues { (_, a) -> a.bind() }
+    mapValues { [_, a] -> a.bind() }
 
   @RaiseDSL
   public fun <A> Iterable<Either<Error, A>>.bindAll(): List<A> =
@@ -629,6 +630,7 @@ public inline fun <reified T : Throwable, A, B> catch(block: () -> A, transform:
  *
  */
 @OptIn(ExperimentalExtendedContracts::class)
+@IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
 @RaiseDSL
 public inline fun <Error> Raise<Error>.ensure(condition: Boolean, raise: () -> Error) {
   contract {

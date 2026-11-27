@@ -81,7 +81,7 @@ public fun interface Index<S, I, A> {
       Index { i ->
         POptional(
           getOrModify = { it[i]?.right() ?: it.left() },
-          set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv } }
+          set = { m, v -> m.mapValues { [k, vv] -> if (k == i) v else vv } }
         )
       }
 

@@ -11,7 +11,6 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.RaiseAccumulate
 import arrow.core.raise.mapOrAccumulate
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmName
 
 public inline fun <B, C, D, E> Iterable<B>.zip(
@@ -314,7 +313,6 @@ public fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
  * <!--- KNIT example-iterable-01.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-@OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   combine: (Error, Error) -> Error,
   transform: RaiseAccumulate<Error>.(A) -> B,
@@ -349,7 +347,6 @@ public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
  * <!--- KNIT example-iterable-02.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-@OptIn(ExperimentalTypeInference::class)
 public inline fun <Error, A, B> Iterable<A>.mapOrAccumulate(
   transform: RaiseAccumulate<Error>.(A) -> B,
 ): Either<NonEmptyList<Error>, List<B>> = either {
@@ -608,7 +605,7 @@ public fun <A, B> Iterable<A>.align(b: Iterable<B>): List<Ior<A, B>> =
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A, B> Iterable<Ior<A, B>>.separateIor(): Pair<List<A>, List<B>> =
-  fold(emptyList<A>() to emptyList<B>()) { (l, r), x ->
+  fold(emptyList<A>() to emptyList<B>()) { [l, r], x ->
     x.fold(
       { l + it to r },
       { l to r + it },
@@ -617,7 +614,7 @@ public fun <A, B> Iterable<Ior<A, B>>.separateIor(): Pair<List<A>, List<B>> =
   }
 
 public fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A?>, List<B?>> =
-  fold(emptyList<A>() to emptyList()) { (l, r), x ->
+  fold(emptyList<A>() to emptyList()) { [l, r], x ->
     x.fold(
       { Pair(l + it, r + null) },
       { Pair(l + null, r + it) },
@@ -797,7 +794,7 @@ public fun <A> Iterable<A>.tail(): List<A> =
  * <!--- TEST lines.isEmpty() -->
  */
 public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
-  this.split()?.let { (fa, a) ->
+  this.split()?.let { [fa, a] ->
     listOf(a) + other.interleave(fa)
   } ?: other.toList()
 
@@ -819,7 +816,7 @@ public fun <A> Iterable<A>.interleave(other: Iterable<A>): List<A> =
  */
 @Deprecated("To be removed due to unclear semantics. Please report use cases at https://github.com/arrow-kt/arrow/issues/3675.")
 public fun <A, B> Iterable<A>.unweave(ffa: (A) -> Iterable<B>): List<B> =
-  split()?.let { (fa, a) ->
+  split()?.let { [fa, a] ->
     @Suppress("DEPRECATION")
     ffa(a).interleave(fa.unweave(ffa))
   } ?: emptyList()
@@ -891,7 +888,7 @@ public fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
 
 public fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<V>> =
   fold(emptyMap()) { bs, a ->
-    f(a).align(bs) { (_, ior) ->
+    f(a).align(bs) { [_, ior] ->
       ior.fold(
         { listOf(it) },
         ::identity,

@@ -72,8 +72,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
    */
   override fun <C> first(): PPrism<Pair<S, C>, Pair<T, C>, Pair<A, C>, Pair<B, C>> =
     PPrism(
-      { (s, c) -> getOrModify(s).mapLeft { it to c }.map { it to c } },
-      { (b, c) -> reverseGet(b) to c }
+      { [s, c] -> getOrModify(s).mapLeft { it to c }.map { it to c } },
+      { [b, c] -> reverseGet(b) to c }
     )
 
   /**
@@ -81,8 +81,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
    */
   override fun <C> second(): PPrism<Pair<C, S>, Pair<C, T>, Pair<C, A>, Pair<C, B>> =
     PPrism(
-      { (c, s) -> getOrModify(s).mapLeft { c to it }.map { c to it } },
-      { (c, b) -> c to reverseGet(b) }
+      { [c, s] -> getOrModify(s).mapLeft { c to it }.map { c to it } },
+      { [c, b] -> c to reverseGet(b) }
     )
 
   /**
@@ -92,8 +92,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     PPrism(
       {
         it.fold(
-          { a -> getOrModify(a).mapLeft { l -> Either.Left(l) }.map { r -> Either.Left(r) } },
-          { c -> Either.Right(Either.Right(c)) })
+          { a -> getOrModify(a).mapLeft { l -> Left(l) }.map { r -> Left(r) } },
+          { c -> Right(Right(c)) })
       },
       {
         when (it) {
@@ -110,8 +110,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
     PPrism(
       {
         it.fold(
-          { c -> Either.Right(Either.Left(c)) },
-          { s -> getOrModify(s).mapLeft { l -> Either.Right(l) }.map { r -> Either.Right(r) } })
+          { c -> Right(Left(c)) },
+          { s -> getOrModify(s).mapLeft { l -> Right(l) }.map { r -> Right(r) } })
       },
       { it.map(this::reverseGet) }
     )
@@ -201,8 +201,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
       Prism(
         getOrModify = { e ->
           when (e) {
-            is Either.Left -> e.value.right()
-            is Either.Right -> e.left()
+            is Left -> e.value.right()
+            is Right -> e.left()
           }
         },
         reverseGet = { it.left() }
@@ -216,8 +216,8 @@ public interface PPrism<S, T, A, B> : POptional<S, T, A, B> {
       PPrism(
         getOrModify = { e ->
           when (e) {
-            is Either.Left -> e.left()
-            is Either.Right -> e.value.right()
+            is Left -> e.left()
+            is Right -> e.value.right()
           }
         },
         reverseGet = { it.right() }

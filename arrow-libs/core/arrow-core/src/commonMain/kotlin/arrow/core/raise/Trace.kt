@@ -49,10 +49,10 @@ public value class Trace(internal val exception: CancellationException) {
 }
 
 @ExperimentalTraceApi
-private tailrec fun Trace.stackTraceToStringImpl(): String = innerTrace?.stackTraceToStringImpl() ?: exception.stackTraceToString()
+private fun Trace.stackTraceToStringImpl(): String = innerTrace?.stackTraceToStringImpl() ?: exception.stackTraceToString()
 
 @ExperimentalTraceApi
-private tailrec fun Trace.printStackTraceImpl(): Unit = innerTrace?.printStackTraceImpl() ?: exception.printStackTrace()
+private fun Trace.printStackTraceImpl(): Unit = innerTrace?.printStackTraceImpl() ?: exception.printStackTrace()
 
 @ExperimentalTraceApi
 private tailrec fun MutableList<Throwable>.suppressedExceptionsImpl(trace: Trace) {

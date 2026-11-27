@@ -8,7 +8,6 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import io.kotest.property.forAll
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -136,7 +135,7 @@ class IorTest {
       Triple(Ior.Both("Hello ", 1), Ior.Left("number"), Ior.Both("Hello number", 1)),
       Triple(Ior.Both("Hello number", 1), Ior.Right(1), Ior.Both("Hello number", 2)),
       Triple(Ior.Both("Hello ", 1), Ior.Both("number", 1), Ior.Both("Hello number", 2)),
-    ).forEach { (a, b, expectedResult) ->
+    ).forEach { [a, b, expectedResult] ->
       a.combine(b, String::plus, Int::plus) shouldBe expectedResult
     }
   }

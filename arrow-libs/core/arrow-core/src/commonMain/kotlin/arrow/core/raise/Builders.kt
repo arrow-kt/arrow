@@ -1,6 +1,6 @@
 @file:JvmMultifileClass
 @file:JvmName("RaiseKt")
-@file:OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+@file:OptIn(ExperimentalContracts::class)
 @file:Suppress("API_NOT_AVAILABLE")
 
 package arrow.core.raise
@@ -19,10 +19,11 @@ import arrow.core.Some
 import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.experimental.ExperimentalTypeInference
 import kotlin.jvm.JvmMultifileClass
 import kotlin.jvm.JvmName
 
@@ -228,6 +229,7 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
   override val isTraced: Boolean
     get() = raise.isTraced
 
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   @RaiseDSL
   public fun ensure(condition: Boolean) {
     contract { returns() implies condition }
@@ -255,10 +257,10 @@ public class SingletonRaise<in E>(private val raise: Raise<Unit>) : Raise<E> {
 
   @RaiseDSL
   @JvmName("bindAllNullable")
-  public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, V?>.bindAll(): Map<K, V> = mapValues { [_, v] -> v.bind() }
 
   @JvmName("bindAllOption")
-  public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, Option<V>>.bindAll(): Map<K, V> = mapValues { [_, v] -> v.bind() }
 
   @RaiseDSL
   @JvmName("bindAllNullable")
@@ -321,7 +323,7 @@ public class ResultRaise(private val raise: Raise<Throwable>) : Raise<Throwable>
   public fun <A> Result<A>.bind(): A = fold(::identity) { raise(it) }
 
   @JvmName("bindAllResult")
-  public fun <K, V> Map<K, Result<V>>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, Result<V>>.bindAll(): Map<K, V> = mapValues { [_, v] -> v.bind() }
 
   @RaiseDSL
   @JvmName("bindAllResult")
@@ -395,7 +397,7 @@ public class IorRaise<Error> @PublishedApi internal constructor(
   }
 
   @JvmName("bindAllIor")
-  public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> = mapValues { (_, v) -> v.bind() }
+  public fun <K, V> Map<K, Ior<Error, V>>.bindAll(): Map<K, V> = mapValues { [_, v] -> v.bind() }
 
   @RaiseDSL
   public inline fun <A> recover(

@@ -143,7 +143,7 @@ internal class SagaBuilder(
         null -> Unit
         else -> stack.update(
           function = { listOf(suspend { compensation(res) }) + it },
-          transform = { _, new -> new }
+          transform = { _, new -> @Suppress("UNUSED_EXPRESSION") new }
         )
       }
     }

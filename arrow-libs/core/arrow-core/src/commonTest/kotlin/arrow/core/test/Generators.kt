@@ -182,8 +182,8 @@ private fun <K, A, B, C> Map<K, Triple<Option<A>?, Option<B>?, Option<C>?>>.dest
   val secondMap = mutableMapOf<K, B?>()
   val thirdMap = mutableMapOf<K, C?>()
 
-  this.forEach { (key, triple) ->
-    val (a, b, c) = triple
+  this.forEach { [key, triple] ->
+    val [a, b, c] = triple
 
     if (a != null) {
       firstMap[key] = a.getOrNull()
@@ -206,8 +206,8 @@ private fun <K, A, B> Map<K, Pair<Option<A>?, Option<B>?>>.destructured(): Pair<
   val firstMap = mutableMapOf<K, A?>()
   val secondMap = mutableMapOf<K, B?>()
 
-  this.forEach { (key, pair) ->
-    val (a, b) = pair
+  this.forEach { [key, pair] ->
+    val [a, b] = pair
 
     if (a != null) {
       firstMap[key] = a.getOrNull()

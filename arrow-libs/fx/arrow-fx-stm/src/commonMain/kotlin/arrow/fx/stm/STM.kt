@@ -5,6 +5,8 @@ package arrow.fx.stm
 import arrow.fx.stm.internal.STMTransaction
 import arrow.fx.stm.internal.alterHamtWithHash
 import arrow.fx.stm.internal.lookupHamtWithHash
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -1670,6 +1672,7 @@ public inline fun <A> stm(noinline f: STM.() -> A): STM.() -> A = f
  *
  * `check(b) = if (b.not()) retry() else Unit`
  */
+@IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
 public fun STM.check(b: Boolean): Unit = if (b.not()) retry() else Unit
 
 /**

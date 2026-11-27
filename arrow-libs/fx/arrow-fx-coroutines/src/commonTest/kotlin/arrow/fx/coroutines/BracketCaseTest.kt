@@ -1,3 +1,4 @@
+@file:Suppress("RETURN_VALUE_NOT_USED_COERCION")
 package arrow.fx.coroutines
 
 import arrow.core.Either
@@ -108,7 +109,7 @@ class BracketCaseTest {
     checkAll(10, Arb.int(), Arb.throwable()) { i, e ->
       val promise = CompletableDeferred<ExitCase>()
 
-      Either.catch {
+      val _ = Either.catch {
         bracketCase<Int, Int>(
           acquire = { i },
           use = { throw e },
@@ -165,7 +166,7 @@ class BracketCaseTest {
     checkAll(10, Arb.int(), Arb.throwable()) { x, e ->
       val promise = CompletableDeferred<Pair<Int, ExitCase>>()
 
-      Either.catch {
+      val _ = Either.catch {
         bracketCase<Int, Int>(
           acquire = { x },
           use = { e.suspend() },
@@ -184,7 +185,7 @@ class BracketCaseTest {
     checkAll(10, Arb.int()) { x ->
       val promise = CompletableDeferred<Pair<Int, ExitCase>>()
 
-      Either.catch {
+      val _ = Either.catch {
         bracketCase(
           acquire = { x },
           use = { it },
@@ -203,7 +204,7 @@ class BracketCaseTest {
     checkAll(10, Arb.int()) { x ->
       val promise = CompletableDeferred<Pair<Int, ExitCase>>()
 
-      Either.catch {
+      val _ = Either.catch {
         bracketCase(
           acquire = { x },
           use = { it },

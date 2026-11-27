@@ -1,5 +1,5 @@
 // Klib ABI Dump
-// Targets: [androidNativeArm32, androidNativeArm64, androidNativeX64, androidNativeX86, iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, mingwX64, tvosArm64, tvosSimulatorArm64, wasmJs, wasmWasi, watchosArm32, watchosArm64, watchosDeviceArm64, watchosSimulatorArm64]
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, mingwX64, tvosArm64, tvosSimulatorArm64, wasmJs, wasmWasi, watchosArm64, watchosDeviceArm64, watchosSimulatorArm64]
 // Rendering settings:
 // - Signature version: 2
 // - Show manifest properties: true
@@ -696,8 +696,6 @@ sealed class <#A: out kotlin/Any?> arrow.core/Option { // arrow.core/Option|null
 
 sealed class arrow.core.raise/RaiseCancellationException : arrow.core/ControlCancellationException // arrow.core.raise/RaiseCancellationException|null[0]
 
-final object arrow.core/ArrowCoreInternalException : kotlin/RuntimeException // arrow.core/ArrowCoreInternalException|null[0]
-
 final object arrow.core/EmptyValue { // arrow.core/EmptyValue|null[0]
     final inline fun <#A1: kotlin/Any?, #B1: kotlin/Any?> fold(kotlin/Any?, kotlin/Function0<#B1>, kotlin/Function1<#A1, #B1>): #B1 // arrow.core/EmptyValue.fold|fold(kotlin.Any?;kotlin.Function0<0:1>;kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
     final inline fun <#A1: kotlin/Any?> combine(kotlin/Any?, #A1, kotlin/Function2<#A1, #A1, #A1>): #A1 // arrow.core/EmptyValue.combine|combine(kotlin.Any?;0:0;kotlin.Function2<0:0,0:0,0:0>){0§<kotlin.Any?>}[0]
@@ -1101,9 +1099,3 @@ final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.co
 final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Nothing>, #A>).arrow.core.raise/get(): #A // arrow.core.raise/get|get@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Nothing>,0:0>(){0§<kotlin.Any?>}[0]
 final suspend fun <#A: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<kotlin/Throwable>, #A>).arrow.core.raise/toResult(): kotlin/Result<#A> // arrow.core.raise/toResult|toResult@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<kotlin.Throwable>,0:0>(){0§<kotlin.Any?>}[0]
 final suspend inline fun <#A: kotlin/Any?, #B: kotlin/Any?> (kotlin.coroutines/SuspendFunction1<arrow.core.raise/Raise<#A>, #B>).arrow.core.raise/getOrElse(kotlin/Function1<#A, #B>): #B // arrow.core.raise/getOrElse|getOrElse@kotlin.coroutines.SuspendFunction1<arrow.core.raise.Raise<0:0>,0:1>(kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
-
-// Targets: [js]
-final inline fun arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5(noinline arrow.core.raise/RaiseCancellationExceptionLike, noinline kotlin/Any? = ..., noinline arrow.core.raise/Raise<kotlin/Any?> = ...): arrow.core.raise/RaiseCancellationExceptionLike // arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5|arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_copy_1tks5(arrow.core.raise.RaiseCancellationExceptionLike;kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]
-
-// Targets: [js]
-final inline fun arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo(noinline kotlin/Any? = ..., noinline arrow.core.raise/Raise<kotlin/Any?>): arrow.core.raise/RaiseCancellationExceptionLike // arrow.core.raise/arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo|arrow_core_raise_RaiseCancellationExceptionLike_Companion_4uj3tt_invoke_jkqnwo(kotlin.Any?;arrow.core.raise.Raise<kotlin.Any?>){}[0]

@@ -20,7 +20,7 @@ class MemoizationTest {
 
       val memoized = ::sum.memoize()
 
-      val (first, second) = listOf(
+      val [first, second] = listOf(
         async { memoized() },
         async { memoized() }
       ).awaitAll()

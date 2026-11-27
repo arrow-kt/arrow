@@ -13,7 +13,7 @@ import platform.posix.SIGINT
 import platform.posix.SIGTERM
 import platform.posix.signal
 
-@OptIn(DelicateCoroutinesApi::class, ExperimentalNativeApi::class)
+@OptIn(ExperimentalNativeApi::class)
 internal actual fun AutoCloseScope.process(): Process {
   install(SIGNAL_DISPATCHER)
   val job = SupervisorJob()
@@ -26,7 +26,7 @@ internal actual fun AutoCloseScope.process(): Process {
   return NativeProcess(job)
 }
 
-@OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
+@OptIn(ExperimentalForeignApi::class)
 private class NativeProcess(job: Job) : Process {
   private val scope = CoroutineScope(SIGNAL_DISPATCHER + job)
 

@@ -3,9 +3,9 @@
 
 package arrow.core
 
+import io.kotest.assertions.assertionCounter
 import io.kotest.assertions.AssertionErrorBuilder
 import io.kotest.common.reflection.bestName
-import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
 import io.kotest.matchers.types.beOfType

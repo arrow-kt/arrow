@@ -15,7 +15,7 @@ class FunctionSyntaxTest {
     val ninja = "ninja"
     val get = { potato }
     val map = { word: String -> ninja + word }
-    (get andThen map)()
+    val _ = (get andThen map)()
     (ninja + potato) shouldBe (get andThen map)()
   }
 

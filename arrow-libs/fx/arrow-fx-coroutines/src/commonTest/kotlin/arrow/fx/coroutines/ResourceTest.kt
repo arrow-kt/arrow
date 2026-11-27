@@ -1,3 +1,4 @@
+@file:Suppress("RETURN_VALUE_NOT_USED_COERCION")
 package arrow.fx.coroutines
 
 import arrow.atomic.AtomicBoolean
@@ -46,6 +47,8 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ResourceTest {
 
@@ -66,7 +69,7 @@ class ResourceTest {
       suspend fun ResourceScope.scoped(n: Int): Int =
         install({ n.also(order::add) }, { it, _ -> order.add(-it) })
 
-      resourceScope {
+      val _ = resourceScope {
         val x = scoped(a)
         val y = scoped(x + b)
         y + 1 shouldBe (a + b) + 1
@@ -80,7 +83,7 @@ class ResourceTest {
   fun resourceReleasedWithComplete() = runTest {
     checkAll(10, Arb.int()) { n ->
       val p = CompletableDeferred<ExitCase>()
-      resourceScope {
+      val _ = resourceScope {
         install({ n }) { _, ex -> require(p.complete(ex)) }
       }
       p.shouldHaveCompleted() shouldBe ExitCase.Completed
@@ -108,7 +111,7 @@ class ResourceTest {
 
       val f = async {
         resourceScope {
-          n()
+          val _ = n()
           require(start.complete(Unit))
           awaitCancellation()
         }
@@ -139,7 +142,7 @@ class ResourceTest {
     val exit = CompletableDeferred<ExitCase>()
     either<String, Int> {
       resourceScope {
-        install({ 1 }) { _, ex ->
+        val _ = install({ 1 }) { _, ex ->
           require(exit.complete(ex))
         }
         raise("error")
@@ -218,7 +221,7 @@ class ResourceTest {
 
   private fun generate(): Pair<List<CompletableDeferred<Int>>, Resource<Int>> {
     val promises = (1..depth).map { Pair(it, CompletableDeferred<Int>()) }
-    val res = promises.fold(resource({ 0 }, { _, _ -> })) { acc, (i, promise) ->
+    val res = promises.fold(resource({ 0 }, { _, _ -> })) { acc, [i, promise] ->
       resource {
         install({ acc.bind() + i }) { _, _ ->
           require(promise.complete(i))
@@ -231,11 +234,11 @@ class ResourceTest {
   @Test
   fun parZipFinalizersBlow() = runTestUsingDefaultDispatcher {
     checkAll(3, Arb.int(10..100)) {
-      val (promises, resource) = generate()
+      val [promises, resource] = generate()
       shouldThrow<RuntimeException> {
         resourceScope {
           parZip({
-            resource.bind()
+            val _ = resource.bind()
             throw RuntimeException()
           }, { }) { _, _ -> }
           fail("It should never reach here")
@@ -252,11 +255,11 @@ class ResourceTest {
   fun parZipFinalizersCancel() = runTestUsingDefaultDispatcher {
     checkAll(3, Arb.int(10..100)) {
       val cancel = CancellationException(null, null)
-      val (promises, resource) = generate()
+      val [promises, resource] = generate()
       shouldThrow<CancellationException> {
         resourceScope {
           parZip({}, {
-            resource.bind()
+            val _ = resource.bind()
             throw cancel
           }) { _, _ -> }
           fail("It should never reach here")
@@ -274,7 +277,7 @@ class ResourceTest {
   fun parZipFinalizersLeftOrRightCancellation() = runTestUsingDefaultDispatcher {
     checkAll(10, Arb.boolean()) { isLeft ->
       val cancel = CancellationException(null, null)
-      val (promises, resource) = generate()
+      val [promises, resource] = generate()
       val latch = CompletableDeferred<Int>()
       shouldThrow<CancellationException> {
         resourceScope {
@@ -328,7 +331,7 @@ class ResourceTest {
         }
       }
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -358,7 +361,7 @@ class ResourceTest {
         }
       }
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -386,7 +389,7 @@ class ResourceTest {
 
       } shouldBe throwable
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Failure>()
     }
@@ -413,7 +416,7 @@ class ResourceTest {
         }
       } shouldBe throwable
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Failure>()
     }
@@ -435,7 +438,7 @@ class ResourceTest {
         }
       }
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Completed>()
     }
@@ -457,7 +460,7 @@ class ResourceTest {
         }
       }
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Completed>()
     }
@@ -478,7 +481,7 @@ class ResourceTest {
         }
       } shouldBe throwable
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Completed>()
     }
@@ -499,7 +502,7 @@ class ResourceTest {
         }
       } shouldBe throwable
 
-      val (ii, ex) = released.await()
+      val [ii, ex] = released.await()
       ii shouldBe i
       ex.shouldBeTypeOf<ExitCase.Completed>()
     }
@@ -522,11 +525,11 @@ class ResourceTest {
         }
       } shouldBe throwable
 
-      val (aa, exA) = releasedA.shouldHaveCompleted()
+      val [aa, exA] = releasedA.shouldHaveCompleted()
       aa shouldBe a
       exA.shouldBeTypeOf<ExitCase.Failure>()
 
-      val (bb, exB) = releasedB.shouldHaveCompleted()
+      val [bb, exB] = releasedB.shouldHaveCompleted()
       bb shouldBe b
       exB.shouldBeTypeOf<ExitCase.Failure>()
     }
@@ -549,11 +552,11 @@ class ResourceTest {
         }
       }
 
-      val (aa, exA) = releasedA.shouldHaveCompleted()
+      val [aa, exA] = releasedA.shouldHaveCompleted()
       aa shouldBe a
       exA.shouldBeTypeOf<ExitCase.Cancelled>()
 
-      val (bb, exB) = releasedB.shouldHaveCompleted()
+      val [bb, exB] = releasedB.shouldHaveCompleted()
       bb shouldBe b
       exB.shouldBeTypeOf<ExitCase.Cancelled>()
     }
@@ -604,7 +607,7 @@ class ResourceTest {
   fun allocateWorks() = runTest {
     checkAll(10, Arb.int()) { seed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocated, release) = resource({ seed }) { _, exitCase -> require(released.complete(exitCase)) }
+      val [allocated, release] = resource({ seed }) { _, exitCase -> require(released.complete(exitCase)) }
         .allocate()
 
       allocated shouldBe seed
@@ -622,7 +625,7 @@ class ResourceTest {
       Arb.string().map(::IllegalStateException)
     ) { seed, original, suppressed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocated, release) =
+      val [allocated, release] =
         resource({ seed }) { _, exitCase ->
           require(released.complete(exitCase))
           throw suppressed
@@ -652,7 +655,7 @@ class ResourceTest {
       Arb.string().map(::IllegalStateException)
     ) { seed, cancellation, suppressed ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocated, release) =
+      val [allocated, release] =
         resource({ seed }) { _, exitCase ->
           require(released.complete(exitCase))
           throw suppressed
@@ -713,7 +716,7 @@ class ResourceTest {
       Arb.string().map(::IllegalStateException),
     ) { seed, original, suppressed1, suppressed2 ->
       val released = CompletableDeferred<ExitCase>()
-      val (allocate, release) =
+      val [allocate, release] =
         resource {
           onRelease { exitCase ->
             require(released.complete(exitCase))
@@ -742,7 +745,7 @@ class ResourceTest {
   @Test
   fun allocatedRunsReleasersOnlyOnce() = runTest {
     val released = CompletableDeferred<ExitCase>()
-    val (_, release) =
+    val [_, release] =
       resource {
         onRelease { exitCase ->
           require(released.complete(exitCase))
@@ -753,7 +756,6 @@ class ResourceTest {
     released.shouldHaveCompleted() shouldBe ExitCase.Completed
   }
 
-  @OptIn(ExperimentalStdlibApi::class) // 'AutoCloseable' in stdlib < 2.0
   private class Res : AutoCloseable {
     private val isActive = AtomicBoolean(true)
 
@@ -779,7 +781,7 @@ class ResourceTest {
     val wasActive = Channel<Boolean>(Channel.UNLIMITED)
     val closed = Channel<Res>(Channel.UNLIMITED)
 
-    resourceScope {
+    val _ = resourceScope {
       val r1 = autoClose({ res1 }) { r, _ ->
         closed.trySend(r).getOrThrow()
         r.shutdown()
@@ -876,9 +878,9 @@ class ResourceTest {
     }
 
     resourceScope {
-      install({
-        install({
-          install({ res1 }, releaser)
+      val _ = install({
+        val _ = install({
+          val _ = install({ res1 }, releaser)
           res2
         }, releaser)
         res3
@@ -893,9 +895,9 @@ class ResourceTest {
 
   @Test
   fun resourceScopeWaitsOnManagedCoroutineScope() = runTest {
-    resourceScope {
+    val _ = resourceScope {
       val scope = ManagedCoroutineScope(StandardTestDispatcher(testScheduler))
-      scope.launch { delay(1000) }
+      scope.launch { delay(1.seconds) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -951,11 +953,11 @@ class ResourceTest {
       val supervisor = ManagedSupervisorScope(nestedContext)
       supervisor.launch {
         channel.send("start nested")
-        delay(100)
+        delay(100.milliseconds)
         channel.send("end nested")
       }
       supervisor.launch {
-        delay(50)
+        delay(50.milliseconds)
         error("boom.")
       }
 

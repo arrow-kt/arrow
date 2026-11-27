@@ -11,6 +11,8 @@ import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.awaitAll
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyRequiredParameterAfterOptional
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -87,6 +89,7 @@ public suspend inline fun <A, B, C> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -101,7 +104,7 @@ public suspend inline fun <A, B, C> parZip(
   return coroutineScope {
     val faa = async(ctx) { fa() }
     val fbb = async(ctx) { fb() }
-    val (a, b) = awaitAll(faa, fbb)
+    val [a, b] = awaitAll(faa, fbb)
     f(a as A, b as B)
   }
 }
@@ -184,6 +187,7 @@ public suspend inline fun <A, B, C, D> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -201,7 +205,7 @@ public suspend inline fun <A, B, C, D> parZip(
     val faa = async(ctx) { fa() }
     val fbb = async(ctx) { fb() }
     val fcc = async(ctx) { fc() }
-    val (a, b, c) = awaitAll(faa, fbb, fcc)
+    val [a, b, c] = awaitAll(faa, fbb, fcc)
     f(a as A, b as B, c as C)
   }
 }
@@ -291,6 +295,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D, E> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -311,7 +316,7 @@ public suspend inline fun <A, B, C, D, E> parZip(
     val fbb = async(ctx) { fb() }
     val fcc = async(ctx) { fc() }
     val fdd = async(ctx) { fd() }
-    val (a, b, c, d) = awaitAll(faa, fbb, fcc, fdd)
+    val [a, b, c, d] = awaitAll(faa, fbb, fcc, fdd)
     f(a as A, b as B, c as C, d as D)
   }
 }
@@ -408,6 +413,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D, E, F> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -431,7 +437,7 @@ public suspend inline fun <A, B, C, D, E, F> parZip(
     val fcc = async(ctx) { fc() }
     val fdd = async(ctx) { fd() }
     val fee = async(ctx) { fe() }
-    val (a, b, c, d, e) = awaitAll(faa, fbb, fcc, fdd, fee)
+    val [a, b, c, d, e] = awaitAll(faa, fbb, fcc, fdd, fee)
     f(a as A, b as B, c as C, d as D, e as E)
   }
 }
@@ -534,6 +540,7 @@ public suspend inline fun <A, B, C, D, E, F, G> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D, E, F, G> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -669,6 +676,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D, E, F, G, H> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -813,6 +821,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D, E, F, G, H, I> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,
@@ -966,6 +975,7 @@ public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
  * @see parZip for a function that ensures operations run in parallel on the [Dispatchers.Default].
  */
 @Suppress("LEAKED_IN_PLACE_LAMBDA")
+@IntentionallyRequiredParameterAfterOptional(reason = ExemptionReason.FOR_BACKWARDS_COMPATIBILITY)
 public suspend inline fun <A, B, C, D, E, F, G, H, I, J> parZip(
   ctx: CoroutineContext = EmptyCoroutineContext,
   crossinline fa: suspend CoroutineScope.() -> A,

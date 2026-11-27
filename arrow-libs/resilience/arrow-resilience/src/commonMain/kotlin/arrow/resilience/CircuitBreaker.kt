@@ -68,7 +68,7 @@ import kotlin.time.TimeSource
  *   Either.catch { circuitBreaker.protectOrThrow { throw RuntimeException("Service overloaded") } }.also(::println)
  *   circuitBreaker.protectEither { }.also { println("I am Open and short-circuit with ${it}. ${circuitBreaker.state()}") }
  *
- *   println("Service recovering . . .").also { delay(2000) }
+ *   println("Service recovering . . .").also { delay(2.seconds) }
  *
  *   circuitBreaker.protectOrThrow { "I am running test-request in HalfOpen: ${circuitBreaker.state()}" }.also(::println)
  *   println("I am back to normal state closed ${circuitBreaker.state()}")
@@ -113,7 +113,7 @@ import kotlin.time.TimeSource
  *     resilient(Schedule.recurs(5), ::apiCall)
  *   }.let { println("recurs(5) apiCall twice and 4x short-circuit result from CircuitBreaker: $it") }
  *
- *   delay(2000)
+ *   delay(2.seconds)
  *   println("CircuitBreaker ready to half-open")
  *
  *   // Retry once and when the CircuitBreaker opens after 2 failures then retry with exponential back-off with same time as CircuitBreaker's resetTimeout
@@ -266,7 +266,7 @@ private constructor(
       onHalfOpen.invoke()
       task.invoke()
     }) {
-      val (value, timeout) = when (it) {
+      val [value, timeout] = when (it) {
         is ExitCase.Completed -> return@guaranteeCase
         // We need to return to Open state, otherwise we get stuck in Half-Open (see https://github.com/monix/monix/issues/1080 )
         is ExitCase.Cancelled -> lastStartedAt to resetTimeout

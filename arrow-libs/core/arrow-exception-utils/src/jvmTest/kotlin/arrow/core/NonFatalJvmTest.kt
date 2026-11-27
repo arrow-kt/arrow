@@ -1,7 +1,7 @@
 package arrow.core
 
+import io.kotest.assertions.assertionCounter
 import io.kotest.assertions.AssertionErrorBuilder.Companion.fail
-import io.kotest.matchers.assertionCounter
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test

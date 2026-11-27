@@ -3,6 +3,8 @@ package arrow.collectors
 import arrow.atomic.Atomic
 import arrow.atomic.AtomicInt
 import arrow.atomic.update
+import kotlinx.library.watchdog.ExemptionReason
+import kotlinx.library.watchdog.IntentionallyBooleanParameter
 
 /**
  * Library of [Collector]s.
@@ -45,6 +47,7 @@ public object Collectors {
     finish = AtomicInt::get,
   )
 
+  @IntentionallyBooleanParameter(reason = ExemptionReason.API_DESIGN)
   public fun <M> reducer(
     initial: () -> M, combine: (M, M) -> M, unordered: Boolean = false,
   ): NonSuspendCollector<M, M> = Collector.nonSuspendOf(
@@ -103,7 +106,7 @@ public object Collectors {
    * Collects all the values in a map.
    */
   public fun <K, V> mapFromEntries(): NonSuspendCollector<Map.Entry<K, V>, Map<K, V>> =
-    map<K, V>().contramapNonSuspend { (k, v) -> k to v }
+    map<K, V>().contramapNonSuspend { [k, v] -> k to v }
 
   /**
    * Collects all the values in a map.
@@ -130,7 +133,7 @@ public object Collectors {
 
   private val _map: NonSuspendCollector<Pair<Any?, Any?>, Map<Any?, Any?>> = Collector.nonSuspendOf(
     supply = { mutableMapOf<Any?, Any?>() },
-    accumulate = { current, (k, v) -> current[k] = v },
+    accumulate = { current, [k, v] -> current[k] = v },
     finish = { it },
     characteristics = Characteristics.IDENTITY_UNORDERED
   )
