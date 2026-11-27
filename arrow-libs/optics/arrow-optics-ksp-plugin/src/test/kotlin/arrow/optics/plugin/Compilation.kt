@@ -53,7 +53,7 @@ fun String.evals(thing: Pair<String, Any?>, contextParameters: Boolean = false) 
   val compilationResult = compile(this, contextParameters = contextParameters)
   compilationResult.exitCode.shouldBe(KotlinCompilation.ExitCode.OK, compilationResult.messages)
   val classesDirectory = compilationResult.outputDirectory
-  val (variable, output) = thing
+  val [variable, output] = thing
   eval(variable, classesDirectory) shouldBe output
 }
 
